@@ -1,0 +1,75 @@
+/**
+ * @file sensor_manager.hpp
+ *
+ * @copyright 2017 John Harwell, All rights reserved.
+ *
+ * This file is part of FORDYCA.
+ *
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#ifndef INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_
+
+/*******************************************************************************
+ * Includes
+ ******************************************************************************/
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+
+/*******************************************************************************
+ * Namespaces
+ ******************************************************************************/
+namespace fordyca {
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+class sensor_manager {
+ public:
+  /* constructors */
+  sensor_manager();
+
+  /* member functions */
+
+ private:
+  /* member functions */
+  /*
+   * Calculates the vector to the light. Used to perform
+   * phototaxis and antiphototaxis.
+   */
+  argos::CVector2 calc_vector_to_light(void);
+
+  /*
+   * Calculates the diffusion vector. If there is a close obstacle, it points
+   * away from it; it there is none, it points forwards.  The b_collision
+   * parameter is used to return true or false whether a collision avoidance
+   * just happened or not. It is necessary for the collision rule.
+   */
+  argos::CVector2 calc_diffusion_vector(const bool& b_collision);
+
+  /* Pointer to the range and bearing sensor */
+  argos::CCI_RangeAndBearingSensor* rabs_;
+  /* Pointer to the foot-bot proximity sensor */
+  argos::CCI_FootBotProximitySensor* proximity_;
+  /* Pointer to the foot-bot light sensor */
+  argos::CCI_FootBotLightSensor* light_;
+  /* Pointer to the foot-bot motor ground sensor */
+  argos::CCI_FootBotMotorGroundSensor* ground_;
+};
+
+} /* namespace fordyca */
+
+#endif /* INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_ */
