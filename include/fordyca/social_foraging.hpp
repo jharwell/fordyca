@@ -1,5 +1,5 @@
 n/**
- * @file footbot_foraging.hpp
+ * @file social_foraging.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -31,6 +31,7 @@ n/**
 #include "fordyca/parameter_parser.hpp"
 #include "fordyca/sensor_manager.hpp"
 #include "fordyca/actuator_manager.hpp"
+#include "fordyca/social_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -144,7 +145,7 @@ class foraging_base : public argos::CCI_Controller {
   } m_eLastExplorationResult;
 
   /* The controller state information */
-  state_machine state_;
+  social_foraging_fsm fsm_;
   parameter_parser params_;
   actuator_manager actuators_;
   sensor_manager sensors_;

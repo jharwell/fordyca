@@ -1,5 +1,5 @@
 /**
- * @file footbot_foraging.cpp
+ * @file social_foraging.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -179,6 +179,7 @@ void Init(TConfigurationNode& t_node) {
 /****************************************/
 
 void ControlStep() {
+  UpdateState();
    switch(m_sStateData.State) {
       case SStateData::STATE_RESTING: {
          Rest();
@@ -266,29 +267,28 @@ CVector2 calc_vector_to_light() {
 /****************************************/
 /****************************************/
 
-CVector2 calc_diffusion_vector(bool& b_collision) {
-   /* Get readings from proximity sensor */
-   const CCI_FootBotProximitySensor::TReadings& tProxReads = m_pcProximity->GetReadings();
-   /* Sum them together */
-   CVector2 ccalc_diffusion_vector;
-   for(size_t i = 0; i < tProxReads.size(); ++i) {
-      ccalc_diffusion_vector += CVector2(tProxReads[i].Value, tProxReads[i].Angle);
-   }
-   /*
-    * If the angle of the vector is small enough and the closest obstacle is far
-    * enough, ignore the vector and go straight, otherwise return it
-    */
-   if(m_sDiffusionParams.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-      ccalc_diffusion_vector.Length() < m_sDiffusionParams.Delta ) {
-      b_collision = false;
-      return CVector2::X;
-   }
-   else {
-      b_collision = true;
-      ccalc_diffusion_vector.Normalize();
-      return -ccalc_diffusion_vector;
-   }
-}
+/* CVector2 calc_diffusion_vector(bool& b_collision) { */
+/*    /\* Get readings from proximity sensor *\/ */
+/*    const CCI_FootBotProximitySensor::TReadings& tProxReads = m_pcProximity->GetReadings(); */
+/*    /\* Sum them together *\/ */
+/*    CVector2 ccalc_diffusion_vector; */
+/*    for(size_t i = 0; i < tProxReads.size(); ++i) { */
+/*       ccalc_diffusion_vector += CVector2(tProxReads[i].Value, tProxReads[i].Angle); */
+/*    } */
+/*    /\* If the angle of the vector is small enough and the closest obstacle */
+/*       is far enough, ignore the vector and go straight, otherwise return */
+/*       it *\/ */
+/*    if(m_sDiffusionParams.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) && */
+/*       ccalc_diffusion_vector.Length() < m_sDiffusionParams.Delta ) { */
+/*       b_collision = false; */
+/*       return CVector2::X; */
+/*    } */
+/*    else { */
+/*       b_collision = true; */
+/*       ccalc_diffusion_vector.Normalize(); */
+/*       return -ccalc_diffusion_vector; */
+/*    } */
+/* } */
 
 /****************************************/
 /****************************************/
@@ -491,6 +491,25 @@ void Explore() {
          SetWheelSpeedsFromVector(m_sWheelTurningParams.max_speed * cDiffusion);
       }
    }
+}
+
+bool calc_diffusion_vector(CVector2* const vector) {
+  /* Get readings from proximity sensor */
+  const CCI_FootBotProximitySensor::TReadings& tProxReads = m_pcProximity->GetReadings();
+  /* Sum them together */
+  CVector2 ccalc_diffusion_vector;
+  for(size_t i = 0; i < tProxReads.size(); ++i) {
+    *vector += CVector2(tProxReads[i].Value, tProxReads[i].Angle);
+  }
+  /*
+   * If the angle of the vector is small enough and the closest obstacle is far
+   * enough, ignore the vector and go straight, otherwise return it
+   */
+  if(m_sDiffusionParams.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
+     ccalc_diffusion_vector.Length() < m_sDiffusionParams.Delta ) {
+    return false;
+  }
+  return true;
 }
 
 /****************************************/

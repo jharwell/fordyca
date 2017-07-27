@@ -117,7 +117,7 @@ void CForagingLoopFunctions::PreStep() {
        ++it) {
       /* Get handle to foot-bot entity and controller */
       CFootBotEntity& cFootBot = *any_cast<CFootBotEntity*>(it->second);
-      CFootBotForaging& cController = dynamic_cast<CFootBotForaging&>(cFootBot.GetControllableEntity().GetController());
+      foraging_base& cController = dynamic_cast<foraging_base&>(cFootBot.GetControllableEntity().GetController());
       /* Count how many foot-bots are in which state */
       if(! cController.IsResting()) ++unWalkingFBs;
       else ++unRestingFBs;
@@ -126,7 +126,7 @@ void CForagingLoopFunctions::PreStep() {
       cPos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
                cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
       /* Get food data */
-      CFootBotForaging::SFoodData& sFoodData = cController.GetFoodData();
+      foraging_base::SFoodData& sFoodData = cController.GetFoodData();
       /* The foot-bot has a food item */
       if(sFoodData.has_item_) {
          /* Check whether the foot-bot is in the nest */
