@@ -94,62 +94,57 @@ struct wheel_turning_params {
   void Init(argos::TConfigurationNode& t_tree);
 };
 
-struct state_machine_params {
-  /* Initial probability to switch from resting to exploring */
-  argos::Real initial_rest_to_explore_prob;
+  struct prob_deltas {
+    /* The increase of explore_to_rest_prob due to the food rule */
+    argos::Real food_rule_explore_to_rest;
 
-  /* Current probability to switch from resting to exploring */
-  argos::Real curr_rest_to_explore_prob;
+    /* The increase of curr_rest_to_explore_prob due to the food rule */
+    argos::Real food_rule_rest_to_explore;
+
+    /* The increase of explore_to_rest_prob due to the collision rule */
+    argos::Real collision_rule_explore_to_rest;
+
+    /* The increase of curr_rest_to_explore_prob due to the social rule */
+    argos::Real social_rule_rest_to_explore;
+
+    /* The increase of explore_to_rest_prob due to the social rule */
+    argos::Real social_rule_explore_to_rest;
+
+  };
+
+  struct threshold_times {
+    /* The minimum number of steps in resting state before the robots
+       starts thinking that it's time to move */
+    size_t min_rested;
+
+    /* The number of exploration steps without finding food after which
+       a foot-bot starts thinking about going back to the nest */
+    size_t max_unsuccessful_explore;
+    /*
+     * If the robots switched to resting as soon as it enters the nest, there
+     * would be overcrowding of robots in the border between the nest and the
+     * rest of the arena. To overcome this issue, the robot spends some time
+     * looking for a place in the nest before finally settling. The following
+     * variable contains the minimum time the robot must spend in state 'return
+     * to nest' looking for a place in the nest before switching to the resting
+     * state.
+     */
+    size_t min_search_for_place_in_nest;
+
+  };
+
+struct social_fsm_config {
+  /* Initial probability to switch from resting to exploring */
+  argos::Real initial_rest_to_explore_prob_;
 
   /* Initial probability to switch from exploring to resting */
-  argos::Real initial_explore_to_rest_prob;
+  argos::Real initial_explore_to_rest_prob_;
 
-  /* Current probability to switch from exploring to resting */
-  argos::Real explore_to_rest_prob;
-
-  /* Used as a range for uniform number generation */
-  argos::CRange<argos::Real> prob_range;
-
-  /* The increase of explore_to_rest_prob due to the food rule */
-  argos::Real FoodRuleExploreToRestDeltaProb;
-
-  /* The increase of curr_rest_to_explore_prob due to the food rule */
-  argos::Real FoodRuleRestToExploreDeltaProb;
-
-  /* The increase of explore_to_rest_prob due to the collision rule */
-  argos::Real CollisionRuleExploreToRestDeltaProb;
-
-  /* The increase of curr_rest_to_explore_prob due to the social rule */
-  argos::Real SocialRuleRestToExploreDeltaProb;
-
-  /* The increase of explore_to_rest_prob due to the social rule */
-  argos::Real SocialRuleExploreToRestDeltaProb;
-
-  /* The minimum number of steps in resting state before the robots
-     starts thinking that it's time to move */
-  size_t MinimumRestingTime;
-  /* The number of steps in resting state */
-  size_t TimeRested;
-  /* The number of exploration steps without finding food after which
-     a foot-bot starts thinking about going back to the nest */
-  size_t MinimumUnsuccessfulExploreTime;
-  /* The number of exploration steps without finding food */
-  size_t TimeExploringUnsuccessfully;
-  /* If the robots switched to resting as soon as it enters the nest,
-     there would be overcrowding of robots in the border between the
-     nest and the rest of the arena. To overcome this issue, the robot
-     spends some time looking for a place in the nest before finally
-     settling. The following variable contains the minimum time the
-     robot must spend in state 'return to nest' looking for a place in
-     the nest before switching to the resting state. */
-  size_t MinimumSearchForPlaceInNestTime;
-  /* The time spent searching for a place in the nest */
-  size_t TimeSearchingForPlaceInNest;
-
-  state_machine_params();
-  void Init(argos::TConfigurationNode& t_node);
-  void Reset();
+  struct prob_deltas deltas;
+  struct threshold_times times;
 };
+
+
 
 } /* namespace fordyca */
 

@@ -24,7 +24,6 @@ n/**
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include "fordyca/fordyca_params.hpp"
 #include "fordyca/state_machine.hpp"
