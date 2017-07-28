@@ -28,6 +28,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
+#include "fordyca/forydca_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,27 +41,35 @@ namespace fordyca {
 class actuator_manager {
  public:
   /* constructors */
-  actuator_manager(void);
+  actuator_manager(const struct actuator_params& params) : mc_params(params) {}
 
   /* member functions */
   void leds_set_color(const argos::CColor& color) {
-    pc_leds_->SetAllColors(color);
+    m_leds_->SetAllColors(color);
   }
 
   /*
    * Gets a direction vector as input and transforms it into wheel
    * actuation.
    */
-  void SetWheelSpeeds(const argos::CVector2& c_heading);
-
+  void set_wheels_speeds(const argos::CVector2& c_heading);
 
  private:
-  /* differential steering actuator */
-  argos::CCI_DifferentialSteeringActuator* pc_wheels_;
-  /* LEDs actuator */
-  argos::CCI_LEDsActuator* pc_leds_;
-  /* Range and bearing actuator */
-  argos::CCI_RangeAndBearingActuator*  pr_raba_;
+  /*
+   * The robot can be in three different turning states.
+   */
+  enum turning_state {
+    NO_TURN = 0, // go straight
+    SOFT_TURN,   // both wheels are turning forwards, but at different speeds
+    HARD_TURN    // wheels are turning with opposite speeds
+  };
+
+  argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
+  argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
+  argos::CCI_RangeAndBearingActuator*      m_rabs;    /* Range and bearing */
+  enum turning_state                       m_turning_state;
+  const struct actuator_params&            mc_params;
+
 };
 
 } /* namespace fordyca */

@@ -28,21 +28,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-/*******************************************************************************
- * Constant Definitions
- ******************************************************************************/
-
-/*******************************************************************************
- * Structure Definitions
- ******************************************************************************/
-
-/*******************************************************************************
- * Global Variables
- ******************************************************************************/
-
-/*******************************************************************************
- * Forward Declarations
- ******************************************************************************/
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -53,7 +38,7 @@ NS_START(fordyca);
  ******************************************************************************/
 bool sensor_manager::calc_diffusion_vector(argos::CVector2& vector) {
   /* Get readings from proximity sensor */
-  const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = proximity_->GetReadings();
+  const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
   /* Sum them together */
   argos::CVector2 ccalc_diffusion_vector;
   for(size_t i = 0; i < tProxReads.size(); ++i) {
@@ -63,11 +48,30 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2& vector) {
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it
    */
-  if(m_sDiffusionParams.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-     ccalc_diffusion_vector.Length() < m_sDiffusionParams.Delta ) {
+  if(m_params.diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
+     ccalc_diffusion_vector.Length() < m_params.diffusion.delta) {
     return false;
   }
   return true;
 }
+
+CVector2 sensor_manager::calc_vector_to_light(void) {
+  /* Get readings from light sensor */
+  const CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
+  /* Sum them together */
+  CVector2 cAccumulator;
+  for(size_t i = 0; i < tLightReads.size(); ++i) {
+    cAccumulator += CVector2(tLightReads[i].Value, tLightReads[i].Angle);
+  }
+  /* If the light was perceived, return the vector */
+  if(cAccumulator.Length() > 0.0f) {
+    return CVector2(1.0f, cAccumulator.Angle());
+  }
+  /* Otherwise, return zero */
+  else {
+    return CVector2();
+  }
+}
+
 
 NS_END(fordyca);

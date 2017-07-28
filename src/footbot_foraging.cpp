@@ -132,9 +132,9 @@ foraging_base() :
    pc_wheels_(NULL),
    pc_leds_(NULL),
    pr_raba_(NULL),
-   rabs_(NULL),
+   m_rabs(NULL),
    m_pcProximity(NULL),
-   light_(NULL),
+   m_light(NULL),
    m_pcGround(NULL),
    m_pcRNG(NULL) {}
 
@@ -149,9 +149,9 @@ void Init(TConfigurationNode& t_node) {
       pc_wheels_    = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
       pc_leds_      = GetActuator<CCI_LEDsActuator                >("leds"                 );
       pr_raba_      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing"    );
-      rabs_      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing"    );
+      m_rabs      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing"    );
       m_pcProximity = GetSensor  <CCI_FootBotProximitySensor      >("footbot_proximity"    );
-      light_     = GetSensor  <CCI_FootBotLightSensor          >("footbot_light"        );
+      m_light     = GetSensor  <CCI_FootBotLightSensor          >("footbot_light"        );
       m_pcGround    = GetSensor  <CCI_FootBotMotorGroundSensor    >("footbot_motor_ground" );
       /*
        * Parse XML parameters
@@ -247,7 +247,7 @@ void UpdateState() {
 
 CVector2 calc_vector_to_light() {
    /* Get readings from light sensor */
-   const CCI_FootBotLightSensor::TReadings& tLightReads = light_->GetReadings();
+   const CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
    /* Sum them together */
    CVector2 cAccumulator;
    for(size_t i = 0; i < tLightReads.size(); ++i) {
@@ -295,23 +295,23 @@ CVector2 calc_diffusion_vector(bool& b_collision) {
 
 void SetWheelSpeedsFromVector(const CVector2& c_heading) {
    /* Get the heading angle */
-   CRadians cHeadingAngle = c_heading.Angle().SignedNormalize();
+   CRadians heading_angle = c_heading.Angle().SignedNormalize();
    /* Get the length of the heading vector */
    Real fHeadingLength = c_heading.Length();
    /* Clamp the speed so that it's not greater than max_speed */
    Real fBaseAngularWheelSpeed = Min<Real>(fHeadingLength, m_sWheelTurningParams.max_speed);
 
    /* Turning state switching conditions */
-   if(Abs(cHeadingAngle) <= m_sWheelTurningParams.NoTurnAngleThreshold) {
+   if(Abs(heading_angle) <= m_sWheelTurningParams.NoTurnAngleThreshold) {
       /* No Turn, heading angle very small */
       m_sWheelTurningParams.TurningMechanism = SWheelTurningParams::NO_TURN;
    }
-   else if(Abs(cHeadingAngle) > m_sWheelTurningParams.hard_turn_threshold) {
+   else if(Abs(heading_angle) > m_sWheelTurningParams.hard_turn_threshold) {
       /* Hard Turn, heading angle very large */
       m_sWheelTurningParams.TurningMechanism = SWheelTurningParams::HARD_TURN;
    }
    else if(m_sWheelTurningParams.TurningMechanism == SWheelTurningParams::NO_TURN &&
-           Abs(cHeadingAngle) > m_sWheelTurningParams.soft_turn_threshold) {
+           Abs(heading_angle) > m_sWheelTurningParams.soft_turn_threshold) {
       /* Soft Turn, heading angle in between the two cases */
       m_sWheelTurningParams.TurningMechanism = SWheelTurningParams::SOFT_TURN;
    }
@@ -328,7 +328,7 @@ void SetWheelSpeedsFromVector(const CVector2& c_heading) {
 
       case SWheelTurningParams::SOFT_TURN: {
          /* Both wheels go straight, but one is faster than the other */
-         Real fSpeedFactor = (m_sWheelTurningParams.hard_turn_threshold - Abs(cHeadingAngle)) / m_sWheelTurningParams.hard_turn_threshold;
+         Real fSpeedFactor = (m_sWheelTurningParams.hard_turn_threshold - Abs(heading_angle)) / m_sWheelTurningParams.hard_turn_threshold;
          fSpeed1 = fBaseAngularWheelSpeed - fBaseAngularWheelSpeed * (1.0 - fSpeedFactor);
          fSpeed2 = fBaseAngularWheelSpeed + fBaseAngularWheelSpeed * (1.0 - fSpeedFactor);
          break;
@@ -344,7 +344,7 @@ void SetWheelSpeedsFromVector(const CVector2& c_heading) {
 
    /* Apply the calculated speeds to the appropriate wheels */
    Real fLeftWheelSpeed, fRightWheelSpeed;
-   if(cHeadingAngle > CRadians::ZERO) {
+   if(heading_angle > CRadians::ZERO) {
       /* Turn Left */
       fLeftWheelSpeed  = fSpeed1;
       fRightWheelSpeed = fSpeed2;
@@ -380,7 +380,7 @@ void Rest() {
        * Social rule: listen to what other people have found and modify
        * probabilities accordingly
        */
-      const CCI_RangeAndBearingSensor::TReadings& tPackets = rabs_->GetReadings();
+      const CCI_RangeAndBearingSensor::TReadings& tPackets = m_rabs->GetReadings();
       for(size_t i = 0; i < tPackets.size(); ++i) {
          switch(tPackets[i].Data[0]) {
             case LAST_EXPLORATION_SUCCESSFUL: {

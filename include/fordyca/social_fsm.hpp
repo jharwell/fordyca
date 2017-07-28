@@ -42,11 +42,11 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class social_fsm : public fsm::base_fsm {
  public:
-  social_fsm(const struct social_fsm_config& config,
+  social_fsm(const struct social_fsm_params& config,
              sensor_manager& sensors,
              actuator_manager& actuators) :
       fsm::base_fsm(ST_MAX_STATES),
-      m_config(config),
+      mc_params(config),
       m_sensors(sensors),
       m_actuators(actuators) {}
 
@@ -128,7 +128,7 @@ class social_fsm : public fsm::base_fsm {
     ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
   };
-  const struct social_fsm_config m_config;
+  const struct social_fsm_params& mc_params;
   struct fsm_state m_state;
   sensor_manager& m_sensors;
   actuator_manager& m_actuators;

@@ -42,11 +42,11 @@ NS_START(fordyca);
 class sensor_manager {
  public:
   /* constructors */
-  sensor_manager();
+  sensor_manager(const struct sensor_params& params) : mc_params(params) {}
 
   /* member functions */
   const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {
-    return rabs_->GetReadings();
+    return m_rabs->GetReadings();
   }
 
   /*
@@ -56,23 +56,19 @@ class sensor_manager {
    * just happened or not. It is necessary for the collision rule.
    */
   bool calc_diffusion_vector(argos::CVector2& vector);
-
- private:
-  /* member functions */
   /*
    * Calculates the vector to the light. Used to perform
    * phototaxis and antiphototaxis.
    */
   argos::CVector2 calc_vector_to_light(void);
 
-  /* Pointer to the range and bearing sensor */
-  argos::CCI_RangeAndBearingSensor* rabs_;
-  /* Pointer to the foot-bot proximity sensor */
-  argos::CCI_FootBotProximitySensor* proximity_;
-  /* Pointer to the foot-bot light sensor */
-  argos::CCI_FootBotLightSensor* light_;
-  /* Pointer to the foot-bot motor ground sensor */
-  argos::CCI_FootBotMotorGroundSensor* ground_;
+ private:
+
+  argos::CCI_RangeAndBearingSensor*    m_rabs; /* range and bearing sensor */
+  argos::CCI_FootBotProximitySensor*   m_proximity; /* proximity sensor */
+  argos::CCI_FootBotLightSensor*       m_light; /* light sensor */
+  argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
+  const struct sensor_params&          mc_params;
 };
 
 NS_END(fordyca);
