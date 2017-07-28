@@ -29,6 +29,7 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/angles.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -128,7 +129,8 @@ struct actuator_params {
 
 struct sensor_params {
   struct diffusion_params diffusion;
-}
-  NS_END(fordyca);
+};
+
+NS_END(fordyca);
 
 #endif /* INCLUDE_FORDYCA_PARAMS_HPP_ */

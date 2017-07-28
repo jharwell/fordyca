@@ -56,7 +56,7 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
    * If we have stayed here enough, probabilistically switch to 'exploring'
    */
   if (mc_params.times.min_rested > m_state.time_rested &&
-      m_pcRNG->Uniform(mc_params.prob_range) < m_state.rest_to_explore_prob) {
+      m_rng->Uniform(mc_params.prob_range) < m_state.rest_to_explore_prob) {
     internal_event(ST_EXPLORE);
   }
 
@@ -64,7 +64,7 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
   ++m_state.time_rested;
   /* Be sure not to send the last exploration result multiple times */
   if (m_state.time_rested == 1) {
-    pr_raba_->SetData(0, LAST_EXPLORATION_NONE);
+    m_actuators.send_last_explore_result(LAST_EXPLORATION_NONE);
   }
   /*
    * Social rule: listen to what other people have found and modify
@@ -81,10 +81,10 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
         break;
       }
       case LAST_EXPLORATION_UNSUCCESSFUL: {
-        m_state.explore_to_rest_prob += m_state.SocialRuleExploreToRestDeltaProb;
+        m_state.explore_to_rest_prob += mc_params.deltas.social_rule_explore_to_rest;
         m_state.prob_range.TruncValue(m_state.explore_to_rest_prob);
-        m_state.RestToExploreProb -= m_state.social_rule_rest_to_explore_prob_delta_;
-        m_state.prob_range.TruncValue(m_state.RestToExploreProb);
+        m_state.rest_to_explore_prob -= mc_params.deltas.social_rule_rest_to_explore;
+        m_state.prob_range.TruncValue(m_state.rest_to_explore_prob);
         break;
       }
     }
@@ -93,7 +93,18 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
 
 EXIT_DEFINE(social_fsm, exit_rest) {
   m_state.time_rested = 0;
+  /*
+   * The vector returned by calc_vector_to_light() points to
+   * the light. Thus, the minus sign is because we want to go away
+   * from the light.
+   */
+  argos::CVector2 diff_vector;
+  m_sensors.calc_diffusion_vector(&diff_vector);
+  m_actuators.set_wheel_speeds(
+      m_actuators.max_wheel_speed() * diff_vector -
+      m_actuators.max_wheel_speed() * 0.25f * m_sensors.calc_vector_to_light());
 }
+
 
 ENTRY_DEFINE(social_fsm, entry_rest, fsm::no_event_data) {
   m_actuators.leds_set_color(argos::CColor::BLACK);
@@ -122,7 +133,7 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
    * nest' if we have been wandering for some time and found nothing.
    */
    if (m_state.time_exploring_unsuccessfully > mc_params.times.max_unsuccessful_explore) {
-    if (m_pcRNG->Uniform(m_state.prob_range) < m_state.explore_to_rest_prob) {
+    if (m_rng->Uniform(m_state.prob_range) < m_state.explore_to_rest_prob) {
       external_event(ST_EXPLORE_FAIL);
     }
     /* Apply the food rule, increasing explore_to_rest_prob and
@@ -137,13 +148,14 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
   ++m_state.time_exploring_unsuccessfully;
 
   /* Get the diffusion vector to perform obstacle avoidance */
-  struct collision_event_data collision_data;
-  if (m_sensors.calc_diffusion_vector(collision_data.vector)) {
-    external_event(ST_COLLISION_AVOIDANCE, &collision_data);
+  if (m_sensors.calc_diffusion_vector(NULL)) {
+    external_event(ST_COLLISION_AVOIDANCE, new struct collision_event_data);
   }
+  argos::CVector2 diff_vector;
+  m_sensors.calc_diffusion_vector(&diff_vector);
 
   /* No obstacles nearby--use the diffusion vector only to set speeds */
-  m_actuators.set_wheel_speeds(m_sWheelTurningParams.max_speed * cDiffusion);
+  m_actuators.set_wheel_speeds(m_actuators.max_wheel_speed() * diff_vector);
 }
 
 EXIT_DEFINE(social_fsm, exit_explore) {
@@ -152,31 +164,34 @@ EXIT_DEFINE(social_fsm, exit_explore) {
 }
 
 STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
-  while (calc_diffusion_vector(&data->vector)) {
-    data->vector = -data->vector.Normalize();
+  argos::CVector2 vector;
+
+  while (m_sensors.calc_diffusion_vector(&vector)) {
+    vector = -vector.Normalize();
 
     /* Use the diffusion vector only */
-    SetWheelSpeedsFromVector(data->vector);
+    m_actuators.set_wheel_speeds(vector);
     /*
      * Collision avoidance happened, increase explore_to_rest_prob and decrease
      * RestToExploreProb
      */
     m_state.explore_to_rest_prob += mc_params.deltas.collision_rule_explore_to_rest;
     m_state.prob_range.TruncValue(m_state.explore_to_rest_prob);
-    m_state.RestToExploreProb -= mc_params.deltas.collision_rule_explore_to_rest;
+    m_state.rest_to_explore_prob -= mc_params.deltas.collision_rule_explore_to_rest;
     m_state.prob_range.TruncValue(m_state.rest_to_explore_prob);
   } /* while() */
 
-  internal_event(last_state());
+  internal_event(data->last_state);
 }
 
 ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
-  actuators.leds_set_color(argos::CColor::RED);
+  m_actuators.leds_set_color(argos::CColor::RED);
 }
 
 STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
   /* Read stuff from the ground sensor */
-  const CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_pcGround->GetReadings();
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_sensors.ground();
+
   /*
    * You can say whether you are in the nest by checking the ground sensor
    * placed close to the wheel motors. It returns a value between 0 and 1.  It
@@ -197,18 +212,20 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
 
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
       /* Have we looked for a place long enough? */
-  if (m_state.time_search_for_place_in_nest_ > mc_params.times.min_search_for_place_in_nest) {
-         /* Yes, stop the wheels... */
-         pc_wheels_->SetLinearVelocity(0.0f, 0.0f);
-         /* Tell people about the last exploration attempt */
-         pr_raba_->SetData(0, m_eLastExplorationResult);
-         /* ... and switch to state 'resting' */
-         internal_event(ST_REST);
+  if (m_state.time_search_for_place_in_nest > mc_params.times.min_search_for_place_in_nest) {
+    m_actuators.stop_wheels();
+    m_actuators.send_last_explore_result(m_last_explore_res);
+    internal_event(ST_REST);
   }
+
   /* No, keep looking */
   ++m_state.time_search_for_place_in_nest;
+
+  argos::CVector2 vector;
+  m_sensors.calc_diffusion_vector(&vector);
+
   m_actuators.set_wheel_speeds(
-      m_actuators.max_wheel_speed() * m_sensors.calc_diffusion_vector() +
+      m_actuators.max_wheel_speed() * vector +
       m_actuators.max_wheel_speed() * m_sensors.calc_vector_to_light());
 }
 
@@ -216,9 +233,9 @@ ENTRY_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
   m_actuators.leds_set_color(argos::CColor::YELLOW);
 }
 
-EXIT_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
-  m_eLastExplorationResult = LAST_EXPLORATION_NONE;
-  m_state.time_search_for_place_in_nest_ = 0;
+EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
+  m_last_explore_res = LAST_EXPLORATION_NONE;
+  m_state.time_search_for_place_in_nest = 0;
 }
 
 STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
@@ -228,13 +245,13 @@ STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
    * Apply the food rule, decreasing explore_to_rest_prob and increasing
    * RestToExploreProb
    */
-  m_state.explore_to_rest_prob -= m_state.food_rule_explore_to_rest_prob_delta_;
+  m_state.explore_to_rest_prob -= mc_params.deltas.food_rule_explore_to_rest;
   m_state.prob_range.TruncValue(m_state.explore_to_rest_prob);
-  m_state.RestToExploreProb += m_state.food_rule_rest_to_explre_prob_delta_;
-  m_state.prob_range.TruncValue(m_state.RestToExploreProb);
+  m_state.rest_to_explore_prob += mc_params.deltas.food_rule_rest_to_explore;
+  m_state.prob_range.TruncValue(m_state.rest_to_explore_prob);
 
   /* Store the result of the expedition */
-  m_eLastExplorationResult = LAST_EXPLORATION_SUCCESSFUL;
+  m_last_explore_res = LAST_EXPLORATION_SUCCESSFUL;
   internal_event(ST_RETURN_TO_NEST);
 }
 
@@ -242,23 +259,8 @@ STATE_DEFINE(social_fsm, explore_fail, fsm::no_event_data) {
   m_actuators.leds_set_color(argos::CColor::ORANGE);
 
   /* Store the result of the expedition */
-  m_eLastExplorationResult = LAST_EXPLORATION_UNSUCCESSFUL;
+  m_last_explore_res = LAST_EXPLORATION_UNSUCCESSFUL;
   internal_event(ST_RETURN_TO_NEST);
-}
-
-STATE_DEFINE(social_fsm, in_nest, fsm::no_event_data) {
-  struct collision_event_data data;
-  if (calc_diffusion_vector(&data.vector)) {
-    external_event(ST_COLLISION_AVOIDANCE, &data);
-  }
-  /*
-   * The vector returned by calc_vector_to_light() points to
-   * the light. Thus, the minus sign is because we want to go away
-   * from the light.
-   */
-  m_actuators.set_wheels_speeds(
-      m_actuators.max_wheel_speed() * cDiffusion -
-      m_actuators.max_wheel_speed() * 0.25f * m_sensors.calc_vector_to_light());
 }
 
 NS_END(fordyca);

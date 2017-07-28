@@ -28,28 +28,30 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-
-/*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool sensor_manager::calc_diffusion_vector(argos::CVector2& vector) {
+bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   /* Get readings from proximity sensor */
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
   /* Sum them together */
   argos::CVector2 ccalc_diffusion_vector;
+  argos::CVector2* vector;
+  argos::CVector2 tmp;
+  if (vector_in == NULL) {
+    vector = &tmp;
+  } else {
+    vector = vector_in;
+  }
   for(size_t i = 0; i < tProxReads.size(); ++i) {
-    vector += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
+    *vector += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
   }
   /*
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it
    */
-  if(m_params.diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-     ccalc_diffusion_vector.Length() < m_params.diffusion.delta) {
+  if(mc_params.diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
+     ccalc_diffusion_vector.Length() < mc_params.diffusion.delta) {
     return false;
   }
   return true;

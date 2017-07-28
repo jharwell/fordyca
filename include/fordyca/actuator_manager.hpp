@@ -28,7 +28,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/forydca_params.hpp"
+#include "fordyca/fordyca_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,14 +45,17 @@ class actuator_manager {
 
   /* member functions */
   void leds_set_color(const argos::CColor& color) {
-    m_leds_->SetAllColors(color);
+    m_leds->SetAllColors(color);
   }
 
   /*
    * Gets a direction vector as input and transforms it into wheel
    * actuation.
    */
-  void set_wheels_speeds(const argos::CVector2& c_heading);
+  void set_wheel_speeds(const argos::CVector2& c_heading);
+  size_t max_wheel_speed(void) { return mc_params.wheels.max_speed; }
+  void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
+  void send_last_explore_result(int result) { m_rabs->SetData(0, result); }
 
  private:
   /*

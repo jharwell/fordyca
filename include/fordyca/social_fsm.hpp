@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 #include "fordyca/fordyca_params.hpp"
 #include "fordyca/sensor_manager.hpp"
@@ -42,16 +43,27 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class social_fsm : public fsm::base_fsm {
  public:
-  social_fsm(const struct social_fsm_params& config,
+  social_fsm(const struct social_fsm_params& params,
              sensor_manager& sensors,
              actuator_manager& actuators) :
       fsm::base_fsm(ST_MAX_STATES),
-      mc_params(config),
+      mc_params(params),
       m_sensors(sensors),
       m_actuators(actuators) {}
 
+  enum fsm_states {
+    ST_REST,
+    ST_EXPLORE,
+    ST_EXPLORE_SUCCESS,
+    ST_EXPLORE_FAIL,
+    ST_RETURN_TO_NEST,
+    ST_SEARCH_FOR_SPOT_IN_NEST,
+    ST_COLLISION_AVOIDANCE,
+    ST_MAX_STATES
+  };
+
   struct collision_event_data : public fsm::event_data {
-    argos::CVector2 vector;
+    enum fsm_states last_state;
   };
 
  private:
@@ -118,20 +130,19 @@ class social_fsm : public fsm::base_fsm {
   }
 
   /* data members */
-  enum states {
-    ST_REST,
-    ST_EXPLORE,
-    ST_EXPLORE_SUCCESS,
-    ST_EXPLORE_FAIL,
-    ST_RETURN_TO_NEST,
-    ST_SEARCH_FOR_SPOT_IN_NEST,
-    ST_COLLISION_AVOIDANCE,
-    ST_MAX_STATES
+  enum last_exploration_result {
+    LAST_EXPLORATION_NONE = 0,    // nothing to report
+    LAST_EXPLORATION_SUCCESSFUL,  // the last exploration resulted in a food item found
+    LAST_EXPLORATION_UNSUCCESSFUL // no food found in the last exploration
   };
+
   const struct social_fsm_params& mc_params;
   struct fsm_state m_state;
   sensor_manager& m_sensors;
   actuator_manager& m_actuators;
+  enum last_exploration_result m_last_explore_res;
+  argos::CRandom::CRNG* m_rng;
+
 };
 
 NS_END(fordyca);
