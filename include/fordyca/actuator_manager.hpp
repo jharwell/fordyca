@@ -43,6 +43,10 @@ class actuator_manager {
   actuator_manager(void);
 
   /* member functions */
+  void leds_set_color(const argos::CColor& color) {
+    pc_leds_->SetAllColors(color);
+  }
+
   /*
    * Gets a direction vector as input and transforms it into wheel
    * actuation.

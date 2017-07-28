@@ -47,17 +47,6 @@ class foraging_base : public argos::CCI_Controller {
 
  public:
 
-  /**
-   * @brief This structure holds data about food collecting by the robots
-   */
-  struct SFoodData {
-    bool has_item_;      // true when the robot is carrying a food item
-    size_t curr_item_idx_;    // the index of the current food item in the array of available food items
-    size_t cum_items_; // the total number of food items carried by this robot during the experiment
-
-    SFoodData();
-    void Reset();
-  };
 
   foraging_base(void);
   virtual ~foraging_base() {}

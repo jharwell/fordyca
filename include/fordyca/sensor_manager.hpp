@@ -28,11 +28,13 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca {
+NS_START(fordyca);
 
 /*******************************************************************************
  * Class Definitions
@@ -43,6 +45,17 @@ class sensor_manager {
   sensor_manager();
 
   /* member functions */
+  const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {
+    return rabs_->GetReadings();
+  }
+
+  /*
+   * Calculates the diffusion vector. If there is a close obstacle, it points
+   * away from it; it there is none, it points forwards.  The b_collision
+   * parameter is used to return true or false whether a collision avoidance
+   * just happened or not. It is necessary for the collision rule.
+   */
+  bool calc_diffusion_vector(argos::CVector2& vector);
 
  private:
   /* member functions */
@@ -51,14 +64,6 @@ class sensor_manager {
    * phototaxis and antiphototaxis.
    */
   argos::CVector2 calc_vector_to_light(void);
-
-  /*
-   * Calculates the diffusion vector. If there is a close obstacle, it points
-   * away from it; it there is none, it points forwards.  The b_collision
-   * parameter is used to return true or false whether a collision avoidance
-   * just happened or not. It is necessary for the collision rule.
-   */
-  argos::CVector2 calc_diffusion_vector(const bool& b_collision);
 
   /* Pointer to the range and bearing sensor */
   argos::CCI_RangeAndBearingSensor* rabs_;
@@ -70,6 +75,6 @@ class sensor_manager {
   argos::CCI_FootBotMotorGroundSensor* ground_;
 };
 
-} /* namespace fordyca */
+NS_END(fordyca);
 
 #endif /* INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_ */

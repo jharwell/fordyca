@@ -115,13 +115,13 @@ void SStateData::Reset() {
    InNest = true;
    RestToExploreProb = initial_rest_to_explor_prob;
    explore_to_rest_prob = initial_explore_to_rest_prob;
-   TimeExploringUnsuccessfully = 0;
+   time_exploring_unsuccessfully_ = 0;
    /* Initially the robot is resting, and by setting RestingTime to
       MinimumRestingTime we force the robots to make a decision at the
       experiment start. If instead we set RestingTime to zero, we would
       have to wait till RestingTime reaches MinimumRestingTime before
       something happens, which is just a waste of time. */
-   TimeRested = MinimumRestingTime;
+   time_rested_ = MinimumRestingTime;
    time_search_for_place_in_nest_ = 0;
 }
 
@@ -161,7 +161,7 @@ void Init(TConfigurationNode& t_node) {
       /* Wheel turning */
       m_sWheelTurningParams.Init(GetNode(t_node, "wheel_turning"));
       /* Controller state */
-      m_sStateData.Init(GetNode(t_node, "state"));
+      state_.Init(GetNode(t_node, "state"));
    }
    catch(CARGoSException& ex) {
       THROW_ARGOSEXCEPTION_NESTED("Error initializing the foot-bot foraging controller for robot \"" << GetId() << "\"", ex);
@@ -180,7 +180,7 @@ void Init(TConfigurationNode& t_node) {
 
 void ControlStep() {
   UpdateState();
-   switch(m_sStateData.State) {
+   switch(state_.State) {
       case SStateData::STATE_RESTING: {
          Rest();
          break;
@@ -204,7 +204,7 @@ void ControlStep() {
 
 void Reset() {
    /* Reset robot state */
-   m_sStateData.Reset();
+   state_.Reset();
    /* Reset food data */
    m_sFoodData.Reset();
    /* Set LED color */
@@ -220,7 +220,7 @@ void Reset() {
 
 void UpdateState() {
    /* Reset state flags */
-   m_sStateData.InNest = false;
+   state_.InNest = false;
    /* Read stuff from the ground sensor */
    const CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_pcGround->GetReadings();
    /*
@@ -239,7 +239,7 @@ void UpdateState() {
       tGroundReads[2].Value < 0.75f &&
       tGroundReads[3].Value > 0.25f &&
       tGroundReads[3].Value < 0.75f) {
-      m_sStateData.InNest = true;
+      state_.InNest = true;
    }
 }
 
@@ -364,16 +364,16 @@ void SetWheelSpeedsFromVector(const CVector2& c_heading) {
 void Rest() {
    /* If we have stayed here enough, probabilistically switch to
     * 'exploring' */
-   if(m_sStateData.TimeRested > m_sStateData.MinimumRestingTime &&
-      m_pcRNG->Uniform(m_sStateData.prob_range) < m_sStateData.RestToExploreProb) {
+   if(state_.time_rested_ > state_.MinimumRestingTime &&
+      m_pcRNG->Uniform(state_.prob_range) < state_.RestToExploreProb) {
       pc_leds_->SetAllColors(CColor::GREEN);
-      m_sStateData.State = SStateData::STATE_EXPLORING;
-      m_sStateData.TimeRested = 0;
+      state_.State = SStateData::STATE_EXPLORING;
+      state_.time_rested_ = 0;
    }
    else {
-      ++m_sStateData.TimeRested;
+      ++state_.time_rested_;
       /* Be sure not to send the last exploration result multiple times */
-      if(m_sStateData.TimeRested == 1) {
+      if(state_.time_rested_ == 1) {
          pr_raba_->SetData(0, LAST_EXPLORATION_NONE);
       }
       /*
@@ -384,17 +384,17 @@ void Rest() {
       for(size_t i = 0; i < tPackets.size(); ++i) {
          switch(tPackets[i].Data[0]) {
             case LAST_EXPLORATION_SUCCESSFUL: {
-               m_sStateData.RestToExploreProb += m_sStateData.social_rule_rest_to_explore_prob_delta_;
-               m_sStateData.prob_range.TruncValue(m_sStateData.RestToExploreProb);
-               m_sStateData.explore_to_rest_prob -= m_sStateData.SocialRuleExploreToRestDeltaProb;
-               m_sStateData.prob_range.TruncValue(m_sStateData.explore_to_rest_prob);
+               state_.RestToExploreProb += state_.social_rule_rest_to_explore_prob_delta_;
+               state_.prob_range.TruncValue(state_.RestToExploreProb);
+               state_.explore_to_rest_prob -= state_.SocialRuleExploreToRestDeltaProb;
+               state_.prob_range.TruncValue(state_.explore_to_rest_prob);
                break;
             }
             case LAST_EXPLORATION_UNSUCCESSFUL: {
-               m_sStateData.explore_to_rest_prob += m_sStateData.SocialRuleExploreToRestDeltaProb;
-               m_sStateData.prob_range.TruncValue(m_sStateData.explore_to_rest_prob);
-               m_sStateData.RestToExploreProb -= m_sStateData.social_rule_rest_to_explore_prob_delta_;
-               m_sStateData.prob_range.TruncValue(m_sStateData.RestToExploreProb);
+               state_.explore_to_rest_prob += state_.SocialRuleExploreToRestDeltaProb;
+               state_.prob_range.TruncValue(state_.explore_to_rest_prob);
+               state_.RestToExploreProb -= state_.social_rule_rest_to_explore_prob_delta_;
+               state_.prob_range.TruncValue(state_.RestToExploreProb);
                break;
             }
          }
@@ -420,10 +420,10 @@ void Explore() {
    if(m_sFoodData.has_item_) {
       /* Apply the food rule, decreasing explore_to_rest_prob and increasing
        * RestToExploreProb */
-      m_sStateData.explore_to_rest_prob -= m_sStateData.food_rule_explore_to_rest_prob_delta_;
-      m_sStateData.prob_range.TruncValue(m_sStateData.explore_to_rest_prob);
-      m_sStateData.RestToExploreProb += m_sStateData.food_rule_rest_to_explre_prob_delta_;
-      m_sStateData.prob_range.TruncValue(m_sStateData.RestToExploreProb);
+      state_.explore_to_rest_prob -= state_.food_rule_explore_to_rest_prob_delta_;
+      state_.prob_range.TruncValue(state_.explore_to_rest_prob);
+      state_.RestToExploreProb += state_.food_rule_rest_to_explre_prob_delta_;
+      state_.prob_range.TruncValue(state_.RestToExploreProb);
       /* Store the result of the expedition */
       m_eLastExplorationResult = LAST_EXPLORATION_SUCCESSFUL;
       /* Switch to 'return to nest' */
@@ -431,8 +431,8 @@ void Explore() {
    }
    /* Test the second condition: we probabilistically switch to 'return to
     * nest' if we have been wandering for some time and found nothing */
-   else if(m_sStateData.TimeExploringUnsuccessfully > m_sStateData.MinimumUnsuccessfulExploreTime) {
-      if (m_pcRNG->Uniform(m_sStateData.prob_range) < m_sStateData.explore_to_rest_prob) {
+   else if(state_.time_exploring_unsuccessfully_ > state_.MinimumUnsuccessfulExploreTime) {
+      if (m_pcRNG->Uniform(state_.prob_range) < state_.explore_to_rest_prob) {
          /* Store the result of the expedition */
          m_eLastExplorationResult = LAST_EXPLORATION_UNSUCCESSFUL;
          /* Switch to 'return to nest' */
@@ -441,23 +441,23 @@ void Explore() {
       else {
          /* Apply the food rule, increasing explore_to_rest_prob and
           * decreasing RestToExploreProb */
-         m_sStateData.explore_to_rest_prob += m_sStateData.food_rule_explore_to_rest_prob_delta_;
-         m_sStateData.prob_range.TruncValue(m_sStateData.explore_to_rest_prob);
-         m_sStateData.RestToExploreProb -= m_sStateData.food_rule_rest_to_explre_prob_delta_;
-         m_sStateData.prob_range.TruncValue(m_sStateData.RestToExploreProb);
+         state_.explore_to_rest_prob += state_.food_rule_explore_to_rest_prob_delta_;
+         state_.prob_range.TruncValue(state_.explore_to_rest_prob);
+         state_.RestToExploreProb -= state_.food_rule_rest_to_explre_prob_delta_;
+         state_.prob_range.TruncValue(state_.RestToExploreProb);
       }
    }
    /* So, do we return to the nest now? */
    if(bReturnToNest) {
       /* Yes, we do! */
-      m_sStateData.TimeExploringUnsuccessfully = 0;
-      m_sStateData.time_search_for_place_in_nest_ = 0;
+      state_.time_exploring_unsuccessfully_ = 0;
+      state_.time_search_for_place_in_nest_ = 0;
       pc_leds_->SetAllColors(CColor::BLUE);
-      m_sStateData.State = SStateData::STATE_RETURN_TO_NEST;
+      state_.State = SStateData::STATE_RETURN_TO_NEST;
    }
    else {
       /* No, perform the actual exploration */
-      ++m_sStateData.TimeExploringUnsuccessfully;
+      ++state_.time_exploring_unsuccessfully_;
       UpdateState();
       /* Get the diffusion vector to perform obstacle avoidance */
       bool bCollision;
@@ -466,17 +466,17 @@ void Explore() {
       if(bCollision) {
          /* Collision avoidance happened, increase explore_to_rest_prob and
           * decrease RestToExploreProb */
-         m_sStateData.explore_to_rest_prob += m_sStateData.collision_rule_explore_to_resta_prob_delta_;
-         m_sStateData.prob_range.TruncValue(m_sStateData.explore_to_rest_prob);
-         m_sStateData.RestToExploreProb -= m_sStateData.collision_rule_explore_to_resta_prob_delta_;
-         m_sStateData.prob_range.TruncValue(m_sStateData.RestToExploreProb);
+         state_.explore_to_rest_prob += state_.collision_rule_explore_to_resta_prob_delta_;
+         state_.prob_range.TruncValue(state_.explore_to_rest_prob);
+         state_.RestToExploreProb -= state_.collision_rule_explore_to_resta_prob_delta_;
+         state_.prob_range.TruncValue(state_.RestToExploreProb);
       }
       /*
        * If we are in the nest, we combine antiphototaxis with obstacle
        * avoidance
        * Outside the nest, we just use the diffusion vector
        */
-      if(m_sStateData.InNest) {
+      if(state_.InNest) {
          /*
           * The vector returned by calc_vector_to_light() points to
           * the light. Thus, the minus sign is because we want to go away
@@ -493,24 +493,6 @@ void Explore() {
    }
 }
 
-bool calc_diffusion_vector(CVector2* const vector) {
-  /* Get readings from proximity sensor */
-  const CCI_FootBotProximitySensor::TReadings& tProxReads = m_pcProximity->GetReadings();
-  /* Sum them together */
-  CVector2 ccalc_diffusion_vector;
-  for(size_t i = 0; i < tProxReads.size(); ++i) {
-    *vector += CVector2(tProxReads[i].Value, tProxReads[i].Angle);
-  }
-  /*
-   * If the angle of the vector is small enough and the closest obstacle is far
-   * enough, ignore the vector and go straight, otherwise return it
-   */
-  if(m_sDiffusionParams.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-     ccalc_diffusion_vector.Length() < m_sDiffusionParams.Delta ) {
-    return false;
-  }
-  return true;
-}
 
 /****************************************/
 /****************************************/
@@ -519,28 +501,28 @@ void ReturnToNest() {
    /* As soon as you get to the nest, switch to 'resting' */
    UpdateState();
    /* Are we in the nest? */
-   if(m_sStateData.InNest) {
+   if(state_.InNest) {
       /* Have we looked for a place long enough? */
-      if(m_sStateData.time_search_for_place_in_nest_ > m_sStateData.MinimumSearchForPlaceInNestTime) {
+      if(state_.time_search_for_place_in_nest_ > state_.MinimumSearchForPlaceInNestTime) {
          /* Yes, stop the wheels... */
          pc_wheels_->SetLinearVelocity(0.0f, 0.0f);
          /* Tell people about the last exploration attempt */
          pr_raba_->SetData(0, m_eLastExplorationResult);
          /* ... and switch to state 'resting' */
          pc_leds_->SetAllColors(CColor::RED);
-         m_sStateData.State = SStateData::STATE_RESTING;
-         m_sStateData.time_search_for_place_in_nest_ = 0;
+         state_.State = SStateData::STATE_RESTING;
+         state_.time_search_for_place_in_nest_ = 0;
          m_eLastExplorationResult = LAST_EXPLORATION_NONE;
          return;
       }
       else {
          /* No, keep looking */
-         ++m_sStateData.time_search_for_place_in_nest_;
+         ++state_.time_search_for_place_in_nest_;
       }
    }
    else {
       /* Still outside the nest */
-      m_sStateData.time_search_for_place_in_nest_ = 0;
+      state_.time_search_for_place_in_nest_ = 0;
    }
    /* Keep going */
    bool bCollision;
