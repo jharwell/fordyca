@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/actuator_manager.cpp"
+#include "fordyca/actuator_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,19 +29,15 @@
 NS_START(fordyca);
 
 /*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_manager::set_wheel_speeds(const CVector2& c_heading) {
+void actuator_manager::set_wheel_speeds(const argos::CVector2& c_heading) {
    /* Get the heading angle */
-   CRadians heading_angle = c_heading.Angle().SignedNormalize();
+  argos::CRadians heading_angle = c_heading.Angle().SignedNormalize();
    /* Get the length of the heading vector */
-   Real heading_length = c_heading.Length();
+  argos::Real heading_length = c_heading.Length();
    /* Clamp the speed so that it's not greater than max_speed */
-   Real base_angular_wheel_speed = Min<Real>(heading_length, mc_params.wheels..max_speed);
+  argos::Real base_angular_wheel_speed = argos::Min<argos::Real>(heading_length, mc_params.wheels.max_speed);
 
    /* Turning state switching conditions */
    if (Abs(heading_angle) <= mc_params.wheels.no_turn_threshold) {
@@ -83,7 +79,7 @@ void actuator_manager::set_wheel_speeds(const CVector2& c_heading) {
    }
 
    /* Apply the calculated speeds to the appropriate wheels */
-   Real left_wheel_speed, right_wheel_speed;
+   argos::Real left_wheel_speed, right_wheel_speed;
    if(heading_angle > argos::CRadians::ZERO) {
       /* Turn Left */
       left_wheel_speed  = speed1;

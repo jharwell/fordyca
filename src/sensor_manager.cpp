@@ -57,23 +57,21 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   return true;
 }
 
-CVector2 sensor_manager::calc_vector_to_light(void) {
+argos::CVector2 sensor_manager::calc_vector_to_light(void) {
   /* Get readings from light sensor */
-  const CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
+  const argos::CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
   /* Sum them together */
-  CVector2 cAccumulator;
+  argos::CVector2 accum;
   for(size_t i = 0; i < tLightReads.size(); ++i) {
-    cAccumulator += CVector2(tLightReads[i].Value, tLightReads[i].Angle);
+    accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
   }
-  /* If the light was perceived, return the vector */
-  if(cAccumulator.Length() > 0.0f) {
-    return CVector2(1.0f, cAccumulator.Angle());
+  /* If the light was perceived, return the vector. Otherwise return 0. */
+  if(accum.Length() > 0.0f) {
+    return argos::CVector2(1.0f, accum.Angle());
+  } else {
+    return argos::CVector2();
   }
-  /* Otherwise, return zero */
-  else {
-    return CVector2();
-  }
-}
+} /* calc_vector_to_light */
 
 
 NS_END(fordyca);
