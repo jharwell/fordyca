@@ -33,13 +33,32 @@ NS_START(fordyca);
  * Constructors/Destructors
  ******************************************************************************/
 social_fsm::social_fsm(const struct social_fsm_params& params,
-           sensor_manager& sensors,
-           actuator_manager& actuators) :
+                       sensor_manager& sensors,
+                       actuator_manager& actuators) :
     fsm::base_fsm(ST_MAX_STATES),
+    rest(),
+    explore(),
+    explore_success(),
+    explore_fail(),
+    return_to_nest(),
+    search_for_spot_in_nest(),
+    collision_avoidance(),
+    guard_return_to_nest(),
+    guard_explore(),
+    exit_explore(),
+    exit_rest(),
+    exit_collision_avoidance(),
+    exit_search_for_spot_in_nest(),
+    entry_explore(),
+    entry_rest(),
+    entry_collision_avoidance(),
+    entry_search_for_spot_in_nest(),
     mc_params(params),
+    m_state(),
     m_sensors(sensors),
     m_actuators(actuators),
     m_last_explore_res(LAST_EXPLORATION_NONE),
+    m_rng(),
     m_prob_range(0.0f, 1.0f) {}
 
 /*******************************************************************************
@@ -80,24 +99,22 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
    * probabilities accordingly
    */
   const argos::CCI_RangeAndBearingSensor::TReadings& tPackets = m_sensors.range_and_bearing();
-  for(size_t i = 0; i < tPackets.size(); ++i) {
-    switch(tPackets[i].Data[0]) {
-      case LAST_EXPLORATION_SUCCESSFUL: {
+  for (size_t i = 0; i < tPackets.size(); ++i) {
+    switch (tPackets[i].Data[0]) {
+      case LAST_EXPLORATION_SUCCESSFUL:
         m_state.rest_to_explore_prob += mc_params.deltas.social_rule_rest_to_explore;
         m_prob_range.TruncValue(m_state.rest_to_explore_prob);
         m_state.explore_to_rest_prob -= mc_params.deltas.social_rule_explore_to_rest;;
         m_prob_range.TruncValue(m_state.explore_to_rest_prob);
         break;
-      }
-      case LAST_EXPLORATION_UNSUCCESSFUL: {
+      case LAST_EXPLORATION_UNSUCCESSFUL:
         m_state.explore_to_rest_prob += mc_params.deltas.social_rule_explore_to_rest;
         m_prob_range.TruncValue(m_state.explore_to_rest_prob);
         m_state.rest_to_explore_prob -= mc_params.deltas.social_rule_rest_to_explore;
         m_prob_range.TruncValue(m_state.rest_to_explore_prob);
         break;
-      }
-    }
-  }
+    } /* switch() */
+  } /* for(i..) */
 }
 
 EXIT_DEFINE(social_fsm, exit_rest) {
@@ -141,7 +158,8 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
    * Second condition: we probabilistically switch to 'return to
    * nest' if we have been wandering for some time and found nothing.
    */
-   if (m_state.time_exploring_unsuccessfully > mc_params.times.max_unsuccessful_explore) {
+  if (m_state.time_exploring_unsuccessfully >
+      mc_params.times.max_unsuccessful_explore) {
     if (m_rng->Uniform(m_prob_range) < m_state.explore_to_rest_prob) {
       external_event(ST_EXPLORE_FAIL);
     }
@@ -213,14 +231,14 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
    * on gray: if so, the robot is completely in the nest, otherwise it's
    * outside.
    */
-   if (tGroundReads[2].Value > 0.25f && tGroundReads[2].Value < 0.75f &&
+  if (tGroundReads[2].Value > 0.25f && tGroundReads[2].Value < 0.75f &&
       tGroundReads[3].Value > 0.25f && tGroundReads[3].Value < 0.75f) {
-     internal_event(ST_SEARCH_FOR_SPOT_IN_NEST);
-   }
+    internal_event(ST_SEARCH_FOR_SPOT_IN_NEST);
+  }
 }
 
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
-      /* Have we looked for a place long enough? */
+  /* Have we looked for a place long enough? */
   if (m_state.time_search_for_place_in_nest > mc_params.times.min_search_for_place_in_nest) {
     m_actuators.stop_wheels();
     m_actuators.send_last_explore_result(m_last_explore_res);

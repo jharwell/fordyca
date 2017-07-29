@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef FORAGING_LOOP_FUNCTIONS_H
-#define FORAGING_LOOP_FUNCTIONS_H
+#ifndef INCLUDE_FORDYCA_SOCIAL_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SOCIAL_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,9 +39,7 @@ NS_START(fordyca);
  * Classes
  ******************************************************************************/
 class social_loop_functions : public argos::CLoopFunctions {
-
  public:
-
   social_loop_functions();
   virtual ~social_loop_functions(void) {}
 
@@ -52,6 +50,9 @@ class social_loop_functions : public argos::CLoopFunctions {
   virtual void PreStep();
 
  private:
+  social_loop_functions(const social_loop_functions& s) = delete;
+  social_loop_functions& operator=(const social_loop_functions& s) = delete;
+
   argos::CRange<argos::Real> m_arena_x;
   argos::CRange<argos::Real> m_arena_y;
   std::vector<argos::CVector2> m_food_pos;
@@ -70,4 +71,4 @@ class social_loop_functions : public argos::CLoopFunctions {
 
 NS_END(fordyca);
 
-#endif
+#endif /* INCLUDE_FORDYCA_SOCIAL_LOOP_FUNCTIONS_HPP_ */

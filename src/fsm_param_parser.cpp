@@ -31,7 +31,7 @@ NS_START(fordyca);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const struct social_fsm_params& fsm_param_parser::parse(argos::TConfigurationNode& node) {
+const struct social_fsm_params* fsm_param_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "state");
      try {
        argos::GetNodeAttribute(fsm_node, "initial_rest_to_explore_prob", m_params.initial_rest_to_explore_prob);
@@ -50,7 +50,7 @@ const struct social_fsm_params& fsm_param_parser::parse(argos::TConfigurationNod
        using namespace argos;
       THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
    }
-     return m_params;
+     return &m_params;
 } /* fsm_param_parser:parse() */
 
 NS_END(fordyca);

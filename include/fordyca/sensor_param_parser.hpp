@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_SENSOR_PARAM_PARSER_HPP_
-#define INCLUDE_SENSOR_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,9 +38,9 @@ NS_START(fordyca);
  ******************************************************************************/
 class sensor_param_parser: public base_param_parser {
  public:
-  sensor_param_parser(void) {}
+  sensor_param_parser(void) : m_params() {}
 
-  const struct sensor_params& parse(argos::TConfigurationNode& node);
+  const struct sensor_params* parse(argos::TConfigurationNode& node);
 
  private:
   struct sensor_params m_params;
@@ -48,4 +48,4 @@ class sensor_param_parser: public base_param_parser {
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_SENSOR_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_ */

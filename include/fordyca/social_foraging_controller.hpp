@@ -45,7 +45,6 @@ NS_START(fordyca);
  */
 class social_foraging_controller : public argos::CCI_Controller {
  public:
-
   /**
    * @brief This structure holds data about food collecting by the robots
    */
@@ -60,7 +59,7 @@ class social_foraging_controller : public argos::CCI_Controller {
   social_foraging_controller(void);
   virtual ~social_foraging_controller() {}
 
-  bool is_resting(void) { m_fsm.is_resting(); }
+  bool is_resting(void) { return m_fsm.is_resting(); }
   /*
    * @brief Initialize the controller.
    *
@@ -108,7 +107,8 @@ class social_foraging_controller : public argos::CCI_Controller {
    */
   void ReturnToNest();
 
- private:
+  social_foraging_controller(const social_foraging_controller& fsm) = delete;
+  social_foraging_controller& operator=(const social_foraging_controller& fsm) = delete;
 
   /* The random number generator */
   argos::CRandom::CRNG* m_rng;

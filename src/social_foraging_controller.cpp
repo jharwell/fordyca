@@ -1,5 +1,5 @@
 /**
- * @file actuator_param_parser.cpp
+ * @file social_foraging_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/actuator_param_parser.hpp"
+#include "fordyca/social_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,25 +29,24 @@
 NS_START(fordyca);
 
 /*******************************************************************************
+ * Constructors/Destructors
+ ******************************************************************************/
+social_foraging_controller::social_foraging_controller(void) :
+    m_rng(),
+    m_fsm(),
+    m_params(),
+    m_actuators(GetActuator<CCI_DifferentialSteeringActuator>("differential_steering"),
+                GetActuator<CCI_LEDsActuator>("leds"),
+                GetActuator<CCI_RangeAndBearingActuator>("range_and_bearing")),
+    m_sensors(GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+              GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
+              GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
+              GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")),
+),
+    m_food_stats() {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const struct actuator_params* actuator_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node = argos::GetNode(node, "wheels");
-  try {
-    argos::CDegrees cAngle;
-    argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
-    m_params.wheels.hard_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_threshold", cAngle);
-    m_params.wheels.soft_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "no_turn_angle_threshold", cAngle);
-    m_params.wheels.no_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "max_speed", m_params.wheels.max_speed);
-  }
-  catch(argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing controller wheel turning parameters.", ex);
-  }
-  return &m_params;
-} /* actuator_param_parser:parse() */
 
 NS_END(fordyca);

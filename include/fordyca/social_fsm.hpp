@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SOCIAL_SOCIAL_FSM_HPP_
-#define INCLUDE_FORDYCA_SOCIAL_SOCIAL_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_SOCIAL_FSM_HPP_
+#define INCLUDE_FORDYCA_SOCIAL_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -56,7 +56,10 @@ class social_fsm : public fsm::base_fsm {
 
   struct collision_event_data : public fsm::event_data {
     enum fsm_states last_state;
+
+    collision_event_data(void) : last_state(ST_REST) {}
   };
+
   social_fsm(const struct social_fsm_params& params,
              sensor_manager& sensors,
              actuator_manager& actuators);
@@ -68,15 +71,24 @@ class social_fsm : public fsm::base_fsm {
    * @brief This structure holds data about food collecting by the robots
    */
   struct food_data {
+    food_data(void) : has_item(false), curr_item_idx(-1), cum_items(0) {}
+    void Reset(void);
+
     bool has_item;      // true when the robot is carrying a food item
-    size_t curr_item_idx;    // the index of the current food item in the array of available food items
+    int curr_item_idx;    // the index of the current food item in the array of available food items
     size_t cum_items; // the total number of food items carried by this robot during the experiment
 
-    food_data();
-    void Reset();
   };
 
   struct fsm_state {
+    fsm_state(void) :
+        rest_to_explore_prob(),
+        explore_to_rest_prob(),
+        time_rested(0),
+        time_exploring_unsuccessfully(0),
+        time_search_for_place_in_nest(0),
+        food_data() {}
+
     /* Current probability to switch from resting to exploring */
     argos::Real rest_to_explore_prob;
     /* Current probability to switch from exploring to resting */
@@ -125,6 +137,9 @@ class social_fsm : public fsm::base_fsm {
                   "state map does not cover all states");
     return kSTATE_MAP;
   }
+
+  social_fsm(const social_fsm& fsm) = delete;
+  social_fsm& operator=(const social_fsm& fsm) = delete;
 
   /* data members */
   enum last_exploration_result {

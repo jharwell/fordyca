@@ -77,7 +77,6 @@ struct threshold_times {
    * state.
    */
   size_t min_search_for_place_in_nest;
-
 };
 
 struct social_fsm_params : public base_params {
@@ -104,6 +103,12 @@ struct wheel_params {
   argos::CRadians soft_turn_threshold;
   argos::CRadians no_turn_threshold;
   argos::Real max_speed;
+
+  wheel_params(void) :
+      hard_turn_threshold(),
+      soft_turn_threshold(),
+      no_turn_threshold(),
+      max_speed() {}
 };
 
 /*
@@ -113,6 +118,9 @@ struct wheel_params {
  * <controllers><footbot_foraging_controller><parameters><diffusion> section.
 x */
 struct diffusion_params {
+  diffusion_params() :
+      delta(0.0),
+      go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
   /*
    * Maximum tolerance for the proximity reading between
    * the robot and the closest obstacle.
@@ -124,15 +132,18 @@ struct diffusion_params {
   /* Angle tolerance range to go straight. */
   argos::CRange<argos::CRadians> go_straight_angle_range;
 
-  diffusion_params() :
-      go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
 };
 
 struct actuator_params : public base_params {
+  actuator_params(void) : wheels() {}
+
   struct wheel_params wheels;
+
 };
 
 struct sensor_params : public base_params {
+  sensor_params(void) : diffusion() {}
+
   struct diffusion_params diffusion;
 };
 

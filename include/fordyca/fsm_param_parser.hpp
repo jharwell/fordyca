@@ -38,9 +38,9 @@ NS_START(fordyca);
  ******************************************************************************/
 class fsm_param_parser: public base_param_parser {
  public:
-  fsm_param_parser(void) {}
+  fsm_param_parser(void) : m_params() {}
 
-  const struct social_fsm_params& parse(argos::TConfigurationNode& node);
+  const struct social_fsm_params* parse(argos::TConfigurationNode& node);
 
  private:
   struct social_fsm_params m_params;

@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_ACTUATOR_PARAM_PARSER_HPP_
-#define INCLUDE_ACTUATOR_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,9 +38,9 @@ NS_START(fordyca);
  ******************************************************************************/
 class actuator_param_parser: public base_param_parser {
  public:
-  actuator_param_parser(void) {}
+  actuator_param_parser(void);
 
-  const struct actuator_params& parse(argos::TConfigurationNode& node);
+  const struct actuator_params* parse(argos::TConfigurationNode& node);
 
  private:
   struct actuator_params m_params;
@@ -48,4 +48,4 @@ class actuator_param_parser: public base_param_parser {
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_ACTUATOR_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_ */

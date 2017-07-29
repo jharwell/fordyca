@@ -41,8 +41,10 @@ class base_param_parser {
   /* constructors */
   base_param_parser(void) {}
 
+  virtual ~base_param_parser(void) {}
+
   /* member functions */
-  virtual const struct base_params& parse(argos::TConfigurationNode& node) {}
+  virtual const struct base_params* parse(__unused argos::TConfigurationNode& node) { return NULL; }
 
  private:
   /* member functions */

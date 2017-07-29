@@ -22,11 +22,32 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/actuator_manager.hpp"
+#include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
+/* Definition of the LEDs actuator */
+#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
+/* Definition of the range and bearing actuator */
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+actuator_manager::actuator_manager(
+    argos::CCI_DifferentialSteeringActuator* const wheels,
+    argos::CCI_LEDsActuator* const leds,
+    argos::CCI_RangeAndBearingActuator* const raba,
+    const struct actuator_params& params) :
+    m_wheels(wheels),
+    m_leds(leds),
+    m_raba(raba),
+    m_turning_state(NO_TURN),
+    mc_params(params) {}
+
 
 /*******************************************************************************
  * Member Functions

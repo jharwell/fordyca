@@ -23,11 +23,30 @@
  ******************************************************************************/
 #include "fordyca/sensor_manager.hpp"
 #include <argos3/core/utility/datatypes/color.h>
+#include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+sensor_manager::sensor_manager(
+    argos::CCI_RangeAndBearingSensor* const rabs,
+    argos::CCI_FootBotProximitySensor* const proximity,
+    argos::CCI_FootBotLightSensor* const light,
+    argos::CCI_FootBotMotorGroundSensor* const ground,
+    const struct sensor_params& params) :
+    m_rabs(rabs),
+    m_proximity(proximity),
+    m_light(light),
+    m_ground(ground),
+    mc_params(params) {}
 
 /*******************************************************************************
  * Member Functions
@@ -77,6 +96,7 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
 
 bool sensor_manager::detect_food_item(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
+  return false;
 } /* sensor_manager:detect_food_item() */
 
 

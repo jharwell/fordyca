@@ -38,9 +38,9 @@ NS_START(fordyca);
  ******************************************************************************/
 class food_param_parser: public base_param_parser {
  public:
-  food_param_parser(void) {}
+  food_param_parser(void) : m_params() {}
 
-  const struct food_params& parse(argos::TConfigurationNode& node);
+  const struct food_params* parse(argos::TConfigurationNode& node);
 
  private:
   struct food_params m_params;

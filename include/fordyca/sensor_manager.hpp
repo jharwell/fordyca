@@ -43,7 +43,12 @@ NS_START(fordyca);
 class sensor_manager {
  public:
   /* constructors */
-  explicit sensor_manager(const struct sensor_params& params) : mc_params(params) {}
+  sensor_manager(
+      argos::CCI_RangeAndBearingSensor* const rabs,
+      argos::CCI_FootBotProximitySensor* const proximity,
+      argos::CCI_FootBotLightSensor* const light,
+      argos::CCI_FootBotMotorGroundSensor* const ground,
+      const struct sensor_params& params);
 
   /* member functions */
   const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {

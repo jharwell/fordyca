@@ -41,7 +41,10 @@ namespace fordyca {
 class actuator_manager {
  public:
   /* constructors */
-  actuator_manager(const struct actuator_params& params) : mc_params(params) {}
+  actuator_manager(argos::CCI_DifferentialSteeringActuator* const wheels,
+                   argos::CCI_LEDsActuator* const leds,
+                   argos::CCI_RangeAndBearingActuator* const raba,
+                   const struct actuator_params& params);
 
   /* member functions */
   void leds_set_color(const argos::CColor& color) {
@@ -55,7 +58,7 @@ class actuator_manager {
   void set_wheel_speeds(const argos::CVector2& c_heading);
   size_t max_wheel_speed(void) { return mc_params.wheels.max_speed; }
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
-  void send_last_explore_result(int result) { m_rabs->SetData(0, result); }
+  void send_last_explore_result(int result) { m_raba->SetData(0, result); }
 
  private:
   /*
@@ -69,7 +72,7 @@ class actuator_manager {
 
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
-  argos::CCI_RangeAndBearingActuator*      m_rabs;    /* Range and bearing */
+  argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   enum turning_state                       m_turning_state;
   const struct actuator_params&            mc_params;
 

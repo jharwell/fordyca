@@ -31,21 +31,25 @@ NS_START(fordyca);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const struct sensor_params& sensor_param_parser::parse(argos::TConfigurationNode& node) {
+const struct sensor_params* sensor_param_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode diff_node = argos::GetNode(node, "diffusion");
 
     try {
-      argos::CRange<argos::CDegrees> go_straight_angle_range_deg(argos::CDegrees(-10.0f), argos::CDegrees(10.0f));
-      argos::GetNodeAttribute(diff_node, "go_straight_angle_range", m_params.diffusion.go_straight_angle_range);
-      m_params.diffusion.go_straight_angle_range.Set(argos::ToRadians(go_straight_angle_range_deg.GetMin()),
-                                  argos::ToRadians(go_straight_angle_range_deg.GetMax()));
+      argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0f),
+                                                     argos::CDegrees(10.0f));
+      argos::GetNodeAttribute(diff_node,
+                              "go_straight_angle_range",
+                              m_params.diffusion.go_straight_angle_range);
+      m_params.diffusion.go_straight_angle_range.Set(
+          argos::ToRadians(angle_range_deg.GetMin()),
+          argos::ToRadians(angle_range_deg.GetMax()));
       argos::GetNodeAttribute(node, "delta", m_params.diffusion.delta);
     }
     catch (argos::CARGoSException& ex) {
       using namespace argos;
       THROW_ARGOSEXCEPTION_NESTED("Error parsing sensor parameters.", ex);
     }
-    return m_params;
+    return &m_params;
 } /* sensor_param_parser:parse() */
 
 NS_END(fordyca);
