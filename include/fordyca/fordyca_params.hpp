@@ -39,7 +39,9 @@ NS_START(fordyca);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct prob_deltas {
+struct base_params {};
+
+struct prob_deltas  {
   /* The increase of explore_to_rest_prob due to the food rule */
   argos::Real food_rule_explore_to_rest;
 
@@ -78,12 +80,12 @@ struct threshold_times {
 
 };
 
-struct social_fsm_params {
+struct social_fsm_params : public base_params {
   /* Initial probability to switch from resting to exploring */
-  argos::Real initial_rest_to_explore_prob_;
+  argos::Real initial_rest_to_explore_prob;
 
   /* Initial probability to switch from exploring to resting */
-  argos::Real initial_explore_to_rest_prob_;
+  argos::Real initial_explore_to_rest_prob;
 
   struct prob_deltas deltas;
   struct threshold_times times;
@@ -109,7 +111,7 @@ struct wheel_params {
  * algorithm. You can set their value in the <parameters> section of the XML
  * configuration file, under the
  * <controllers><footbot_foraging_controller><parameters><diffusion> section.
- */
+x */
 struct diffusion_params {
   /*
    * Maximum tolerance for the proximity reading between
@@ -121,14 +123,23 @@ struct diffusion_params {
   argos::Real delta;
   /* Angle tolerance range to go straight. */
   argos::CRange<argos::CRadians> go_straight_angle_range;
+
+  diffusion_params() :
+      go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
 };
 
-struct actuator_params {
+struct actuator_params : public base_params {
   struct wheel_params wheels;
 };
 
-struct sensor_params {
+struct sensor_params : public base_params {
   struct diffusion_params diffusion;
+};
+
+struct food_params : public base_params {
+  uint n_items;
+  argos::Real square_radius;
+  uint energy_per_item;
 };
 
 NS_END(fordyca);

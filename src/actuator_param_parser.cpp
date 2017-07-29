@@ -1,5 +1,5 @@
 /**
- * @file social_loop_functions.hpp
+ * @file actuator_param_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,56 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef FORAGING_LOOP_FUNCTIONS_H
-#define FORAGING_LOOP_FUNCTIONS_H
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/loop_functions.h>
-#include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/core/utility/math/range.h>
-#include <argos3/core/utility/math/rng.h>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/parameter_parser.hpp"
+#include "fordyca/actuator_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
 /*******************************************************************************
- * Classes
+ * Member Functions
  ******************************************************************************/
-class social_loop_functions : public argos::CLoopFunctions {
-
- public:
-
-  social_loop_functions();
-  virtual ~social_loop_functions(void) {}
-
-  virtual void Init(argos::TConfigurationNode& t_tree);
-  virtual void Reset();
-  virtual void Destroy();
-  virtual argos::CColor GetFloorColor(const argos::CVector2& c_position_on_plane);
-  virtual void PreStep();
-
- private:
-  argos::CRange<argos::Real> m_arena_x;
-  argos::CRange<argos::Real> m_arena_y;
-  std::vector<argos::CVector2> m_food_pos;
-  argos::CFloorEntity* m_floor;
-  argos::CRandom::CRNG* m_rng;
-
-  std::string m_ofname;
-  std::ofstream m_ofile;
-
-  uint m_uncollected_food;
-  int m_energy;
-  uint m_energy_per_moving_robot;
-  struct food_params m_food_params;
-  parameter_parser m_parser;
-};
+const struct actuator_params& actuator_param_parser::parse(argos::TConfigurationNode& node) {
+  argos::TConfigurationNode wheel_node = argos::GetNode(node, "wheels");
+  try {
+    argos::CDegrees cAngle;
+    argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
+    m_params.wheels.hard_turn_threshold = ToRadians(cAngle);
+    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_threshold", cAngle);
+    m_params.wheels.soft_turn_threshold = ToRadians(cAngle);
+    argos::GetNodeAttribute(wheel_node, "no_turn_angle_threshold", cAngle);
+    m_params.wheels.no_turn_threshold = ToRadians(cAngle);
+    argos::GetNodeAttribute(wheel_node, "max_speed", m_params.wheels.max_speed);
+  }
+  catch(argos::CARGoSException& ex) {
+    using namespace argos;
+    THROW_ARGOSEXCEPTION_NESTED("Error initializing controller wheel turning parameters.", ex);
+  }
+  return m_params;
+} /* actuator_param_parser:parse() */
 
 NS_END(fordyca);
-
-#endif

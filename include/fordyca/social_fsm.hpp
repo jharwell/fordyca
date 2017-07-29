@@ -43,14 +43,6 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class social_fsm : public fsm::base_fsm {
  public:
-  social_fsm(const struct social_fsm_params& params,
-             sensor_manager& sensors,
-             actuator_manager& actuators) :
-      fsm::base_fsm(ST_MAX_STATES),
-      mc_params(params),
-      m_sensors(sensors),
-      m_actuators(actuators) {}
-
   enum fsm_states {
     ST_REST,
     ST_EXPLORE,
@@ -65,6 +57,11 @@ class social_fsm : public fsm::base_fsm {
   struct collision_event_data : public fsm::event_data {
     enum fsm_states last_state;
   };
+  social_fsm(const struct social_fsm_params& params,
+             sensor_manager& sensors,
+             actuator_manager& actuators);
+
+  bool is_resting(void) { return current_state() == ST_REST; }
 
  private:
   /**
@@ -142,6 +139,7 @@ class social_fsm : public fsm::base_fsm {
   actuator_manager& m_actuators;
   enum last_exploration_result m_last_explore_res;
   argos::CRandom::CRNG* m_rng;
+  argos::CRange<argos::Real> m_prob_range;
 
 };
 

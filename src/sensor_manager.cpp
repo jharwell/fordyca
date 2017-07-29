@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/sensor_manager.hpp"
+#include <argos3/core/utility/datatypes/color.h>
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +35,6 @@ NS_START(fordyca);
 bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   /* Get readings from proximity sensor */
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
-  /* Sum them together */
   argos::CVector2 ccalc_diffusion_vector;
   argos::CVector2* vector;
   argos::CVector2 tmp;
@@ -43,7 +43,9 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   } else {
     vector = vector_in;
   }
-  for(size_t i = 0; i < tProxReads.size(); ++i) {
+
+  /* Sum them together */
+  for (size_t i = 0; i < tProxReads.size(); ++i) {
     *vector += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
   }
   /*
@@ -71,7 +73,11 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
   } else {
     return argos::CVector2();
   }
-} /* calc_vector_to_light */
+} /* calc_vector_to_light() */
+
+bool sensor_manager::detect_food_item(void) {
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
+} /* sensor_manager:detect_food_item() */
 
 
 NS_END(fordyca);

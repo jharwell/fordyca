@@ -1,33 +1,29 @@
 /**
- * @file parameter_parser.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file fsm_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_
+#ifndef INCLUDE_FSM_PARAM_PARSER_HPP_
+#define INCLUDE_FSM_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/fordyca_params.hpp"
 #include "fordyca/base_param_parser.hpp"
@@ -40,17 +36,16 @@ NS_START(fordyca);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class parameter_parser {
+class fsm_param_parser: public base_param_parser {
  public:
-  parameter_parser(void) : m_parsers() {}
+  fsm_param_parser(void) {}
 
-  status_t add_category(const std::string& category, const base_param_parser& parser);
-  status_t parse(argos::TConfigurationNode& node);
+  const struct social_fsm_params& parse(argos::TConfigurationNode& node);
 
  private:
-  std::map<std::string, base_param_parser> m_parsers;
+  struct social_fsm_params m_params;
 };
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_ */
+#endif /* INCLUDE_FSM_PARAM_PARSER_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file social_loop_functions.hpp
+ * @file base_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,56 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef FORAGING_LOOP_FUNCTIONS_H
-#define FORAGING_LOOP_FUNCTIONS_H
+#ifndef INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/loop_functions.h>
-#include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/core/utility/math/range.h>
-#include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/parameter_parser.hpp"
+#include "fordyca/fordyca_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
 /*******************************************************************************
- * Classes
+ * Class Definitions
  ******************************************************************************/
-class social_loop_functions : public argos::CLoopFunctions {
-
+class base_param_parser {
  public:
+  /* constructors */
+  base_param_parser(void) {}
 
-  social_loop_functions();
-  virtual ~social_loop_functions(void) {}
-
-  virtual void Init(argos::TConfigurationNode& t_tree);
-  virtual void Reset();
-  virtual void Destroy();
-  virtual argos::CColor GetFloorColor(const argos::CVector2& c_position_on_plane);
-  virtual void PreStep();
+  /* member functions */
+  virtual const struct base_params& parse(argos::TConfigurationNode& node) {}
 
  private:
-  argos::CRange<argos::Real> m_arena_x;
-  argos::CRange<argos::Real> m_arena_y;
-  std::vector<argos::CVector2> m_food_pos;
-  argos::CFloorEntity* m_floor;
-  argos::CRandom::CRNG* m_rng;
+  /* member functions */
 
-  std::string m_ofname;
-  std::ofstream m_ofile;
-
-  uint m_uncollected_food;
-  int m_energy;
-  uint m_energy_per_moving_robot;
-  struct food_params m_food_params;
-  parameter_parser m_parser;
+  /* data members */
 };
 
 NS_END(fordyca);
 
-#endif
+#endif /* INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_ */

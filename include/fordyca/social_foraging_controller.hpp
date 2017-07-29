@@ -1,5 +1,5 @@
-n/**
- * @file footbot_foraging.hpp
+/**
+ * @file social_foraging_controllor.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@ n/**
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FOOTBOT_FORAGING_HPP_
-#define INCLUDE_FORDYCA_FOOTBOT_FORAGING_HPP_
+#ifndef INCLUDE_FORDYCA_SOCIAL_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_SOCIAL_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,7 +27,7 @@ n/**
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include "fordyca/fordyca_params.hpp"
-#include "fordyca/state_machine.hpp"
+#include "fordyca/social_fsm.hpp"
 #include "fordyca/parameter_parser.hpp"
 #include "fordyca/sensor_manager.hpp"
 #include "fordyca/actuator_manager.hpp"
@@ -35,7 +35,7 @@ n/**
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controllers);
+NS_START(fordyca);
 
 /*******************************************************************************
  * Class Definitions
@@ -43,19 +43,29 @@ NS_START(fordyca, controllers);
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class foraging_base : public argos::CCI_Controller {
-
+class social_foraging_controller : public argos::CCI_Controller {
  public:
 
+  /**
+   * @brief This structure holds data about food collecting by the robots
+   */
+  struct food_data {
+    bool has_item;      // true when the robot is carrying a food item
+    size_t curr_item_idx;    // the index of the current food item in the array of available food items
+    size_t cum_items; // the total number of food items carried by this robot during the experiment
 
-  foraging_base(void);
-  virtual ~foraging_base() {}
+    void Reset();
+  };
 
+  social_foraging_controller(void);
+  virtual ~social_foraging_controller() {}
+
+  bool is_resting(void) { m_fsm.is_resting(); }
   /*
    * @brief Initialize the controller.
    *
    * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><footbot_foraging_controller> section.
+   *               <controllers><social_foraging_controller_controller> section.
    */
   virtual void Init(argos::TConfigurationNode& t_node);
 
@@ -75,31 +85,10 @@ class foraging_base : public argos::CCI_Controller {
   virtual void Destroy() {}
 
   /*
-   * Returns true if the robot is currently exploring.
-   */
-  inline bool is_exploring() const {
-    return m_sStateData.State == SStateData::STATE_EXPLORING;
-  }
-
-  /*
-   * Returns true if the robot is currently resting.
-   */
-  inline bool is_resting() const {
-    return m_sStateData.State == SStateData::STATE_RESTING;
-  }
-
-  /*
-   * Returns true if the robot is currently returning to the nest.
-   */
-  inline bool is_returning_to_rest() const {
-    return m_sStateData.State == SStateData::STATE_RETURN_TO_NEST;
-  }
-
-  /*
    * Returns the food data
    */
-  inline SFoodData& GetFoodData() {
-    return m_sFoodData;
+  inline struct food_data& get_food_data() {
+    return m_food_stats;
   }
 
  private:
@@ -122,27 +111,19 @@ class foraging_base : public argos::CCI_Controller {
  private:
 
   /* The random number generator */
-  argos::CRandom::CRNG* m_pcRNG;
-
-  /* Used in the social rule to communicate the result of the last
-   * exploration attempt */
-  enum ELastExplorationResult {
-    LAST_EXPLORATION_NONE = 0,    // nothing to report
-    LAST_EXPLORATION_SUCCESSFUL,  // the last exploration resulted in a food item found
-    LAST_EXPLORATION_UNSUCCESSFUL // no food found in the last exploration
-  } m_eLastExplorationResult;
+  argos::CRandom::CRNG* m_rng;
 
   /* The controller state information */
-  state_machine state_;
-  parameter_parser params_;
-  actuator_manager actuators_;
-  sensor_manager sensors_;
+  social_fsm m_fsm;
+  parameter_parser m_params;
+  actuator_manager m_actuators;
+  sensor_manager m_sensors;
 
   /* The food data */
-  SFoodData m_sFoodData;
+  struct food_data m_food_stats;
 
 };
 
-NS_END(controllers, fordyca);
+NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_FOOTBOT_FORAGING_HPP_ */
+#endif /* INCLUDE_FORDYCA_SOCIAL_FORAGING_CONTROLLER_HPP_ */
