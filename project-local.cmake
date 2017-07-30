@@ -4,22 +4,36 @@
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
-
-ExternalProject_Add(rcppsw
+ExternalProject_Add(project_rcppsw
   SOURCE_DIR "$ENV{rcppsw}"
   BINARY_DIR "$ENV{rcppsw}/build"
   STEP_TARGETS build
   EXCLUDE_FROM_ALL TRUE
 )
 
+ExternalProject_Get_Property(project_rcppsw binary_dir)
+ExternalProject_Get_Property(project_rcppsw source_dir)
+add_library(rcppsw STATIC IMPORTED)
+set_property(TARGET rcppsw PROPERTY IMPORTED_LOCATION ${binary_dir}/lib/librcppsw.a)
+include_directories(${source_dir}/include)
+
+ExternalProject_Add(project_rcsw
+  SOURCE_DIR "$ENV{rcsw}"
+  BINARY_DIR "$ENV{rcsw}/build"
+  STEP_TARGETS build
+  EXCLUDE_FROM_ALL TRUE
+)
+
+ExternalProject_Get_Property(project_rcsw binary_dir)
+ExternalProject_Get_Property(project_rcsw source_dir)
+add_library(rcsw STATIC IMPORTED)
+set_property(TARGET rcsw PROPERTY IMPORTED_LOCATION ${binary_dir}/lib/librcsw.a)
+include_directories(${source_dir}/include)
 
 ################################################################################
 # Includes                                                                     #
 ################################################################################
-include_directories("$ENV{rcppsw}/include")
-include_directories("$ENV{rcsw}/include")
 include_directories(BEFORE SYSTEM
-  /usr/include
   /usr/include/lua5.2
   ${Qt5Widgets_INCLUDE_DIRS}
   )
@@ -32,16 +46,4 @@ include_directories(BEFORE SYSTEM
 # Libraries                                                                    #
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
-
-# add_library(${target} SHARED
-#   $<TARGET_OBJECTS:common>
-#   $<TARGET_OBJECTS:multithread>
-#   $<TARGET_OBJECTS:utils>
-#   )
-
-# if(WITH_MPI)
-# add_library(${target} SHARED
-#   $<TARGET_OBJECTS:multiprocess>)
-# endif()
-
-add_dependencies(${target} rcppsw-build)
+add_library(${target} ${${target}_ROOT_SRC})

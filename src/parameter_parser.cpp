@@ -34,7 +34,7 @@ NS_START(fordyca);
  * Member Functions
  ******************************************************************************/
 status_t parameter_parser::add_category(const std::string& name, const base_param_parser& parser) {
-  FPC_CHECK(ERROR, m_parsers.find(name) != m_parsers.end());
+  FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
 
   m_parsers.insert(std::pair<std::string, base_param_parser>(name, parser));
   return OK;
