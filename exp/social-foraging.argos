@@ -22,9 +22,9 @@
   <!-- * Controllers * -->
   <!-- *************** -->
   <controllers>
-
+    
     <social_foraging_controller id="ffc"
-                                 library="build/lib/libfordyca.so">
+                                 library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />

@@ -46,4 +46,7 @@ include_directories(BEFORE SYSTEM
 # Libraries                                                                    #
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
-add_library(${target} ${${target}_ROOT_SRC})
+add_library(${target} SHARED ${${target}_ROOT_SRC})
+add_dependencies(${target} project_rcppsw-build project_rcsw-build)
+
+target_link_libraries(${target} rcppsw rcsw)
