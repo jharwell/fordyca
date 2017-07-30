@@ -33,8 +33,8 @@ NS_START(fordyca);
  * Constructors/Destructors
  ******************************************************************************/
 social_fsm::social_fsm(const struct social_fsm_params& params,
-                       sensor_manager& sensors,
-                       actuator_manager& actuators) :
+                       sensor_manager* const sensors,
+                       actuator_manager* const actuators) :
     fsm::base_fsm(ST_MAX_STATES),
     rest(),
     explore(),
@@ -43,8 +43,6 @@ social_fsm::social_fsm(const struct social_fsm_params& params,
     return_to_nest(),
     search_for_spot_in_nest(),
     collision_avoidance(),
-    guard_return_to_nest(),
-    guard_explore(),
     exit_explore(),
     exit_rest(),
     exit_collision_avoidance(),
@@ -53,13 +51,13 @@ social_fsm::social_fsm(const struct social_fsm_params& params,
     entry_rest(),
     entry_collision_avoidance(),
     entry_search_for_spot_in_nest(),
+    m_last_explore_res(LAST_EXPLORATION_NONE),
+    m_rng(),
+    m_prob_range(0.0f, 1.0f),
     mc_params(params),
     m_state(),
     m_sensors(sensors),
-    m_actuators(actuators),
-    m_last_explore_res(LAST_EXPLORATION_NONE),
-    m_rng(),
-    m_prob_range(0.0f, 1.0f) {}
+    m_actuators(actuators) {}
 
 /*******************************************************************************
  * Events
@@ -92,13 +90,13 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
   ++m_state.time_rested;
   /* Be sure not to send the last exploration result multiple times */
   if (m_state.time_rested == 1) {
-    m_actuators.send_last_explore_result(LAST_EXPLORATION_NONE);
+    m_actuators->set_raba_data(LAST_EXPLORATION_NONE);
   }
   /*
    * Social rule: listen to what other people have found and modify
    * probabilities accordingly
    */
-  const argos::CCI_RangeAndBearingSensor::TReadings& tPackets = m_sensors.range_and_bearing();
+  const argos::CCI_RangeAndBearingSensor::TReadings& tPackets = m_sensors->range_and_bearing();
   for (size_t i = 0; i < tPackets.size(); ++i) {
     switch (tPackets[i].Data[0]) {
       case LAST_EXPLORATION_SUCCESSFUL:
@@ -125,19 +123,19 @@ EXIT_DEFINE(social_fsm, exit_rest) {
    * from the light.
    */
   argos::CVector2 diff_vector;
-  m_sensors.calc_diffusion_vector(&diff_vector);
-  m_actuators.set_wheel_speeds(
-      m_actuators.max_wheel_speed() * diff_vector -
-      m_actuators.max_wheel_speed() * 0.25f * m_sensors.calc_vector_to_light());
+  m_sensors->calc_diffusion_vector(&diff_vector);
+  m_actuators->set_wheel_speeds(
+      m_actuators->max_wheel_speed() * diff_vector -
+      m_actuators->max_wheel_speed() * 0.25f * m_sensors->calc_vector_to_light());
 }
 
 
 ENTRY_DEFINE(social_fsm, entry_rest, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::BLACK);
+  m_actuators->leds_set_color(argos::CColor::BLACK);
 }
 
 ENTRY_DEFINE(social_fsm, entry_explore, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::MAGENTA);
+  m_actuators->leds_set_color(argos::CColor::MAGENTA);
 }
 
 STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
@@ -175,14 +173,14 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
   ++m_state.time_exploring_unsuccessfully;
 
   /* Get the diffusion vector to perform obstacle avoidance */
-  if (m_sensors.calc_diffusion_vector(NULL)) {
+  if (m_sensors->calc_diffusion_vector(NULL)) {
     external_event(ST_COLLISION_AVOIDANCE, new struct collision_event_data);
   }
   argos::CVector2 diff_vector;
-  m_sensors.calc_diffusion_vector(&diff_vector);
+  m_sensors->calc_diffusion_vector(&diff_vector);
 
   /* No obstacles nearby--use the diffusion vector only to set speeds */
-  m_actuators.set_wheel_speeds(m_actuators.max_wheel_speed() * diff_vector);
+  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * diff_vector);
 }
 
 EXIT_DEFINE(social_fsm, exit_explore) {
@@ -193,11 +191,11 @@ EXIT_DEFINE(social_fsm, exit_explore) {
 STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
   argos::CVector2 vector;
 
-  while (m_sensors.calc_diffusion_vector(&vector)) {
+  while (m_sensors->calc_diffusion_vector(&vector)) {
     vector = -vector.Normalize();
 
     /* Use the diffusion vector only */
-    m_actuators.set_wheel_speeds(vector);
+    m_actuators->set_wheel_speeds(vector);
     /*
      * Collision avoidance happened, increase explore_to_rest_prob and decrease
      * RestToExploreProb
@@ -212,12 +210,12 @@ STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
 }
 
 ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::RED);
+  m_actuators->leds_set_color(argos::CColor::RED);
 }
 
 STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
   /* Read stuff from the ground sensor */
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_sensors.ground();
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_sensors->ground();
 
   /*
    * You can say whether you are in the nest by checking the ground sensor
@@ -240,8 +238,8 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
   /* Have we looked for a place long enough? */
   if (m_state.time_search_for_place_in_nest > mc_params.times.min_search_for_place_in_nest) {
-    m_actuators.stop_wheels();
-    m_actuators.send_last_explore_result(m_last_explore_res);
+    m_actuators->stop_wheels();
+    m_actuators->set_raba_data(m_last_explore_res);
     internal_event(ST_REST);
   }
 
@@ -249,15 +247,15 @@ STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
   ++m_state.time_search_for_place_in_nest;
 
   argos::CVector2 vector;
-  m_sensors.calc_diffusion_vector(&vector);
+  m_sensors->calc_diffusion_vector(&vector);
 
-  m_actuators.set_wheel_speeds(
-      m_actuators.max_wheel_speed() * vector +
-      m_actuators.max_wheel_speed() * m_sensors.calc_vector_to_light());
+  m_actuators->set_wheel_speeds(
+      m_actuators->max_wheel_speed() * vector +
+      m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
 }
 
 ENTRY_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::YELLOW);
+  m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
 
 EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
@@ -266,7 +264,7 @@ EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
 }
 
 STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::GREEN);
+  m_actuators->leds_set_color(argos::CColor::GREEN);
 
   /*
    * Apply the food rule, decreasing explore_to_rest_prob and increasing
@@ -283,11 +281,31 @@ STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
 }
 
 STATE_DEFINE(social_fsm, explore_fail, fsm::no_event_data) {
-  m_actuators.leds_set_color(argos::CColor::ORANGE);
+  m_actuators->leds_set_color(argos::CColor::ORANGE);
 
   /* Store the result of the expedition */
   m_last_explore_res = LAST_EXPLORATION_UNSUCCESSFUL;
   internal_event(ST_RETURN_TO_NEST);
 }
+
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+void social_fsm::reset(void) {
+  m_state.explore_to_rest_prob = mc_params.initial_rest_to_explore_prob;
+  m_state.time_exploring_unsuccessfully = 0;
+
+  /*
+   * Initially the robot is resting, and by setting RestingTime to
+   * MinimumRestingTime we force the robots to make a decision at the experiment
+   * start. If instead we set RestingTime to zero, we would have to wait till
+   * RestingTime reaches MinimumRestingTime before something happens, which is
+   * just a waste of time.
+   */
+  m_state.time_rested = mc_params.times.min_rested;
+  m_state.time_search_for_place_in_nest = 0;
+  m_last_explore_res = LAST_EXPLORATION_NONE;
+  m_actuators->reset(LAST_EXPLORATION_NONE);
+} /* reset() */
 
 NS_END(fordyca);

@@ -38,13 +38,13 @@ status_t parameter_parser::add_category(const std::string& name, const base_para
 
   m_parsers.insert(std::pair<std::string, base_param_parser>(name, parser));
   return OK;
-} /* parameter_parser:add_category() */
+} /* add_category() */
 
-status_t parameter_parser::parse(argos::TConfigurationNode& node) {
+status_t parameter_parser::parse_all(argos::TConfigurationNode& node) {
   std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser>& pair) {
       pair.second.parse(node);
     });
   return OK;
-} /* parameter_parser:parse() */
+} /* parse_all() */
 
 NS_END(fordyca);

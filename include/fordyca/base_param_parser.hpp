@@ -38,18 +38,11 @@ NS_START(fordyca);
  ******************************************************************************/
 class base_param_parser {
  public:
-  /* constructors */
   base_param_parser(void) {}
-
   virtual ~base_param_parser(void) {}
 
-  /* member functions */
-  virtual const struct base_params* parse(__unused argos::TConfigurationNode& node) { return NULL; }
-
- private:
-  /* member functions */
-
-  /* data members */
+  virtual void parse(__unused argos::TConfigurationNode& node) {}
+  virtual const struct base_params* get_results(void) { return NULL; }
 };
 
 NS_END(fordyca);

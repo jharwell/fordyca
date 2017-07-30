@@ -115,4 +115,9 @@ void actuator_manager::set_wheel_speeds(const argos::CVector2& c_heading) {
    m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
+void actuator_manager::reset(int state) {
+  m_raba->ClearData();
+  set_raba_data(state);
+} /* reset() */
+
 NS_END(fordyca);

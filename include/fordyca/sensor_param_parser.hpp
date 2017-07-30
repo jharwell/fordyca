@@ -40,10 +40,11 @@ class sensor_param_parser: public base_param_parser {
  public:
   sensor_param_parser(void) : m_params() {}
 
-  const struct sensor_params* parse(argos::TConfigurationNode& node);
+  void parse(argos::TConfigurationNode& node);
+  const struct sensor_params* get_results(void) { return m_params.get(); }
 
  private:
-  struct sensor_params m_params;
+  std::unique_ptr<struct sensor_params> m_params;
 };
 
 NS_END(fordyca);

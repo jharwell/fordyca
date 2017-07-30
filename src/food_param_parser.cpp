@@ -31,15 +31,15 @@ NS_START(fordyca);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const struct food_params* food_param_parser::parse(argos::TConfigurationNode& node) {
+void food_param_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode food_node = argos::GetNode(node, "food");
 
-  argos::GetNodeAttribute(food_node, "n_items", m_params.n_items);
-  argos::GetNodeAttribute(food_node, "radius", m_params.square_radius);
-  m_params.square_radius *= m_params.square_radius;
+  m_params.reset(new struct food_params);
+  argos::GetNodeAttribute(food_node, "n_items", m_params->n_items);
+  argos::GetNodeAttribute(food_node, "radius", m_params->square_radius);
+  m_params->square_radius *= m_params->square_radius;
   argos::GetNodeAttribute(food_node, "energy_per_item",
-                          m_params.energy_per_item);
-  return &m_params;
-} /* food_param_parser:parse() */
+                          m_params->energy_per_item);
+} /* parse() */
 
 NS_END(fordyca);

@@ -58,7 +58,8 @@ class actuator_manager {
   void set_wheel_speeds(const argos::CVector2& c_heading);
   size_t max_wheel_speed(void) { return mc_params.wheels.max_speed; }
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
-  void send_last_explore_result(int result) { m_raba->SetData(0, result); }
+  void set_raba_data(int data) { m_raba->SetData(0, data); }
+  void reset(int state);
 
  private:
   /*

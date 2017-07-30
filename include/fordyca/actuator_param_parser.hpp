@@ -38,12 +38,13 @@ NS_START(fordyca);
  ******************************************************************************/
 class actuator_param_parser: public base_param_parser {
  public:
-  actuator_param_parser(void);
+  actuator_param_parser(void) : m_params() {}
 
-  const struct actuator_params* parse(argos::TConfigurationNode& node);
+  void parse(argos::TConfigurationNode& node);
+  const struct actuator_params* get_results(void) { return m_params.get(); }
 
  private:
-  struct actuator_params m_params;
+  std::unique_ptr<struct actuator_params> m_params;
 };
 
 NS_END(fordyca);

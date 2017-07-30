@@ -40,10 +40,11 @@ class food_param_parser: public base_param_parser {
  public:
   food_param_parser(void) : m_params() {}
 
-  const struct food_params* parse(argos::TConfigurationNode& node);
+  void parse(argos::TConfigurationNode& node);
+  const struct food_params* get_results(void) { return m_params.get(); }
 
  private:
-  struct food_params m_params;
+  std::unique_ptr<struct food_params> m_params;
 };
 
 NS_END(fordyca);

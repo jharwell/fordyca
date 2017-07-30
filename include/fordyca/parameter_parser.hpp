@@ -45,7 +45,8 @@ class parameter_parser {
   parameter_parser(void) : m_parsers() {}
 
   status_t add_category(const std::string& category, const base_param_parser& parser);
-  status_t parse(argos::TConfigurationNode& node);
+  status_t parse_all(argos::TConfigurationNode& node);
+  const struct base_params* get_params(const std::string& name) { return m_parsers[name].get_results(); }
 
  private:
   std::map<std::string, base_param_parser> m_parsers;

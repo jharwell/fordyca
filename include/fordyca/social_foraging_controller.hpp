@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
+#include <boost/shared_ptr.hpp>
 #include "fordyca/fordyca_params.hpp"
 #include "fordyca/social_fsm.hpp"
 #include "fordyca/parameter_parser.hpp"
@@ -53,13 +54,17 @@ class social_foraging_controller : public argos::CCI_Controller {
     size_t curr_item_idx;    // the index of the current food item in the array of available food items
     size_t cum_items; // the total number of food items carried by this robot during the experiment
 
-    void Reset();
+    void reset(void) {
+      has_item = false;
+      curr_item_idx = -1;
+      cum_items = 0;
+    }
   };
 
   social_foraging_controller(void);
   virtual ~social_foraging_controller() {}
 
-  bool is_resting(void) { return m_fsm.is_resting(); }
+  bool is_resting(void) { return m_fsm->is_resting(); }
   /*
    * @brief Initialize the controller.
    *
@@ -76,7 +81,7 @@ class social_foraging_controller : public argos::CCI_Controller {
   /*
    * @brief Reset controller to its state right after the Init().
    */
-  virtual void Reset();
+  virtual void Reset(void);
 
   /*
    * @brief Cleanup whatever was done by Init().
@@ -91,22 +96,6 @@ class social_foraging_controller : public argos::CCI_Controller {
   }
 
  private:
-
-  /*
-   * Executes the resting state.
-   */
-  void Rest();
-
-  /*
-   * Executes the exploring state.
-   */
-  void Explore();
-
-  /*
-   * Executes the return to nest state.
-   */
-  void ReturnToNest();
-
   social_foraging_controller(const social_foraging_controller& fsm) = delete;
   social_foraging_controller& operator=(const social_foraging_controller& fsm) = delete;
 
@@ -114,14 +103,13 @@ class social_foraging_controller : public argos::CCI_Controller {
   argos::CRandom::CRNG* m_rng;
 
   /* The controller state information */
-  social_fsm m_fsm;
-  parameter_parser m_params;
-  actuator_manager m_actuators;
-  sensor_manager m_sensors;
+  parameter_parser m_parser;
+  std::shared_ptr<actuator_manager> m_actuators;
+  std::shared_ptr<sensor_manager> m_sensors;
+  std::unique_ptr<social_fsm> m_fsm;
 
   /* The food data */
   struct food_data m_food_stats;
-
 };
 
 NS_END(fordyca);

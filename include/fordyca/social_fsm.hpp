@@ -61,10 +61,12 @@ class social_fsm : public fsm::base_fsm {
   };
 
   social_fsm(const struct social_fsm_params& params,
-             sensor_manager& sensors,
-             actuator_manager& actuators);
+             sensor_manager* const sensors,
+             actuator_manager* const actuators);
 
   bool is_resting(void) { return current_state() == ST_REST; }
+  void reset(void);
+  void event_explore(void);
 
  private:
   /**
@@ -100,8 +102,6 @@ class social_fsm : public fsm::base_fsm {
     struct food_data food_data;
   };
 
-  void event_explore(void);
-
   STATE_DECLARE(social_fsm, rest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, explore, fsm::no_event_data);
   STATE_DECLARE(social_fsm, explore_success, fsm::no_event_data);
@@ -109,9 +109,6 @@ class social_fsm : public fsm::base_fsm {
   STATE_DECLARE(social_fsm, return_to_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, search_for_spot_in_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, collision_avoidance, struct collision_event_data);
-
-  GUARD_DECLARE(social_fsm, guard_return_to_nest, fsm::no_event_data);
-  GUARD_DECLARE(social_fsm, guard_explore, fsm::no_event_data);
 
   EXIT_DECLARE(social_fsm, exit_explore);
   EXIT_DECLARE(social_fsm, exit_rest);
@@ -148,14 +145,13 @@ class social_fsm : public fsm::base_fsm {
     LAST_EXPLORATION_UNSUCCESSFUL // no food found in the last exploration
   };
 
-  const struct social_fsm_params& mc_params;
-  struct fsm_state m_state;
-  sensor_manager& m_sensors;
-  actuator_manager& m_actuators;
   enum last_exploration_result m_last_explore_res;
   argos::CRandom::CRNG* m_rng;
   argos::CRange<argos::Real> m_prob_range;
-
+  const struct social_fsm_params& mc_params;
+  struct fsm_state m_state;
+  std::shared_ptr<sensor_manager> m_sensors;
+  std::shared_ptr<actuator_manager> m_actuators;
 };
 
 NS_END(fordyca);
