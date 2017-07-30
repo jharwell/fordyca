@@ -76,7 +76,7 @@ class social_foraging_controller : public argos::CCI_Controller {
   /*
    * @brief Called once every time step; length set in the XML file.
    */
-  virtual void ControlStep();
+  virtual void ControlStep(void) { m_fsm->event_explore(); }
 
   /*
    * @brief Reset controller to its state right after the Init().
@@ -86,14 +86,9 @@ class social_foraging_controller : public argos::CCI_Controller {
   /*
    * @brief Cleanup whatever was done by Init().
    */
-  virtual void Destroy() {}
+  virtual void Destroy(void) {}
 
-  /*
-   * Returns the food data
-   */
-  inline struct food_data& get_food_data() {
-    return m_food_stats;
-  }
+  inline struct food_data& get_food_data() { return m_food_stats; }
 
  private:
   social_foraging_controller(const social_foraging_controller& fsm) = delete;

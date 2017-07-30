@@ -51,5 +51,5 @@ void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 }
 
 using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(qt_user_functions, "foraging_qt_user_functions")
+REGISTER_QTOPENGL_USER_FUNCTIONS(qt_user_functions, "qt_user_functions")
 NS_END(fordyca);

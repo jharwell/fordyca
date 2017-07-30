@@ -23,8 +23,8 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_foraging_controller id="ffc"
-                                 library="build/lib/libfordyca">
+    <social_foraging_controller id="ffc"
+                                 library="build/lib/libfordyca.so">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -56,7 +56,7 @@
           <food_rule active="true" food_rule_explore_to_rest_delta_prob="0.01" />
         </state>
       </params>
-    </footbot_foraging_controller>
+    </social_foraging_controller>
 
   </controllers>
 
@@ -64,7 +64,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="foraging_loop_functions">
+                  label="social_loop_functions">
     <foraging items="15"
               radius="0.1"
               energy_per_item="1000"
@@ -157,7 +157,7 @@
                    look_at="0,0,0"
                    lens_focal_length="20" />
       </camera>
-      <user_functions label="foraging_qt_user_functions" />
+      <user_functions label="qt_user_functions" />
     </qt-opengl>
   </visualization>
 

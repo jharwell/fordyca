@@ -71,8 +71,17 @@ void social_foraging_controller::Reset(void) {
   m_fsm->reset();
   m_food_stats.reset();
   m_actuators->leds_set_color(argos::CColor::WHITE);
-  m_fsm->event_explore();
 } /* Reset() */
 
+/*
+ * This statement notifies ARGoS of the existence of the controller.  It binds
+ * the class passed as first argument to the string passed as second argument.
+ * The string is then usable in the XML configuration file to refer to this
+ * controller.  When ARGoS reads that string in the XML file, it knows which
+ * controller class to instantiate.  See also the XML configuration files for an
+ * example of how this is used.
+ */
+using namespace argos;
+REGISTER_CONTROLLER(social_foraging_controller, "social_foraging_controller")
 
 NS_END(fordyca);
