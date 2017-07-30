@@ -55,7 +55,7 @@ social_loop_functions::social_loop_functions(void) :
  ******************************************************************************/
 void social_loop_functions::Init(argos::TConfigurationNode& t_node) {
   argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
-  m_parser.add_category("food", food_param_parser());
+  m_parser.add_category("food", new food_param_parser());
   m_parser.parse_all(foraging);
 
   m_floor = &GetSpace().GetFloorEntity();

@@ -33,7 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca {
+NS_START(fordyca);
 
 /*******************************************************************************
  * Class Definitions
@@ -41,10 +41,10 @@ namespace fordyca {
 class actuator_manager {
  public:
   /* constructors */
-  actuator_manager(argos::CCI_DifferentialSteeringActuator* const wheels,
+  actuator_manager(const struct actuator_params* params,
+                   argos::CCI_DifferentialSteeringActuator* const wheels,
                    argos::CCI_LEDsActuator* const leds,
-                   argos::CCI_RangeAndBearingActuator* const raba,
-                   const struct actuator_params& params);
+                   argos::CCI_RangeAndBearingActuator* const raba);
 
   /* member functions */
   void leds_set_color(const argos::CColor& color) {
@@ -56,12 +56,15 @@ class actuator_manager {
    * actuation.
    */
   void set_wheel_speeds(const argos::CVector2& c_heading);
-  size_t max_wheel_speed(void) { return mc_params.wheels.max_speed; }
+  size_t max_wheel_speed(void) { return mc_params->wheels.max_speed; }
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
   void reset(int state);
 
  private:
+  actuator_manager(const actuator_manager& fsm) = delete;
+  actuator_manager& operator=(const actuator_manager& fsm) = delete;
+
   /*
    * The robot can be in three different turning states.
    */
@@ -71,14 +74,14 @@ class actuator_manager {
     HARD_TURN    // wheels are turning with opposite speeds
   };
 
-  argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
-  argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
-  argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   enum turning_state                       m_turning_state;
-  const struct actuator_params&            mc_params;
+  std::shared_ptr<argos::CCI_DifferentialSteeringActuator> m_wheels;  /* differential steering */
+  std::shared_ptr<argos::CCI_LEDsActuator>                 m_leds;    /* LEDs  */
+  std::shared_ptr<argos::CCI_RangeAndBearingActuator>      m_raba;    /* Range and bearing */
+  std::shared_ptr<const struct actuator_params>  mc_params;
 
 };
 
-} /* namespace fordyca */
+NS_END(fordyca);
 
 #endif /* INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_ */

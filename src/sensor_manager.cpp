@@ -37,16 +37,17 @@ NS_START(fordyca);
  * Constructors/Destructor
  ******************************************************************************/
 sensor_manager::sensor_manager(
+    const struct sensor_params* params,
     argos::CCI_RangeAndBearingSensor* const rabs,
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,
-    argos::CCI_FootBotMotorGroundSensor* const ground,
-    const struct sensor_params& params) :
+    argos::CCI_FootBotMotorGroundSensor* const ground) :
+    mc_params(params),
     m_rabs(rabs),
     m_proximity(proximity),
     m_light(light),
-    m_ground(ground),
-    mc_params(params) {}
+    m_ground(ground) {}
+
 
 /*******************************************************************************
  * Member Functions
@@ -71,8 +72,8 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it
    */
-  if(mc_params.diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-     ccalc_diffusion_vector.Length() < mc_params.diffusion.delta) {
+  if(mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
+     ccalc_diffusion_vector.Length() < mc_params->diffusion.delta) {
     return false;
   }
   return true;

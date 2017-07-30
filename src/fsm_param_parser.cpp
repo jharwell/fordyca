@@ -32,7 +32,7 @@ NS_START(fordyca);
  * Member Functions
  ******************************************************************************/
 void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "state");
+  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
   m_params.reset(new social_fsm_params);
   try {

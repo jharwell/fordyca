@@ -41,29 +41,35 @@ social_foraging_controller::social_foraging_controller(void) :
     m_sensors(),
     m_fsm(),
     m_food_stats() {
-  m_parser.add_category("actuators", actuator_param_parser());
-  m_parser.add_category("sensors", sensor_param_parser());
-  m_parser.add_category("fsm", fsm_param_parser());
+  m_parser.add_category("actuators", new actuator_param_parser());
+  m_parser.add_category("sensors", new sensor_param_parser());
+  m_parser.add_category("fsm", new fsm_param_parser());
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void social_foraging_controller::Init(argos::TConfigurationNode& node) {
+  printf("Initializing social foraging controller\n");
   m_parser.parse_all(node);
-  m_actuators.reset(new actuator_manager(GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
-                                      GetActuator<argos::CCI_LEDsActuator>("leds"),
-                                      GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"),
-                                         static_cast<const struct actuator_params&>(*m_parser.get_params("actuators"))));
+  printf(" - Parsed all parameters\n");
+  m_actuators.reset(new actuator_manager(static_cast<const struct actuator_params*>(m_parser.get_params("actuators")),
+                                         GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
+                                         GetActuator<argos::CCI_LEDsActuator>("leds"),
+                                         GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
 
-  m_sensors.reset(new sensor_manager(GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+
+  m_sensors.reset(new sensor_manager(static_cast<const struct sensor_params*>(m_parser.get_params("sensors")),
+                                     GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
                                      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
                                      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-                                     GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground"),
-                                     static_cast<const struct sensor_params&>(*m_parser.get_params("sensors"))));
-  m_fsm.reset(new social_fsm(static_cast<const struct social_fsm_params&>(*m_parser.get_params("fsm")),
+                                     GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+
+  printf("fsm params: %p\n", m_parser.get_params("fsm"));
+  m_fsm.reset(new social_fsm(static_cast<const struct social_fsm_params*>(m_parser.get_params("fsm")),
                              m_sensors.get(),
                              m_actuators.get()));
+  printf(" - Loaded all sensors and actuators\n");
   Reset();
 } /* Init() */
 
@@ -71,6 +77,7 @@ void social_foraging_controller::Reset(void) {
   m_fsm->reset();
   m_food_stats.reset();
   m_actuators->leds_set_color(argos::CColor::WHITE);
+  printf("Reset social foraging controller\n");
 } /* Reset() */
 
 /*

@@ -45,7 +45,7 @@ void sensor_param_parser::parse(argos::TConfigurationNode& node) {
       m_params->diffusion.go_straight_angle_range.Set(
           argos::ToRadians(angle_range_deg.GetMin()),
           argos::ToRadians(angle_range_deg.GetMax()));
-      argos::GetNodeAttribute(node, "delta", m_params->diffusion.delta);
+      argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
     }
     catch (argos::CARGoSException& ex) {
       using namespace argos;

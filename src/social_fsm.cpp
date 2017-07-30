@@ -32,7 +32,7 @@ NS_START(fordyca);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-social_fsm::social_fsm(const struct social_fsm_params& params,
+social_fsm::social_fsm(const struct social_fsm_params* params,
                        sensor_manager* const sensors,
                        actuator_manager* const actuators) :
     fsm::base_fsm(ST_MAX_STATES),
@@ -54,8 +54,8 @@ social_fsm::social_fsm(const struct social_fsm_params& params,
     m_last_explore_res(LAST_EXPLORATION_NONE),
     m_rng(),
     m_prob_range(0.0f, 1.0f),
-    mc_params(params),
     m_state(),
+    mc_params(params),
     m_sensors(sensors),
     m_actuators(actuators) {}
 
@@ -81,7 +81,7 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
   /*
    * If we have stayed here enough, probabilistically switch to 'exploring'
    */
-  if (mc_params.times.min_rested > m_state.time_rested &&
+  if (mc_params->times.min_rested > m_state.time_rested &&
       m_rng->Uniform(m_prob_range) < m_state.rest_to_explore_prob) {
     internal_event(ST_EXPLORE);
   }
@@ -100,15 +100,15 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
   for (size_t i = 0; i < tPackets.size(); ++i) {
     switch (tPackets[i].Data[0]) {
       case LAST_EXPLORATION_SUCCESSFUL:
-        m_state.rest_to_explore_prob += mc_params.deltas.social_rule_rest_to_explore;
+        m_state.rest_to_explore_prob += mc_params->deltas.social_rule_rest_to_explore;
         m_prob_range.TruncValue(m_state.rest_to_explore_prob);
-        m_state.explore_to_rest_prob -= mc_params.deltas.social_rule_explore_to_rest;;
+        m_state.explore_to_rest_prob -= mc_params->deltas.social_rule_explore_to_rest;;
         m_prob_range.TruncValue(m_state.explore_to_rest_prob);
         break;
       case LAST_EXPLORATION_UNSUCCESSFUL:
-        m_state.explore_to_rest_prob += mc_params.deltas.social_rule_explore_to_rest;
+        m_state.explore_to_rest_prob += mc_params->deltas.social_rule_explore_to_rest;
         m_prob_range.TruncValue(m_state.explore_to_rest_prob);
-        m_state.rest_to_explore_prob -= mc_params.deltas.social_rule_rest_to_explore;
+        m_state.rest_to_explore_prob -= mc_params->deltas.social_rule_rest_to_explore;
         m_prob_range.TruncValue(m_state.rest_to_explore_prob);
         break;
     } /* switch() */
@@ -157,15 +157,15 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
    * nest' if we have been wandering for some time and found nothing.
    */
   if (m_state.time_exploring_unsuccessfully >
-      mc_params.times.max_unsuccessful_explore) {
+      mc_params->times.max_unsuccessful_explore) {
     if (m_rng->Uniform(m_prob_range) < m_state.explore_to_rest_prob) {
       external_event(ST_EXPLORE_FAIL);
     }
     /* Apply the food rule, increasing explore_to_rest_prob and
      * decreasing RestToExploreProb */
-    m_state.explore_to_rest_prob += mc_params.deltas.food_rule_explore_to_rest;
+    m_state.explore_to_rest_prob += mc_params->deltas.food_rule_explore_to_rest;
     m_prob_range.TruncValue(m_state.explore_to_rest_prob);
-    m_state.rest_to_explore_prob -= mc_params.deltas.food_rule_rest_to_explore;
+    m_state.rest_to_explore_prob -= mc_params->deltas.food_rule_rest_to_explore;
     m_prob_range.TruncValue(m_state.rest_to_explore_prob);
   }
 
@@ -200,9 +200,9 @@ STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
      * Collision avoidance happened, increase explore_to_rest_prob and decrease
      * RestToExploreProb
      */
-    m_state.explore_to_rest_prob += mc_params.deltas.collision_rule_explore_to_rest;
+    m_state.explore_to_rest_prob += mc_params->deltas.collision_rule_explore_to_rest;
     m_prob_range.TruncValue(m_state.explore_to_rest_prob);
-    m_state.rest_to_explore_prob -= mc_params.deltas.collision_rule_explore_to_rest;
+    m_state.rest_to_explore_prob -= mc_params->deltas.collision_rule_explore_to_rest;
     m_prob_range.TruncValue(m_state.rest_to_explore_prob);
   } /* while() */
 
@@ -237,7 +237,7 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
 
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
   /* Have we looked for a place long enough? */
-  if (m_state.time_search_for_place_in_nest > mc_params.times.min_search_for_place_in_nest) {
+  if (m_state.time_search_for_place_in_nest > mc_params->times.min_search_for_place_in_nest) {
     m_actuators->stop_wheels();
     m_actuators->set_raba_data(m_last_explore_res);
     internal_event(ST_REST);
@@ -270,9 +270,9 @@ STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
    * Apply the food rule, decreasing explore_to_rest_prob and increasing
    * RestToExploreProb
    */
-  m_state.explore_to_rest_prob -= mc_params.deltas.food_rule_explore_to_rest;
+  m_state.explore_to_rest_prob -= mc_params->deltas.food_rule_explore_to_rest;
   m_prob_range.TruncValue(m_state.explore_to_rest_prob);
-  m_state.rest_to_explore_prob += mc_params.deltas.food_rule_rest_to_explore;
+  m_state.rest_to_explore_prob += mc_params->deltas.food_rule_rest_to_explore;
   m_prob_range.TruncValue(m_state.rest_to_explore_prob);
 
   /* Store the result of the expedition */
@@ -292,7 +292,7 @@ STATE_DEFINE(social_fsm, explore_fail, fsm::no_event_data) {
  * General Member Functions
  ******************************************************************************/
 void social_fsm::reset(void) {
-  m_state.explore_to_rest_prob = mc_params.initial_rest_to_explore_prob;
+  m_state.explore_to_rest_prob = mc_params->initial_rest_to_explore_prob;
   m_state.time_exploring_unsuccessfully = 0;
 
   /*
@@ -302,7 +302,7 @@ void social_fsm::reset(void) {
    * RestingTime reaches MinimumRestingTime before something happens, which is
    * just a waste of time.
    */
-  m_state.time_rested = mc_params.times.min_rested;
+  m_state.time_rested = mc_params->times.min_rested;
   m_state.time_search_for_place_in_nest = 0;
   m_last_explore_res = LAST_EXPLORATION_NONE;
   m_actuators->reset(LAST_EXPLORATION_NONE);

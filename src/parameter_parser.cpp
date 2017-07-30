@@ -33,16 +33,16 @@ NS_START(fordyca);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-status_t parameter_parser::add_category(const std::string& name, const base_param_parser& parser) {
+status_t parameter_parser::add_category(const std::string& name, base_param_parser* parser) {
   FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
 
-  m_parsers.insert(std::pair<std::string, base_param_parser>(name, parser));
+  m_parsers.insert(std::pair<std::string, base_param_parser*>(name, parser));
   return OK;
 } /* add_category() */
 
 status_t parameter_parser::parse_all(argos::TConfigurationNode& node) {
-  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser>& pair) {
-      pair.second.parse(node);
+  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
+      pair.second->parse(node);
     });
   return OK;
 } /* parse_all() */

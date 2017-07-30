@@ -44,11 +44,11 @@ class sensor_manager {
  public:
   /* constructors */
   sensor_manager(
+      const struct sensor_params* params,
       argos::CCI_RangeAndBearingSensor* const rabs,
       argos::CCI_FootBotProximitySensor* const proximity,
       argos::CCI_FootBotLightSensor* const light,
-      argos::CCI_FootBotMotorGroundSensor* const ground,
-      const struct sensor_params& params);
+      argos::CCI_FootBotMotorGroundSensor* const ground);
 
   /* member functions */
   const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {
@@ -75,11 +75,11 @@ class sensor_manager {
   argos::CVector2 calc_vector_to_light(void);
 
  private:
-  argos::CCI_RangeAndBearingSensor*    m_rabs; /* range and bearing sensor */
-  argos::CCI_FootBotProximitySensor*   m_proximity; /* proximity sensor */
-  argos::CCI_FootBotLightSensor*       m_light; /* light sensor */
-  argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
-  const struct sensor_params&          mc_params;
+  std::shared_ptr<const struct sensor_params>          mc_params;
+  std::shared_ptr<argos::CCI_RangeAndBearingSensor>    m_rabs; /* range and bearing sensor */
+  std::shared_ptr<argos::CCI_FootBotProximitySensor>   m_proximity; /* proximity sensor */
+  std::shared_ptr<argos::CCI_FootBotLightSensor>       m_light; /* light sensor */
+  std::shared_ptr<argos::CCI_FootBotMotorGroundSensor> m_ground; /* motor ground sensor */
 };
 
 NS_END(fordyca);

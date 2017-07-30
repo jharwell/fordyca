@@ -22,7 +22,7 @@
   <!-- * Controllers * -->
   <!-- *************** -->
   <controllers>
-    
+
     <social_foraging_controller id="ffc"
                                  library="build/lib/libfordyca">
       <actuators>
@@ -39,11 +39,11 @@
       <params>
         <diffusion go_straight_angle_range="-5:5"
                    delta="0.1" />
-        <wheel_turning hard_turn_angle_threshold="90"
-                       soft_turn_angle_threshold="70"
-                       no_turn_angle_threshold="10"
-                       max_speed="10" />
-        <state initial_rest_to_explore_prob="0.1"
+        <wheels hard_turn_angle_threshold="90"
+                soft_turn_angle_threshold="70"
+                no_turn_angle_threshold="10"
+                max_speed="10" />
+        <fsm initial_rest_to_explore_prob="0.1"
                initial_explore_to_rest_prob="0.1"
                food_rule_explore_to_rest_delta_prob="0.01"
                food_rule_rest_to_explore_delta_prob="0.01"
@@ -51,10 +51,10 @@
                social_rule_explore_to_rest_delta_prob="0.01"
                social_rule_rest_to_explore_delta_prob="0.01"
                minimum_resting_time="50"
-               minimum_unsuccessful_explore_time="600"
+               maximum_unsuccessful_explore_time="600"
                minimum_search_for_place_in_nest_time="50">
           <food_rule active="true" food_rule_explore_to_rest_delta_prob="0.01" />
-        </state>
+        </fsm>
       </params>
     </social_foraging_controller>
 
@@ -65,10 +65,10 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="social_loop_functions">
-    <foraging items="15"
+    <foraging n_items="15"
               radius="0.1"
               energy_per_item="1000"
-              energy_per_walking_robot="1"
+              energy_per_moving_robot="1"
               output="foraging.txt" />
   </loop_functions>
 
@@ -122,7 +122,7 @@
     <distribute>
       <position method="uniform" min="-2,-2,0" max="-1,2,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="20" max_trials="100">
+      <entity quantity="2" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

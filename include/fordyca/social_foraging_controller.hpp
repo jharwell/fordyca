@@ -62,7 +62,7 @@ class social_foraging_controller : public argos::CCI_Controller {
   };
 
   social_foraging_controller(void);
-  virtual ~social_foraging_controller() {}
+  virtual ~social_foraging_controller() {printf("DESTROY\n");}
 
   bool is_resting(void) { return m_fsm->is_resting(); }
   /*

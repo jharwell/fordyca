@@ -60,7 +60,7 @@ class social_fsm : public fsm::base_fsm {
     collision_event_data(void) : last_state(ST_REST) {}
   };
 
-  social_fsm(const struct social_fsm_params& params,
+  social_fsm(const struct social_fsm_params* params,
              sensor_manager* const sensors,
              actuator_manager* const actuators);
 
@@ -148,8 +148,8 @@ class social_fsm : public fsm::base_fsm {
   enum last_exploration_result m_last_explore_res;
   argos::CRandom::CRNG* m_rng;
   argos::CRange<argos::Real> m_prob_range;
-  const struct social_fsm_params& mc_params;
   struct fsm_state m_state;
+  std::shared_ptr<const struct social_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
 };
