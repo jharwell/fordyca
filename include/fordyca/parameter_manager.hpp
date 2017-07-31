@@ -1,29 +1,36 @@
 /**
- * @file parameter_parser.cpp
+ * @file parameter_manager.hpp
+ *
+ * Handles parsing of all XML parameters at runtime.
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of RCPPSW.
+ * This file is part of FORDYCA.
  *
- * RCPPSW is free software: you can redistribute it and/or modify it under the
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * RCPPSW.  If not, see <http://www.gnu.org/licenses/
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
+
+#ifndef INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
+#define INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/parameter_parser.hpp"
-#include <algorithm>
-#include "rcsw/common/fpc.h"
+#include <string>
+#include <map>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params.hpp"
+#include "fordyca/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,20 +38,20 @@
 NS_START(fordyca);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-status_t parameter_parser::add_category(const std::string& name, base_param_parser* parser) {
-  FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
+class parameter_manager {
+ public:
+  parameter_manager(void) : m_parsers() {}
 
-  m_parsers.insert(std::pair<std::string, base_param_parser*>(name, parser));
-  return OK;
-} /* add_category() */
+  status_t add_category(const std::string& category, base_param_parser* parser);
+  status_t parse_all(argos::TConfigurationNode& node);
+  const struct base_params* get_params(const std::string& name) { return m_parsers[name]->get_results(); }
 
-status_t parameter_parser::parse_all(argos::TConfigurationNode& node) {
-  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
-      pair.second->parse(node);
-    });
-  return OK;
-} /* parse_all() */
+ private:
+  std::map<std::string, base_param_parser*> m_parsers;
+};
 
 NS_END(fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_ */

@@ -30,7 +30,7 @@
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/parameter_parser.hpp"
+#include "fordyca/parameter_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,7 +68,7 @@ class social_loop_functions : public argos::CLoopFunctions {
   int m_energy;
   uint m_energy_per_moving_robot;
   struct food_params m_food_params;
-  parameter_parser m_parser;
+  parameter_manager m_parser;
 };
 
 NS_END(fordyca);

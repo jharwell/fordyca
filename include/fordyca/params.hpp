@@ -1,10 +1,8 @@
 /**
- * @file fordyca_params.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
- *
+n *
  * This file is part of FORDYCA.
  *
  * FORDYCA is free software: you can redistribute it and/or modify it under the
@@ -56,7 +54,6 @@ struct prob_deltas  {
 
   /* The increase of explore_to_rest_prob due to the social rule */
   argos::Real social_rule_explore_to_rest;
-
 };
 
 struct threshold_times {

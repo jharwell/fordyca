@@ -28,7 +28,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/fordyca_params.hpp"
+#include "fordyca/params.hpp"
 
 /*******************************************************************************
  * Namespaces

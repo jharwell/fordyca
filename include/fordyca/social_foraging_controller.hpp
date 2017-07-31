@@ -27,9 +27,9 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
-#include "fordyca/fordyca_params.hpp"
+#include "fordyca/params.hpp"
 #include "fordyca/social_fsm.hpp"
-#include "fordyca/parameter_parser.hpp"
+#include "fordyca/parameter_manager.hpp"
 #include "fordyca/sensor_manager.hpp"
 #include "fordyca/actuator_manager.hpp"
 
@@ -96,7 +96,7 @@ class social_foraging_controller : public argos::CCI_Controller,
   social_foraging_controller& operator=(const social_foraging_controller& c) = delete;
 
   /* The controller state information */
-  parameter_parser m_parser;
+  parameter_manager m_param_manager;
   std::shared_ptr<actuator_manager> m_actuators;
   std::shared_ptr<sensor_manager> m_sensors;
   std::unique_ptr<social_fsm> m_fsm;

@@ -1,5 +1,5 @@
 /**
- * @file base_param_parser.hpp
+ * @file expressions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_EXPRESSIONS_HPP_
+#define INCLUDE_FORDYCA_EXPRESSIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <utility>
+#include <cmath>
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,15 +38,52 @@ NS_START(fordyca);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_param_parser {
+class pheremone_density: public rcppsw::math::expression<double> {
  public:
-  base_param_parser(void) {}
-  virtual ~base_param_parser(void) {}
+  explicit pheremone_density(double rho) :
+      expression(), m_delta(0), m_rho(rho) {}
 
-  virtual void parse(__unused argos::TConfigurationNode& node) = 0;
-  virtual const struct base_params* get_results(void) { return NULL; }
+  double calc(void) const {
+    return m_rho * last_res() + m_delta;
+  }
+  void add_pheremone(void) {
+    ++m_delta;
+  }
+
+ private:
+  double m_delta;
+  double m_rho;
 };
+
+NS_START(forage);
+class block_utility: public rcppsw::math::expression<double>  {
+ public:
+  /* constructors */
+  block_utility(argos::CVector2 block_loc, argos::CVector2 nest_loc) :
+      mc_block_loc(block_loc),
+      mc_nest_loc(nest_loc) {}
+
+  /* member functions */
+  double calc(const argos::CVector2& rloc, double density) {
+    return ((mc_block_loc - mc_nest_loc).Length() /
+            (mc_block_loc - rloc).Length()) * std::exp(-density);
+  }
+
+
+ private:
+  /* member functions */
+
+  /* data members */
+  const argos::CVector2 mc_block_loc;
+  const argos::CVector2 mc_nest_loc;
+};
+typedef block_utility cache_utility;
+NS_END(forage);
+
+NS_START(harvest);
+
+NS_END(harvest);
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_EXPRESSIONS_HPP_ */
