@@ -61,12 +61,14 @@ class social_fsm : public fsm::base_fsm {
   };
 
   social_fsm(const struct social_fsm_params* params,
+             std::shared_ptr<rcppsw::common::er_server> server,
              sensor_manager* const sensors,
              actuator_manager* const actuators);
-
+  ~social_fsm(void);
   bool is_resting(void) { return current_state() == ST_REST; }
   void reset(void);
   void event_explore(void);
+  void run(void) { state_engine(); }
 
  private:
   /**

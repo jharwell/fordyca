@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FOOD_PARAM_PARSER_HPP_
-#define INCLUDE_FOOD_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_FOOD_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_FOOD_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -49,4 +49,4 @@ class food_param_parser: public base_param_parser {
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FOOD_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_FOOD_PARAM_PARSER_HPP_ */

@@ -44,7 +44,8 @@ NS_START(fordyca);
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class social_foraging_controller : public argos::CCI_Controller {
+class social_foraging_controller : public argos::CCI_Controller,
+                                   public rcppsw::common::er_client {
  public:
   /**
    * @brief This structure holds data about food collecting by the robots
@@ -76,7 +77,7 @@ class social_foraging_controller : public argos::CCI_Controller {
   /*
    * @brief Called once every time step; length set in the XML file.
    */
-  virtual void ControlStep(void) { m_fsm->event_explore(); }
+  virtual void ControlStep(void) { m_fsm->run(); }
 
   /*
    * @brief Reset controller to its state right after the Init().
@@ -91,17 +92,15 @@ class social_foraging_controller : public argos::CCI_Controller {
   inline struct food_data& get_food_data() { return m_food_stats; }
 
  private:
-  social_foraging_controller(const social_foraging_controller& fsm) = delete;
-  social_foraging_controller& operator=(const social_foraging_controller& fsm) = delete;
-
-  /* The random number generator */
-  argos::CRandom::CRNG* m_rng;
+  social_foraging_controller(const social_foraging_controller& c) = delete;
+  social_foraging_controller& operator=(const social_foraging_controller& c) = delete;
 
   /* The controller state information */
   parameter_parser m_parser;
   std::shared_ptr<actuator_manager> m_actuators;
   std::shared_ptr<sensor_manager> m_sensors;
   std::unique_ptr<social_fsm> m_fsm;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
 
   /* The food data */
   struct food_data m_food_stats;

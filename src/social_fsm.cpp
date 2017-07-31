@@ -33,9 +33,10 @@ NS_START(fordyca);
  * Constructors/Destructors
  ******************************************************************************/
 social_fsm::social_fsm(const struct social_fsm_params* params,
+                       std::shared_ptr<rcppsw::common::er_server> server,
                        sensor_manager* const sensors,
                        actuator_manager* const actuators) :
-    fsm::base_fsm(ST_MAX_STATES),
+    fsm::base_fsm(server, ST_MAX_STATES),
     rest(),
     explore(),
     explore_success(),
@@ -52,13 +53,16 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
     entry_collision_avoidance(),
     entry_search_for_spot_in_nest(),
     m_last_explore_res(LAST_EXPLORATION_NONE),
-    m_rng(),
+    m_rng(argos::CRandom::CreateRNG("argos")),
     m_prob_range(0.0f, 1.0f),
     m_state(),
     mc_params(params),
     m_sensors(sensors),
     m_actuators(actuators) {}
 
+social_fsm::~social_fsm(void) {
+  delete m_rng;
+}
 /*******************************************************************************
  * Events
  ******************************************************************************/
@@ -78,6 +82,8 @@ void social_fsm::event_explore(void) {
  * States
  ******************************************************************************/
 STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
+  ER_DIAG("Executing ST_REST");
+
   /*
    * If we have stayed here enough, probabilistically switch to 'exploring'
    */
@@ -116,6 +122,8 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
 }
 
 EXIT_DEFINE(social_fsm, exit_rest) {
+  ER_DIAG("Exiting ST_REST\n");
+
   m_state.time_rested = 0;
   /*
    * The vector returned by calc_vector_to_light() points to
@@ -131,14 +139,18 @@ EXIT_DEFINE(social_fsm, exit_rest) {
 
 
 ENTRY_DEFINE(social_fsm, entry_rest, fsm::no_event_data) {
+  ER_DIAG("Entrying ST_REST\n");
   m_actuators->leds_set_color(argos::CColor::BLACK);
 }
 
 ENTRY_DEFINE(social_fsm, entry_explore, fsm::no_event_data) {
+  ER_DIAG("Entrying ST_EXPLORE\n");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
 }
 
 STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
+  ER_DIAG("Executing ST_EXPlORE\n");
+
   /*
    * We transition to the 'return to nest' state in two situations:
    *
@@ -184,12 +196,15 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
 }
 
 EXIT_DEFINE(social_fsm, exit_explore) {
+  ER_DIAG("Exiting ST_EXLORE\n");
   m_state.time_exploring_unsuccessfully = 0;
   m_state.time_search_for_place_in_nest = 0;
 }
 
 STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
   argos::CVector2 vector;
+
+  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE\n");
 
   while (m_sensors->calc_diffusion_vector(&vector)) {
     vector = -vector.Normalize();
@@ -210,10 +225,13 @@ STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
 }
 
 ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
+  ER_DIAG("Entering ST_COLLIISION_AVOIDANCE\n");
   m_actuators->leds_set_color(argos::CColor::RED);
 }
 
 STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
+    ER_DIAG("Executing ST_RETURN_TO_NEST\n");
+
   /* Read stuff from the ground sensor */
   const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_sensors->ground();
 
@@ -236,6 +254,8 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
 }
 
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
+  ER_DIAG("Executing ST_SEARCH_FOR_SPOT_IN_NEST\n");
+
   /* Have we looked for a place long enough? */
   if (m_state.time_search_for_place_in_nest > mc_params->times.min_search_for_place_in_nest) {
     m_actuators->stop_wheels();
@@ -255,15 +275,19 @@ STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
 }
 
 ENTRY_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
+  ER_DIAG("Entering ST_SEARCH_FOR_SPOT_IN_NEST\n");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
 
 EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
+  ER_DIAG("Exiting ST_SEARCH_FOR_SPOT_IN_NEST");
   m_last_explore_res = LAST_EXPLORATION_NONE;
   m_state.time_search_for_place_in_nest = 0;
 }
 
 STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
+  ER_DIAG("Executing ST_EXPLORE_SUCCESS");
+
   m_actuators->leds_set_color(argos::CColor::GREEN);
 
   /*
@@ -281,6 +305,7 @@ STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
 }
 
 STATE_DEFINE(social_fsm, explore_fail, fsm::no_event_data) {
+  ER_DIAG("Executing ST_EXPLORE_FAIL");
   m_actuators->leds_set_color(argos::CColor::ORANGE);
 
   /* Store the result of the expedition */

@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FSM_PARAM_PARSER_HPP_
-#define INCLUDE_FSM_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -49,4 +49,4 @@ class fsm_param_parser: public base_param_parser {
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FSM_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_ */
