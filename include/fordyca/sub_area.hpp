@@ -41,18 +41,19 @@ NS_START(fordyca);
 class sub_area_poa: public rcppsw::math::expression<double> {
  public:
   /* constructors */
-  sub_area_poa(argos::CVector2 area_center, argos::CVector2 nest_center) :
+  sub_area_poa(const argos::CVector2& area_center,
+               const argos::CVector2& nest_center) :
       mc_center(area_center), mc_nest(nest_center) {}
 
   /* member functions */
-  double calc(const std::vector<argos::CVector2>& caches) const {
+  double calc(const std::vector<argos::CVector2>& caches) {
     double sum = 0;
     std::for_each(caches.begin(),
                   caches.end(),
                   [&](const argos::CVector2& cache) {
                     sum += (cache - mc_nest).Length();
                   });
-    return (mc_center - mc_nest).Length() / sum;
+    return set_result((mc_center - mc_nest).Length() / sum);
   }
 
  private:
@@ -65,8 +66,8 @@ class sub_area_poa: public rcppsw::math::expression<double> {
 
 class sub_area_utility: public rcppsw::math::expression<double> {
  public:
-  sub_area_utility(argos::CVector2 area_center,
-                   argos::CVector2 nest_center,
+  sub_area_utility(const argos::CVector2& area_center,
+                   const argos::CVector2& nest_center,
                    size_t squares) :
       expression(),
       m_squares(squares),
@@ -74,8 +75,9 @@ class sub_area_utility: public rcppsw::math::expression<double> {
       m_poa(area_center, nest_center) {}
 
   double calc(const argos::CVector2& rloc,
-              const std::vector<argos::CVector2>& caches) const {
-    return m_poa.calc(caches) * (m_unexplored / (rloc - mc_center).Length());
+              const std::vector<argos::CVector2>& caches) {
+    return set_result(m_poa.calc(caches) * (m_unexplored /
+                                            (rloc - mc_center).Length()));
   }
   void update_explored(size_t explored) { m_unexplored = m_squares - explored; }
 
@@ -91,8 +93,8 @@ class sub_area {
  public:
   /* constructors */
   sub_area(size_t dim,
-           argos::CVector2 area_center,
-           argos::CVector2 nest_center) :
+           const argos::CVector2& area_center,
+           const argos::CVector2& nest_center) :
       m_dim(dim),
       m_center(area_center),
       m_utility(m_center, nest_center, m_dim*m_dim) {}
