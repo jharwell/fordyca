@@ -75,11 +75,14 @@ class sensor_manager {
   argos::CVector2 calc_vector_to_light(void);
 
  private:
+  sensor_manager(const sensor_manager& fsm) = delete;
+  sensor_manager& operator=(const sensor_manager& fsm) = delete;
+
   std::shared_ptr<const struct sensor_params>          mc_params;
-  std::shared_ptr<argos::CCI_RangeAndBearingSensor>    m_rabs; /* range and bearing sensor */
-  std::shared_ptr<argos::CCI_FootBotProximitySensor>   m_proximity; /* proximity sensor */
-  std::shared_ptr<argos::CCI_FootBotLightSensor>       m_light; /* light sensor */
-  std::shared_ptr<argos::CCI_FootBotMotorGroundSensor> m_ground; /* motor ground sensor */
+  argos::CCI_RangeAndBearingSensor*    m_rabs; /* range and bearing sensor */
+  argos::CCI_FootBotProximitySensor*   m_proximity; /* proximity sensor */
+  argos::CCI_FootBotLightSensor*       m_light; /* light sensor */
+  argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
 };
 
 NS_END(fordyca);

@@ -34,8 +34,8 @@ NS_START(fordyca);
  ******************************************************************************/
 social_fsm::social_fsm(const struct social_fsm_params* params,
                        std::shared_ptr<rcppsw::common::er_server> server,
-                       sensor_manager* const sensors,
-                       actuator_manager* const actuators) :
+                       std::shared_ptr<sensor_manager> sensors,
+                       std::shared_ptr<actuator_manager> actuators) :
     fsm::base_fsm(server, ST_MAX_STATES),
     rest(),
     explore(),
@@ -58,11 +58,11 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
     m_state(),
     mc_params(params),
     m_sensors(sensors),
-    m_actuators(actuators) {}
+    m_actuators(actuators) {
+  insmod("social_fsm");
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+    }
 
-social_fsm::~social_fsm(void) {
-  delete m_rng;
-}
 /*******************************************************************************
  * Events
  ******************************************************************************/
@@ -74,6 +74,18 @@ void social_fsm::event_explore(void) {
     EVENT_IGNORED,     /* explore success */
     EVENT_IGNORED,      /* return to nest */
     ST_COLLISION_AVOIDANCE, /* collision avoidance */
+  };
+  external_event(kTRANSITIONS[current_state()], NULL);
+}
+
+void social_fsm::event_continue(void) {
+  static const uint8_t kTRANSITIONS[] = {
+    ST_REST,
+    ST_EXPLORE,
+    ST_EXPLORE_SUCCESS,
+    ST_EXPLORE_FAIL,
+    ST_RETURN_TO_NEST,
+    ST_SEARCH_FOR_SPOT_IN_NEST
   };
   external_event(kTRANSITIONS[current_state()], NULL);
 }
@@ -122,7 +134,7 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
 }
 
 EXIT_DEFINE(social_fsm, exit_rest) {
-  ER_DIAG("Exiting ST_REST\n");
+  ER_DIAG("Exiting ST_REST");
 
   m_state.time_rested = 0;
   /*
@@ -137,19 +149,18 @@ EXIT_DEFINE(social_fsm, exit_rest) {
       m_actuators->max_wheel_speed() * 0.25f * m_sensors->calc_vector_to_light());
 }
 
-
 ENTRY_DEFINE(social_fsm, entry_rest, fsm::no_event_data) {
-  ER_DIAG("Entrying ST_REST\n");
+  ER_DIAG("Entrying ST_REST");
   m_actuators->leds_set_color(argos::CColor::BLACK);
 }
 
 ENTRY_DEFINE(social_fsm, entry_explore, fsm::no_event_data) {
-  ER_DIAG("Entrying ST_EXPLORE\n");
+  ER_DIAG("Entrying ST_EXPLORE");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
 }
 
 STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
-  ER_DIAG("Executing ST_EXPlORE\n");
+  ER_DIAG("Executing ST_EXPlORE");
 
   /*
    * We transition to the 'return to nest' state in two situations:
@@ -196,7 +207,7 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
 }
 
 EXIT_DEFINE(social_fsm, exit_explore) {
-  ER_DIAG("Exiting ST_EXLORE\n");
+  ER_DIAG("Exiting ST_EXLORE");
   m_state.time_exploring_unsuccessfully = 0;
   m_state.time_search_for_place_in_nest = 0;
 }
@@ -204,7 +215,7 @@ EXIT_DEFINE(social_fsm, exit_explore) {
 STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
   argos::CVector2 vector;
 
-  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE\n");
+  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
 
   while (m_sensors->calc_diffusion_vector(&vector)) {
     vector = -vector.Normalize();
@@ -225,12 +236,12 @@ STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
 }
 
 ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
-  ER_DIAG("Entering ST_COLLIISION_AVOIDANCE\n");
+  ER_DIAG("Entering ST_COLLIISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
 }
 
 STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
-    ER_DIAG("Executing ST_RETURN_TO_NEST\n");
+    ER_DIAG("Executing ST_RETURN_TO_NEST");
 
   /* Read stuff from the ground sensor */
   const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_sensors->ground();
@@ -254,7 +265,7 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
 }
 
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_SEARCH_FOR_SPOT_IN_NEST\n");
+  ER_DIAG("Executing ST_SEARCH_FOR_SPOT_IN_NEST");
 
   /* Have we looked for a place long enough? */
   if (m_state.time_search_for_place_in_nest > mc_params->times.min_search_for_place_in_nest) {
@@ -275,7 +286,7 @@ STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
 }
 
 ENTRY_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
-  ER_DIAG("Entering ST_SEARCH_FOR_SPOT_IN_NEST\n");
+  ER_DIAG("Entering ST_SEARCH_FOR_SPOT_IN_NEST");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
 
@@ -331,6 +342,7 @@ void social_fsm::reset(void) {
   m_state.time_search_for_place_in_nest = 0;
   m_last_explore_res = LAST_EXPLORATION_NONE;
   m_actuators->reset(LAST_EXPLORATION_NONE);
+  base_fsm::reset();
 } /* reset() */
 
 NS_END(fordyca);

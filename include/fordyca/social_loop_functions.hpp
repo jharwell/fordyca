@@ -68,7 +68,7 @@ class social_loop_functions : public argos::CLoopFunctions {
   int m_energy;
   uint m_energy_per_moving_robot;
   struct food_params m_food_params;
-  parameter_manager m_parser;
+  parameter_manager m_param_manager;
 };
 
 NS_END(fordyca);

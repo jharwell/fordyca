@@ -36,59 +36,59 @@ NS_START(fordyca);
  ******************************************************************************/
 social_foraging_controller::social_foraging_controller(void) :
     er_client(),
-    m_parser(),
+    m_param_manager(),
     m_actuators(),
     m_sensors(),
     m_fsm(),
-    m_server(new rcppsw::common::er_server(
-        std::string(std::string("controller-") +
-                    this->GetId() +
-                    std::string(".txt")) ,
-        rcppsw::common::er_lvl::NOM,
-        rcppsw::common::er_lvl::NOM, false)),
+    m_server(new rcppsw::common::er_server("init.txt")),
     m_food_stats() {
   deferred_init(m_server);
-  m_parser.add_category("actuators", new actuator_param_parser());
-  m_parser.add_category("sensors", new sensor_param_parser());
-  m_parser.add_category("fsm", new fsm_param_parser());
+  insmod("controller");
+  m_param_manager.add_category("actuators", new actuator_param_parser());
+  m_param_manager.add_category("sensors", new sensor_param_parser());
+  m_param_manager.add_category("fsm", new fsm_param_parser());
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void social_foraging_controller::Init(argos::TConfigurationNode& node) {
-  ER_NOM("Initializing social foraging controller\n");
+  ER_NOM("Initializing social foraging controller");
 
-  m_parser.parse_all(node);
-  ER_NOM(" - Parsed all parameters\n");
+  m_param_manager.parse_all(node);
+  ER_NOM(" - Parsed all parameters");
 
   m_actuators.reset(new actuator_manager(
-      static_cast<const struct actuator_params*>(m_parser.get_params("actuators")),
+      static_cast<const struct actuator_params*>(m_param_manager.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
-
   m_sensors.reset(new sensor_manager(
-      static_cast<const struct sensor_params*>(m_parser.get_params("sensors")),
+      static_cast<const struct sensor_params*>(m_param_manager.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
   m_fsm.reset(
-      new social_fsm(static_cast<const struct social_fsm_params*>(m_parser.get_params("fsm")),
+      new social_fsm(static_cast<const struct social_fsm_params*>(m_param_manager.get_params("fsm")),
                      m_server,
-                     m_sensors.get(),
-                     m_actuators.get()));
-  ER_NOM(" - Loaded all sensors and actuators\n");
+                     m_sensors,
+                     m_actuators));
+  ER_NOM(" - Loaded all sensors and actuators");
   Reset();
 } /* Init() */
 
 void social_foraging_controller::Reset(void) {
+  server_handle()->change_logfile(std::string(std::string("controller-") +
+                                              GetId() +
+                                              std::string(".txt")));
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   m_fsm->reset();
   m_food_stats.reset();
   m_actuators->leds_set_color(argos::CColor::WHITE);
-  ER_NOM("Reset social foraging controller\n");
+  m_fsm->event_explore();
+  ER_NOM("Reset social foraging controller");
 } /* Reset() */
 
 /*

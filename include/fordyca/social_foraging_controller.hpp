@@ -63,7 +63,6 @@ class social_foraging_controller : public argos::CCI_Controller,
   };
 
   social_foraging_controller(void);
-  virtual ~social_foraging_controller() {printf("DESTROY\n");}
 
   bool is_resting(void) { return m_fsm->is_resting(); }
   /*
@@ -92,8 +91,8 @@ class social_foraging_controller : public argos::CCI_Controller,
   inline struct food_data& get_food_data() { return m_food_stats; }
 
  private:
-  social_foraging_controller(const social_foraging_controller& c) = delete;
-  social_foraging_controller& operator=(const social_foraging_controller& c) = delete;
+  /* social_foraging_controller(const social_foraging_controller& c) = delete; */
+  /* social_foraging_controller& operator=(const social_foraging_controller& c) = delete; */
 
   /* The controller state information */
   parameter_manager m_param_manager;

@@ -48,15 +48,15 @@ social_loop_functions::social_loop_functions(void) :
     m_energy(0),
     m_energy_per_moving_robot(1),
     m_food_params(),
-    m_parser() {}
+    m_param_manager() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void social_loop_functions::Init(argos::TConfigurationNode& t_node) {
   argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
-  m_parser.add_category("food", new food_param_parser());
-  m_parser.parse_all(foraging);
+  m_param_manager.add_category("food", new food_param_parser());
+  m_param_manager.parse_all(foraging);
 
   m_floor = &GetSpace().GetFloorEntity();
   m_rng = argos::CRandom::CreateRNG("argos");
@@ -131,6 +131,7 @@ void social_loop_functions::PreStep() {
     /* Get handle to foot-bot entity and controller */
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
     social_foraging_controller& cController = dynamic_cast<social_foraging_controller&>(cFootBot.GetControllableEntity().GetController());
+
     /* Count how many foot-bots are in which state */
     if (!cController.is_resting()) {
       ++unWalkingFBs;

@@ -75,9 +75,9 @@ class actuator_manager {
   };
 
   enum turning_state                       m_turning_state;
-  std::shared_ptr<argos::CCI_DifferentialSteeringActuator> m_wheels;  /* differential steering */
-  std::shared_ptr<argos::CCI_LEDsActuator>                 m_leds;    /* LEDs  */
-  std::shared_ptr<argos::CCI_RangeAndBearingActuator>      m_raba;    /* Range and bearing */
+  argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
+  argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
+  argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   std::shared_ptr<const struct actuator_params>  mc_params;
 
 };
