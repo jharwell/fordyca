@@ -49,6 +49,7 @@ class social_fsm : public fsm::base_fsm {
     ST_EXPLORE_SUCCESS,
     ST_EXPLORE_FAIL,
     ST_RETURN_TO_NEST,
+    ST_LEAVING_NEST,
     ST_SEARCH_FOR_SPOT_IN_NEST,
     ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
@@ -69,6 +70,7 @@ class social_fsm : public fsm::base_fsm {
   void event_explore(void);
   void event_continue(void);
   void event_block_found(void);
+  void event_entered_nest(void);
 
   void run(void) { event_continue(); }
 
@@ -111,6 +113,7 @@ class social_fsm : public fsm::base_fsm {
   STATE_DECLARE(social_fsm, explore_success, fsm::no_event_data);
   STATE_DECLARE(social_fsm, explore_fail, fsm::no_event_data);
   STATE_DECLARE(social_fsm, return_to_nest, fsm::no_event_data);
+  STATE_DECLARE(social_fsm, leaving_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, search_for_spot_in_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, collision_avoidance, struct collision_event_data);
 
@@ -131,6 +134,7 @@ class social_fsm : public fsm::base_fsm {
         STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
         STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
         STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL, NULL, NULL),
         STATE_MAP_ENTRY_EX_ALL(&search_for_spot_in_nest, NULL, NULL, &exit_search_for_spot_in_nest),
         STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, NULL, &exit_collision_avoidance),
     };

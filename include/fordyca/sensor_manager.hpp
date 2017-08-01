@@ -61,6 +61,7 @@ class sensor_manager {
   void update_position(argos::CVector2& new_pos);
 
   bool detect_food_item(void);
+  bool in_nest(void);
   /*
    * Calculates the diffusion vector. If there is a close obstacle, it points
    * away from it; it there is none, it points forwards.  The b_collision

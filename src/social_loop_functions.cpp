@@ -157,6 +157,7 @@ void social_loop_functions::PreStep() {
         ++food_stats.cum_items;
         m_energy += m_food_params.energy_per_item;
         ++m_uncollected_food;
+        cController.publish_event(social_foraging_controller::ENTERED_NEST);
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
@@ -174,6 +175,7 @@ void social_loop_functions::PreStep() {
             food_stats.curr_item_idx = i;
             /* The floor texture must be updated */
             m_floor->SetChanged();
+            cController.publish_event(social_foraging_controller::BLOCK_FOUND);
             break;
           }
         } /* for(i..) */

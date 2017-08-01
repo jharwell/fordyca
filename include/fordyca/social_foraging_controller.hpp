@@ -61,10 +61,18 @@ class social_foraging_controller : public argos::CCI_Controller,
       cum_items = 0;
     }
   };
+  enum event_type {
+    EXPLORE,
+    CONTINUE,
+    BLOCK_FOUND,
+    ENTERED_NEST
+  };
 
   social_foraging_controller(void);
 
   bool is_resting(void) { return m_fsm->is_resting(); }
+  void publish_event(enum event_type event);
+
   /*
    * @brief Initialize the controller.
    *
@@ -76,7 +84,7 @@ class social_foraging_controller : public argos::CCI_Controller,
   /*
    * @brief Called once every time step; length set in the XML file.
    */
-  virtual void ControlStep(void) { m_fsm->run(); }
+  virtual void ControlStep(void) { publish_event(CONTINUE); }
 
   /*
    * @brief Reset controller to its state right after the Init().

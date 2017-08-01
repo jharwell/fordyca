@@ -52,6 +52,20 @@ social_foraging_controller::social_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void social_foraging_controller::publish_event(enum event_type type) {
+  switch (type) {
+    case EXPLORE:
+      m_fsm->event_explore();
+      break;
+    case CONTINUE:
+      m_fsm->event_continue();
+    case BLOCK_FOUND:
+      m_fsm->event_block_found();
+    case ENTERED_NEST:
+      m_fsm->event_entered_nest();
+  }
+} /* publish_event() */
+
 void social_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing social foraging controller");
 
