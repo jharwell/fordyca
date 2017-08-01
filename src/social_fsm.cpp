@@ -67,15 +67,32 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
  * Events
  ******************************************************************************/
 void social_fsm::event_explore(void) {
-  static const uint8_t kTRANSITIONS[] = {
+  DEFINE_TRANSITION_MAP(kTRANSITIONS) {
     ST_EXPLORE,         /* resting */
     EVENT_IGNORED,      /* explore */
+    EVENT_IGNORED,      /* explore success */
     EVENT_IGNORED,      /* explore fail */
-    EVENT_IGNORED,     /* explore success */
     EVENT_IGNORED,      /* return to nest */
+    EVENT_IGNORED,      /* search for spot in nest */
     ST_COLLISION_AVOIDANCE, /* collision avoidance */
   };
+  VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
+}
+
+void social_fsm::event_block_found(void) {
+  DEFINE_TRANSITION_MAP(kTRANSITIONS) {
+    CANNOT_HAPPEN,      /* resting */
+    ST_EXPLORE_SUCCESS, /* explore */
+    EVENT_IGNORED,      /* explore success */
+    EVENT_IGNORED,      /* explore fail */
+    EVENT_IGNORED,      /* return to nest */
+    EVENT_IGNORED,      /* search for spot in nest */
+    ST_COLLISION_AVOIDANCE, /* collision avoidance */
+        };
+  VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  external_event(kTRANSITIONS[current_state()], NULL);
+
 }
 
 void social_fsm::event_continue(void) {

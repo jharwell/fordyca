@@ -68,6 +68,8 @@ class social_fsm : public fsm::base_fsm {
   void reset(void);
   void event_explore(void);
   void event_continue(void);
+  void event_block_found(void);
+
   void run(void) { event_continue(); }
 
  private:
@@ -122,19 +124,18 @@ class social_fsm : public fsm::base_fsm {
   ENTRY_DECLARE(social_fsm, entry_collision_avoidance, fsm::no_event_data);
   ENTRY_DECLARE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data);
 
-  virtual const fsm::state_map_ex_row* state_map_ex() {
-    static const fsm::state_map_ex_row kSTATE_MAP[] = {
-      {&rest, NULL, &entry_rest, NULL},
-      {&explore, NULL, &entry_explore, &exit_explore},
-      {&explore_success, NULL, NULL, NULL},
-      {&explore_fail, NULL, NULL, NULL},
-      {&return_to_nest, NULL, NULL , NULL},
-      {&search_for_spot_in_nest, NULL, NULL, NULL},
-      {&collision_avoidance, NULL, NULL, NULL}
+  DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+  DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
+    STATE_MAP_ENTRY_EX_ALL(&rest, NULL, &entry_rest, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, &exit_explore),
+        STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&search_for_spot_in_nest, NULL, NULL, &exit_search_for_spot_in_nest),
+        STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, NULL, &exit_collision_avoidance),
     };
-    static_assert((sizeof(kSTATE_MAP)/sizeof(struct fsm::state_map_ex_row)) == ST_MAX_STATES,
-                  "state map does not cover all states");
-    return kSTATE_MAP;
+  VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
+    return &kSTATE_MAP[0];
   }
 
   social_fsm(const social_fsm& fsm) = delete;
