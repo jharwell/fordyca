@@ -110,18 +110,14 @@ argos::CColor social_loop_functions::GetFloorColor(const argos::CVector2& c_posi
 } /* get_floor_color() */
 
 
-/****************************************/
-/****************************************/
-
 void social_loop_functions::PreStep() {
-  /* Logic to pick and drop food items */
   /*
    * If a robot is in the nest, drop the food item
    * If a robot is on a food item, pick it
    * Each robot can carry only one food item per time
    */
-  uint unWalkingFBs = 0;
-  uint unRestingFBs = 0;
+  uint n_moving = 0;
+  uint n_resting = 0;
   /* Check whether a robot is on a food item */
   argos::CSpace::TMapPerType& m_cFootbots = GetSpace().GetEntitiesByType("foot-bot");
 
@@ -134,20 +130,20 @@ void social_loop_functions::PreStep() {
 
     /* Count how many foot-bots are in which state */
     if (!cController.is_resting()) {
-      ++unWalkingFBs;
+      ++n_moving;
     } else {
-      ++unRestingFBs;
+      ++n_resting;
     }
     /* Get the position of the foot-bot on the ground as a CVector2 */
-    argos::CVector2 cPos;
-    cPos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+    argos::CVector2 pos;
+    pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
     /* Get food data */
     social_foraging_controller::food_data& food_stats = cController.get_food_data();
     /* The foot-bot has a food item */
     if (food_stats.has_item) {
       /* Check whether the foot-bot is in the nest */
-      if(cPos.GetX() < -1.0f) {
+      if(pos.GetX() < -1.0f) {
         /* Place a new food item on the ground */
         m_food_pos[food_stats.curr_item_idx].Set(m_rng->Uniform(m_arena_x),
                                                  m_rng->Uniform(m_arena_y));
@@ -164,10 +160,10 @@ void social_loop_functions::PreStep() {
     } else {
       /* The foot-bot has no food item */
       /* Check whether the foot-bot is out of the nest */
-      if (cPos.GetX() > -1.0f) {
+      if (pos.GetX() > -1.0f) {
         /* Check whether the foot-bot is on a food item */
         for (size_t i = 0; i < m_food_pos.size(); ++i) {
-          if((cPos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
+          if((pos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
             /* If so, we move that item out of sight */
             m_food_pos[i].Set(100.0f, 100.f);
             /* The foot-bot is now carrying an item */
@@ -183,11 +179,11 @@ void social_loop_functions::PreStep() {
     }
   }
   /* Update energy expediture due to walking robots */
-  m_energy -= unWalkingFBs * m_energy_per_moving_robot;
+  m_energy -= n_moving * m_energy_per_moving_robot;
   /* Output stuff to file */
   m_ofile << GetSpace().GetSimulationClock() << "\t"
-          << unWalkingFBs << "\t"
-          << unRestingFBs << "\t"
+          << n_moving << "\t"
+          << n_resting << "\t"
           << m_uncollected_food << "\t"
           << m_energy << std::endl;
 }

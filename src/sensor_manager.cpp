@@ -78,7 +78,6 @@ bool sensor_manager::in_nest(void) {
 bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   /* Get readings from proximity sensor */
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
-  argos::CVector2 ccalc_diffusion_vector;
   argos::CVector2* vector;
   argos::CVector2 tmp;
   if (vector_in == NULL) {
@@ -93,15 +92,14 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   }
   /*
    * If the angle of the vector is small enough and the closest obstacle is far
-   * enough, ignore the vector and go straight, otherwise return it
+   * enough, ignore the vector and go straight, otherwise return it.
    */
-  if(mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
-     ccalc_diffusion_vector.Length() < mc_params->diffusion.delta) {
+  if(mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
+     vector->Length() < mc_params->diffusion.delta) {
     *vector = argos::CVector2::X;
     return false;
   }
   *vector = -vector->Normalize();
-  printf("Obstacles!");
   return true;
 }
 

@@ -139,8 +139,7 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
    */
   if (m_state.time_rested > mc_params->times.min_rested &&
        m_rng->Uniform(m_prob_range) > m_state.rest_to_explore_prob) {
-    printf("changing state\n");
-    internal_event(ST_EXPLORE);
+    internal_event(ST_LEAVING_NEST);
   }
 
   /* continue resting */
@@ -171,7 +170,10 @@ STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
     } /* switch() */
   } /* for(i..) */
 }
+
 STATE_DEFINE(social_fsm, leaving_nest, fsm::no_event_data) {
+  ER_DIAG("Executing ST_LEAVING_NEST");
+
   /*
    * The vector returned by calc_vector_to_light() points to
    * the light. Thus, the minus sign is because we want to go away
