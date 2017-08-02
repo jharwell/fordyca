@@ -48,7 +48,7 @@ class social_loop_functions : public argos::CLoopFunctions {
   virtual void Init(argos::TConfigurationNode& t_tree);
   virtual void Reset();
   virtual void Destroy();
-  virtual argos::CColor GetFloorColor(const argos::CVector2& c_position_on_plane);
+  virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
   virtual void PreStep();
 
  private:
@@ -64,7 +64,7 @@ class social_loop_functions : public argos::CLoopFunctions {
   std::string m_ofname;
   std::ofstream m_ofile;
 
-  uint m_uncollected_food;
+  uint m_total_collected_blocks;
   int m_energy;
   uint m_energy_per_moving_robot;
   struct food_params m_food_params;

@@ -119,10 +119,10 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
   }
 } /* calc_vector_to_light() */
 
-bool sensor_manager::detect_food_item(void) {
+bool sensor_manager::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   return false;
-} /* sensor_manager:detect_food_item() */
+} /* block_detected() */
 
 
 NS_END(fordyca);

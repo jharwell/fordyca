@@ -1,5 +1,5 @@
 /**
- * @file qt_user_functions.cpp
+ * @file block_data.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,12 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_BLOCK_DATA_HPP_
+#define INCLUDE_FORDYCA_BLOCK_DATA_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/qt_user_functions.hpp"
-#include "fordyca/social_foraging_controller.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,29 +32,38 @@
 NS_START(fordyca);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-qt_user_functions::qt_user_functions() {
-  RegisterUserFunction<qt_user_functions,
-                       argos::CFootBotEntity>(&qt_user_functions::Draw);
-}
+/**
+ * @brief This structure holds data about food collecting by the robots
+ */
+class block_data {
+ public:
+  block_data(void) : m_has_block(false), m_curr_block_idx(-1), m_cum_blocks(0) {}
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  social_foraging_controller& controller = dynamic_cast<social_foraging_controller&>(c_entity.GetControllableEntity().GetController());
-  if (controller.carrying_block()) {
-    DrawCylinder(
-        argos::CVector3(0.0f, 0.0f, 0.3f),
-        argos::CQuaternion(),
-        0.1f,
-        0.05f,
-        argos::CColor::BLACK);
+  bool has_block(void) const { return m_has_block; }
+  int block_idx(void) const { return m_curr_block_idx; }
+  void reset(void) {
+    m_has_block = false;
+    m_curr_block_idx = -1;
+    m_cum_blocks = 0;
   }
-}
+  void picked_up_block(int idx) {
+    m_has_block = true;
+    m_curr_block_idx = idx;
+  }
+  void dropped_in_nest(void) {
+    m_has_block = false;
+    m_curr_block_idx = -1;
+    ++m_cum_blocks;
+  }
 
-using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(qt_user_functions, "qt_user_functions")
+ private:
+  bool   m_has_block;       /// True when the robot is carrying a block.
+  int    m_curr_block_idx;  /// Index of the current block in global array.
+  size_t m_cum_blocks;      /// Total # blocks carried by this robot so far.
+};
 
 NS_END(fordyca);
+
+#endif /* INCLUDE_FORDYCA_BLOCK_DATA_HPP_ */

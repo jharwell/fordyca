@@ -44,7 +44,7 @@ social_loop_functions::social_loop_functions(void) :
     m_rng(NULL),
     m_ofname(),
     m_ofile(),
-    m_uncollected_food(0),
+    m_total_collected_blocks(0),
     m_energy(0),
     m_energy_per_moving_robot(1),
     m_food_params(),
@@ -81,7 +81,7 @@ void social_loop_functions::Init(argos::TConfigurationNode& t_node) {
 }
 
 void social_loop_functions::Reset() {
-  m_uncollected_food = 0;
+  m_total_collected_blocks = 0;
   m_energy = 0;
   m_ofile.close();
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
@@ -97,18 +97,17 @@ void social_loop_functions::Destroy() {
   m_ofile.close();
 }
 
-argos::CColor social_loop_functions::GetFloorColor(const argos::CVector2& c_position_on_plane) {
-  if (c_position_on_plane.GetX() < -1.0f) {
+argos::CColor social_loop_functions::GetFloorColor(const argos::CVector2& plane_pos) {
+  if (plane_pos.GetX() < -1.0f) {
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_food_pos.size(); ++i) {
-    if ((c_position_on_plane - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
+    if ((plane_pos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
       return argos::CColor::BLACK;
     }
   }
   return argos::CColor::WHITE;
 } /* get_floor_color() */
-
 
 void social_loop_functions::PreStep() {
   /*
@@ -118,18 +117,19 @@ void social_loop_functions::PreStep() {
    */
   uint n_moving = 0;
   uint n_resting = 0;
-  /* Check whether a robot is on a food item */
-  argos::CSpace::TMapPerType& m_cFootbots = GetSpace().GetEntitiesByType("foot-bot");
+  int i = 0;
 
-  for (argos::CSpace::TMapPerType::iterator it = m_cFootbots.begin();
-       it != m_cFootbots.end();
+  /* Check whether a robot is on a food item */
+  argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
+
+  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
+       it != footbots.end();
        ++it) {
-    /* Get handle to foot-bot entity and controller */
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
-    social_foraging_controller& cController = dynamic_cast<social_foraging_controller&>(cFootBot.GetControllableEntity().GetController());
+    social_foraging_controller& controller = dynamic_cast<social_foraging_controller&>(cFootBot.GetControllableEntity().GetController());
 
     /* Count how many foot-bots are in which state */
-    if (!cController.is_resting()) {
+    if (!controller.is_resting()) {
       ++n_moving;
     } else {
       ++n_resting;
@@ -138,53 +138,54 @@ void social_loop_functions::PreStep() {
     argos::CVector2 pos;
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    /* Get food data */
-    social_foraging_controller::food_data& food_stats = cController.get_food_data();
-    /* The foot-bot has a food item */
-    if (food_stats.has_item) {
+    if (controller.carrying_block()) {
+      printf("Robot %d carrying block\n", i);
+      /* TODO: possibly change this to be autonomous, rather than just
+       * informing the robot... */
       /* Check whether the foot-bot is in the nest */
       if(pos.GetX() < -1.0f) {
-        /* Place a new food item on the ground */
-        m_food_pos[food_stats.curr_item_idx].Set(m_rng->Uniform(m_arena_x),
-                                                 m_rng->Uniform(m_arena_y));
+        controller.publish_event(social_foraging_controller::ENTERED_NEST);
+
         /* Drop the food item */
-        food_stats.has_item = false;
-        food_stats.curr_item_idx = -1;
-        ++food_stats.cum_items;
+        controller.drop_block_in_nest();
         m_energy += m_food_params.energy_per_item;
-        ++m_uncollected_food;
-        cController.publish_event(social_foraging_controller::ENTERED_NEST);
+        ++m_total_collected_blocks;
+
+        /* Place a new food item on the ground */
+        m_food_pos[controller.block_idx()].Set(m_rng->Uniform(m_arena_x),
+                                                 m_rng->Uniform(m_arena_y));
+
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
-    } else {
-      /* The foot-bot has no food item */
-      /* Check whether the foot-bot is out of the nest */
+    } else { /* The foot-bot has no food item */
+      printf("Robot %d not carrying block\n", i);
       if (pos.GetX() > -1.0f) {
         /* Check whether the foot-bot is on a food item */
         for (size_t i = 0; i < m_food_pos.size(); ++i) {
           if((pos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
             /* If so, we move that item out of sight */
             m_food_pos[i].Set(100.0f, 100.f);
-            /* The foot-bot is now carrying an item */
-            food_stats.has_item = true;
-            food_stats.curr_item_idx = i;
+            controller.pickup_block(i);
+
             /* The floor texture must be updated */
             m_floor->SetChanged();
-            cController.publish_event(social_foraging_controller::BLOCK_FOUND);
+            controller.publish_event(social_foraging_controller::BLOCK_FOUND);
             break;
           }
         } /* for(i..) */
       }
     }
-  }
-  /* Update energy expediture due to walking robots */
+    ++i;
+  } /* for(it..) */
+
+  /* Update Energy expediture due to moving robots */
   m_energy -= n_moving * m_energy_per_moving_robot;
   /* Output stuff to file */
   m_ofile << GetSpace().GetSimulationClock() << "\t"
           << n_moving << "\t"
           << n_resting << "\t"
-          << m_uncollected_food << "\t"
+          << m_total_collected_blocks << "\t"
           << m_energy << std::endl;
 }
 using namespace argos;

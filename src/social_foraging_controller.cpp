@@ -41,7 +41,7 @@ social_foraging_controller::social_foraging_controller(void) :
     m_sensors(),
     m_fsm(),
     m_server(new rcppsw::common::er_server("init.txt")),
-    m_food_stats() {
+    m_block_data() {
   deferred_init(m_server);
   insmod("controller");
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
@@ -53,6 +53,16 @@ social_foraging_controller::social_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void social_foraging_controller::drop_block_in_nest(void) {
+  ER_DIAG("%s dropped block in nest", GetId().c_str());
+  m_block_data.dropped_in_nest();
+} /* drop_block_in_nest() */
+
+void social_foraging_controller::pickup_block(int i) {
+  ER_DIAG("%s picked up block", GetId().c_str());
+  m_block_data.picked_up_block(i);
+} /* pickup_block() */
+
 void social_foraging_controller::publish_event(enum event_type type) {
   switch (type) {
     case EXPLORE:
@@ -74,7 +84,6 @@ void social_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing social foraging controller");
 
   m_param_manager.parse_all(node);
-  ER_NOM(" - Parsed all parameters");
   m_param_manager.print_all(std::cout);
   m_actuators.reset(new actuator_manager(
       static_cast<const struct actuator_params*>(m_param_manager.get_params("actuators")),
@@ -93,8 +102,6 @@ void social_foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_server,
                      m_sensors,
                      m_actuators));
-  ER_NOM(" - Loaded all sensors and actuators");
-  printf("Start max: %f\n",m_actuators->max_wheel_speed());
   Reset();
 } /* Init() */
 
@@ -104,10 +111,9 @@ void social_foraging_controller::Reset(void) {
                                               std::string(".txt")));
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   m_fsm->reset();
-  m_food_stats.reset();
+  m_block_data.reset();
   m_actuators->leds_set_color(argos::CColor::WHITE);
   m_fsm->event_explore();
-  ER_NOM("Reset social foraging controller");
 } /* Reset() */
 
 /*

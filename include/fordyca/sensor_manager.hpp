@@ -60,7 +60,7 @@ class sensor_manager {
 
   void update_position(argos::CVector2& new_pos);
 
-  bool detect_food_item(void);
+  bool block_detected(void);
   bool in_nest(void);
 
   /*

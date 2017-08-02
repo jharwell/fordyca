@@ -32,6 +32,7 @@
 #include "fordyca/parameter_manager.hpp"
 #include "fordyca/sensor_manager.hpp"
 #include "fordyca/actuator_manager.hpp"
+#include "fordyca/block_data.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,20 +48,6 @@ NS_START(fordyca);
 class social_foraging_controller : public argos::CCI_Controller,
                                    public rcppsw::common::er_client {
  public:
-  /**
-   * @brief This structure holds data about food collecting by the robots
-   */
-  struct food_data {
-    bool has_item;      // true when the robot is carrying a food item
-    size_t curr_item_idx;    // the index of the current food item in the array of available food items
-    size_t cum_items; // the total number of food items carried by this robot during the experiment
-
-    void reset(void) {
-      has_item = false;
-      curr_item_idx = -1;
-      cum_items = 0;
-    }
-  };
   enum event_type {
     EXPLORE,
     CONTINUE,
@@ -96,7 +83,10 @@ class social_foraging_controller : public argos::CCI_Controller,
    */
   virtual void Destroy(void) {}
 
-  inline struct food_data& get_food_data() { return m_food_stats; }
+  bool carrying_block(void) const { return m_block_data.has_block(); }
+  bool block_idx(void) const { return m_block_data.block_idx(); }
+  void drop_block_in_nest(void);
+  void pickup_block(int i);
 
  private:
   /* social_foraging_controller(const social_foraging_controller& c) = delete; */
@@ -109,8 +99,7 @@ class social_foraging_controller : public argos::CCI_Controller,
   std::unique_ptr<social_fsm> m_fsm;
   std::shared_ptr<rcppsw::common::er_server> m_server;
 
-  /* The food data */
-  struct food_data m_food_stats;
+  block_data  m_block_data;
 };
 
 NS_END(fordyca);
