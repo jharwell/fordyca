@@ -42,6 +42,7 @@ class food_param_parser: public base_param_parser {
 
   void parse(argos::TConfigurationNode& node);
   const struct food_params* get_results(void) { return m_params.get(); }
+  void print(std::ostream& stream);
 
  private:
   std::unique_ptr<struct food_params> m_params;

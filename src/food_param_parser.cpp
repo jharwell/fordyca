@@ -32,7 +32,6 @@ NS_START(fordyca);
  * Member Functions
  ******************************************************************************/
 void food_param_parser::parse(argos::TConfigurationNode& node) {
-
   m_params.reset(new struct food_params);
   argos::GetNodeAttribute(node, "n_items", m_params->n_items);
   argos::GetNodeAttribute(node, "radius", m_params->square_radius);
@@ -40,5 +39,12 @@ void food_param_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "energy_per_item",
                           m_params->energy_per_item);
 } /* parse() */
+
+void food_param_parser::print(std::ostream& stream) {
+  stream << "Food params\n====================" << std::endl;
+  stream << "n_items=" << m_params->n_items << std::endl;
+  stream << "square_radius=" << m_params->square_radius << std::endl;
+  stream << "energy_per_item=" << m_params->energy_per_item << std::endl;
+} /* print() */
 
 NS_END(fordyca);

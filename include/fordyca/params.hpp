@@ -49,11 +49,11 @@ struct prob_deltas  {
   /* The increase of explore_to_rest_prob due to the collision rule */
   argos::Real collision_rule_explore_to_rest;
 
-  /* The increase of curr_rest_to_explore_prob due to the social rule */
-  argos::Real social_rule_rest_to_explore;
-
   /* The increase of explore_to_rest_prob due to the social rule */
   argos::Real social_rule_explore_to_rest;
+
+  /* The increase of curr_rest_to_explore_prob due to the social rule */
+  argos::Real social_rule_rest_to_explore;
 };
 
 struct threshold_times {

@@ -47,6 +47,7 @@ class parameter_manager {
   status_t add_category(const std::string& category, base_param_parser* parser);
   status_t parse_all(argos::TConfigurationNode& node);
   const struct base_params* get_params(const std::string& name) { return m_parsers[name]->get_results(); }
+void print_all(std::ostream& stream);
 
  private:
   std::map<std::string, base_param_parser*> m_parsers;

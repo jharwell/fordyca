@@ -44,6 +44,7 @@ social_foraging_controller::social_foraging_controller(void) :
     m_food_stats() {
   deferred_init(m_server);
   insmod("controller");
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   m_param_manager.add_category("actuators", new actuator_param_parser());
   m_param_manager.add_category("sensors", new sensor_param_parser());
   m_param_manager.add_category("fsm", new fsm_param_parser());
@@ -59,10 +60,13 @@ void social_foraging_controller::publish_event(enum event_type type) {
       break;
     case CONTINUE:
       m_fsm->event_continue();
+      break;
     case BLOCK_FOUND:
       m_fsm->event_block_found();
+      break;
     case ENTERED_NEST:
       m_fsm->event_entered_nest();
+      break;
   }
 } /* publish_event() */
 
@@ -71,7 +75,7 @@ void social_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_param_manager.parse_all(node);
   ER_NOM(" - Parsed all parameters");
-
+  m_param_manager.print_all(std::cout);
   m_actuators.reset(new actuator_manager(
       static_cast<const struct actuator_params*>(m_param_manager.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
@@ -90,6 +94,7 @@ void social_foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_sensors,
                      m_actuators));
   ER_NOM(" - Loaded all sensors and actuators");
+  printf("Start max: %f\n",m_actuators->max_wheel_speed());
   Reset();
 } /* Init() */
 

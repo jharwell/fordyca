@@ -130,13 +130,16 @@ void social_fsm::event_entered_nest(void) {
  * States
  ******************************************************************************/
 STATE_DEFINE(social_fsm, rest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_REST");
+  ER_DIAG("Executing ST_REST rested=%zu min=%zu rest_to_explore=%f",
+          m_state.time_rested, mc_params->times.min_rested,
+          m_state.rest_to_explore_prob);
 
   /*
    * If we have stayed here enough, probabilistically switch to 'exploring'
    */
-  if (mc_params->times.min_rested > m_state.time_rested &&
-      m_rng->Uniform(m_prob_range) < m_state.rest_to_explore_prob) {
+  if (m_state.time_rested > mc_params->times.min_rested &&
+       m_rng->Uniform(m_prob_range) > m_state.rest_to_explore_prob) {
+    printf("changing state\n");
     internal_event(ST_EXPLORE);
   }
 
@@ -329,7 +332,7 @@ EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
   m_state.time_search_for_place_in_nest = 0;
 }
 EXIT_DEFINE(social_fsm, exit_explore) {
-  ER_DIAG("Exiting ST_EXLORE");
+  ER_DIAG("Exiting ST_EXPLORE");
   m_state.time_exploring_unsuccessfully = 0;
   m_state.time_search_for_place_in_nest = 0;
 }
@@ -344,9 +347,9 @@ EXIT_DEFINE(social_fsm, exit_rest) {
  * General Member Functions
  ******************************************************************************/
 void social_fsm::reset(void) {
-  m_state.explore_to_rest_prob = mc_params->initial_rest_to_explore_prob;
+  m_state.explore_to_rest_prob = mc_params->initial_explore_to_rest_prob;
+  m_state.rest_to_explore_prob = mc_params->initial_rest_to_explore_prob;
   m_state.time_exploring_unsuccessfully = 0;
-
   /*
    * Initially the robot is resting, and by setting RestingTime to
    * MinimumRestingTime we force the robots to make a decision at the experiment

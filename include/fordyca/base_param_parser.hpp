@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <fstream>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params.hpp"
@@ -42,6 +43,7 @@ class base_param_parser {
   virtual ~base_param_parser(void) {}
 
   virtual void parse(__unused argos::TConfigurationNode& node) = 0;
+  virtual void print(std::ostream& stream) = 0;
   virtual const struct base_params* get_results(void) { return NULL; }
 };
 

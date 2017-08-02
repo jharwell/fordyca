@@ -62,6 +62,7 @@ class sensor_manager {
 
   bool detect_food_item(void);
   bool in_nest(void);
+
   /*
    * Calculates the diffusion vector. If there is a close obstacle, it points
    * away from it; it there is none, it points forwards.  The b_collision

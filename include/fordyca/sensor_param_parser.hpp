@@ -42,6 +42,7 @@ class sensor_param_parser: public base_param_parser {
 
   void parse(argos::TConfigurationNode& node);
   const struct sensor_params* get_results(void) { return m_params.get(); }
+  void print(std::ostream& stream);
 
  private:
   std::unique_ptr<struct sensor_params> m_params;

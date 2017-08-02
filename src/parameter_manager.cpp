@@ -47,4 +47,10 @@ status_t parameter_manager::parse_all(argos::TConfigurationNode& node) {
   return OK;
 } /* parse_all() */
 
+void parameter_manager::print_all(std::ostream& stream) {
+  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
+      pair.second->print(stream);
+    });
+} /* parse_all() */
+
 NS_END(fordyca);

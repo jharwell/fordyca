@@ -97,8 +97,11 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
    */
   if(mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(ccalc_diffusion_vector.Angle()) &&
      ccalc_diffusion_vector.Length() < mc_params->diffusion.delta) {
+    *vector = argos::CVector2::X;
     return false;
   }
+  *vector = -vector->Normalize();
+  printf("Obstacles!");
   return true;
 }
 
