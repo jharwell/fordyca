@@ -35,11 +35,14 @@ NS_START(fordyca);
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief This structure holds data about food collecting by the robots
+ * @brief This structure holds data about blocks by a robot, including
+ * operations on that data as the result of events such as picking up/dropping
+ * blocks.
  */
 class block_data {
  public:
-  block_data(void) : m_has_block(false), m_curr_block_idx(-1), m_cum_blocks(0) {}
+  block_data(void) :
+      m_has_block(false), m_curr_block_idx(-1), m_cum_blocks(0) {}
 
   bool has_block(void) const { return m_has_block; }
   int block_idx(void) const { return m_curr_block_idx; }
