@@ -60,7 +60,7 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
     m_sensors(sensors),
     m_actuators(actuators) {
   insmod("foraging_fsm");
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
     }
 
