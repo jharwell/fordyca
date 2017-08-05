@@ -40,20 +40,14 @@ NS_START(fordyca);
 struct base_params {};
 
 struct prob_deltas  {
-  /* The increase of explore_to_rest_prob due to the food rule */
-  argos::Real food_rule_explore_to_rest;
+  /* The increase of explore_to_rest_prob due to the block rule */
+  argos::Real block_rule_explore_to_rest;
 
-  /* The increase of curr_rest_to_explore_prob due to the food rule */
-  argos::Real food_rule_rest_to_explore;
+  /* The increase of curr_rest_to_explore_prob due to the block rule */
+  argos::Real block_rule_rest_to_explore;
 
   /* The increase of explore_to_rest_prob due to the collision rule */
   argos::Real collision_rule_explore_to_rest;
-
-  /* The increase of explore_to_rest_prob due to the social rule */
-  argos::Real social_rule_explore_to_rest;
-
-  /* The increase of curr_rest_to_explore_prob due to the social rule */
-  argos::Real social_rule_rest_to_explore;
 };
 
 struct threshold_times {
@@ -61,7 +55,7 @@ struct threshold_times {
      starts thinking that it's time to move */
   size_t min_rested;
 
-  /* The number of exploration steps without finding food after which
+  /* The number of exploration steps without finding block after which
      a foot-bot starts thinking about going back to the nest */
   size_t max_unsuccessful_explore;
   /*
@@ -76,7 +70,7 @@ struct threshold_times {
   size_t min_search_for_place_in_nest;
 };
 
-struct social_fsm_params : public base_params {
+struct foraging_fsm_params : public base_params {
   /* Initial probability to switch from resting to exploring */
   argos::Real initial_rest_to_explore_prob;
 
@@ -113,7 +107,7 @@ struct wheel_params {
  * algorithm. You can set their value in the <parameters> section of the XML
  * configuration file, under the
  * <controllers><footbot_foraging_controller><parameters><diffusion> section.
-x */
+  */
 struct diffusion_params {
   diffusion_params() :
       delta(0.0),
@@ -144,10 +138,9 @@ struct sensor_params : public base_params {
   struct diffusion_params diffusion;
 };
 
-struct food_params : public base_params {
+struct block_params : public base_params {
   uint n_items;
   argos::Real square_radius;
-  uint energy_per_item;
 };
 
 NS_END(fordyca);

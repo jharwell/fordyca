@@ -34,15 +34,13 @@ NS_START(fordyca);
 void fsm_param_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
-  m_params.reset(new social_fsm_params);
+  m_params.reset(new foraging_fsm_params);
   try {
        argos::GetNodeAttribute(fsm_node, "initial_rest_to_explore_prob", m_params->initial_rest_to_explore_prob);
       argos::GetNodeAttribute(fsm_node, "initial_explore_to_rest_prob", m_params->initial_explore_to_rest_prob);
-      argos::GetNodeAttribute(fsm_node, "food_rule_explore_to_rest_delta_prob", m_params->deltas.food_rule_explore_to_rest);
-      argos::GetNodeAttribute(fsm_node, "food_rule_rest_to_explore_delta_prob", m_params->deltas.food_rule_rest_to_explore);
+      argos::GetNodeAttribute(fsm_node, "block_rule_explore_to_rest_delta_prob", m_params->deltas.block_rule_explore_to_rest);
+      argos::GetNodeAttribute(fsm_node, "block_rule_rest_to_explore_delta_prob", m_params->deltas.block_rule_rest_to_explore);
       argos::GetNodeAttribute(fsm_node, "collision_rule_explore_to_rest_delta_prob", m_params->deltas.collision_rule_explore_to_rest);
-      argos::GetNodeAttribute(fsm_node, "social_rule_rest_to_explore_delta_prob", m_params->deltas.social_rule_rest_to_explore);
-      argos::GetNodeAttribute(fsm_node, "social_rule_explore_to_rest_delta_prob", m_params->deltas.social_rule_explore_to_rest);
       argos::GetNodeAttribute(fsm_node, "minimum_resting_time", m_params->times.min_rested);
       argos::GetNodeAttribute(fsm_node, "maximum_unsuccessful_explore_time", m_params->times.max_unsuccessful_explore);
       argos::GetNodeAttribute(fsm_node, "minimum_search_for_place_in_nest_time", m_params->times.min_search_for_place_in_nest);
@@ -59,11 +57,9 @@ void fsm_param_parser::print(std::ostream& stream) {
   stream << "initial_rest_to_explore_prob=" << m_params->initial_rest_to_explore_prob << std::endl;
   stream << "initial_explore_to_rest_prob=" << m_params->initial_explore_to_rest_prob << std::endl;
 
-  stream << "deltas.food_rule_explore_to_rest=" << m_params->deltas.food_rule_explore_to_rest << std::endl;
-  stream << "deltas.food_rule_rest_to_explore=" << m_params->deltas.food_rule_rest_to_explore << std::endl;
+  stream << "deltas.block_rule_explore_to_rest=" << m_params->deltas.block_rule_explore_to_rest << std::endl;
+  stream << "deltas.block_rule_rest_to_explore=" << m_params->deltas.block_rule_rest_to_explore << std::endl;
   stream << "deltas.collision_rule_explore_to_rest=" << m_params->deltas.collision_rule_explore_to_rest << std::endl;
-  stream << "deltas.social_rule_explore_to_rest=" << m_params->deltas.social_rule_explore_to_rest << std::endl;
-  stream << "deltas.social_rule_rest_to_explore=" << m_params->deltas.social_rule_rest_to_explore << std::endl;
   stream << "times.min_rested=" << m_params->times.min_rested << std::endl;
   stream << "times.max_unsuccessful_explore=" << m_params->times.max_unsuccessful_explore << std::endl;
   stream << "times.min_search_for_place_in_nest=" << m_params->times.min_search_for_place_in_nest << std::endl;

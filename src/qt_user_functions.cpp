@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/qt_user_functions.hpp"
-#include "fordyca/social_foraging_controller.hpp"
+#include "fordyca/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,7 @@ qt_user_functions::qt_user_functions() {
  * Member Functions
  ******************************************************************************/
 void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  social_foraging_controller& controller = dynamic_cast<social_foraging_controller&>(c_entity.GetControllableEntity().GetController());
+  foraging_controller& controller = dynamic_cast<foraging_controller&>(c_entity.GetControllableEntity().GetController());
   if (controller.carrying_block()) {
     DrawCylinder(
         argos::CVector3(0.0f, 0.0f, 0.3f),

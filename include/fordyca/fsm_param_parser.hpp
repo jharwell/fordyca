@@ -41,11 +41,11 @@ class fsm_param_parser: public base_param_parser {
   fsm_param_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node);
-  const struct social_fsm_params* get_results(void) { return m_params.get(); }
+  const struct foraging_fsm_params* get_results(void) { return m_params.get(); }
   void print(std::ostream& stream);
 
  private:
-  std::unique_ptr<struct social_fsm_params> m_params;
+  std::unique_ptr<struct foraging_fsm_params> m_params;
 };
 
 NS_END(fordyca);
