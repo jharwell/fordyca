@@ -59,7 +59,8 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
     m_sensors(sensors),
     m_actuators(actuators) {
   insmod("social_fsm");
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::NOM);
     }
 
 /*******************************************************************************

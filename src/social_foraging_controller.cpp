@@ -44,8 +44,8 @@ social_foraging_controller::social_foraging_controller(void) :
     m_block_data() {
   deferred_init(m_server);
   insmod("controller");
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
   m_param_manager.add_category("actuators", new actuator_param_parser());
   m_param_manager.add_category("sensors", new sensor_param_parser());
   m_param_manager.add_category("fsm", new fsm_param_parser());
@@ -55,12 +55,12 @@ social_foraging_controller::social_foraging_controller(void) :
  * Member Functions
  ******************************************************************************/
 void social_foraging_controller::drop_block_in_nest(void) {
-  ER_DIAG("%s dropped block in nest", GetId().c_str());
+  ER_NOM("%s dropped block in nest", GetId().c_str());
   m_block_data.dropped_in_nest();
 } /* drop_block_in_nest() */
 
 void social_foraging_controller::pickup_block(int i) {
-  ER_DIAG("%s picked up block", GetId().c_str());
+  ER_NOM("%s picked up block", GetId().c_str());
   m_block_data.picked_up_block(i);
 } /* pickup_block() */
 
@@ -85,7 +85,7 @@ void social_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing social foraging controller");
 
   m_param_manager.parse_all(node);
-  m_param_manager.print_all(std::cout);
+  /* m_param_manager.print_all(std::cout); */
   m_actuators.reset(new actuator_manager(
       static_cast<const struct actuator_params*>(m_param_manager.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),

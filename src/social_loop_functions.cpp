@@ -69,7 +69,6 @@ void social_loop_functions::Init(argos::TConfigurationNode& t_node) {
         argos::CVector2(m_rng->Uniform(m_arena_x),
                         m_rng->Uniform(m_arena_y)));
   } /* for(i..) */
-  printf("%d\n",m_food_pos.size());;
 
   /* Open output file and truncate */
   argos::GetNodeAttribute(foraging, "output", m_ofname);
