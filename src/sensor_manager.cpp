@@ -54,22 +54,17 @@ sensor_manager::sensor_manager(
  ******************************************************************************/
 bool sensor_manager::in_nest(void) {
   /* Read stuff from the ground sensor */
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& tGroundReads = m_ground->GetReadings();
-
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   /*
    * You can say whether you are in the nest by checking the ground sensor
    * placed close to the wheel motors. It returns a value between 0 and 1.  It
    * is 1 when the robot is on a white area, it is 0 when the robot is on a
    * black area and it is around 0.5 when the robot is on a gray area.
-   *
-   * The foot-bot has 4 sensors like this, two in the front (corresponding to
-   * readings 0 and 1) and two in the back (corresponding to reading 2 and 3).
-   * Here we want the back sensors (readings 2 and 3) to tell us whether we are
-   * on gray: if so, the robot is completely in the nest, otherwise it's
-   * outside.
    */
-  if (tGroundReads[2].Value > 0.25f && tGroundReads[2].Value < 0.75f &&
-      tGroundReads[3].Value > 0.25f && tGroundReads[3].Value < 0.75f) {
+  if (readings[0].Value > 0.25f && readings[0].Value < 0.75f &&
+      readings[1].Value > 0.25f && readings[1].Value < 0.75f &&
+      readings[2].Value > 0.25f && readings[2].Value < 0.75f &&
+      readings[3].Value > 0.25f && readings[3].Value < 0.75f) {
     return true;
   }
   return false;
@@ -94,7 +89,8 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it.
    */
-  if(mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
+
+  if (mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
      vector->Length() < mc_params->diffusion.delta) {
     *vector = argos::CVector2::X;
     return false;

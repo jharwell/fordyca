@@ -97,6 +97,7 @@ class social_foraging_controller : public argos::CCI_Controller,
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
+   printf("%d\n",m_food_pos.size());;
    *
    * This needs to be here, rather than in the FSM, because dropping of blocks
    * needs to be done in the loop functions so the area can correctly be drawn

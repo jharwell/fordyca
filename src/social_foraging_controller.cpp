@@ -45,6 +45,7 @@ social_foraging_controller::social_foraging_controller(void) :
   deferred_init(m_server);
   insmod("controller");
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   m_param_manager.add_category("actuators", new actuator_param_parser());
   m_param_manager.add_category("sensors", new sensor_param_parser());
   m_param_manager.add_category("fsm", new fsm_param_parser());
@@ -112,8 +113,6 @@ void social_foraging_controller::Reset(void) {
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   m_fsm->reset();
   m_block_data.reset();
-  m_actuators->leds_set_color(argos::CColor::WHITE);
-  m_fsm->event_explore();
 } /* Reset() */
 
 /*

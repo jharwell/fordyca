@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <vector>
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
@@ -67,7 +68,7 @@ class social_loop_functions : public argos::CLoopFunctions {
   uint m_total_collected_blocks;
   int m_energy;
   uint m_energy_per_moving_robot;
-  struct food_params m_food_params;
+  std::shared_ptr<const struct food_params> m_food_params;
   parameter_manager m_param_manager;
 };
 

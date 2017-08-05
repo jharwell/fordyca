@@ -42,7 +42,7 @@ void fsm_param_parser::parse(argos::TConfigurationNode& node) {
       argos::GetNodeAttribute(fsm_node, "food_rule_rest_to_explore_delta_prob", m_params->deltas.food_rule_rest_to_explore);
       argos::GetNodeAttribute(fsm_node, "collision_rule_explore_to_rest_delta_prob", m_params->deltas.collision_rule_explore_to_rest);
       argos::GetNodeAttribute(fsm_node, "social_rule_rest_to_explore_delta_prob", m_params->deltas.social_rule_rest_to_explore);
-      argos::GetNodeAttribute(fsm_node, "social_rule_explore_to_rest_delta_prob", m_params->deltas.social_rule_rest_to_explore);
+      argos::GetNodeAttribute(fsm_node, "social_rule_explore_to_rest_delta_prob", m_params->deltas.social_rule_explore_to_rest);
       argos::GetNodeAttribute(fsm_node, "minimum_resting_time", m_params->times.min_rested);
       argos::GetNodeAttribute(fsm_node, "maximum_unsuccessful_explore_time", m_params->times.max_unsuccessful_explore);
       argos::GetNodeAttribute(fsm_node, "minimum_search_for_place_in_nest_time", m_params->times.min_search_for_place_in_nest);

@@ -55,12 +55,6 @@ class social_fsm : public fsm::base_fsm {
     ST_MAX_STATES
   };
 
-  struct collision_event_data : public fsm::event_data {
-    enum fsm_states last_state;
-
-    collision_event_data(void) : last_state(ST_REST) {}
-  };
-
   social_fsm(const struct social_fsm_params* params,
              std::shared_ptr<rcppsw::common::er_server> server,
              std::shared_ptr<sensor_manager> sensors,
@@ -115,28 +109,27 @@ class social_fsm : public fsm::base_fsm {
   STATE_DECLARE(social_fsm, return_to_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, leaving_nest, fsm::no_event_data);
   STATE_DECLARE(social_fsm, search_for_spot_in_nest, fsm::no_event_data);
-  STATE_DECLARE(social_fsm, collision_avoidance, struct collision_event_data);
+  STATE_DECLARE(social_fsm, collision_avoidance, fsm::no_event_data);
 
-  EXIT_DECLARE(social_fsm, exit_explore);
-  EXIT_DECLARE(social_fsm, exit_rest);
-  EXIT_DECLARE(social_fsm, exit_collision_avoidance);
   EXIT_DECLARE(social_fsm, exit_search_for_spot_in_nest);
 
   ENTRY_DECLARE(social_fsm, entry_explore, fsm::no_event_data);
   ENTRY_DECLARE(social_fsm, entry_rest, fsm::no_event_data);
   ENTRY_DECLARE(social_fsm, entry_collision_avoidance, fsm::no_event_data);
   ENTRY_DECLARE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data);
+  ENTRY_DECLARE(social_fsm, entry_leaving_nest, fsm::no_event_data);
+
 
   DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
     STATE_MAP_ENTRY_EX_ALL(&rest, NULL, &entry_rest, NULL),
-        STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, &exit_explore),
+        STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
         STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
         STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
         STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
-        STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL, NULL, NULL),
-        STATE_MAP_ENTRY_EX_ALL(&search_for_spot_in_nest, NULL, NULL, &exit_search_for_spot_in_nest),
-        STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, NULL, &exit_collision_avoidance),
+        STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL, &entry_leaving_nest, NULL),
+        STATE_MAP_ENTRY_EX_ALL(&search_for_spot_in_nest, NULL, &entry_search_for_spot_in_nest, &exit_search_for_spot_in_nest),
+        STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, &entry_collision_avoidance, NULL),
     };
   VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];
