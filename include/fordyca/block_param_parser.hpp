@@ -1,5 +1,5 @@
 /**
- * @file sensor_param_parser.hpp
+ * @file block_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,18 +36,18 @@ NS_START(fordyca);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class sensor_param_parser: public base_param_parser {
+class block_param_parser: public base_param_parser {
  public:
-  sensor_param_parser(void) : m_params() {}
+  block_param_parser(void): m_params() {}
 
   void parse(argos::TConfigurationNode& node);
-  const struct sensor_params* get_results(void) { return m_params.get(); }
+  const struct block_params* get_results(void) { return m_params.get(); }
   void show(std::ostream& stream);
 
  private:
-  std::unique_ptr<struct sensor_params> m_params;
+  std::unique_ptr<struct block_params> m_params;
 };
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_ */

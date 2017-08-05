@@ -42,7 +42,7 @@ class fsm_param_parser: public base_param_parser {
 
   void parse(argos::TConfigurationNode& node);
   const struct foraging_fsm_params* get_results(void) { return m_params.get(); }
-  void print(std::ostream& stream);
+  void show(std::ostream& stream);
 
  private:
   std::unique_ptr<struct foraging_fsm_params> m_params;

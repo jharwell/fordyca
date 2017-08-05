@@ -43,7 +43,7 @@ class base_param_parser {
   virtual ~base_param_parser(void) {}
 
   virtual void parse(__unused argos::TConfigurationNode& node) = 0;
-  virtual void print(std::ostream& stream) = 0;
+  virtual void show(std::ostream& stream) = 0;
   virtual const struct base_params* get_results(void) { return NULL; }
 };
 

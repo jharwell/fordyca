@@ -52,12 +52,12 @@ try {
   }
 } /* parse() */
 
-void actuator_param_parser::print(std::ostream& stream) {
+void actuator_param_parser::show(std::ostream& stream) {
   stream << "Actuator params\n====================" << std::endl;
   stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold << std::endl;
   stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold << std::endl;
   stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold << std::endl;
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
-} /* print() */
+} /* show() */
 
 NS_END(fordyca);

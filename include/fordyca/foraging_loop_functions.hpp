@@ -1,7 +1,5 @@
 /**
- * @file parameter_manager.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file foraging_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,18 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
-#define INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <map>
+#include <vector>
+#include <argos3/core/simulator/loop_functions.h>
+#include <argos3/core/simulator/entity/floor_entity.h>
+#include <argos3/core/utility/math/range.h>
+#include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "fordyca/parameter_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,23 +39,37 @@
 NS_START(fordyca);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-class parameter_manager: public rcppsw::common::er_client {
+class foraging_loop_functions : public argos::CLoopFunctions {
  public:
-  parameter_manager(void) : m_parsers() {}
-  void init(std::shared_ptr<rcppsw::common::er_server> server);
-  status_t add_category(const std::string& category, base_param_parser* parser);
-  status_t parse_all(argos::TConfigurationNode& node);
-  const struct base_params* get_params(const std::string& name) {
-    return m_parsers[name]->get_results();
-  }
-void show_all(void);
+  foraging_loop_functions();
+  virtual ~foraging_loop_functions(void) {}
+
+  virtual void Init(argos::TConfigurationNode& t_tree);
+  virtual void Reset();
+  virtual void Destroy();
+  virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
+  virtual void PreStep();
 
  private:
-  std::map<std::string, base_param_parser*> m_parsers;
+  foraging_loop_functions(const foraging_loop_functions& s) = delete;
+  foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
+
+  argos::CRange<argos::Real> m_arena_x;
+  argos::CRange<argos::Real> m_arena_y;
+  std::vector<argos::CVector2> m_block_pos;
+  argos::CFloorEntity* m_floor;
+  argos::CRandom::CRNG* m_rng;
+
+  std::string m_ofname;
+  std::ofstream m_ofile;
+
+  uint m_total_collected_blocks;
+  std::shared_ptr<const struct block_params> m_block_params;
+  parameter_manager m_param_manager;
 };
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_ */

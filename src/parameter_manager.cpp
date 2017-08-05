@@ -30,9 +30,20 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+void parameter_manager::init(std::shared_ptr<rcppsw::common::er_server> server) {
+  deferred_init(server);
+  insmod("params");
+  server_handle()->dbglvl(rcppsw::common::er_lvl::OFF);
+  server_handle()->loglvl(rcppsw::common::er_lvl::NOM);
+} /* init() */
+
 status_t parameter_manager::add_category(const std::string& name, base_param_parser* parser) {
   FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
 
@@ -47,10 +58,10 @@ status_t parameter_manager::parse_all(argos::TConfigurationNode& node) {
   return OK;
 } /* parse_all() */
 
-void parameter_manager::print_all(std::ostream& stream) {
+void parameter_manager::show_all(void) {
   std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
-      pair.second->print(stream);
+      pair.second->show(server_handle()->log_stream());
     });
-} /* parse_all() */
+} /* show_all() */
 
 NS_END(fordyca);
