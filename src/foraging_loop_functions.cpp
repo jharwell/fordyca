@@ -25,14 +25,14 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "fordyca/foraging_loop_functions.hpp"
-#include "fordyca/foraging_controller.hpp"
-#include "fordyca/block_param_parser.hpp"
+#include "fordyca/support/foraging_loop_functions.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/params/block_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -57,7 +57,7 @@ foraging_loop_functions::foraging_loop_functions(void) :
 void foraging_loop_functions::Init(argos::TConfigurationNode& t_node) {
   argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
   m_param_manager.init(std::make_shared<rcppsw::common::er_server>("loop-functions.txt"));
-  m_param_manager.add_category("block", new block_param_parser());
+  m_param_manager.add_category("block", new params::block_param_parser());
   m_param_manager.parse_all(foraging);
   m_block_params.reset(static_cast<const struct block_params*>(m_param_manager.get_params("block")));
   m_floor = &GetSpace().GetFloorEntity();
@@ -136,7 +136,7 @@ void foraging_loop_functions::PreStep() {
        it != footbots.end();
        ++it) {
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
-    foraging_controller& controller = dynamic_cast<foraging_controller&>(cFootBot.GetControllableEntity().GetController());
+    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(cFootBot.GetControllableEntity().GetController());
 
     /* Count how many foot-bots are in which state */
     n_resting += controller.is_resting();
@@ -154,7 +154,7 @@ void foraging_loop_functions::PreStep() {
       /* Check whether the foot-bot is in the nest */
       if(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
          m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
-        controller.publish_event(foraging_controller::ENTERED_NEST);
+        controller.publish_event(controller::foraging_controller::ENTERED_NEST);
 
         /*
          * Place a new block item on the ground (must be before the actual drop
@@ -180,7 +180,7 @@ void foraging_loop_functions::PreStep() {
 
             /* The floor texture must be updated */
             m_floor->SetChanged();
-            controller.publish_event(foraging_controller::BLOCK_FOUND);
+            controller.publish_event(controller::foraging_controller::BLOCK_FOUND);
             break;
           }
         } /* for(i..) */
@@ -200,4 +200,4 @@ void foraging_loop_functions::PreStep() {
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")
 
-NS_END(fordyca);
+NS_END(support, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file block_param_parser.hpp
+ * @file sensor_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,36 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_SENSOR_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_SENSOR_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_param_parser: public base_param_parser {
+class sensor_param_parser: public base_param_parser {
  public:
-  block_param_parser(void): m_params() {}
+  sensor_param_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node);
-  const struct block_params* get_results(void) { return m_params.get(); }
+  const struct sensor_params* get_results(void) { return m_params.get(); }
   void show(std::ostream& stream);
 
  private:
-  std::unique_ptr<struct block_params> m_params;
+  std::unique_ptr<struct sensor_params> m_params;
 };
 
-NS_END(fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_BLOCK_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_SENSOR_PARAM_PARSER_HPP_ */

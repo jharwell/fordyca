@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/actuator_param_parser.hpp"
+#include "fordyca/params/actuator_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
@@ -60,4 +60,4 @@ void actuator_param_parser::show(std::ostream& stream) {
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
 } /* show() */
 
-NS_END(fordyca);
+NS_END(params, fordyca);

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,12 +28,12 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/params.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -82,6 +82,6 @@ class actuator_manager {
 
 };
 
-NS_END(fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_ */

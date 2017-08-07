@@ -1,5 +1,7 @@
 /**
- * @file qt_user_functions.hpp
+ * @file parameter_manager.hpp
+ *
+ * Handles parsing of all XML parameters at runtime.
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,33 +19,43 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_
-#define INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_
+
+#ifndef INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include <string>
+#include <map>
 #include "rcppsw/common/common.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
+#include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Classes
+ * Class Definitions
  ******************************************************************************/
-class qt_user_functions : public argos::CQTOpenGLUserFunctions {
-public:
-   qt_user_functions(void);
+class repository: public rcppsw::common::er_client {
+ public:
+  repository(void) : m_parsers() {}
+  void init(std::shared_ptr<rcppsw::common::er_server> server);
+  status_t add_category(const std::string& category, base_param_parser* parser);
+  status_t parse_all(argos::TConfigurationNode& node);
+  const struct base_params* get_params(const std::string& name) {
+    return m_parsers[name]->get_results();
+  }
+void show_all(void);
 
-   virtual ~qt_user_functions() {}
-
-  void Draw(argos::CFootBotEntity& c_entity);
+ private:
+  std::map<std::string, base_param_parser*> m_parsers;
 };
 
-NS_END(fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_ */

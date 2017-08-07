@@ -1,53 +1,49 @@
 /**
- * @file sensor_param_parser.hpp
+ * @file qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of RCPPSW.
+ * This file is part of FORDYCA.
  *
- * RCPPSW is free software: you can redistribute it and/or modify it under the
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * RCPPSW.  If not, see <http://www.gnu.org/licenses/
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-class sensor_param_parser: public base_param_parser {
+class qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
-  sensor_param_parser(void) : m_params() {}
+  qt_user_functions(void);
 
-  void parse(argos::TConfigurationNode& node);
-  const struct sensor_params* get_results(void) { return m_params.get(); }
-  void show(std::ostream& stream);
+  virtual ~qt_user_functions() {}
 
- private:
-  std::unique_ptr<struct sensor_params> m_params;
+  void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(fordyca);
+NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_SENSOR_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.hpp
+ * @file repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,46 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
+#include "fordyca/params/repository.hpp"
+#include <algorithm>
+#include "rcsw/common/fpc.h"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class fsm_param_parser: public base_param_parser {
- public:
-  fsm_param_parser(void) : m_params() {}
+void repository::init(std::shared_ptr<rcppsw::common::er_server> server) {
+  deferred_init(server);
+  insmod("params");
+  server_handle()->dbglvl(rcppsw::common::er_lvl::OFF);
+  server_handle()->loglvl(rcppsw::common::er_lvl::NOM);
+} /* init() */
 
-  void parse(argos::TConfigurationNode& node);
-  const struct foraging_fsm_params* get_results(void) { return m_params.get(); }
-  void show(std::ostream& stream);
+status_t repository::add_category(const std::string& name, base_param_parser* parser) {
+  FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
 
- private:
-  std::unique_ptr<struct foraging_fsm_params> m_params;
-};
+  m_parsers.insert(std::pair<std::string, base_param_parser*>(name, parser));
+  return OK;
+} /* add_category() */
 
-NS_END(fordyca);
+status_t repository::parse_all(argos::TConfigurationNode& node) {
+  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
+      pair.second->parse(node);
+    });
+  return OK;
+} /* parse_all() */
 
-#endif /* INCLUDE_FORDYCA_FSM_PARAM_PARSER_HPP_ */
+void repository::show_all(void) {
+  std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
+      pair.second->show(server_handle()->log_stream());
+    });
+} /* show_all() */
+
+NS_END(params, fordyca);

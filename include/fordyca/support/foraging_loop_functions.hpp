@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_FORAGING_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,12 +31,12 @@
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/parameter_manager.hpp"
+#include "fordyca/params/repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Classes
@@ -84,9 +84,9 @@ class foraging_loop_functions : public argos::CLoopFunctions {
 
   uint m_total_collected_blocks;
   std::shared_ptr<const struct block_params> m_block_params;
-  parameter_manager m_param_manager;
+  params::repository m_param_manager;
 };
 
-NS_END(fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FORAGING_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_FORAGING_LOOP_FUNCTIONS_HPP_ */

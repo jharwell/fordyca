@@ -1,7 +1,5 @@
 /**
- * @file parameter_manager.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file sub_area.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,42 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
-#define INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_SUB_AREA_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_SUB_AREA_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
+#include <argos3/core/utility/math/vector2.h>
+#include <vector>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "fordyca/expressions/expressions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, resprentation);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class parameter_manager: public rcppsw::common::er_client {
+/**
+ * @brief Representation of a sub area of the arena to a specific
+ * robot. Includes how much has been explored, how valuable this sub area is
+ * considered to be to the robot, and known caches/blocks along with
+ * freshness/staleness of information via pheromones.
+ */
+class sub_area {
  public:
-  parameter_manager(void) : m_parsers() {}
-  void init(std::shared_ptr<rcppsw::common::er_server> server);
-  status_t add_category(const std::string& category, base_param_parser* parser);
-  status_t parse_all(argos::TConfigurationNode& node);
-  const struct base_params* get_params(const std::string& name) {
-    return m_parsers[name]->get_results();
-  }
-void show_all(void);
+  sub_area(size_t dim,
+           const argos::CVector2& area_center,
+           const argos::CVector2& nest_center) :
+      m_dim(dim),
+      m_center(area_center),
+      m_utility(m_center, nest_center, m_dim*m_dim) {}
 
  private:
-  std::map<std::string, base_param_parser*> m_parsers;
+  size_t           m_dim;
+  argos::CVector2  m_center;
+  expressions::sub_area_utility m_utility;
 };
 
-NS_END(fordyca);
+NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTION_SUB_AREA_HPP_ */
