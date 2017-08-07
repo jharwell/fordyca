@@ -31,7 +31,7 @@ set_property(TARGET rcsw PROPERTY IMPORTED_LOCATION ${binary_dir}/lib/librcsw.a)
 include_directories(${source_dir}/include)
 
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.58.0 COMPONENTS system filesystem) 
+find_package(Boost 1.58.0 COMPONENTS system filesystem)
 
 ################################################################################
 # Includes                                                                     #
