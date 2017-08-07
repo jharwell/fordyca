@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,14 +28,14 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "fordyca/params.hpp"
-#include "fordyca/sensor_manager.hpp"
-#include "fordyca/actuator_manager.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 #include "rcsw/common/common.h"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
@@ -155,6 +155,6 @@ class foraging_fsm : public fsm::simple_fsm {
   std::shared_ptr<actuator_manager> m_actuators;
 };
 
-NS_END(fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_ */

@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/foraging_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/actuator_param_parser.hpp"
 #include "fordyca/sensor_param_parser.hpp"
 #include "fordyca/fsm_param_parser.hpp"
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -126,4 +126,4 @@ void foraging_controller::Reset(void) {
 using namespace argos;
 REGISTER_CONTROLLER(foraging_controller, "foraging_controller")
 
-NS_END(fordyca);
+NS_END(controller, fordyca);

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_SENSOR_MANAGER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_SENSOR_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -35,7 +35,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -87,6 +87,6 @@ class sensor_manager {
   argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
 };
 
-NS_END(fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SENSOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_SENSOR_MANAGER_HPP_ */

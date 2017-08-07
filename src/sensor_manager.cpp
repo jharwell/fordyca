@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/sensor_manager.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
@@ -31,7 +31,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -121,4 +121,4 @@ bool sensor_manager::block_detected(void) {
 } /* block_detected() */
 
 
-NS_END(fordyca);
+NS_END(controller, fordyca);

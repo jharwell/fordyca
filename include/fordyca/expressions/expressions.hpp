@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_HPP_
+#ifndef INCLUDE_FORDYCA_EXPRESSIONS_EXPRESSIONS_HPP_
+#define INCLUDE_FORDYCA_EXPRESSIONS_EXPRESSIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -327,4 +327,4 @@ class abort_probability: public rcppsw::math::expression<double> {
 NS_END(tasks);
 NS_END(expressions, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_EXPRESSIONS_EXPRESSIONS_HPP_ */

@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_
-#define INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_
+#ifndef INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,20 +30,20 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 class qt_user_functions : public argos::CQTOpenGLUserFunctions {
-public:
-   qt_user_functions(void);
+ public:
+  qt_user_functions(void);
 
-   virtual ~qt_user_functions() {}
+  virtual ~qt_user_functions() {}
 
   void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(fordyca);
+NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_QT_USER_FUNCTIONS_H_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_ */

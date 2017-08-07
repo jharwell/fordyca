@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUB_AREA_HPP_
-#define INCLUDE_FORDYCA_SUB_AREA_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_SUB_AREA_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_SUB_AREA_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,12 +27,12 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <vector>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/expressions.hpp"
+#include "fordyca/expressions/expressions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, resprentation);
 
 /*******************************************************************************
  * Class Definitions
@@ -58,6 +58,6 @@ class sub_area {
   expressions::sub_area_utility m_utility;
 };
 
-NS_END(fordyca);
+NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUB_AREA_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTION_SUB_AREA_HPP_ */

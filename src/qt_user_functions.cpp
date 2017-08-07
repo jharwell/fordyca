@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/qt_user_functions.hpp"
-#include "fordyca/foraging_controller.hpp"
+#include "fordyca/support/qt_user_functions.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -42,7 +42,7 @@ qt_user_functions::qt_user_functions() {
  * Member Functions
  ******************************************************************************/
 void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  foraging_controller& controller = dynamic_cast<foraging_controller&>(c_entity.GetControllableEntity().GetController());
+  controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(c_entity.GetControllableEntity().GetController());
   if (controller.carrying_block()) {
     DrawCylinder(
         argos::CVector3(0.0f, 0.0f, 0.3f),
@@ -56,4 +56,4 @@ void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 using namespace argos;
 REGISTER_QTOPENGL_USER_FUNCTIONS(qt_user_functions, "qt_user_functions")
 
-NS_END(fordyca);
+NS_END(support, fordyca);

@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/foraging_fsm.hpp"
+#include "fordyca/controller/foraging_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
@@ -354,4 +354,4 @@ void foraging_fsm::init(void) {
   simple_fsm::init();
 } /* init() */
 
-NS_END(fordyca);
+NS_END(controller, fordyca);

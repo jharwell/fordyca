@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_BLOCK_DATA_HPP_
-#define INCLUDE_FORDYCA_BLOCK_DATA_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_BLOCK_DATA_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_BLOCK_DATA_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
  * Class Definitions
@@ -67,6 +67,6 @@ class block_data {
   size_t m_cum_blocks;      /// Total # blocks carried by this robot so far.
 };
 
-NS_END(fordyca);
+NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_BLOCK_DATA_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_BLOCK_DATA_HPP_ */

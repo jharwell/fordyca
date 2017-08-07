@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_FORAGING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,16 +28,16 @@
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
 #include "fordyca/params.hpp"
-#include "fordyca/foraging_fsm.hpp"
+#include "fordyca/controller/foraging_fsm.hpp"
 #include "fordyca/parameter_manager.hpp"
-#include "fordyca/sensor_manager.hpp"
-#include "fordyca/actuator_manager.hpp"
-#include "fordyca/block_data.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/representation/block_data.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -124,9 +124,9 @@ class foraging_controller : public argos::CCI_Controller,
   std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<foraging_fsm>              m_fsm;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  block_data                                 m_block_data;
+  representation::block_data                 m_block_data;
 };
 
-NS_END(fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FORAGING_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_FORAGING_CONTROLLER_CONTROLLER_HPP_ */

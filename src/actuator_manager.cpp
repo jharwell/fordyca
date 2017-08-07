@@ -21,18 +21,16 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/actuator_manager.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-/* Definition of the LEDs actuator */
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-/* Definition of the range and bearing actuator */
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -119,4 +117,4 @@ void actuator_manager::reset(int state) {
   set_raba_data(state);
 } /* reset() */
 
-NS_END(fordyca);
+NS_END(controller, fordyca);

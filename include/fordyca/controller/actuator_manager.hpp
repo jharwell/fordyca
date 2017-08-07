@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,7 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -82,6 +82,6 @@ class actuator_manager {
 
 };
 
-NS_END(fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_ */
