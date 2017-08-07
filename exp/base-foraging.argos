@@ -93,32 +93,13 @@
     </box>
 
     <light id="light_1"
-           position="-2,-1.5,1.0"
+           position="0,0,1.0"
            orientation="0,0,0"
            color="yellow"
-           intensity="3.0"
+           intensity="4.0"
            medium="leds" />
-    <light id="light_2"
-           position="-2,-0.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-    <light id="light_3"
-           position="-2,0.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-    <light id="light_4"
-           position="-2,1.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-
     <distribute>
-      <position method="uniform" min="-2,-2,0" max="-1,2,0" />
+      <position method="uniform" min="-2,-2,0" max="2,2,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="20" max_trials="100">
         <foot-bot id="fb">

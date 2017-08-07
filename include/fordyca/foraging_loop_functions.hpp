@@ -53,11 +53,28 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   virtual void PreStep();
 
  private:
+  /**
+   * @brief Distribute a block randomly in the arena (excluding nest extent)
+   * during initialization or after a robot has brought it to the
+   * nest. Collisions are not checked, as having 2 blocks on 1 square is not a
+   * big deal for now.
+   *
+   * @param i The index of the block to place/distribute.
+   */
+  void distribute_block(size_t i);
+
+  /**
+   * @brief Distribute all blocks in the arena.
+   */
+  void distribute_blocks(void);
+
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
   argos::CRange<argos::Real> m_arena_x;
   argos::CRange<argos::Real> m_arena_y;
+  argos::CRange<argos::Real> m_nest_x;
+  argos::CRange<argos::Real> m_nest_y;
   std::vector<argos::CVector2> m_block_pos;
   argos::CFloorEntity* m_floor;
   argos::CRandom::CRNG* m_rng;

@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
@@ -37,8 +38,10 @@ NS_START(fordyca);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_loop_functions::foraging_loop_functions(void) :
-    m_arena_x(-0.9f, 1.7f),
-    m_arena_y(-1.7f, 1.7f),
+    m_arena_x(-1.7, 1.7),
+    m_arena_y(-1.7, 1.7),
+    m_nest_x(-0.5, 0.5),
+    m_nest_y(-0.5, 0.5),
     m_block_pos(),
     m_floor(NULL),
     m_rng(NULL),
@@ -60,14 +63,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& t_node) {
   m_floor = &GetSpace().GetFloorEntity();
   m_rng = argos::CRandom::CreateRNG("argos");
 
-  /*
-   * Distribute block items uniformly in the arena.
-   */
-  for (size_t i = 0; i < m_block_params->n_items; ++i) {
-    m_block_pos.push_back(
-        argos::CVector2(m_rng->Uniform(m_arena_x),
-                        m_rng->Uniform(m_arena_y)));
-  } /* for(i..) */
+  m_block_pos.resize(m_block_params->n_items);
+  distribute_blocks();
 
   /* Open output file and truncate */
   argos::GetNodeAttribute(foraging, "output", m_ofname);
@@ -76,16 +73,30 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& t_node) {
   m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
 }
 
+void foraging_loop_functions::distribute_blocks(void) {
+  for (size_t i = 0; i < m_block_params->n_items; ++i) {
+    distribute_block(i);
+  } /* for(i..) */
+} /* distribute_blocks() */
+
+void foraging_loop_functions::distribute_block(size_t i) {
+  float x, y;
+  do {
+    x = m_rng->Uniform(m_arena_x);
+    y = m_rng->Uniform(m_arena_y);
+  } while (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(x) &&
+           m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(y));
+  m_block_pos[i] = argos::CVector2(x, y);
+} /* distribute_block() */
+
+
 void foraging_loop_functions::Reset() {
   m_total_collected_blocks = 0;
   m_ofile.close();
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
   m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
 
-  for (size_t i = 0; i < m_block_pos.size(); ++i) {
-    m_block_pos[i].Set(m_rng->Uniform(m_arena_x),
-                      m_rng->Uniform(m_arena_y));
-  } /* for(i..) */
+  distribute_blocks();
 }
 
 void foraging_loop_functions::Destroy() {
@@ -93,7 +104,8 @@ void foraging_loop_functions::Destroy() {
 }
 
 argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plane_pos) {
-  if (plane_pos.GetX() < -1.0f) {
+  if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
+      m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_block_pos.size(); ++i) {
@@ -140,15 +152,15 @@ void foraging_loop_functions::PreStep() {
       /* TODO: possibly change this to be autonomous, rather than just
        * informing the robot... */
       /* Check whether the foot-bot is in the nest */
-      if(pos.GetX() < -1.0f) {
+      if(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+         m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
         controller.publish_event(foraging_controller::ENTERED_NEST);
 
         /*
          * Place a new block item on the ground (must be before the actual drop
-         * because the block index goes to -1 after that)
+         * because the block index goes to -1 after that).
          */
-        m_block_pos[controller.block_idx()].Set(m_rng->Uniform(m_arena_x),
-                                               m_rng->Uniform(m_arena_y));
+        distribute_block(controller.block_idx());
         /* Drop the block item */
         controller.drop_block_in_nest();
         ++m_total_collected_blocks;
@@ -157,7 +169,8 @@ void foraging_loop_functions::PreStep() {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (pos.GetX() > -1.0f) {
+      if (!m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+          !m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
         /* Check whether the foot-bot is on a block item */
         for (size_t i = 0; i < m_block_pos.size(); ++i) {
           if((pos - m_block_pos[i]).SquareLength() < m_block_params->square_radius) {
