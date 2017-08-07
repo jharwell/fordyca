@@ -48,3 +48,6 @@ compile_commands.json
 
 # Build process
 build
+
+# Runtime
+*.txt

@@ -45,14 +45,12 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
     leaving_nest(),
     search_for_spot_in_nest(),
     collision_avoidance(),
-    exit_explore(),
-    exit_rest(),
-    exit_collision_avoidance(),
     exit_search_for_spot_in_nest(),
     entry_explore(),
     entry_rest(),
     entry_collision_avoidance(),
     entry_search_for_spot_in_nest(),
+    entry_leaving_nest(),
     m_last_explore_res(LAST_EXPLORATION_NONE),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_prob_range(0.0f, 1.0f),
@@ -61,7 +59,8 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
     m_sensors(sensors),
     m_actuators(actuators) {
   insmod("social_fsm");
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::NOM);
     }
 
 /*******************************************************************************
@@ -69,7 +68,7 @@ social_fsm::social_fsm(const struct social_fsm_params* params,
  ******************************************************************************/
 void social_fsm::event_explore(void) {
   DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    ST_EXPLORE,             /* resting */
+    ST_LEAVING_NEST,        /* resting */
     EVENT_IGNORED,          /* explore */
     EVENT_IGNORED,          /* explore success */
     EVENT_IGNORED,          /* explore fail */
@@ -190,7 +189,7 @@ STATE_DEFINE(social_fsm, leaving_nest, fsm::no_event_data) {
   }
 }
 STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
-  ER_DIAG("Executing ST_EXPlORE");
+  ER_DIAG("Executing ST_EXPLORE");
 
   /*
    * We transition to the 'return to nest' state in two situations:
@@ -222,7 +221,7 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
 
   /* Get the diffusion vector to perform obstacle avoidance */
   if (m_sensors->calc_diffusion_vector(NULL)) {
-    internal_event(ST_COLLISION_AVOIDANCE, new struct collision_event_data);
+    internal_event(ST_COLLISION_AVOIDANCE);
   }
   argos::CVector2 diff_vector;
   m_sensors->calc_diffusion_vector(&diff_vector);
@@ -232,8 +231,6 @@ STATE_DEFINE(social_fsm, explore, fsm::no_event_data) {
 }
 STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE_SUCCESS");
-
-  m_actuators->leds_set_color(argos::CColor::GREEN);
 
   /*
    * Apply the food rule, decreasing explore_to_rest_prob and increasing
@@ -250,7 +247,6 @@ STATE_DEFINE(social_fsm, explore_success, fsm::no_event_data) {
 }
 STATE_DEFINE(social_fsm, explore_fail, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE_FAIL");
-  m_actuators->leds_set_color(argos::CColor::ORANGE);
 
   /* Store the result of the expedition */
   m_last_explore_res = LAST_EXPLORATION_UNSUCCESSFUL;
@@ -260,24 +256,29 @@ STATE_DEFINE(social_fsm, return_to_nest, fsm::no_event_data) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
     argos::CVector2 vector;
 
+    if (LAST_EXPLORATION_SUCCESSFUL == m_last_explore_res) {
+      m_actuators->leds_set_color(argos::CColor::GREEN);
+    } else {
+      m_actuators->leds_set_color(argos::CColor::ORANGE);
+    }
+
     if (m_sensors->in_nest()) {
       internal_event(ST_SEARCH_FOR_SPOT_IN_NEST);
     }
 
     m_sensors->calc_diffusion_vector(&vector);
-    m_actuators->set_wheel_speeds(
+    /*   internal_event(ST_COLLISION_AVOIDANCE); */
+    /* } */
+      m_actuators->set_wheel_speeds(
         m_actuators->max_wheel_speed() * vector +
         m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
 }
-STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
+STATE_DEFINE(social_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
-
+  static argos::CColor last_color;
   ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  if (m_sensors->calc_diffusion_vector(&vector)) {
 
-  while (m_sensors->calc_diffusion_vector(&vector)) {
-    vector = -vector.Normalize();
-
-    /* Use the diffusion vector only */
     m_actuators->set_wheel_speeds(vector);
     /*
      * Collision avoidance happened, increase explore_to_rest_prob and decrease
@@ -287,9 +288,9 @@ STATE_DEFINE(social_fsm, collision_avoidance, struct collision_event_data) {
     m_prob_range.TruncValue(m_state.explore_to_rest_prob);
     m_state.rest_to_explore_prob -= mc_params->deltas.collision_rule_explore_to_rest;
     m_prob_range.TruncValue(m_state.rest_to_explore_prob);
-  } /* while() */
-
-  internal_event(data->last_state);
+  } else {
+    internal_event(previous_state());
+  }
 }
 STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
   ER_DIAG("Executing ST_SEARCH_FOR_SPOT_IN_NEST");
@@ -305,6 +306,9 @@ STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
   ++m_state.time_search_for_place_in_nest;
 
   argos::CVector2 vector;
+  /* if (m_sensors->calc_diffusion_vector(&vector)) { */
+  /*   internal_event(ST_COLLISION_AVOIDANCE); */
+  /* } */
   m_sensors->calc_diffusion_vector(&vector);
 
   m_actuators->set_wheel_speeds(
@@ -315,10 +319,17 @@ STATE_DEFINE(social_fsm, search_for_spot_in_nest, fsm::no_event_data) {
 ENTRY_DEFINE(social_fsm, entry_rest, fsm::no_event_data) {
   ER_DIAG("Entrying ST_REST");
   m_actuators->leds_set_color(argos::CColor::BLACK);
+  m_actuators->stop_wheels();
+  m_state.time_rested = 0;
+}
+ENTRY_DEFINE(social_fsm, entry_leaving_nest, fsm::no_event_data) {
+  ER_DIAG("Entering ST_LEAVING_NEST");
+  m_actuators->leds_set_color(argos::CColor::WHITE);
 }
 ENTRY_DEFINE(social_fsm, entry_explore, fsm::no_event_data) {
   ER_DIAG("Entrying ST_EXPLORE");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
+  m_state.time_exploring_unsuccessfully = 0;
 }
 ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLIISION_AVOIDANCE");
@@ -327,24 +338,13 @@ ENTRY_DEFINE(social_fsm, entry_collision_avoidance, fsm::no_event_data) {
 ENTRY_DEFINE(social_fsm, entry_search_for_spot_in_nest, fsm::no_event_data) {
   ER_DIAG("Entering ST_SEARCH_FOR_SPOT_IN_NEST");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
+  m_state.time_search_for_place_in_nest = 0;
 }
 
 EXIT_DEFINE(social_fsm, exit_search_for_spot_in_nest) {
   ER_DIAG("Exiting ST_SEARCH_FOR_SPOT_IN_NEST");
   m_last_explore_res = LAST_EXPLORATION_NONE;
-  m_state.time_search_for_place_in_nest = 0;
 }
-EXIT_DEFINE(social_fsm, exit_explore) {
-  ER_DIAG("Exiting ST_EXPLORE");
-  m_state.time_exploring_unsuccessfully = 0;
-  m_state.time_search_for_place_in_nest = 0;
-}
-EXIT_DEFINE(social_fsm, exit_rest) {
-  ER_DIAG("Exiting ST_REST");
-
-  m_state.time_rested = 0;
-}
-
 
 /*******************************************************************************
  * General Member Functions

@@ -57,14 +57,14 @@ void social_loop_functions::Init(argos::TConfigurationNode& t_node) {
   argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
   m_param_manager.add_category("food", new food_param_parser());
   m_param_manager.parse_all(foraging);
-
+  m_food_params.reset(static_cast<const struct food_params*>(m_param_manager.get_params("food")));
   m_floor = &GetSpace().GetFloorEntity();
   m_rng = argos::CRandom::CreateRNG("argos");
 
   /*
    * Distribute food items uniformly in the arena.
    */
-  for (size_t i = 0; i < m_food_params.n_items; ++i) {
+  for (size_t i = 0; i < m_food_params->n_items; ++i) {
     m_food_pos.push_back(
         argos::CVector2(m_rng->Uniform(m_arena_x),
                         m_rng->Uniform(m_arena_y)));
@@ -102,7 +102,7 @@ argos::CColor social_loop_functions::GetFloorColor(const argos::CVector2& plane_
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_food_pos.size(); ++i) {
-    if ((plane_pos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
+    if ((plane_pos - m_food_pos[i]).SquareLength() < m_food_params->square_radius) {
       return argos::CColor::BLACK;
     }
   }
@@ -139,31 +139,31 @@ void social_loop_functions::PreStep() {
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
     if (controller.carrying_block()) {
-      printf("Robot %d carrying block\n", i);
       /* TODO: possibly change this to be autonomous, rather than just
        * informing the robot... */
       /* Check whether the foot-bot is in the nest */
       if(pos.GetX() < -1.0f) {
         controller.publish_event(social_foraging_controller::ENTERED_NEST);
 
+        /*
+         * Place a new food item on the ground (must be before the actual drop
+         * because the block index goes to -1 after that)
+         */
+        m_food_pos[controller.block_idx()].Set(m_rng->Uniform(m_arena_x),
+                                               m_rng->Uniform(m_arena_y));
         /* Drop the food item */
         controller.drop_block_in_nest();
-        m_energy += m_food_params.energy_per_item;
+        m_energy += m_food_params->energy_per_item;
         ++m_total_collected_blocks;
-
-        /* Place a new food item on the ground */
-        m_food_pos[controller.block_idx()].Set(m_rng->Uniform(m_arena_x),
-                                                 m_rng->Uniform(m_arena_y));
 
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no food item */
-      printf("Robot %d not carrying block\n", i);
       if (pos.GetX() > -1.0f) {
         /* Check whether the foot-bot is on a food item */
         for (size_t i = 0; i < m_food_pos.size(); ++i) {
-          if((pos - m_food_pos[i]).SquareLength() < m_food_params.square_radius) {
+          if((pos - m_food_pos[i]).SquareLength() < m_food_params->square_radius) {
             /* If so, we move that item out of sight */
             m_food_pos[i].Set(100.0f, 100.f);
             controller.pickup_block(i);
