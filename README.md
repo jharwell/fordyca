@@ -19,3 +19,7 @@ This is mainly just a collection of things I don't want to forget at the moment.
   scenario".
 
 - Enhancements are pretty self-explanatory.
+
+Also, branches should be named after their issue number, which is probably not the
+same as their number within their category (i.e. the 4th bug is probably the
+17th global issue).
