@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/block_param_parser.hpp"
+#include "fordyca/params/block_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
@@ -44,4 +44,4 @@ void block_param_parser::show(std::ostream& stream) {
   stream << "square_radius=" << m_params->square_radius << std::endl;
 } /* show() */
 
-NS_END(fordyca);
+NS_END(params, fordyca);

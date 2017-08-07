@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/actuator_param_parser.hpp"
-#include "fordyca/sensor_param_parser.hpp"
-#include "fordyca/fsm_param_parser.hpp"
+#include "fordyca/params/actuator_param_parser.hpp"
+#include "fordyca/params/sensor_param_parser.hpp"
+#include "fordyca/params/fsm_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,9 +44,9 @@ foraging_controller::foraging_controller(void) :
     m_block_data() {
   deferred_init(m_server);
   m_param_manager.init(m_server);
-  m_param_manager.add_category("actuators", new actuator_param_parser());
-  m_param_manager.add_category("sensors", new sensor_param_parser());
-  m_param_manager.add_category("fsm", new fsm_param_parser());
+  m_param_manager.add_category("actuators", new params::actuator_param_parser());
+  m_param_manager.add_category("sensors", new params::sensor_param_parser());
+  m_param_manager.add_category("fsm", new params::fsm_param_parser());
 }
 
 /*******************************************************************************

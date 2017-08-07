@@ -20,8 +20,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
-#define INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,21 +29,21 @@
 #include <string>
 #include <map>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class parameter_manager: public rcppsw::common::er_client {
+class repository: public rcppsw::common::er_client {
  public:
-  parameter_manager(void) : m_parsers() {}
+  repository(void) : m_parsers() {}
   void init(std::shared_ptr<rcppsw::common::er_server> server);
   status_t add_category(const std::string& category, base_param_parser* parser);
   status_t parse_all(argos::TConfigurationNode& node);
@@ -56,6 +56,6 @@ void show_all(void);
   std::map<std::string, base_param_parser*> m_parsers;
 };
 
-NS_END(fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMETER_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PARAMETER_MANAGER_HPP_ */

@@ -27,9 +27,8 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
-#include "fordyca/params.hpp"
 #include "fordyca/controller/foraging_fsm.hpp"
-#include "fordyca/parameter_manager.hpp"
+#include "fordyca/params/repository.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/block_data.hpp"
@@ -119,7 +118,7 @@ class foraging_controller : public argos::CCI_Controller,
     void pickup_block(int i);
 
  private:
-  parameter_manager                          m_param_manager;
+  params::repository                         m_param_manager;
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<foraging_fsm>              m_fsm;

@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "fordyca/params.hpp"
+#include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "rcsw/common/common.h"

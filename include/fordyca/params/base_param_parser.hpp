@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,12 +27,12 @@
 #include <fstream>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
@@ -47,6 +47,6 @@ class base_param_parser {
   virtual const struct base_params* get_results(void) { return NULL; }
 };
 
-NS_END(fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_BASE_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_ */

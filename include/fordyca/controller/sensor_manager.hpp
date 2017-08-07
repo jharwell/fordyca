@@ -30,7 +30,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces

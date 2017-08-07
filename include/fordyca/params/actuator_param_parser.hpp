@@ -18,20 +18,20 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_
-#define INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params.hpp"
-#include "fordyca/base_param_parser.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,6 +48,6 @@ class actuator_param_parser : public base_param_parser {
   std::unique_ptr<struct actuator_params> m_params;
 };
 
-NS_END(fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ACTUATOR_PARAM_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAM_PARSER_HPP_ */

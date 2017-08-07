@@ -27,7 +27,7 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "fordyca/support/foraging_loop_functions.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/block_param_parser.hpp"
+#include "fordyca/params/block_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +57,7 @@ foraging_loop_functions::foraging_loop_functions(void) :
 void foraging_loop_functions::Init(argos::TConfigurationNode& t_node) {
   argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
   m_param_manager.init(std::make_shared<rcppsw::common::er_server>("loop-functions.txt"));
-  m_param_manager.add_category("block", new block_param_parser());
+  m_param_manager.add_category("block", new params::block_param_parser());
   m_param_manager.parse_all(foraging);
   m_block_params.reset(static_cast<const struct block_params*>(m_param_manager.get_params("block")));
   m_floor = &GetSpace().GetFloorEntity();

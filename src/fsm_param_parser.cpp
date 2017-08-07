@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm_param_parser.hpp"
+#include "fordyca/params/fsm_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
@@ -65,4 +65,4 @@ void fsm_param_parser::show(std::ostream& stream) {
   stream << "times.min_search_for_place_in_nest=" << m_params->times.min_search_for_place_in_nest << std::endl;
 } /* show() */
 
-NS_END(fordyca);
+NS_END(params, fordyca);

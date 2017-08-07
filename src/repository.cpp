@@ -1,5 +1,5 @@
 /**
- * @file parameter_manager.cpp
+ * @file repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,47 +21,43 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/parameter_manager.hpp"
+#include "fordyca/params/repository.hpp"
 #include <algorithm>
 #include "rcsw/common/fpc.h"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-void parameter_manager::init(std::shared_ptr<rcppsw::common::er_server> server) {
+void repository::init(std::shared_ptr<rcppsw::common::er_server> server) {
   deferred_init(server);
   insmod("params");
   server_handle()->dbglvl(rcppsw::common::er_lvl::OFF);
   server_handle()->loglvl(rcppsw::common::er_lvl::NOM);
 } /* init() */
 
-status_t parameter_manager::add_category(const std::string& name, base_param_parser* parser) {
+status_t repository::add_category(const std::string& name, base_param_parser* parser) {
   FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());
 
   m_parsers.insert(std::pair<std::string, base_param_parser*>(name, parser));
   return OK;
 } /* add_category() */
 
-status_t parameter_manager::parse_all(argos::TConfigurationNode& node) {
+status_t repository::parse_all(argos::TConfigurationNode& node) {
   std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
       pair.second->parse(node);
     });
   return OK;
 } /* parse_all() */
 
-void parameter_manager::show_all(void) {
+void repository::show_all(void) {
   std::for_each(m_parsers.begin(), m_parsers.end(), [&](std::pair<const std::string, base_param_parser*>& pair) {
       pair.second->show(server_handle()->log_stream());
     });
 } /* show_all() */
 
-NS_END(fordyca);
+NS_END(params, fordyca);

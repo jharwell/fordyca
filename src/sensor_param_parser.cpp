@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/sensor_param_parser.hpp"
+#include "fordyca/params/sensor_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
@@ -59,4 +59,4 @@ void sensor_param_parser::show(std::ostream& stream) {
   stream << "go_straight_angle_range=" << m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
 
-NS_END(fordyca);
+NS_END(params, fordyca);

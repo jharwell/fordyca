@@ -31,7 +31,7 @@
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/parameter_manager.hpp"
+#include "fordyca/params/repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,7 +84,7 @@ class foraging_loop_functions : public argos::CLoopFunctions {
 
   uint m_total_collected_blocks;
   std::shared_ptr<const struct block_params> m_block_params;
-  parameter_manager m_param_manager;
+  params::repository m_param_manager;
 };
 
 NS_END(support, fordyca);
