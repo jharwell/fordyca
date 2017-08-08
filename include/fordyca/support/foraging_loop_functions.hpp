@@ -29,9 +29,9 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
-#include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/repository.hpp"
+#include "fordyca/support/block_distributor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,28 +46,13 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   foraging_loop_functions();
   virtual ~foraging_loop_functions(void) {}
 
-  virtual void Init(argos::TConfigurationNode& t_tree);
+  virtual void Init(argos::TConfigurationNode& node);
   virtual void Reset();
   virtual void Destroy();
   virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
   virtual void PreStep();
 
  private:
-  /**
-   * @brief Distribute a block randomly in the arena (excluding nest extent)
-   * during initialization or after a robot has brought it to the
-   * nest. Collisions are not checked, as having 2 blocks on 1 square is not a
-   * big deal for now.
-   *
-   * @param i The index of the block to place/distribute.
-   */
-  void distribute_block(size_t i);
-
-  /**
-   * @brief Distribute all blocks in the arena.
-   */
-  void distribute_blocks(void);
-
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
@@ -75,16 +60,15 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   argos::CRange<argos::Real> m_arena_y;
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
-  std::vector<argos::CVector2> m_block_pos;
   argos::CFloorEntity* m_floor;
-  argos::CRandom::CRNG* m_rng;
-
   std::string m_ofname;
   std::ofstream m_ofile;
-
   uint m_total_collected_blocks;
+  std::shared_ptr<const struct logging_params> m_logging_params;
   std::shared_ptr<const struct block_params> m_block_params;
   params::repository m_param_manager;
+  std::unique_ptr<block_distributor> m_distributor;
+  std::shared_ptr<std::vector<argos::CVector2>> m_blocks;
 };
 
 NS_END(support, fordyca);

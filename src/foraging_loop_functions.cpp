@@ -28,6 +28,7 @@
 #include "fordyca/support/foraging_loop_functions.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/params/block_param_parser.hpp"
+#include "fordyca/params/logging_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,52 +43,46 @@ foraging_loop_functions::foraging_loop_functions(void) :
     m_arena_y(-1.7, 1.7),
     m_nest_x(-0.5, 0.5),
     m_nest_y(-0.5, 0.5),
-    m_block_pos(),
     m_floor(NULL),
-    m_rng(NULL),
     m_ofname(),
     m_ofile(),
     m_total_collected_blocks(0),
+    m_logging_params(),
     m_block_params(),
-    m_param_manager() {}
+    m_param_manager(),
+    m_distributor(),
+    m_blocks() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void foraging_loop_functions::Init(argos::TConfigurationNode& t_node) {
-  argos::TConfigurationNode& foraging = argos::GetNode(t_node, "foraging");
-  m_param_manager.init(std::make_shared<rcppsw::common::er_server>("loop-functions.txt"));
-  m_param_manager.add_category("block", new params::block_param_parser());
-  m_param_manager.parse_all(foraging);
-  m_block_params.reset(static_cast<const struct block_params*>(m_param_manager.get_params("block")));
-  m_floor = &GetSpace().GetFloorEntity();
-  m_rng = argos::CRandom::CreateRNG("argos");
+void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+  m_param_manager.add_category("blocks", new params::block_param_parser());
+  m_param_manager.add_category("logging", new params::logging_param_parser());
+  m_param_manager.parse_all(node);
 
-  m_block_pos.resize(m_block_params->n_items);
-  distribute_blocks();
+  m_logging_params.reset(static_cast<const struct logging_params*>(
+      m_param_manager.get_params("logging")));
+
+  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>());
+  m_floor = &GetSpace().GetFloorEntity();
+
+  m_block_params.reset(static_cast<const struct block_params*>(
+      m_param_manager.get_params("blocks")));
+  m_distributor.reset(new support::block_distributor(m_arena_x,
+                                                     m_arena_y,
+                                                     m_nest_x,
+                                                     m_nest_y,
+                                                     m_block_params,
+                                                     m_blocks));
+
+  m_distributor->distribute_blocks();
 
   /* Open output file and truncate */
-  argos::GetNodeAttribute(foraging, "output", m_ofname);
+  m_ofname = m_logging_params->sim_stats;
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-
   m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
 }
-
-void foraging_loop_functions::distribute_blocks(void) {
-  for (size_t i = 0; i < m_block_params->n_items; ++i) {
-    distribute_block(i);
-  } /* for(i..) */
-} /* distribute_blocks() */
-
-void foraging_loop_functions::distribute_block(size_t i) {
-  float x, y;
-  do {
-    x = m_rng->Uniform(m_arena_x);
-    y = m_rng->Uniform(m_arena_y);
-  } while (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(x) &&
-           m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(y));
-  m_block_pos[i] = argos::CVector2(x, y);
-} /* distribute_block() */
 
 
 void foraging_loop_functions::Reset() {
@@ -96,7 +91,7 @@ void foraging_loop_functions::Reset() {
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
   m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
 
-  distribute_blocks();
+  m_distributor->distribute_blocks();
 }
 
 void foraging_loop_functions::Destroy() {
@@ -108,13 +103,13 @@ argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plan
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
   }
-  for (size_t i = 0; i < m_block_pos.size(); ++i) {
-    if ((plane_pos - m_block_pos[i]).SquareLength() < m_block_params->square_radius) {
+  for (size_t i = 0; i < m_blocks->size(); ++i) {
+    if ((plane_pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
       return argos::CColor::BLACK;
     }
   }
   return argos::CColor::WHITE;
-} /* get_floor_color() */
+} /* GetFloorColor() */
 
 void foraging_loop_functions::PreStep() {
   /*
@@ -152,7 +147,7 @@ void foraging_loop_functions::PreStep() {
       /* TODO: possibly change this to be autonomous, rather than just
        * informing the robot... */
       /* Check whether the foot-bot is in the nest */
-      if(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+      if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
          m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
         controller.publish_event(controller::foraging_controller::ENTERED_NEST);
 
@@ -160,7 +155,7 @@ void foraging_loop_functions::PreStep() {
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
          */
-        distribute_block(controller.block_idx());
+        m_distributor->distribute_block(controller.block_idx());
         /* Drop the block item */
         controller.drop_block_in_nest();
         ++m_total_collected_blocks;
@@ -172,10 +167,10 @@ void foraging_loop_functions::PreStep() {
       if (!m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
           !m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
         /* Check whether the foot-bot is on a block item */
-        for (size_t i = 0; i < m_block_pos.size(); ++i) {
-          if((pos - m_block_pos[i]).SquareLength() < m_block_params->square_radius) {
+        for (size_t i = 0; i < m_blocks->size(); ++i) {
+          if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
             /* If so, we move that item out of sight */
-            m_block_pos[i].Set(100.0f, 100.f);
+              m_blocks->at(i).Set(100.0f, 100.f);
             controller.pickup_block(i);
 
             /* The floor texture must be updated */

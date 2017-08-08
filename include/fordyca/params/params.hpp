@@ -18,12 +18,13 @@ n *
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/angles.h>
@@ -122,14 +123,12 @@ struct diffusion_params {
   argos::Real delta;
   /* Angle tolerance range to go straight. */
   argos::CRange<argos::CRadians> go_straight_angle_range;
-
 };
 
 struct actuator_params : public base_params {
   actuator_params(void) : wheels() {}
 
   struct wheel_params wheels;
-
 };
 
 struct sensor_params : public base_params {
@@ -139,10 +138,18 @@ struct sensor_params : public base_params {
 };
 
 struct block_params : public base_params {
-  uint n_items;
+  block_params(void) : n_blocks(),
+                       square_radius(),
+                       dist_model() {}
+  uint n_blocks;
   argos::Real square_radius;
+  std::string dist_model;
+};
+
+struct logging_params : public base_params {
+  std::string sim_stats;
 };
 
 NS_END(fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PARAMS_HPP_ */

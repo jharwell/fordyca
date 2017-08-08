@@ -43,10 +43,13 @@ foraging_controller::foraging_controller(void) :
     m_server(new rcppsw::common::er_server("init.txt")),
     m_block_data() {
   deferred_init(m_server);
-  m_param_manager.init(m_server);
-  m_param_manager.add_category("actuators", new params::actuator_param_parser());
-  m_param_manager.add_category("sensors", new params::sensor_param_parser());
-  m_param_manager.add_category("fsm", new params::fsm_param_parser());
+  m_param_manager.logging_init(m_server);
+  m_param_manager.add_category("actuators",
+                               new params::actuator_param_parser());
+  m_param_manager.add_category("sensors",
+                               new params::sensor_param_parser());
+  m_param_manager.add_category("fsm",
+                               new params::fsm_param_parser());
 }
 
 /*******************************************************************************

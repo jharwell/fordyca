@@ -37,12 +37,16 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <diffusion go_straight_angle_range="-5:5"
-                   delta="0.1" />
-        <wheels hard_turn_angle_threshold="90"
-                soft_turn_angle_threshold="70"
-                no_turn_angle_threshold="10"
-                max_speed="10" />
+        <sensors>
+          <diffusion go_straight_angle_range="-5:5"
+                     delta="0.1" />
+        </sensors>
+        <actuators>
+          <wheels hard_turn_angle_threshold="90"
+                  soft_turn_angle_threshold="70"
+                  no_turn_angle_threshold="10"
+                  max_speed="10" />
+        </actuators>
         <fsm initial_rest_to_explore_prob="0.1"
                initial_explore_to_rest_prob="0.1"
                block_rule_explore_to_rest_delta_prob="0.01"
@@ -63,11 +67,12 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="foraging_loop_functions">
-    <foraging n_items="25"
-              radius="0.1"
-              energy_per_item="1000"
-              energy_per_moving_robot="1"
-              output="foraging.txt" />
+    <logging sim_stats="base-foraging-stats.txt"
+             />
+    <blocks n_blocks="25"
+            radius="0.1"
+            dist_model="random"
+            />
   </loop_functions>
 
   <!-- *********************** -->

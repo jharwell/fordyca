@@ -33,12 +33,12 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void repository::init(std::shared_ptr<rcppsw::common::er_server> server) {
+void repository::logging_init(std::shared_ptr<rcppsw::common::er_server> server) {
   deferred_init(server);
   insmod("params");
   server_handle()->dbglvl(rcppsw::common::er_lvl::OFF);
   server_handle()->loglvl(rcppsw::common::er_lvl::NOM);
-} /* init() */
+} /* logging_init() */
 
 status_t repository::add_category(const std::string& name, base_param_parser* parser) {
   FPC_CHECK(ERROR, m_parsers.find(name) == m_parsers.end());

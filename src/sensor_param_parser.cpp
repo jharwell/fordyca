@@ -32,7 +32,8 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void sensor_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode diff_node = argos::GetNode(node, "diffusion");
+  argos::TConfigurationNode diff_node = argos::GetNode(
+      argos::GetNode(node, "sensors"), "diffusion");
 
   m_params.reset(new sensor_params);
 

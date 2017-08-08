@@ -1,5 +1,5 @@
 /**
- * @file block_param_parser.cpp
+ * @file logging_param_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/block_param_parser.hpp"
+#include "fordyca/params/logging_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,19 +31,14 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_param_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct block_params);
-  argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
-  argos::GetNodeAttribute(node, "radius", m_params->square_radius);
-  argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
-  m_params->square_radius *= m_params->square_radius;
+void logging_param_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct logging_params);
+  argos::GetNodeAttribute(node, "sim_stats", m_params->sim_stats);
 } /* parse() */
 
-void block_param_parser::show(std::ostream& stream) {
-  stream << "Block params\n====================" << std::endl;
-  stream << "n_items=" << m_params->n_blocks << std::endl;
-  stream << "square_radius=" << m_params->square_radius << std::endl;
-  stream << "dist_model=" << m_params->dist_model << std::endl;
+void logging_param_parser::show(std::ostream& stream) {
+  stream << "Logging params\n====================" << std::endl;
+  stream << "sim_stats=" << m_params->sim_stats << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

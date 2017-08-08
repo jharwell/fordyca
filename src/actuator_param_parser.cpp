@@ -32,7 +32,8 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void actuator_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node = argos::GetNode(node, "wheels");
+  argos::TConfigurationNode wheel_node = argos::GetNode(
+      argos::GetNode(node, "actuators"), "wheels");
 
   m_params.reset(new struct actuator_params);
 
