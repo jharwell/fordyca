@@ -73,7 +73,6 @@ void block_distributor::dist_single_src(size_t i) {
    * direction, and put all the blocks around there.
    */
   argos::CRange<argos::Real> y_range = m_nest_y;
-  double point = m_arena_x.GetMax() * 0.75;
   argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(m_arena_x.GetMax() * 0.75 - 0.5,
                                                                   m_arena_x.GetMax() * 0.75);
   m_blocks->at(i) = dist_in_range(x_range, y_range);

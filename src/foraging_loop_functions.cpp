@@ -59,11 +59,11 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_param_manager.add_category("blocks", new params::block_param_parser());
   m_param_manager.add_category("logging", new params::logging_param_parser());
   m_param_manager.parse_all(node);
-
   m_logging_params.reset(static_cast<const struct logging_params*>(
       m_param_manager.get_params("logging")));
 
-  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>());
+  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>("loop-functions-init.txt"));
+  m_param_manager.show_all();
   m_floor = &GetSpace().GetFloorEntity();
 
   /* distribute blocks in arena */
@@ -143,8 +143,8 @@ void foraging_loop_functions::PreStep() {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
-          !m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
+      if (!(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+            m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY()))) {
         /* Check whether the foot-bot is on a block item */
         for (size_t i = 0; i < m_blocks->size(); ++i) {
           if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
