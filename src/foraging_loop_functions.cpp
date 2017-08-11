@@ -44,9 +44,7 @@ foraging_loop_functions::foraging_loop_functions(void) :
     m_nest_x(-0.5, 0.5),
     m_nest_y(-0.5, 0.5),
     m_floor(NULL),
-    m_ofname(),
-    m_ofile(),
-    m_total_collected_blocks(0),
+    m_collector(),
     m_logging_params(),
     m_block_params(),
     m_param_manager(),
@@ -57,6 +55,7 @@ foraging_loop_functions::foraging_loop_functions(void) :
  * Member Functions
  ******************************************************************************/
 void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+  /* parse all environment parameters */
   m_param_manager.add_category("blocks", new params::block_param_parser());
   m_param_manager.add_category("logging", new params::logging_param_parser());
   m_param_manager.parse_all(node);
@@ -67,6 +66,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>());
   m_floor = &GetSpace().GetFloorEntity();
 
+  /* distribute blocks in arena */
   m_block_params.reset(static_cast<const struct block_params*>(
       m_param_manager.get_params("blocks")));
   m_distributor.reset(new support::block_distributor(m_arena_x,
@@ -78,24 +78,18 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   m_distributor->distribute_blocks();
 
-  /* Open output file and truncate */
-  m_ofname = m_logging_params->sim_stats;
-  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
+  /* initialize stat collecting */
+  m_collector.reset(m_logging_params->sim_stats);
 }
 
 
 void foraging_loop_functions::Reset() {
-  m_total_collected_blocks = 0;
-  m_ofile.close();
-  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
-
+  m_collector.reset(m_logging_params->sim_stats);
   m_distributor->distribute_blocks();
 }
 
 void foraging_loop_functions::Destroy() {
-  m_ofile.close();
+  m_collector.finalize();
 }
 
 argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plane_pos) {
@@ -112,19 +106,8 @@ argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plan
 } /* GetFloorColor() */
 
 void foraging_loop_functions::PreStep() {
-  /*
-   * If a robot is in the nest, drop the block item
-   * If a robot is on a block item, pick it
-   * Each robot can carry only one block item per time
-   */
-  uint n_resting = 0;
-  uint n_exploring = 0;
-  uint n_returning = 0;
-  uint n_avoiding = 0;
-
   int i = 0;
 
-  /* Check whether a robot is on a block item */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -133,12 +116,8 @@ void foraging_loop_functions::PreStep() {
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
     controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(cFootBot.GetControllableEntity().GetController());
 
-    /* Count how many foot-bots are in which state */
-    n_resting += controller.is_resting();
-    n_exploring += controller.is_exploring();
-    n_returning += controller.is_returning();
-    n_avoiding += controller.is_avoiding_collision();
-
+    /* collect all stats from this robot */
+    m_collector.collect_from_robot(controller);
     /* Get the position of the foot-bot on the ground as a CVector2 */
     argos::CVector2 pos;
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
@@ -158,7 +137,6 @@ void foraging_loop_functions::PreStep() {
         m_distributor->distribute_block(controller.block_idx());
         /* Drop the block item */
         controller.drop_block_in_nest();
-        ++m_total_collected_blocks;
 
         /* The floor texture must be updated */
         m_floor->SetChanged();
@@ -183,14 +161,7 @@ void foraging_loop_functions::PreStep() {
     }
     ++i;
   } /* for(it..) */
-
-  /* Output stuff to file */
-  m_ofile << GetSpace().GetSimulationClock() << "\t"
-          << m_total_collected_blocks << "\t"
-          << n_resting << "\t"
-          << n_exploring << "\t"
-          << n_returning << "\t"
-          << n_avoiding << std::endl;
+  m_collector.store(GetSpace().GetSimulationClock());
 }
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")

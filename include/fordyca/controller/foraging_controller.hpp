@@ -60,7 +60,7 @@ class foraging_controller : public argos::CCI_Controller,
   bool is_exploring(void) { return m_fsm->is_exploring(); }
   bool is_returning(void) { return m_fsm->is_returning(); }
   bool is_avoiding_collision(void) { return m_fsm->is_avoiding_collision(); }
-
+  bool in_nest(void) {return m_sensors->in_nest(); }
   void publish_event(enum event_type event);
 
   /*

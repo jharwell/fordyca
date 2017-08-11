@@ -147,6 +147,7 @@ struct block_params : public base_params {
 };
 
 struct logging_params : public base_params {
+  logging_params(void) : sim_stats() {}
   std::string sim_stats;
 };
 

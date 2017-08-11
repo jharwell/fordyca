@@ -32,6 +32,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/repository.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/support/stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,9 +62,7 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
   argos::CFloorEntity* m_floor;
-  std::string m_ofname;
-  std::ofstream m_ofile;
-  uint m_total_collected_blocks;
+  stat_collector m_collector;
   std::shared_ptr<const struct logging_params> m_logging_params;
   std::shared_ptr<const struct block_params> m_block_params;
   params::repository m_param_manager;
