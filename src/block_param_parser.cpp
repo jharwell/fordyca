@@ -33,9 +33,10 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void block_param_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct block_params);
-  argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
-  argos::GetNodeAttribute(node, "radius", m_params->square_radius);
-  argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
+  argos::TConfigurationNode bnode = argos::GetNode(node, "blocks");
+  argos::GetNodeAttribute(bnode, "n_blocks", m_params->n_blocks);
+  argos::GetNodeAttribute(bnode, "radius", m_params->square_radius);
+  argos::GetNodeAttribute(bnode, "dist_model", m_params->dist_model);
   m_params->square_radius *= m_params->square_radius;
 } /* parse() */
 

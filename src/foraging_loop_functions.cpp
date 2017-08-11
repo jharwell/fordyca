@@ -39,9 +39,9 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_loop_functions::foraging_loop_functions(void) :
-    m_arena_x(-1.7, 1.7),
+    m_arena_x(-4.7, 4.7),
     m_arena_y(-1.7, 1.7),
-    m_nest_x(-0.5, 0.5),
+    m_nest_x(-3.5, -2.5),
     m_nest_y(-0.5, 0.5),
     m_floor(NULL),
     m_collector(),
@@ -69,6 +69,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* distribute blocks in arena */
   m_block_params.reset(static_cast<const struct block_params*>(
       m_param_manager.get_params("blocks")));
+  m_blocks = std::make_shared<std::vector<argos::CVector2>>(m_block_params->n_blocks);
   m_distributor.reset(new support::block_distributor(m_arena_x,
                                                      m_arena_y,
                                                      m_nest_x,

@@ -71,34 +71,34 @@
              />
     <blocks n_blocks="25"
             radius="0.1"
-            dist_model="random"
+            dist_model="single_source"
             />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="5, 5, 2" center="0,0,1">
+  <arena size="10, 5, 2" center="0,0,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="4,0.1,0.5" movable="false">
+    <box id="wall_north" size="8,0.1,0.5" movable="false">
       <body position="0,2,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="4,0.1,0.5" movable="false">
+    <box id="wall_south" size="8,0.1,0.5" movable="false">
       <body position="0,-2,0" orientation="0,0,0" />
     </box>
     <box id="wall_east" size="0.1,4,0.5" movable="false">
-      <body position="2,0,0" orientation="0,0,0" />
+      <body position="4,0,0" orientation="0,0,0" />
     </box>
     <box id="wall_west" size="0.1,4,0.5" movable="false">
-      <body position="-2,0,0" orientation="0,0,0" />
+      <body position="-4,0,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
-           position="0,0,1.0"
+           position="-4,0,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="4.0"
@@ -139,7 +139,9 @@
         <placement idx="0"
                    position="0,0,4.34"
                    look_at="0,0,0"
-                   lens_focal_length="20" />
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
       </camera>
       <user_functions label="qt_user_functions" />
     </qt-opengl>
