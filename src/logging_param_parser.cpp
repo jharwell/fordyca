@@ -33,7 +33,8 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void logging_param_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct logging_params);
-  argos::GetNodeAttribute(node, "sim_stats", m_params->sim_stats);
+  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
+  argos::GetNodeAttribute(lnode, "sim_stats", m_params->sim_stats);
 } /* parse() */
 
 void logging_param_parser::show(std::ostream& stream) {
