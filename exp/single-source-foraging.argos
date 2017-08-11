@@ -67,11 +67,11 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="foraging_loop_functions">
-    <logging sim_stats="random-foraging-stats.txt"
+    <logging sim_stats="base-foraging-stats.txt"
              />
     <blocks n_blocks="25"
             radius="0.1"
-            dist_model="random"
+            dist_model="single_source"
             />
   </loop_functions>
 
