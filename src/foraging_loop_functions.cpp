@@ -115,40 +115,35 @@ void foraging_loop_functions::PreStep() {
        ++it) {
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
     controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(cFootBot.GetControllableEntity().GetController());
+    argos::CVector2 pos;
+    pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+             cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
     /* collect all stats from this robot */
     m_collector.collect_from_robot(controller);
     /* Get the position of the foot-bot on the ground as a CVector2 */
-    argos::CVector2 pos;
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    if (controller.carrying_block()) {
-      /* TODO: possibly change this to be autonomous, rather than just
-       * informing the robot... */
+    if (controller.is_carrying_block()) {
       /* Check whether the foot-bot is in the nest */
-      if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
-         m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
-        controller.publish_event(controller::foraging_controller::ENTERED_NEST);
-
+      if (controller.in_nest()) {
         /*
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
          */
         m_distributor->distribute_block(controller.block_idx());
-        /* Drop the block item */
         controller.drop_block_in_nest();
 
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
-          !m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
+      if (!controller.in_nest()) {
         /* Check whether the foot-bot is on a block item */
         for (size_t i = 0; i < m_blocks->size(); ++i) {
           if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
             /* If so, we move that item out of sight */
-              m_blocks->at(i).Set(100.0f, 100.f);
+            m_blocks->at(i).Set(100.0f, 100.f);
             controller.pickup_block(i);
 
             /* The floor texture must be updated */

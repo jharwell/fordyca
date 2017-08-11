@@ -67,7 +67,6 @@ class foraging_fsm : public fsm::simple_fsm {
   void event_explore(void);
   void event_continue(void);
   void event_block_found(void);
-  void event_entered_nest(void);
 
   void run(void) { event_continue(); }
 

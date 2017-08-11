@@ -50,8 +50,7 @@ class foraging_controller : public argos::CCI_Controller,
   enum event_type {
     EXPLORE,
     CONTINUE,
-    BLOCK_FOUND,
-    ENTERED_NEST
+    BLOCK_FOUND
   };
 
   foraging_controller(void);
@@ -91,7 +90,7 @@ class foraging_controller : public argos::CCI_Controller,
   /**
    * @brief Return if the robot is currently carrying a block.
    */
-  bool carrying_block(void) const { return m_block_data.has_block(); }
+  bool is_carrying_block(void) const { return m_block_data.has_block(); }
 
   /**
    * @brief Return block index of block robot is carrying.

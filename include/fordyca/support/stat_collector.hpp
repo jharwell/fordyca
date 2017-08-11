@@ -52,6 +52,14 @@ class stat_collector {
   /* member functions */
   void reset(const std::string& ofname);
   void finalize(void) { m_ofile.close(); }
+
+  /**
+   * @brief Collect statistics from a robot at the end of a timestep. Must be
+   * called before the robot state is updated (i.e. pickup/dropped blocks) by an
+   * external functions.
+   *
+   * @param controller The controller to collect from.
+   */
   void collect_from_robot(controller::foraging_controller& controller);
   void store(uint timestep);
 

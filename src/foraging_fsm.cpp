@@ -112,21 +112,6 @@ void foraging_fsm::event_continue(void) {
   external_event(kTRANSITIONS[current_state()], NULL);
 }
 
-void foraging_fsm::event_entered_nest(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    fsm::event::EVENT_FATAL,         /* resting */
-        fsm::event::EVENT_IGNORED,   /* explore */
-        fsm::event::EVENT_FATAL,     /* explore success */
-        fsm::event::EVENT_FATAL,     /* explore fail */
-        ST_SEARCH_FOR_SPOT_IN_NEST,  /* return to nest */
-        fsm::event::EVENT_FATAL,     /* leaving nest */
-        fsm::event::EVENT_IGNORED,   /* search for spot in nest */
-        ST_COLLISION_AVOIDANCE,     /* collision avoidance */
-        };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], NULL);
-}
-
 /*******************************************************************************
  * States
  ******************************************************************************/
@@ -251,9 +236,7 @@ FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event) {
     }
 
     m_sensors->calc_diffusion_vector(&vector);
-    /*   internal_event(ST_COLLISION_AVOIDANCE); */
-    /* } */
-      m_actuators->set_wheel_speeds(
+    m_actuators->set_wheel_speeds(
         m_actuators->max_wheel_speed() * vector +
         m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
       return fsm::event::EVENT_HANDLED;
