@@ -76,9 +76,6 @@ void foraging_controller::publish_event(enum event_type type) {
     case BLOCK_FOUND:
       m_fsm->event_block_found();
       break;
-    case ENTERED_NEST:
-      m_fsm->event_entered_nest();
-      break;
   }
 } /* publish_event() */
 

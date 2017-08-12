@@ -49,7 +49,7 @@ void stat_collector::collect_from_robot(controller::foraging_controller& control
   m_stats.n_returning += controller.is_returning();
   m_stats.n_avoiding += controller.is_avoiding_collision();
 
-  if (controller.carrying_block() && controller.in_nest()) {
+  if (controller.is_carrying_block() && controller.in_nest()) {
     ++m_stats.total_collected_blocks;
   }
 } /* collect_from_robot() */

@@ -43,7 +43,7 @@ qt_user_functions::qt_user_functions() {
  ******************************************************************************/
 void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(c_entity.GetControllableEntity().GetController());
-  if (controller.carrying_block()) {
+  if (controller.is_carrying_block()) {
     DrawCylinder(
         argos::CVector3(0.0f, 0.0f, 0.3f),
         argos::CQuaternion(),

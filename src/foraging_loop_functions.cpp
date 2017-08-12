@@ -59,6 +59,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_param_manager.add_category("blocks", new params::block_param_parser());
   m_param_manager.add_category("logging", new params::logging_param_parser());
   m_param_manager.parse_all(node);
+
   m_logging_params.reset(static_cast<const struct logging_params*>(
       m_param_manager.get_params("logging")));
 
@@ -123,14 +124,9 @@ void foraging_loop_functions::PreStep() {
     argos::CVector2 pos;
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    if (controller.carrying_block()) {
-      /* TODO: possibly change this to be autonomous, rather than just
-       * informing the robot... */
+    if (controller.is_carrying_block()) {
       /* Check whether the foot-bot is in the nest */
-      if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
-         m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
-        controller.publish_event(controller::foraging_controller::ENTERED_NEST);
-
+      if (controller.in_nest()) {
         /*
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
@@ -143,8 +139,7 @@ void foraging_loop_functions::PreStep() {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
-            m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY()))) {
+      if (!controller.in_nest()) {
         /* Check whether the foot-bot is on a block item */
         for (size_t i = 0; i < m_blocks->size(); ++i) {
           if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
