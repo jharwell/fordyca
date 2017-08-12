@@ -108,7 +108,7 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
     accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
   }
   /* If the light was perceived, return the vector. Otherwise return 0. */
-  if(accum.Length() > 0.0f) {
+  if (accum.Length() > 0.0f) {
     return argos::CVector2(1.0f, accum.Angle());
   } else {
     return argos::CVector2();
@@ -117,7 +117,15 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
 
 bool sensor_manager::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
-  return false;
+  int sum = 0;
+
+  /* We are on a block if at least 3 of the 4 ground sensors say we are */
+  sum += readings[0].Value < 0.05;
+  sum += readings[1].Value < 0.05;
+  sum += readings[2].Value < 0.05;
+  sum += readings[3].Value < 0.05;
+
+  return sum >= 3;
 } /* block_detected() */
 
 

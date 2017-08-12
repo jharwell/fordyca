@@ -24,7 +24,6 @@
 #include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "fordyca/support/foraging_loop_functions.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/params/block_param_parser.hpp"
@@ -115,15 +114,11 @@ void foraging_loop_functions::PreStep() {
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
        it != footbots.end();
        ++it) {
-    argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
-    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(cFootBot.GetControllableEntity().GetController());
-
+    argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
+    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(robot.GetControllableEntity().GetController());
     /* collect all stats from this robot */
     m_collector.collect_from_robot(controller);
     /* Get the position of the foot-bot on the ground as a CVector2 */
-    argos::CVector2 pos;
-    pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-             cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
     if (controller.is_carrying_block()) {
       /* Check whether the foot-bot is in the nest */
       if (controller.in_nest()) {
@@ -139,26 +134,41 @@ void foraging_loop_functions::PreStep() {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest()) {
-        /* Check whether the foot-bot is on a block item */
-        for (size_t i = 0; i < m_blocks->size(); ++i) {
-          if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
-            /* If so, we move that item out of sight */
-              m_blocks->at(i).Set(100.0f, 100.f);
-            controller.pickup_block(i);
+      if (!controller.in_nest() && controller.block_detected()) {
 
-            /* The floor texture must be updated */
-            m_floor->SetChanged();
-            controller.publish_event(controller::foraging_controller::BLOCK_FOUND);
-            break;
-          }
-        } /* for(i..) */
+        /* Check whether the foot-bot is on a block item */
+        int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(it->second));
+        if (-1 == block) {
+          printf("FALSE positive on robot%d_on_block\n", i);
+        } else {
+          /* Move that item out of sight */
+          m_blocks->at(block).Set(100.0f, 100.f);
+          controller.pickup_block(block);
+
+          /* The floor texture must be updated */
+          m_floor->SetChanged();
+          controller.publish_event(controller::foraging_controller::BLOCK_FOUND);
+        }
       }
     }
     ++i;
   } /* for(it..) */
   m_collector.store(GetSpace().GetSimulationClock());
 }
+
+int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+
+  for (size_t i = 0; i < m_blocks->size(); ++i) {
+    if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
+      return i;
+    }
+  } /* for(i..) */
+  return -1;
+} /* robot_on_block() */
+
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")
 

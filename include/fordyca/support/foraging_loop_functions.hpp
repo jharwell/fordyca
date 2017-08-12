@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 #include <argos3/core/simulator/loop_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
@@ -56,6 +57,7 @@ class foraging_loop_functions : public argos::CLoopFunctions {
  private:
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
+  int robot_on_block(const argos::CFootBotEntity& robot);
 
   argos::CRange<argos::Real> m_arena_x;
   argos::CRange<argos::Real> m_arena_y;
