@@ -40,7 +40,7 @@ foraging_controller::foraging_controller(void) :
     m_actuators(),
     m_sensors(),
     m_fsm(),
-    m_server(new rcppsw::common::er_server("init.txt")),
+    m_server(new rcppsw::common::er_server("controller-init.txt")),
     m_block_data() {
   deferred_init(m_server);
   m_param_manager.logging_init(m_server);

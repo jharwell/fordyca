@@ -39,9 +39,9 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_loop_functions::foraging_loop_functions(void) :
-    m_arena_x(-1.7, 1.7),
+    m_arena_x(-4.7, 4.7),
     m_arena_y(-1.7, 1.7),
-    m_nest_x(-0.5, 0.5),
+    m_nest_x(-3.5, -2.5),
     m_nest_y(-0.5, 0.5),
     m_floor(NULL),
     m_collector(),
@@ -63,12 +63,14 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_logging_params.reset(static_cast<const struct logging_params*>(
       m_param_manager.get_params("logging")));
 
-  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>());
+  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>("loop-functions-init.txt"));
+  m_param_manager.show_all();
   m_floor = &GetSpace().GetFloorEntity();
 
   /* distribute blocks in arena */
   m_block_params.reset(static_cast<const struct block_params*>(
       m_param_manager.get_params("blocks")));
+  m_blocks = std::make_shared<std::vector<argos::CVector2>>(m_block_params->n_blocks);
   m_distributor.reset(new support::block_distributor(m_arena_x,
                                                      m_arena_y,
                                                      m_nest_x,
@@ -115,35 +117,40 @@ void foraging_loop_functions::PreStep() {
        ++it) {
     argos::CFootBotEntity& cFootBot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
     controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(cFootBot.GetControllableEntity().GetController());
-    argos::CVector2 pos;
-    pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-             cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
     /* collect all stats from this robot */
     m_collector.collect_from_robot(controller);
     /* Get the position of the foot-bot on the ground as a CVector2 */
+    argos::CVector2 pos;
     pos.Set(cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
              cFootBot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    if (controller.is_carrying_block()) {
+    if (controller.carrying_block()) {
+      /* TODO: possibly change this to be autonomous, rather than just
+       * informing the robot... */
       /* Check whether the foot-bot is in the nest */
-      if (controller.in_nest()) {
+      if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+         m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY())) {
+        controller.publish_event(controller::foraging_controller::ENTERED_NEST);
+
         /*
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
          */
         m_distributor->distribute_block(controller.block_idx());
+        /* Drop the block item */
         controller.drop_block_in_nest();
 
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest()) {
+      if (!(m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(pos.GetX()) &&
+            m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(pos.GetY()))) {
         /* Check whether the foot-bot is on a block item */
         for (size_t i = 0; i < m_blocks->size(); ++i) {
           if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
             /* If so, we move that item out of sight */
-            m_blocks->at(i).Set(100.0f, 100.f);
+              m_blocks->at(i).Set(100.0f, 100.f);
             controller.pickup_block(i);
 
             /* The floor texture must be updated */

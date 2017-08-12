@@ -62,7 +62,10 @@ void stat_collector::store(uint timestep) {
           << m_stats.n_exploring << "\t"
           << m_stats.n_returning << "\t"
           << m_stats.n_avoiding << std::endl;
-
+  m_stats.n_resting = 0;
+  m_stats.n_exploring = 0;
+  m_stats.n_returning = 0;
+  m_stats.n_avoiding = 0;
 } /* store() */
 
 
