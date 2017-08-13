@@ -23,7 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_foraging_controller id="ffc"
+    <foraging_controller id="ffc"
                                  library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -37,26 +37,28 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <diffusion go_straight_angle_range="-5:5"
-                   delta="0.1" />
-        <wheel_turning hard_turn_angle_threshold="90"
-                       soft_turn_angle_threshold="70"
-                       no_turn_angle_threshold="10"
-                       max_speed="10" />
-        <state initial_rest_to_explore_prob="0.1"
+        <sensors>
+          <diffusion go_straight_angle_range="-5:5"
+                     delta="0.1" />
+        </sensors>
+        <actuators>
+          <wheels hard_turn_angle_threshold="90"
+                  soft_turn_angle_threshold="70"
+                  no_turn_angle_threshold="10"
+                  max_speed="10" />
+        </actuators>
+        <fsm initial_rest_to_explore_prob="0.1"
                initial_explore_to_rest_prob="0.1"
-               food_rule_explore_to_rest_delta_prob="0.01"
-               food_rule_rest_to_explore_delta_prob="0.01"
+               block_rule_explore_to_rest_delta_prob="0.01"
+               block_rule_rest_to_explore_delta_prob="0.01"
                collision_rule_explore_to_rest_delta_prob="0.01"
-               social_rule_explore_to_rest_delta_prob="0.01"
-               social_rule_rest_to_explore_delta_prob="0.01"
                minimum_resting_time="50"
-               minimum_unsuccessful_explore_time="600"
+               maximum_unsuccessful_explore_time="600"
                minimum_search_for_place_in_nest_time="50">
-          <food_rule active="true" food_rule_explore_to_rest_delta_prob="0.01" />
-        </state>
+          <block_rule active="true" block_rule_explore_to_rest_delta_prob="0.01" />
+        </fsm>
       </params>
-    </footbot_foraging_controller>
+    </foraging_controller>
 
   </controllers>
 
@@ -65,62 +67,45 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="foraging_loop_functions">
-    <foraging items="15"
-              radius="0.1"
-              energy_per_item="1000"
-              energy_per_walking_robot="1"
-              output="foraging.txt" />
+    <logging sim_stats="base-foraging-stats.txt"
+             />
+    <blocks n_blocks="25"
+            radius="0.1"
+            dist_model="random"
+            />
+    <nest size="0.5, 0.5" center="-3, 0" />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="5, 5, 2" center="0,0,1">
+  <arena size="10, 5, 2" center="0,0,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="4,0.1,0.5" movable="false">
+    <box id="wall_north" size="8,0.1,0.5" movable="false">
       <body position="0,2,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="4,0.1,0.5" movable="false">
+    <box id="wall_south" size="8,0.1,0.5" movable="false">
       <body position="0,-2,0" orientation="0,0,0" />
     </box>
     <box id="wall_east" size="0.1,4,0.5" movable="false">
-      <body position="2,0,0" orientation="0,0,0" />
+      <body position="4,0,0" orientation="0,0,0" />
     </box>
     <box id="wall_west" size="0.1,4,0.5" movable="false">
-      <body position="-2,0,0" orientation="0,0,0" />
+      <body position="-4,0,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
-           position="-2,-1.5,1.0"
+           position="-3,0,1.0"
            orientation="0,0,0"
            color="yellow"
-           intensity="3.0"
+           intensity="4.0"
            medium="leds" />
-    <light id="light_2"
-           position="-2,-0.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-    <light id="light_3"
-           position="-2,0.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-    <light id="light_4"
-           position="-2,1.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="3.0"
-           medium="leds" />
-
     <distribute>
-      <position method="uniform" min="-2,-2,0" max="-1,2,0" />
+      <position method="uniform" min="-2,-2,0" max="2,2,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="20" max_trials="100">
         <foot-bot id="fb">
@@ -155,9 +140,11 @@
         <placement idx="0"
                    position="0,0,4.34"
                    look_at="0,0,0"
-                   lens_focal_length="20" />
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
       </camera>
-      <user_functions label="foraging_qt_user_functions" />
+      <user_functions label="qt_user_functions" />
     </qt-opengl>
   </visualization>
 

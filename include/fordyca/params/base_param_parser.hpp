@@ -1,5 +1,5 @@
 /**
- * @file actuator_manager.hpp
+ * @file base_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include <argos3/core/utility/math/vector2.h>
+#include <fstream>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca {
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class actuator_manager {
+class base_param_parser {
  public:
-  /* constructors */
-  actuator_manager(void);
+  base_param_parser(void) {}
+  virtual ~base_param_parser(void) {}
 
-  /* member functions */
-  /*
-   * Gets a direction vector as input and transforms it into wheel
-   * actuation.
-   */
-  void SetWheelSpeeds(const argos::CVector2& c_heading);
-
-
- private:
-  /* differential steering actuator */
-  argos::CCI_DifferentialSteeringActuator* pc_wheels_;
-  /* LEDs actuator */
-  argos::CCI_LEDsActuator* pc_leds_;
-  /* Range and bearing actuator */
-  argos::CCI_RangeAndBearingActuator*  pr_raba_;
+  virtual void parse(__unused argos::TConfigurationNode& node) = 0;
+  virtual void show(std::ostream& stream) = 0;
+  virtual const struct base_params* get_results(void) { return NULL; }
 };
 
-} /* namespace fordyca */
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_ACTUATOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BASE_PARAM_PARSER_HPP_ */

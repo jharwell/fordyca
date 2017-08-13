@@ -1,7 +1,5 @@
 /**
- * @file parameter_parser.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,52 +17,33 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcsw/common/common.h"
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fordyca {
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-
-class parameter_parser {
+class qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
-  /* constructors */
-  parameter_parser();
+  qt_user_functions(void);
 
-  /* member functions */
-  template<typename T>
-  status_t add_category(const std::string& category);
-  status_t parse_categories(void);
+  virtual ~qt_user_functions() {}
 
- private:
-  /* member functions */
-  /* data members */
+  void Draw(argos::CFootBotEntity& c_entity);
 };
 
-/*******************************************************************************
- * Structure Definitions
- ******************************************************************************/
+NS_END(fordyca, support);
 
-/*******************************************************************************
- * Class Definitions
- ******************************************************************************/
-
-/*******************************************************************************
- * Operater Definitions
- ******************************************************************************/
-
-} /* namespace fordyca */
-
-#endif /* INCLUDE_FORDYCA_PARAMETER_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_ */
