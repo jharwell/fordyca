@@ -52,6 +52,8 @@ foraging_controller::foraging_controller(void) :
                                new params::sensor_param_parser());
   m_param_manager.add_category("fsm",
                                new params::fsm_param_parser());
+  m_param_manager.add_category("grid",
+                               new params::grid_param_parser());
 }
 
 /*******************************************************************************

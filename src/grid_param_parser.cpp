@@ -34,7 +34,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void grid_param_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct grid_params);
-  ticpp::Node *arena = node.NextSibling("arena");
+  ticpp::Node *arena = node.Parent()->Parent()->NextSibling("arena");
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');

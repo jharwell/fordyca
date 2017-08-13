@@ -44,7 +44,9 @@ NS_START(fordyca, representation);
  */
 class cell2D {
  public:
-  cell2D(void) : m_relevance(0.0), m_delta(0.0), m_fsm(nullptr) {}
+  cell2D(void) : m_relevance(0.0),
+                 m_delta(0.0),
+                 m_fsm(std::make_shared<rcppsw::common::er_server>("grid.txt")) {}
 
   void delta(double delta) { m_delta = delta; }
 
