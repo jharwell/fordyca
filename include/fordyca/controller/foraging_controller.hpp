@@ -32,6 +32,7 @@
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/block_data.hpp"
+#include "fordyca/representation/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -122,6 +123,7 @@ class foraging_controller : public argos::CCI_Controller,
   std::unique_ptr<foraging_fsm>              m_fsm;
   std::shared_ptr<rcppsw::common::er_server> m_server;
   representation::block_data                 m_block_data;
+  std::unique_ptr<representation::grid2D>    m_grid;
 };
 
 NS_END(controller, fordyca);

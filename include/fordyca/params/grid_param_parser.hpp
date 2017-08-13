@@ -1,52 +1,53 @@
 /**
- * @file block.hpp
+ * @file grid_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARENA_BLOCK_HPP_
-#define INCLUDE_FORDYCA_ARENA_BLOCK_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_GRID_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block {
+class grid_param_parser: public base_param_parser {
  public:
-  /* constructors */
-  block();
+  grid_param_parser(void): m_params() {}
 
-  /* member functions */
+  void parse(argos::TConfigurationNode& node);
+  const struct grid_params* get_results(void) { return m_params.get(); }
+  void show(std::ostream& stream);
 
-  
  private:
-  /* member functions */
-
-  /* data members */
+  std::unique_ptr<struct grid_params> m_params;
 };
 
-NS_END(forydca);
-#endif /* INCLUDE_FORDYCA_ARENA_BLOCK_HPP_ */
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARAM_PARSER_HPP_ */

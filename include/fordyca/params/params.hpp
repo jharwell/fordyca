@@ -28,6 +28,7 @@ n *
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/angles.h>
+#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -133,6 +134,15 @@ struct loop_functions_params : public base_params {
   argos::CRange<argos::Real> arena_y;
   argos::CRange<argos::Real> nest_x;
   argos::CRange<argos::Real> nest_y;
+};
+
+struct grid_params : public base_params {
+  grid_params(void) : resolution(0.0), cell_delta(0.0),
+                      upper(), lower() {}
+  double resolution;
+  double cell_delta;
+  argos::CVector2 upper;
+  argos::CVector2 lower;
 };
 
 NS_END(fordyca);

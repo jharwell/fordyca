@@ -1,5 +1,5 @@
 /**
- * @file grid.hpp
+ * @file grid2D.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARENA_GRID_HPP_
-#define INCLUDE_FORDYCA_ARENA_GRID_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "fordyca/representation/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, arena);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-class grid {
- public:
-  /* constructors */
-  grid();
+grid2D::grid2D(const grid_params* params) :
+    mc_params(params),
+    m_cells(boost::extents
+            [(mc_params->upper.GetX() - mc_params->lower.GetX())/mc_params->resolution]
+            [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
+  for (auto i = m_cells.origin(); i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    i->delta(mc_params->cell_delta);
+  } /* for(i..) */
+}
 
-  /* member functions */
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+std::list<const cell2D*> grid2D::with_blocks(void) {
+  std::list<const cell2D*> cells;
+  for (auto i = m_cells.origin(); i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    if (i->state() == cell2D_fsm::ST_HAS_BLOCK) {
+      cells.push_back(i);
+    }
+  } /* for(i..) */
+  return cells;
+} /* with_blocks() */
 
-  
- private:
-  /* member functions */
-
-  /* data members */
-};
-
-NS_END(arena, fordyca);
-
-#endif /* INCLUDE_FORDYCA_ARENA_GRID_HPP_ */
+NS_END(representation, fordyca);

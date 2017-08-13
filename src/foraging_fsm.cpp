@@ -64,11 +64,11 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
  ******************************************************************************/
 void foraging_fsm::event_explore(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    fsm::event::EVENT_IGNORED,  /* explore */
-    fsm::event::EVENT_IGNORED,  /* explore success */
-    fsm::event::EVENT_IGNORED,  /* explore fail */
-    fsm::event::EVENT_IGNORED,  /* return to nest */
-    fsm::event::EVENT_IGNORED,  /* leaving nest */
+    fsm::event_signal::IGNORED,  /* explore */
+    fsm::event_signal::IGNORED,  /* explore success */
+    fsm::event_signal::IGNORED,  /* explore fail */
+    fsm::event_signal::IGNORED,  /* return to nest */
+    fsm::event_signal::IGNORED,  /* leaving nest */
     ST_COLLISION_AVOIDANCE,     /* collision avoidance */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
@@ -78,10 +78,10 @@ void foraging_fsm::event_explore(void) {
 void foraging_fsm::event_block_found(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
     ST_EXPLORE_SUCCESS,          /* explore */
-    fsm::event::EVENT_IGNORED,   /* explore success */
-    fsm::event::EVENT_IGNORED,   /* explore fail */
-    fsm::event::EVENT_IGNORED,   /* return to nest */
-    fsm::event::EVENT_FATAL,     /* leaving to nest */
+    fsm::event_signal::IGNORED,   /* explore success */
+    fsm::event_signal::IGNORED,   /* explore fail */
+    fsm::event_signal::IGNORED,   /* return to nest */
+    fsm::event_signal::FATAL,     /* leaving to nest */
     ST_COLLISION_AVOIDANCE,      /* collision avoidance */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
@@ -104,7 +104,7 @@ void foraging_fsm::event_continue(void) {
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event_data) {
   ER_DIAG("Executing ST_LEAVING_NEST");
 
   /*
@@ -120,9 +120,9 @@ FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event) {
   if (!m_sensors->in_nest()) {
     internal_event(ST_EXPLORE);
   }
-  return fsm::event::EVENT_HANDLED;
+  return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE");
 
   /*
@@ -138,8 +138,7 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event) {
    * nest' if we have been wandering for some time and found nothing.
    */
   if (m_state.time_exploring_unsuccessfully >
-      mc_params->times.max_unsuccessful_explore &&
-    m_rng->Uniform(m_prob_range) < m_state.explore_to_rest_prob) {
+      mc_params->times.max_unsuccessful_explore) {
       internal_event(ST_EXPLORE_FAIL);
   }
 
@@ -155,25 +154,25 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event) {
 
   /* No obstacles nearby--use the diffusion vector only to set speeds */
   m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * diff_vector);
-  return fsm::event::EVENT_HANDLED;
+  return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, explore_success, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, explore_success, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE_SUCCESS");
 
   /* Store the result of the expedition */
   m_last_explore_res = LAST_EXPLORATION_SUCCESSFUL;
   internal_event(ST_RETURN_TO_NEST);
-  return fsm::event::EVENT_HANDLED;
+  return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, explore_fail, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, explore_fail, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE_FAIL");
 
   /* Store the result of the expedition */
   m_last_explore_res = LAST_EXPLORATION_UNSUCCESSFUL;
   internal_event(ST_RETURN_TO_NEST);
-  return fsm::event::EVENT_HANDLED;
+  return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event_data) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
     argos::CVector2 vector;
 
@@ -191,10 +190,10 @@ FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event) {
     m_actuators->set_wheel_speeds(
         m_actuators->max_wheel_speed() * vector +
         m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
-      return fsm::event::EVENT_HANDLED;
+      return fsm::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event) {
+FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
   static argos::CColor last_color;
   ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
@@ -203,19 +202,19 @@ FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event) {
   } else {
     internal_event(previous_state());
   }
-  return fsm::event::EVENT_HANDLED;
+  return fsm::event_signal::HANDLED;
 }
-FSM_ENTRY_DEFINE(foraging_fsm, entry_leaving_nest, fsm::no_event) {
+FSM_ENTRY_DEFINE(foraging_fsm, entry_leaving_nest, fsm::no_event_data) {
   ER_DIAG("Entering ST_LEAVING_NEST");
   m_actuators->leds_set_color(argos::CColor::WHITE);
 }
-FSM_ENTRY_DEFINE(foraging_fsm, entry_explore, fsm::no_event) {
+FSM_ENTRY_DEFINE(foraging_fsm, entry_explore, fsm::no_event_data) {
   ER_DIAG("Entrying ST_EXPLORE");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
   m_state.time_exploring_unsuccessfully = 0;
   m_last_explore_res = LAST_EXPLORATION_NONE;
 }
-FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_avoidance, fsm::no_event) {
+FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLIISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
 }

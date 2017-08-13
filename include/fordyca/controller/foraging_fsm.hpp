@@ -82,34 +82,24 @@ class foraging_fsm : public fsm::simple_fsm {
 
   struct fsm_state {
     fsm_state(void) :
-        rest_to_explore_prob(),
-        explore_to_rest_prob(),
-        time_rested(0),
         time_exploring_unsuccessfully(0),
-        time_search_for_place_in_nest(0),
         block_data() {}
 
-    /* Current probability to switch from resting to exploring */
-    argos::Real rest_to_explore_prob;
-    /* Current probability to switch from exploring to resting */
-    argos::Real explore_to_rest_prob;
-    /* The number of steps in resting state */
-    size_t time_rested;
     size_t time_exploring_unsuccessfully;
-    size_t time_search_for_place_in_nest;
     struct block_data block_data;
   };
 
-  FSM_STATE_DECLARE(foraging_fsm, explore, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, explore_success, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, explore_fail, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event);
+  FSM_STATE_DECLARE(foraging_fsm, explore, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, explore_success, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, explore_fail, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event_data);
 
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance, fsm::no_event);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
+                    fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   FSM_DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
@@ -117,8 +107,10 @@ class foraging_fsm : public fsm::simple_fsm {
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL, &entry_leaving_nest, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, &entry_collision_avoidance, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
+                                   &entry_leaving_nest, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                   &entry_collision_avoidance, NULL),
     };
   FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];

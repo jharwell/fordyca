@@ -1,5 +1,5 @@
 /**
- * @file gridsquare_fsm.hpp
+ * @file cell2D_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,54 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_ARENA_GRIDSQUARE_FSM_HPP_
-#define INCLUDE_FORDYCA_ARENA_GRIDSQUARE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcsw/common/common.h"
-#include "rcppsw/patterns/state_machine/base_fsm.hpp"
+#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, arena);
+NS_START(fordyca, representation);
 namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class gridsquare_fsm : public fsm::base_fsm {
+class cell2D_fsm : public fsm::simple_fsm {
  public:
-  enum states {
+  enum state {
     ST_UNKNOWN,
-    ST_KNOWN,
     ST_EMPTY,
     ST_HAS_BLOCK,
     ST_HAS_CACHE,
     ST_MAX_STATES
   };
   enum encounter_type {
-    EMPTY_GRIDSQUARE,
+    UNKNOWN,
+    EMPTY,
     BLOCK,
     CACHE
   };
 
   struct encounter_data : public fsm::event_data {
+    explicit encounter_data(enum encounter_type type_, int cache_blocks_ = 0) :
+        type(type_), cache_blocks(cache_blocks_) {}
     enum encounter_type type;
     int cache_blocks;
   };
 
-  explicit gridsquare_fsm(std::shared_ptr<rcppsw::common::er_server>& server) :
-      base_fsm(server, ST_MAX_STATES, ST_UNKNOWN), m_cache_blocks(0) {}
+  explicit cell2D_fsm(const std::shared_ptr<rcppsw::common::er_server>& server) :
+      simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
+      state_unknown(),
+      state_empty(),
+      state_has_block(),
+      state_has_cache(),
+      m_cache_blocks(0) {}
 
   bool is_known(void) { return current_state() != ST_UNKNOWN; }
   bool has_block(void) { return current_state() == ST_HAS_BLOCK; }
@@ -69,26 +76,25 @@ class gridsquare_fsm : public fsm::base_fsm {
   void event_encounter(const struct encounter_data* const data);
 
  private:
-  STATE_DECLARE(gridsquare_fsm, state_unknown, fsm::no_event_data);
-  STATE_DECLARE(gridsquare_fsm, state_known, struct encounter_data);
-  STATE_DECLARE(gridsquare_fsm, state_empty, fsm::no_event_data);
-  STATE_DECLARE(gridsquare_fsm, state_has_block, fsm::no_event_data);
-  STATE_DECLARE(gridsquare_fsm, state_has_cache, struct encounter_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, struct encounter_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_empty, struct encounter_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, struct encounter_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_has_cache, struct encounter_data);
 
-  DEFINE_STATE_MAP_ACCESSOR(state_map) {
-  DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
-    STATE_MAP_ENTRY(state_unknown),
-        STATE_MAP_ENTRY(state_known),
-        STATE_MAP_ENTRY(state_empty),
-        STATE_MAP_ENTRY(state_has_block),
-        STATE_MAP_ENTRY(state_has_cache)
-        };
-  VERIFY_STATE_MAP(state_map, kSTATE_MAP);
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
+  FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
+        FSM_STATE_MAP_ENTRY(&state_unknown),
+        FSM_STATE_MAP_ENTRY(&state_empty),
+        FSM_STATE_MAP_ENTRY(&state_has_block),
+        FSM_STATE_MAP_ENTRY(&state_has_cache)
+            };
+  FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
   return &kSTATE_MAP[0];
   }
 
   int m_cache_blocks;
 };
 
-NS_END(arena, forydca);
-#endif /* INCLUDE_FORDYCA_ARENA_GRIDSQUARE_FSM_HPP_ */
+NS_END(representation, forydca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_ */

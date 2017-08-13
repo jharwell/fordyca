@@ -1,5 +1,5 @@
 /**
- * @file gridsquare_fsm.cpp
+ * @file grid2D.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,49 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/arena/gridsquare_fsm.hpp"
+#include <boost/multi_array.hpp>
+#include <list>
+#include <argos/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, arena);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Event Functions
+ * Class Definitions
  ******************************************************************************/
-void gridsquare_fsm::event_encounter(const struct encounter_data*const data) {
-  DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    ST_KNOWN,
-        ST_KNOWN,
-        ST_KNOWN,
-        ST_KNOWN,
-        ST_KNOWN
-  };
-  VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], data);
-}
+class grid2D {
+ public:
+  /* constructors */
+  explicit grid2D(const grid_params* params);
 
-/*******************************************************************************
- * State Functions
- ******************************************************************************/
-STATE_DEFINE(gridsquare_fsm, state_known, struct encounter_data) {
-  if (BLOCK == data->type) {
-    internal_event(ST_HAS_BLOCK);
-  } else if (CACHE == data->type) {
-    internal_event(ST_HAS_CACHE, data);
-  } else {
-    internal_event(ST_EMPTY);
-  }
+  /* member functions */
+  argos::CVector2 coord_to_cell(double x, double y);
+  std::list<const cell2D*> with_blocks(void);
+
+ private:
+  std::shared_ptr<const grid_params> mc_params;
+  boost::multi_array<cell2D, 2> m_cells;
 };
 
-STATE_DEFINE(gridsquare_fsm, state_unknown, fsm::no_event_data) {}
-STATE_DEFINE(gridsquare_fsm, state_empty, fsm::no_event_data) {}
-STATE_DEFINE(gridsquare_fsm, state_has_block, fsm::no_event_data) {}
-STATE_DEFINE(gridsquare_fsm, state_has_cache, struct encounter_data) {
-  m_cache_blocks = data->cache_blocks;
-}
+NS_END(representation, fordyca);
 
-NS_END(arena, fordyca);
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_ */

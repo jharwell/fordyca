@@ -25,6 +25,7 @@
 #include "fordyca/params/actuator_param_parser.hpp"
 #include "fordyca/params/sensor_param_parser.hpp"
 #include "fordyca/params/fsm_param_parser.hpp"
+#include "fordyca/params/grid_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,8 @@ foraging_controller::foraging_controller(void) :
     m_sensors(),
     m_fsm(),
     m_server(new rcppsw::common::er_server("controller-init.txt")),
-    m_block_data() {
+    m_block_data(),
+    m_grid() {
   deferred_init(m_server);
   m_param_manager.logging_init(m_server);
   m_param_manager.add_category("actuators",
@@ -85,22 +87,27 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_param_manager.parse_all(node);
   m_param_manager.show_all();
   m_actuators.reset(new actuator_manager(
-      static_cast<const struct actuator_params*>(m_param_manager.get_params("actuators")),
+      static_cast<const struct actuator_params*>(
+          m_param_manager.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
   m_sensors.reset(new sensor_manager(
-      static_cast<const struct sensor_params*>(m_param_manager.get_params("sensors")),
+      static_cast<const struct sensor_params*>(
+          m_param_manager.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
   m_fsm.reset(
-      new foraging_fsm(static_cast<const struct foraging_fsm_params*>(m_param_manager.get_params("fsm")),
+      new foraging_fsm(static_cast<const struct foraging_fsm_params*>(
+          m_param_manager.get_params("fsm")),
                      m_server,
                      m_sensors,
                      m_actuators));
+  m_grid.reset(new representation::grid2D(
+      static_cast<const struct grid_params*>(m_param_manager.get_params("grid"))));
   Reset();
 } /* Init() */
 
