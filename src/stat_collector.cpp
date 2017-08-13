@@ -39,7 +39,7 @@ void stat_collector::reset(const std::string& ofname) {
     m_ofile.close();
   }
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\tresting\texploring\treturning\tcollision_avoidance\n";
+  m_ofile << "clock\tcollected_blocks\texploring\treturning\tcollision_avoidance\n";
 } /* reset() */
 
 void stat_collector::collect_from_robot(controller::foraging_controller& controller) {
