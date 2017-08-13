@@ -67,12 +67,13 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="foraging_loop_functions">
-    <logging sim_stats="base-foraging-stats.txt"
+    <logging sim_stats="single-source-foraging-stats.txt"
              />
     <blocks n_blocks="25"
             radius="0.1"
             dist_model="single_source"
             />
+    <nest size="0.5, 0.5" center="-3, 0" />
   </loop_functions>
 
   <!-- *********************** -->
@@ -98,7 +99,7 @@
     </box>
 
     <light id="light_1"
-           position="-4,0,1.0"
+           position="-3,0,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="4.0"

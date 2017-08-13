@@ -59,14 +59,11 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
   int robot_on_block(const argos::CFootBotEntity& robot);
 
-  argos::CRange<argos::Real> m_arena_x;
-  argos::CRange<argos::Real> m_arena_y;
-  argos::CRange<argos::Real> m_nest_x;
-  argos::CRange<argos::Real> m_nest_y;
   argos::CFloorEntity* m_floor;
   stat_collector m_collector;
   std::shared_ptr<const struct logging_params> m_logging_params;
   std::shared_ptr<const struct block_params> m_block_params;
+  std::unique_ptr<const struct loop_functions_params> m_loop_params;
   params::repository m_param_manager;
   std::unique_ptr<block_distributor> m_distributor;
   std::shared_ptr<std::vector<argos::CVector2>> m_blocks;

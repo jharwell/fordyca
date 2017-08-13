@@ -151,6 +151,18 @@ struct logging_params : public base_params {
   std::string sim_stats;
 };
 
+struct loop_functions_params : public base_params {
+  loop_functions_params(void) :
+      arena_x(),
+      arena_y(),
+      nest_x(),
+      nest_y() {}
+  argos::CRange<argos::Real> arena_x;
+  argos::CRange<argos::Real> arena_y;
+  argos::CRange<argos::Real> nest_x;
+  argos::CRange<argos::Real> nest_y;
+};
+
 NS_END(fordyca);
 
 #endif /* INCLUDE_FORDYCA_PARAMS_PARAMS_HPP_ */
