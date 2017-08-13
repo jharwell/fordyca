@@ -41,43 +41,15 @@ NS_START(fordyca);
 struct base_params {};
 
 struct prob_deltas  {
-  /* The increase of explore_to_rest_prob due to the block rule */
-  argos::Real block_rule_explore_to_rest;
-
-  /* The increase of curr_rest_to_explore_prob due to the block rule */
-  argos::Real block_rule_rest_to_explore;
-
-  /* The increase of explore_to_rest_prob due to the collision rule */
-  argos::Real collision_rule_explore_to_rest;
 };
 
 struct threshold_times {
-  /* The minimum number of steps in resting state before the robots
-     starts thinking that it's time to move */
-  size_t min_rested;
-
   /* The number of exploration steps without finding block after which
      a foot-bot starts thinking about going back to the nest */
   size_t max_unsuccessful_explore;
-  /*
-   * If the robots switched to resting as soon as it enters the nest, there
-   * would be overcrowding of robots in the border between the nest and the
-   * rest of the arena. To overcome this issue, the robot spends some time
-   * looking for a place in the nest before finally settling. The following
-   * variable contains the minimum time the robot must spend in state 'return
-   * to nest' looking for a place in the nest before switching to the resting
-   * state.
-   */
-  size_t min_search_for_place_in_nest;
 };
 
 struct foraging_fsm_params : public base_params {
-  /* Initial probability to switch from resting to exploring */
-  argos::Real initial_rest_to_explore_prob;
-
-  /* Initial probability to switch from exploring to resting */
-  argos::Real initial_explore_to_rest_prob;
-
   struct prob_deltas deltas;
   struct threshold_times times;
 };

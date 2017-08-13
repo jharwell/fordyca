@@ -44,13 +44,11 @@ namespace fsm = rcppsw::patterns::state_machine;
 class foraging_fsm : public fsm::simple_fsm {
  public:
   enum fsm_states {
-    ST_REST,
     ST_EXPLORE,
     ST_EXPLORE_SUCCESS,
     ST_EXPLORE_FAIL,
     ST_RETURN_TO_NEST,
     ST_LEAVING_NEST,
-    ST_SEARCH_FOR_SPOT_IN_NEST,
     ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
   };
@@ -59,7 +57,6 @@ class foraging_fsm : public fsm::simple_fsm {
              std::shared_ptr<rcppsw::common::er_server> server,
              std::shared_ptr<sensor_manager> sensors,
              std::shared_ptr<actuator_manager> actuators);
-  bool is_resting(void) { return current_state() == ST_REST; }
   bool is_exploring(void) {return current_state() == ST_EXPLORE; }
   bool is_returning(void) {return current_state() == ST_RETURN_TO_NEST; }
   bool is_avoiding_collision(void) {return current_state() == ST_COLLISION_AVOIDANCE; }
@@ -103,32 +100,24 @@ class foraging_fsm : public fsm::simple_fsm {
     struct block_data block_data;
   };
 
-  FSM_STATE_DECLARE(foraging_fsm, rest, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, explore, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, explore_success, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, explore_fail, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event);
-  FSM_STATE_DECLARE(foraging_fsm, search_for_spot_in_nest, fsm::no_event);
   FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event);
 
-  FSM_EXIT_DECLARE(foraging_fsm, exit_search_for_spot_in_nest);
-
   FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_rest, fsm::no_event);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance, fsm::no_event);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_search_for_spot_in_nest, fsm::no_event);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   FSM_DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
-    FSM_STATE_MAP_ENTRY_EX_ALL(&rest, NULL, &entry_rest, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL, &entry_leaving_nest, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&search_for_spot_in_nest, NULL, &entry_search_for_spot_in_nest, &exit_search_for_spot_in_nest),
         FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL, &entry_collision_avoidance, NULL),
     };
   FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);

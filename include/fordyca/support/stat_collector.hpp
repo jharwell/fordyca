@@ -40,7 +40,6 @@ class stat_collector {
  public:
   struct foraging_stats {
     uint total_collected_blocks;
-    uint n_resting;
     uint n_exploring;
     uint n_returning;
     uint n_avoiding;

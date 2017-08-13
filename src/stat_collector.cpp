@@ -44,7 +44,6 @@ void stat_collector::reset(const std::string& ofname) {
 
 void stat_collector::collect_from_robot(controller::foraging_controller& controller) {
   /* Count how many foot-bots are in which state */
-  m_stats.n_resting += controller.is_resting();
   m_stats.n_exploring += controller.is_exploring();
   m_stats.n_returning += controller.is_returning();
   m_stats.n_avoiding += controller.is_avoiding_collision();
@@ -58,11 +57,9 @@ void stat_collector::store(uint timestep) {
   /* Output stuff to file */
   m_ofile << timestep << "\t"
           << m_stats.total_collected_blocks << "\t"
-          << m_stats.n_resting << "\t"
           << m_stats.n_exploring << "\t"
           << m_stats.n_returning << "\t"
           << m_stats.n_avoiding << std::endl;
-  m_stats.n_resting = 0;
   m_stats.n_exploring = 0;
   m_stats.n_returning = 0;
   m_stats.n_avoiding = 0;

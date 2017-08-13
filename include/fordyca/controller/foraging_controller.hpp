@@ -55,7 +55,6 @@ class foraging_controller : public argos::CCI_Controller,
 
   foraging_controller(void);
 
-  bool is_resting(void) { return m_fsm->is_resting(); }
   bool is_exploring(void) { return m_fsm->is_exploring(); }
   bool is_returning(void) { return m_fsm->is_returning(); }
   bool is_avoiding_collision(void) { return m_fsm->is_avoiding_collision(); }
@@ -100,7 +99,6 @@ class foraging_controller : public argos::CCI_Controller,
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
-   printf("%d\n",m_block_pos.size());;
    *
    * This needs to be here, rather than in the FSM, because dropping of blocks
    * needs to be done in the loop functions so the area can correctly be drawn
