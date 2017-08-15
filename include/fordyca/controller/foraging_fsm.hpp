@@ -114,7 +114,6 @@ class foraging_fsm : public fsm::simple_fsm {
   /* data members */
 
   argos::CRandom::CRNG* m_rng;
-  argos::CRange<argos::Real> m_prob_range;
   struct fsm_state m_state;
   std::shared_ptr<const struct foraging_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;

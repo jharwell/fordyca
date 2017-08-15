@@ -110,10 +110,10 @@ struct sensor_params : public base_params {
 
 struct block_params : public base_params {
   block_params(void) : n_blocks(),
-                       square_radius(),
+                       dimension(),
                        dist_model() {}
   uint n_blocks;
-  argos::Real square_radius;
+  argos::Real dimension;
   std::string dist_model;
 };
 

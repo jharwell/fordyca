@@ -34,7 +34,7 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 qt_user_functions::qt_user_functions() {
-  RegisterUserFunction<qt_user_functions,
+RegisterUserFunction<qt_user_functions,
                        argos::CFootBotEntity>(&qt_user_functions::Draw);
 }
 
@@ -42,14 +42,19 @@ qt_user_functions::qt_user_functions() {
  * Member Functions
  ******************************************************************************/
 void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(c_entity.GetControllableEntity().GetController());
+  controller::foraging_controller& controller =
+      dynamic_cast<controller::foraging_controller&>(
+          c_entity.GetControllableEntity().GetController());
   if (controller.is_carrying_block()) {
-    DrawCylinder(
-        argos::CVector3(0.0f, 0.0f, 0.3f),
-        argos::CQuaternion(),
-        0.1f,
-        0.05f,
-        argos::CColor::BLACK);
+    /*
+     * Box dimensions should ideally be read from .argos file, but there does
+     * not appear to be a simple way to do that, so just hardcode it. Not that
+     * bad of a hack, as this is only for visualization.
+     */
+    DrawBox(argos::CVector3(0.0, 0.0, 0.3),
+            argos::CQuaternion(),
+            argos::CVector3(0.2, 0.2, 0.2),
+            argos::CColor::BLACK);
   }
 }
 

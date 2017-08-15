@@ -35,15 +35,14 @@ void block_param_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct block_params);
   argos::TConfigurationNode bnode = argos::GetNode(node, "blocks");
   argos::GetNodeAttribute(bnode, "n_blocks", m_params->n_blocks);
-  argos::GetNodeAttribute(bnode, "radius", m_params->square_radius);
+  argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
   argos::GetNodeAttribute(bnode, "dist_model", m_params->dist_model);
-  m_params->square_radius *= m_params->square_radius;
 } /* parse() */
 
 void block_param_parser::show(std::ostream& stream) {
   stream << "Block params\n====================" << std::endl;
   stream << "n_items=" << m_params->n_blocks << std::endl;
-  stream << "square_radius=" << m_params->square_radius << std::endl;
+  stream << "dimension=" << m_params->dimension << std::endl;
   stream << "dist_model=" << m_params->dist_model << std::endl;
 } /* show() */
 

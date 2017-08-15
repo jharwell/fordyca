@@ -41,9 +41,9 @@ NS_START(fordyca, support);
 foraging_loop_functions::foraging_loop_functions(void) :
     m_floor(NULL),
     m_collector(),
-    m_logging_params(),
-    m_block_params(),
-    m_loop_params(),
+    mc_logging_params(),
+    mc_block_params(),
+    mc_loop_params(),
     m_param_manager(),
     m_distributor(),
     m_blocks() {}
@@ -59,9 +59,9 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
                                new params::loop_functions_param_parser());
   m_param_manager.parse_all(node);
 
-  m_loop_params.reset(static_cast<const struct loop_functions_params*>(
+  mc_loop_params.reset(static_cast<const struct loop_functions_params*>(
       m_param_manager.get_params("loop_functions")));
-  m_logging_params.reset(static_cast<const struct logging_params*>(
+  mc_logging_params.reset(static_cast<const struct logging_params*>(
       m_param_manager.get_params("logging")));
 
   m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>("loop-functions-init.txt"));
@@ -69,25 +69,25 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_floor = &GetSpace().GetFloorEntity();
 
   /* distribute blocks in arena */
-  m_block_params.reset(static_cast<const struct block_params*>(
+  mc_block_params.reset(static_cast<const struct block_params*>(
       m_param_manager.get_params("blocks")));
-  m_blocks = std::make_shared<std::vector<argos::CVector2>>(m_block_params->n_blocks);
-  m_distributor.reset(new support::block_distributor(m_loop_params->arena_x,
-                                                     m_loop_params->arena_y,
-                                                     m_loop_params->nest_x,
-                                                     m_loop_params->nest_y,
-                                                     m_block_params,
+  m_blocks = std::make_shared<std::vector<argos::CVector2>>(mc_block_params->n_blocks);
+  m_distributor.reset(new support::block_distributor(mc_loop_params->arena_x,
+                                                     mc_loop_params->arena_y,
+                                                     mc_loop_params->nest_x,
+                                                     mc_loop_params->nest_y,
+                                                     mc_block_params,
                                                      m_blocks));
 
   m_distributor->distribute_blocks();
 
   /* initialize stat collecting */
-  m_collector.reset(m_logging_params->sim_stats);
+  m_collector.reset(mc_logging_params->sim_stats);
 }
 
 
 void foraging_loop_functions::Reset() {
-  m_collector.reset(m_logging_params->sim_stats);
+  m_collector.reset(mc_logging_params->sim_stats);
   m_distributor->distribute_blocks();
 }
 
@@ -96,12 +96,12 @@ void foraging_loop_functions::Destroy() {
 }
 
 argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plane_pos) {
-  if (m_loop_params->nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      m_loop_params->nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
+  if (mc_loop_params->nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
+      mc_loop_params->nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if ((plane_pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
+    if (point_within_block(plane_pos, i)) {
       return argos::CColor::BLACK;
     }
   }
@@ -164,12 +164,25 @@ int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) 
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
   for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if ((pos - m_blocks->at(i)).SquareLength() < m_block_params->square_radius) {
-      return i;
+    if (point_within_block(pos, i)) {
+        return i;
     }
   } /* for(i..) */
   return -1;
 } /* robot_on_block() */
+
+bool foraging_loop_functions::point_within_block(const argos::CVector2& point,
+                                                 size_t index) {
+  double x = m_blocks->at(index).GetX();
+  double y = m_blocks->at(index).GetY();
+  if (point.GetX() < (x + (.5 * mc_block_params->dimension)) &&
+      point.GetX() > (x - (.5 * mc_block_params->dimension)) &&
+      point.GetY() < (y + (.5 * mc_block_params->dimension)) &&
+      point.GetY() > (y - (.5 * mc_block_params->dimension))) {
+    return true;
+  }
+  return false;
+} /* point_within_block() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")

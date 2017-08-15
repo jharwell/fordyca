@@ -62,7 +62,7 @@
     <logging sim_stats="single-source-foraging-stats.txt"
              />
     <blocks n_blocks="25"
-            radius="0.1"
+            dimension="0.2"
             dist_model="single_source"
             />
     <nest size="0.5, 0.5" center="-3, 0" />
