@@ -43,15 +43,6 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class foraging_fsm : public fsm::simple_fsm {
  public:
-  enum fsm_states {
-    ST_START,
-    ST_EXPLORE,
-    ST_NEW_DIRECTION,
-    ST_RETURN_TO_NEST,
-    ST_LEAVING_NEST,
-    ST_COLLISION_AVOIDANCE,
-    ST_MAX_STATES
-  };
   struct new_direction_data : public fsm::event_data {
     explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
     argos::CRadians dir;
@@ -70,6 +61,15 @@ class foraging_fsm : public fsm::simple_fsm {
   void run(void) { event_continue(); }
 
  private:
+  enum fsm_states {
+    ST_START,
+    ST_EXPLORE,
+    ST_NEW_DIRECTION,
+    ST_RETURN_TO_NEST,
+    ST_LEAVING_NEST,
+    ST_COLLISION_AVOIDANCE,
+    ST_MAX_STATES
+  };
   struct fsm_state {
     fsm_state(void) : time_exploring_unsuccessfully(0) {}
 

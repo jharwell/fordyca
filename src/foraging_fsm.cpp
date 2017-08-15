@@ -34,9 +34,9 @@ namespace fsm = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
-                       std::shared_ptr<rcppsw::common::er_server> server,
-                       std::shared_ptr<sensor_manager> sensors,
-                       std::shared_ptr<actuator_manager> actuators) :
+                           std::shared_ptr<rcppsw::common::er_server> server,
+                           std::shared_ptr<sensor_manager> sensors,
+                           std::shared_ptr<actuator_manager> actuators) :
     fsm::simple_fsm(server, ST_MAX_STATES),
     explore(),
     return_to_nest(),
@@ -62,11 +62,11 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
 void foraging_fsm::event_block_found(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
     fsm::event_signal::FATAL,    /* start */
-    ST_RETURN_TO_NEST,           /* explore */
-    ST_RETURN_TO_NEST,           /* new direction */
-    fsm::event_signal::IGNORED,  /* return to nest */
-    fsm::event_signal::FATAL,    /* leaving nest */
-    ST_COLLISION_AVOIDANCE,      /* collision avoidance */
+        ST_RETURN_TO_NEST,           /* explore */
+        ST_RETURN_TO_NEST,           /* new direction */
+        fsm::event_signal::IGNORED,  /* return to nest */
+        fsm::event_signal::FATAL,    /* leaving nest */
+        ST_COLLISION_AVOIDANCE,      /* collision avoidance */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
@@ -98,9 +98,9 @@ FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event_data) {
   argos::CVector2 diff_vector;
   argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
   m_sensors->calc_diffusion_vector(&diff_vector);
-  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * diff_vector -
-                                argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
-                                                current_heading));
+  m_actuators->set_heading(m_actuators->max_wheel_speed() * diff_vector -
+                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
+                                           current_heading));
   if (!m_sensors->in_nest()) {
     internal_event(ST_EXPLORE);
   }
@@ -133,7 +133,7 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
    */
   argos::CVector2 vector;
   m_sensors->calc_diffusion_vector(&vector);
-  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * vector);
+  m_actuators->set_heading(m_actuators->max_wheel_speed() * vector);
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, start, fsm::no_event_data) {
@@ -159,8 +159,8 @@ FSM_STATE_DEFINE(foraging_fsm, new_direction, new_direction_data) {
     count = 0;
     new_dir = data->dir;
   }
-  m_actuators->set_wheel_speeds(argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
-                                                new_dir), true);
+  m_actuators->set_heading(argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
+                                           new_dir), true);
 
   /* We have changed direction and started a new exploration */
   if (std::fabs((current_dir - new_dir).GetValue()) < 0.1) {
@@ -171,28 +171,28 @@ FSM_STATE_DEFINE(foraging_fsm, new_direction, new_direction_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event_data) {
-    ER_DIAG("Executing ST_RETURN_TO_NEST");
-    argos::CVector2 vector;
+  ER_DIAG("Executing ST_RETURN_TO_NEST");
+  argos::CVector2 vector;
 
-    /*
-     * We have arrived at the nest and it's time to head back out again. The
-     * loop functions need to call the drop_block() function, as they have to
-     * redistribute it (the FSM has no idea how to do that).
-     */
-    if (m_sensors->in_nest()) {
-      internal_event(ST_LEAVING_NEST);
-    }
+  /*
+   * We have arrived at the nest and it's time to head back out again. The
+   * loop functions need to call the drop_block() function, as they have to
+   * redistribute it (the FSM has no idea how to do that).
+   */
+  if (m_sensors->in_nest()) {
+    internal_event(ST_LEAVING_NEST);
+  }
 
-    m_sensors->calc_diffusion_vector(&vector);
-    m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * vector +
-                                  m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
-      return fsm::event_signal::HANDLED;
+  m_sensors->calc_diffusion_vector(&vector);
+  m_actuators->set_heading(m_actuators->max_wheel_speed() * vector +
+                           m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
+  return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
   ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   if (m_sensors->calc_diffusion_vector(&vector)) {
-    m_actuators->set_wheel_speeds(vector);
+    m_actuators->set_heading(vector);
   } else {
     internal_event(previous_state());
   }

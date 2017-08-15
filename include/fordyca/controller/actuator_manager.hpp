@@ -28,17 +28,19 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class actuator_manager {
+class actuator_manager: public fsm::simple_fsm {
  public:
   /* constructors */
   actuator_manager(const struct actuator_params* params,
@@ -55,8 +57,9 @@ class actuator_manager {
    * Gets a direction vector as input and transforms it into wheel
    * actuation.
    */
-  void set_wheel_speeds(const argos::CVector2& c_heading,
-                        bool force_hard_turn = false);
+  void set_heading(const argos::CVector2& heading,
+                   bool force_hard_turn = false);
+
   argos::Real max_wheel_speed(void) { return mc_params->wheels.max_speed; }
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
@@ -65,17 +68,37 @@ class actuator_manager {
  private:
   actuator_manager(const actuator_manager& fsm) = delete;
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
+  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
 
   /*
    * The robot can be in three different turning states.
    */
-  enum turning_state {
-    NO_TURN = 0, // go straight
-    SOFT_TURN,   // both wheels are turning forwards, but at different speeds
-    HARD_TURN    // wheels are turning with opposite speeds
+  enum fsm_states {
+    ST_NO_TURN,     /* go straight */
+    ST_SOFT_TURN,   /* both wheels are turning forwards, but at different speeds */
+    ST_HARD_TURN,   /* wheels are turning with opposite speeds */
+    ST_MAX_STATES
   };
 
-  enum turning_state                       m_turning_state;
+  struct turn_data : public fsm::event_data {
+    turn_data(argos::CVector2 heading_, bool force_hard_) :
+        heading(heading_), force_hard(force_hard_) {}
+    argos::CVector2 heading;
+    bool force_hard;
+  };
+  FSM_STATE_DECLARE(actuator_manager, no_turn, turn_data);
+  FSM_STATE_DECLARE(actuator_manager, soft_turn, turn_data);
+  FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
+    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
+      FSM_STATE_MAP_ENTRY(&no_turn),
+          FSM_STATE_MAP_ENTRY(&soft_turn),
+          FSM_STATE_MAP_ENTRY(&hard_turn),
+          };
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
+    return &kSTATE_MAP[0];
+  }
+
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
