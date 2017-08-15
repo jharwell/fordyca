@@ -131,11 +131,11 @@ void foraging_loop_functions::PreStep() {
          * changes.
          */
         m_collector.collect_from_block(m_blocks->at(controller.block_idx()));
+        m_blocks->at(controller.block_idx()).update_on_nest_drop();
         /*
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
          */
-        m_blocks->at(controller.block_idx()).update_on_nest_drop();
         m_distributor->distribute_block(controller.block_idx());
 
         /* Actually drop the block item */
