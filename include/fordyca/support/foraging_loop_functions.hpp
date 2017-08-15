@@ -34,6 +34,7 @@
 #include "fordyca/params/repository.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +59,6 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
   int robot_on_block(const argos::CFootBotEntity& robot);
-  bool point_within_block(const argos::CVector2& point, size_t index);
 
   argos::CFloorEntity* m_floor;
   stat_collector m_collector;
@@ -67,7 +67,7 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
   params::repository m_param_manager;
   std::unique_ptr<block_distributor> m_distributor;
-  std::shared_ptr<std::vector<argos::CVector2>> m_blocks;
+  std::shared_ptr<std::vector<representation::block>> m_blocks;
 };
 
 NS_END(support, fordyca);

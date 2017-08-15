@@ -37,7 +37,7 @@ block_distributor::block_distributor(
     argos::CRange<argos::Real> nest_x,
     argos::CRange<argos::Real> nest_y,
     std::shared_ptr<const struct block_params> params,
-    std::shared_ptr<std::vector<argos::CVector2>> blocks) :
+    std::shared_ptr<std::vector<representation::block>> blocks) :
     m_arena_x(arena_x),
     m_arena_y(arena_y),
     m_nest_x(nest_x),
@@ -64,7 +64,7 @@ void block_distributor::distribute_block(size_t i) {
 } /* distribute_block() */
 
 void block_distributor::dist_random(size_t i) {
-  m_blocks->at(i) = dist_outside_range(m_nest_x, m_nest_y);
+  m_blocks->at(i).set_loc(dist_outside_range(m_nest_x, m_nest_y));
 } /* dist_random() */
 
 void block_distributor::dist_single_src(size_t i) {
@@ -75,7 +75,7 @@ void block_distributor::dist_single_src(size_t i) {
   argos::CRange<argos::Real> y_range = m_nest_y;
   argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(m_arena_x.GetMax() * 0.75 - 0.5,
                                                                   m_arena_x.GetMax() * 0.75);
-  m_blocks->at(i) = dist_in_range(x_range, y_range);
+  m_blocks->at(i).set_loc(dist_in_range(x_range, y_range));
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(
