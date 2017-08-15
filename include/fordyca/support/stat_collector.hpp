@@ -27,6 +27,7 @@
 #include <string>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,14 +40,19 @@ NS_START(fordyca, support);
 class stat_collector {
  public:
   struct foraging_stats {
-    uint total_collected_blocks;
     uint n_exploring;
     uint n_returning;
     uint n_avoiding;
   };
 
+  struct block_stats {
+    uint total_collected;
+    uint total_carries;
+  };
+
   /* constructors */
-  stat_collector(void) : m_stats(), m_ofname(), m_ofile() {}
+  stat_collector(void) : m_foraging_stats(), m_block_stats(),
+                         m_ofname(), m_ofile() {}
 
   /* member functions */
   void reset(const std::string& ofname);
@@ -59,14 +65,17 @@ class stat_collector {
    *
    * @param controller The controller to collect from.
    */
-  void collect_from_robot(controller::foraging_controller& controller);
-  void store(uint timestep);
+  void collect_from_robot(const controller::foraging_controller& controller);
+  void collect_from_block(const representation::block& block);
+  void store_foraging_stats(uint timestep);
+  void store_block_stats(uint timestep);
 
  private:
   /* member functions */
 
   /* data members */
-  struct foraging_stats m_stats;
+  struct foraging_stats m_foraging_stats;
+  struct block_stats m_block_stats;
   std::string m_ofname;
   std::ofstream m_ofile;
 };

@@ -30,6 +30,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/params.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +48,7 @@ class block_distributor {
                     argos::CRange<argos::Real> nest_x,
                     argos::CRange<argos::Real> nest_y,
                     std::shared_ptr<const struct block_params> params,
-                    std::shared_ptr<std::vector<argos::CVector2>> blocks);
+                    std::shared_ptr<std::vector<representation::block>> blocks);
 
   /* member functions */
   /**
@@ -81,7 +82,7 @@ class block_distributor {
   argos::CRange<argos::Real> m_nest_y;
   argos::CRandom::CRNG* m_rng;
   std::shared_ptr<const struct block_params> m_params;
-  std::shared_ptr<std::vector<argos::CVector2>> m_blocks;
+  std::shared_ptr<std::vector<representation::block>> m_blocks;
 };
 
 NS_END(support, fordyca);

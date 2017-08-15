@@ -38,32 +38,41 @@ void stat_collector::reset(const std::string& ofname) {
   if (m_ofile.is_open()) {
     m_ofile.close();
   }
+  m_block_stats = {0, 0};
+  m_foraging_stats = {0, 0, 0};
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\texploring\treturning\tcollision_avoidance\n";
+  m_ofile << "clock\tcollected_blocks\tavg_carries\texploring\treturning\tcollision_avoidance\n";
 } /* reset() */
 
-void stat_collector::collect_from_robot(controller::foraging_controller& controller) {
+void stat_collector::collect_from_robot(
+    const controller::foraging_controller& controller) {
   /* Count how many foot-bots are in which state */
-  m_stats.n_exploring += controller.is_exploring();
-  m_stats.n_returning += controller.is_returning();
-  m_stats.n_avoiding += controller.is_avoiding_collision();
-
-  if (controller.is_carrying_block() && controller.in_nest()) {
-    ++m_stats.total_collected_blocks;
-  }
+  m_foraging_stats.n_exploring += controller.is_exploring();
+  m_foraging_stats.n_returning += controller.is_returning();
+  m_foraging_stats.n_avoiding += controller.is_avoiding_collision();
 } /* collect_from_robot() */
 
-void stat_collector::store(uint timestep) {
+void stat_collector::collect_from_block(const representation::block& block) {
+  ++m_block_stats.total_collected;
+  m_block_stats.total_carries += block.carries();
+} /* collect_from_block() */
+
+void stat_collector::store_foraging_stats(uint timestep) {
   /* Output stuff to file */
+  double avg_carries = 0;
+  if (m_block_stats.total_collected > 0) {
+    avg_carries = (double)m_block_stats.total_collected/m_block_stats.total_carries;
+  }
   m_ofile << timestep << "\t"
-          << m_stats.total_collected_blocks << "\t"
-          << m_stats.n_exploring << "\t"
-          << m_stats.n_returning << "\t"
-          << m_stats.n_avoiding << std::endl;
-  m_stats.n_exploring = 0;
-  m_stats.n_returning = 0;
-  m_stats.n_avoiding = 0;
-} /* store() */
+          << m_block_stats.total_collected << "\t"
+          << avg_carries << "\t"
+          << m_foraging_stats.n_exploring << "\t"
+          << m_foraging_stats.n_returning << "\t"
+          << m_foraging_stats.n_avoiding << std::endl;
+  m_foraging_stats.n_exploring = 0;
+  m_foraging_stats.n_returning = 0;
+  m_foraging_stats.n_avoiding = 0;
+} /* store_foraging_stats() */
 
 
 NS_END(support, fordyca);

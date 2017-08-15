@@ -64,14 +64,17 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   mc_logging_params.reset(static_cast<const struct logging_params*>(
       m_param_manager.get_params("logging")));
 
-  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>("loop-functions-init.txt"));
+  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>(
+      "loop-functions-init.txt"));
   m_param_manager.show_all();
   m_floor = &GetSpace().GetFloorEntity();
 
   /* distribute blocks in arena */
   mc_block_params.reset(static_cast<const struct block_params*>(
       m_param_manager.get_params("blocks")));
-  m_blocks = std::make_shared<std::vector<argos::CVector2>>(mc_block_params->n_blocks);
+  m_blocks = std::make_shared<std::vector<representation::block>>(
+      mc_block_params->n_blocks,
+      representation::block(mc_block_params->dimension));
   m_distributor.reset(new support::block_distributor(mc_loop_params->arena_x,
                                                      mc_loop_params->arena_y,
                                                      mc_loop_params->nest_x,
@@ -84,7 +87,6 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   m_collector.reset(mc_logging_params->sim_stats);
 }
-
 
 void foraging_loop_functions::Reset() {
   m_collector.reset(mc_logging_params->sim_stats);
@@ -101,7 +103,7 @@ argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plan
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if (point_within_block(plane_pos, i)) {
+    if (m_blocks->at(i).contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   }
@@ -117,21 +119,27 @@ void foraging_loop_functions::PreStep() {
        it != footbots.end();
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
-    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(robot.GetControllableEntity().GetController());
-    /* collect all stats from this robot */
+    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(
+        robot.GetControllableEntity().GetController());
+    /* get stats from this robot before its state changes */
     m_collector.collect_from_robot(controller);
-    /* Get the position of the foot-bot on the ground as a CVector2 */
+
     if (controller.is_carrying_block()) {
-      /* Check whether the foot-bot is in the nest */
       if (controller.in_nest()) {
+        /*
+         * Get stats from carried block before it's dropped and its state
+         * changes.
+         */
+        m_collector.collect_from_block(m_blocks->at(controller.block_idx()));
+        m_blocks->at(controller.block_idx()).update_on_nest_drop();
         /*
          * Place a new block item on the ground (must be before the actual drop
          * because the block index goes to -1 after that).
          */
         m_distributor->distribute_block(controller.block_idx());
-        /* Drop the block item */
-        controller.drop_block_in_nest();
 
+        /* Actually drop the block item */
+        controller.drop_block_in_nest();
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
@@ -143,8 +151,7 @@ void foraging_loop_functions::PreStep() {
         if (-1 == block) {
           printf("FALSE positive on robot%d_on_block\n", i);
         } else {
-          /* Move that item out of sight */
-          m_blocks->at(block).Set(100.0f, 100.f);
+          m_blocks->at(block).update_on_robot_pickup(i);
           controller.pickup_block(block);
 
           /* The floor texture must be updated */
@@ -155,7 +162,7 @@ void foraging_loop_functions::PreStep() {
     }
     ++i;
   } /* for(it..) */
-  m_collector.store(GetSpace().GetSimulationClock());
+  m_collector.store_foraging_stats(GetSpace().GetSimulationClock());
 }
 
 int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
@@ -164,25 +171,12 @@ int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) 
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
   for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if (point_within_block(pos, i)) {
+    if (m_blocks->at(i).contains_point(pos)) {
         return i;
     }
   } /* for(i..) */
   return -1;
 } /* robot_on_block() */
-
-bool foraging_loop_functions::point_within_block(const argos::CVector2& point,
-                                                 size_t index) {
-  double x = m_blocks->at(index).GetX();
-  double y = m_blocks->at(index).GetY();
-  if (point.GetX() < (x + (.5 * mc_block_params->dimension)) &&
-      point.GetX() > (x - (.5 * mc_block_params->dimension)) &&
-      point.GetY() < (y + (.5 * mc_block_params->dimension)) &&
-      point.GetY() > (y - (.5 * mc_block_params->dimension))) {
-    return true;
-  }
-  return false;
-} /* point_within_block() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")
