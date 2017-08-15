@@ -39,15 +39,12 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
                        std::shared_ptr<actuator_manager> actuators) :
     fsm::simple_fsm(server, ST_MAX_STATES),
     explore(),
-    explore_success(),
-    explore_fail(),
     return_to_nest(),
     leaving_nest(),
     collision_avoidance(),
     entry_explore(),
     entry_collision_avoidance(),
     entry_leaving_nest(),
-    m_last_explore_res(LAST_EXPLORATION_NONE),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_prob_range(0.0f, 1.0f),
     m_state(),
@@ -62,26 +59,13 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void foraging_fsm::event_explore(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    fsm::event_signal::IGNORED,  /* explore */
-    fsm::event_signal::IGNORED,  /* explore success */
-    fsm::event_signal::IGNORED,  /* explore fail */
-    fsm::event_signal::IGNORED,  /* return to nest */
-    fsm::event_signal::IGNORED,  /* leaving nest */
-    ST_COLLISION_AVOIDANCE,     /* collision avoidance */
-  };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], NULL);
-}
-
 void foraging_fsm::event_block_found(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    ST_EXPLORE_SUCCESS,          /* explore */
-    fsm::event_signal::IGNORED,   /* explore success */
-    fsm::event_signal::IGNORED,   /* explore fail */
-    fsm::event_signal::IGNORED,   /* return to nest */
-    fsm::event_signal::FATAL,     /* leaving to nest */
+    fsm::event_signal::FATAL,    /* start */
+    ST_RETURN_TO_NEST,           /* explore */
+    ST_RETURN_TO_NEST,           /* new direction */
+    fsm::event_signal::IGNORED,  /* return to nest */
+    fsm::event_signal::FATAL,    /* leaving nest */
     ST_COLLISION_AVOIDANCE,      /* collision avoidance */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
@@ -90,11 +74,11 @@ void foraging_fsm::event_block_found(void) {
 
 void foraging_fsm::event_continue(void) {
   static const uint8_t kTRANSITIONS[] = {
+    ST_EXPLORE,                  /* start */
     ST_EXPLORE,                 /* explore */
-    ST_EXPLORE_SUCCESS,         /* explore success */
-    ST_EXPLORE_FAIL,            /* explore fail */
+    ST_NEW_DIRECTION,           /* new direction */
     ST_RETURN_TO_NEST,          /* return to nest */
-    ST_LEAVING_NEST,            /* leaving to nest */
+    ST_LEAVING_NEST,            /* leaving nest */
     ST_COLLISION_AVOIDANCE      /* collision avoidance */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
@@ -108,15 +92,15 @@ FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event_data) {
   ER_DIAG("Executing ST_LEAVING_NEST");
 
   /*
-   * The vector returned by calc_vector_to_light() points to
-   * the light. Thus, the minus sign is because we want to go away
-   * from the light.
+   * The vector returned by calc_vector_to_light() points to the light. Thus,
+   * the minus sign is because we want to go away from the light.
    */
   argos::CVector2 diff_vector;
+  argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
   m_sensors->calc_diffusion_vector(&diff_vector);
-  m_actuators->set_wheel_speeds(
-      m_actuators->max_wheel_speed() * diff_vector -
-      m_actuators->max_wheel_speed() * 0.25f * m_sensors->calc_vector_to_light());
+  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * diff_vector -
+                                argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
+                                                current_heading));
   if (!m_sensors->in_nest()) {
     internal_event(ST_EXPLORE);
   }
@@ -125,77 +109,87 @@ FSM_STATE_DEFINE(foraging_fsm, leaving_nest, fsm::no_event_data) {
 FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE");
 
-  /*
-   * We transition to the 'return to nest' state in two situations:
-   *
-   * 1. If we have a block item, in which case we are notified by an external event.
-   * 2. If we have not found a block item for some time; in this case, the switch
-   *    is probabilistic.
-   */
-
-  /*
-   * Second condition: we probabilistically switch to 'return to
-   * nest' if we have been wandering for some time and found nothing.
-   */
-  if (m_state.time_exploring_unsuccessfully >
-      mc_params->times.max_unsuccessful_explore) {
-      internal_event(ST_EXPLORE_FAIL);
-  }
-
-  /* perform the actual exploration */
   ++m_state.time_exploring_unsuccessfully;
 
-  /* Get the diffusion vector to perform obstacle avoidance */
+  /*
+   * Check for nearby obstacles, and if so go int obstacle avoidance. Time spent
+   * in collision avoidance still counts towards the direction change threshold.
+   */
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
+  } else if (m_state.time_exploring_unsuccessfully >
+             mc_params->times.unsuccessful_explore_dir_change) {
+    argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
+                                         argos::CRadians(1.0));
+    argos::CVector2 new_dir = argos::CVector2::X;
+    new_dir = new_dir.Rotate(m_rng->Uniform(range));
+    internal_event(ST_NEW_DIRECTION,
+                   rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
   }
-  argos::CVector2 diff_vector;
-  m_sensors->calc_diffusion_vector(&diff_vector);
 
-  /* No obstacles nearby--use the diffusion vector only to set speeds */
-  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * diff_vector);
+  /*
+   * No obstacles nearby and have not hit direction changing threshold--use the
+   * diffusion vector only to set speeds.
+   */
+  argos::CVector2 vector;
+  m_sensors->calc_diffusion_vector(&vector);
+  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * vector);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, explore_success, fsm::no_event_data) {
-  ER_DIAG("Executing ST_EXPLORE_SUCCESS");
-
-  /* Store the result of the expedition */
-  m_last_explore_res = LAST_EXPLORATION_SUCCESSFUL;
-  internal_event(ST_RETURN_TO_NEST);
+FSM_STATE_DEFINE(foraging_fsm, start, fsm::no_event_data) {
+  /* argos::CRange<argos::CRadians> range(argos::CRadians(0.25), */
+  /*                                      argos::CRadians(1.0)); */
+  /* argos::CVector2 new_dir = argos::CVector2::X; */
+  /* new_dir = new_dir.Rotate(m_rng->Uniform(range)); */
+  /* printf("HERE\n"); */
+  internal_event(ST_EXPLORE);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(foraging_fsm, explore_fail, fsm::no_event_data) {
-  ER_DIAG("Executing ST_EXPLORE_FAIL");
+FSM_STATE_DEFINE(foraging_fsm, new_direction, new_direction_data) {
+  ER_DIAG("Executing ST_NEW_DIRECTION");
+  static argos::CRadians new_dir;
+  static int count = 0;
+  argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
 
-  /* Store the result of the expedition */
-  m_last_explore_res = LAST_EXPLORATION_UNSUCCESSFUL;
-  internal_event(ST_RETURN_TO_NEST);
+  /*
+   * The new direction is only passed the first time this state is entered, so
+   * save it.
+   */
+  if (data) {
+    count = 0;
+    new_dir = data->dir;
+  }
+  m_actuators->set_wheel_speeds(argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
+                                                new_dir), true);
+
+  /* We have changed direction and started a new exploration */
+  if (std::fabs((current_dir - new_dir).GetValue()) < 0.1) {
+    m_state.time_exploring_unsuccessfully = 0;
+    internal_event(ST_EXPLORE);
+  }
+  ++count;
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event_data) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
     argos::CVector2 vector;
 
-    if (LAST_EXPLORATION_SUCCESSFUL == m_last_explore_res) {
-      m_actuators->leds_set_color(argos::CColor::GREEN);
-    } else {
-      m_actuators->leds_set_color(argos::CColor::ORANGE);
-    }
-
+    /*
+     * We have arrived at the nest and it's time to head back out again. The
+     * loop functions need to call the drop_block() function, as they have to
+     * redistribute it (the FSM has no idea how to do that).
+     */
     if (m_sensors->in_nest()) {
       internal_event(ST_LEAVING_NEST);
     }
 
     m_sensors->calc_diffusion_vector(&vector);
-    m_actuators->set_wheel_speeds(
-        m_actuators->max_wheel_speed() * vector +
-        m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
+    m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * vector +
+                                  m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
       return fsm::event_signal::HANDLED;
 }
-
 FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
-  static argos::CColor last_color;
   ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   if (m_sensors->calc_diffusion_vector(&vector)) {
     m_actuators->set_wheel_speeds(vector);
@@ -209,23 +203,32 @@ FSM_ENTRY_DEFINE(foraging_fsm, entry_leaving_nest, fsm::no_event_data) {
   m_actuators->leds_set_color(argos::CColor::WHITE);
 }
 FSM_ENTRY_DEFINE(foraging_fsm, entry_explore, fsm::no_event_data) {
-  ER_DIAG("Entrying ST_EXPLORE");
+  ER_DIAG("Entering ST_EXPLORE");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
-  m_state.time_exploring_unsuccessfully = 0;
-  m_last_explore_res = LAST_EXPLORATION_NONE;
+}
+FSM_ENTRY_DEFINE(foraging_fsm, entry_new_direction, fsm::no_event_data) {
+  ER_DIAG("Entering ST_NEW_DIRECTION");
+  m_actuators->leds_set_color(argos::CColor::CYAN);
+}
+FSM_ENTRY_DEFINE(foraging_fsm, entry_return_to_nest, fsm::no_event_data) {
+  ER_DIAG("Entering ST_RETURN_TO_NEST");
+  m_actuators->leds_set_color(argos::CColor::GREEN);
 }
 FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLIISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
 }
 
+FSM_EXIT_DEFINE(foraging_fsm, exit_leaving_nest) {
+  ER_DIAG("Exiting ST_LEAVING_NEST");
+  m_state.time_exploring_unsuccessfully = 0;
+}
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void foraging_fsm::init(void) {
   m_state.time_exploring_unsuccessfully = 0;
-  m_last_explore_res = LAST_EXPLORATION_NONE;
-  m_actuators->reset(LAST_EXPLORATION_NONE);
+  m_actuators->reset();
   simple_fsm::init();
 } /* init() */
 

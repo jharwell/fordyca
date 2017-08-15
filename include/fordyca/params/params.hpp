@@ -45,9 +45,11 @@ struct prob_deltas  {
 };
 
 struct threshold_times {
-  /* The number of exploration steps without finding block after which
-     a foot-bot starts thinking about going back to the nest */
-  size_t max_unsuccessful_explore;
+  /*
+   * The number of exploration steps without finding block after which the
+   * footboot will randomly change direction.
+   */
+  size_t unsuccessful_explore_dir_change;
 };
 
 struct foraging_fsm_params : public base_params {
@@ -78,20 +80,16 @@ struct wheel_params {
 
 /*
  * The following variables are used as parameters for the diffusion
- * algorithm. You can set their value in the <parameters> section of the XML
- * configuration file, under the
- * <controllers><footbot_foraging_controller><parameters><diffusion> section.
-  */
+ * algorithm.
+ */
 struct diffusion_params {
   diffusion_params() :
       delta(0.0),
       go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
   /*
-   * Maximum tolerance for the proximity reading between
-   * the robot and the closest obstacle.
-   * The proximity reading is 0 when nothing is detected
-   * and grows exponentially to 1 when the obstacle is
-   * touching the robot.
+   * Maximum tolerance for the proximity reading between the robot and the
+   * closest obstacle.  The proximity reading is 0 when nothing is detected and
+   * grows exponentially to 1 when the obstacle is touching the robot.
    */
   argos::Real delta;
   /* Angle tolerance range to go straight. */

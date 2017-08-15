@@ -36,17 +36,20 @@ void fsm_param_parser::parse(argos::TConfigurationNode& node) {
 
   m_params.reset(new foraging_fsm_params);
   try {
-      argos::GetNodeAttribute(fsm_node, "maximum_unsuccessful_explore_time", m_params->times.max_unsuccessful_explore);
-   }
-     catch (argos::CARGoSException& ex) {
-       using namespace argos;
-      THROW_ARGOSEXCEPTION_NESTED("Error initializing controller state parameters.", ex);
-   }
+      argos::GetNodeAttribute(fsm_node,
+                              "unsuccessful_explore_dir_change",
+                              m_params->times.unsuccessful_explore_dir_change);
+  }
+  catch (argos::CARGoSException& ex) {
+    using namespace argos;
+    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
+  }
 } /* parse() */
 
 void fsm_param_parser::show(std::ostream& stream) {
   stream << "FSM params\n====================" << std::endl;
-  stream << "times.max_unsuccessful_explore=" << m_params->times.max_unsuccessful_explore << std::endl;
+  stream << "times.unsuccessful_explore_dir_change="
+         << m_params->times.unsuccessful_explore_dir_change << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

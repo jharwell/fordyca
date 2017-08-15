@@ -55,11 +55,12 @@ class actuator_manager {
    * Gets a direction vector as input and transforms it into wheel
    * actuation.
    */
-  void set_wheel_speeds(const argos::CVector2& c_heading);
+  void set_wheel_speeds(const argos::CVector2& c_heading,
+                        bool force_hard_turn = false);
   argos::Real max_wheel_speed(void) { return mc_params->wheels.max_speed; }
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
-  void reset(int state);
+  void reset(void);
 
  private:
   actuator_manager(const actuator_manager& fsm) = delete;

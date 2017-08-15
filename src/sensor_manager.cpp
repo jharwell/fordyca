@@ -71,25 +71,24 @@ bool sensor_manager::in_nest(void) {
 } /* in_nest() */
 
 bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
-  /* Get readings from proximity sensor */
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
   argos::CVector2* vector;
   argos::CVector2 tmp;
+
   if (vector_in == NULL) {
     vector = &tmp;
   } else {
     vector = vector_in;
   }
 
-  /* Sum them together */
   for (size_t i = 0; i < tProxReads.size(); ++i) {
     *vector += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
-  }
+  } /* for(i..) */
+
   /*
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it.
    */
-
   if (mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
      vector->Length() < mc_params->diffusion.delta) {
     *vector = argos::CVector2::X;
@@ -100,13 +99,13 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
 }
 
 argos::CVector2 sensor_manager::calc_vector_to_light(void) {
-  /* Get readings from light sensor */
   const argos::CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
-  /* Sum them together */
   argos::CVector2 accum;
-  for(size_t i = 0; i < tLightReads.size(); ++i) {
+
+  for (size_t i = 0; i < tLightReads.size(); ++i) {
     accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
-  }
+  } /* for(i..) */
+
   /* If the light was perceived, return the vector. Otherwise return 0. */
   if (accum.Length() > 0.0f) {
     return argos::CVector2(1.0f, accum.Angle());

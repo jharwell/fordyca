@@ -49,7 +49,6 @@ class foraging_controller : public argos::CCI_Controller,
                                    public rcppsw::common::er_client {
  public:
   enum event_type {
-    EXPLORE,
     CONTINUE,
     BLOCK_FOUND
   };

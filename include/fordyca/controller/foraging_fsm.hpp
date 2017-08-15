@@ -44,71 +44,63 @@ namespace fsm = rcppsw::patterns::state_machine;
 class foraging_fsm : public fsm::simple_fsm {
  public:
   enum fsm_states {
+    ST_START,
     ST_EXPLORE,
-    ST_EXPLORE_SUCCESS,
-    ST_EXPLORE_FAIL,
+    ST_NEW_DIRECTION,
     ST_RETURN_TO_NEST,
     ST_LEAVING_NEST,
     ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
   };
-
+  struct new_direction_data : public fsm::event_data {
+    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
+    argos::CRadians dir;
+  };
   foraging_fsm(const struct foraging_fsm_params* params,
              std::shared_ptr<rcppsw::common::er_server> server,
              std::shared_ptr<sensor_manager> sensors,
              std::shared_ptr<actuator_manager> actuators);
   bool is_exploring(void) {return current_state() == ST_EXPLORE; }
   bool is_returning(void) {return current_state() == ST_RETURN_TO_NEST; }
-  bool is_avoiding_collision(void) {return current_state() == ST_COLLISION_AVOIDANCE; }
+  bool is_avoiding_collision(void) { return current_state() == ST_COLLISION_AVOIDANCE; }
   void init(void);
-  void event_explore(void);
   void event_continue(void);
   void event_block_found(void);
 
   void run(void) { event_continue(); }
 
  private:
-  /**
-   * @brief This structure holds data about block collecting by the robots
-   */
-  struct block_data {
-    block_data(void) : has_item(false), curr_item_idx(-1), cum_items(0) {}
-    void Reset(void);
-
-    bool has_item;      // true when the robot is carrying a block item
-    int curr_item_idx;    // the index of the current block item in the array of available block items
-    size_t cum_items; // the total number of block items carried by this robot during the experiment
-  };
-
   struct fsm_state {
-    fsm_state(void) :
-        time_exploring_unsuccessfully(0),
-        block_data() {}
+    fsm_state(void) : time_exploring_unsuccessfully(0) {}
 
     size_t time_exploring_unsuccessfully;
-    struct block_data block_data;
   };
-
+  FSM_STATE_DECLARE(foraging_fsm, start, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, explore, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, explore_success, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, explore_fail, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, new_direction, new_direction_data);
   FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event_data);
 
   FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_return_to_nest, fsm::no_event_data);
+
   FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
                     fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
+  FSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   FSM_DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
+        FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&explore_success, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&explore_fail, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL, NULL, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
+                                   &entry_new_direction, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+                                   &entry_return_to_nest, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
-                                   &entry_leaving_nest, NULL),
+                                   &entry_leaving_nest, &exit_leaving_nest),
         FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                    &entry_collision_avoidance, NULL),
     };
@@ -120,13 +112,7 @@ class foraging_fsm : public fsm::simple_fsm {
   foraging_fsm& operator=(const foraging_fsm& fsm) = delete;
 
   /* data members */
-  enum last_exploration_result {
-    LAST_EXPLORATION_NONE = 0,    // nothing to report
-    LAST_EXPLORATION_SUCCESSFUL,  // the last exploration resulted in a block item found
-    LAST_EXPLORATION_UNSUCCESSFUL // no block found in the last exploration
-  };
 
-  enum last_exploration_result m_last_explore_res;
   argos::CRandom::CRNG* m_rng;
   argos::CRange<argos::Real> m_prob_range;
   struct fsm_state m_state;

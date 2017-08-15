@@ -71,9 +71,6 @@ void foraging_controller::pickup_block(int i) {
 
 void foraging_controller::publish_event(enum event_type type) {
   switch (type) {
-    case EXPLORE:
-      m_fsm->event_explore();
-      break;
     case CONTINUE:
       m_fsm->event_continue();
       break;

@@ -37,6 +37,7 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
+        <grid cell_decay_delta="0.001"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />
@@ -47,16 +48,7 @@
                   no_turn_angle_threshold="10"
                   max_speed="10" />
         </actuators>
-        <fsm initial_rest_to_explore_prob="0.1"
-               initial_explore_to_rest_prob="0.1"
-               block_rule_explore_to_rest_delta_prob="0.01"
-               block_rule_rest_to_explore_delta_prob="0.01"
-               collision_rule_explore_to_rest_delta_prob="0.01"
-               minimum_resting_time="50"
-               maximum_unsuccessful_explore_time="600"
-               minimum_search_for_place_in_nest_time="50">
-          <block_rule active="true" block_rule_explore_to_rest_delta_prob="0.01" />
-        </fsm>
+        <fsm unsuccessful_explore_dir_change="600"/>
       </params>
     </foraging_controller>
 
