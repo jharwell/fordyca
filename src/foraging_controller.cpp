@@ -25,7 +25,6 @@
 #include "fordyca/params/actuator_param_parser.hpp"
 #include "fordyca/params/sensor_param_parser.hpp"
 #include "fordyca/params/fsm_param_parser.hpp"
-#include "fordyca/params/grid_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,8 +41,7 @@ foraging_controller::foraging_controller(void) :
     m_sensors(),
     m_fsm(),
     m_server(new rcppsw::common::er_server("controller-init.txt")),
-    m_block_data(),
-    m_grid() {
+    m_block_data() {
   deferred_init(m_server);
   m_param_manager.logging_init(m_server);
   m_param_manager.add_category("actuators",
@@ -52,8 +50,6 @@ foraging_controller::foraging_controller(void) :
                                new params::sensor_param_parser());
   m_param_manager.add_category("fsm",
                                new params::fsm_param_parser());
-  m_param_manager.add_category("grid",
-                               new params::grid_param_parser());
 }
 
 /*******************************************************************************
@@ -105,8 +101,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_server,
                      m_sensors,
                      m_actuators));
-  m_grid.reset(new representation::grid2D(
-      static_cast<const struct grid_params*>(m_param_manager.get_params("grid"))));
   Reset();
 } /* Init() */
 
