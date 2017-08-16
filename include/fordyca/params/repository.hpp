@@ -30,7 +30,7 @@
 #include <map>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/params.hpp"
-#include "fordyca/params/base_param_parser.hpp"
+#include "fordyca/params/base_parser.hpp"
 #include "rcppsw/common/er_client.hpp"
 #include "rcppsw/patterns/factory/releasing_factory.hpp"
 
@@ -53,16 +53,16 @@ class repository {
   void show_all(std::ostream& stream);
 
  protected:
-  factory::releasing_factory<base_param_parser>& factory(void) {
+  factory::releasing_factory<base_parser>& factory(void) {
     return m_factory;
   }
-  std::map<std::string, base_param_parser*>& parsers(void) {
+  std::map<std::string, base_parser*>& parsers(void) {
     return m_parsers;
   }
 
  private:
-  std::map<std::string, base_param_parser*> m_parsers;
-  factory::releasing_factory<base_param_parser> m_factory;
+  std::map<std::string, base_parser*> m_parsers;
+  factory::releasing_factory<base_parser> m_factory;
 };
 
 NS_END(params, fordyca);

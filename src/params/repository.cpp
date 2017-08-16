@@ -36,7 +36,7 @@ NS_START(fordyca, params);
 void repository::parse_all(argos::TConfigurationNode& node) {
   std::for_each(m_parsers.begin(),
                 m_parsers.end(),
-                [&](std::pair<const std::string, base_param_parser*>& pair) {
+                [&](std::pair<const std::string, base_parser*>& pair) {
       pair.second->parse(node);
     });
 } /* parse_all() */
@@ -44,7 +44,7 @@ void repository::parse_all(argos::TConfigurationNode& node) {
 void repository::show_all(std::ostream& stream) {
   std::for_each(m_parsers.begin(),
                 m_parsers.end(),
-                [&](std::pair<const std::string, base_param_parser*>& pair) {
+                [&](std::pair<const std::string, base_parser*>& pair) {
       pair.second->show(stream);
     });
 } /* show_all() */

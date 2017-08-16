@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/controller_repository.hpp"
-#include "fordyca/params/actuator_param_parser.hpp"
-#include "fordyca/params/sensor_param_parser.hpp"
-#include "fordyca/params/fsm_param_parser.hpp"
-#include "fordyca/params/perceived_grid_param_parser.hpp"
+#include "fordyca/params/actuator_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/fsm_parser.hpp"
+#include "fordyca/params/perceived_grid_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,10 +36,10 @@ NS_START(fordyca, params);
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  factory().register_type<actuator_param_parser>("actuators");
-  factory().register_type<sensor_param_parser> ("sensors");
-  factory().register_type<fsm_param_parser>("fsm");
-  factory().register_type<perceived_grid_param_parser>("perceived_grid");
+  factory().register_type<actuator_parser>("actuators");
+  factory().register_type<sensor_parser> ("sensors");
+  factory().register_type<fsm_parser>("fsm");
+  factory().register_type<perceived_grid_parser>("perceived_grid");
   parsers()["actuators"]        = factory().create("actuators");
   parsers()["sensors"]          = factory().create("sensors");
   parsers()["fsm"]              = factory().create("fsm");
