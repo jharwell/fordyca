@@ -28,11 +28,10 @@
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
 #include "fordyca/controller/foraging_fsm.hpp"
-#include "fordyca/params/repository.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/block_data.hpp"
-#include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/dynamic_grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +52,15 @@ class foraging_controller : public argos::CCI_Controller,
     BLOCK_FOUND
   };
 
-  foraging_controller(void);
+  foraging_controller(void) :
+      er_client(),
+      m_server(new rcppsw::common::er_server("controller-init.txt")),
+      m_actuators(),
+      m_sensors(),
+      m_fsm(),
+      m_block_data(),
+      m_grid() {}
+
 
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
   bool is_returning(void) const { return m_fsm->is_returning(); }
@@ -116,13 +123,12 @@ class foraging_controller : public argos::CCI_Controller,
     void pickup_block(int i);
 
  private:
-  params::repository                         m_param_manager;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<foraging_fsm>              m_fsm;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
   representation::block_data                 m_block_data;
-  std::unique_ptr<representation::grid2D>    m_grid;
+  std::unique_ptr<representation::dynamic_grid2D>    m_grid;
 };
 
 NS_END(controller, fordyca);

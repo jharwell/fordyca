@@ -1,5 +1,5 @@
 /**
- * @file grid_param_parser.cpp
+ * @file dynamic_grid_param_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/grid_param_parser.hpp"
+#include "fordyca/params/dynamic_grid_param_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -32,16 +32,15 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grid_param_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct grid_params);
-  ticpp::Node *arena = node.Parent()->Parent()->NextSibling("arena");
+void dynamic_grid_param_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct dynamic_grid_params);
+  ticpp::Node *arena = node.NextSibling("arena");
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(arena->ToElement()->GetAttribute("size"));
-  m_params->cell_delta = std::atof(argos::GetNode(node,
-                                                  "grid").GetAttribute("cell_decay_delta").c_str());
-  m_params->cell_delta = std::atof(argos::GetNode(node,
+
+  m_params->resolution = std::atof(argos::GetNode(node,
                                                   "grid").GetAttribute("resolution").c_str());
   m_params->lower.Set(-std::atoi(res[0].c_str())/2.0 + 0.3,
                       std::atoi(res[0].c_str())/2.0 - 0.3);
@@ -49,9 +48,9 @@ void grid_param_parser::parse(argos::TConfigurationNode& node) {
                       std::atoi(res[1].c_str())/2.0 - 0.3);
 } /* parse() */
 
-void grid_param_parser::show(std::ostream& stream) {
-  stream << "Grid params\n====================" << std::endl;
-  stream << "cell_decay_delta=" << m_params->cell_delta << std::endl;
+void dynamic_grid_param_parser::show(std::ostream& stream) {
+  stream << "====================\nDynamic grid params\n====================\n"
+         << std::endl;
   stream << "resolution=" << m_params->resolution << std::endl;
   stream << "lower=" << m_params->lower << std::endl;
   stream << "upper=" << m_params->upper << std::endl;

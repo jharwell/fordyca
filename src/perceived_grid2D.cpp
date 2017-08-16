@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file perceived_grid2D.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,36 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/fsm_param_parser.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "fordyca/representation/perceived_grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
+
+/*******************************************************************************
+ * Constructors/Destructors
+ ******************************************************************************/
+perceived_grid2D::perceived_grid2D(const perceived_grid_params* params) :
+    dynamic_grid2D(&params->dynamic),
+    mc_params(params) {
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    i->delta(mc_params->cell_delta);
+  } /* for(i..) */
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
+std::list<const dynamic_cell2D*> perceived_grid2D::with_blocks(void) {
+  std::list<const dynamic_cell2D*> cells;
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    if (i->state() == dynamic_cell2D_fsm::ST_HAS_BLOCK) {
+      cells.push_back(i);
+    }
+  } /* for(i..) */
+  return cells;
+} /* with_blocks() */
 
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
-} /* parse() */
-
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(representation, fordyca);

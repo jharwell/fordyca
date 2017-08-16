@@ -1,5 +1,5 @@
 /**
- * @file cell2D_fsm.hpp
+ * @file dynamic_cell2d_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,7 +36,7 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell2D_fsm : public fsm::simple_fsm {
+class dynamic_cell2D_fsm : public fsm::simple_fsm {
  public:
   enum state {
     ST_UNKNOWN,
@@ -45,21 +45,23 @@ class cell2D_fsm : public fsm::simple_fsm {
     ST_HAS_CACHE,
     ST_MAX_STATES
   };
-  enum encounter_type {
+  enum new_state {
     UNKNOWN,
     EMPTY,
     BLOCK,
     CACHE
   };
 
-  struct encounter_data : public fsm::event_data {
-    explicit encounter_data(enum encounter_type type_, int cache_blocks_ = 0) :
-        type(type_), cache_blocks(cache_blocks_) {}
-    enum encounter_type type;
+  struct new_state_data : public fsm::event_data {
+    explicit new_state_data(enum new_state new_state_,
+                            size_t cache_blocks_ = 0) :
+        new_state(new_state_), cache_blocks(cache_blocks_) {}
+    enum new_state new_state;
     int cache_blocks;
   };
 
-  explicit cell2D_fsm(const std::shared_ptr<rcppsw::common::er_server>& server) :
+  explicit dynamic_cell2D_fsm(
+      const std::shared_ptr<rcppsw::common::er_server>& server) :
       simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
       state_unknown(),
       state_empty(),
@@ -73,13 +75,13 @@ class cell2D_fsm : public fsm::simple_fsm {
   bool is_empty(void) { return current_state() == ST_EMPTY; }
 
   /* events */
-  void event_encounter(const struct encounter_data* const data);
+  void change_state(const struct new_state_data* const data);
 
  private:
-  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, struct encounter_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_empty, struct encounter_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, struct encounter_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_has_cache, struct encounter_data);
+  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_unknown, struct new_state_data);
+  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_empty, struct new_state_data);
+  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_has_block, struct new_state_data);
+  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_has_cache, struct new_state_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
@@ -92,9 +94,9 @@ class cell2D_fsm : public fsm::simple_fsm {
   return &kSTATE_MAP[0];
   }
 
-  int m_cache_blocks;
+  size_t m_cache_blocks;
 };
 
 NS_END(representation, forydca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_ */

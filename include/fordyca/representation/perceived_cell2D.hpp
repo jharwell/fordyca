@@ -1,5 +1,5 @@
 /**
- * @file cell2D.hpp
+ * @file perceived_cell2D.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CELL2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CELL2D_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <utility>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/cell2D_fsm.hpp"
+#include "fordyca/representation/dynamic_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,12 +42,11 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-class cell2D {
+class perceived_cell2D: public dynamic_cell2D {
  public:
-  cell2D(void) : m_relevance(0.0),
-                 m_delta(0.0),
-                 m_fsm(std::make_shared<rcppsw::common::er_server>("grid.txt")) {}
+  typedef dynamic_cell2D_fsm::new_state_data encounter_data;
 
+  perceived_cell2D(void) : dynamic_cell2D(), m_relevance(0.0), m_delta(0.0) {}
   void delta(double delta) { m_delta = delta; }
 
   /**
@@ -59,7 +58,6 @@ class cell2D {
    */
   void update_relevance(void);
 
-  uint8_t state(void) const { return m_fsm.current_state(); }
   /**
    * @brief If another robot reports that a block is in the same state that the
    * parent robot has it in, then that information is reinforced by calling \ref
@@ -71,16 +69,15 @@ class cell2D {
    * @param type The encounter type.
    * @param cache_blocks # of blocks in the observed cache (if relevant).
    */
-  void remote_encounter(cell2D_fsm::encounter_type type,
+  void remote_encounter(dynamic_cell2D_fsm::new_state state,
                         int cache_blocks = 0);
-  void encounter(cell2D_fsm::encounter_type type, int cache_blocks = 0);
+  void encounter(dynamic_cell2D_fsm::new_state state, int cache_blocks = 0);
 
  private:
   double m_relevance;
   double m_delta;
-  cell2D_fsm m_fsm;
 };
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CELL2D_HPP_ */

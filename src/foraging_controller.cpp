@@ -22,39 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/params/actuator_param_parser.hpp"
-#include "fordyca/params/sensor_param_parser.hpp"
-#include "fordyca/params/fsm_param_parser.hpp"
-#include "fordyca/params/grid_param_parser.hpp"
+#include "fordyca/params/controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-
-/*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-foraging_controller::foraging_controller(void) :
-    er_client(),
-    m_param_manager(),
-    m_actuators(),
-    m_sensors(),
-    m_fsm(),
-    m_server(new rcppsw::common::er_server("controller-init.txt")),
-    m_block_data(),
-    m_grid() {
-  deferred_init(m_server);
-  m_param_manager.logging_init(m_server);
-  m_param_manager.add_category("actuators",
-                               new params::actuator_param_parser());
-  m_param_manager.add_category("sensors",
-                               new params::sensor_param_parser());
-  m_param_manager.add_category("fsm",
-                               new params::fsm_param_parser());
-  m_param_manager.add_category("grid",
-                               new params::grid_param_parser());
-}
 
 /*******************************************************************************
  * Member Functions
@@ -81,19 +54,22 @@ void foraging_controller::publish_event(enum event_type type) {
 } /* publish_event() */
 
 void foraging_controller::Init(argos::TConfigurationNode& node) {
+  deferred_init(m_server);
   ER_NOM("Initializing foraging controller");
 
-  m_param_manager.parse_all(node);
-  m_param_manager.show_all();
+  params::controller_repository param_repo;
+  param_repo.parse_all(node);
+  param_repo.show_all(server_handle()->log_stream());
+
   m_actuators.reset(new actuator_manager(
       static_cast<const struct actuator_params*>(
-          m_param_manager.get_params("actuators")),
+          param_repo.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
   m_sensors.reset(new sensor_manager(
       static_cast<const struct sensor_params*>(
-          m_param_manager.get_params("sensors")),
+          param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
@@ -101,12 +77,13 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_fsm.reset(
       new foraging_fsm(static_cast<const struct foraging_fsm_params*>(
-          m_param_manager.get_params("fsm")),
+          param_repo.get_params("fsm")),
                      m_server,
                      m_sensors,
                      m_actuators));
-  m_grid.reset(new representation::grid2D(
-      static_cast<const struct grid_params*>(m_param_manager.get_params("grid"))));
+  m_grid.reset(new representation::dynamic_grid2D(
+      static_cast<const struct dynamic_grid_params*>(
+          param_repo.get_params("perceived_grid"))));
   Reset();
 } /* Init() */
 

@@ -57,7 +57,8 @@ void loop_functions_param_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void loop_functions_param_parser::show(std::ostream& stream) {
-  stream << "Loop Function params\n====================" << std::endl;
+  stream << "====================\nLoop Function params\n===================="
+         << std::endl;
   stream << "arena_x= " << m_params->arena_x << std::endl;
   stream << "arena_y= " << m_params->arena_y << std::endl;
   stream << "nest_x= " << m_params->nest_x << std::endl;

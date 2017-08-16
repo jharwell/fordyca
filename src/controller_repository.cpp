@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file controller_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/params/controller_repository.hpp"
+#include "fordyca/params/actuator_param_parser.hpp"
+#include "fordyca/params/sensor_param_parser.hpp"
 #include "fordyca/params/fsm_param_parser.hpp"
+#include "fordyca/params/perceived_grid_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,28 +33,17 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Constructors/Destructor
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
-
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
-} /* parse() */
-
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
+controller_repository::controller_repository(void) {
+  factory().register_type<actuator_param_parser>("actuators");
+  factory().register_type<sensor_param_parser> ("sensors");
+  factory().register_type<fsm_param_parser>("fsm");
+  factory().register_type<perceived_grid_param_parser>("perceived_grid");
+  parsers()["actuators"]        = factory().create("actuators");
+  parsers()["sensors"]          = factory().create("sensors");
+  parsers()["fsm"]              = factory().create("fsm");
+  parsers()["perceived_grid"]   = factory().create("perceived_grid");
+}
 
 NS_END(params, fordyca);

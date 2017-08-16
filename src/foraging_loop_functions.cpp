@@ -26,9 +26,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/foraging_loop_functions.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/params/block_param_parser.hpp"
-#include "fordyca/params/logging_param_parser.hpp"
-#include "fordyca/params/loop_functions_param_parser.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +42,6 @@ foraging_loop_functions::foraging_loop_functions(void) :
     mc_logging_params(),
     mc_block_params(),
     mc_loop_params(),
-    m_param_manager(),
     m_distributor(),
     m_blocks() {}
 
@@ -52,26 +49,25 @@ foraging_loop_functions::foraging_loop_functions(void) :
  * Member Functions
  ******************************************************************************/
 void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+  params::loop_function_repository param_repo;
+
   /* parse all environment parameters */
-  m_param_manager.add_category("blocks", new params::block_param_parser());
-  m_param_manager.add_category("logging", new params::logging_param_parser());
-  m_param_manager.add_category("loop_functions",
-                               new params::loop_functions_param_parser());
-  m_param_manager.parse_all(node);
+  param_repo.parse_all(node);
 
   mc_loop_params.reset(static_cast<const struct loop_functions_params*>(
-      m_param_manager.get_params("loop_functions")));
+      param_repo.get_params("loop_functions")));
   mc_logging_params.reset(static_cast<const struct logging_params*>(
-      m_param_manager.get_params("logging")));
+      param_repo.get_params("logging")));
 
-  m_param_manager.logging_init(std::make_shared<rcppsw::common::er_server>(
-      "loop-functions-init.txt"));
-  m_param_manager.show_all();
+  std::ofstream init_file("loop-functions-init.txt");
+  param_repo.show_all(init_file);
+  init_file.close();
+
   m_floor = &GetSpace().GetFloorEntity();
 
   /* distribute blocks in arena */
   mc_block_params.reset(static_cast<const struct block_params*>(
-      m_param_manager.get_params("blocks")));
+      param_repo.get_params("blocks")));
   m_blocks = std::make_shared<std::vector<representation::block>>(
       mc_block_params->n_blocks,
       representation::block(mc_block_params->dimension));
@@ -152,7 +148,8 @@ void foraging_loop_functions::PreStep() {
       if (!controller.in_nest() && controller.block_detected()) {
 
         /* Check whether the foot-bot is on a block item */
-        int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(it->second));
+        int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(
+            it->second));
         if (-1 != block) {
           m_blocks->at(block).update_on_robot_pickup(i);
           controller.pickup_block(block);

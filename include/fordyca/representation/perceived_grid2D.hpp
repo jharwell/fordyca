@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file perceived_grid2d.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,39 +18,39 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_GRID2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_GRID2D_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/fsm_param_parser.hpp"
+#include <boost/multi_array.hpp>
+#include <list>
+#include <argos/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/representation/dynamic_grid2D.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
+class perceived_grid2D : public dynamic_grid2D {
+ public:
+  explicit perceived_grid2D(const perceived_grid_params* params);
 
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
-} /* parse() */
+  std::list<const dynamic_cell2D*> with_blocks(void);
 
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
+ private:
+  std::shared_ptr<const perceived_grid_params> mc_params;
+  boost::multi_array<perceived_cell2D, 2> m_cells;
+};
 
-NS_END(params, fordyca);
+NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_GRID2D_HPP_ */

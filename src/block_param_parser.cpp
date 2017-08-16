@@ -41,7 +41,8 @@ void block_param_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void block_param_parser::show(std::ostream& stream) {
-  stream << "Block params\n====================" << std::endl;
+  stream << "==============================\nBlock params\n===================="
+         << std::endl;
   stream << "n_items=" << m_params->n_blocks << std::endl;
   stream << "dimension=" << m_params->dimension << std::endl;
   stream << "dist_model=" << m_params->dist_model << std::endl;

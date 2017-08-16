@@ -1,5 +1,5 @@
 /**
- * @file repository.cpp
+ * @file dynamic_grid_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,12 +18,15 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARAM_PARSER_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-#include "rcsw/common/fpc.h"
-#include "fordyca/params/repository.hpp"
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,22 +34,20 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void repository::parse_all(argos::TConfigurationNode& node) {
-  std::for_each(m_parsers.begin(),
-                m_parsers.end(),
-                [&](std::pair<const std::string, base_param_parser*>& pair) {
-      pair.second->parse(node);
-    });
-} /* parse_all() */
+class dynamic_grid_param_parser: public base_param_parser {
+ public:
+  dynamic_grid_param_parser(void): m_params() {}
 
-void repository::show_all(std::ostream& stream) {
-  std::for_each(m_parsers.begin(),
-                m_parsers.end(),
-                [&](std::pair<const std::string, base_param_parser*>& pair) {
-      pair.second->show(stream);
-    });
-} /* show_all() */
+  void parse(argos::TConfigurationNode& node);
+  const struct dynamic_grid_params* get_results(void) { return m_params.get(); }
+  void show(std::ostream& stream);
+
+ private:
+  std::unique_ptr<struct dynamic_grid_params> m_params;
+};
 
 NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARAM_PARSER_HPP_ */

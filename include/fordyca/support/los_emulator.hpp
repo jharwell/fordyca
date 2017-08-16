@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file los_emulator.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,39 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_LOS_EMULATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_LOS_EMULATOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/fsm_param_parser.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
+class los_emulator {
+ public:
+  /* constructors */
+  los_emulator(const argos::CVector2&
 
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
-} /* parse() */
+  /* member functions */
 
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
+  
+ private:
+  /* member functions */
 
-NS_END(params, fordyca);
+  /* data members */
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_LOS_EMULATOR_HPP_ */

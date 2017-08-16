@@ -1,5 +1,5 @@
 /**
- * @file cell2D_fsm.cpp
+ * @file dynamic_cell2D_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell2D_fsm.hpp"
+#include "fordyca/representation/dynamic_cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,7 +31,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Event Functions
  ******************************************************************************/
-void cell2D_fsm::event_encounter(const struct encounter_data*const data) {
+void dynamic_cell2D_fsm::change_state(const struct new_state_data*const data) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_UNKNOWN,   /* unknown */
         ST_EMPTY,     /* empty */
@@ -40,46 +40,46 @@ void cell2D_fsm::event_encounter(const struct encounter_data*const data) {
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()],
-                 std::unique_ptr<const struct encounter_data>(data));
-}
+                 std::unique_ptr<const struct new_state_data>(data));
+} /* change_state() */
 
 /*******************************************************************************
  * State Functions
  ******************************************************************************/
-FSM_STATE_DEFINE(cell2D_fsm, state_unknown, struct encounter_data) {
-  if (BLOCK == data->type) {
+FSM_STATE_DEFINE(dynamic_cell2D_fsm, state_unknown, struct new_state_data) {
+  if (BLOCK == data->new_state) {
     internal_event(ST_HAS_BLOCK);
-  } else if (CACHE == data->type) {
+  } else if (CACHE == data->new_state) {
     internal_event(ST_HAS_CACHE,
-                   std::unique_ptr<const struct encounter_data>(data));
+                   std::unique_ptr<const struct new_state_data>(data));
   } else {
     internal_event(ST_EMPTY);
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_empty, struct encounter_data) {
-  if (BLOCK == data->type) {
+FSM_STATE_DEFINE(dynamic_cell2D_fsm, state_empty, struct new_state_data) {
+  if (BLOCK == data->new_state) {
     internal_event(ST_HAS_BLOCK);
-  } else if (CACHE == data->type) {
+  } else if (CACHE == data->new_state) {
     internal_event(ST_HAS_CACHE,
-                   std::unique_ptr<const struct encounter_data>(data));
+                   std::unique_ptr<const struct new_state_data>(data));
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_has_block, struct encounter_data) {
-if (CACHE == data->type) {
+FSM_STATE_DEFINE(dynamic_cell2D_fsm, state_has_block, struct new_state_data) {
+if (CACHE == data->new_state) {
   internal_event(ST_HAS_CACHE,
-                 std::unique_ptr<const struct encounter_data>(data));
-} else if (EMPTY == data->type) {
+                 std::unique_ptr<const struct new_state_data>(data));
+} else if (EMPTY == data->new_state) {
   internal_event(ST_EMPTY);
 }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_has_cache, struct encounter_data) {
+FSM_STATE_DEFINE(dynamic_cell2D_fsm, state_has_cache, struct new_state_data) {
   m_cache_blocks = data->cache_blocks;
-  if (BLOCK == data->type) {
+  if (BLOCK == data->new_state) {
     internal_event(ST_HAS_BLOCK);
-  } else if (EMPTY == data->type) {
+  } else if (EMPTY == data->new_state) {
     internal_event(ST_EMPTY);
   }
   return fsm::event_signal::HANDLED;

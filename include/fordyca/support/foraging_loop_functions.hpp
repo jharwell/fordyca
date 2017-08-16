@@ -31,7 +31,6 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/repository.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
 #include "fordyca/representation/block.hpp"
@@ -67,7 +66,6 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   std::shared_ptr<const struct logging_params> mc_logging_params;
   std::shared_ptr<const struct block_params> mc_block_params;
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
-  params::repository m_param_manager;
   std::unique_ptr<block_distributor> m_distributor;
   std::shared_ptr<std::vector<representation::block>> m_blocks;
 };

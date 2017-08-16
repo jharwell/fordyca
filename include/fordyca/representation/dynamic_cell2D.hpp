@@ -1,5 +1,5 @@
 /**
- * @file cell2D.cpp
+ * @file dynamic_cell2D.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,10 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell2D.hpp"
+#include <algorithm>
+#include <utility>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/representation/dynamic_cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,36 +35,25 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void cell2D::update_relevance(void) {
-  if (m_fsm.is_known()) {
-    m_relevance = std::max(0.0, m_relevance - m_delta);
-    if (m_relevance <= 0.0) {
-      m_fsm.event_encounter(new cell2D_fsm::encounter_data(
-          cell2D_fsm::UNKNOWN));
-    }
-  }
-} /* update_relevance() */
+/**
+ * @brief Base representation of a cell on the 2D grid. This class represents
+ * the ACTUAL state of the grid (i.e. global/omniscient state).
+ */
+class dynamic_cell2D {
+ public:
+  dynamic_cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
 
-void cell2D::encounter(cell2D_fsm::encounter_type type,
-                        int cache_blocks) {
-  m_fsm.event_encounter(new cell2D_fsm::encounter_data(type,
-                                                           cache_blocks));
-  m_relevance += 1.0;
-} /* encounter() */
+  uint8_t state(void) const { return m_fsm.current_state(); }
 
-void cell2D::remote_encounter(cell2D_fsm::encounter_type type,
-                                  int cache_blocks) {
-  if ((m_fsm.is_empty() && type == cell2D_fsm::EMPTY) ||
-      (m_fsm.has_block() && type == cell2D_fsm::BLOCK) ||
-      (m_fsm.has_cache() && type == cell2D_fsm::CACHE)) {
-    encounter(type, cache_blocks);
-  } else {
-    m_relevance = 0.0;
-  }
-  encounter(type, cache_blocks);
-} /* remote_encounter() */
+ protected:
+  dynamic_cell2D_fsm& fsm(void) { return m_fsm; }
 
+ private:
+  dynamic_cell2D_fsm m_fsm;
+};
 
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_ */

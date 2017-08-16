@@ -1,5 +1,5 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file dynamic_cell2d.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,36 +21,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/fsm_param_parser.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
-
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
+void perceived_cell2D::update_relevance(void) {
+  if (fsm().is_known()) {
+    m_relevance = std::max(0.0, m_relevance - m_delta);
+    if (m_relevance <= 0.0) {
+      fsm().change_state(new encounter_data(dynamic_cell2D_fsm::UNKNOWN));
+    }
   }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
+} /* update_relevance() */
+
+void perceived_cell2D::encounter(dynamic_cell2D_fsm::new_state state,
+                        int cache_blocks) {
+  fsm().change_state(new encounter_data(state, cache_blocks));
+  m_relevance += 1.0;
+} /* encounter() */
+
+void perceived_cell2D::remote_encounter(dynamic_cell2D_fsm::new_state state,
+                                  int cache_blocks) {
+  if ((fsm().is_empty() && state == dynamic_cell2D_fsm::EMPTY) ||
+      (fsm().has_block() && state == dynamic_cell2D_fsm::BLOCK) ||
+      (fsm().has_cache() && state == dynamic_cell2D_fsm::CACHE)) {
+    encounter(state, cache_blocks);
+  } else {
+    m_relevance = 0.0;
   }
-} /* parse() */
+  encounter(state, cache_blocks);
+} /* remote_encounter() */
 
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
 
-NS_END(params, fordyca);
+NS_END(representation, fordyca);

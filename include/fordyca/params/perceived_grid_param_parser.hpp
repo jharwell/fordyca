@@ -1,58 +1,55 @@
 /**
- * @file grid2D.hpp
+ * @file perceived_grid_param_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAM_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAM_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/multi_array.hpp>
-#include <list>
-#include <argos/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/params/params.hpp"
+#include "fordyca/params/base_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class grid2D {
+class perceived_grid_param_parser: public base_param_parser {
  public:
-  /* constructors */
-  explicit grid2D(const grid_params* params);
+  perceived_grid_param_parser(void): m_params() {}
 
-  /* member functions */
-  argos::CVector2 coord_to_cell(double x, double y);
-  std::list<const cell2D*> with_blocks(void);
+  void parse(argos::TConfigurationNode& node);
+  const struct perceived_grid_params* get_results(void) {
+    return m_params.get();
+  }
+  void show(std::ostream& stream);
 
  private:
-  std::shared_ptr<const grid_params> mc_params;
-  boost::multi_array<cell2D, 2> m_cells;
+  std::unique_ptr<struct perceived_grid_params> m_params;
 };
 
-NS_END(representation, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAM_PARSER_HPP_ */

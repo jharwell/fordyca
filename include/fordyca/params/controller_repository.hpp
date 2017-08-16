@@ -1,5 +1,7 @@
 /**
- * @file fsm_param_parser.cpp
+ * @file controller_repository.hpp
+ *
+ * Handles parsing of all XML parameters at runtime.
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,10 +20,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CONTROLLER_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/fsm_param_parser.hpp"
+#include <string>
+#include <map>
+#include "fordyca/params/repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,28 +36,13 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void fsm_param_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
-
-  m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
-} /* parse() */
-
-void fsm_param_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
-  stream << "times.unsuccessful_explore_dir_change="
-         << m_params->times.unsuccessful_explore_dir_change << std::endl;
-} /* show() */
+class controller_repository: public repository {
+ public:
+  controller_repository(void);
+};
 
 NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_CONTROLLER_REPOSITORY_HPP_ */

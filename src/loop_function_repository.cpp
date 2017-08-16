@@ -1,5 +1,5 @@
 /**
- * @file grid2D.cpp
+ * @file loop_function_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,38 +21,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include "fordyca/representation/grid2D.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
+#include "fordyca/params/dynamic_grid_param_parser.hpp"
+#include "fordyca/params/block_param_parser.hpp"
+#include "fordyca/params/logging_param_parser.hpp"
+#include "fordyca/params/loop_functions_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Constructors/Destructor
  ******************************************************************************/
-grid2D::grid2D(const grid_params* params) :
-    mc_params(params),
-    m_cells(boost::extents
-            [(mc_params->upper.GetX() - mc_params->lower.GetX())/mc_params->resolution]
-            [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
-  for (auto i = m_cells.origin(); i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    i->delta(mc_params->cell_delta);
-  } /* for(i..) */
+loop_function_repository::loop_function_repository(void) {
+  factory().register_type<dynamic_grid_param_parser>("dynamic_grid");
+  factory().register_type<block_param_parser>("block");
+  factory().register_type<logging_param_parser>("logging");
+  factory().register_type<loop_functions_param_parser>("loop_functions");
+  parsers()["dynamic_grid"]     = factory().create("dynamic_grid");
+  parsers()["blocks"]           = factory().create("block");
+  parsers()["logging"]          = factory().create("logging");
+  parsers()["loop_functions"]   = factory().create("loop_functions");
 }
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-std::list<const cell2D*> grid2D::with_blocks(void) {
-  std::list<const cell2D*> cells;
-  for (auto i = m_cells.origin(); i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if (i->state() == cell2D_fsm::ST_HAS_BLOCK) {
-      cells.push_back(i);
-    }
-  } /* for(i..) */
-  return cells;
-} /* with_blocks() */
-
-NS_END(representation, fordyca);
+NS_END(params, fordyca);

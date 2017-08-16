@@ -37,7 +37,9 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <grid cell_decay_delta="0.001"/>
+        <grid cell_decay_delta="0.001"
+              resolution="0.2"
+              />
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />
@@ -61,6 +63,7 @@
                   label="foraging_loop_functions">
     <logging sim_stats="base-foraging-stats.txt"
              />
+    <grid resolution="0.2"/>
     <blocks n_blocks="25"
             dimension="0.2"
             dist_model="random"

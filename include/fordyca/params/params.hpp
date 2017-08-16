@@ -110,6 +110,7 @@ struct sensor_params : public base_params {
 
 struct block_params : public base_params {
   block_params(void) : n_blocks(), dimension(), dist_model(), respawn() {}
+
   uint n_blocks;
   argos::Real dimension;
   std::string dist_model;
@@ -118,6 +119,7 @@ struct block_params : public base_params {
 
 struct logging_params : public base_params {
   logging_params(void) : sim_stats() {}
+
   std::string sim_stats;
 };
 
@@ -133,13 +135,17 @@ struct loop_functions_params : public base_params {
   argos::CRange<argos::Real> nest_y;
 };
 
-struct grid_params : public base_params {
-  grid_params(void) : resolution(0.0), cell_delta(0.0),
-                      upper(), lower() {}
+struct dynamic_grid_params : public base_params {
+  dynamic_grid_params(void) : resolution(0.0), upper(), lower() {}
   double resolution;
-  double cell_delta;
   argos::CVector2 upper;
   argos::CVector2 lower;
+};
+
+struct perceived_grid_params : public base_params {
+  perceived_grid_params(void) : dynamic(), cell_delta(0.0) {}
+  struct dynamic_grid_params dynamic;
+  double cell_delta;
 };
 
 NS_END(fordyca);
