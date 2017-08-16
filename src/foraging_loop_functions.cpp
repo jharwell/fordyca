@@ -82,7 +82,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
                                                      mc_block_params,
                                                      m_blocks));
 
-  m_distributor->distribute_blocks();
+  m_distributor->distribute_blocks(true);
 
   /* initialize stat collecting */
   m_collector.reset(mc_logging_params->sim_stats);
@@ -97,7 +97,8 @@ void foraging_loop_functions::Destroy() {
   m_collector.finalize();
 }
 
-argos::CColor foraging_loop_functions::GetFloorColor(const argos::CVector2& plane_pos) {
+argos::CColor foraging_loop_functions::GetFloorColor(
+    const argos::CVector2& plane_pos) {
   if (mc_loop_params->nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       mc_loop_params->nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
@@ -118,9 +119,12 @@ void foraging_loop_functions::PreStep() {
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
        it != footbots.end();
        ++it) {
-    argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(it->second);
-    controller::foraging_controller& controller = dynamic_cast<controller::foraging_controller&>(
+    argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
+        it->second);
+    controller::foraging_controller& controller =
+        dynamic_cast<controller::foraging_controller&>(
         robot.GetControllableEntity().GetController());
+
     /* get stats from this robot before its state changes */
     m_collector.collect_from_robot(controller);
 
@@ -131,6 +135,7 @@ void foraging_loop_functions::PreStep() {
          * changes.
          */
         m_collector.collect_from_block(m_blocks->at(controller.block_idx()));
+
         m_blocks->at(controller.block_idx()).update_on_nest_drop();
         /*
          * Place a new block item on the ground (must be before the actual drop
@@ -163,6 +168,7 @@ void foraging_loop_functions::PreStep() {
     ++i;
   } /* for(it..) */
   m_collector.store_foraging_stats(GetSpace().GetSimulationClock());
+
 }
 
 int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
@@ -177,6 +183,20 @@ int foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) 
   } /* for(i..) */
   return -1;
 } /* robot_on_block() */
+
+bool foraging_loop_functions::IsExperimentFinished(void) {
+  /*
+   * If we are not respawning blocks and all blocks have been collected, signal
+   * the end of the experiment. If respawn is enabled, then the experiment will
+   * run until I cancel it.
+   */
+  if (!mc_block_params->respawn &&
+      m_collector.n_collected_blocks() == mc_block_params->n_blocks) {
+    return true;
+  }
+  return false;
+} /* IsExperimentFinished() */
+
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(foraging_loop_functions, "foraging_loop_functions")

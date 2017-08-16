@@ -54,6 +54,8 @@ class foraging_loop_functions : public argos::CLoopFunctions {
   virtual void Destroy();
   virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
   virtual void PreStep();
+  virtual bool IsExperimentFinished(void);
+  virtual void PostExperiment(void) { std::exit(0); }
 
  private:
   foraging_loop_functions(const foraging_loop_functions& s) = delete;

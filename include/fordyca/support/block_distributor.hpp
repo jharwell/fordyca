@@ -42,7 +42,6 @@ NS_START(fordyca, support);
  ******************************************************************************/
 class block_distributor {
  public:
-  /* constructors */
   block_distributor(argos::CRange<argos::Real> arena_x,
                     argos::CRange<argos::Real> arena_y,
                     argos::CRange<argos::Real> nest_x,
@@ -50,12 +49,11 @@ class block_distributor {
                     std::shared_ptr<const struct block_params> params,
                     std::shared_ptr<std::vector<representation::block>> blocks);
 
-  /* member functions */
   /**
    * @brief Distribute all blocks in the arena.
    */
-  void distribute_blocks(void);
-  void distribute_block(size_t i);
+  void distribute_blocks(bool first_time = false);
+  void distribute_block(size_t i, bool first_time = false);
 
  private:
   /**

@@ -49,14 +49,16 @@ block_distributor::block_distributor(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distributor::distribute_blocks(void) {
+void block_distributor::distribute_blocks(bool first_time) {
   for (size_t i = 0; i < m_params->n_blocks; ++i) {
-    distribute_block(i);
+    distribute_block(i, first_time);
   } /* for(i..) */
 } /* distribute_blocks() */
 
-void block_distributor::distribute_block(size_t i) {
-  if (m_params->dist_model == "random") {
+void block_distributor::distribute_block(size_t i, bool first_time) {
+  if (!m_params->respawn && !first_time) {
+    return;
+  } else if (m_params->dist_model == "random") {
     dist_random(i);
   } else if (m_params->dist_model == "single_source") {
     dist_single_src(i);

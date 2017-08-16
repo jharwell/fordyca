@@ -50,13 +50,12 @@ class stat_collector {
     uint total_carries;
   };
 
-  /* constructors */
   stat_collector(void) : m_foraging_stats(), m_block_stats(),
                          m_ofname(), m_ofile() {}
 
-  /* member functions */
   void reset(const std::string& ofname);
   void finalize(void) { m_ofile.close(); }
+  uint n_collected_blocks(void) const { return m_block_stats.total_collected; }
 
   /**
    * @brief Collect statistics from a robot at the end of a timestep. Must be

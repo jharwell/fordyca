@@ -109,12 +109,11 @@ struct sensor_params : public base_params {
 };
 
 struct block_params : public base_params {
-  block_params(void) : n_blocks(),
-                       dimension(),
-                       dist_model() {}
+  block_params(void) : n_blocks(), dimension(), dist_model(), respawn() {}
   uint n_blocks;
   argos::Real dimension;
   std::string dist_model;
+  bool respawn;
 };
 
 struct logging_params : public base_params {
