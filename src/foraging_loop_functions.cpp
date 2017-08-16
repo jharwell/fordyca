@@ -153,9 +153,7 @@ void foraging_loop_functions::PreStep() {
 
         /* Check whether the foot-bot is on a block item */
         int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(it->second));
-        if (-1 == block) {
-          printf("FALSE positive on robot%d_on_block\n", i);
-        } else {
+        if (-1 != block) {
           m_blocks->at(block).update_on_robot_pickup(i);
           controller.pickup_block(block);
 
