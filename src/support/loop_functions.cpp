@@ -42,8 +42,7 @@ loop_functions::loop_functions(void) :
     mc_logging_params(),
     mc_loop_params(),
     m_distributor(),
-    m_blocks(),
-    m_grid() {}
+    m_map() {}
 
 /*******************************************************************************
  * Member Functions
@@ -65,21 +64,17 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
   const struct grid_params * grid_params = static_cast<const struct grid_params*>(
       param_repo.get_params("grid"));
 
+  /* initialize arena map */
+  m_map.reset(new representation::arena_map(grid_params));
+
   /* distribute blocks in arena */
-  m_blocks = std::make_shared<std::vector<representation::block>>(
-      grid_params->block.n_blocks,
-      representation::block(grid_params->block.dimension));
   m_distributor.reset(new support::block_distributor(mc_loop_params->arena_x,
                                                      mc_loop_params->arena_y,
                                                      mc_loop_params->nest_x,
                                                      mc_loop_params->nest_y,
                                                      grid_params->block,
-                                                     m_blocks));
-
+                                                     m_map->blocks()));
   m_distributor->distribute_blocks(true);
-
-  /* initialize grid */
-  m_grid.reset(new representation::grid2D(grid_params));
 
   /* initialize stat collecting */
   m_collector.reset(new stat_collector(static_cast<const struct logging_params*>(
@@ -105,7 +100,7 @@ argos::CColor loop_functions::GetFloorColor(
     if (m_blocks->at(i).contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
-  }
+  } /* for(i..) */
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 

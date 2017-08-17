@@ -38,17 +38,14 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 class arena_map {
  public:
-  /* constructors */
   explicit arena_map(const struct grid_params* params) :
       m_blocks(params->block.n_blocks, block(params->block.dimension)),
       m_grid(params) {}
 
-  /* member functions */
+  std::vector<block>& blocks(void) { return m_blocks; }
+  cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
 
  private:
-  /* member functions */
-
-  /* data members */
   std::vector<block> m_blocks;
   grid2D m_grid;
 };

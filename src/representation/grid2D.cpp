@@ -33,11 +33,9 @@ NS_START(fordyca, representation);
  * Constructors/Destructors
  ******************************************************************************/
 grid2D::grid2D(const grid_params* params) :
-    mc_params(params),
     m_cells(boost::extents
-            [(std::fabs(mc_params->upper.GetX()) - mc_params->lower.GetX())/mc_params->resolution]
-            [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
-}
+            [(std::fabs(params->upper.GetX()) - params->lower.GetX())/params->resolution]
+            [(params->upper.GetY() - params->lower.GetY())/params->resolution]) {}
 
 /*******************************************************************************
  * Member Functions

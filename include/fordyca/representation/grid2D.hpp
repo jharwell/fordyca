@@ -42,13 +42,12 @@ NS_START(fordyca, representation);
 class grid2D {
  public:
   explicit grid2D(const grid_params* params);
-  virtual ~grid2D(void) {}
 
   static argos::CVector2 coord_to_cell(double x, double y);
-  virtual std::list<const cell2D*> with_blocks(void);
+  std::list<const cell2D*> with_blocks(void);
+  cell2D& access(size_t i, size_t j) { return m_cells[i][j]; }
 
  private:
-  std::shared_ptr<const grid_params> mc_params;
   boost::multi_array<cell2D, 2> m_cells;
 };
 
