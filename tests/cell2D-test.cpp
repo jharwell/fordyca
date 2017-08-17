@@ -1,5 +1,5 @@
 /**
- * @file cell2D.hpp
+ * @file cell2D-test.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,53 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-#include <utility>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/representation/cell2D_fsm.hpp"
+#define CATCH_CONFIG_PREFIX_ALL
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+using namespace fordyca::representation;
 
 /*******************************************************************************
- * Class Definitions
+ * Test Cases
  ******************************************************************************/
-/**
- * @brief Base representation of a cell on a 2D grid. This class represents
- * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
- * state is).
- */
-class cell2D {
- public:
-  cell2D(void) : m_fsm(rcppsw::common::g_null_server) { m_fsm.init(); }
+CATCH_TEST_CASE("init-test", "[cell2D]") {
+  cell2D cell;
+  CATCH_REQUIRE(!cell.state_is_known());
+}
 
-  /* events */
-  void event_unknown(void) { m_fsm.event_unknown(); }
-  void event_empty(void) { m_fsm.event_empty(); }
-  void event_has_block(void) { m_fsm.event_has_block(); }
-
-  /* state inquiry */
-  bool state_is_known(void) { return m_fsm.state_is_known(); }
-  bool state_has_block(void) { return m_fsm.state_has_block(); }
-  bool state_is_empty(void) { return m_fsm.state_is_empty(); }
-
-  void reset(void) { m_fsm.init(); }
-
- protected:
-  cell2D_fsm& fsm(void) { return m_fsm; }
-
- private:
-  cell2D_fsm m_fsm;
-};
-
-NS_END(representation, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */
+CATCH_TEST_CASE("transition-test", "[cell2D]") {
+  cell2D cell;
+  cell.event_unknown();
+  CATCH_REQUIRE(!cell.state_is_known());
+  cell.event_empty();
+  CATCH_REQUIRE(cell.state_is_empty());
+  cell.event_has_block();
+  CATCH_REQUIRE(cell.state_has_block());
+  cell.event_empty();
+CATCH_REQUIRE(cell.state_is_empty());
+  cell.event_unknown();
+CATCH_REQUIRE(!cell.state_is_known());
+}

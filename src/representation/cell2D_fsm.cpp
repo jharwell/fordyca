@@ -71,7 +71,7 @@ FSM_STATE_DEFINE(cell2D_fsm, state_empty, fsm::no_event_data) {
   ER_NOM("Cell in EMPTY state.")
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_has_block, fsm::no_event_data) {
+FSM_STATE_DEFINE(cell2D_fsm, state_block, fsm::no_event_data) {
   ER_NOM("Cell HAS_BLOCK.")
   return fsm::event_signal::HANDLED;
 }
