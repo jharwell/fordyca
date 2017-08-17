@@ -50,10 +50,10 @@ class stat_collector {
     uint total_carries;
   };
 
-  stat_collector(void) : m_foraging_stats(), m_block_stats(),
-                         m_ofname(), m_ofile() {}
+  explicit stat_collector(const std::string ofname) :
+      m_foraging_stats(), m_block_stats(), m_ofname(ofname), m_ofile() {}
 
-  void reset(const std::string& ofname);
+  void reset();
   void finalize(void) { m_ofile.close(); }
   uint n_collected_blocks(void) const { return m_block_stats.total_collected; }
 

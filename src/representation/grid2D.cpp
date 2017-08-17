@@ -35,7 +35,7 @@ NS_START(fordyca, representation);
 grid2D::grid2D(const grid_params* params) :
     mc_params(params),
     m_cells(boost::extents
-            [(mc_params->upper.GetX() - mc_params->lower.GetX())/mc_params->resolution]
+            [(std::fabs(mc_params->upper.GetX()) - mc_params->lower.GetX())/mc_params->resolution]
             [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
 }
 

@@ -46,7 +46,7 @@ class block_distributor {
                     argos::CRange<argos::Real> arena_y,
                     argos::CRange<argos::Real> nest_x,
                     argos::CRange<argos::Real> nest_y,
-                    std::shared_ptr<const struct block_params> params,
+                    const struct block_params& params,
                     std::shared_ptr<std::vector<representation::block>> blocks);
 
   /**
@@ -79,7 +79,7 @@ class block_distributor {
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
   argos::CRandom::CRNG* m_rng;
-  std::shared_ptr<const struct block_params> m_params;
+  const struct block_params& m_params;
   std::shared_ptr<std::vector<representation::block>> m_blocks;
 };
 
