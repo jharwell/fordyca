@@ -1,5 +1,5 @@
 /**
- * @file dynamic_cell2D.hpp
+ * @file grid_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,42 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-#include <utility>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/representation/dynamic_cell2D_fsm.hpp"
+#include "fordyca/params/grid_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @brief Base representation of a cell on the 2D grid. This class represents
- * the ACTUAL state of the grid (i.e. global/omniscient state).
- */
-class dynamic_cell2D {
- public:
-  dynamic_cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
+void grid_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct grid_params);
+  ticpp::Node *arena = node.NextSibling("arena");
+  std::vector<std::string> res;
 
-  uint8_t state(void) const { return m_fsm.current_state(); }
+  rcppsw::utils::line_parser parser(' ');
+  res = parser.parse(arena->ToElement()->GetAttribute("size"));
 
- protected:
-  dynamic_cell2D_fsm& fsm(void) { return m_fsm; }
+  m_params->resolution = std::atof(argos::GetNode(node,
+                                                  "grid").GetAttribute("resolution").c_str());
+  m_params->lower.Set(-std::atoi(res[0].c_str())/2.0 + 0.3,
+                      std::atoi(res[0].c_str())/2.0 - 0.3);
+  m_params->upper.Set(-std::atoi(res[1].c_str())/2.0 + 0.3,
+                      std::atoi(res[1].c_str())/2.0 - 0.3);
+} /* parse() */
 
- private:
-  dynamic_cell2D_fsm m_fsm;
-};
+void grid_parser::show(std::ostream& stream) {
+  stream << "====================\nGrid params\n====================\n"
+         << std::endl;
+  stream << "resolution=" << m_params->resolution << std::endl;
+  stream << "lower=" << m_params->lower << std::endl;
+  stream << "upper=" << m_params->upper << std::endl;
+} /* show() */
 
-NS_END(representation, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_ */
+NS_END(params, fordyca);

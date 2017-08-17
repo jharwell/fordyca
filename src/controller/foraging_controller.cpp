@@ -81,9 +81,9 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_server,
                      m_sensors,
                      m_actuators));
-  m_grid.reset(new representation::dynamic_grid2D(
-      static_cast<const struct dynamic_grid_params*>(
-          param_repo.get_params("perceived_grid"))));
+  /* m_grid.reset(new representation::dynamic_grid2D( */
+  /*     static_cast<const struct dynamic_grid_params*>( */
+  /*         param_repo.get_params("perceived_grid")))); */
   Reset();
 } /* Init() */
 

@@ -1,5 +1,5 @@
 /**
- * @file dynamic_grid2D.cpp
+ * @file grid2D.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,11 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include "fordyca/representation/dynamic_grid2D.hpp"
+#include <boost/multi_array.hpp>
+#include <list>
+#include <argos/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
+#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,27 +37,21 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Class Definitions
  ******************************************************************************/
-dynamic_grid2D::dynamic_grid2D(const dynamic_grid_params* params) :
-    mc_params(params),
-    m_cells(boost::extents
-            [(mc_params->upper.GetX() - mc_params->lower.GetX())/mc_params->resolution]
-            [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
-}
+class grid2D {
+ public:
+  explicit grid2D(const grid_params* params);
+  virtual ~grid2D(void) {}
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-std::list<const dynamic_cell2D*> dynamic_grid2D::with_blocks(void) {
-  std::list<const dynamic_cell2D*> cells;
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if (i->state() == dynamic_cell2D_fsm::ST_HAS_BLOCK) {
-      cells.push_back(i);
-    }
-  } /* for(i..) */
-  return cells;
-} /* with_blocks() */
+  static argos::CVector2 coord_to_cell(double x, double y);
+  virtual std::list<const cell2D*> with_blocks(void);
+
+ private:
+  std::shared_ptr<const grid_params> mc_params;
+  boost::multi_array<cell2D, 2> m_cells;
+};
 
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_ */

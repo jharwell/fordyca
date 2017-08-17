@@ -43,7 +43,8 @@ loop_functions::loop_functions(void) :
     mc_block_params(),
     mc_loop_params(),
     m_distributor(),
-    m_blocks() {}
+    m_blocks(),
+    m_grid() {}
 
 /*******************************************************************************
  * Member Functions
@@ -79,6 +80,11 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
                                                      m_blocks));
 
   m_distributor->distribute_blocks(true);
+
+  /* initialize grid */
+  m_grid.reset(new representation::grid2D(
+      static_cast<const struct grid_params*>(
+          param_repo.get_params("grid"))));
 
   /* initialize stat collecting */
   m_collector.reset(mc_logging_params->sim_stats);
@@ -117,8 +123,8 @@ void loop_functions::PreStep() {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::controller& controller =
-        dynamic_cast<controller::controller&>(
+    controller::foraging_controller& controller =
+        dynamic_cast<controller::foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
@@ -156,13 +162,13 @@ void loop_functions::PreStep() {
 
           /* The floor texture must be updated */
           m_floor->SetChanged();
-          controller.publish_event(controller::controller::BLOCK_FOUND);
+          controller.publish_event(controller::foraging_controller::BLOCK_FOUND);
         }
       }
     }
     ++i;
   } /* for(it..) */
-  m_collector.store_stats(GetSpace().GetSimulationClock());
+  m_collector.store_foraging_stats(GetSpace().GetSimulationClock());
 
 }
 
@@ -194,6 +200,6 @@ bool loop_functions::IsExperimentFinished(void) {
 
 
 using namespace argos;
-REGISTER_LOOP_FUNCTIONS(loop_functions, "loop_functions")
+REGISTER_LOOP_FUNCTIONS(loop_functions, "foraging_loop_functions")
 
 NS_END(support, fordyca);
