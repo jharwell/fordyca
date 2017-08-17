@@ -50,7 +50,7 @@ class arena_map {
 
   std::vector<block>& blocks(void) { return m_blocks; }
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  void distribute_blocks(void);
+  void distribute_blocks(bool first_time = false);
 
  private:
   std::vector<block> m_blocks;

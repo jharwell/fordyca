@@ -41,7 +41,6 @@ loop_functions::loop_functions(void) :
     m_collector(),
     mc_logging_params(),
     mc_loop_params(),
-    m_distributor(),
     m_map() {}
 
 /*******************************************************************************
@@ -64,17 +63,13 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
   const struct grid_params * grid_params = static_cast<const struct grid_params*>(
       param_repo.get_params("grid"));
 
-  /* initialize arena map */
-  m_map.reset(new representation::arena_map(grid_params));
-
-  /* distribute blocks in arena */
-  m_distributor.reset(new support::block_distributor(mc_loop_params->arena_x,
-                                                     mc_loop_params->arena_y,
-                                                     mc_loop_params->nest_x,
-                                                     mc_loop_params->nest_y,
-                                                     grid_params->block,
-                                                     m_map->blocks()));
-  m_distributor->distribute_blocks(true);
+  /* initialize arena map and distribute blocks */
+  m_map.reset(new representation::arena_map(grid_params,
+                                            mc_loop_params->arena_x,
+                                            mc_loop_params->arena_y,
+                                            mc_loop_params->nest_x,
+                                            mc_loop_params->nest_y));
+  m_map->distribute_blocks();
 
   /* initialize stat collecting */
   m_collector.reset(new stat_collector(static_cast<const struct logging_params*>(

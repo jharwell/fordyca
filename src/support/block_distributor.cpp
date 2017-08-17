@@ -32,15 +32,16 @@ NS_START(fordyca, support);
  * Member Functions
  ******************************************************************************/
 void block_distributor::distribute_blocks(
-    std::vector<representation::block>& blocks) {
+    std::vector<representation::block>& blocks,
+    bool first_time) {
   for (size_t i = 0; i < blocks.size(); ++i) {
-    distribute_block(blocks[i]);
+    distribute_block(blocks[i], first_time);
   } /* for(i..) */
-  m_first_distribute = false;
 } /* distribute_blocks() */
 
-void block_distributor::distribute_block(representation::block& block) {
-  if (!m_respawn && !m_first_distribute) {
+void block_distributor::distribute_block(representation::block& block,
+                                         bool first_time) {
+  if (!m_respawn && !first_time) {
     return;
   } else if (m_dist_model == "random") {
     dist_random(block);

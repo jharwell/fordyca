@@ -31,7 +31,6 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 
@@ -65,7 +64,6 @@ class loop_functions : public argos::CLoopFunctions {
   std::unique_ptr<stat_collector> m_collector;
   std::shared_ptr<const struct logging_params> mc_logging_params;
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
-  std::unique_ptr<block_distributor> m_distributor;
   std::unique_ptr<representation::arena_map> m_map;
 };
 

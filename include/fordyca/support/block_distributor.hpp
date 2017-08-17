@@ -49,7 +49,6 @@ class block_distributor {
                     const struct block_params* params) :
       m_dist_model(params->dist_model),
       m_respawn(params->respawn),
-      m_first_distribute(true),
       m_arena_x(arena_x),
       m_arena_y(arena_y),
       m_nest_x(nest_x),
@@ -60,8 +59,9 @@ class block_distributor {
   /**
    * @brief Distribute all blocks in the arena.
    */
-  void distribute_blocks(std::vector<representation::block>& blocks);
-  void distribute_block(representation::block& block);
+  void distribute_blocks(std::vector<representation::block>& blocks,
+                         bool first_time);
+  void distribute_block(representation::block& block, bool first_time);
 
  private:
   /**
@@ -84,7 +84,6 @@ class block_distributor {
 
   std::string m_dist_model;
   bool m_respawn;
-  bool m_first_distribute;
   argos::CRange<argos::Real> m_arena_x;
   argos::CRange<argos::Real> m_arena_y;
   argos::CRange<argos::Real> m_nest_x;

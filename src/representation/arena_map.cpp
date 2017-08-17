@@ -31,12 +31,12 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void arena_map::distribute_blocks(void) {
+void arena_map::distribute_blocks(bool first_time) {
   /* reset all state machines */
   m_grid.reset_cells(cell2D_fsm::EMPTY);
 
   /* assign blocks to new locations and update state machines */
-  m_block_distributor.distribute_blocks(m_blocks);
+  m_block_distributor.distribute_blocks(m_blocks, first_time);
 
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     cell2D& cell = m_grid.access(m_blocks[i].discrete_loc().first,
