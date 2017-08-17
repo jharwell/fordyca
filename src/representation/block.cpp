@@ -32,22 +32,18 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block::update_on_robot_pickup(size_t index) {
+void block::event_pickup(size_t index) {
   ++m_carries;
   m_robot_index = index;
 
   /* Move block out of sight */
-  set_loc(argos::CVector2(100.0, 100.0));
-} /* update_on_robot_pickup() */
-
-void block::update_on_arena_drop(const argos::CVector2& loc) {
-  m_loc = loc;
-  m_robot_index = -1;
-} /* update_on_arena_drop() */
+  set_real_loc(argos::CVector2(100.0, 100.0));
+  set_discrete_loc(discrete_coord(100, 100));
+} /* event_pickup() */
 
 bool block::contains_point(const argos::CVector2& point) {
-  double x = m_loc.GetX();
-  double y = m_loc.GetY();
+  double x = m_real_loc.GetX();
+  double y = m_real_loc.GetY();
   if (point.GetX() < (x + (.5 * m_dimension)) &&
       point.GetX() > (x - (.5 * m_dimension)) &&
       point.GetY() < (y + (.5 * m_dimension)) &&

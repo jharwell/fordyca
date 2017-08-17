@@ -39,6 +39,14 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief A 2D logical grid that is overlayed over the arena as part of a
+ * representation of arena state (either global or per-robot).  It discretizes
+ * the continuous arena into a grid of a specified resolution onto which blocks
+ * and caches are mapped as points with an extent.
+ *
+ * Each cell within the 2D grid has its own state machine for reacting to
+ */
 class grid2D {
  public:
   explicit grid2D(const grid_params* params);
@@ -46,9 +54,12 @@ class grid2D {
   static argos::CVector2 coord_to_cell(double x, double y);
   std::list<const cell2D*> with_blocks(void);
   cell2D& access(size_t i, size_t j) { return m_cells[i][j]; }
-  void reset_cells(cell2D_fsm::new_state state);
+  double resoluton(void) const { return m_resolution; }
 
  private:
+  double m_resolution;
+  argos::CVector2 m_upper;
+  argos::CVector2 m_lower;
   boost::multi_array<cell2D, 2> m_cells;
 };
 

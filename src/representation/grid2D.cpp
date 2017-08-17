@@ -33,6 +33,9 @@ NS_START(fordyca, representation);
  * Constructors/Destructors
  ******************************************************************************/
 grid2D::grid2D(const grid_params* params) :
+    m_resolution(params->resolution),
+    m_upper(params->upper),
+    m_lower(params->lower),
     m_cells(boost::extents
             [(std::fabs(params->upper.GetX()) - params->lower.GetX())/params->resolution]
             [(params->upper.GetY() - params->lower.GetY())/params->resolution]) {}
@@ -40,13 +43,6 @@ grid2D::grid2D(const grid_params* params) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grid2D::reset_cells(cell2D_fsm::new_state state) {
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    i->change_state(new cell2D_fsm::new_state_data(state));
-  } /* for(i..) */
-} /* reset_cells() */
-
 std::list<const cell2D*> grid2D::with_blocks(void) {
   std::list<const cell2D*> cells;
   for (auto i = m_cells.origin();

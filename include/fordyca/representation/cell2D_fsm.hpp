@@ -36,28 +36,17 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief Per-cell (2D square on arena map) state machine containing the current
+ * state of the cell (empty, has a block, or unknown).
+ */
 class cell2D_fsm : public fsm::simple_fsm {
  public:
   enum state {
     ST_UNKNOWN,
     ST_EMPTY,
     ST_HAS_BLOCK,
-    ST_HAS_CACHE,
     ST_MAX_STATES
-  };
-  enum new_state {
-    UNKNOWN,
-    EMPTY,
-    BLOCK,
-    CACHE
-  };
-
-  struct new_state_data : public fsm::event_data {
-    explicit new_state_data(enum new_state new_state_,
-                            size_t cache_blocks_ = 0) :
-        new_state(new_state_), cache_blocks(cache_blocks_) {}
-    enum new_state new_state;
-    int cache_blocks;
   };
 
   explicit cell2D_fsm(
@@ -65,36 +54,32 @@ class cell2D_fsm : public fsm::simple_fsm {
       simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
       state_unknown(),
       state_empty(),
-      state_has_block(),
-      state_has_cache(),
-      m_cache_blocks(0) {}
+      state_has_block() {}
 
   bool is_known(void) { return current_state() != ST_UNKNOWN; }
   bool has_block(void) { return current_state() == ST_HAS_BLOCK; }
-  bool has_cache(void) { return current_state() == ST_HAS_CACHE; }
   bool is_empty(void) { return current_state() == ST_EMPTY; }
 
   /* events */
-  void change_state(const struct new_state_data* const data);
+  void event_unknown(void);
+  void event_empty(void);
+  void event_has_block(void);
+  void init(void);
 
  private:
-  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, struct new_state_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_empty, struct new_state_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, struct new_state_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_has_cache, struct new_state_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, fsm::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_empty, fsm::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, fsm::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_has_block),
-        FSM_STATE_MAP_ENTRY(&state_has_cache)
             };
   FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
   return &kSTATE_MAP[0];
   }
-
-  size_t m_cache_blocks;
 };
 
 NS_END(representation, forydca);

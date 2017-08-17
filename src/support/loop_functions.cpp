@@ -69,7 +69,7 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
                                             mc_loop_params->arena_y,
                                             mc_loop_params->nest_x,
                                             mc_loop_params->nest_y));
-  m_map->distribute_blocks();
+  m_map->distribute_blocks(true);
 
   /* initialize stat collecting */
   m_collector.reset(new stat_collector(static_cast<const struct logging_params*>(
@@ -91,8 +91,8 @@ argos::CColor loop_functions::GetFloorColor(
       mc_loop_params->nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
   }
-  for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if (m_blocks->at(i).contains_point(plane_pos)) {
+  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
+    if (m_map->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */
@@ -118,32 +118,34 @@ void loop_functions::PreStep() {
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
+        representation::block& block = m_map->blocks[controller.block_idx()];
         /*
          * Get stats from carried block before it's dropped and its state
          * changes.
          */
-        m_collector->collect_from_block(m_blocks->at(controller.block_idx()));
+        m_collector->collect_from_block(block);
 
-        m_blocks->at(controller.block_idx()).update_on_nest_drop();
         /*
-         * Place a new block item on the ground (must be before the actual drop
-         * because the block index goes to -1 after that).
+         * Handle updating the arena map state when a block is dropped in the
+         * nest (must be before the actual drop because the block index goes to
+         * -1 after that).
          */
-        m_distributor->distribute_block(controller.block_idx());
+        m_map->event_block_nest_drop(block);
 
         /* Actually drop the block item */
         controller.drop_block_in_nest();
+
         /* The floor texture must be updated */
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
       if (!controller.in_nest() && controller.block_detected()) {
 
-        /* Check whether the foot-bot is on a block item */
+        /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(
             it->second));
         if (-1 != block) {
-          m_blocks->at(block).update_on_robot_pickup(i);
+          m_map->event_block_pickup(m_map->blocks()[block], i);
           controller.pickup_block(block);
 
           /* The floor texture must be updated */
@@ -162,13 +164,7 @@ int loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-
-  for (size_t i = 0; i < m_blocks->size(); ++i) {
-    if (m_blocks->at(i).contains_point(pos)) {
-        return i;
-    }
-  } /* for(i..) */
-  return -1;
+  return m_map->robot_on_block(pos);
 } /* robot_on_block() */
 
 bool loop_functions::IsExperimentFinished(void) {
@@ -177,10 +173,11 @@ bool loop_functions::IsExperimentFinished(void) {
    * the end of the experiment. If respawn is enabled, then the experiment will
    * run until I cancel it.
    */
-  /* if (!mc_grid_params->block.respawn && */
-  /*     m_collector->n_collected_blocks() == mc_grid_params->block.n_blocks) { */
-  /*   return true; */
-  /* } */
+
+  if (!m_map->respawn_enabled() &&
+      m_collector->n_collected_blocks() == m_map->n_blocks()) {
+    return true;
+  }
   return false;
 } /* IsExperimentFinished() */
 

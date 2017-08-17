@@ -38,17 +38,19 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Base representation of a cell on the 2D grid. This class represents
- * the ACTUAL state of the grid (i.e. global/omniscient state).
+ * @brief Base representation of a cell on a 2D grid. This class represents
+ * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
+ * state is).
  */
 class cell2D {
  public:
   cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
 
   uint8_t current_state(void) const { return m_fsm.current_state(); }
-  void change_state(const struct cell2D_fsm::new_state_data* const data) {
-    m_fsm.change_state(data);
-  }
+  void event_unknown(void) { m_fsm.event_unknown(); }
+  void event_empty(void) { m_fsm.event_empty(); }
+  void event_has_block(void) { m_fsm.event_has_block(); }
+  void reset(void) { m_fsm.init(); }
 
  protected:
   cell2D_fsm& fsm(void) { return m_fsm; }

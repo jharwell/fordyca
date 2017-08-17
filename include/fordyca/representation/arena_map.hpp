@@ -37,6 +37,11 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief The arena map stores a logical representation of the state of the
+ * arena. Basically, it combines a 2D grid with sets of objects that populate
+ * the grid and move around as the state of the arena changes.
+ */
 class arena_map {
  public:
   explicit arena_map(const struct grid_params* params,
@@ -44,13 +49,23 @@ class arena_map {
                      argos::CRange<argos::Real> arena_y,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
-      m_blocks(params->block.n_blocks, block(params->block.dimension)),
-      m_block_distributor(arena_x, arena_y, nest_x, nest_y, &params->block),
+      m_blocks(params->block.n_blocks,
+               block(params->block.dimension)),
+      m_block_distributor(params->resolution, arena_x, arena_y, nest_x, nest_y,
+                          &params->block),
       m_grid(params) {}
 
   std::vector<block>& blocks(void) { return m_blocks; }
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  void distribute_blocks(bool first_time = false);
+  void distribute_blocks(bool first_time);
+  void distribute_block(block& block, bool first_time);
+  size_t n_blocks(void) const { return m_blocks.size(); }
+  bool respawn_enabled(void) const { return m_block_distributor.respawn_enabled(); }
+  int robot_on_block(const argos::CVector2& pos);
+
+  /* events */
+  void event_block_pickup(block& block, size_t robot_index);
+  void event_block_nest_drop(block& block);
 
  private:
   std::vector<block> m_blocks;

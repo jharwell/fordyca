@@ -53,8 +53,8 @@ void block_distributor::distribute_block(representation::block& block,
 void block_distributor::dist_random(representation::block& block) {
   block.set_real_loc(dist_outside_range(m_nest_x, m_nest_y));
   block.set_discrete_loc(
-      representation::block::discrete_coord(block.real_loc().GetX(),
-                                            block.real_loc().GetY()));
+      representation::block::discrete_coord(block.real_loc().GetX() / m_resolution,
+                                            block.real_loc().GetY() / m_resolution));
 } /* dist_random() */
 
 void block_distributor::dist_single_src(representation::block& block) {
@@ -68,8 +68,8 @@ void block_distributor::dist_single_src(representation::block& block) {
       m_arena_x.GetMax() * 0.75);
   block.set_real_loc(dist_in_range(x_range, y_range));
   block.set_discrete_loc(
-      representation::block::discrete_coord(block.real_loc().GetX(),
-                                            block.real_loc().GetY()));
+      representation::block::discrete_coord(block.real_loc().GetX() / m_resolution,
+                                            block.real_loc().GetY() / m_resolution));
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(

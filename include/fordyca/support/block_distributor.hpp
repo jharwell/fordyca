@@ -42,11 +42,13 @@ NS_START(fordyca, support);
  ******************************************************************************/
 class block_distributor {
  public:
-  block_distributor(argos::CRange<argos::Real> arena_x,
+  block_distributor(double resolution,
+                    argos::CRange<argos::Real> arena_x,
                     argos::CRange<argos::Real> arena_y,
                     argos::CRange<argos::Real> nest_x,
                     argos::CRange<argos::Real> nest_y,
                     const struct block_params* params) :
+      m_resolution(resolution),
       m_dist_model(params->dist_model),
       m_respawn(params->respawn),
       m_arena_x(arena_x),
@@ -62,6 +64,7 @@ class block_distributor {
   void distribute_blocks(std::vector<representation::block>& blocks,
                          bool first_time);
   void distribute_block(representation::block& block, bool first_time);
+  bool respawn_enabled(void) const { return m_respawn; }
 
  private:
   /**
@@ -82,6 +85,7 @@ class block_distributor {
   block_distributor(const block_distributor& s) = delete;
   block_distributor& operator=(const block_distributor& s) = delete;
 
+  double m_resolution;
   std::string m_dist_model;
   bool m_respawn;
   argos::CRange<argos::Real> m_arena_x;
