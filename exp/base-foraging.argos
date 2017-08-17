@@ -61,8 +61,7 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="foraging_loop_functions">
-    <logging sim_stats="base-foraging-stats.txt"
-             />
+    <logging sim_stats="base-foraging-stats.txt"/>
     <grid resolution="0.2"/>
     <blocks n_blocks="25"
             dimension="0.2"

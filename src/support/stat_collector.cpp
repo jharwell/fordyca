@@ -32,8 +32,7 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stat_collector::reset(const std::string& ofname) {
-  m_ofname = ofname;
+void stat_collector::reset(void) {
   /* Open output file and truncate */
   if (m_ofile.is_open()) {
     m_ofile.close();

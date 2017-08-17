@@ -136,10 +136,11 @@ struct loop_functions_params : public base_params {
 };
 
 struct grid_params : public base_params {
-  grid_params(void) : resolution(0.0), upper(), lower() {}
+  grid_params(void) : resolution(0.0), upper(), lower(), block() {}
   double resolution;
   argos::CVector2 upper;
   argos::CVector2 lower;
+  struct block_params block;
 };
 
 struct perceived_grid_params : public base_params {

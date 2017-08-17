@@ -36,7 +36,7 @@ block_distributor::block_distributor(
     argos::CRange<argos::Real> arena_y,
     argos::CRange<argos::Real> nest_x,
     argos::CRange<argos::Real> nest_y,
-    std::shared_ptr<const struct block_params> params,
+    const struct block_params& params,
     std::shared_ptr<std::vector<representation::block>> blocks) :
     m_arena_x(arena_x),
     m_arena_y(arena_y),
@@ -50,17 +50,17 @@ block_distributor::block_distributor(
  * Member Functions
  ******************************************************************************/
 void block_distributor::distribute_blocks(bool first_time) {
-  for (size_t i = 0; i < m_params->n_blocks; ++i) {
+  for (size_t i = 0; i < m_params.n_blocks; ++i) {
     distribute_block(i, first_time);
   } /* for(i..) */
 } /* distribute_blocks() */
 
 void block_distributor::distribute_block(size_t i, bool first_time) {
-  if (!m_params->respawn && !first_time) {
+  if (!m_params.respawn && !first_time) {
     return;
-  } else if (m_params->dist_model == "random") {
+  } else if (m_params.dist_model == "random") {
     dist_random(i);
-  } else if (m_params->dist_model == "single_source") {
+  } else if (m_params.dist_model == "single_source") {
     dist_single_src(i);
   }
 } /* distribute_block() */
