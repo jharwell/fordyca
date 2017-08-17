@@ -34,6 +34,7 @@
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,6 +69,7 @@ class loop_functions : public argos::CLoopFunctions {
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
   std::unique_ptr<block_distributor> m_distributor;
   std::shared_ptr<std::vector<representation::block>> m_blocks;
+  std::unique_ptr<representation::grid2D> m_grid;
 };
 
 NS_END(support, fordyca);

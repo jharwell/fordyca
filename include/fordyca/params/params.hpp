@@ -135,16 +135,16 @@ struct loop_functions_params : public base_params {
   argos::CRange<argos::Real> nest_y;
 };
 
-struct dynamic_grid_params : public base_params {
-  dynamic_grid_params(void) : resolution(0.0), upper(), lower() {}
+struct grid_params : public base_params {
+  grid_params(void) : resolution(0.0), upper(), lower() {}
   double resolution;
   argos::CVector2 upper;
   argos::CVector2 lower;
 };
 
 struct perceived_grid_params : public base_params {
-  perceived_grid_params(void) : dynamic(), cell_delta(0.0) {}
-  struct dynamic_grid_params dynamic;
+  perceived_grid_params(void) : grid(), cell_delta(0.0) {}
+  struct grid_params grid;
   double cell_delta;
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file dynamic_grid2d.hpp
+ * @file cell2D.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,18 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_GRID2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_GRID2D_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/multi_array.hpp>
-#include <list>
-#include <argos/core/utility/math/vector2.h>
+#include <algorithm>
+#include <utility>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/dynamic_cell2D.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/representation/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,19 +37,23 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_grid2D {
+/**
+ * @brief Base representation of a cell on the 2D grid. This class represents
+ * the ACTUAL state of the grid (i.e. global/omniscient state).
+ */
+class cell2D {
  public:
-  explicit dynamic_grid2D(const dynamic_grid_params* params);
-  virtual ~dynamic_grid2D(void) {}
+  cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
 
-  static argos::CVector2 coord_to_cell(double x, double y);
-  virtual std::list<const dynamic_cell2D*> with_blocks(void);
+  uint8_t state(void) const { return m_fsm.current_state(); }
+
+ protected:
+  cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
-  std::shared_ptr<const dynamic_grid_params> mc_params;
-  boost::multi_array<dynamic_cell2D, 2> m_cells;
+  cell2D_fsm m_fsm;
 };
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_GRID2D_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file dynamic_grid_parser.hpp
+ * @file grid_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,18 +36,18 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_grid_parser: public base_parser {
+class grid_parser: public base_parser {
  public:
-  dynamic_grid_parser(void): m_params() {}
+  grid_parser(void): m_params() {}
 
   void parse(argos::TConfigurationNode& node);
-  const struct dynamic_grid_params* get_results(void) { return m_params.get(); }
+  const struct grid_params* get_results(void) { return m_params.get(); }
   void show(std::ostream& stream);
 
  private:
-  std::unique_ptr<struct dynamic_grid_params> m_params;
+  std::unique_ptr<struct grid_params> m_params;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DYNAMIC_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */
