@@ -27,6 +27,7 @@
 #include <vector>
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/support/block_distributor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,18 +39,22 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 class arena_map {
  public:
-  /* constructors */
-  explicit arena_map(const struct grid_params* params) :
+  explicit arena_map(const struct grid_params* params,
+                     argos::CRange<argos::Real> arena_x,
+                     argos::CRange<argos::Real> arena_y,
+                     argos::CRange<argos::Real> nest_x,
+                     argos::CRange<argos::Real> nest_y) :
       m_blocks(params->block.n_blocks, block(params->block.dimension)),
+      m_block_distributor(arena_x, arena_y, nest_x, nest_y, &params->block),
       m_grid(params) {}
 
-  /* member functions */
+  std::vector<block>& blocks(void) { return m_blocks; }
+  cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  void distribute_blocks(void);
 
  private:
-  /* member functions */
-
-  /* data members */
   std::vector<block> m_blocks;
+  support::block_distributor m_block_distributor;
   grid2D m_grid;
 };
 

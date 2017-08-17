@@ -33,8 +33,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,8 +66,7 @@ class loop_functions : public argos::CLoopFunctions {
   std::shared_ptr<const struct logging_params> mc_logging_params;
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
   std::unique_ptr<block_distributor> m_distributor;
-  std::shared_ptr<std::vector<representation::block>> m_blocks;
-  std::unique_ptr<representation::grid2D> m_grid;
+  std::unique_ptr<representation::arena_map> m_map;
 };
 
 NS_END(support, fordyca);
