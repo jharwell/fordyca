@@ -39,7 +39,9 @@ NS_START(fordyca, representation);
 class arena_map {
  public:
   /* constructors */
-  arena_map();
+  explicit arena_map(const struct grid_params* params) :
+      m_blocks(params->block.n_blocks, block(params->block.dimension)),
+      m_grid(params) {}
 
   /* member functions */
 
