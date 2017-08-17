@@ -45,13 +45,16 @@ NS_START(fordyca, representation);
 class arena_map {
  public:
   explicit arena_map(const struct grid_params* params,
-                     argos::CRange<argos::Real> arena_x,
-                     argos::CRange<argos::Real> arena_y,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
       m_blocks(params->block.n_blocks,
                block(params->block.dimension)),
-      m_block_distributor(params->resolution, arena_x, arena_y, nest_x, nest_y,
+      m_block_distributor(params->resolution,
+                          argos::CRange<argos::Real>(params->lower.GetX(),
+                                                     params->upper.GetX()),
+                          argos::CRange<argos::Real>(params->lower.GetY(),
+                                                     params->upper.GetY()),
+                          nest_x, nest_y,
                           &params->block),
       m_grid(params) {}
 

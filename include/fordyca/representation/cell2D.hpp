@@ -28,6 +28,7 @@
 #include <utility>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/cell2D_fsm.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,18 +45,20 @@ NS_START(fordyca, representation);
  */
 class cell2D {
  public:
-  cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
+  cell2D(void) : m_block(nullptr), m_fsm(rcppsw::common::g_null_server) {}
 
   uint8_t current_state(void) const { return m_fsm.current_state(); }
-  void event_unknown(void) { m_fsm.event_unknown(); }
-  void event_empty(void) { m_fsm.event_empty(); }
-  void event_has_block(void) { m_fsm.event_has_block(); }
+  void event_unknown(void) { m_fsm.event_unknown(); m_block = nullptr; }
+  void event_empty(void) { m_fsm.event_empty(); m_block = nullptr; }
+  void event_has_block(block* const block) { m_block = block; m_fsm.event_has_block(); }
   void reset(void) { m_fsm.init(); }
+  const block* block(void) const { return m_block; }
 
  protected:
   cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
+  representation::block* m_block;
   cell2D_fsm m_fsm;
 };
 

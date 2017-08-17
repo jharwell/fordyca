@@ -62,7 +62,7 @@ void arena_map::distribute_block(block& block, bool first_time) {
   m_block_distributor.distribute_block(block, first_time);
   cell2D& cell = m_grid.access(block.discrete_loc().first,
                                block.discrete_loc().second);
-  cell.event_has_block();
+  cell.event_has_block(&block);
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {

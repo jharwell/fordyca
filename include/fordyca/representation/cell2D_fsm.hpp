@@ -56,6 +56,7 @@ class cell2D_fsm : public fsm::simple_fsm {
       state_empty(),
       state_has_block() {}
 
+  /* state query */
   bool is_known(void) { return current_state() != ST_UNKNOWN; }
   bool has_block(void) { return current_state() == ST_HAS_BLOCK; }
   bool is_empty(void) { return current_state() == ST_EMPTY; }
