@@ -34,6 +34,7 @@
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/support/stat_collector.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,12 +63,12 @@ class loop_functions : public argos::CLoopFunctions {
   int robot_on_block(const argos::CFootBotEntity& robot);
 
   argos::CFloorEntity* m_floor;
-  stat_collector m_collector;
+  std::unique_ptr<stat_collector> m_collector;
   std::shared_ptr<const struct logging_params> mc_logging_params;
-  std::shared_ptr<const struct block_params> mc_block_params;
   std::unique_ptr<const struct loop_functions_params> mc_loop_params;
   std::unique_ptr<block_distributor> m_distributor;
   std::shared_ptr<std::vector<representation::block>> m_blocks;
+  std::unique_ptr<representation::grid2D> m_grid;
 };
 
 NS_END(support, fordyca);

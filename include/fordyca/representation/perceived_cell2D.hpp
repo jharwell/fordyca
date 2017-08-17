@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <utility>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/dynamic_cell2D.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,11 +42,11 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-class perceived_cell2D: public dynamic_cell2D {
+class perceived_cell2D: public cell2D {
  public:
-  typedef dynamic_cell2D_fsm::new_state_data encounter_data;
+  typedef cell2D_fsm::new_state_data encounter_data;
 
-  perceived_cell2D(void) : dynamic_cell2D(), m_relevance(0.0), m_delta(0.0) {}
+  perceived_cell2D(void) : cell2D(), m_relevance(0.0), m_delta(0.0) {}
   void delta(double delta) { m_delta = delta; }
 
   /**
@@ -69,9 +69,9 @@ class perceived_cell2D: public dynamic_cell2D {
    * @param type The encounter type.
    * @param cache_blocks # of blocks in the observed cache (if relevant).
    */
-  void remote_encounter(dynamic_cell2D_fsm::new_state state,
+  void remote_encounter(cell2D_fsm::new_state state,
                         int cache_blocks = 0);
-  void encounter(dynamic_cell2D_fsm::new_state state, int cache_blocks = 0);
+  void encounter(cell2D_fsm::new_state state, int cache_blocks = 0);
 
  private:
   double m_relevance;

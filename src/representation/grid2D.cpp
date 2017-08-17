@@ -1,5 +1,5 @@
 /**
- * @file dynamic_cell2D.hpp
+ * @file grid2D.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,16 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-#include <utility>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/representation/dynamic_cell2D_fsm.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "fordyca/representation/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,25 +30,27 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * @brief Base representation of a cell on the 2D grid. This class represents
- * the ACTUAL state of the grid (i.e. global/omniscient state).
- */
-class dynamic_cell2D {
- public:
-  dynamic_cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
+grid2D::grid2D(const grid_params* params) :
+    mc_params(params),
+    m_cells(boost::extents
+            [(std::fabs(mc_params->upper.GetX()) - mc_params->lower.GetX())/mc_params->resolution]
+            [(mc_params->upper.GetY() - mc_params->lower.GetY())/mc_params->resolution]) {
+}
 
-  uint8_t state(void) const { return m_fsm.current_state(); }
-
- protected:
-  dynamic_cell2D_fsm& fsm(void) { return m_fsm; }
-
- private:
-  dynamic_cell2D_fsm m_fsm;
-};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+std::list<const cell2D*> grid2D::with_blocks(void) {
+  std::list<const cell2D*> cells;
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    if (i->state() == cell2D_fsm::ST_HAS_BLOCK) {
+      cells.push_back(i);
+    }
+  } /* for(i..) */
+  return cells;
+} /* with_blocks() */
 
 NS_END(representation, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_HPP_ */

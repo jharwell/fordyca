@@ -1,5 +1,5 @@
 /**
- * @file dynamic_cell2d_fsm.hpp
+ * @file cell2D_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,7 +36,7 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_cell2D_fsm : public fsm::simple_fsm {
+class cell2D_fsm : public fsm::simple_fsm {
  public:
   enum state {
     ST_UNKNOWN,
@@ -60,7 +60,7 @@ class dynamic_cell2D_fsm : public fsm::simple_fsm {
     int cache_blocks;
   };
 
-  explicit dynamic_cell2D_fsm(
+  explicit cell2D_fsm(
       const std::shared_ptr<rcppsw::common::er_server>& server) :
       simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
       state_unknown(),
@@ -78,10 +78,10 @@ class dynamic_cell2D_fsm : public fsm::simple_fsm {
   void change_state(const struct new_state_data* const data);
 
  private:
-  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_unknown, struct new_state_data);
-  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_empty, struct new_state_data);
-  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_has_block, struct new_state_data);
-  FSM_STATE_DECLARE(dynamic_cell2D_fsm, state_has_cache, struct new_state_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, struct new_state_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_empty, struct new_state_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, struct new_state_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_has_cache, struct new_state_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
@@ -99,4 +99,4 @@ class dynamic_cell2D_fsm : public fsm::simple_fsm {
 
 NS_END(representation, forydca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_DYNAMIC_CELL2D_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_ */

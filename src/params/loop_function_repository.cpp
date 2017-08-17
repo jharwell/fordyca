@@ -22,8 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/dynamic_grid_parser.hpp"
-#include "fordyca/params/block_parser.hpp"
+#include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/logging_parser.hpp"
 #include "fordyca/params/loop_functions_parser.hpp"
 
@@ -36,12 +35,10 @@ NS_START(fordyca, params);
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) {
-  factory().register_type<dynamic_grid_parser>("dynamic_grid");
-  factory().register_type<block_parser>("block");
+  factory().register_type<grid_parser>("grid");
   factory().register_type<logging_parser>("logging");
   factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["dynamic_grid"]     = factory().create("dynamic_grid");
-  parsers()["blocks"]           = factory().create("block");
+  parsers()["grid"]             = factory().create("grid");
   parsers()["logging"]          = factory().create("logging");
   parsers()["loop_functions"]   = factory().create("loop_functions");
 }

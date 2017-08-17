@@ -40,57 +40,59 @@ loop_functions::loop_functions(void) :
     m_floor(NULL),
     m_collector(),
     mc_logging_params(),
-    mc_block_params(),
     mc_loop_params(),
     m_distributor(),
-    m_blocks() {}
+    m_blocks(),
+    m_grid() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void loop_functions::Init(argos::TConfigurationNode& node) {
-  params::loop_function_repository param_repo;
+  m_floor = &GetSpace().GetFloorEntity();
 
   /* parse all environment parameters */
+  params::loop_function_repository param_repo;
   param_repo.parse_all(node);
 
-  mc_loop_params.reset(static_cast<const struct loop_functions_params*>(
-      param_repo.get_params("loop_functions")));
-  mc_logging_params.reset(static_cast<const struct logging_params*>(
-      param_repo.get_params("logging")));
-
+  /* Capture parsed parameters in logfile */
   std::ofstream init_file("loop-functions-init.txt");
   param_repo.show_all(init_file);
   init_file.close();
 
-  m_floor = &GetSpace().GetFloorEntity();
+  mc_loop_params.reset(static_cast<const struct loop_functions_params*>(
+      param_repo.get_params("loop_functions")));
+  const struct grid_params * grid_params = static_cast<const struct grid_params*>(
+      param_repo.get_params("grid"));
 
   /* distribute blocks in arena */
-  mc_block_params.reset(static_cast<const struct block_params*>(
-      param_repo.get_params("blocks")));
   m_blocks = std::make_shared<std::vector<representation::block>>(
-      mc_block_params->n_blocks,
-      representation::block(mc_block_params->dimension));
+      grid_params->block.n_blocks,
+      representation::block(grid_params->block.dimension));
   m_distributor.reset(new support::block_distributor(mc_loop_params->arena_x,
                                                      mc_loop_params->arena_y,
                                                      mc_loop_params->nest_x,
                                                      mc_loop_params->nest_y,
-                                                     mc_block_params,
+                                                     grid_params->block,
                                                      m_blocks));
 
   m_distributor->distribute_blocks(true);
 
+  /* initialize grid */
+  m_grid.reset(new representation::grid2D(grid_params));
+
   /* initialize stat collecting */
-  m_collector.reset(mc_logging_params->sim_stats);
+  m_collector.reset(new stat_collector(static_cast<const struct logging_params*>(
+      param_repo.get_params("logging"))->sim_stats));
 }
 
 void loop_functions::Reset() {
-  m_collector.reset(mc_logging_params->sim_stats);
+  m_collector->reset();
   m_distributor->distribute_blocks();
 }
 
 void loop_functions::Destroy() {
-  m_collector.finalize();
+  m_collector->finalize();
 }
 
 argos::CColor loop_functions::GetFloorColor(
@@ -117,12 +119,12 @@ void loop_functions::PreStep() {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::controller& controller =
-        dynamic_cast<controller::controller&>(
+    controller::foraging_controller& controller =
+        dynamic_cast<controller::foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_collector.collect_from_robot(controller);
+    m_collector->collect_from_robot(controller);
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
@@ -130,7 +132,7 @@ void loop_functions::PreStep() {
          * Get stats from carried block before it's dropped and its state
          * changes.
          */
-        m_collector.collect_from_block(m_blocks->at(controller.block_idx()));
+        m_collector->collect_from_block(m_blocks->at(controller.block_idx()));
 
         m_blocks->at(controller.block_idx()).update_on_nest_drop();
         /*
@@ -156,13 +158,13 @@ void loop_functions::PreStep() {
 
           /* The floor texture must be updated */
           m_floor->SetChanged();
-          controller.publish_event(controller::controller::BLOCK_FOUND);
+          controller.publish_event(controller::foraging_controller::BLOCK_FOUND);
         }
       }
     }
     ++i;
   } /* for(it..) */
-  m_collector.store_stats(GetSpace().GetSimulationClock());
+  m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
 
 }
 
@@ -185,15 +187,15 @@ bool loop_functions::IsExperimentFinished(void) {
    * the end of the experiment. If respawn is enabled, then the experiment will
    * run until I cancel it.
    */
-  if (!mc_block_params->respawn &&
-      m_collector.n_collected_blocks() == mc_block_params->n_blocks) {
-    return true;
-  }
+  /* if (!mc_grid_params->block.respawn && */
+  /*     m_collector->n_collected_blocks() == mc_grid_params->block.n_blocks) { */
+  /*   return true; */
+  /* } */
   return false;
 } /* IsExperimentFinished() */
 
 
 using namespace argos;
-REGISTER_LOOP_FUNCTIONS(loop_functions, "loop_functions")
+REGISTER_LOOP_FUNCTIONS(loop_functions, "foraging_loop_functions")
 
 NS_END(support, fordyca);
