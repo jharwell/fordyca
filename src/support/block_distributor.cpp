@@ -29,55 +29,46 @@
 NS_START(fordyca, support);
 
 /*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-block_distributor::block_distributor(
-    argos::CRange<argos::Real> arena_x,
-    argos::CRange<argos::Real> arena_y,
-    argos::CRange<argos::Real> nest_x,
-    argos::CRange<argos::Real> nest_y,
-    const struct block_params& params,
-    std::shared_ptr<std::vector<representation::block>> blocks) :
-    m_arena_x(arena_x),
-    m_arena_y(arena_y),
-    m_nest_x(nest_x),
-    m_nest_y(nest_y),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_params(params),
-    m_blocks(blocks) {}
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distributor::distribute_blocks(bool first_time) {
-  for (size_t i = 0; i < m_params.n_blocks; ++i) {
-    distribute_block(i, first_time);
+void block_distributor::distribute_blocks(
+    std::vector<representation::block>& blocks) {
+  for (size_t i = 0; i < blocks.size(); ++i) {
+    distribute_block(blocks[i]);
   } /* for(i..) */
+  m_first_distribute = false;
 } /* distribute_blocks() */
 
-void block_distributor::distribute_block(size_t i, bool first_time) {
-  if (!m_params.respawn && !first_time) {
+void block_distributor::distribute_block(representation::block& block) {
+  if (!m_respawn && !m_first_distribute) {
     return;
-  } else if (m_params.dist_model == "random") {
-    dist_random(i);
-  } else if (m_params.dist_model == "single_source") {
-    dist_single_src(i);
+  } else if (m_dist_model == "random") {
+    dist_random(block);
+  } else if (m_dist_model == "single_source") {
+    dist_single_src(block);
   }
 } /* distribute_block() */
 
-void block_distributor::dist_random(size_t i) {
-  m_blocks->at(i).set_loc(dist_outside_range(m_nest_x, m_nest_y));
+void block_distributor::dist_random(representation::block& block) {
+  block.set_real_loc(dist_outside_range(m_nest_x, m_nest_y));
+  block.set_discrete_loc(
+      representation::block::discrete_coord(block.real_loc().GetX(),
+                                            block.real_loc().GetY()));
 } /* dist_random() */
 
-void block_distributor::dist_single_src(size_t i) {
+void block_distributor::dist_single_src(representation::block& block) {
   /*
    * Find the 3/4 point between the nest and the source along the Y (horizontal)
    * direction, and put all the blocks around there.
    */
   argos::CRange<argos::Real> y_range = m_nest_y;
-  argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(m_arena_x.GetMax() * 0.75 - 0.5,
-                                                                  m_arena_x.GetMax() * 0.75);
-  m_blocks->at(i).set_loc(dist_in_range(x_range, y_range));
+  argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(
+      m_arena_x.GetMax() * 0.75 - 0.5,
+      m_arena_x.GetMax() * 0.75);
+  block.set_real_loc(dist_in_range(x_range, y_range));
+  block.set_discrete_loc(
+      representation::block::discrete_coord(block.real_loc().GetX(),
+                                            block.real_loc().GetY()));
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(

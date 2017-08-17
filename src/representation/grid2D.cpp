@@ -40,11 +40,18 @@ grid2D::grid2D(const grid_params* params) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void grid2D::reset_cells(cell2D_fsm::new_state state) {
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    i->change_state(new cell2D_fsm::new_state_data(state));
+  } /* for(i..) */
+} /* reset_cells() */
+
 std::list<const cell2D*> grid2D::with_blocks(void) {
   std::list<const cell2D*> cells;
   for (auto i = m_cells.origin();
        i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if (i->state() == cell2D_fsm::ST_HAS_BLOCK) {
+    if (i->current_state() == cell2D_fsm::ST_HAS_BLOCK) {
       cells.push_back(i);
     }
   } /* for(i..) */

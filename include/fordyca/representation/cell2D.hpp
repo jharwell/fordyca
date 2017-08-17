@@ -45,7 +45,10 @@ class cell2D {
  public:
   cell2D(void) : m_fsm(rcppsw::common::g_null_server) {}
 
-  uint8_t state(void) const { return m_fsm.current_state(); }
+  uint8_t current_state(void) const { return m_fsm.current_state(); }
+  void change_state(const struct cell2D_fsm::new_state_data* const data) {
+    m_fsm.change_state(data);
+  }
 
  protected:
   cell2D_fsm& fsm(void) { return m_fsm; }

@@ -1,35 +1,27 @@
 /**
- * @file grid2D.hpp
+ * @file arena_map.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <boost/multi_array.hpp>
-#include <list>
-#include <argos/core/utility/math/vector2.h>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/representation/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,21 +29,20 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class grid2D {
- public:
-  explicit grid2D(const grid_params* params);
+void arena_map::distribute_blocks(void) {
+  /* reset all state machines */
+  m_grid.reset_cells(cell2D_fsm::EMPTY);
 
-  static argos::CVector2 coord_to_cell(double x, double y);
-  std::list<const cell2D*> with_blocks(void);
-  cell2D& access(size_t i, size_t j) { return m_cells[i][j]; }
-  void reset_cells(cell2D_fsm::new_state state);
+  /* assign blocks to new locations and update state machines */
+  m_block_distributor.distribute_blocks(m_blocks);
 
- private:
-  boost::multi_array<cell2D, 2> m_cells;
-};
+  for (size_t i = 0; i < m_blocks.size(); ++i) {
+    cell2D& cell = m_grid.access(m_blocks[i].discrete_loc().first,
+                                 m_blocks[i].discrete_loc().second);
+    cell.change_state(new cell2D_fsm::new_state_data(cell2D_fsm::BLOCK));
+  } /* for(i..) */
+} /* distribute_blocks() */
 
 NS_END(representation, fordyca);
-
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_GRID2D_HPP_ */

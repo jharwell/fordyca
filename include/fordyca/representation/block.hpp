@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 
@@ -37,20 +38,25 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 class block {
  public:
-  explicit block(double dimension) : m_loc(), m_robot_index(-1),
-                                     m_carries(0), m_dimension(dimension) {}
+  typedef std::pair<size_t, size_t> discrete_coord;
+  explicit block(double dimension) :
+      m_real_loc(), m_discrete_loc(), m_robot_index(-1), m_carries(0),
+      m_dimension(dimension) {}
 
-  const argos::CVector2& loc(void) const { return m_loc; }
+  const argos::CVector2& real_loc(void) const { return m_real_loc; }
+  const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
   size_t carries(void) const { return m_carries; }
 
-  void set_loc(const argos::CVector2& loc) { m_loc = loc; }
+  void set_real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
+  void set_discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
   void update_on_robot_pickup(size_t index);
   void update_on_nest_drop(void) { m_carries = 0; m_robot_index = -1; }
   void update_on_arena_drop(const argos::CVector2& loc);
   bool contains_point(const argos::CVector2& point);
 
  private:
-  argos::CVector2 m_loc;
+  argos::CVector2 m_real_loc;
+  discrete_coord m_discrete_loc;
   int m_robot_index;
   size_t m_carries;
   double m_dimension;
