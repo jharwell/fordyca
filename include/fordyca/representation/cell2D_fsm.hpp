@@ -54,12 +54,11 @@ class cell2D_fsm : public fsm::simple_fsm {
       simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
       state_unknown(),
       state_empty(),
-      state_has_block() {}
+      state_block() {}
 
-  /* state query */
-  bool is_known(void) { return current_state() != ST_UNKNOWN; }
-  bool has_block(void) { return current_state() == ST_HAS_BLOCK; }
-  bool is_empty(void) { return current_state() == ST_EMPTY; }
+  bool state_is_known(void) { return current_state() != ST_UNKNOWN; }
+  bool state_has_block(void) { return current_state() == ST_HAS_BLOCK; }
+  bool state_is_empty(void) { return current_state() == ST_EMPTY; }
 
   /* events */
   void event_unknown(void);
@@ -70,13 +69,13 @@ class cell2D_fsm : public fsm::simple_fsm {
  private:
   FSM_STATE_DECLARE(cell2D_fsm, state_unknown, fsm::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_empty, fsm::no_event_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_has_block, fsm::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_block, fsm::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),
-        FSM_STATE_MAP_ENTRY(&state_has_block),
+        FSM_STATE_MAP_ENTRY(&state_block),
             };
   FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
   return &kSTATE_MAP[0];

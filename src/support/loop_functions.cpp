@@ -78,7 +78,7 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
 
 void loop_functions::Reset() {
   m_collector->reset();
-  m_distributor->distribute_blocks();
+  m_map->distribute_blocks(true);
 }
 
 void loop_functions::Destroy() {
@@ -118,7 +118,7 @@ void loop_functions::PreStep() {
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
-        representation::block& block = m_map->blocks[controller.block_idx()];
+        representation::block& block = m_map->blocks()[controller.block_idx()];
         /*
          * Get stats from carried block before it's dropped and its state
          * changes.

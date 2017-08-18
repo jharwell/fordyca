@@ -1,5 +1,5 @@
 /**
- * @file grid2D.cpp
+ * @file cell2D-test.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,34 +21,34 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include "fordyca/representation/grid2D.hpp"
+#define CATCH_CONFIG_PREFIX_ALL
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+using namespace fordyca::representation;
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Test Cases
  ******************************************************************************/
-grid2D::grid2D(const grid_params* params) :
-    m_cells(boost::extents
-            [(std::fabs(params->upper.GetX()) - params->lower.GetX())/params->resolution]
-            [(params->upper.GetY() - params->lower.GetY())/params->resolution]) {}
+CATCH_TEST_CASE("init-test", "[cell2D]") {
+  cell2D cell;
+  CATCH_REQUIRE(!cell.state_is_known());
+}
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-std::list<const cell2D*> grid2D::with_blocks(void) {
-  std::list<const cell2D*> cells;
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if (i->state_has_block()) {
-      cells.push_back(i);
-    }
-  } /* for(i..) */
-  return cells;
-} /* with_blocks() */
-
-NS_END(representation, fordyca);
+CATCH_TEST_CASE("transition-test", "[cell2D]") {
+  cell2D cell;
+  cell.event_unknown();
+  CATCH_REQUIRE(!cell.state_is_known());
+  cell.event_empty();
+  CATCH_REQUIRE(cell.state_is_empty());
+  cell.event_has_block();
+  CATCH_REQUIRE(cell.state_has_block());
+  cell.event_empty();
+CATCH_REQUIRE(cell.state_is_empty());
+  cell.event_unknown();
+CATCH_REQUIRE(!cell.state_is_known());
+}
