@@ -50,11 +50,7 @@ class cell2D_fsm : public fsm::simple_fsm {
   };
 
   explicit cell2D_fsm(
-      const std::shared_ptr<rcppsw::common::er_server>& server) :
-      simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
-      state_unknown(),
-      state_empty(),
-      state_block() {}
+      const std::shared_ptr<rcppsw::common::er_server>& server);
 
   bool state_is_known(void) { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) { return current_state() == ST_HAS_BLOCK; }

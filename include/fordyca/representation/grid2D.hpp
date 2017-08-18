@@ -49,18 +49,25 @@ NS_START(fordyca, representation);
  */
 class grid2D {
  public:
-  explicit grid2D(const grid_params* params);
+  explicit grid2D(
+      const grid_params* params,
+      const std::shared_ptr<rcppsw::common::er_server>& server =
+      rcppsw::common::g_null_server);
+
+  ~grid2D(void);
 
   static argos::CVector2 coord_to_cell(double x, double y);
   std::list<const cell2D*> with_blocks(void);
-  cell2D& access(size_t i, size_t j) { return m_cells[i][j]; }
+  cell2D& access(size_t i, size_t j) { return *m_cells[i][j]; }
   double resoluton(void) const { return m_resolution; }
+  size_t xsize(void) const { return m_upper.GetX() / m_resolution; }
+  size_t ysize(void) const { return m_upper.GetY() / m_resolution; }
 
  private:
   double m_resolution;
   argos::CVector2 m_upper;
   argos::CVector2 m_lower;
-  boost::multi_array<cell2D, 2> m_cells;
+  boost::multi_array<cell2D*, 2> m_cells;
 };
 
 NS_END(representation, fordyca);

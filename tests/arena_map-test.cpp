@@ -46,15 +46,31 @@ argos::CRange<argos::Real> nest_y(2.5, 3.5);
 /*******************************************************************************
  * Helper Functions
  ******************************************************************************/
-void map_sanity_check(arena_map& map) {
+void map_sanity_check(arena_map& map, int type) {
   /* Verify all cells that don't contain blocks are empty */
   for (size_t i = 0; i < params.upper.GetX()/params.resolution; ++i) {
     for (size_t j = 0; j < params.upper.GetY()/params.resolution; ++j) {
       cell2D& cell = map.access(i, j);
       if (!cell.state_has_block()) {
-        CATCH_REQUIRE(!cell.state_is_empty());
+        if (0 == type) {
+          CATCH_REQUIRE(cell.state_is_empty());
+        } else {
+          CATCH_REQUIRE(!cell.state_is_known());
+        }
       }
     } /* for(j..) */
+  } /* for(i..) */
+}
+
+void map_resolution_check(arena_map& map) {
+  /*
+   * Verify that every cell is pointing to the correct block (testing the
+   * resolution-based indexing).
+   */
+  for (size_t i = 0; i < map.blocks().size(); ++i) {
+    cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
+                              map.blocks()[i].discrete_loc().second);
+    CATCH_REQUIRE((cell.block() == &map.blocks()[i]));
   } /* for(i..) */
 }
 
@@ -68,7 +84,7 @@ CATCH_TEST_CASE("init-test", "[arena_map]") {
   CATCH_REQUIRE(map.respawn_enabled() == params.block.respawn);
 
   /* verify all cells in a known state */
-  map_sanity_check(map);
+  map_sanity_check(map, 1);
 }
 
 CATCH_TEST_CASE("distribute-test", "[arena_map]") {
@@ -80,58 +96,47 @@ CATCH_TEST_CASE("distribute-test", "[arena_map]") {
   for (size_t i = 0; i < map.blocks().size(); ++i) {
     cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
                               map.blocks()[i].discrete_loc().second);
-    CATCH_REQUIRE(!cell.state_has_block());
+    CATCH_REQUIRE(cell.state_has_block());
   } /* for(i..) */
 
-  map_sanity_check(map);
+  map_sanity_check(map, 0);
+  map_resolution_check(map);
 
   map.distribute_blocks(false);
   /* Verify all cells that actually contain blocks think they contain blocks */
   for (size_t i = 0; i < map.blocks().size(); ++i) {
     cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
                               map.blocks()[i].discrete_loc().second);
-    CATCH_REQUIRE(!cell.state_has_block());
+    CATCH_REQUIRE(cell.state_has_block());
   } /* for(i..) */
 
-  /* Verify all cells that don't contain blocks are empty */
-  map_sanity_check(map);
+  map_sanity_check(map, 0);
+  map_resolution_check(map);
 }
 
-/* CATCH_TEST_CASE("resolution-test", "[arena_map]") { */
-/*   arena_map map(&params, nest_x, nest_y); */
-/*   map.distribute_blocks(true); */
+CATCH_TEST_CASE("block-move-test", "[arena_map]") {
+  arena_map map(&params, nest_x, nest_y);
+  map.distribute_blocks(true);
 
-/*   /\* */
-/*    * Verify that every cell is pointing to the correct block (testing the */
-/*    * resolution-based indexing). */
-/*    *\/ */
-/*   for (size_t i = 0; i < map.blocks().size(); ++i) { */
-/*     cell2D& cell = map.access(map.blocks()[i].discrete_loc().first, */
-/*                               map.blocks()[i].discrete_loc().second); */
-/*     CATCH_REQUIRE((cell.block() == &map.blocks()[i])); */
-/*   } /\* for(i..) *\/ */
+  /*
+   * Simulate a robot picking up, carrying, and then dropping a block, verifying
+   * the arena map is in the current state all the way.
+   */
+  for (size_t i = 0; i < map.blocks().size(); ++i) {
+    CATCH_REQUIRE(map.blocks()[i].id() != -1);
+    cell2D& old_cell = map.access(map.blocks()[i].discrete_loc().first,
+                              map.blocks()[i].discrete_loc().second);
+    map.event_block_pickup(map.blocks()[i], 0);
+    CATCH_REQUIRE(old_cell.state_is_empty());
+    map_sanity_check(map, 0);
 
-/* } */
-/* CATCH_TEST_CASE("block-move-test", "[arena_map]") { */
-/*   arena_map map(&params, nest_x, nest_y); */
-/*   map.distribute_blocks(true); */
+    CATCH_REQUIRE(map.blocks()[i].robot_index() != -1);
+    map.event_block_nest_drop(map.blocks()[i]);
+    cell2D& new_cell = map.access(map.blocks()[i].discrete_loc().first,
+                                  map.blocks()[i].discrete_loc().second);
+    CATCH_REQUIRE(new_cell.state_has_block());
 
-/*   /\* */
-/*    * Simulation a robot picking up, carrying, and then dropping a block, */
-/*    * verifying the arena map is in the current state all the way. */
-/*    *\/ */
-/*   for (size_t i = 0; i < map.blocks().size(); ++i) { */
-/*     cell2D& old_cell = map.access(map.blocks()[i].discrete_loc().first, */
-/*                               map.blocks()[i].discrete_loc().second); */
-/*     map.event_block_pickup(map.blocks()[i], 0); */
-/*     CATCH_REQUIRE(old_cell.state_is_empty()); */
-/*     map_sanity_check(map); */
-
-/*     map.event_block_nest_drop(map.blocks()[i]); */
-/*     cell2D& new_cell = map.access(map.blocks()[i].discrete_loc().first, */
-/*                                   map.blocks()[i].discrete_loc().second); */
-/*     CATCH_REQUIRE(old_cell.state_has_block()); */
-
-/*     map_sanity_check(map); */
-/*   } /\* for(i..) *\/ */
-/* } */
+    map_sanity_check(map, 0);
+    map_resolution_check(map);
+  } /* for(i..) */
+}

@@ -29,6 +29,33 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+arena_map::arena_map(const struct grid_params* params,
+                     argos::CRange<argos::Real> nest_x,
+                     argos::CRange<argos::Real> nest_y) :
+    m_blocks(params->block.n_blocks,
+             block(params->block.dimension)),
+    m_block_distributor(params->resolution,
+                        argos::CRange<argos::Real>(params->lower.GetX(),
+                                                   params->upper.GetX()),
+                        argos::CRange<argos::Real>(params->lower.GetY(),
+                                                   params->upper.GetY()),
+                        nest_x, nest_y,
+                        &params->block),
+    m_server(std::make_shared<rcppsw::common::er_server>()),
+    m_grid(params) {
+  deferred_init(m_server);
+  insmod("arena_map");
+  server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+
+  for (size_t i = 0; i < m_blocks.size(); ++i) {
+    m_blocks[i].id(i);
+  } /* for(i..) */
+    }
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 int arena_map::robot_on_block(const argos::CVector2& pos) {
@@ -41,34 +68,55 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
 } /* robot_on_block() */
 
 void arena_map::event_block_nest_drop(block& block) {
-  block.event_nest_drop();
   distribute_block(block, false);
+  int robot_index = block.robot_index();
+  block.event_nest_drop();
+  ER_NOM("Robot %d dropped block in nest", robot_index);
 } /* event_block_nest_drop() */
 
 void arena_map::event_block_pickup(block& block, size_t robot_index) {
-  cell2D& cell = m_grid.access(block.discrete_loc().first,
-                               block.discrete_loc().second);
+  block::discrete_coord old_d(block.discrete_loc().first,
+                             block.discrete_loc().second);
+  argos::CVector2 old_r(block.real_loc().GetX(),
+                        block.real_loc().GetY());
+  cell2D& cell = m_grid.access(old_d.first, old_d.second);
   cell.event_empty();
   block.event_pickup(robot_index);
+  ER_NOM("Robot %zu picked up block from (%f, %f) -> (%zu, %zu)",
+         robot_index,
+         old_r.GetX(), old_r.GetY(),
+         old_d.first, old_d.second);
 } /* event_block_pickup() */
 
 void arena_map::distribute_block(block& block, bool first_time) {
-  /* set previous location to empty */
-  if (!first_time) {
-    cell2D& cell = m_grid.access(block.discrete_loc().first,
-                                 block.discrete_loc().second);
-    cell.event_empty();
-  }
   m_block_distributor.distribute_block(block, first_time);
   cell2D& cell = m_grid.access(block.discrete_loc().first,
                                block.discrete_loc().second);
   cell.event_has_block(&block);
+  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu)",
+         block.id(),
+         block.real_loc().GetX(),
+         block.real_loc().GetY(),
+         block.discrete_loc().first,
+         block.discrete_loc().second);
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {
-  /* reset all state machines */
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     distribute_block(m_blocks[i], first_time);
+  } /* for(i..) */
+
+  /*
+   * Once all blocks have been distributed, all cells that do not have blocks
+   * are empty.
+   */
+  for (size_t i = 0; i < m_grid.xsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+      cell2D& cell = m_grid.access(i, j);
+      if (!cell.state_has_block()) {
+        cell.event_empty();
+      }
+    } /* for(j..) */
   } /* for(i..) */
 } /* distribute_blocks() */
 

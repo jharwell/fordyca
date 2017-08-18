@@ -29,6 +29,20 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cell2D_fsm::cell2D_fsm(
+    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
+    state_unknown(),
+    state_empty(),
+    state_block() {
+    insmod("cell2D_fsm",
+           rcppsw::common::er_lvl::VER,
+           rcppsw::common::er_lvl::NOM);
+}
+
+/*******************************************************************************
  * Event Functions
  ******************************************************************************/
 void cell2D_fsm::event_unknown(void) {
@@ -65,14 +79,15 @@ void cell2D_fsm::event_has_block(void) {
  * State Functions
  ******************************************************************************/
 FSM_STATE_DEFINE(cell2D_fsm, state_unknown, fsm::no_event_data) {
+  ER_DIAG("Cell in UNKNOWN state.")
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(cell2D_fsm, state_empty, fsm::no_event_data) {
-  ER_NOM("Cell in EMPTY state.")
+  ER_DIAG("Cell in EMPTY state.")
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(cell2D_fsm, state_block, fsm::no_event_data) {
-  ER_NOM("Cell HAS_BLOCK.")
+  ER_DIAG("Cell HAS_BLOCK.")
   return fsm::event_signal::HANDLED;
 }
 

@@ -34,6 +34,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 void block::event_pickup(size_t index) {
   ++m_carries;
+  assert(-1 != m_id);
   m_robot_index = index;
 
   /* Move block out of sight */

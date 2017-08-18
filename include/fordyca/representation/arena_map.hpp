@@ -28,6 +28,7 @@
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,21 +43,11 @@ NS_START(fordyca, representation);
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map {
+class arena_map: public rcppsw::common::er_client {
  public:
-  explicit arena_map(const struct grid_params* params,
-                     argos::CRange<argos::Real> nest_x,
-                     argos::CRange<argos::Real> nest_y) :
-      m_blocks(params->block.n_blocks,
-               block(params->block.dimension)),
-      m_block_distributor(params->resolution,
-                          argos::CRange<argos::Real>(params->lower.GetX(),
-                                                     params->upper.GetX()),
-                          argos::CRange<argos::Real>(params->lower.GetY(),
-                                                     params->upper.GetY()),
-                          nest_x, nest_y,
-                          &params->block),
-      m_grid(params) {}
+  arena_map(const struct grid_params* params,
+            argos::CRange<argos::Real> nest_x,
+            argos::CRange<argos::Real> nest_y);
 
   std::vector<block>& blocks(void) { return m_blocks; }
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
@@ -73,6 +64,7 @@ class arena_map {
  private:
   std::vector<block> m_blocks;
   support::block_distributor m_block_distributor;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
   grid2D m_grid;
 };
 

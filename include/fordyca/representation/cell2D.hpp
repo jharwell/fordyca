@@ -45,8 +45,9 @@ NS_START(fordyca, representation);
  */
 class cell2D {
  public:
-  cell2D(void) : m_block(nullptr),
-                 m_fsm(rcppsw::common::g_null_server) { m_fsm.init(); }
+  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server) :
+      m_block(nullptr),
+      m_fsm(server) { m_fsm.init(); }
 
   /* events */
   void event_unknown(void) { m_fsm.event_unknown(); m_block = nullptr; }
@@ -68,6 +69,9 @@ class cell2D {
   cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
+  cell2D(const cell2D& other) = delete;
+  cell2D& operator=(const cell2D& other) = delete;
+
   representation::block* m_block;
   cell2D_fsm m_fsm;
 };

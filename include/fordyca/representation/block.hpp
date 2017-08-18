@@ -47,7 +47,7 @@ class block {
   typedef std::pair<size_t, size_t> discrete_coord;
   explicit block(double dimension) :
       m_real_loc(), m_discrete_loc(), m_robot_index(-1), m_carries(0),
-      m_dimension(dimension) {}
+      m_dimension(dimension), m_id(-1) {}
 
   const argos::CVector2& real_loc(void) const { return m_real_loc; }
   const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
@@ -56,6 +56,9 @@ class block {
   void set_real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
   void set_discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
   bool contains_point(const argos::CVector2& point);
+  int robot_index(void) const { return m_robot_index; }
+  void id(int id) { m_id = id; }
+  int id(void) const { return m_id; }
 
   /* events */
   void event_pickup(size_t index);
@@ -67,6 +70,7 @@ class block {
   int m_robot_index;
   size_t m_carries;
   double m_dimension;
+  int m_id;
 };
 
 NS_END(representation, fordyca);

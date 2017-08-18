@@ -32,10 +32,26 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-grid2D::grid2D(const grid_params* params) :
+grid2D::grid2D(const grid_params* params,
+               const std::shared_ptr<rcppsw::common::er_server>& server) :
+    m_resolution(params->resolution),
+    m_upper(params->upper),
+    m_lower(params->lower),
     m_cells(boost::extents
-            [(std::fabs(params->upper.GetX()) - params->lower.GetX())/params->resolution]
-            [(params->upper.GetY() - params->lower.GetY())/params->resolution]) {}
+            [(std::fabs(params->upper.GetX()) - params->lower.GetX())/m_resolution]
+            [(params->upper.GetY() - params->lower.GetY())/m_resolution]) {
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    *i = new cell2D(server);
+  } /* for(i..) */
+}
+
+grid2D::~grid2D(void) {
+  for (auto i = m_cells.origin();
+       i < m_cells.origin() + m_cells.num_elements(); ++i) {
+    delete *i;
+  } /* for(i..) */
+}
 
 /*******************************************************************************
  * Member Functions
@@ -44,8 +60,8 @@ std::list<const cell2D*> grid2D::with_blocks(void) {
   std::list<const cell2D*> cells;
   for (auto i = m_cells.origin();
        i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if (i->state_has_block()) {
-      cells.push_back(i);
+    if ((*i)->state_has_block()) {
+      cells.push_back(*i);
     }
   } /* for(i..) */
   return cells;
