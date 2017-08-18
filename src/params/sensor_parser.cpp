@@ -54,10 +54,10 @@ void sensor_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void sensor_parser::show(std::ostream& stream) {
-  stream << "====================\nSensor params\n===================="
-         << std::endl;
+  stream << "====================\nSensor params\n====================\n";
   stream << "delta=" << m_params->diffusion.delta << std::endl;
-  stream << "go_straight_angle_range=" << m_params->diffusion.go_straight_angle_range << std::endl;
+  stream << "go_straight_angle_range=" <<
+      m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

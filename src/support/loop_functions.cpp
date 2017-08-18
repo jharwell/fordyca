@@ -37,11 +37,11 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 loop_functions::loop_functions(void) :
+    m_nest_x(),
+    m_nest_y(),
     m_floor(NULL),
     m_collector(),
-    mc_logging_params(),
-    mc_loop_params(),
-    m_map() {}
+     m_map() {}
 
 /*******************************************************************************
  * Member Functions
@@ -54,24 +54,27 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
   param_repo.parse_all(node);
 
   /* Capture parsed parameters in logfile */
-  std::ofstream init_file("loop-functions-init.txt");
+  std::ofstream init_file("loop-functions-params.txt");
   param_repo.show_all(init_file);
   init_file.close();
 
-  mc_loop_params.reset(static_cast<const struct loop_functions_params*>(
-      param_repo.get_params("loop_functions")));
-  const struct grid_params * grid_params = static_cast<const struct grid_params*>(
-      param_repo.get_params("grid"));
+  const struct loop_functions_params * l_params =
+      static_cast<const struct loop_functions_params*>(
+      param_repo.get_params("loop_functions"));
+  m_nest_x = l_params->nest_x;
+  m_nest_y = l_params->nest_y;
 
   /* initialize arena map and distribute blocks */
-  m_map.reset(new representation::arena_map(grid_params,
-                                            mc_loop_params->nest_x,
-                                            mc_loop_params->nest_y));
+  const struct grid_params * grid_params =
+      static_cast<const struct grid_params*>(
+          param_repo.get_params("grid"));
+  m_map.reset(new representation::arena_map(grid_params, m_nest_x, m_nest_y));
   m_map->distribute_blocks(true);
 
   /* initialize stat collecting */
-  m_collector.reset(new stat_collector(static_cast<const struct logging_params*>(
-      param_repo.get_params("logging"))->sim_stats));
+  m_collector.reset(new stat_collector(
+      static_cast<const struct logging_params*>(
+          param_repo.get_params("logging"))->sim_stats));
 }
 
 void loop_functions::Reset() {
@@ -85,8 +88,8 @@ void loop_functions::Destroy() {
 
 argos::CColor loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  if (mc_loop_params->nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      mc_loop_params->nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
+  if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
+      m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY50;
   }
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
@@ -99,7 +102,6 @@ argos::CColor loop_functions::GetFloorColor(
 
 void loop_functions::PreStep() {
   int i = 0;
-
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -138,7 +140,6 @@ void loop_functions::PreStep() {
       }
     } else { /* The foot-bot has no block item */
       if (!controller.in_nest() && controller.block_detected()) {
-
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(
             it->second));
@@ -155,7 +156,6 @@ void loop_functions::PreStep() {
     ++i;
   } /* for(it..) */
   m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
-
 }
 
 int loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
@@ -171,7 +171,6 @@ bool loop_functions::IsExperimentFinished(void) {
    * the end of the experiment. If respawn is enabled, then the experiment will
    * run until I cancel it.
    */
-
   if (!m_map->respawn_enabled() &&
       m_collector->n_collected_blocks() == m_map->n_blocks()) {
     return true;

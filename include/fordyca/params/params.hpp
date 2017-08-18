@@ -127,13 +127,7 @@ struct logging_params : public base_params {
 };
 
 struct loop_functions_params : public base_params {
-  loop_functions_params(void) :
-      arena_x(),
-      arena_y(),
-      nest_x(),
-      nest_y() {}
-  argos::CRange<argos::Real> arena_x;
-  argos::CRange<argos::Real> arena_y;
+  loop_functions_params(void) : nest_x(), nest_y() {}
   argos::CRange<argos::Real> nest_x;
   argos::CRange<argos::Real> nest_y;
 };

@@ -47,8 +47,7 @@ void fsm_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) {
-  stream << "====================\nFSM params\n===================="
-         << std::endl;
+  stream << "====================\nFSM params\n====================\n";
   stream << "times.unsuccessful_explore_dir_change="
          << m_params->times.unsuccessful_explore_dir_change << std::endl;
 } /* show() */

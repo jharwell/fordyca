@@ -59,7 +59,7 @@ class grid2D {
   static argos::CVector2 coord_to_cell(double x, double y);
   std::list<const cell2D*> with_blocks(void);
   cell2D& access(size_t i, size_t j) { return *m_cells[i][j]; }
-  double resoluton(void) const { return m_resolution; }
+  double resolution(void) const { return m_resolution; }
   size_t xsize(void) const { return m_upper.GetX() / m_resolution; }
   size_t ysize(void) const { return m_upper.GetY() / m_resolution; }
 

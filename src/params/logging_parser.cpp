@@ -38,7 +38,7 @@ void logging_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void logging_parser::show(std::ostream& stream) {
-  stream << "Logging params\n====================" << std::endl;
+  stream << "====================\nLogging params\n====================\n";
   stream << "sim_stats=" << m_params->sim_stats << std::endl;
 } /* show() */
 

@@ -40,13 +40,6 @@ void loop_functions_parser::parse(argos::TConfigurationNode& node) {
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(arena->ToElement()->GetAttribute("size"));
 
-  /*
-   * +/- 0.3 is for the walls of the arena which reduce the effective size.
-   */
-  m_params->arena_x.Set(-std::atoi(res[0].c_str())/2.0 + 0.3,
-                        std::atoi(res[0].c_str())/2.0 - 0.3);
-  m_params->arena_y.Set(-std::atoi(res[1].c_str())/2.0 + 0.3,
-                        std::atoi(res[1].c_str())/2.0 - 0.3);
   res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
   res2 = parser.parse(node.FirstChildElement("nest")->GetAttribute("size"));
 
@@ -57,10 +50,7 @@ void loop_functions_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void loop_functions_parser::show(std::ostream& stream) {
-  stream << "====================\nLoop Function params\n===================="
-         << std::endl;
-  stream << "arena_x= " << m_params->arena_x << std::endl;
-  stream << "arena_y= " << m_params->arena_y << std::endl;
+  stream << "====================\nLoop Function params\n====================\n";
   stream << "nest_x= " << m_params->nest_x << std::endl;
   stream << "nest_y= " << m_params->nest_y << std::endl;
 } /* show() */

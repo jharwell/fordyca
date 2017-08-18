@@ -54,8 +54,7 @@ try {
 } /* parse() */
 
 void actuator_parser::show(std::ostream& stream) {
-  stream << "====================\nActuator params\n===================="
-         << std::endl;
+  stream << "====================\nActuator params\n====================\n";
   stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold << std::endl;
   stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold << std::endl;
   stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold << std::endl;

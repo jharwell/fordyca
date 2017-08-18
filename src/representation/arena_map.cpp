@@ -49,7 +49,8 @@ arena_map::arena_map(const struct grid_params* params,
   insmod("arena_map");
   server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
-
+  ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
+         m_grid.resolution());
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     m_blocks[i].id(i);
   } /* for(i..) */

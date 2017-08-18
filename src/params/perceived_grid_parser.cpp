@@ -50,8 +50,7 @@ void perceived_grid_parser::parse(argos::TConfigurationNode& node) {
 } /* parse() */
 
 void perceived_grid_parser::show(std::ostream& stream) {
-  stream << "====================\nPerceived grid params\n====================\n"
-         <<std::endl;
+  stream << "====================\nPerceived grid params\n====================\n";
   stream << "cell_decay_delta=" << m_params->cell_delta << std::endl;
   stream << "resolution=" << m_params->grid.resolution << std::endl;
   stream << "lower=" << m_params->grid.lower << std::endl;

@@ -60,10 +60,10 @@ class loop_functions : public argos::CLoopFunctions {
   loop_functions& operator=(const loop_functions& s) = delete;
   int robot_on_block(const argos::CFootBotEntity& robot);
 
+  argos::CRange<argos::Real> m_nest_x;
+  argos::CRange<argos::Real> m_nest_y;
   argos::CFloorEntity* m_floor;
   std::unique_ptr<stat_collector> m_collector;
-  std::shared_ptr<const struct logging_params> mc_logging_params;
-  std::unique_ptr<const struct loop_functions_params> mc_loop_params;
   std::unique_ptr<representation::arena_map> m_map;
 };
 
