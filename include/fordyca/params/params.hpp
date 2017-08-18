@@ -109,7 +109,10 @@ struct sensor_params : public base_params {
 };
 
 struct block_params : public base_params {
-  block_params(void) : n_blocks(), dimension(), dist_model(), respawn() {}
+  block_params(uint n_blocks_ = 0, argos::Real dimension_ = 0.0,
+               std::string dist_model_ =  "", bool respawn_ = false) :
+      n_blocks(n_blocks_), dimension(dimension_), dist_model(dist_model_),
+      respawn(respawn_) {}
 
   uint n_blocks;
   argos::Real dimension;
@@ -136,7 +139,11 @@ struct loop_functions_params : public base_params {
 };
 
 struct grid_params : public base_params {
-  grid_params(void) : resolution(0.0), upper(), lower(), block() {}
+  grid_params(double resolution_ = 0.0,
+              argos::CVector2 upper_ = argos::CVector2(),
+              argos::CVector2 lower_ = argos::CVector2(),
+              struct block_params block_ = block_params()) :
+      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
   double resolution;
   argos::CVector2 upper;
   argos::CVector2 lower;

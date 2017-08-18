@@ -65,8 +65,6 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
 
   /* initialize arena map and distribute blocks */
   m_map.reset(new representation::arena_map(grid_params,
-                                            mc_loop_params->arena_x,
-                                            mc_loop_params->arena_y,
                                             mc_loop_params->nest_x,
                                             mc_loop_params->nest_y));
   m_map->distribute_blocks(true);
