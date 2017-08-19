@@ -1,5 +1,5 @@
 /**
- * @file block.cpp
+ * @file cell_entity.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,11 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/block.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include <utility>
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,28 +34,34 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void block::event_pickup(size_t index) {
-  ++m_carries;
-  assert(-1 != id());
-  m_robot_index = index;
+class cell_entity {
+ public:
+  typedef std::pair<size_t, size_t> discrete_coord;
 
-  /* Move block out of sight */
-  real_loc(argos::CVector2(100.0, 100.0));
-  discrete_loc(discrete_coord(100, 100));
-} /* event_pickup() */
+  cell_entity(double x_dim, double y_dim) : m_id(-1),
+                                            m_x_dim(x_dim), m_y_dim(y_dim),
+                                            m_real_loc(), m_discrete_loc() {}
 
-bool block::contains_point(const argos::CVector2& point) {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  if (point.GetX() < (x + (.5 * xsize())) &&
-      point.GetX() > (x - (.5 * xsize())) &&
-      point.GetY() < (y + (.5 * xsize())) &&
-      point.GetY() > (y - (.5 * xsize()))) {
-    return true;
-  }
-  return false;
-} /* contains_point() */
+  double xsize(void) const { return m_x_dim; }
+  double ysize(void) const { return m_y_dim; }
+
+  const argos::CVector2& real_loc(void) const { return m_real_loc; }
+  const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
+  void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
+  void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
+  void id(int id) { m_id = id; }
+  int id(void) const { return m_id; }
+
+ private:
+  int m_id;
+  double m_x_dim;
+  double m_y_dim;
+  argos::CVector2 m_real_loc;
+  discrete_coord m_discrete_loc;
+};
 
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_ */

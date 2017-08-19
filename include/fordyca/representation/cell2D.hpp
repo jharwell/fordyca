@@ -46,15 +46,15 @@ NS_START(fordyca, representation);
 class cell2D {
  public:
   explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server) :
-      m_block(nullptr),
+      m_entity(nullptr),
       m_fsm(server) { m_fsm.init(); }
 
   /* events */
-  void event_unknown(void) { m_fsm.event_unknown(); m_block = nullptr; }
-  void event_empty(void) { m_fsm.event_empty(); m_block = nullptr; }
+  void event_unknown(void) { m_fsm.event_unknown(); m_entity = nullptr; }
+  void event_empty(void) { m_fsm.event_empty(); m_entity = nullptr; }
   void event_has_block(representation::block* block) {
     m_fsm.event_has_block();
-    m_block = block;
+    m_entity = block;
   }
 
   /* state inquiry */
@@ -63,7 +63,8 @@ class cell2D {
   bool state_is_empty(void) { return m_fsm.state_is_empty(); }
 
   void reset(void) { m_fsm.init(); }
-  const representation::block* block(void) const { return m_block; }
+  const representation::block* block(void) const {
+    return static_cast<representation::block*>(m_entity); }
 
  protected:
   cell2D_fsm& fsm(void) { return m_fsm; }
@@ -72,7 +73,7 @@ class cell2D {
   cell2D(const cell2D& other) = delete;
   cell2D& operator=(const cell2D& other) = delete;
 
-  representation::block* m_block;
+  representation::cell_entity* m_entity;
   cell2D_fsm m_fsm;
 };
 
