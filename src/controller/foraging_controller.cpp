@@ -34,12 +34,12 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 void foraging_controller::drop_block_in_nest(void) {
   ER_NOM("%s dropped block in nest", GetId().c_str());
-  m_block_data.dropped_in_nest();
+  m_block = nullptr;
 } /* drop_block_in_nest() */
 
-void foraging_controller::pickup_block(int i) {
+void foraging_controller::pickup_block(representation::block* block) {
   ER_NOM("%s picked up block", GetId().c_str());
-  m_block_data.picked_up_block(i);
+  m_block = block;
 } /* pickup_block() */
 
 void foraging_controller::publish_event(enum event_type type) {
@@ -95,7 +95,7 @@ void foraging_controller::Reset(void) {
                                               GetId() +
                                               std::string(".txt")));
   m_fsm->init();
-  m_block_data.reset();
+  m_block = nullptr;
 } /* Reset() */
 
 /*

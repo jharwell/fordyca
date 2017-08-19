@@ -41,11 +41,14 @@ class cell_entity {
   typedef std::pair<size_t, size_t> discrete_coord;
 
   cell_entity(double x_dim, double y_dim) : m_id(-1),
+                                            m_display_id(false),
                                             m_x_dim(x_dim), m_y_dim(y_dim),
                                             m_real_loc(), m_discrete_loc() {}
 
   double xsize(void) const { return m_x_dim; }
   double ysize(void) const { return m_y_dim; }
+  void display_id(bool display_id) { m_display_id = display_id; }
+  bool display_id(void) const { return m_display_id; }
 
   const argos::CVector2& real_loc(void) const { return m_real_loc; }
   const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
@@ -56,6 +59,7 @@ class cell_entity {
 
  private:
   int m_id;
+  bool m_display_id;
   double m_x_dim;
   double m_y_dim;
   argos::CVector2 m_real_loc;

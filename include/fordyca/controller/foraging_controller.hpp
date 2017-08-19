@@ -30,8 +30,8 @@
 #include "fordyca/controller/foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/block_data.hpp"
 #include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,11 +54,12 @@ class foraging_controller : public argos::CCI_Controller,
 
   foraging_controller(void) :
       er_client(),
+      m_display_id(false),
+      m_block(nullptr),
       m_server(new rcppsw::common::er_server("controller-init.txt")),
       m_actuators(),
       m_sensors(),
       m_fsm(),
-      m_block_data(),
       m_grid() {}
 
 
@@ -68,6 +69,8 @@ class foraging_controller : public argos::CCI_Controller,
   bool in_nest(void) const { return m_sensors->in_nest(); }
   bool block_detected(void) const { return m_sensors->block_detected(); }
   void publish_event(enum event_type event);
+  void display_id(bool display_id) { m_display_id = display_id; }
+  bool display_id(void) const { return m_display_id; }
 
   /*
    * @brief Initialize the controller.
@@ -97,12 +100,12 @@ class foraging_controller : public argos::CCI_Controller,
   /**
    * @brief Return if the robot is currently carrying a block.
    */
-  bool is_carrying_block(void) const { return m_block_data.has_block(); }
+  bool is_carrying_block(void) const { return nullptr != m_block; }
 
   /**
-   * @brief Return block index of block robot is carrying.
+   * @brief Return the block robot is carrying.
    */
-  int block_idx(void) const { return m_block_data.block_idx(); }
+  representation::block* block(void) const { return m_block; }
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -120,14 +123,15 @@ class foraging_controller : public argos::CCI_Controller,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-    void pickup_block(int i);
+  void pickup_block(representation::block* block);
 
  private:
+  bool m_display_id;
+  representation::block* m_block;
   std::shared_ptr<rcppsw::common::er_server> m_server;
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<foraging_fsm>              m_fsm;
-  representation::block_data                 m_block_data;
   std::unique_ptr<representation::grid2D>    m_grid;
 };
 

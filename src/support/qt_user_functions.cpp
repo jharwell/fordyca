@@ -55,6 +55,21 @@ void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
             argos::CQuaternion(),
             argos::CVector3(0.2, 0.2, 0.2),
             argos::CColor::BLACK);
+    std::string text;
+    if (controller.block()->display_id()) {
+      text = c_entity.GetId() + "/" +
+              + "b" + std::to_string(controller.block()->id());
+    } else {
+      text = c_entity.GetId();
+    }
+      DrawText(argos::CVector3(0.0, 0.0, 0.5),
+               text.c_str(),
+               argos::CColor::RED);
+  } else {
+    if (controller.display_id()) {
+      DrawText(argos::CVector3(0.0, 0.0, 0.3),
+               c_entity.GetId().c_str());
+    }
   }
 }
 

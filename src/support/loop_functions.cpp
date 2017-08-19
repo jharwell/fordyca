@@ -70,11 +70,26 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
           param_repo.get_params("grid"));
   m_map.reset(new representation::arena_map(grid_params, m_nest_x, m_nest_y));
   m_map->distribute_blocks(true);
+  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
+    m_map->blocks()[i].display_id(l_params->display_block_id);
+  } /* for(i..) */
 
   /* initialize stat collecting */
   m_collector.reset(new stat_collector(
       static_cast<const struct logging_params*>(
           param_repo.get_params("logging"))->sim_stats));
+
+  argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
+  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
+       it != footbots.end();
+       ++it) {
+    argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
+        it->second);
+    controller::foraging_controller& controller =
+        dynamic_cast<controller::foraging_controller&>(
+            robot.GetControllableEntity().GetController());
+    controller.display_id(l_params->display_robot_id);
+  } /* for(it..) */
 }
 
 void loop_functions::Reset() {
@@ -117,15 +132,14 @@ void loop_functions::PreStep() {
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
-        representation::block& block = m_map->blocks()[controller.block_idx()];
         /*
          * Get stats from carried block before it's dropped and its state
          * changes.
          */
-        m_collector->collect_from_block(block);
+        m_collector->collect_from_block(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        m_map->event_block_nest_drop(block);
+        m_map->event_block_nest_drop(*controller.block());
 
         /* Actually drop the block */
         controller.drop_block_in_nest();
@@ -140,7 +154,7 @@ void loop_functions::PreStep() {
         int block = robot_on_block(robot);
         if (-1 != block) {
           m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
-          controller.pickup_block(block);
+          controller.pickup_block(&m_map->blocks()[block]);
 
           /* The floor texture must be updated */
           m_floor->SetChanged();

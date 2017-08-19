@@ -47,12 +47,19 @@ void loop_functions_parser::parse(argos::TConfigurationNode& node) {
                        std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
   m_params->nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
                        std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
+
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_id",
+                          m_params->display_robot_id);
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "block_id",
+                          m_params->display_block_id);
 } /* parse() */
 
 void loop_functions_parser::show(std::ostream& stream) {
   stream << "====================\nLoop Function params\n====================\n";
   stream << "nest_x= " << m_params->nest_x << std::endl;
   stream << "nest_y= " << m_params->nest_y << std::endl;
+  stream << "display_robot_id= " << m_params->display_robot_id << std::endl;
+  stream << "display_block_id= " << m_params->display_block_id << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);
