@@ -134,7 +134,8 @@ void loop_functions::PreStep() {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.block_detected()) {
+      if (!controller.in_nest() && controller.is_exploring() &&
+          controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {

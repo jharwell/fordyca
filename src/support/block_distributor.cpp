@@ -51,9 +51,9 @@ void block_distributor::distribute_block(representation::block& block,
 } /* distribute_block() */
 
 void block_distributor::dist_random(representation::block& block) {
-  block.set_real_loc(dist_outside_range(block.dimension(),
+  block.real_loc(dist_outside_range(block.xsize(),
                                         m_nest_x, m_nest_y));
-  block.set_discrete_loc(
+  block.discrete_loc(
       representation::block::discrete_coord(
           block.real_loc().GetX() / m_resolution - 1,
           block.real_loc().GetY() / m_resolution - 1));
@@ -68,8 +68,8 @@ void block_distributor::dist_single_src(representation::block& block) {
   argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(
       m_arena_x.GetMax() * 0.75 - 0.5,
       m_arena_x.GetMax() * 0.75);
-  block.set_real_loc(dist_in_range(x_range, y_range));
-  block.set_discrete_loc(
+  block.real_loc(dist_in_range(x_range, y_range));
+  block.discrete_loc(
       representation::block::discrete_coord(
           std::max<int>(0, block.real_loc().GetX() / m_resolution - 1),
           std::max<int>(0, block.real_loc().GetY() / m_resolution - 1)));
