@@ -42,10 +42,9 @@ void grid_parser::parse(argos::TConfigurationNode& node) {
 
   m_params->resolution = std::atof(
       argos::GetNode(node, "grid").GetAttribute("resolution").c_str());
-  m_params->lower.Set(-std::atoi(res[0].c_str())/2.0 + 0.3,
-                      -std::atoi(res[1].c_str())/2.0 + 0.3);
-  m_params->upper.Set(std::atoi(res[0].c_str())/2.0 - 0.3,
-                      std::atoi(res[1].c_str())/2.0 - 0.3);
+  m_params->lower.Set(0.3, 0.3);
+  m_params->upper.Set(std::atoi(res[0].c_str()) - 0.3,
+                      std::atoi(res[1].c_str()) - 0.3);
 
   argos::TConfigurationNode bnode = argos::GetNode(node, "blocks");
   argos::GetNodeAttribute(bnode, "n_blocks", m_params->block.n_blocks);

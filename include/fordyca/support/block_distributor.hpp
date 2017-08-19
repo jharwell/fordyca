@@ -79,7 +79,8 @@ class block_distributor {
   void dist_single_src(representation::block& block);
   argos::CVector2 dist_in_range(argos::CRange<argos::Real> x_range,
                                 argos::CRange<argos::Real> y_range);
-  argos::CVector2 dist_outside_range(argos::CRange<argos::Real> x_range,
+  argos::CVector2 dist_outside_range(double dimension,
+                                     argos::CRange<argos::Real> x_range,
                                      argos::CRange<argos::Real> y_range);
 
   block_distributor(const block_distributor& s) = delete;

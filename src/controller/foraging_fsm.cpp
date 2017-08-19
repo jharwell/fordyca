@@ -65,7 +65,7 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
  ******************************************************************************/
 void foraging_fsm::event_block_found(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-    fsm::event_signal::FATAL,    /* start */
+        ST_RETURN_TO_NEST,           /* start (robot might be on block initially) */
         ST_RETURN_TO_NEST,           /* explore */
         ST_RETURN_TO_NEST,           /* new direction */
         fsm::event_signal::IGNORED,  /* return to nest */

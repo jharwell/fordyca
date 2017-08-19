@@ -59,6 +59,7 @@ class block {
   int robot_index(void) const { return m_robot_index; }
   void id(int id) { m_id = id; }
   int id(void) const { return m_id; }
+  double dimension(void) const { return m_dimension; }
 
   /* events */
   void event_pickup(size_t index);

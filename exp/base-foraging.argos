@@ -68,39 +68,39 @@
             dist_model="random"
             respawn="true"
             />
-    <nest size="0.5, 0.5" center="-3, 0" />
+    <nest size="0.5, 0.5" center="5, 2.5" />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 5, 2" center="0,0,1">
+  <arena size="10, 5, 2" center="5,2.5,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="8,0.1,0.5" movable="false">
-      <body position="0,2,0" orientation="0,0,0" />
+    <box id="wall_north" size="10,0.1,0.5" movable="false">
+      <body position="5,5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="8,0.1,0.5" movable="false">
-      <body position="0,-2,0" orientation="0,0,0" />
+    <box id="wall_south" size="10,0.1,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,4,0.5" movable="false">
-      <body position="4,0,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,5,0.5" movable="false">
+      <body position="10,2.5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,4,0.5" movable="false">
-      <body position="-4,0,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,5,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
-           position="-3,0,1.0"
+           position="5,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="4.0"
            medium="leds" />
     <distribute>
-      <position method="uniform" min="-2,-2,0" max="2,2,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="20" max_trials="100">
         <foot-bot id="fb">
@@ -133,8 +133,8 @@
     <qt-opengl>
       <camera>
         <placement idx="0"
-                   position="0,0,4.34"
-                   look_at="0,0,0"
+                   position="5,2.5,4"
+                   look_at="5,2.5,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />

@@ -41,7 +41,7 @@ loop_functions::loop_functions(void) :
     m_nest_y(),
     m_floor(NULL),
     m_collector(),
-     m_map() {}
+    m_map() {}
 
 /*******************************************************************************
  * Member Functions
@@ -101,7 +101,6 @@ argos::CColor loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void loop_functions::PreStep() {
-  int i = 0;
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -125,14 +124,10 @@ void loop_functions::PreStep() {
          */
         m_collector->collect_from_block(block);
 
-        /*
-         * Handle updating the arena map state when a block is dropped in the
-         * nest (must be before the actual drop because the block index goes to
-         * -1 after that).
-         */
+        /* Update arena map state due to a block nest drop */
         m_map->event_block_nest_drop(block);
 
-        /* Actually drop the block item */
+        /* Actually drop the block */
         controller.drop_block_in_nest();
 
         /* The floor texture must be updated */
@@ -141,10 +136,9 @@ void loop_functions::PreStep() {
     } else { /* The foot-bot has no block item */
       if (!controller.in_nest() && controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
-        int block = robot_on_block(*argos::any_cast<argos::CFootBotEntity*>(
-            it->second));
+        int block = robot_on_block(robot);
         if (-1 != block) {
-          m_map->event_block_pickup(m_map->blocks()[block], i);
+          m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
           controller.pickup_block(block);
 
           /* The floor texture must be updated */
@@ -153,10 +147,14 @@ void loop_functions::PreStep() {
         }
       }
     }
-    ++i;
   } /* for(it..) */
   m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
 }
+
+int loop_functions::robot_id(const argos::CFootBotEntity& robot) {
+  /* +2 because the ID string starts with 'fb' */
+  return std::atoi(robot.GetId().c_str()+2);
+} /* robot_id() */
 
 int loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
   argos::CVector2 pos;

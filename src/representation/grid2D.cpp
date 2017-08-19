@@ -37,9 +37,7 @@ grid2D::grid2D(const grid_params* params,
     m_resolution(params->resolution),
     m_upper(params->upper),
     m_lower(params->lower),
-    m_cells(boost::extents
-            [(std::fabs(params->upper.GetX()) - params->lower.GetX())/m_resolution]
-            [(params->upper.GetY() - params->lower.GetY())/m_resolution]) {
+    m_cells(boost::extents[xsize()][ysize()]) {
   for (auto i = m_cells.origin();
        i < m_cells.origin() + m_cells.num_elements(); ++i) {
     *i = new cell2D(server);

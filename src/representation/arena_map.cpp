@@ -72,7 +72,7 @@ void arena_map::event_block_nest_drop(block& block) {
   distribute_block(block, false);
   int robot_index = block.robot_index();
   block.event_nest_drop();
-  ER_NOM("Robot %d dropped block in nest", robot_index);
+  ER_NOM("fb%d dropped block%d in nest", robot_index, block.id());
 } /* event_block_nest_drop() */
 
 void arena_map::event_block_pickup(block& block, size_t robot_index) {
@@ -83,8 +83,8 @@ void arena_map::event_block_pickup(block& block, size_t robot_index) {
   cell2D& cell = m_grid.access(old_d.first, old_d.second);
   cell.event_empty();
   block.event_pickup(robot_index);
-  ER_NOM("Robot %zu picked up block from (%f, %f) -> (%zu, %zu)",
-         robot_index,
+  ER_NOM("fb%zu picked up block%d from (%f, %f) -> (%zu, %zu)",
+         robot_index, block.id(),
          old_r.GetX(), old_r.GetY(),
          old_d.first, old_d.second);
 } /* event_block_pickup() */
