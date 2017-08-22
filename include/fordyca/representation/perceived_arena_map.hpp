@@ -1,5 +1,5 @@
 /**
- * @file perceived_cell2D.cpp
+ * @file arena_map.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,10 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
+#include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/representation/block.hpp"
+#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,38 +36,32 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Constants
+ * Class Definitions
  ******************************************************************************/
-const double perceived_cell2D::kEpsilon = 0.001;
+/**
+ * @brief The arena map stores a logical representation of the state of the
+ * arena. Basically, it combines a 2D grid with sets of objects that populate
+ * the grid and move around as the state of the arena changes.
+ */
+class perceived_arena_map: public rcppsw::common::er_client {
+ public:
+  perceived_arena_map(const struct grid_params* params,
+                      const std::shared_ptr<rcppsw::common::er_server>& server =
+                      rcppsw::common::g_null_server);
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void perceived_cell2D::update_relevance(void) {
-  if (m_cell.state_is_known()) {
-    m_relevance = std::max(0.0, m_relevance - m_delta);
-    if (m_relevance < kEpsilon) {
-      m_cell.event_unknown();
-    }
-  }
-} /* update_relevance() */
+  std::list<const block*> blocks(void);
+  perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  void update_relevance(void);
 
-void perceived_cell2D::event_encounter(cell2D_fsm::state state,
-                                       representation::block* block) {
-  switch (state) {
-    case cell2D_fsm::ST_UNKNOWN:
-      m_cell.event_unknown();
-      break;
-    case cell2D_fsm::ST_EMPTY:
-      m_cell.event_empty();
-      break;
-    case cell2D_fsm::ST_HAS_BLOCK:
-      m_cell.event_has_block(block);
-      break;
-    default:
-      break;
-  } /* switch() */
-  m_relevance += 1.0;
-} /* encounter() */
+  /* events */
+  void event_block_pickup(block* block);
+  void event_new_los(void);
+
+ private:
+  std::shared_ptr<rcppsw::common::er_server> m_server;
+  grid2D<perceived_cell2D> m_grid;
+};
 
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_ */

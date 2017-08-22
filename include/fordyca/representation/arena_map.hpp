@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <vector>
 #include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/common/er_server.hpp"
@@ -65,7 +66,7 @@ class arena_map: public rcppsw::common::er_client {
   std::vector<block> m_blocks;
   support::block_distributor m_block_distributor;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  grid2D m_grid;
+  grid2D<cell2D> m_grid;
 };
 
 NS_END(representation, fordyca);

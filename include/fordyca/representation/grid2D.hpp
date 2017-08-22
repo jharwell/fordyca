@@ -27,8 +27,7 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <argos/core/utility/math/vector2.h>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "rcppsw/common/er_server.hpp"
 #include "fordyca/params/params.hpp"
 
 /*******************************************************************************
@@ -46,19 +45,34 @@ NS_START(fordyca, representation);
  * and caches are mapped as points with an extent.
  *
  * Each cell within the 2D grid has its own state machine for reacting to
+ * events.
  */
+template<typename T>
 class grid2D {
  public:
-  explicit grid2D(
-      const grid_params* params,
-      const std::shared_ptr<rcppsw::common::er_server>& server =
-      rcppsw::common::g_null_server);
+  /* constructors/destructor */
+  explicit grid2D(const grid_params* params,
+                  const std::shared_ptr<rcppsw::common::er_server>& server =
+                          rcppsw::common::g_null_server) :
+      m_resolution(params->resolution),
+      m_upper(params->upper),
+      m_lower(params->lower),
+      m_cells(boost::extents[xsize()][ysize()]) {
+    for (auto i = m_cells.origin();
+         i < m_cells.origin() + m_cells.num_elements(); ++i) {
+      *i = new T(server);
+    } /* for(i..) */
+  }
 
-  ~grid2D(void);
+  ~grid2D(void) {
+    for (auto i = m_cells.origin();
+         i < m_cells.origin() + m_cells.num_elements(); ++i) {
+      delete *i;
+    } /* for(i..) */
+  }
 
-  static argos::CVector2 coord_to_cell(double x, double y);
-  std::list<const cell2D*> with_blocks(void);
-  cell2D& access(size_t i, size_t j) { return *m_cells[i][j]; }
+  /* member functions */
+  T& access(size_t i, size_t j) { return *m_cells[i][j]; }
   double resolution(void) const { return m_resolution; }
   size_t xsize(void) const { return std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution); }
   size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
@@ -67,7 +81,7 @@ class grid2D {
   double m_resolution;
   argos::CVector2 m_upper;
   argos::CVector2 m_lower;
-  boost::multi_array<cell2D*, 2> m_cells;
+  boost::multi_array<T*, 2> m_cells;
 };
 
 NS_END(representation, fordyca);
