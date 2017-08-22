@@ -45,7 +45,7 @@ NS_START(fordyca, controller);
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class foraging_controller : public argos::CCI_Controller,
-                                   public rcppsw::common::er_client {
+                            public rcppsw::common::er_client {
  public:
   enum event_type {
     CONTINUE,
@@ -59,8 +59,7 @@ class foraging_controller : public argos::CCI_Controller,
       m_server(new rcppsw::common::er_server("controller-init.txt")),
       m_actuators(),
       m_sensors(),
-      m_fsm(),
-      m_grid() {}
+      m_fsm() {}
 
 
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
@@ -132,7 +131,6 @@ class foraging_controller : public argos::CCI_Controller,
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<foraging_fsm>              m_fsm;
-  std::unique_ptr<representation::grid2D>    m_grid;
 };
 
 NS_END(controller, fordyca);

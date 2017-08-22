@@ -56,6 +56,7 @@ class perceived_cell2D  {
   bool state_is_known(void) { return m_cell.state_is_known(); }
   bool state_has_block(void) { return m_cell.state_has_block(); }
   bool state_is_empty(void) { return m_cell.state_is_empty(); }
+  const representation::block* block(void) const { return m_cell.block(); }
 
 
   /**
@@ -67,7 +68,7 @@ class perceived_cell2D  {
    */
   void update_relevance(void);
   void event_encounter(cell2D_fsm::state state,
-                       block* block = nullptr);
+                       representation::block* block = nullptr);
 
  private:
   double m_relevance;
