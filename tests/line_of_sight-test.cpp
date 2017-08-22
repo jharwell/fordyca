@@ -1,5 +1,5 @@
 /**
- * @file grid2D.cpp
+ * @file line_of_sight-test.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,48 +21,44 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include "fordyca/representation/grid2D.hpp"
+#define CATCH_CONFIG_PREFIX_ALL
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+using namespace fordyca::representation;
+using namespace fordyca;
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Global Variables
  ******************************************************************************/
-grid2D::grid2D(const grid_params* params,
-               const std::shared_ptr<rcppsw::common::er_server>& server) :
-    m_resolution(params->resolution),
-    m_upper(params->upper),
-    m_lower(params->lower),
-    m_cells(boost::extents[xsize()][ysize()]) {
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    *i = new cell2D(server);
-  } /* for(i..) */
-}
-
-grid2D::~grid2D(void) {
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    delete *i;
-  } /* for(i..) */
-}
+struct grid_params params = {
+  0.2, argos::CVector2(10, 5), argos::CVector2(0, 0),
+  {25, 0.2, "random", true}
+};
+argos::CRange<argos::Real> nest_x(0.5, 1.5);
+argos::CRange<argos::Real> nest_y(2.5, 3.5);
 
 /*******************************************************************************
- * Member Functions
+ * Test Cases
  ******************************************************************************/
-std::list<const cell2D*> grid2D::with_blocks(void) {
-  std::list<const cell2D*> cells;
-  for (auto i = m_cells.origin();
-       i < m_cells.origin() + m_cells.num_elements(); ++i) {
-    if ((*i)->state_has_block()) {
-      cells.push_back(*i);
-    }
-  } /* for(i..) */
-  return cells;
-} /* with_blocks() */
+CATCH_TEST_CASE("init-test", "[line_of_sight]") {
+  argos::CRandom::CreateCategory("argos", 123);
+  arena_map map(&params, nest_x, nest_y);
+  line_of_sight los(map.subgrid(1, 1, 0.2));
+}
 
-NS_END(representation, fordyca);
+CATCH_TEST_CASE("resolution-test", "[line_of_sight]") {
+  argos::CRandom::CreateCategory("argos", 123);
+  arena_map map(&params, nest_x, nest_y);
+  line_of_sight los(map.subgrid(1, 1, 0.4));
+  CATCH_REQUIRE(los.size() == 16);
+
+  line_of_sight los2(map.subgrid(0.2, 0.2, 0.2));
+  CATCH_REQUIRE(los2.size() == 4);
+}

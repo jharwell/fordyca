@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <vector>
 #include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/common/er_server.hpp"
@@ -56,6 +57,7 @@ class arena_map: public rcppsw::common::er_client {
   size_t n_blocks(void) const { return m_blocks.size(); }
   bool respawn_enabled(void) const { return m_block_distributor.respawn_enabled(); }
   int robot_on_block(const argos::CVector2& pos);
+  grid_view<cell2D*> subgrid(double x, double y, double radius) { return m_grid.subgrid(x, y, radius); }
 
   /* events */
   void event_block_pickup(block& block, size_t robot_index);
@@ -65,7 +67,7 @@ class arena_map: public rcppsw::common::er_client {
   std::vector<block> m_blocks;
   support::block_distributor m_block_distributor;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  grid2D m_grid;
+  grid2D<cell2D> m_grid;
 };
 
 NS_END(representation, fordyca);
