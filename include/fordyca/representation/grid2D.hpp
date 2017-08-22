@@ -34,6 +34,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+template<typename T>
+using grid_type = typename boost::multi_array<T, 2>;
+template<typename T>
+using grid_view = typename grid_type<T>::template array_view<2>::type;
+template<typename T>
+using view_range = typename grid_type<T>::index_range;
+using index_range = boost::multi_array_types::index_range;
 
 /*******************************************************************************
  * Class Definitions
@@ -72,6 +79,15 @@ class grid2D {
   }
 
   /* member functions */
+  grid_view<T*> subgrid(double x, double y, double radius) {
+    size_t lower_x = x / m_resolution - radius / m_resolution;
+    size_t upper_x = x / m_resolution + radius / m_resolution;
+    size_t lower_y = y / m_resolution - radius / m_resolution;
+    size_t upper_y = y / m_resolution + radius / m_resolution;
+    typename grid_type<T*>::index_gen indices;
+    return grid_view<T*>(m_cells[indices[index_range(lower_x, upper_x, 1)]
+                                 [index_range(lower_y, upper_y, 1)]]);
+  }
   T& access(size_t i, size_t j) { return *m_cells[i][j]; }
   double resolution(void) const { return m_resolution; }
   size_t xsize(void) const { return std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution); }
@@ -81,7 +97,7 @@ class grid2D {
   double m_resolution;
   argos::CVector2 m_upper;
   argos::CVector2 m_lower;
-  boost::multi_array<T*, 2> m_cells;
+  grid_type<T*> m_cells;
 };
 
 NS_END(representation, fordyca);
