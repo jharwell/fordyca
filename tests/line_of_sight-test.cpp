@@ -1,5 +1,5 @@
 /**
- * @file cell2D-test.cpp
+ * @file line_of_sight-test.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -24,12 +24,15 @@
 #define CATCH_CONFIG_PREFIX_ALL
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 using namespace fordyca::representation;
+using namespace fordyca;
 
 /*******************************************************************************
  * Global Variables
@@ -44,21 +47,18 @@ argos::CRange<argos::Real> nest_y(2.5, 3.5);
 /*******************************************************************************
  * Test Cases
  ******************************************************************************/
-CATCH_TEST_CASE("init-test", "[cell2D]") {
-  cell2D cell;
-  CATCH_REQUIRE(!cell.state_is_known());
+CATCH_TEST_CASE("init-test", "[line_of_sight]") {
+  argos::CRandom::CreateCategory("argos", 123);
+  arena_map map(&params, nest_x, nest_y);
+  line_of_sight los(map.subgrid(1, 1, 0.2));
 }
 
-CATCH_TEST_CASE("transition-test", "[cell2D]") {
-  cell2D cell;
-  cell.event_unknown();
-  CATCH_REQUIRE(!cell.state_is_known());
-  cell.event_empty();
-  CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_has_block();
-  CATCH_REQUIRE(cell.state_has_block());
-  cell.event_empty();
-CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_unknown();
-CATCH_REQUIRE(!cell.state_is_known());
+CATCH_TEST_CASE("resolution-test", "[line_of_sight]") {
+  argos::CRandom::CreateCategory("argos", 123);
+  arena_map map(&params, nest_x, nest_y);
+  line_of_sight los(map.subgrid(1, 1, 0.4));
+  CATCH_REQUIRE(los.size() == 16);
+
+  line_of_sight los2(map.subgrid(0.2, 0.2, 0.2));
+  CATCH_REQUIRE(los2.size() == 4);
 }

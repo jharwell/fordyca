@@ -1,5 +1,5 @@
 /**
- * @file cell2D-test.cpp
+ * @file line_of_sight.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,44 +21,26 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#define CATCH_CONFIG_PREFIX_ALL
-#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-using namespace fordyca::representation;
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Global Variables
+ * Member Functions
  ******************************************************************************/
-struct grid_params params = {
-  0.2, argos::CVector2(10, 5), argos::CVector2(0, 0),
-  {25, 0.2, "random", true}
-};
-argos::CRange<argos::Real> nest_x(0.5, 1.5);
-argos::CRange<argos::Real> nest_y(2.5, 3.5);
+std::list<const representation::block*> line_of_sight::blocks(void) {
+  std::list<const representation::block*> blocks;
+  for (auto i = m_view.origin();
+       i < m_view.origin() + m_view.num_elements(); ++i) {
+    if ((*i)->state_has_block()) {
+      blocks.push_back((*i)->block());
+    }
+  } /* for(i..) */
+  return blocks;
+} /* blocks() */
 
-/*******************************************************************************
- * Test Cases
- ******************************************************************************/
-CATCH_TEST_CASE("init-test", "[cell2D]") {
-  cell2D cell;
-  CATCH_REQUIRE(!cell.state_is_known());
-}
 
-CATCH_TEST_CASE("transition-test", "[cell2D]") {
-  cell2D cell;
-  cell.event_unknown();
-  CATCH_REQUIRE(!cell.state_is_known());
-  cell.event_empty();
-  CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_has_block();
-  CATCH_REQUIRE(cell.state_has_block());
-  cell.event_empty();
-CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_unknown();
-CATCH_REQUIRE(!cell.state_is_known());
-}
+NS_END(representation, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file cell2D-test.cpp
+ * @file line_of_sight.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#define CATCH_CONFIG_PREFIX_ALL
-#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include <boost/multi_array.hpp>
+#include <list>
+#include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-using namespace fordyca::representation;
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Global Variables
+ * Class Definitions
  ******************************************************************************/
-struct grid_params params = {
-  0.2, argos::CVector2(10, 5), argos::CVector2(0, 0),
-  {25, 0.2, "random", true}
+class line_of_sight {
+ public:
+  explicit line_of_sight(const grid_view<cell2D*> view) : m_view(view) {}
+  std::list<const representation::block*> blocks(void);
+  size_t size(void) const { return m_view.num_elements(); }
+
+ private:
+  grid_view<cell2D*> m_view;
 };
-argos::CRange<argos::Real> nest_x(0.5, 1.5);
-argos::CRange<argos::Real> nest_y(2.5, 3.5);
 
-/*******************************************************************************
- * Test Cases
- ******************************************************************************/
-CATCH_TEST_CASE("init-test", "[cell2D]") {
-  cell2D cell;
-  CATCH_REQUIRE(!cell.state_is_known());
-}
+NS_END(representation, fordyca);
 
-CATCH_TEST_CASE("transition-test", "[cell2D]") {
-  cell2D cell;
-  cell.event_unknown();
-  CATCH_REQUIRE(!cell.state_is_known());
-  cell.event_empty();
-  CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_has_block();
-  CATCH_REQUIRE(cell.state_has_block());
-  cell.event_empty();
-CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_unknown();
-CATCH_REQUIRE(!cell.state_is_known());
-}
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_ */
