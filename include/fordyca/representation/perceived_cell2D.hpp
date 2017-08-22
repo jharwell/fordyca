@@ -28,6 +28,7 @@
 #include <utility>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,40 +43,37 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-/* class perceived_cell2D: public cell2D { */
-/*  public: */
+class perceived_cell2D  {
+ public:
+  static const double kEpsilon;
+  explicit perceived_cell2D(
+      const std::shared_ptr<rcppsw::common::er_server>& server = rcppsw::common::g_null_server) :
+      m_relevance(0.0), m_delta(0.0), m_cell(server) {}
 
-/*   perceived_cell2D(void) : cell2D(), m_relevance(0.0), m_delta(0.0) {} */
-/*   void delta(double delta) { m_delta = delta; } */
+  void delta(double delta) { m_delta = delta; }
+  double relevance(void) const { return m_relevance; }
 
-/*   /\** */
-/*    * @brief Update the relevance/freshness of the information about the state of */
-/*    * the current square. */
-/*    * */
-/*    * Each call to this function increases the relevance of the information by a */
-/*    * factor of 1.0. */
-/*    *\/ */
-/*   void update_relevance(void); */
+  bool state_is_known(void) { return m_cell.state_is_known(); }
+  bool state_has_block(void) { return m_cell.state_has_block(); }
+  bool state_is_empty(void) { return m_cell.state_is_empty(); }
 
-/*   /\** */
-/*    * @brief If another robot reports that a block is in the same state that the */
-/*    * parent robot has it in, then that information is reinforced by calling \ref */
-/*    * encounter. If the remote robot has it in a different state, then the */
-/*    * relevance is reset to 1.0, as that means that this robot's information was */
-/*    * out of date (this function called AFTER each robot has already made all the */
-/*    * updates to its own internal view of the world). */
-/*    * */
-/*    * @param type The encounter type. */
-/*    * @param cache_blocks # of blocks in the observed cache (if relevant). */
-/*    *\/ */
-/*   /\* void remote_encounter(cell2D_fsm::new_state state, *\/ */
-/*   /\*                       int cache_blocks = 0); *\/ */
-/*   /\* void encounter(cell2D_fsm::new_state state, int cache_blocks = 0); *\/ */
 
-/*  private: */
-/*   double m_relevance; */
-/*   double m_delta; */
-/* }; */
+  /**
+   * @brief Update the relevance/freshness of the information about the state of
+   * the current square.
+   *
+   * Each call to this function increases the relevance of the information by a
+   * factor of 1.0.
+   */
+  void update_relevance(void);
+  void event_encounter(cell2D_fsm::state state,
+                       block* block = nullptr);
+
+ private:
+  double m_relevance;
+  double m_delta;
+  cell2D m_cell;
+};
 
 NS_END(representation, fordyca);
 

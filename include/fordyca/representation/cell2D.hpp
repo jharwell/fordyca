@@ -45,7 +45,8 @@ NS_START(fordyca, representation);
  */
 class cell2D {
  public:
-  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server) :
+  explicit cell2D(
+      const std::shared_ptr<rcppsw::common::er_server>& server = rcppsw::common::g_null_server) :
       m_entity(nullptr),
       m_fsm(server) { m_fsm.init(); }
 
@@ -77,6 +78,8 @@ class cell2D {
   cell2D_fsm m_fsm;
 };
 
+
 NS_END(representation, fordyca);
+
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */

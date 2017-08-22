@@ -1,5 +1,5 @@
 /**
- * @file perceived_cell2D.cpp
+ * @file perceived_cell2D-test.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,45 +21,49 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#define CATCH_CONFIG_PREFIX_ALL
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 #include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+using namespace fordyca::representation;
 
 /*******************************************************************************
- * Constants
+ * Test Cases
  ******************************************************************************/
-const double perceived_cell2D::kEpsilon = 0.001;
+CATCH_TEST_CASE("init-test", "[perceived_cell2D]") {
+  perceived_cell2D cell;
+  CATCH_REQUIRE(!cell.state_is_known());
+  CATCH_REQUIRE(cell.relevance() == 0.0);
+}
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void perceived_cell2D::update_relevance(void) {
-  if (m_cell.state_is_known()) {
-    m_relevance = std::max(0.0, m_relevance - m_delta);
-    if (m_relevance < kEpsilon) {
-      m_cell.event_unknown();
-    }
-  }
-} /* update_relevance() */
+CATCH_TEST_CASE("transition-test", "[perceived_cell2D]") {
+  perceived_cell2D cell;
+  cell.delta(0.1);
+  cell.event_encounter(cell2D_fsm::ST_EMPTY);
+  CATCH_REQUIRE(cell.state_is_known());
+  CATCH_REQUIRE(cell.state_is_empty());
+  CATCH_REQUIRE(std::fabs(cell.relevance() - 1.0) < perceived_cell2D::kEpsilon);
 
-void perceived_cell2D::event_encounter(cell2D_fsm::state state, block* block) {
-  switch (state) {
-    case cell2D_fsm::ST_UNKNOWN:
-      m_cell.event_unknown();
-      break;
-    case cell2D_fsm::ST_EMPTY:
-      m_cell.event_empty();
-      break;
-    case cell2D_fsm::ST_HAS_BLOCK:
-      m_cell.event_has_block(block);
-      break;
-    default:
-      break;
-  } /* switch() */
-  m_relevance += 1.0;
-} /* encounter() */
+  for (size_t i = 0; i < 10; ++i) {
+    cell.update_relevance();
+    CATCH_REQUIRE(cell.relevance() - 1.0 - 0.1 * (i+1) < 0.00001);
+  } /* for(i..) */
 
-NS_END(representation, fordyca);
+  CATCH_REQUIRE(!cell.state_is_known());
+
+  cell.event_encounter(cell2D_fsm::ST_HAS_BLOCK);
+  CATCH_REQUIRE(cell.state_is_known());
+  CATCH_REQUIRE(cell.state_has_block());
+  CATCH_REQUIRE(std::fabs(cell.relevance() - 1.0) < perceived_cell2D::kEpsilon);
+
+  for (size_t i = 0; i < 10; ++i) {
+    cell.update_relevance();
+    CATCH_REQUIRE(cell.relevance() - 1.0 - 0.1 * (i+1) < 0.00001);
+  } /* for(i..) */
+
+  CATCH_REQUIRE(!cell.state_is_known());
+}
