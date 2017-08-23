@@ -35,16 +35,22 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class line_of_sight {
+  typedef std::pair<size_t, size_t> discrete_coord;
  public:
-  explicit line_of_sight(const grid_view<cell2D*> view) : m_view(view) {}
+  explicit line_of_sight(const grid_view<cell2D*> view, const discrete_coord& center) :
+      m_center(center), m_view(view) {}
   std::list<const representation::block*> blocks(void);
   size_t size(void) const { return m_view.num_elements(); }
+  cell2D& cell(size_t i, size_t j) { return *m_view[i][j]; }
+  discrete_coord& center(void) const { return m_center; }
 
  private:
+  const discrete_coord& m_center;
   grid_view<cell2D*> m_view;
 };
 

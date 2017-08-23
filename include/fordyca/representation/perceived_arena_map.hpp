@@ -29,6 +29,7 @@
 #include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "rcppsw/common/er_server.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +56,7 @@ class perceived_arena_map: public rcppsw::common::er_client {
 
   /* events */
   void event_block_pickup(block* block);
-  void event_new_los(void);
+  void event_new_los(line_of_sight& los);
 
  private:
   std::shared_ptr<rcppsw::common::er_server> m_server;
