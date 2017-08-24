@@ -37,6 +37,23 @@ void perceived_arena_map::event_block_pickup(block* block) {
   cell.event_encounter(cell2D_fsm::ST_EMPTY);
 } /* event_block_pickup() */
 
+void perceived_arena_map::event_new_los(line_of_sight& los) {
+  for (size_t x = los.center().first - los.size()/2;
+       x < los.center().first + los.size()/2; ++x) {
+    for (size_t y = los.center().second - los.size()/2;
+         y < los.center().second + los.size()/2; ++y) {
+      if (los.cell(x, y).state_has_block()) {
+        block* block = const_cast<representation::block*>(los.cell(x,
+                                                                   y).block());
+        ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
+        m_grid.access(x, y).event_encounter(cell2D_fsm::ST_HAS_BLOCK, block);
+      } else { /* must be empty if it doesn't have a block */
+        m_grid.access(x, y).event_encounter(cell2D_fsm::ST_EMPTY);
+      }
+    } /* for(y..) */
+  } /* for(x..) */
+} /* event_new_los() */
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
@@ -59,6 +76,5 @@ void perceived_arena_map::update_relevance(void) {
     } /* for(j..) */
   } /* for(i..) */
 } /* update_relevance() */
-
 
 NS_END(representation, fordyca);
