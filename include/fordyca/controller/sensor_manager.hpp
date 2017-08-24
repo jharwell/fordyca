@@ -31,6 +31,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/params.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,17 +52,28 @@ class sensor_manager {
       argos::CCI_FootBotMotorGroundSensor* const ground);
 
   /* member functions */
-  const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {
+  const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) const {
     return m_rabs->GetReadings();
   }
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& ground(void) {
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& ground(void) const {
     return m_ground->GetReadings();
   }
 
-  void update_position(argos::CVector2& new_pos);
-
   bool block_detected(void);
   bool in_nest(void);
+  const representation::line_of_sight* los(void) const { return m_los.get(); }
+
+  /**
+   * @brief This is a hack to make it easy for me to run simulations, as I can
+   * computer the line of sight for a robot within the loop functions, and just
+   * pass it in here. In real robots this routine would be MUCH messier and
+   * harder to work with.
+   *
+   * @param los The new los
+   */
+  void los(std::unique_ptr<representation::line_of_sight>& los) {
+    m_los = std::move(los);
+  }
 
   /*
    * Calculates the diffusion vector. If there is a close obstacle, it points
@@ -80,11 +92,12 @@ class sensor_manager {
   sensor_manager(const sensor_manager& fsm) = delete;
   sensor_manager& operator=(const sensor_manager& fsm) = delete;
 
-  std::shared_ptr<const struct sensor_params>          mc_params;
-  argos::CCI_RangeAndBearingSensor*    m_rabs; /* range and bearing sensor */
-  argos::CCI_FootBotProximitySensor*   m_proximity; /* proximity sensor */
-  argos::CCI_FootBotLightSensor*       m_light; /* light sensor */
-  argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
+  std::shared_ptr<const struct sensor_params> mc_params;
+  argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
+  argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */
+  argos::CCI_FootBotLightSensor*              m_light; /* light sensor */
+  argos::CCI_FootBotMotorGroundSensor*        m_ground; /* motor ground sensor */
+  std::unique_ptr<representation::line_of_sight> m_los;
 };
 
 NS_END(controller, fordyca);

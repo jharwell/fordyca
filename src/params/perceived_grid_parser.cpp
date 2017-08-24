@@ -40,11 +40,10 @@ void perceived_grid_parser::parse(argos::TConfigurationNode& node) {
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(arena->ToElement()->GetAttribute("size"));
   m_params->grid.resolution = std::atof(argos::GetNode(node,
-                                                  "grid").GetAttribute("resolution").c_str());
-  m_params->grid.lower.Set(-std::atoi(res[0].c_str())/2.0 + 0.3,
-                      std::atoi(res[0].c_str())/2.0 - 0.3);
-  m_params->grid.upper.Set(-std::atoi(res[1].c_str())/2.0 + 0.3,
-                      std::atoi(res[1].c_str())/2.0 - 0.3);
+                                                       "grid").GetAttribute("resolution").c_str());
+  m_params->grid.lower.Set(0.3, 0.3);
+  m_params->grid.upper.Set(std::atoi(res[0].c_str()) - 0.3,
+                      std::atoi(res[1].c_str()) - 0.3);
   m_params->cell_delta = std::atof(argos::GetNode(node,
                                                   "grid").GetAttribute("cell_decay_delta").c_str());
 } /* parse() */

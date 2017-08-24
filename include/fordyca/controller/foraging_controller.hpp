@@ -30,8 +30,7 @@
 #include "fordyca/controller/foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/representation/grid2D.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +58,8 @@ class foraging_controller : public argos::CCI_Controller,
       m_server(new rcppsw::common::er_server("controller-init.txt")),
       m_actuators(),
       m_sensors(),
-      m_fsm() {}
-
+      m_fsm(),
+      m_map() {}
 
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
   bool is_returning(void) const { return m_fsm->is_returning(); }
@@ -84,7 +83,7 @@ class foraging_controller : public argos::CCI_Controller,
    *
    * Since the FSM does most of the work, this function just tells it run.
    */
-  virtual void ControlStep(void) { publish_event(CONTINUE); }
+  virtual void ControlStep(void);
 
   /*
    * @brief Reset controller to its state right after the Init().
@@ -106,6 +105,10 @@ class foraging_controller : public argos::CCI_Controller,
    */
   representation::block* block(void) const { return m_block; }
 
+  void los(std::unique_ptr<representation::line_of_sight>& new_los) {
+    m_sensors->los(new_los);
+  }
+
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
    *
@@ -125,12 +128,13 @@ class foraging_controller : public argos::CCI_Controller,
   void pickup_block(representation::block* block);
 
  private:
-  bool m_display_id;
-  representation::block* m_block;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
-  std::shared_ptr<actuator_manager>          m_actuators;
-  std::shared_ptr<sensor_manager>            m_sensors;
-  std::unique_ptr<foraging_fsm>              m_fsm;
+  bool                                                 m_display_id;
+  representation::block*                               m_block;
+  std::shared_ptr<rcppsw::common::er_server>           m_server;
+  std::shared_ptr<actuator_manager>                    m_actuators;
+  std::shared_ptr<sensor_manager>                      m_sensors;
+  std::unique_ptr<foraging_fsm>                        m_fsm;
+  std::unique_ptr<representation::perceived_arena_map> m_map;
 };
 
 NS_END(controller, fordyca);

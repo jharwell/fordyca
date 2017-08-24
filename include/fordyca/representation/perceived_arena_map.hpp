@@ -46,7 +46,7 @@ NS_START(fordyca, representation);
  */
 class perceived_arena_map: public rcppsw::common::er_client {
  public:
-  perceived_arena_map(const struct grid_params* params,
+  perceived_arena_map(const struct perceived_grid_params* params,
                       const std::shared_ptr<rcppsw::common::er_server>& server =
                       rcppsw::common::g_null_server);
 
@@ -56,7 +56,7 @@ class perceived_arena_map: public rcppsw::common::er_client {
 
   /* events */
   void event_block_pickup(block* block);
-  void event_new_los(line_of_sight& los);
+  void event_new_los(const line_of_sight* los);
 
  private:
   std::shared_ptr<rcppsw::common::er_server> m_server;

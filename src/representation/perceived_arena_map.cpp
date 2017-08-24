@@ -29,26 +29,68 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+perceived_arena_map::perceived_arena_map(
+    const struct perceived_grid_params* params,
+    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    m_server(server), m_grid(&params->grid) {
+  deferred_init(m_server);
+  insmod("perceived_arena_map");
+  server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
+         m_grid.resolution());
+
+  for (size_t i = 0; i < m_grid.xsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+      perceived_cell2D& cell = m_grid.access(i, j);
+      cell.delta(params->cell_delta);
+    } /* for(j..) */
+  } /* for(i..) */
+}
+
+/*******************************************************************************
  * Events
  ******************************************************************************/
 void perceived_arena_map::event_block_pickup(block* block) {
+  ER_NOM("Block%d picked up from (%f, %f) -> (%zu, %zu)",
+         block->id(),
+         block->real_loc().GetX(), block->real_loc().GetY(),
+         block->discrete_loc().first, block->discrete_loc().second);
   perceived_cell2D& cell = m_grid.access(block->discrete_loc().first,
                                          block->discrete_loc().second);
   cell.event_encounter(cell2D_fsm::ST_EMPTY);
 } /* event_block_pickup() */
 
-void perceived_arena_map::event_new_los(line_of_sight& los) {
-  for (size_t x = los.center().first - los.size()/2;
-       x < los.center().first + los.size()/2; ++x) {
-    for (size_t y = los.center().second - los.size()/2;
-         y < los.center().second + los.size()/2; ++y) {
-      if (los.cell(x, y).state_has_block()) {
-        block* block = const_cast<representation::block*>(los.cell(x,
-                                                                   y).block());
+void perceived_arena_map::event_new_los(const line_of_sight* los) {
+  for (size_t x = 0; x < los->sizex(); ++x) {
+    for (size_t y = 0; y < los->sizey(); ++y) {
+      size_t abs_x_coord, abs_y_coord;
+      if (x < los->sizex()/2) {
+        abs_x_coord = los->center().first - x;
+      } else {
+        abs_x_coord = los->center().first + x;
+      }
+      if (y < los->sizey()/2) {
+        abs_y_coord = los->center().second - y;
+      } else {
+        abs_y_coord = los->center().second + y;
+      }
+      if (los->cell(x, y).state_has_block()) {
+        block* block = const_cast<representation::block*>(los->cell(x,
+                                                                    y).block());
         ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
-        m_grid.access(x, y).event_encounter(cell2D_fsm::ST_HAS_BLOCK, block);
+        if (!m_grid.access(abs_x_coord, abs_y_coord).state_has_block()) {
+          ER_NOM("Discovered block%d at (%zu, %zu)", block->id(), abs_x_coord,
+                 abs_y_coord);
+        }
+        m_grid.access(abs_x_coord, abs_y_coord).event_encounter(
+            cell2D_fsm::ST_HAS_BLOCK,
+            block);
       } else { /* must be empty if it doesn't have a block */
-        m_grid.access(x, y).event_encounter(cell2D_fsm::ST_EMPTY);
+        m_grid.access(abs_x_coord, abs_y_coord).event_encounter(
+            cell2D_fsm::ST_EMPTY);
       }
     } /* for(y..) */
   } /* for(x..) */

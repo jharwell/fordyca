@@ -57,7 +57,10 @@ class arena_map: public rcppsw::common::er_client {
   size_t n_blocks(void) const { return m_blocks.size(); }
   bool respawn_enabled(void) const { return m_block_distributor.respawn_enabled(); }
   int robot_on_block(const argos::CVector2& pos);
-  grid_view<cell2D*> subgrid(double x, double y, double radius) { return m_grid.subgrid(x, y, radius); }
+  grid_view<cell2D*> subgrid(double x, double y, double radius) {
+    return m_grid.subgrid(x, y, radius);
+  }
+  double grid_resolution(void) { return m_grid.resolution(); }
 
   /* events */
   void event_block_pickup(block& block, size_t robot_index);

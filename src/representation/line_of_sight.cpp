@@ -42,5 +42,10 @@ std::list<const representation::block*> line_of_sight::blocks(void) {
   return blocks;
 } /* blocks() */
 
+cell2D& line_of_sight::cell(size_t i, size_t j) const {
+  assert(i < m_view.shape()[0]);
+  assert(j < m_view.shape()[1]);
+  return *m_view[i][j];
+}
 
 NS_END(representation, fordyca);
