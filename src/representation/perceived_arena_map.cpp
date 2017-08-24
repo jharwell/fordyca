@@ -45,14 +45,14 @@ void perceived_arena_map::event_new_los(line_of_sight& los) {
       if (los.cell(x, y).state_has_block()) {
         block* block = const_cast<representation::block*>(los.cell(x,
                                                                    y).block());
-        assert(block);
+        ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
         m_grid.access(x, y).event_encounter(cell2D_fsm::ST_HAS_BLOCK, block);
       } else { /* must be empty if it doesn't have a block */
         m_grid.access(x, y).event_encounter(cell2D_fsm::ST_EMPTY);
+      }
     } /* for(y..) */
   } /* for(x..) */
 } /* event_new_los() */
-
 
 /*******************************************************************************
  * Member Functions
