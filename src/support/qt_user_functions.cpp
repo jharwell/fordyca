@@ -45,6 +45,14 @@ void qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   controller::foraging_controller& controller =
       dynamic_cast<controller::foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
+  if (controller.display_los()) {
+    const representation::line_of_sight* los = controller.los();
+    DrawCircle(argos::CVector3(0, 0, 0),
+               argos::CQuaternion(),
+               (los->sizex()/2)*0.2,
+               argos::CColor::RED,
+               false);
+  }
   if (controller.is_carrying_block()) {
     /*
      * Box dimensions should ideally be read from .argos file, but there does

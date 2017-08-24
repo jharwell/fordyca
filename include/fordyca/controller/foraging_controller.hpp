@@ -54,6 +54,7 @@ class foraging_controller : public argos::CCI_Controller,
   foraging_controller(void) :
       er_client(),
       m_display_id(false),
+      m_display_los(false),
       m_block(nullptr),
       m_server(new rcppsw::common::er_server("controller-init.txt")),
       m_actuators(),
@@ -69,6 +70,8 @@ class foraging_controller : public argos::CCI_Controller,
   void publish_event(enum event_type event);
   void display_id(bool display_id) { m_display_id = display_id; }
   bool display_id(void) const { return m_display_id; }
+  void display_los(bool display_los) { m_display_los = display_los; }
+  bool display_los(void) const { return m_display_los; }
 
   /*
    * @brief Initialize the controller.
@@ -108,6 +111,7 @@ class foraging_controller : public argos::CCI_Controller,
   void los(std::unique_ptr<representation::line_of_sight>& new_los) {
     m_sensors->los(new_los);
   }
+  const representation::line_of_sight* los(void) const { return m_sensors->los(); }
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -129,6 +133,7 @@ class foraging_controller : public argos::CCI_Controller,
 
  private:
   bool                                                 m_display_id;
+  bool                                                 m_display_los;
   representation::block*                               m_block;
   std::shared_ptr<rcppsw::common::er_server>           m_server;
   std::shared_ptr<actuator_manager>                    m_actuators;
