@@ -52,6 +52,7 @@ class line_of_sight {
   size_t sizey(void) const { return m_view.num_elements() / 2; }
   size_t size(void) const { return m_view.num_elements(); }
   cell2D& cell(size_t i, size_t j) const;
+  discrete_coord cell_abs_coord(size_t i, size_t j) const;
   const discrete_coord& center(void) const { return m_center; }
 
  private:

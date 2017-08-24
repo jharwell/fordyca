@@ -50,6 +50,8 @@ void loop_functions_parser::parse(argos::TConfigurationNode& node) {
 
   argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_id",
                           m_params->display_robot_id);
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_los",
+                          m_params->display_robot_los);
   argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "block_id",
                           m_params->display_block_id);
 } /* parse() */

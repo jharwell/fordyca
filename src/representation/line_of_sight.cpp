@@ -48,4 +48,19 @@ cell2D& line_of_sight::cell(size_t i, size_t j) const {
   return *m_view[i][j];
 }
 
+discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
+  size_t abs_i_coord, abs_j_coord;
+  if (i < sizex()/2) {
+    abs_i_coord = m_center.first - i;
+  } else {
+    abs_i_coord = m_center.first + i;
+  }
+  if (j < sizey()/2) {
+    abs_j_coord = m_center.second - j;
+  } else {
+    abs_j_coord = m_center.second + j;
+  }
+  return discrete_coord(abs_i_coord, abs_j_coord);
+} /* cell_abs_coord() */
+
 NS_END(representation, fordyca);

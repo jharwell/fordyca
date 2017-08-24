@@ -90,6 +90,7 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
         dynamic_cast<controller::foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
+    controller.display_los(l_params->display_robot_los);
     set_robot_los(robot);
   } /* for(it..) */
 }
