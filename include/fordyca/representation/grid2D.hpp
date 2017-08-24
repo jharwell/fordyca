@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <boost/multi_array.hpp>
 #include <list>
+#include <algorithm>
 #include <argos/core/utility/math/vector2.h>
 #include "rcppsw/common/er_server.hpp"
 #include "fordyca/params/params.hpp"
@@ -79,11 +80,25 @@ class grid2D {
   }
 
   /* member functions */
+  /**
+   * @brief Create a subgrid (really an array view) from a grid. The grid is
+   * clamped to the maximum boundaries of the parent grid, so rather than
+   * getting a 2 x 2 subgrid centered at 0 with the out-of-bounds elements
+   * zeroed, you will get a 1 x 2 subgrid.
+   *
+   * @param x X coord of center of subgrid.
+   * @param y Y coord of center of subgrid.
+   * @param radius Radius of subgrid.
+   *
+   * @return The subgrid.
+   */
   grid_view<T*> subgrid(double x, double y, double radius) {
-    size_t lower_x = x / m_resolution - radius / m_resolution;
-    size_t upper_x = x / m_resolution + radius / m_resolution;
-    size_t lower_y = y / m_resolution - radius / m_resolution;
-    size_t upper_y = y / m_resolution + radius / m_resolution;
+    size_t lower_x = std::max(0.0, x / m_resolution - radius / m_resolution);
+    size_t upper_x = std::min(x / m_resolution + radius / m_resolution,
+                              static_cast<double>(xsize()));
+    size_t lower_y = std::max(0.0, y / m_resolution - radius / m_resolution);
+    size_t upper_y = std::min(y / m_resolution + radius / m_resolution,
+                              static_cast<double>(ysize()));
     typename grid_type<T*>::index_gen indices;
     return grid_view<T*>(m_cells[indices[index_range(lower_x, upper_x, 1)]
                                  [index_range(lower_y, upper_y, 1)]]);

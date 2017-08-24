@@ -1,5 +1,5 @@
 /**
- * @file cell_entity.hpp
+ * @file discrete_coord.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,16 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <utility>
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,36 +33,16 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-class cell_entity {
- public:
-  cell_entity(double x_dim, double y_dim) : m_id(-1),
-                                            m_display_id(false),
-                                            m_x_dim(x_dim), m_y_dim(y_dim),
-                                            m_real_loc(), m_discrete_loc() {}
+typedef std::pair<size_t, size_t> discrete_coord;
 
-  double xsize(void) const { return m_x_dim; }
-  double ysize(void) const { return m_y_dim; }
-  void display_id(bool display_id) { m_display_id = display_id; }
-  bool display_id(void) const { return m_display_id; }
-
-  const argos::CVector2& real_loc(void) const { return m_real_loc; }
-  const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
-  void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
-  void id(int id) { m_id = id; }
-  int id(void) const { return m_id; }
-
- private:
-  int m_id;
-  bool m_display_id;
-  double m_x_dim;
-  double m_y_dim;
-  argos::CVector2 m_real_loc;
-  discrete_coord m_discrete_loc;
-};
+/*******************************************************************************
+ * Functions
+ ******************************************************************************/
+discrete_coord real_to_discrete_coord(std::pair<double, double> real_coord,
+                                      double resolution);
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_ */

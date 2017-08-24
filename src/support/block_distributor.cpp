@@ -53,10 +53,9 @@ void block_distributor::distribute_block(representation::block& block,
 void block_distributor::dist_random(representation::block& block) {
   block.real_loc(dist_outside_range(block.xsize(),
                                         m_nest_x, m_nest_y));
-  block.discrete_loc(
-      representation::block::discrete_coord(
-          block.real_loc().GetX() / m_resolution - 1,
-          block.real_loc().GetY() / m_resolution - 1));
+  block.discrete_loc(representation::real_to_discrete_coord(
+      std::pair<double, double>(block.real_loc().GetX(),
+                                block.real_loc().GetY()), m_resolution));
 } /* dist_random() */
 
 void block_distributor::dist_single_src(representation::block& block) {
@@ -69,10 +68,9 @@ void block_distributor::dist_single_src(representation::block& block) {
       m_arena_x.GetMax() * 0.75 - 0.5,
       m_arena_x.GetMax() * 0.75);
   block.real_loc(dist_in_range(x_range, y_range));
-  block.discrete_loc(
-      representation::block::discrete_coord(
-          std::max<int>(0, block.real_loc().GetX() / m_resolution - 1),
-          std::max<int>(0, block.real_loc().GetY() / m_resolution - 1)));
+  block.discrete_loc(representation::real_to_discrete_coord(
+      std::pair<double, double>(block.real_loc().GetX(),
+                                block.real_loc().GetY()), m_resolution));
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(

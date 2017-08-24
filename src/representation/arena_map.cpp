@@ -76,7 +76,7 @@ void arena_map::event_block_nest_drop(block& block) {
 } /* event_block_nest_drop() */
 
 void arena_map::event_block_pickup(block& block, size_t robot_index) {
-  block::discrete_coord old_d(block.discrete_loc().first,
+  representation::discrete_coord old_d(block.discrete_loc().first,
                              block.discrete_loc().second);
   argos::CVector2 old_r(block.real_loc().GetX(),
                         block.real_loc().GetY());

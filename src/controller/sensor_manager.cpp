@@ -46,7 +46,8 @@ sensor_manager::sensor_manager(
     m_rabs(rabs),
     m_proximity(proximity),
     m_light(light),
-    m_ground(ground) {}
+    m_ground(ground),
+    m_los() {}
 
 
 /*******************************************************************************
@@ -126,6 +127,5 @@ bool sensor_manager::block_detected(void) {
 
   return sum >= 3;
 } /* block_detected() */
-
 
 NS_END(controller, fordyca);

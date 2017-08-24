@@ -30,6 +30,7 @@
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,16 +44,18 @@ NS_START(fordyca, representation);
 class line_of_sight {
  public:
   explicit line_of_sight(const grid_view<cell2D*> view,
-                         const block::discrete_coord& center) :
+                         discrete_coord center) :
       m_center(center), m_view(view) {}
   std::list<const representation::block*> blocks(void);
 
+  size_t sizex(void) const { return m_view.num_elements() / 2; }
+  size_t sizey(void) const { return m_view.num_elements() / 2; }
   size_t size(void) const { return m_view.num_elements(); }
-  cell2D& cell(size_t i, size_t j) { return *m_view[i][j]; }
-  const block::discrete_coord& center(void) const { return m_center; }
+  cell2D& cell(size_t i, size_t j) const;
+  const discrete_coord& center(void) const { return m_center; }
 
  private:
-  const block::discrete_coord& m_center;
+  discrete_coord m_center;
   grid_view<cell2D*> m_view;
 };
 

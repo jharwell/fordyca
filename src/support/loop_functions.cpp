@@ -79,6 +79,7 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
       static_cast<const struct logging_params*>(
           param_repo.get_params("logging"))->sim_stats));
 
+  /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
        it != footbots.end();
@@ -89,6 +90,7 @@ void loop_functions::Init(argos::TConfigurationNode& node) {
         dynamic_cast<controller::foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
+    set_robot_los(robot);
   } /* for(it..) */
 }
 
@@ -127,6 +129,9 @@ void loop_functions::PreStep() {
         dynamic_cast<controller::foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
+    /* Send the robot its new line of sight */
+    set_robot_los(robot);
+
     /* get stats from this robot before its state changes */
     m_collector->collect_from_robot(controller);
 
@@ -153,8 +158,8 @@ void loop_functions::PreStep() {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
           controller.pickup_block(&m_map->blocks()[block]);
+          m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
 
           /* The floor texture must be updated */
           m_floor->SetChanged();
@@ -164,7 +169,7 @@ void loop_functions::PreStep() {
     }
   } /* for(it..) */
   m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
-}
+} /* PreStep() */
 
 int loop_functions::robot_id(const argos::CFootBotEntity& robot) {
   /* +2 because the ID string starts with 'fb' */
@@ -190,6 +195,25 @@ bool loop_functions::IsExperimentFinished(void) {
   }
   return false;
 } /* IsExperimentFinished() */
+
+void loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  representation::discrete_coord robot_loc =
+      representation::real_to_discrete_coord(
+          std::pair<double, double>(pos.GetX(), pos.GetY()),
+          m_map->grid_resolution());
+  controller::foraging_controller& controller =
+      dynamic_cast<controller::foraging_controller&>(
+          robot.GetControllableEntity().GetController());
+  std::unique_ptr<representation::line_of_sight> new_los =
+      rcppsw::make_unique<representation::line_of_sight>(
+          m_map->subgrid(pos.GetX(), pos.GetY(),
+                         m_map->grid_resolution()),
+          robot_loc);
+  controller.los(new_los);
+} /* set_robot_los() */
 
 
 using namespace argos;

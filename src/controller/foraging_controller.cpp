@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/params/controller_repository.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,14 +33,25 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void foraging_controller::ControlStep(void) {
+  /*
+   * Update the perceived arena map with the current line-of-sight, and update
+   * the relevance of information within it.
+   */
+  m_map->event_new_los(m_sensors->los());
+  m_map->update_relevance();
+  m_fsm->event_continue();
+} /* ControlStep() */
+
 void foraging_controller::drop_block_in_nest(void) {
   ER_NOM("%s dropped block in nest", GetId().c_str());
   m_block = nullptr;
 } /* drop_block_in_nest() */
 
 void foraging_controller::pickup_block(representation::block* block) {
-  ER_NOM("%s picked up block", GetId().c_str());
+  ER_NOM("%s picked up block%d", GetId().c_str(), block->id());
   m_block = block;
+  m_map->event_block_pickup(block);
 } /* pickup_block() */
 
 void foraging_controller::publish_event(enum event_type type) {
@@ -81,9 +93,9 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_server,
                      m_sensors,
                      m_actuators));
-  /* m_grid.reset(new representation::dynamic_grid2D( */
-  /*     static_cast<const struct dynamic_grid_params*>( */
-  /*         param_repo.get_params("perceived_grid")))); */
+  m_map.reset(new representation::perceived_arena_map(
+      static_cast<const struct perceived_grid_params*>(
+          param_repo.get_params("perceived_grid"))));
   Reset();
 } /* Init() */
 

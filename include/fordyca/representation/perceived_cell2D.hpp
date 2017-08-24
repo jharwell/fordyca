@@ -47,7 +47,8 @@ class perceived_cell2D  {
  public:
   static const double kEpsilon;
   explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server = rcppsw::common::g_null_server) :
+      const std::shared_ptr<rcppsw::common::er_server>& server =
+      rcppsw::common::g_null_server) :
       m_relevance(0.0), m_delta(0.0), m_cell(server) {}
 
   void delta(double delta) { m_delta = delta; }

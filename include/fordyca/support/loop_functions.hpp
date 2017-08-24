@@ -60,6 +60,7 @@ class loop_functions : public argos::CLoopFunctions {
   loop_functions& operator=(const loop_functions& s) = delete;
   int robot_on_block(const argos::CFootBotEntity& robot);
   int robot_id(const argos::CFootBotEntity& robot);
+  void set_robot_los(argos::CFootBotEntity& robot);
 
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
