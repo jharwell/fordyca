@@ -58,6 +58,8 @@ void vectored_controller::Init(argos::TConfigurationNode& node) {
   m_map.reset(new representation::perceived_arena_map(
       static_cast<const struct perceived_grid_params*>(
           param_repo.get_params("perceived_grid"))));
+  m_light_loc = sensors()->calc_light_loc(argos::CVector2(robot_loc().first,
+                                                          robot_loc().second));
 } /* Init() */
 
 /*

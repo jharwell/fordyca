@@ -107,13 +107,16 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
     accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
   } /* for(i..) */
 
-  /* If the light was perceived, return the vector. Otherwise return 0. */
-  if (accum.Length() > 0.0f) {
-    return argos::CVector2(1.0f, accum.Angle());
-  } else {
-    return argos::CVector2();
-  }
+  assert(accum.Length() > 0.0f);
+  return argos::CVector2(1.0f, accum.Angle());
 } /* calc_vector_to_light() */
+
+argos::CVector2 sensor_manager::calc_light_loc(const argos::CVector2& robot_loc) {
+  argos::CVector2 robot_to_light_vec = calc_vector_to_light();
+  return argos::CVector2(std::fabs(robot_loc.GetX() - robot_to_light_vec.GetX()),
+                         std::fabs(robot_loc.GetY() - robot_to_light_vec.GetY()));
+} /* calc_light_loc() */
+
 
 bool sensor_manager::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();

@@ -46,6 +46,7 @@ class vectored_controller : public base_controller {
   vectored_controller(void) :
       base_controller(),
       m_display_los(false),
+      m_light_loc(),
       m_map() {}
 
   void display_los(bool display_los) { m_display_los = display_los; }
@@ -71,6 +72,8 @@ class vectored_controller : public base_controller {
   }
   const representation::line_of_sight* los(void) const { return sensors()->los(); }
 
+  representation::discrete_coord robot_loc(void) { return sensors()->los()->center(); }
+
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
    *
@@ -82,6 +85,7 @@ class vectored_controller : public base_controller {
 
  private:
   bool                                                 m_display_los;
+  argos::CVector2                                      m_light_loc;
   std::unique_ptr<representation::perceived_arena_map> m_map;
 };
 
