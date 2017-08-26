@@ -43,24 +43,21 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class foraging_fsm : public fsm::simple_fsm {
  public:
-  struct new_direction_data : public fsm::event_data {
-    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
-    argos::CRadians dir;
-  };
   foraging_fsm(const struct foraging_fsm_params* params,
              std::shared_ptr<rcppsw::common::er_server> server,
              std::shared_ptr<sensor_manager> sensors,
              std::shared_ptr<actuator_manager> actuators);
+
+  virtual void init(void);
   bool is_exploring(void) {return current_state() == ST_EXPLORE; }
   bool is_returning(void) {return current_state() == ST_RETURN_TO_NEST; }
   bool is_avoiding_collision(void) { return current_state() == ST_COLLISION_AVOIDANCE; }
-  void init(void);
   void event_continue(void);
   void event_block_found(void);
 
   void run(void) { event_continue(); }
 
- private:
+ protected:
   enum fsm_states {
     ST_START,
     ST_EXPLORE,
@@ -68,8 +65,21 @@ class foraging_fsm : public fsm::simple_fsm {
     ST_RETURN_TO_NEST,
     ST_LEAVING_NEST,
     ST_COLLISION_AVOIDANCE,
+    ST_COLLISION_RECOVERY,
     ST_MAX_STATES
   };
+
+ private:
+  struct new_direction_data : public fsm::event_data {
+    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
+    argos::CRadians dir;
+  };
+  struct collision_recovery_data : public fsm::event_data {
+    explicit collision_recovery_data(argos::CVector2 curr_heading_) :
+        curr_heading(curr_heading_) {}
+    argos::CVector2 curr_heading;
+  };
+
   struct fsm_state {
     fsm_state(void) : time_exploring_unsuccessfully(0) {}
 
@@ -81,12 +91,15 @@ class foraging_fsm : public fsm::simple_fsm {
   FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event_data);
+  FSM_STATE_DECLARE(foraging_fsm, collision_recovery, fsm::no_event_data);
 
   FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_return_to_nest, fsm::no_event_data);
 
   FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
+                    fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_recovery,
                     fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
   FSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
@@ -103,6 +116,8 @@ class foraging_fsm : public fsm::simple_fsm {
                                    &entry_leaving_nest, &exit_leaving_nest),
         FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                    &entry_collision_avoidance, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_recovery, NULL,
+                                   &entry_collision_recovery, NULL),
     };
   FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];

@@ -141,11 +141,6 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, start, fsm::no_event_data) {
-  /* argos::CRange<argos::CRadians> range(argos::CRadians(0.25), */
-  /*                                      argos::CRadians(1.0)); */
-  /* argos::CVector2 new_dir = argos::CVector2::X; */
-  /* new_dir = new_dir.Rotate(m_rng->Uniform(range)); */
-  /* printf("HERE\n"); */
   internal_event(ST_EXPLORE);
   return fsm::event_signal::HANDLED;
 }
@@ -202,6 +197,9 @@ FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
+FSM_STATE_DEFINE(foraging_fsm, collision_recovery, fsm::no_event_data) {
+  return fsm::event_signal::HANDLED;
+}
 FSM_ENTRY_DEFINE(foraging_fsm, entry_leaving_nest, fsm::no_event_data) {
   ER_DIAG("Entering ST_LEAVING_NEST");
   m_actuators->leds_set_color(argos::CColor::WHITE);
@@ -219,8 +217,12 @@ FSM_ENTRY_DEFINE(foraging_fsm, entry_return_to_nest, fsm::no_event_data) {
   m_actuators->leds_set_color(argos::CColor::GREEN);
 }
 FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
-  ER_DIAG("Entering ST_COLLIISION_AVOIDANCE");
+  ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
+}
+FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_recovery, fsm::no_event_data) {
+  ER_DIAG("Entering ST_COLLISION_RECOVERY");
+  m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
 
 FSM_EXIT_DEFINE(foraging_fsm, exit_leaving_nest) {
