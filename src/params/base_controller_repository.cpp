@@ -1,7 +1,5 @@
 /**
- * @file base_controller_repository.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file base_controller_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,15 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
-#include "fordyca/params/repository.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
+#include "fordyca/params/actuator_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/fsm_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,13 +32,15 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-class base_controller_repository: public repository {
- public:
-  base_controller_repository(void);
-};
+base_controller_repository::base_controller_repository(void) {
+  factory().register_type<actuator_parser>("actuators");
+  factory().register_type<sensor_parser> ("sensors");
+  factory().register_type<fsm_parser>("fsm");
+  parsers()["actuators"]        = factory().create("actuators");
+  parsers()["sensors"]          = factory().create("sensors");
+  parsers()["fsm"]              = factory().create("fsm");
+}
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */

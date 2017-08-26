@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ class stat_collector {
    *
    * @param controller The controller to collect from.
    */
-  void collect_from_robot(const controller::foraging_controller& controller);
+  void collect_from_robot(const controller::base_controller& controller);
   void collect_from_block(const representation::block& block);
   void store_foraging_stats(uint timestep);
   void store_block_stats(uint timestep);

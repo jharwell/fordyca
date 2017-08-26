@@ -1,8 +1,6 @@
 /**
  * @file base_controller_repository.hpp
  *
- * Handles parsing of all XML parameters at runtime.
- *
  * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.

@@ -1,5 +1,5 @@
 /**
- * @file foraging_controllor.hpp
+ * @file base_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,7 +30,6 @@
 #include "fordyca/controller/foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +42,7 @@ NS_START(fordyca, controller);
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class foraging_controller : public argos::CCI_Controller,
+class base_controller : public argos::CCI_Controller,
                             public rcppsw::common::er_client {
  public:
   enum event_type {
@@ -51,16 +50,14 @@ class foraging_controller : public argos::CCI_Controller,
     BLOCK_FOUND
   };
 
-  foraging_controller(void) :
+  base_controller(void) :
       er_client(),
       m_display_id(false),
-      m_display_los(false),
       m_block(nullptr),
       m_server(new rcppsw::common::er_server("controller-init.txt")),
       m_actuators(),
       m_sensors(),
-      m_fsm(),
-      m_map() {}
+      m_fsm() {}
 
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
   bool is_returning(void) const { return m_fsm->is_returning(); }
@@ -70,14 +67,12 @@ class foraging_controller : public argos::CCI_Controller,
   void publish_event(enum event_type event);
   void display_id(bool display_id) { m_display_id = display_id; }
   bool display_id(void) const { return m_display_id; }
-  void display_los(bool display_los) { m_display_los = display_los; }
-  bool display_los(void) const { return m_display_los; }
 
   /*
    * @brief Initialize the controller.
    *
    * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><foraging_controller_controller> section.
+   *               <controllers><base_controller_controller> section.
    */
   virtual void Init(argos::TConfigurationNode& t_node);
 
@@ -86,7 +81,7 @@ class foraging_controller : public argos::CCI_Controller,
    *
    * Since the FSM does most of the work, this function just tells it run.
    */
-  virtual void ControlStep(void);
+  virtual void ControlStep(void) { m_fsm->event_continue(); }
 
   /*
    * @brief Reset controller to its state right after the Init().
@@ -108,11 +103,6 @@ class foraging_controller : public argos::CCI_Controller,
    */
   representation::block* block(void) const { return m_block; }
 
-  void los(std::unique_ptr<representation::line_of_sight>& new_los) {
-    m_sensors->los(new_los);
-  }
-  const representation::line_of_sight* los(void) const { return m_sensors->los(); }
-
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
    *
@@ -120,7 +110,7 @@ class foraging_controller : public argos::CCI_Controller,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void drop_block_in_nest(void);
+  virtual void drop_block_in_nest(void);
 
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
@@ -129,19 +119,23 @@ class foraging_controller : public argos::CCI_Controller,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void pickup_block(representation::block* block);
+  virtual void pickup_block(representation::block* block);
+
+ protected:
+  sensor_manager* sensors(void) const { return m_sensors.get(); }
 
  private:
-  bool                                                 m_display_id;
-  bool                                                 m_display_los;
-  representation::block*                               m_block;
-  std::shared_ptr<rcppsw::common::er_server>           m_server;
-  std::shared_ptr<actuator_manager>                    m_actuators;
-  std::shared_ptr<sensor_manager>                      m_sensors;
-  std::unique_ptr<foraging_fsm>                        m_fsm;
-  std::unique_ptr<representation::perceived_arena_map> m_map;
+  base_controller(const base_controller& other) = delete;
+  base_controller& operator=(const base_controller& other) = delete;
+
+  bool                                       m_display_id;
+  representation::block*                     m_block;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<actuator_manager>          m_actuators;
+  std::shared_ptr<sensor_manager>            m_sensors;
+  std::unique_ptr<foraging_fsm>              m_fsm;
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FORAGING_CONTROLLER_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_BASE_CONTROLLER_CONTROLLER_HPP_ */

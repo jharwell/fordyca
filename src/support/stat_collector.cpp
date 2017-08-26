@@ -44,7 +44,7 @@ void stat_collector::reset(void) {
 } /* reset() */
 
 void stat_collector::collect_from_robot(
-    const controller::foraging_controller& controller) {
+    const controller::base_controller& controller) {
   /* Count how many foot-bots are in which state */
   m_foraging_stats.n_exploring += controller.is_exploring();
   m_foraging_stats.n_returning += controller.is_returning();

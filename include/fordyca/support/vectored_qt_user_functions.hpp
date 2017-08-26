@@ -1,7 +1,5 @@
 /**
- * @file base_controller_repository.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file vectored_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,30 +17,31 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
-#include "fordyca/params/repository.hpp"
+#include "fordyca/support/base_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-class base_controller_repository: public repository {
+class vectored_qt_user_functions : public base_qt_user_functions {
  public:
-  base_controller_repository(void);
+  vectored_qt_user_functions(void);
+
+  virtual ~vectored_qt_user_functions() {}
+
+  virtual void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(params, fordyca);
+NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_ */

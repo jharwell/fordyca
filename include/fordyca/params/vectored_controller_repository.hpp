@@ -1,7 +1,5 @@
 /**
- * @file base_controller_repository.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file vectored_controller_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_VECTORED_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_VECTORED_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,11 +36,11 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_controller_repository: public repository {
+class vectored_controller_repository: public repository {
  public:
-  base_controller_repository(void);
+  vectored_controller_repository(void);
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_VECTORED_CONTROLLER_REPOSITORY_HPP_ */
