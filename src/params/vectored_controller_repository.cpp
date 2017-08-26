@@ -1,5 +1,5 @@
 /**
- * @file qt_user_functions.hpp
+ * @file vectored_controller_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,33 +17,24 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/params/vectored_controller_repository.hpp"
+#include "fordyca/params/perceived_grid_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Classes
+ * Constructors/Destructor
  ******************************************************************************/
-class qt_user_functions : public argos::CQTOpenGLUserFunctions {
- public:
-  qt_user_functions(void);
+vectored_controller_repository::vectored_controller_repository(void) {
+    factory().register_type<perceived_grid_parser>("perceived_grid");
+    parsers()["perceived_grid"] = factory().create("perceived_grid");
+}
 
-  virtual ~qt_user_functions() {}
-
-  void Draw(argos::CFootBotEntity& c_entity);
-};
-
-NS_END(fordyca, support);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_QT_USER_FUNCTIONS_HPP_ */
+NS_END(params, fordyca);

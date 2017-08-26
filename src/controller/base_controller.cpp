@@ -1,5 +1,5 @@
 /**
- * @file foraging_controller.cpp
+ * @file base_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/foraging_controller.hpp"
-#include "fordyca/params/controller_repository.hpp"
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -33,28 +33,17 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void foraging_controller::ControlStep(void) {
-  /*
-   * Update the perceived arena map with the current line-of-sight, and update
-   * the relevance of information within it.
-   */
-  m_map->event_new_los(m_sensors->los());
-  m_map->update_relevance();
-  m_fsm->event_continue();
-} /* ControlStep() */
-
-void foraging_controller::drop_block_in_nest(void) {
+void base_controller::drop_block_in_nest(void) {
   ER_NOM("%s dropped block in nest", GetId().c_str());
   m_block = nullptr;
 } /* drop_block_in_nest() */
 
-void foraging_controller::pickup_block(representation::block* block) {
+void base_controller::pickup_block(representation::block* block) {
   ER_NOM("%s picked up block%d", GetId().c_str(), block->id());
   m_block = block;
-  m_map->event_block_pickup(block);
 } /* pickup_block() */
 
-void foraging_controller::publish_event(enum event_type type) {
+void base_controller::publish_event(enum event_type type) {
   switch (type) {
     case CONTINUE:
       m_fsm->event_continue();
@@ -65,11 +54,11 @@ void foraging_controller::publish_event(enum event_type type) {
   }
 } /* publish_event() */
 
-void foraging_controller::Init(argos::TConfigurationNode& node) {
+void base_controller::Init(argos::TConfigurationNode& node) {
   deferred_init(m_server);
   ER_NOM("Initializing foraging controller");
 
-  params::controller_repository param_repo;
+  params::base_controller_repository param_repo;
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
 
@@ -93,13 +82,10 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
                      m_server,
                      m_sensors,
                      m_actuators));
-  m_map.reset(new representation::perceived_arena_map(
-      static_cast<const struct perceived_grid_params*>(
-          param_repo.get_params("perceived_grid"))));
   Reset();
 } /* Init() */
 
-void foraging_controller::Reset(void) {
+void base_controller::Reset(void) {
   insmod("controller");
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
@@ -119,6 +105,6 @@ void foraging_controller::Reset(void) {
  * example of how this is used.
  */
 using namespace argos;
-REGISTER_CONTROLLER(foraging_controller, "foraging_controller")
+REGISTER_CONTROLLER(base_controller, "base_controller")
 
 NS_END(controller, fordyca);

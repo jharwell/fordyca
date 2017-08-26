@@ -1,5 +1,5 @@
 /**
- * @file controller_repository.cpp
+ * @file base_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,33 +17,33 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
+#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/controller_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/perceived_grid_parser.hpp"
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Classes
  ******************************************************************************/
-controller_repository::controller_repository(void) {
-  factory().register_type<actuator_parser>("actuators");
-  factory().register_type<sensor_parser> ("sensors");
-  factory().register_type<fsm_parser>("fsm");
-  factory().register_type<perceived_grid_parser>("perceived_grid");
-  parsers()["actuators"]        = factory().create("actuators");
-  parsers()["sensors"]          = factory().create("sensors");
-  parsers()["fsm"]              = factory().create("fsm");
-  parsers()["perceived_grid"]   = factory().create("perceived_grid");
-}
+class base_qt_user_functions : public argos::CQTOpenGLUserFunctions {
+ public:
+  base_qt_user_functions(void);
 
-NS_END(params, fordyca);
+  virtual ~base_qt_user_functions() {}
+
+  virtual void Draw(argos::CFootBotEntity& c_entity);
+};
+
+NS_END(fordyca, support);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_ */

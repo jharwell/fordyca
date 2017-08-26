@@ -23,8 +23,8 @@
   <!-- *************** -->
   <controllers>
 
-    <foraging_controller id="ffc"
-                                 library="build/lib/libfordyca">
+    <vectored_controller id="ffc"
+                         library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -52,7 +52,7 @@
         </actuators>
         <fsm unsuccessful_explore_dir_change="600"/>
       </params>
-    </foraging_controller>
+    </vectored_controller>
 
   </controllers>
 
@@ -60,7 +60,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="foraging_loop_functions">
+                  label="vectored_loop_functions">
     <logging sim_stats="base-foraging-stats.txt"/>
     <grid resolution="0.2"/>
     <blocks n_blocks="25"
@@ -143,7 +143,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="qt_user_functions" />
+      <user_functions label="vectored_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
