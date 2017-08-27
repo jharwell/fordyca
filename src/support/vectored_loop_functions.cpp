@@ -68,7 +68,7 @@ void vectored_loop_functions::PreStep() {
 
     /* Send the robot its new line of sight */
     set_robot_los(robot);
-
+    set_robot_tick(robot);
     base_loop_functions::pre_step_iter(robot);
   } /* for(it..) */
   base_loop_functions::pre_step_final();
@@ -92,6 +92,13 @@ void vectored_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
           robot_loc);
   controller.los(new_los);
 } /* set_robot_los() */
+
+void vectored_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
+  controller::vectored_controller& controller =
+      dynamic_cast<controller::vectored_controller&>(
+          robot.GetControllableEntity().GetController());
+  controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
+} /* set_robot_tic() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(vectored_loop_functions, "vectored_loop_functions");

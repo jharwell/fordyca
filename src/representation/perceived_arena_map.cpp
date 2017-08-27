@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcsw/utils/utils.h"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -64,6 +65,9 @@ void perceived_arena_map::event_block_pickup(block* block) {
 } /* event_block_pickup() */
 
 void perceived_arena_map::event_new_los(const line_of_sight* los) {
+  if (!IS_SIZE_ALIGNED(los->size(), 4)) {
+    return;
+  }
   for (size_t x = 0; x < los->sizex(); ++x) {
     for (size_t y = 0; y < los->sizey(); ++y) {
       discrete_coord abs = los->cell_abs_coord(x, y);

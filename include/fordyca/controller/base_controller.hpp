@@ -46,7 +46,7 @@ class base_controller : public argos::CCI_Controller,
                             public rcppsw::common::er_client {
  public:
   enum event_type {
-    CONTINUE,
+    FSM_START,
     BLOCK_FOUND
   };
 
@@ -81,7 +81,7 @@ class base_controller : public argos::CCI_Controller,
    *
    * Since the FSM does most of the work, this function just tells it run.
    */
-  virtual void ControlStep(void) { m_fsm->event_continue(); }
+  virtual void ControlStep(void) { m_fsm->run(); }
 
   /*
    * @brief Reset controller to its state right after the Init().

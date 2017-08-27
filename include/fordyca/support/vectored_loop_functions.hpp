@@ -48,6 +48,7 @@ class vectored_loop_functions : public base_loop_functions {
   vectored_loop_functions(const vectored_loop_functions& s) = delete;
   vectored_loop_functions& operator=(const vectored_loop_functions& s) = delete;
   void set_robot_los(argos::CFootBotEntity& robot);
+  void set_robot_tick(argos::CFootBotEntity& robot);
 };
 
 NS_END(support, fordyca);

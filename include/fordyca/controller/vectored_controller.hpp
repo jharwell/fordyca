@@ -71,7 +71,7 @@ class vectored_controller : public base_controller {
     sensors()->los(new_los);
   }
   const representation::line_of_sight* los(void) const { return sensors()->los(); }
-
+  void tick(uint tick) { sensors()->tick(tick); }
   representation::discrete_coord robot_loc(void) { return sensors()->los()->center(); }
 
   /**
