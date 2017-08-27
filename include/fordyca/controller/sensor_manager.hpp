@@ -75,6 +75,9 @@ class sensor_manager {
     m_los = std::move(los);
   }
 
+  uint tick(void) const { return m_tick; }
+  void tick(uint tick) { m_tick = tick; }
+
   /*
    * Calculates the diffusion vector. If there is a close obstacle, it points
    * away from it; it there is none, it points forwards.  The b_collision
@@ -92,6 +95,7 @@ class sensor_manager {
   sensor_manager(const sensor_manager& fsm) = delete;
   sensor_manager& operator=(const sensor_manager& fsm) = delete;
 
+  uint                                        m_tick;
   std::shared_ptr<const struct sensor_params> mc_params;
   argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
   argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */

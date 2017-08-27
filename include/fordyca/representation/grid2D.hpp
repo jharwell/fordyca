@@ -95,10 +95,16 @@ class grid2D {
   grid_view<T*> subgrid(double x, double y, double radius) {
     size_t lower_x = std::max(0.0, x / m_resolution - radius / m_resolution);
     size_t upper_x = std::min(x / m_resolution + radius / m_resolution,
-                              static_cast<double>(xsize()));
+                              static_cast<double>(xsize()) - 1);
     size_t lower_y = std::max(0.0, y / m_resolution - radius / m_resolution);
     size_t upper_y = std::min(y / m_resolution + radius / m_resolution,
-                              static_cast<double>(ysize()));
+                              static_cast<double>(ysize()) - 1);
+    if (lower_x > upper_x) {
+      lower_x = upper_x - 1;
+    }
+    if (lower_y > upper_y) {
+      lower_y = upper_y - 1;
+    }
     typename grid_type<T*>::index_gen indices;
     return grid_view<T*>(m_cells[indices[index_range(lower_x, upper_x, 1)]
                                  [index_range(lower_y, upper_y, 1)]]);

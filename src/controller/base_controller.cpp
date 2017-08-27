@@ -45,8 +45,8 @@ void base_controller::pickup_block(representation::block* block) {
 
 void base_controller::publish_event(enum event_type type) {
   switch (type) {
-    case CONTINUE:
-      m_fsm->event_continue();
+    case FSM_START:
+      m_fsm->event_start();
       break;
     case BLOCK_FOUND:
       m_fsm->event_block_found();

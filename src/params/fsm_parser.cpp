@@ -39,6 +39,9 @@ void fsm_parser::parse(argos::TConfigurationNode& node) {
       argos::GetNodeAttribute(fsm_node,
                               "unsuccessful_explore_dir_change",
                               m_params->times.unsuccessful_explore_dir_change);
+      argos::GetNodeAttribute(fsm_node,
+                              "frequent_collision_thresh",
+                              m_params->times.frequent_collision_thresh);
   }
   catch (argos::CARGoSException& ex) {
     using namespace argos;

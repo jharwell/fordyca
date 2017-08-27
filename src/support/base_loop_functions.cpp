@@ -89,6 +89,7 @@ void base_loop_functions::Init(argos::TConfigurationNode& node) {
         dynamic_cast<controller::base_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
+    controller.publish_event(controller::base_controller::FSM_START);
   } /* for(it..) */
 }
 
