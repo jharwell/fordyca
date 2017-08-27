@@ -50,7 +50,9 @@
                   no_turn_angle_threshold="10"
                   max_speed="10" />
         </actuators>
-        <fsm unsuccessful_explore_dir_change="600"/>
+        <fsm unsuccessful_explore_dir_change="600"
+             frequent_collision_thresh="100"
+             />
       </params>
     </vectored_controller>
 

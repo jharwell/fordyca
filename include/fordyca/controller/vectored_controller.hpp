@@ -71,6 +71,8 @@ class vectored_controller : public base_controller {
   }
   const representation::line_of_sight* los(void) const { return sensors()->los(); }
 
+  void tick(uint tick) { sensors()->tick(tick); }
+
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
    *

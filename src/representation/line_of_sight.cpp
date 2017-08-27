@@ -49,7 +49,7 @@ cell2D& line_of_sight::cell(size_t i, size_t j) const {
 }
 
 discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
-  size_t abs_i_coord, abs_j_coord;
+  int abs_i_coord, abs_j_coord;
   if (i < sizex()/2) {
     abs_i_coord = m_center.first - i;
   } else {

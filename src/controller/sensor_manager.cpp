@@ -42,6 +42,7 @@ sensor_manager::sensor_manager(
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
+    m_tick(0),
     mc_params(params),
     m_rabs(rabs),
     m_proximity(proximity),

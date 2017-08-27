@@ -45,8 +45,8 @@ void base_controller::pickup_block(representation::block* block) {
 
 void base_controller::publish_event(enum event_type type) {
   switch (type) {
-    case CONTINUE:
-      m_fsm->event_continue();
+    case FSM_START:
+      m_fsm->event_start();
       break;
     case BLOCK_FOUND:
       m_fsm->event_block_found();
@@ -96,15 +96,8 @@ void base_controller::Reset(void) {
   m_block = nullptr;
 } /* Reset() */
 
-/*
- * This statement notifies ARGoS of the existence of the controller.  It binds
- * the class passed as first argument to the string passed as second argument.
- * The string is then usable in the XML configuration file to refer to this
- * controller.  When ARGoS reads that string in the XML file, it knows which
- * controller class to instantiate.  See also the XML configuration files for an
- * example of how this is used.
- */
+/* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;
-REGISTER_CONTROLLER(base_controller, "base_controller")
+REGISTER_CONTROLLER(base_controller, "base_controller");
 
 NS_END(controller, fordyca);
