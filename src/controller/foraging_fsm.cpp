@@ -191,6 +191,7 @@ FSM_STATE_DEFINE(foraging_fsm, return_to_nest, fsm::no_event_data) {
     internal_event(ST_LEAVING_NEST);
   }
 
+  /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);
   m_actuators->set_heading(m_actuators->max_wheel_speed() * vector +
                            m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
@@ -207,8 +208,10 @@ FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, collision_data) {
    * randomly exploring or doing something else.
    */
   if (m_sensors->calc_diffusion_vector(&vector)) {
-    if (m_sensors->tick() - m_state.last_collision_time >=
+    if (m_sensors->tick() - m_state.last_collision_time <
         mc_params->times.frequent_collision_thresh) {
+      ER_DIAG("Frequent collision: last=%u curr=%u",
+              m_state.last_collision_time, m_sensors->tick());
       vector = randomize_vector_angle(vector);
     }
     m_actuators->set_heading(vector);
@@ -218,7 +221,6 @@ FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, collision_data) {
     internal_event(ST_COLLISION_RECOVERY,
                    rcppsw::make_unique<struct collision_data>(data));
   }
-  m_state.last_collision_time = m_sensors->tick();
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, collision_recovery, collision_data) {
@@ -255,6 +257,7 @@ FSM_ENTRY_DEFINE(foraging_fsm, entry_return_to_nest, fsm::no_event_data) {
 FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
+  m_state.last_collision_time = m_sensors->tick();
 }
 FSM_ENTRY_DEFINE(foraging_fsm, entry_collision_recovery, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
@@ -275,7 +278,7 @@ void foraging_fsm::init(void) {
 } /* init() */
 
 argos::CVector2 foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
-  argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
+  argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
   vector.Rotate(m_rng->Uniform(range));
   return vector;

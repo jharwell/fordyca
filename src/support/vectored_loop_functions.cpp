@@ -97,7 +97,7 @@ void vectored_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
   controller::vectored_controller& controller =
       dynamic_cast<controller::vectored_controller&>(
           robot.GetControllableEntity().GetController());
-  controller.tick(GetSpace().GetSimulationClock());
+  controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
 
 using namespace argos;

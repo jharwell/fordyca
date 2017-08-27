@@ -54,7 +54,7 @@ class foraging_fsm : public fsm::simple_fsm {
   bool is_avoiding_collision(void) { return current_state() == ST_COLLISION_AVOIDANCE; }
   void event_block_found(void);
   void event_start(void);
-  void run(void) { state_engine(); }
+  void run(void) { generated_event(true); state_engine(); }
 
  protected:
   enum fsm_states {
