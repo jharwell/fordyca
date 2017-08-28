@@ -36,6 +36,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  * Constants
  ******************************************************************************/
 int foraging_fsm::kCOLLISION_RECOVERY_TIME = 10;
+int foraging_fsm::kVECTOR_TO_GOAL_MIN_DIFF = 0.01;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -79,6 +80,7 @@ void foraging_fsm::event_block_found(void) {
         fsm::event_signal::FATAL,    /* leaving nest */
         ST_COLLISION_AVOIDANCE,      /* collision avoidance */
         ST_COLLISION_RECOVERY,       /* collision recovery */
+        ST_VECTOR_TO_GOAL,           /* vector to goal */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
@@ -93,6 +95,7 @@ void foraging_fsm::event_start(void) {
     fsm::event_signal::IGNORED,  /* leaving nest */
     fsm::event_signal::IGNORED,  /* collision avoidance */
     fsm::event_signal::IGNORED,  /* collision recovery */
+    fsm::event_signal::IGNORED,  /* vector to goal */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
@@ -123,7 +126,7 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
   ER_DIAG("Executing ST_EXPLORE");
 
   ++m_state.time_exploring_unsuccessfully;
-
+  argos::CVector2 a;
   /*
    * Check for nearby obstacles, and if so go int obstacle avoidance. Time spent
    * in collision avoidance still counts towards the direction change threshold.
@@ -139,7 +142,6 @@ FSM_STATE_DEFINE(foraging_fsm, explore, fsm::no_event_data) {
     internal_event(ST_NEW_DIRECTION,
                    rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
   }
-
   /*
    * No obstacles nearby and have not hit direction changing threshold--use the
    * diffusion vector only to set speeds.
@@ -224,7 +226,7 @@ FSM_STATE_DEFINE(foraging_fsm, collision_avoidance, collision_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(foraging_fsm, collision_recovery, collision_data) {
-  ER_DIAG("Entering ST_COLLISION_RECOVERY");
+  ER_DIAG("Executing ST_COLLISION_RECOVERY");
 
   static int count = 0;
   static uint8_t prev_state;
@@ -236,6 +238,22 @@ FSM_STATE_DEFINE(foraging_fsm, collision_recovery, collision_data) {
     count = 0;
     internal_event(prev_state);
   }
+  return fsm::event_signal::HANDLED;
+}
+FSM_STATE_DEFINE(foraging_fsm, vector_to_goal, goal_data) {
+  ER_DIAG("Executing ST_VECTOR_TO_GOAL");
+  argos::CVector2 robot_loc(m_sensors->los()->center().first,
+                            m_sensors->los()->center().second);
+
+  if (m_sensors->calc_diffusion_vector(NULL)) {
+    internal_event(ST_COLLISION_AVOIDANCE,
+                   rcppsw::make_unique<struct collision_data>(true,
+                                                              ST_VECTOR_TO_GOAL));
+  }
+  if ((robot_loc - data->goal).Length() <= kVECTOR_TO_GOAL_MIN_DIFF) {
+    ER_NOM("Arrived at goal");
+  }
+  m_actuators->set_heading(robot_loc - data->goal);
   return fsm::event_signal::HANDLED;
 }
 FSM_ENTRY_DEFINE(foraging_fsm, entry_leaving_nest, fsm::no_event_data) {

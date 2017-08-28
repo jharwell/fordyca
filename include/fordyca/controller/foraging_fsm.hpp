@@ -65,6 +65,7 @@ class foraging_fsm : public fsm::simple_fsm {
     ST_LEAVING_NEST,
     ST_COLLISION_AVOIDANCE,
     ST_COLLISION_RECOVERY,
+    ST_VECTOR_TO_GOAL,
     ST_MAX_STATES
   };
 
@@ -82,6 +83,12 @@ class foraging_fsm : public fsm::simple_fsm {
     uint8_t prev_state;
   };
 
+  struct goal_data : public fsm::event_data {
+    explicit goal_data(argos::CVector2 goal_) : goal(goal_) {}
+
+    argos::CVector2 goal;
+  };
+
   struct fsm_state {
     fsm_state(void) : time_exploring_unsuccessfully(0),
                       last_collision_time(0) {}
@@ -92,6 +99,7 @@ class foraging_fsm : public fsm::simple_fsm {
 
   /* constants */
   static int kCOLLISION_RECOVERY_TIME;
+  static int kVECTOR_TO_GOAL_MIN_DIFF;
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
@@ -104,6 +112,7 @@ class foraging_fsm : public fsm::simple_fsm {
   FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event_data);
   FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, collision_data);
   FSM_STATE_DECLARE(foraging_fsm, collision_recovery, collision_data);
+  FSM_STATE_DECLARE(foraging_fsm, vector_to_goal, goal_data);
 
   FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
@@ -113,6 +122,7 @@ class foraging_fsm : public fsm::simple_fsm {
                     fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_recovery,
                     fsm::no_event_data);
+  FSM_ENTRY_DECLARE(foraging_fsm, entry_vector_to_goal, fsm::no_event_data);
   FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
   FSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
 
@@ -130,6 +140,8 @@ class foraging_fsm : public fsm::simple_fsm {
                                    &entry_collision_avoidance, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&collision_recovery, NULL,
                                    &entry_collision_recovery, NULL),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&vector_to_goal, NULL,
+                                   &entry_vector_to_goal, NULL),
     };
   FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];
