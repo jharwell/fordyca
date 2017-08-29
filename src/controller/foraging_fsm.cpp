@@ -39,7 +39,7 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
                            std::shared_ptr<rcppsw::common::er_server> server,
                            std::shared_ptr<sensor_manager> sensors,
                            std::shared_ptr<actuator_manager> actuators) :
-    fsm::simple_fsm(server, ST_MAX_STATES),
+    fsm::hfsm(server),
     start(),
     explore(),
     new_direction(),
@@ -52,6 +52,10 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
     entry_collision_avoidance(),
     entry_leaving_nest(),
     exit_leaving_nest(),
+    m_current_state(ST_START),
+    m_next_state(ST_START),
+    m_initial_state(ST_START),
+    m_previous_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
     mc_params(params),
@@ -66,7 +70,7 @@ foraging_fsm::foraging_fsm(const struct foraging_fsm_params* params,
  * Events
  ******************************************************************************/
 void foraging_fsm::event_block_found(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
+  HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_RETURN_TO_NEST,           /* start (robot might be on block initially) */
         ST_RETURN_TO_NEST,           /* explore */
         ST_RETURN_TO_NEST,           /* new direction */
@@ -74,12 +78,12 @@ void foraging_fsm::event_block_found(void) {
         fsm::event_signal::FATAL,    /* leaving nest */
         ST_COLLISION_AVOIDANCE,      /* collision avoidance */
         };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
 }
 
 void foraging_fsm::event_start(void) {
-  static const uint8_t kTRANSITIONS[] = {
+  HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
     ST_EXPLORE,                  /* start */
     ST_EXPLORE,                  /* explore */
     fsm::event_signal::IGNORED,  /* new direction */
@@ -87,7 +91,7 @@ void foraging_fsm::event_start(void) {
     fsm::event_signal::IGNORED,  /* leaving nest */
     fsm::event_signal::IGNORED,  /* collision avoidance */
   };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
 }
 
@@ -237,7 +241,7 @@ FSM_EXIT_DEFINE(foraging_fsm, exit_leaving_nest) {
 void foraging_fsm::init(void) {
   m_state.time_exploring_unsuccessfully = 0;
   m_actuators->reset();
-  simple_fsm::init();
+  base_fsm::init();
 } /* init() */
 
 argos::CVector2 foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
@@ -246,6 +250,13 @@ argos::CVector2 foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
   vector.Rotate(m_rng->Uniform(range));
   return vector;
 } /* randomize_vector_angle() */
+
+void foraging_fsm::update_state(uint8_t new_state) {
+  if (new_state != m_current_state) {
+    m_previous_state = m_current_state;
+  }
+  m_current_state = new_state;
+} /* update_state() */
 
 
 NS_END(controller, fordyca);

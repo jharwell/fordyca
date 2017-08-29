@@ -103,7 +103,7 @@ class vector_to_goal : public fsm::simple_fsm {
                     fsm::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
-  FSM_DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
+  FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&vector, NULL, &entry_vector, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
