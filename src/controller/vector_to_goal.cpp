@@ -83,6 +83,10 @@ void vector_to_goal::event_start(const argos::CVector2& goal) {
 /*******************************************************************************
  * States
  ******************************************************************************/
+FSM_STATE_DEFINE(vector_to_goal, start, fsm::no_event_data) {
+  return fsm::event_signal::HANDLED;
+}
+
 FSM_STATE_DEFINE(vector_to_goal, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
   ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
@@ -135,6 +139,11 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   m_actuators->set_heading(robot_loc - data->goal);
   return fsm::event_signal::HANDLED;
 }
+FSM_STATE_DEFINE(vector_to_goal, arrived, fsm::no_event_data) {
+  ER_DIAG("Executing ST_ARRIVED");
+  return fsm::event_signal::HANDLED;
+}
+
 FSM_ENTRY_DEFINE(vector_to_goal, entry_vector, fsm::no_event_data) {
   ER_DIAG("Entering ST_VECTOR");
   m_actuators->leds_set_color(argos::CColor::BLUE);

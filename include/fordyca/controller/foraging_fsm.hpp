@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
+#include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
@@ -41,7 +41,7 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class foraging_fsm : public fsm::simple_fsm {
+class foraging_fsm : public fsm::hfsm {
  public:
   foraging_fsm(const struct foraging_fsm_params* params,
              std::shared_ptr<rcppsw::common::er_server> server,
@@ -49,6 +49,11 @@ class foraging_fsm : public fsm::simple_fsm {
              std::shared_ptr<actuator_manager> actuators);
 
   void init(void);
+
+  uint8_t current_state(void) const { return m_current_state; }
+  uint8_t max_states(void) const { return ST_MAX_STATES; }
+  uint8_t previous_state(void) const { return m_previous_state; }
+
   bool is_exploring(void) {return current_state() == ST_EXPLORE; }
   bool is_returning(void) {return current_state() == ST_RETURN_TO_NEST; }
   bool is_avoiding_collision(void) { return current_state() == ST_COLLISION_AVOIDANCE; }
@@ -69,7 +74,7 @@ class foraging_fsm : public fsm::simple_fsm {
 
  private:
   /* types */
-  struct new_direction_data : public fsm::event_data {
+  struct new_direction_data  : public fsm::event_data {
     explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
     argos::CRadians dir;
   };
@@ -83,38 +88,54 @@ class foraging_fsm : public fsm::simple_fsm {
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  uint8_t next_state(void) const { return m_next_state; }
+  uint8_t initial_state(void) const { return m_initial_state; }
+  void next_state(uint8_t next_state) { m_next_state = next_state; }
+  void update_state(uint8_t update_state);
 
   /* states */
-  FSM_STATE_DECLARE(foraging_fsm, start, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, explore, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, new_direction, new_direction_data);
-  FSM_STATE_DECLARE(foraging_fsm, return_to_nest, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, leaving_nest, fsm::no_event_data);
-  FSM_STATE_DECLARE(foraging_fsm, collision_avoidance, fsm::no_event_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     start, fsm::no_event_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     explore, fsm::no_event_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     new_direction, new_direction_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     return_to_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     leaving_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+                     top_state, fsm::no_event_data,
+                     collision_avoidance, fsm::no_event_data);
 
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_return_to_nest, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(foraging_fsm, entry_return_to_nest, fsm::no_event_data);
 
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
+  HFSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
                     fsm::no_event_data);
-  FSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
-  FSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
+  HFSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
+  HFSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
-  FSM_DEFINE_STATE_MAP_EX(state_map_ex, kSTATE_MAP) {
-        FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
                                    &entry_new_direction, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
                                    &entry_return_to_nest, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
                                    &entry_leaving_nest, &exit_leaving_nest),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                    &entry_collision_avoidance, NULL),
     };
-  FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
+  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];
   }
 
@@ -122,7 +143,10 @@ class foraging_fsm : public fsm::simple_fsm {
   foraging_fsm& operator=(const foraging_fsm& fsm) = delete;
 
   /* data members */
-
+  uint8_t m_current_state;
+  uint8_t m_next_state;
+  uint8_t m_initial_state;
+  uint8_t m_previous_state;
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   std::shared_ptr<const struct foraging_fsm_params> mc_params;
