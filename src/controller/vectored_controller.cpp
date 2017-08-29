@@ -48,7 +48,6 @@ void vectored_controller::pickup_block(representation::block* block) {
   m_map->event_block_pickup(block);
 } /* pickup_block() */
 
-
 void vectored_controller::Init(argos::TConfigurationNode& node) {
   base_controller::Init(node);
   params::vectored_controller_repository param_repo;
@@ -58,8 +57,6 @@ void vectored_controller::Init(argos::TConfigurationNode& node) {
   m_map.reset(new representation::perceived_arena_map(
       static_cast<const struct perceived_grid_params*>(
           param_repo.get_params("perceived_grid"))));
-  m_light_loc = sensors()->calc_light_loc(argos::CVector2(robot_loc().first,
-                                                          robot_loc().second));
 } /* Init() */
 
 /*
