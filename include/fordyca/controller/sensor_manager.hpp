@@ -91,6 +91,8 @@ class sensor_manager {
    */
   argos::CVector2 calc_vector_to_light(void);
 
+  argos::CVector2 calc_light_loc(const argos::CVector2& robot_loc);
+
  private:
   sensor_manager(const sensor_manager& fsm) = delete;
   sensor_manager& operator=(const sensor_manager& fsm) = delete;

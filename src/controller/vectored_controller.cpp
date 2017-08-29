@@ -48,7 +48,6 @@ void vectored_controller::pickup_block(representation::block* block) {
   m_map->event_block_pickup(block);
 } /* pickup_block() */
 
-
 void vectored_controller::Init(argos::TConfigurationNode& node) {
   base_controller::Init(node);
   params::vectored_controller_repository param_repo;
