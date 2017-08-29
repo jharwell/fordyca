@@ -76,6 +76,7 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
              mc_params->wheels.soft_turn_threshold) {
     internal_event(ST_SOFT_TURN);
   }
+  m_wheels->
   set_wheel_speeds(data->heading.Length(), data->heading.Length(),
                    data->heading.Angle());
   return fsm::event_signal::HANDLED;
