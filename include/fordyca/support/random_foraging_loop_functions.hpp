@@ -1,5 +1,5 @@
 /**
- * @file base_loop_functions.hpp
+ * @file random_foraging_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -43,10 +43,10 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class base_loop_functions : public argos::CLoopFunctions {
+class random_foraging_loop_functions : public argos::CLoopFunctions {
  public:
-  base_loop_functions();
-  virtual ~base_loop_functions(void) {}
+  random_foraging_loop_functions();
+  virtual ~random_foraging_loop_functions(void) {}
 
   virtual void Init(argos::TConfigurationNode& node);
   virtual void Reset();
@@ -57,16 +57,18 @@ class base_loop_functions : public argos::CLoopFunctions {
   virtual void PostExperiment(void) { std::exit(0); }
 
  protected:
-  void pre_step_iter(argos::CFootBotEntity& robot);
-  void pre_step_final(void);
+  virtual void pre_step_iter(argos::CFootBotEntity& robot);
+  virtual void pre_step_final(void);
   int robot_on_block(const argos::CFootBotEntity& robot);
   int robot_id(const argos::CFootBotEntity& robot);
   representation::arena_map* map(void) const { return m_map.get(); }
   params::loop_function_repository* repo(void) const { return m_repo.get(); }
+  argos::CFloorEntity* floor(void) const { return m_floor; }
+  stat_collector* collector(void) const { return m_collector.get(); }
 
  private:
-  base_loop_functions(const base_loop_functions& s) = delete;
-  base_loop_functions& operator=(const base_loop_functions& s) = delete;
+  random_foraging_loop_functions(const random_foraging_loop_functions& s) = delete;
+  random_foraging_loop_functions& operator=(const random_foraging_loop_functions& s) = delete;
 
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
@@ -78,4 +80,4 @@ class base_loop_functions : public argos::CLoopFunctions {
 
 NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_LOOP_FUNCTIONS_HPP_ */

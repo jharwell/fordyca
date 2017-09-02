@@ -1,5 +1,5 @@
 /**
- * @file base_loop_functions.cpp
+ * @file random_foraging_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -24,8 +24,8 @@
 #include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/support/random_foraging_loop_functions.hpp"
+#include "fordyca/controller/random_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,7 +35,7 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_loop_functions::base_loop_functions(void) :
+random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_nest_x(),
     m_nest_y(),
     m_floor(NULL),
@@ -46,7 +46,7 @@ base_loop_functions::base_loop_functions(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_loop_functions::Init(argos::TConfigurationNode& node) {
+void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_floor = &GetSpace().GetFloorEntity();
 
   /* parse all environment parameters */
@@ -85,24 +85,24 @@ void base_loop_functions::Init(argos::TConfigurationNode& node) {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::base_controller& controller =
-        dynamic_cast<controller::base_controller&>(
+    controller::random_foraging_controller& controller =
+        dynamic_cast<controller::random_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
-    controller.publish_event(controller::base_controller::FSM_START);
+    controller.publish_event(controller::FSM_START);
   } /* for(it..) */
 }
 
-void base_loop_functions::Reset() {
+void random_foraging_loop_functions::Reset() {
   m_collector->reset();
   m_map->distribute_blocks(true);
 }
 
-void base_loop_functions::Destroy() {
+void random_foraging_loop_functions::Destroy() {
   m_collector->finalize();
 }
 
-argos::CColor base_loop_functions::GetFloorColor(
+argos::CColor random_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
@@ -116,9 +116,9 @@ argos::CColor base_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void base_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-    controller::base_controller& controller =
-        dynamic_cast<controller::base_controller&>(
+void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+    controller::random_foraging_controller& controller =
+        dynamic_cast<controller::random_foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
@@ -142,27 +142,27 @@ void base_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.is_exploring() &&
+      if (!controller.in_nest() && controller.is_searching_for_block() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
           controller.pickup_block(&m_map->blocks()[block]);
           m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
+          controller.publish_event(controller::BLOCK_FOUND);
 
           /* The floor texture must be updated */
           m_floor->SetChanged();
-          controller.publish_event(controller::base_controller::BLOCK_FOUND);
         }
       }
     }
 } /* pre_step_iter() */
 
-void base_loop_functions::pre_step_final(void) {
+void random_foraging_loop_functions::pre_step_final(void) {
   m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
 } /* pre_step_final() */
 
-void base_loop_functions::PreStep() {
+void random_foraging_loop_functions::PreStep() {
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -175,19 +175,19 @@ void base_loop_functions::PreStep() {
   pre_step_final();
 } /* PreStep() */
 
-int base_loop_functions::robot_id(const argos::CFootBotEntity& robot) {
+int random_foraging_loop_functions::robot_id(const argos::CFootBotEntity& robot) {
   /* +2 because the ID string starts with 'fb' */
   return std::atoi(robot.GetId().c_str()+2);
 } /* robot_id() */
 
-int base_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
+int random_foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
   return m_map->robot_on_block(pos);
 } /* robot_on_block() */
 
-bool base_loop_functions::IsExperimentFinished(void) {
+bool random_foraging_loop_functions::IsExperimentFinished(void) {
   /*
    * If we are not respawning blocks and all blocks have been collected, signal
    * the end of the experiment. If respawn is enabled, then the experiment will
@@ -202,6 +202,6 @@ bool base_loop_functions::IsExperimentFinished(void) {
 
 
 using namespace argos;
-/* REGISTER_LOOP_FUNCTIONS(base_loop_functions, "base_loop_functions") */
+REGISTER_LOOP_FUNCTIONS(random_foraging_loop_functions, "random_foraging_loop_functions")
 
 NS_END(support, fordyca);

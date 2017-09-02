@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/utils/line_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
 
 /*******************************************************************************
@@ -35,24 +36,27 @@ void fsm_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
   m_params.reset(new foraging_fsm_params);
-  try {
-      argos::GetNodeAttribute(fsm_node,
-                              "unsuccessful_explore_dir_change",
-                              m_params->times.unsuccessful_explore_dir_change);
-      argos::GetNodeAttribute(fsm_node,
-                              "frequent_collision_thresh",
-                              m_params->times.frequent_collision_thresh);
-  }
-  catch (argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing FSM parameters.", ex);
-  }
+
+  argos::GetNodeAttribute(fsm_node,
+                          "unsuccessful_explore_dir_change",
+                          m_params->times.unsuccessful_explore_dir_change);
+  argos::GetNodeAttribute(fsm_node,
+                          "frequent_collision_thresh",
+                          m_params->times.frequent_collision_thresh);
+  rcppsw::utils::line_parser parser(' ');
+  std::vector<std::string> res;
+  res = parser.parse(fsm_node.GetAttribute("nest"));
+  m_params->nest_center.Set(std::atof(res[0].c_str()),
+                            std::atof(res[1].c_str()));
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) {
   stream << "====================\nFSM params\n====================\n";
   stream << "times.unsuccessful_explore_dir_change="
          << m_params->times.unsuccessful_explore_dir_change << std::endl;
+  stream << "times.frequent_collision_thresh="
+         << m_params->times.frequent_collision_thresh << std::endl;
+  stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

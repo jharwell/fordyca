@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <utility>
+
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/block.hpp"
@@ -50,8 +52,8 @@ class perceived_arena_map: public rcppsw::common::er_client {
                       const std::shared_ptr<rcppsw::common::er_server>& server =
                       rcppsw::common::g_null_server);
 
-  std::list<const block*> blocks(void);
-  perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  std::list<std::pair<const block*, double>> blocks(void) const;
+  perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i, j); }
   void update_relevance(void);
 
   /* events */

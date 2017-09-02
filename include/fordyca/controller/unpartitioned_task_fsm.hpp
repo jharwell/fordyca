@@ -1,5 +1,5 @@
 /**
- * @file foraging_fsm.hpp
+ * @file unpartitioned_task_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,19 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
+#include <utility>
+
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "rcsw/common/common.h"
+#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/controller/vector_to_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,12 +45,21 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class foraging_fsm : public fsm::hfsm {
+class foraging_signal : public fsm::event_signal {
  public:
-  foraging_fsm(const struct foraging_fsm_params* params,
-             std::shared_ptr<rcppsw::common::er_server> server,
-             std::shared_ptr<sensor_manager> sensors,
-             std::shared_ptr<actuator_manager> actuators);
+  enum {
+    BLOCK_FOUND = fsm::event_signal::EXTERNAL_SIGNALS,
+    ARRIVED_AT_TARGET
+  };
+};
+
+class unpartitioned_task_fsm : public fsm::hfsm {
+ public:
+  unpartitioned_task_fsm(const struct foraging_fsm_params* params,
+               const std::shared_ptr<rcppsw::common::er_server>& server,
+               const std::shared_ptr<sensor_manager>& sensors,
+               const std::shared_ptr<actuator_manager>& actuators,
+               const std::shared_ptr<const representation::perceived_arena_map>& map);
 
   void init(void);
 
@@ -54,11 +67,11 @@ class foraging_fsm : public fsm::hfsm {
   uint8_t max_states(void) const { return ST_MAX_STATES; }
   uint8_t previous_state(void) const { return m_previous_state; }
 
-  bool is_exploring(void) {return current_state() == ST_EXPLORE; }
-  bool is_returning(void) {return current_state() == ST_RETURN_TO_NEST; }
-  bool is_avoiding_collision(void) { return current_state() == ST_COLLISION_AVOIDANCE; }
+  bool is_searching_for_block(void) {
+    return current_state() == ST_EXPLORE ||
+        (current_state() == ST_LOCATE_BLOCK && !m_vector_fsm.in_progress());
+  }
   void event_block_found(void);
-  void event_start(void);
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
@@ -69,6 +82,7 @@ class foraging_fsm : public fsm::hfsm {
     ST_RETURN_TO_NEST,
     ST_LEAVING_NEST,
     ST_COLLISION_AVOIDANCE,
+    ST_LOCATE_BLOCK,
     ST_MAX_STATES
   };
 
@@ -83,7 +97,6 @@ class foraging_fsm : public fsm::hfsm {
 
     size_t time_exploring_unsuccessfully;
   };
-
   /* constants */
 
   /* member functions */
@@ -92,35 +105,51 @@ class foraging_fsm : public fsm::hfsm {
   uint8_t initial_state(void) const { return m_initial_state; }
   void next_state(uint8_t next_state) { m_next_state = next_state; }
   void update_state(uint8_t update_state);
+  bool acquire_block(void);
+  void acquire_known_block(
+      std::list<std::pair<const representation::block*, double>> blocks);
 
-  /* states */
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+  /* non-hierarchical states */
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
                      top_state, fsm::no_event_data,
                      start, fsm::no_event_data);
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     explore, fsm::no_event_data);
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     new_direction, new_direction_data);
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
                      top_state, fsm::no_event_data,
                      return_to_nest, fsm::no_event_data);
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
                      top_state, fsm::no_event_data,
                      leaving_nest, fsm::no_event_data);
-  HFSM_STATE_DECLARE(foraging_fsm, hfsm,
+
+  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_return_to_nest, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_leaving_nest, fsm::no_event_data);
+  HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_leaving_nest);
+
+  /*
+   * States for locate_block sub-fsm. Note that the states for the
+   * vector_to_goal sub-fsm cannot be part of the locate_block hfsm, because that
+   * sub-fsm is initiated from multiple states, and hfsm states can only have
+   * ONE parent state.
+   **/
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
                      top_state, fsm::no_event_data,
-                     collision_avoidance, fsm::no_event_data);
-
-  HFSM_ENTRY_DECLARE(foraging_fsm, entry_explore, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(foraging_fsm, entry_new_direction, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(foraging_fsm, entry_return_to_nest, fsm::no_event_data);
-
-  HFSM_ENTRY_DECLARE(foraging_fsm, entry_collision_avoidance,
-                    fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(foraging_fsm, entry_leaving_nest, fsm::no_event_data);
-  HFSM_EXIT_DECLARE(foraging_fsm, exit_leaving_nest);
+                     locate_block, fsm::event_data);
+  /*
+   * States for exploration sub-fsm (part of locate_block fsm).
+   */
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
+                     locate_block, fsm::event_data,
+                     explore, fsm::event_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
+                     locate_block, fsm::event_data,
+                     new_direction, new_direction_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
+                     locate_block, fsm::event_data,
+                     collision_avoidance, fsm::event_data);
+  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_new_direction, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_explore, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_collision_avoidance,
+                     fsm::no_event_data);
+  HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_locate_block);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
@@ -134,13 +163,14 @@ class foraging_fsm : public fsm::hfsm {
                                    &entry_leaving_nest, &exit_leaving_nest),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                    &entry_collision_avoidance, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&locate_block, NULL, NULL, &exit_locate_block)
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];
   }
 
-  foraging_fsm(const foraging_fsm& fsm) = delete;
-  foraging_fsm& operator=(const foraging_fsm& fsm) = delete;
+  unpartitioned_task_fsm(const unpartitioned_task_fsm& fsm) = delete;
+  unpartitioned_task_fsm& operator=(const unpartitioned_task_fsm& fsm) = delete;
 
   /* data members */
   uint8_t m_current_state;
@@ -152,8 +182,10 @@ class foraging_fsm : public fsm::hfsm {
   std::shared_ptr<const struct foraging_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
+  std::shared_ptr<const representation::perceived_arena_map> m_map;
+  vector_to_goal m_vector_fsm;
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_ */

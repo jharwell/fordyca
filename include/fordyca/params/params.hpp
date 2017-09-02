@@ -59,8 +59,10 @@ struct threshold_times {
 };
 
 struct foraging_fsm_params : public base_params {
+  foraging_fsm_params(void) : deltas(), times(), nest_center() {}
   struct prob_deltas deltas;
   struct threshold_times times;
+  argos::CVector2 nest_center;
 };
 
 /*

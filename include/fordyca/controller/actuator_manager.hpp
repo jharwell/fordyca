@@ -64,11 +64,12 @@ class actuator_manager: public fsm::simple_fsm {
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
   void reset(void);
+  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
+  void set_wheel_speeds(double lin_speed, double ang_speed);
 
  private:
   actuator_manager(const actuator_manager& fsm) = delete;
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
-  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
 
   /*
    * The robot can be in three different turning states.

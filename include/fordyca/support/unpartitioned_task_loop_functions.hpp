@@ -1,5 +1,5 @@
 /**
- * @file base_qt_user_functions.hpp
+ * @file unpartitioned_task_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,15 +17,16 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_
+
+#ifndef INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "rcppsw/common/common.hpp"
+#include <string>
+#include <vector>
+#include "fordyca/support/random_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,15 +36,24 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class base_qt_user_functions : public argos::CQTOpenGLUserFunctions {
+class unpartitioned_task_loop_functions : public random_foraging_loop_functions {
  public:
-  base_qt_user_functions(void);
+  unpartitioned_task_loop_functions() {}
+  virtual ~unpartitioned_task_loop_functions(void) {}
 
-  virtual ~base_qt_user_functions() {}
+  virtual void Init(argos::TConfigurationNode& node);
+  virtual void PreStep();
 
-  virtual void Draw(argos::CFootBotEntity& c_entity);
+ protected:
+  void pre_step_iter(argos::CFootBotEntity& robot);
+
+ private:
+  unpartitioned_task_loop_functions(const unpartitioned_task_loop_functions& s) = delete;
+  unpartitioned_task_loop_functions& operator=(const unpartitioned_task_loop_functions& s) = delete;
+  void set_robot_los(argos::CFootBotEntity& robot);
+  void set_robot_tick(argos::CFootBotEntity& robot);
 };
 
-NS_END(fordyca, support);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_LOOP_FUNCTIONS_HPP_ */
