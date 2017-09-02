@@ -93,12 +93,14 @@ void perceived_arena_map::event_new_los(const line_of_sight* los) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const block*> perceived_arena_map::blocks(void) {
-  std::list<const block*> blocks;
+std::list<std::pair<const block*, double>> perceived_arena_map::blocks(void) const {
+  std::list<std::pair<const block*, double>> blocks;
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       if (m_grid.access(i, j).state_has_block()) {
-        blocks.push_back(m_grid.access(i, j).block());
+        blocks.push_back(std::pair<const block*, double>(
+            m_grid.access(i, j).block(),
+            m_grid.access(i, j).relevance()));
       }
     } /* for(j..) */
   } /* for(i..) */

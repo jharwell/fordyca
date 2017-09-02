@@ -32,23 +32,25 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::block* block_target_selector::calc_best(
-    const std::list<std::pair<representation::block*, double>> blocks,
+std::pair<const representation::block*, double> block_target_selector::calc_best(
+    const std::list<std::pair<const representation::block*, double>> blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  representation::block* best;
+  const representation::block* best;
   for (auto pair : blocks) {
-    expressions::forage::block_utility u(pair.first->real_loc(),
-                                         argos::CVector2(m_nest_loc.first,
-                                                         m_nest_loc.second));
+    expressions::forage::block_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second);
+    printf("Utility for block %d at (%zu, %zu): %f\n", pair.first->id(),
+           pair.first->discrete_loc().first,
+           pair.first->discrete_loc().second,
+           utility);
     if (utility > max_utility) {
       max_utility = utility;
       best = pair.first;
     }
   } /* for(block..) */
-  return best;
+  return std::pair<const representation::block*, double>(best, max_utility);
 } /* calc_best() */
 
 NS_END(controller, fordyca);

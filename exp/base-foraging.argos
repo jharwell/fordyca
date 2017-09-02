@@ -23,7 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <vectored_controller id="ffc"
+    <unpartitioned_task_controller id="ffc"
                          library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -47,14 +47,15 @@
         <actuators>
           <wheels hard_turn_angle_threshold="90"
                   soft_turn_angle_threshold="70"
-                  no_turn_angle_threshold="10"
+                  no_turn_angle_threshold="5"
                   max_speed="10" />
         </actuators>
         <fsm unsuccessful_explore_dir_change="600"
              frequent_collision_thresh="100"
+             nest="5, 2.5"
              />
       </params>
-    </vectored_controller>
+    </unpartitioned_task_controller>
 
   </controllers>
 
@@ -62,7 +63,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="vectored_loop_functions">
+                  label="unpartitioned_task_loop_functions">
     <logging sim_stats="base-foraging-stats.txt"/>
     <grid resolution="0.2"/>
     <blocks n_blocks="25"
@@ -108,7 +109,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="20" max_trials="100">
+      <entity quantity="1" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -145,7 +146,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="vectored_qt_user_functions" />
+      <user_functions label="unpartitioned_task_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

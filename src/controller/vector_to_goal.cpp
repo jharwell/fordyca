@@ -21,10 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/vector_to_goal.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include "fordyca/controller/vector_to_goal.hpp"
+#include "rcppsw/control/pid_loop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,15 +37,15 @@ namespace fsm = rcppsw::patterns::state_machine;
  * Constants
  ******************************************************************************/
 int vector_to_goal::kCOLLISION_RECOVERY_TIME = 10;
-double vector_to_goal::kVECTOR_TO_GOAL_MIN_DIFF = 0.01;
+double vector_to_goal::kVECTOR_TO_GOAL_MIN_DIFF = 0.02;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_to_goal::vector_to_goal(const struct foraging_fsm_params* params,
-                           std::shared_ptr<rcppsw::common::er_server> server,
-                           std::shared_ptr<sensor_manager> sensors,
-                           std::shared_ptr<actuator_manager> actuators) :
+vector_to_goal::vector_to_goal(double frequent_collision_thresh,
+                               std::shared_ptr<rcppsw::common::er_server> server,
+                               std::shared_ptr<sensor_manager> sensors,
+                               std::shared_ptr<actuator_manager> actuators) :
     fsm::simple_fsm(server, ST_MAX_STATES),
     start(),
     vector(),
@@ -56,7 +57,7 @@ vector_to_goal::vector_to_goal(const struct foraging_fsm_params* params,
     entry_collision_recovery(),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
-    m_freq_collision_thresh(params->times.frequent_collision_thresh),
+    m_freq_collision_thresh(frequent_collision_thresh),
     m_sensors(sensors),
     m_actuators(actuators) {
   insmod("vector_to_goal");
@@ -123,24 +124,35 @@ FSM_STATE_DEFINE(vector_to_goal, collision_recovery, fsm::no_event_data) {
 }
 FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   ER_DIAG("Executing ST_VECTOR");
-  argos::CVector2 robot_loc(m_sensors->los()->center().first,
-                            m_sensors->los()->center().second);
-  static goal_data goal;
+  static goal_data _goal;
+  static rcppsw::control::pid_loop angle_pid(2, 0, 0,
+                                             1,
+                                             -2* M_PI, 2 * M_PI );
+  static double ang_speed = 0;
   if (data) {
-    goal = *data;
+    _goal = *data;
   }
 
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
-  if ((robot_loc - data->goal).Length() <= kVECTOR_TO_GOAL_MIN_DIFF) {
-    internal_event(ST_ARRIVED);
+  if ((_goal.goal - m_sensors->robot_loc()).Length() <= kVECTOR_TO_GOAL_MIN_DIFF) {
+    internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(_goal));
   }
-  m_actuators->set_heading(robot_loc - data->goal);
+  argos::CVector2 robot_to_goal = calc_vector_to_goal(_goal.goal);
+  argos::CVector2 heading = m_sensors->robot_heading();
+  ang_speed = angle_pid.calculate(robot_to_goal.Angle().GetValue(),
+                                   m_sensors->heading_angle().GetValue());
+  std::cout << robot_to_goal << std::endl;
+  std::cout << "heading: " << heading << " ang_speed: " << ang_speed << std::endl;
+  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * 0.5,
+                                ang_speed);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_to_goal, arrived, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_to_goal, arrived, struct goal_data) {
   ER_DIAG("Executing ST_ARRIVED");
+  ER_NOM("Arrived at with %f target (%f, %f)", kVECTOR_TO_GOAL_MIN_DIFF,
+         data->goal.GetX(), data->goal.GetY());
   return fsm::event_signal::HANDLED;
 }
 
@@ -165,6 +177,21 @@ void vector_to_goal::init(void) {
   m_actuators->reset();
   simple_fsm::init();
 } /* init() */
+
+argos::CVector2 vector_to_goal::calc_vector_to_goal(const argos::CVector2& goal) {
+  argos::CVector2 robot_to_goal;
+  if (m_sensors->robot_loc().GetX() < goal.GetX()) {
+    robot_to_goal.SetX(goal.GetX() - m_sensors->robot_loc().GetX());
+  } else {
+    robot_to_goal.SetX(m_sensors->robot_loc().GetX() - goal.GetX());
+  }
+  if (m_sensors->robot_loc().GetY() < goal.GetY()) {
+    robot_to_goal.SetY(goal.GetY() - m_sensors->robot_loc().GetY());
+  } else {
+    robot_to_goal.SetY(m_sensors->robot_loc().GetY() - goal.GetY());
+  }
+  return robot_to_goal;
+} /* calc_vector_to_goal() */
 
 argos::CVector2 vector_to_goal::randomize_vector_angle(argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),

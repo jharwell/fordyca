@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -40,7 +40,7 @@ NS_START(fordyca, support);
 class stat_collector {
  public:
   struct foraging_stats {
-    uint n_exploring;
+    uint n_searching;
     uint n_returning;
     uint n_avoiding;
   };
@@ -64,7 +64,7 @@ class stat_collector {
    *
    * @param controller The controller to collect from.
    */
-  void collect_from_robot(const controller::base_controller& controller);
+  void collect_from_robot(const controller::random_foraging_controller& controller);
   void collect_from_block(const representation::block& block);
   void store_foraging_stats(uint timestep);
   void store_block_stats(uint timestep);

@@ -1,5 +1,5 @@
 /**
- * @file base_qt_user_functions.cpp
+ * @file unpartitioned_task_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/support/base_qt_user_functions.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/support/unpartitioned_task_qt_user_functions.hpp"
+#include "fordyca/controller/unpartitioned_task_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,48 +33,32 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_qt_user_functions::base_qt_user_functions() {
-RegisterUserFunction<base_qt_user_functions,
-                       argos::CFootBotEntity>(&base_qt_user_functions::Draw);
+unpartitioned_task_qt_user_functions::unpartitioned_task_qt_user_functions() {
+  RegisterUserFunction<unpartitioned_task_qt_user_functions,
+                       argos::CFootBotEntity>(&unpartitioned_task_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  controller::base_controller& controller =
-      dynamic_cast<controller::base_controller&>(
-          c_entity.GetControllableEntity().GetController());
+void unpartitioned_task_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  random_foraging_qt_user_functions::Draw(c_entity);
 
-  if (controller.is_carrying_block()) {
-    /*
-     * Box dimensions should ideally be read from .argos file, but there does
-     * not appear to be a simple way to do that, so just hardcode it. Not that
-     * bad of a hack, as this is only for visualization.
-     */
-    DrawBox(argos::CVector3(0.0, 0.0, 0.3),
-            argos::CQuaternion(),
-            argos::CVector3(0.2, 0.2, 0.2),
-            argos::CColor::BLACK);
-    std::string text;
-    if (controller.block()->display_id()) {
-      text = c_entity.GetId() + "/" +
-              + "b" + std::to_string(controller.block()->id());
-    } else {
-      text = c_entity.GetId();
-    }
-      DrawText(argos::CVector3(0.0, 0.0, 0.5),
-               text.c_str(),
-               argos::CColor::RED);
-  } else {
-    if (controller.display_id()) {
-      DrawText(argos::CVector3(0.0, 0.0, 0.3),
-               c_entity.GetId().c_str());
-    }
+  controller::unpartitioned_task_controller& controller =
+      dynamic_cast<controller::unpartitioned_task_controller&>(
+          c_entity.GetControllableEntity().GetController());
+  if (controller.display_los()) {
+    const representation::line_of_sight* los = controller.los();
+    DrawCircle(argos::CVector3(0, 0, 0),
+               argos::CQuaternion(),
+               (los->sizex()/2)*0.2,
+               argos::CColor::RED,
+               false);
   }
 }
 
 using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(base_qt_user_functions, "base_qt_user_functions")
+REGISTER_QTOPENGL_USER_FUNCTIONS(unpartitioned_task_qt_user_functions,
+                                 "unpartitioned_task_qt_user_functions")
 
 NS_END(support, fordyca);

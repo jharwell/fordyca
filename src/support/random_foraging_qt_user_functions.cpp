@@ -1,5 +1,5 @@
 /**
- * @file vectored_qt_user_functions.cpp
+ * @file random_foraging_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/support/vectored_qt_user_functions.hpp"
-#include "fordyca/controller/vectored_controller.hpp"
+#include "fordyca/support/random_foraging_qt_user_functions.hpp"
+#include "fordyca/controller/random_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,31 +33,49 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-vectored_qt_user_functions::vectored_qt_user_functions() {
-  RegisterUserFunction<vectored_qt_user_functions,
-                       argos::CFootBotEntity>(&vectored_qt_user_functions::Draw);
+random_foraging_qt_user_functions::random_foraging_qt_user_functions() {
+RegisterUserFunction<random_foraging_qt_user_functions,
+                       argos::CFootBotEntity>(&random_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void vectored_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  base_qt_user_functions::Draw(c_entity);
-
-  controller::vectored_controller& controller =
-      dynamic_cast<controller::vectored_controller&>(
+void random_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  controller::random_foraging_controller& controller =
+      dynamic_cast<controller::random_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
-  if (controller.display_los()) {
-    const representation::line_of_sight* los = controller.los();
-    DrawCircle(argos::CVector3(0, 0, 0),
-               argos::CQuaternion(),
-               (los->sizex()/2)*0.2,
-               argos::CColor::RED,
-               false);
+
+  if (controller.is_carrying_block()) {
+    /*
+     * Box dimensions should ideally be read from .argos file, but there does
+     * not appear to be a simple way to do that, so just hardcode it. Not that
+     * bad of a hack, as this is only for visualization.
+     */
+    DrawBox(argos::CVector3(0.0, 0.0, 0.3),
+            argos::CQuaternion(),
+            argos::CVector3(0.2, 0.2, 0.2),
+            argos::CColor::BLACK);
+    std::string text;
+    if (controller.block()->display_id()) {
+      text = c_entity.GetId() + "/" +
+              + "b" + std::to_string(controller.block()->id());
+    } else {
+      text = c_entity.GetId();
+    }
+      DrawText(argos::CVector3(0.0, 0.0, 0.5),
+               text.c_str(),
+               argos::CColor::RED);
+  } else {
+    if (controller.display_id()) {
+      DrawText(argos::CVector3(0.0, 0.0, 0.3),
+               c_entity.GetId().c_str());
+    }
   }
 }
 
 using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(vectored_qt_user_functions, "vectored_qt_user_functions")
+REGISTER_QTOPENGL_USER_FUNCTIONS(random_foraging_qt_user_functions,
+                                 "random_foraging_qt_user_functions");
 
 NS_END(support, fordyca);

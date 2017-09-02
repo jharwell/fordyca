@@ -1,5 +1,5 @@
 /**
- * @file vectored_controller_repository.cpp
+ * @file random_foraging_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/vectored_controller_repository.hpp"
-#include "fordyca/params/perceived_grid_parser.hpp"
+#include "fordyca/params/random_foraging_repository.hpp"
+#include "fordyca/params/actuator_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/fsm_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,9 +34,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-vectored_controller_repository::vectored_controller_repository(void) {
-    factory().register_type<perceived_grid_parser>("perceived_grid");
-    parsers()["perceived_grid"] = factory().create("perceived_grid");
+random_foraging_repository::random_foraging_repository(void) {
+  factory().register_type<actuator_parser>("actuators");
+  factory().register_type<sensor_parser> ("sensors");
+  factory().register_type<fsm_parser>("fsm");
+  parsers()["actuators"]        = factory().create("actuators");
+  parsers()["sensors"]          = factory().create("sensors");
+  parsers()["fsm"]              = factory().create("fsm");
 }
 
 NS_END(params, fordyca);
