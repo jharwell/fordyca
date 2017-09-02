@@ -39,7 +39,7 @@ void unpartitioned_task_controller::ControlStep(void) {
    * the relevance of information within it.
    */
   m_map->event_new_los(sensors()->los());
-  m_map->update_relevance();
+    m_map->update_relevance();
   m_fsm->run();
 } /* ControlStep() */
 

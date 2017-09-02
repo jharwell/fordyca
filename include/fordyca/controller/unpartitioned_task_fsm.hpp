@@ -104,6 +104,8 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   uint8_t next_state(void) const { return m_next_state; }
   uint8_t initial_state(void) const { return m_initial_state; }
   void next_state(uint8_t next_state) { m_next_state = next_state; }
+  uint8_t last_state(void) const { return m_last_state; }
+
   void update_state(uint8_t update_state);
   bool acquire_block(void);
   void acquire_known_block(
@@ -177,12 +179,15 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   uint8_t m_next_state;
   uint8_t m_initial_state;
   uint8_t m_previous_state;
+  uint8_t m_last_state;
+  
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   std::shared_ptr<const struct foraging_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
   vector_to_goal m_vector_fsm;
 };
 

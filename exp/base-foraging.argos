@@ -37,7 +37,7 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <grid cell_decay_delta="0.001"
+        <grid pheromone_rho="0.01"
               resolution="0.2"
               />
         <sensors>

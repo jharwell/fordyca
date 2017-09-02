@@ -31,15 +31,15 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constants
  ******************************************************************************/
-const double perceived_cell2D::kEpsilon = 0.001;
+const double perceived_cell2D::kEpsilon = 0.0001;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void perceived_cell2D::update_relevance(void) {
   if (m_cell.state_is_known()) {
-    m_relevance = std::max(0.0, m_relevance - m_delta);
-    if (m_relevance < kEpsilon) {
+    m_density.calc();
+    if (m_density.last_result() < kEpsilon) {
       m_cell.event_unknown();
     }
   }
@@ -60,7 +60,7 @@ void perceived_cell2D::event_encounter(cell2D_fsm::state state,
     default:
       break;
   } /* switch() */
-  m_relevance += 1.0;
+  m_density.add_pheromone(1.0);
 } /* encounter() */
 
 NS_END(representation, fordyca);

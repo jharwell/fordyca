@@ -90,7 +90,9 @@ FSM_STATE_DEFINE(vector_to_goal, start, fsm::no_event_data) {
 
 FSM_STATE_DEFINE(vector_to_goal, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
-  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  if (ST_COLLISION_AVOIDANCE != last_state()) {
+    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  }
 
   /*
    * We stay in collision avoidance until we are sufficiently distant/heading
@@ -112,7 +114,9 @@ FSM_STATE_DEFINE(vector_to_goal, collision_avoidance, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_to_goal, collision_recovery, fsm::no_event_data) {
-  ER_DIAG("Executing ST_COLLISION_RECOVERY");
+  if (ST_COLLISION_RECOVERY != last_state()) {
+    ER_DIAG("Executing ST_COLLISION_RECOVERY");
+  }
 
   static int count = 0;
 
@@ -123,9 +127,11 @@ FSM_STATE_DEFINE(vector_to_goal, collision_recovery, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
-  ER_DIAG("Executing ST_VECTOR");
+  if (ST_VECTOR != last_state()) {
+    ER_DIAG("Executing ST_VECTOR");
+  }
   static goal_data _goal;
-  static rcppsw::control::pid_loop angle_pid(2, 0, 0,
+  static rcppsw::control::pid_loop angle_pid(1.8, 0, 0,
                                              1,
                                              -2* M_PI, 2 * M_PI );
   static double ang_speed = 0;
@@ -143,8 +149,10 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   argos::CVector2 heading = m_sensors->robot_heading();
   ang_speed = angle_pid.calculate(robot_to_goal.Angle().GetValue(),
                                    m_sensors->heading_angle().GetValue());
-  std::cout << robot_to_goal << std::endl;
-  std::cout << "heading: " << heading << " ang_speed: " << ang_speed << std::endl;
+  ER_VER("robot_to_target vector=(%f, %f), heading=(%f, %f), angular speed=%f",
+         robot_to_goal.GetX(), robot_to_goal.GetY(),
+         heading.GetX(), heading.GetY(),
+         ang_speed);
   m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * 0.5,
                                 ang_speed);
   return fsm::event_signal::HANDLED;

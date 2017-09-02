@@ -30,6 +30,19 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+block_target_selector::block_target_selector(const std::shared_ptr<rcppsw::common::er_server>& server,
+                                             argos::CVector2 nest_loc) :
+    er_client(server),
+    m_nest_loc(nest_loc) {
+  insmod("block_target_selector",
+          rcppsw::common::er_lvl::DIAG,
+          rcppsw::common::er_lvl::NOM);
+}
+
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::pair<const representation::block*, double> block_target_selector::calc_best(
@@ -41,15 +54,22 @@ std::pair<const representation::block*, double> block_target_selector::calc_best
     expressions::forage::block_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second);
-    printf("Utility for block %d at (%zu, %zu): %f\n", pair.first->id(),
-           pair.first->discrete_loc().first,
-           pair.first->discrete_loc().second,
-           utility);
+    ER_DIAG("Utility for block%d loc=(%zu, %zu), density=%f: %f",
+            pair.first->id(),
+            pair.first->discrete_loc().first,
+            pair.first->discrete_loc().second,
+            pair.second,
+            utility);
     if (utility > max_utility) {
       max_utility = utility;
       best = pair.first;
     }
   } /* for(block..) */
+  ER_NOM("Best utility: block%d at (%zu, %zu): %f",
+         best->id(),
+         best->discrete_loc().first,
+         best->discrete_loc().second,
+         max_utility);
   return std::pair<const representation::block*, double>(best, max_utility);
 } /* calc_best() */
 

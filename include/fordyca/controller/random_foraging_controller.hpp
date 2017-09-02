@@ -54,14 +54,7 @@ enum event_type {
 class random_foraging_controller : public argos::CCI_Controller,
                             public rcppsw::common::er_client {
  public:
-  random_foraging_controller(void) :
-      er_client(),
-      m_display_id(false),
-      m_block(nullptr),
-      m_server(new rcppsw::common::er_server("controller-init.txt")),
-      m_actuators(),
-      m_sensors(),
-      m_fsm() {}
+  random_foraging_controller(void);
 
   bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
   bool is_returning(void) const { return m_fsm->is_returning(); }

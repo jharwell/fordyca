@@ -158,9 +158,9 @@ struct grid_params : public base_params {
 };
 
 struct perceived_grid_params : public base_params {
-  perceived_grid_params(void) : grid(), cell_delta(0.0) {}
+  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
   struct grid_params grid;
-  double cell_delta;
+  double pheromone_rho;
 };
 
 NS_END(fordyca);

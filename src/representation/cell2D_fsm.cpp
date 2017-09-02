@@ -37,9 +37,9 @@ cell2D_fsm::cell2D_fsm(
     state_unknown(),
     state_empty(),
     state_block() {
-    insmod("cell2D_fsm",
-           rcppsw::common::er_lvl::VER,
-           rcppsw::common::er_lvl::NOM);
+    /* insmod("cell2D_fsm", */
+    /*        rcppsw::common::er_lvl::DIAG, */
+    /*        rcppsw::common::er_lvl::NOM); */
 }
 
 /*******************************************************************************
