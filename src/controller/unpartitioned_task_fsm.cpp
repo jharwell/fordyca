@@ -303,6 +303,8 @@ bool unpartitioned_task_fsm::acquire_block(void) {
   } else if (m_vector_fsm.arrived_at_goal()) {
     if (m_sensors->block_detected()) {
       return true;
+    } else {
+      ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
     }
   }
   /* try again--someone beat us to our chosen block */
