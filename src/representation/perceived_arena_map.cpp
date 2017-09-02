@@ -37,16 +37,17 @@ perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::common::er_server>& server) :
     m_server(server), m_grid(&params->grid) {
   deferred_init(m_server);
-  insmod("perceived_arena_map");
+  insmod("perceived_arena_map",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
   server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
   ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
          m_grid.resolution());
 
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       perceived_cell2D& cell = m_grid.access(i, j);
-      cell.delta(params->cell_delta);
+      cell.rho(params->pheromone_rho);
     } /* for(j..) */
   } /* for(i..) */
 }
@@ -100,7 +101,7 @@ std::list<std::pair<const block*, double>> perceived_arena_map::blocks(void) con
       if (m_grid.access(i, j).state_has_block()) {
         blocks.push_back(std::pair<const block*, double>(
             m_grid.access(i, j).block(),
-            m_grid.access(i, j).relevance()));
+            m_grid.access(i, j).density()));
       }
     } /* for(j..) */
   } /* for(i..) */

@@ -61,17 +61,19 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     m_next_state(ST_START),
     m_initial_state(ST_START),
     m_previous_state(ST_START),
+    m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
     mc_params(params),
     m_sensors(sensors),
     m_actuators(actuators),
     m_map(map),
+    m_server(server),
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators) {
-  insmod("unpartitioned_task_fsm");
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  insmod("unpartitioned_task_fsm",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
     }
 
 /*******************************************************************************
@@ -97,7 +99,9 @@ void unpartitioned_task_fsm::event_block_found(void) {
  * Exploration FSM
  ******************************************************************************/
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
-  ER_DIAG("Executing ST_EXPLORE");
+  if (ST_EXPLORE != last_state()) {
+    ER_DIAG("Executing ST_EXPLORE");
+  }
 
   ++m_state.time_exploring_unsuccessfully;
   argos::CVector2 a;
@@ -126,7 +130,10 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
 }
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, collision_avoidance, fsm::event_data) {
   argos::CVector2 vector;
-  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+
+  if (ST_COLLISION_AVOIDANCE != last_state()) {
+    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  }
 
   if (m_sensors->calc_diffusion_vector(&vector)) {
     m_actuators->set_heading(vector);
@@ -137,10 +144,13 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, collision_avoidance, fsm::event_data) 
 }
 
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, new_direction, new_direction_data) {
-  ER_DIAG("Executing ST_NEW_DIRECTION");
   static argos::CRadians new_dir;
   static int count = 0;
   argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
+
+  if (ST_NEW_DIRECTION != last_state()) {
+    ER_DIAG("Executing ST_NEW_DIRECTION");
+  }
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -178,7 +188,10 @@ HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_collision_avoidance, fsm::no_eve
  * Locate Block FSM
  ******************************************************************************/
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
-  ER_NOM("Executing ST_LOCATE_BLOCK");
+  if (ST_LOCATE_BLOCK != last_state()) {
+    ER_DIAG("Executing ST_LOCATE_BLOCK");
+  }
+
 
   /*
    * We are executing this state as part of the normal worker process.
@@ -204,7 +217,9 @@ HFSM_EXIT_DEFINE(unpartitioned_task_fsm, exit_locate_block) {
  * Non-Hierarchical States
  ******************************************************************************/
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_LEAVING_NEST");
+  if (ST_LEAVING_NEST != last_state()) {
+    ER_DIAG("Executing ST_LEAVING_NEST");
+  }
 
   /*
    * The vector returned by calc_vector_to_light() points to the light. Thus,
@@ -229,8 +244,11 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, start, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(unpartitioned_task_fsm, return_to_nest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_RETURN_TO_NEST");
   argos::CVector2 vector;
+
+  if (ST_RETURN_TO_NEST != last_state()) {
+    ER_DIAG("Executing ST_RETURN_TO_NEST");
+  }
 
   /*
    * We have arrived at the nest and it's time to head back out again. The
@@ -280,12 +298,13 @@ void unpartitioned_task_fsm::update_state(uint8_t new_state) {
   if (new_state != m_current_state) {
     m_previous_state = m_current_state;
   }
+  m_last_state = m_current_state;
   m_current_state = new_state;
 } /* update_state() */
 
 void unpartitioned_task_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
-  block_target_selector selector(mc_params->nest_center);
+  block_target_selector selector(m_server, mc_params->nest_center);
   auto best = selector.calc_best(blocks, m_sensors->robot_loc());
   ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
          best.first->id(),

@@ -29,6 +29,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/expressions/expressions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,20 +46,18 @@ NS_START(fordyca, representation);
  */
 class perceived_cell2D  {
  public:
-  static const double kEpsilon;
   explicit perceived_cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server =
       rcppsw::common::g_null_server) :
-      m_relevance(0.0), m_delta(0.0), m_cell(server) {}
+      m_rho(0.0), m_density(), m_cell(server) {}
 
-  void delta(double delta) { m_delta = delta; }
-  double relevance(void) const { return m_relevance; }
+  void rho(double rho) { m_density.rho(rho); }
+  double density(void) const { return m_density.last_result(); }
 
   bool state_is_known(void) { return m_cell.state_is_known(); }
   bool state_has_block(void) { return m_cell.state_has_block(); }
   bool state_is_empty(void) { return m_cell.state_is_empty(); }
   const representation::block* block(void) const { return m_cell.block(); }
-
 
   /**
    * @brief Update the relevance/freshness of the information about the state of
@@ -72,8 +71,9 @@ class perceived_cell2D  {
                        representation::block* block = nullptr);
 
  private:
-  double m_relevance;
-  double m_delta;
+  static const double kEpsilon;
+  double m_rho;
+  expressions::pheromone_density m_density;
   cell2D m_cell;
 };
 

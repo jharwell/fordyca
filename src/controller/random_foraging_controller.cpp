@@ -31,6 +31,28 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+random_foraging_controller::random_foraging_controller(void) :
+    er_client(),
+    m_display_id(false),
+    m_block(nullptr),
+    m_server(rcppsw::common::g_null_server),
+    m_actuators(),
+    m_sensors(),
+    m_fsm() {
+  deferred_init(m_server);
+  server_handle()->change_logfile("controller-init.txt");
+
+  /* diagnostic for logging, nominal for printing */
+  insmod("controller",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
+  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void random_foraging_controller::drop_block_in_nest(void) {
@@ -88,9 +110,6 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
 } /* Init() */
 
 void random_foraging_controller::Reset(void) {
-  insmod("controller");
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
   server_handle()->change_logfile(std::string(std::string("controller-") +
                                               GetId() +
                                               std::string(".txt")));

@@ -123,16 +123,21 @@ class sub_area_utility: public rcppsw::math::expression<double> {
  * - The pheromone decay parameter.
  * - The previous value of the pheromone density.
  */
-class pheremone_density: public rcppsw::math::expression<double> {
+class pheromone_density: public rcppsw::math::expression<double> {
  public:
-  explicit pheremone_density(double rho) :
+  pheromone_density(void) : pheromone_density(0.0) {}
+  explicit pheromone_density(double rho) :
       expression(), m_delta(0), m_rho(rho) {}
 
+  void rho(double rho) { m_rho = rho; }
+
   double calc(void) {
-    return set_result(m_rho * last_result() + m_delta);
+    double res = set_result((1.0 - m_rho) * last_result() + m_delta);
+    m_delta = 0;
+    return res;
   }
-  void add_pheremone(void) {
-    ++m_delta;
+  void add_pheromone(double val) {
+    m_delta += val;
   }
 
  private:

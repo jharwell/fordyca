@@ -44,13 +44,13 @@ void perceived_grid_parser::parse(argos::TConfigurationNode& node) {
   m_params->grid.lower.Set(0.3, 0.3);
   m_params->grid.upper.Set(std::atoi(res[0].c_str()) - 0.3,
                       std::atoi(res[1].c_str()) - 0.3);
-  m_params->cell_delta = std::atof(argos::GetNode(node,
-                                                  "grid").GetAttribute("cell_decay_delta").c_str());
+  m_params->pheromone_rho = std::atof(argos::GetNode(node,
+                                                     "grid").GetAttribute("pheromone_rho").c_str());
 } /* parse() */
 
 void perceived_grid_parser::show(std::ostream& stream) {
   stream << "====================\nPerceived grid params\n====================\n";
-  stream << "cell_decay_delta=" << m_params->cell_delta << std::endl;
+  stream << "pheromone_rho=" << m_params->pheromone_rho << std::endl;
   stream << "resolution=" << m_params->grid.resolution << std::endl;
   stream << "lower=" << m_params->grid.lower << std::endl;
   stream << "upper=" << m_params->grid.upper << std::endl;
