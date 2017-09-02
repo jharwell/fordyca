@@ -109,7 +109,6 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
     accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
   } /* for(i..) */
 
-  assert(accum.Length() > 0.0f);
   return argos::CVector2(1.0f, accum.Angle());
 } /* calc_vector_to_light() */
 

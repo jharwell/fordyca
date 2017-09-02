@@ -40,13 +40,13 @@ void stat_collector::reset(void) {
   m_block_stats = {0, 0};
   m_foraging_stats = {0, 0, 0};
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\tavg_carries\texploring\treturning\tcollision_avoidance\n";
+  m_ofile << "clock\tcollected_blocks\tavg_carries\tsearching\treturning\tcollision_avoidance\n";
 } /* reset() */
 
 void stat_collector::collect_from_robot(
-    const controller::base_controller& controller) {
+    const controller::random_foraging_controller& controller) {
   /* Count how many foot-bots are in which state */
-  m_foraging_stats.n_exploring += controller.is_exploring();
+  m_foraging_stats.n_searching += controller.is_searching_for_block();
   m_foraging_stats.n_returning += controller.is_returning();
   m_foraging_stats.n_avoiding += controller.is_avoiding_collision();
 } /* collect_from_robot() */
@@ -65,10 +65,10 @@ void stat_collector::store_foraging_stats(uint timestep) {
   m_ofile << timestep << "\t"
           << m_block_stats.total_collected << "\t"
           << avg_carries << "\t"
-          << m_foraging_stats.n_exploring << "\t"
+          << m_foraging_stats.n_searching << "\t"
           << m_foraging_stats.n_returning << "\t"
           << m_foraging_stats.n_avoiding << std::endl;
-  m_foraging_stats.n_exploring = 0;
+  m_foraging_stats.n_searching = 0;
   m_foraging_stats.n_returning = 0;
   m_foraging_stats.n_avoiding = 0;
 } /* store_foraging_stats() */

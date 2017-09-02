@@ -109,7 +109,7 @@ class grid2D {
     return grid_view<T*>(m_cells[indices[index_range(lower_x, upper_x, 1)]
                                  [index_range(lower_y, upper_y, 1)]]);
   }
-  T& access(size_t i, size_t j) { return *m_cells[i][j]; }
+  T& access(size_t i, size_t j) const { return *m_cells[i][j]; }
   double resolution(void) const { return m_resolution; }
   size_t xsize(void) const { return std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution); }
   size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }

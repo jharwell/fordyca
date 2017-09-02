@@ -1,5 +1,5 @@
 /**
- * @file vectored_controller.cpp
+ * @file unpartitioned_task_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/vectored_controller.hpp"
-#include "fordyca/params/vectored_controller_repository.hpp"
+#include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/params/unpartitioned_task_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -33,30 +33,48 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void vectored_controller::ControlStep(void) {
+void unpartitioned_task_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it.
    */
   m_map->event_new_los(sensors()->los());
   m_map->update_relevance();
-  base_controller::ControlStep();
+  m_fsm->run();
 } /* ControlStep() */
 
-void vectored_controller::pickup_block(representation::block* block) {
-  base_controller::pickup_block(block);
+void unpartitioned_task_controller::publish_event(enum event_type type) {
+  switch (type) {
+    case BLOCK_FOUND:
+      m_fsm->event_block_found();
+      break;
+    default:
+      break;
+  }
+} /* publish_event() */
+
+void unpartitioned_task_controller::pickup_block(representation::block* block) {
+  random_foraging_controller::pickup_block(block);
   m_map->event_block_pickup(block);
 } /* pickup_block() */
 
-void vectored_controller::Init(argos::TConfigurationNode& node) {
-  base_controller::Init(node);
-  params::vectored_controller_repository param_repo;
+void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
+  random_foraging_controller::Init(node);
+  params::unpartitioned_task_repository param_repo;
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
 
   m_map.reset(new representation::perceived_arena_map(
       static_cast<const struct perceived_grid_params*>(
           param_repo.get_params("perceived_grid"))));
+
+  m_fsm.reset(
+      new unpartitioned_task_fsm(static_cast<const struct foraging_fsm_params*>(
+          param_repo.get_params("fsm")),
+                       server(),
+                       sensors(),
+                       actuators(),
+                       m_map));
 } /* Init() */
 
 /*
@@ -65,6 +83,6 @@ void vectored_controller::Init(argos::TConfigurationNode& node) {
  * which is then available in the XML.
  */
 using namespace argos;
-REGISTER_CONTROLLER(vectored_controller, "vectored_controller")
+REGISTER_CONTROLLER(unpartitioned_task_controller, "unpartitioned_task_controller")
 
 NS_END(controller, fordyca);

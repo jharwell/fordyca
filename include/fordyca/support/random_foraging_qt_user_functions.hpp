@@ -1,5 +1,5 @@
 /**
- * @file vectored_loop_functions.hpp
+ * @file random_foraging_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_SUPPORT_VECTORED_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_VECTORED_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
-#include "fordyca/support/base_loop_functions.hpp"
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,21 +35,15 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class vectored_loop_functions : public base_loop_functions {
+class random_foraging_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
-  vectored_loop_functions() {}
-  virtual ~vectored_loop_functions(void) {}
+  random_foraging_qt_user_functions(void);
 
-  virtual void Init(argos::TConfigurationNode& node);
-  virtual void PreStep();
+  virtual ~random_foraging_qt_user_functions() {}
 
- private:
-  vectored_loop_functions(const vectored_loop_functions& s) = delete;
-  vectored_loop_functions& operator=(const vectored_loop_functions& s) = delete;
-  void set_robot_los(argos::CFootBotEntity& robot);
-  void set_robot_tick(argos::CFootBotEntity& robot);
+  virtual void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(support, fordyca);
+NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_VECTORED_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_RANDOM_FORAGING_QT_USER_FUNCTIONS_HPP_ */

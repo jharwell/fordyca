@@ -76,8 +76,12 @@ class sensor_manager {
   }
 
   argos::CVector2 robot_loc(void) const { return m_robot_loc; }
-  void robot_loc(argos::CVector2 robot_loc) { m_robot_loc = robot_loc; }
-
+  void robot_loc(argos::CVector2 robot_loc) {
+    m_prev_robot_loc = m_robot_loc;
+    m_robot_loc = robot_loc;
+  }
+  argos::CVector2 robot_heading(void) { return m_robot_loc - m_prev_robot_loc; }
+  argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
   uint tick(void) const { return m_tick; }
   void tick(uint tick) { m_tick = tick; }
 
@@ -108,6 +112,7 @@ class sensor_manager {
   argos::CCI_FootBotMotorGroundSensor*        m_ground; /* motor ground sensor */
   std::unique_ptr<representation::line_of_sight> m_los;
   argos::CVector2                             m_robot_loc;
+  argos::CVector2                             m_prev_robot_loc;
 };
 
 NS_END(controller, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file vectored_qt_user_functions.hpp
+ * @file unpartitioned_task_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/base_qt_user_functions.hpp"
+#include "fordyca/support/random_foraging_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,15 +33,15 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class vectored_qt_user_functions : public base_qt_user_functions {
+class unpartitioned_task_qt_user_functions : public random_foraging_qt_user_functions {
  public:
-  vectored_qt_user_functions(void);
+  unpartitioned_task_qt_user_functions(void);
 
-  virtual ~vectored_qt_user_functions() {}
+  virtual ~unpartitioned_task_qt_user_functions() {}
 
   virtual void Draw(argos::CFootBotEntity& c_entity);
 };
 
 NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_VECTORED_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_UNPARTITIONED_TASK_QT_USER_FUNCTIONS_HPP_ */
