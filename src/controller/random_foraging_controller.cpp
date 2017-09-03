@@ -37,13 +37,14 @@ random_foraging_controller::random_foraging_controller(void) :
     er_client(),
     m_display_id(false),
     m_block(nullptr),
-    m_server(rcppsw::common::g_null_server),
+    m_server(std::make_shared<rcppsw::common::er_server>()),
     m_actuators(),
     m_sensors(),
     m_fsm() {
+  /*
+   * Initially, all robots use the RCPPSW er_server to log parameters.
+   */
   deferred_init(m_server);
-  server_handle()->change_logfile("controller-init.txt");
-
   /* diagnostic for logging, nominal for printing */
   insmod("controller",
          rcppsw::common::er_lvl::DIAG,
@@ -79,7 +80,9 @@ void random_foraging_controller::publish_event(enum event_type type) {
 } /* publish_event() */
 
 void random_foraging_controller::Init(argos::TConfigurationNode& node) {
-  deferred_init(m_server);
+    server_handle()->change_logfile(std::string(std::string("controller-") +
+                                              GetId() +
+                                              std::string(".txt")));
   ER_NOM("Initializing random foraging controller");
 
   params::random_foraging_repository param_repo;
@@ -107,12 +110,10 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
                        m_sensors,
                        m_actuators));
   Reset();
+  ER_NOM("Random foraging controller initialization finished");
 } /* Init() */
 
 void random_foraging_controller::Reset(void) {
-  server_handle()->change_logfile(std::string(std::string("controller-") +
-                                              GetId() +
-                                              std::string(".txt")));
   m_fsm->init();
   m_block = nullptr;
 } /* Reset() */

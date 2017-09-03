@@ -43,12 +43,13 @@ arena_map::arena_map(const struct grid_params* params,
                                                    params->upper.GetY()),
                         nest_x, nest_y,
                         &params->block),
-    m_server(std::make_shared<rcppsw::common::er_server>()),
+    m_server(rcppsw::common::g_server),
     m_grid(params) {
   deferred_init(m_server);
-  insmod("arena_map");
-  server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  insmod("arena_map",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
+
   ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
          m_grid.resolution());
   for (size_t i = 0; i < m_blocks.size(); ++i) {

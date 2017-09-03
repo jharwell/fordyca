@@ -59,12 +59,15 @@ void unpartitioned_task_controller::pickup_block(representation::block* block) {
 } /* pickup_block() */
 
 void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
-  random_foraging_controller::Init(node);
   params::unpartitioned_task_repository param_repo;
+
+  random_foraging_controller::Init(node);
+  ER_NOM("Initializing unpartitioned_task controller");
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
 
   m_map.reset(new representation::perceived_arena_map(
+      server(),
       static_cast<const struct perceived_grid_params*>(
           param_repo.get_params("perceived_grid"))));
 
@@ -75,6 +78,7 @@ void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
                        sensors(),
                        actuators(),
                        m_map));
+ER_NOM("unpartitioned_task controller initialization finished");
 } /* Init() */
 
 /*

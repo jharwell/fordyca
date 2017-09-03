@@ -38,6 +38,8 @@ NS_START(fordyca, support);
 void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
   random_foraging_loop_functions::Init(node);
 
+  ER_NOM("Initializing unpartitioned_task loop functions");
+
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -55,6 +57,7 @@ void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
     controller.display_los(l_params->display_robot_los);
     set_robot_los(robot);
   } /* for(it..) */
+  ER_NOM("unpartitioned_task loop functions initialization finished");
 }
 
 void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {

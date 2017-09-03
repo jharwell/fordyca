@@ -33,8 +33,8 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
-    const struct perceived_grid_params* params,
-    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const struct perceived_grid_params* params) :
     m_server(server), m_grid(&params->grid) {
   deferred_init(m_server);
   insmod("perceived_arena_map",

@@ -47,7 +47,7 @@ class cell2D {
  public:
   explicit cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server =
-      rcppsw::common::g_null_server) :
+      rcppsw::common::g_server) :
       m_entity(nullptr),
       m_fsm(server) { m_fsm.init(); }
 

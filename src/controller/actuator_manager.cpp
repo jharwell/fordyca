@@ -40,7 +40,7 @@ actuator_manager::actuator_manager(
     argos::CCI_DifferentialSteeringActuator* const wheels,
     argos::CCI_LEDsActuator* const leds,
     argos::CCI_RangeAndBearingActuator* const raba) :
-    simple_fsm(rcppsw::common::g_null_server, ST_MAX_STATES),
+    simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
     no_turn(),
     soft_turn(),
     hard_turn(),
