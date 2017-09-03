@@ -47,8 +47,7 @@ NS_START(fordyca, representation);
 class perceived_cell2D  {
  public:
   explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server =
-      rcppsw::common::g_null_server) :
+      const std::shared_ptr<rcppsw::common::er_server>& server) :
       m_rho(0.0), m_density(), m_cell(server) {}
 
   void rho(double rho) { m_density.rho(rho); }

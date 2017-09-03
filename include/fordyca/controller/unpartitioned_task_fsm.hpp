@@ -180,7 +180,7 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   uint8_t m_initial_state;
   uint8_t m_previous_state;
   uint8_t m_last_state;
-  
+
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   std::shared_ptr<const struct foraging_fsm_params> mc_params;

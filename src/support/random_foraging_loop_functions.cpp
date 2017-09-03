@@ -36,26 +36,35 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 random_foraging_loop_functions::random_foraging_loop_functions(void) :
+    er_client(rcppsw::common::g_server),
     m_nest_x(),
     m_nest_y(),
     m_floor(NULL),
     m_repo(new params::loop_function_repository),
     m_collector(),
-    m_map() {}
+    m_map() {
+  insmod("loop_functions",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+
+  rcppsw::common::g_server->change_logfile("loop-functions.txt");
+  rcppsw::common::g_server->dbglvl(rcppsw::common::er_lvl::NOM);
+  rcppsw::common::g_server->loglvl(rcppsw::common::er_lvl::DIAG);
+  ER_NOM("Initializing random foraging loop functions");
+
   m_floor = &GetSpace().GetFloorEntity();
 
   /* parse all environment parameters */
   m_repo->parse_all(node);
 
   /* Capture parsed parameters in logfile */
-  std::ofstream init_file("loop-functions-params.txt");
-  m_repo->show_all(init_file);
-  init_file.close();
+  m_repo->show_all(rcppsw::common::g_server->log_stream());
 
   const struct loop_functions_params * l_params =
       static_cast<const struct loop_functions_params*>(
@@ -91,6 +100,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
     controller.display_id(l_params->display_robot_id);
     controller.publish_event(controller::FSM_START);
   } /* for(it..) */
+  ER_NOM("Random foraging loop functions initialization finished");
 }
 
 void random_foraging_loop_functions::Reset() {
