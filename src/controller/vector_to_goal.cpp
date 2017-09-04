@@ -131,10 +131,23 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
     ER_DIAG("Executing ST_VECTOR");
   }
   static goal_data _goal;
-  static rcppsw::control::pid_loop angle_pid(1.8, 0, 0,
+
+  /*
+   * 2 PID loops to control the angular and linear speed of the robot as it
+   * approaches the goal. The PID values for the loops are 100% empirically
+   * determined. They could still use a little more tuning so the robots can
+   * move at higher speeds and still be guaranteed to hit any target within
+   * tolerance.
+   */
+  static rcppsw::control::pid_loop ang_pid(3.0, 0, 0,
                                              1,
-                                             -2* M_PI, 2 * M_PI );
+                                             -M_PI, M_PI);
   static double ang_speed = 0;
+  static rcppsw::control::pid_loop lin_pid(3.0, 0, 0.02,
+                                           1,
+                                           m_actuators->max_wheel_speed() * 0.4,
+                                           m_actuators->max_wheel_speed() * 0.75);
+  static double lin_speed = 0;
   if (data) {
     _goal = *data;
   }
@@ -142,25 +155,36 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
-  if ((_goal.goal - m_sensors->robot_loc()).Length() <= kVECTOR_TO_GOAL_MIN_DIFF) {
+  if ((_goal.goal - m_sensors->robot_loc()).Length() <=
+      kVECTOR_TO_GOAL_MIN_DIFF) {
+    lin_speed = 0;
+    ang_speed = 0;
+    ang_pid.reset();
+    lin_pid.reset();
     internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(_goal));
   }
   argos::CVector2 robot_to_goal = calc_vector_to_goal(_goal.goal);
   argos::CVector2 heading = m_sensors->robot_heading();
-  ang_speed = angle_pid.calculate(robot_to_goal.Angle().GetValue(),
-                                   m_sensors->heading_angle().GetValue());
-  ER_VER("robot_to_target vector=(%f, %f), heading=(%f, %f), angular speed=%f",
-         robot_to_goal.GetX(), robot_to_goal.GetY(),
+  if (lin_pid.integral() > 200) {
+    lin_pid.reset_integral();
+  }
+  ang_speed = ang_pid.calculate(robot_to_goal.Angle().GetValue(),
+                                m_sensors->heading_angle().GetValue());
+  lin_speed = lin_pid.calculate(0, -robot_to_goal.Length());
+  ER_VER("robot_to_target: vector=(%f, %f),len=%f robot_to_heading=(%f, %f), ang_speed=%f lin_speed=%f",
+         robot_to_goal.GetX(), robot_to_goal.GetY(), robot_to_goal.Length(),
          heading.GetX(), heading.GetY(),
-         ang_speed);
-  m_actuators->set_wheel_speeds(m_actuators->max_wheel_speed() * 0.5,
+         ang_speed, lin_speed);
+  m_actuators->set_wheel_speeds(lin_speed,
                                 ang_speed);
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_to_goal, arrived, struct goal_data) {
-  ER_DIAG("Executing ST_ARRIVED");
-  ER_NOM("Arrived at with %f target (%f, %f)", kVECTOR_TO_GOAL_MIN_DIFF,
-         data->goal.GetX(), data->goal.GetY());
+  if (ST_VECTOR != last_state()) {
+    ER_DIAG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
+            data->goal.GetX(), data->goal.GetY(),
+            kVECTOR_TO_GOAL_MIN_DIFF);
+  }
   return fsm::event_signal::HANDLED;
 }
 
@@ -187,18 +211,18 @@ void vector_to_goal::init(void) {
 } /* init() */
 
 argos::CVector2 vector_to_goal::calc_vector_to_goal(const argos::CVector2& goal) {
-  argos::CVector2 robot_to_goal;
-  if (m_sensors->robot_loc().GetX() < goal.GetX()) {
-    robot_to_goal.SetX(goal.GetX() - m_sensors->robot_loc().GetX());
-  } else {
-    robot_to_goal.SetX(m_sensors->robot_loc().GetX() - goal.GetX());
-  }
-  if (m_sensors->robot_loc().GetY() < goal.GetY()) {
-    robot_to_goal.SetY(goal.GetY() - m_sensors->robot_loc().GetY());
-  } else {
-    robot_to_goal.SetY(m_sensors->robot_loc().GetY() - goal.GetY());
-  }
-  return robot_to_goal;
+  return goal - m_sensors->robot_loc();
+  /* if (m_sensors->robot_loc().GetX() < goal.GetX()) { */
+  /*   robot_to_goal.SetX(goal.GetX() - m_sensors->robot_loc().GetX()); */
+  /* } else { */
+  /*   robot_to_goal.SetX(m_sensors->robot_loc().GetX() - goal.GetX()); */
+  /* } */
+  /* if (m_sensors->robot_loc().GetY() < goal.GetY()) { */
+  /*   robot_to_goal.SetY(goal.GetY() - m_sensors->robot_loc().GetY()); */
+  /* } else { */
+  /*   robot_to_goal.SetY(m_sensors->robot_loc().GetY() - goal.GetY()); */
+  /* } */
+  /* return robot_to_goal; */
 } /* calc_vector_to_goal() */
 
 argos::CVector2 vector_to_goal::randomize_vector_angle(argos::CVector2 vector) {

@@ -149,10 +149,8 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
   }
 
   /* Finally, set the wheel speeds */
-  left_wheel_speed = argos::Min<argos::Real>(left_wheel_speed,
-                                             mc_params->wheels.max_speed);
-  right_wheel_speed = argos::Min<argos::Real>(right_wheel_speed,
-                                              mc_params->wheels.max_speed);
+  left_wheel_speed = std::min(left_wheel_speed, mc_params->wheels.max_speed);
+  right_wheel_speed = std::min(right_wheel_speed, mc_params->wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
