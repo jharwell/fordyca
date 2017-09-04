@@ -212,17 +212,6 @@ void vector_to_goal::init(void) {
 
 argos::CVector2 vector_to_goal::calc_vector_to_goal(const argos::CVector2& goal) {
   return goal - m_sensors->robot_loc();
-  /* if (m_sensors->robot_loc().GetX() < goal.GetX()) { */
-  /*   robot_to_goal.SetX(goal.GetX() - m_sensors->robot_loc().GetX()); */
-  /* } else { */
-  /*   robot_to_goal.SetX(m_sensors->robot_loc().GetX() - goal.GetX()); */
-  /* } */
-  /* if (m_sensors->robot_loc().GetY() < goal.GetY()) { */
-  /*   robot_to_goal.SetY(goal.GetY() - m_sensors->robot_loc().GetY()); */
-  /* } else { */
-  /*   robot_to_goal.SetY(m_sensors->robot_loc().GetY() - goal.GetY()); */
-  /* } */
-  /* return robot_to_goal; */
 } /* calc_vector_to_goal() */
 
 argos::CVector2 vector_to_goal::randomize_vector_angle(argos::CVector2 vector) {
