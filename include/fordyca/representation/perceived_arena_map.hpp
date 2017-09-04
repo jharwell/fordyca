@@ -48,9 +48,8 @@ NS_START(fordyca, representation);
  */
 class perceived_arena_map: public rcppsw::common::er_client {
  public:
-  perceived_arena_map(const struct perceived_grid_params* params,
-                      const std::shared_ptr<rcppsw::common::er_server>& server =
-                      rcppsw::common::g_null_server);
+  perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
+                      const struct perceived_grid_params* params);
 
   std::list<std::pair<const block*, double>> blocks(void) const;
   perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i, j); }

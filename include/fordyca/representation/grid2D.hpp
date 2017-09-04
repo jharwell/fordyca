@@ -61,7 +61,7 @@ class grid2D {
   /* constructors/destructor */
   explicit grid2D(const grid_params* params,
                   const std::shared_ptr<rcppsw::common::er_server>& server =
-                          rcppsw::common::g_null_server) :
+                          rcppsw::common::g_server) :
       m_resolution(params->resolution),
       m_upper(params->upper),
       m_lower(params->lower),
