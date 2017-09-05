@@ -45,6 +45,10 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief Signals that sub-states can return in order to notify their super
+ * states that a conditiot that they do not know how to handle has arised.
+ */
 class foraging_signal : public fsm::event_signal {
  public:
   enum {
@@ -53,6 +57,11 @@ class foraging_signal : public fsm::event_signal {
   };
 };
 
+/**
+ * @brief The FSM for an unpartitioned foraging task. Each robot executing this
+ * FSM will locate for a block (either a known block or via random exploration),
+ * pickup the block and bring it all the way back to the nest.
+ */
 class unpartitioned_task_fsm : public fsm::hfsm {
  public:
   unpartitioned_task_fsm(const struct foraging_fsm_params* params,
@@ -61,33 +70,61 @@ class unpartitioned_task_fsm : public fsm::hfsm {
                const std::shared_ptr<actuator_manager>& actuators,
                const std::shared_ptr<const representation::perceived_arena_map>& map);
 
+  /**
+   * @brief Reset the FSM
+   */
   void init(void);
 
+  /**
+   * @brief Get the current state of the FSM.
+   */
   uint8_t current_state(void) const { return m_current_state; }
   uint8_t max_states(void) const { return ST_MAX_STATES; }
+
+  /**
+   * @brief Get the previous state of the FSM. Note that this is not necessarily the state
+   * that the FSM was in last time the state engine was run, but that this is
+   * the last visited state that is NOT the current state.
+   */
   uint8_t previous_state(void) const { return m_previous_state; }
 
+  /**
+   * @brief Get if the robot is currently searching for a block within the arena
+   * (either vectoring towards a known block, or exploring for one).
+   *
+   * @return TRUE if the condition is met, FALSE otherwise.
+   */
   bool is_searching_for_block(void) {
     return current_state() == ST_EXPLORE ||
         (current_state() == ST_LOCATE_BLOCK && !m_vector_fsm.in_progress());
   }
+  /**
+   * @brief Pass a block fround event from the controller's/robot's sensors to
+   * the FSM, so that it can update state accordingly.
+   */
   void event_block_found(void);
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
   enum fsm_states {
-    ST_START,
-    ST_EXPLORE,
-    ST_NEW_DIRECTION,
-    ST_RETURN_TO_NEST,
-    ST_LEAVING_NEST,
-    ST_COLLISION_AVOIDANCE,
-    ST_LOCATE_BLOCK,
+    ST_START,                 /* Initial state */
+    ST_EXPLORE,               /* No known blocks--roam around looking for one  */
+    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
+    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
+    ST_LOCATE_BLOCK,          /* superstate for finding a block */
     ST_MAX_STATES
   };
 
  private:
   /* types */
+
+  /**
+   * @brief Inject randomness into robot exploring by having them change their
+   * direction every X timesteps if they have not yet located a block, where X
+   * is set in the .argos configuration file.
+   */
   struct new_direction_data  : public fsm::event_data {
     explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
     argos::CRadians dir;
@@ -97,7 +134,6 @@ class unpartitioned_task_fsm : public fsm::hfsm {
 
     size_t time_exploring_unsuccessfully;
   };
-  /* constants */
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
@@ -105,9 +141,20 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   uint8_t initial_state(void) const { return m_initial_state; }
   void next_state(uint8_t next_state) { m_next_state = next_state; }
   uint8_t last_state(void) const { return m_last_state; }
-
   void update_state(uint8_t update_state);
+
+  /**
+   * @brief Acquire a known block by calculating the "best" block according to a
+   * utility equation, and then traveling to that location and attempting to
+   * pickup the block at that location.
+   *
+   * @return TRUE if a block has been acquired, FALSE otherwise.
+   */
   bool acquire_block(void);
+
+  /**
+   * @brief Acquire a known block.
+   */
   void acquire_known_block(
       std::list<std::pair<const representation::block*, double>> blocks);
 

@@ -97,7 +97,8 @@ class random_foraging_controller : public argos::CCI_Controller,
   bool is_carrying_block(void) const { return nullptr != m_block; }
 
   /**
-   * @brief Return the block robot is carrying.
+   * @brief Return the block robot is carrying, or NULL if the robot is not
+   * currently carrying a block.
    */
   representation::block* block(void) const { return m_block; }
 
@@ -128,8 +129,16 @@ class random_foraging_controller : public argos::CCI_Controller,
   random_foraging_controller(const random_foraging_controller& other) = delete;
   random_foraging_controller& operator=(const random_foraging_controller& other) = delete;
 
+  /** Should the ID of the robot be displayed during visualization?  */
   bool                                       m_display_id;
+
+  /**
+   * The current block that the robot is carrying, or NULL if the robot is not
+   * currently carrying a block.
+   */
   representation::block*                     m_block;
+
+  /** The er_server that this and all derived classes will use */
   std::shared_ptr<rcppsw::common::er_server> m_server;
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;

@@ -48,30 +48,66 @@ class perceived_cell2D  {
  public:
   explicit perceived_cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server) :
-      m_rho(0.0), m_density(), m_cell(server) {}
+      m_density(), m_cell(server) {}
 
+  /**
+   * @brief Set the relevance decay parameter for the cell.
+   *
+   * @param rho The new value.
+   */
   void rho(double rho) { m_density.rho(rho); }
+
+  /**
+   * @brief Get the current information relavence via the current pheromone
+   * density of the cell.
+   *
+   * @return The current relevance.
+   */
   double density(void) const { return m_density.last_result(); }
 
   bool state_is_known(void) { return m_cell.state_is_known(); }
   bool state_has_block(void) { return m_cell.state_has_block(); }
   bool state_is_empty(void) { return m_cell.state_is_empty(); }
-  const representation::block* block(void) const { return m_cell.block(); }
 
   /**
-   * @brief Update the relevance/freshness of the information about the state of
-   * the current square.
+   * @brief Get the block current associated with this cell. NULL if no block
+   * currently associated.
    *
-   * Each call to this function increases the relevance of the information by a
-   * factor of 1.0.
+   * @return The associated block.
    */
-  void update_relevance(void);
+  const representation::block* block(void) const { return m_cell.block(); }
+
+
+  /**
+   * @brief Update the information relevance/pheromone density associated with
+   * this cell.
+   *
+   * Every timestep, the relevance decays. Update reaching \ref kEpsilon, the
+   * cell transitions back to an unknown state, as the robot can no longer trust
+   * its information.
+   */
+  void update_density(void);
+
+  /**
+   * @brief A robot has encountered this cell during exploring or travel
+   * (i.e. the cell fell within its LOS). Each timestep that the cell remains in
+   * the robot's LOS, it is encountered again. Each encounter causes a unit
+   * amout of pheromone to be deposited on the cell; the information relevance
+   * is reinforced.
+   *
+   * This is OK, because blocks CAN suddenly disappear from a robot's LOS if it
+   * is picked up by another robot (robots are generally unaware of each
+   * other).
+   */
   void event_encounter(cell2D_fsm::state state,
                        representation::block* block = nullptr);
 
  private:
+  /**
+   * The tolerance to zero which the pheromone density has to reach before the
+   * cell will transition back to an unknown state.
+   */
   static const double kEpsilon;
-  double m_rho;
   expressions::pheromone_density m_density;
   cell2D m_cell;
 };

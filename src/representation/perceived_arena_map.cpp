@@ -94,26 +94,25 @@ void perceived_arena_map::event_new_los(const line_of_sight* los) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::pair<const block*, double>> perceived_arena_map::blocks(void) const {
-  std::list<std::pair<const block*, double>> blocks;
+std::list<perceived_block> perceived_arena_map::blocks(void) const {
+  std::list<perceived_block> blocks;
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       if (m_grid.access(i, j).state_has_block()) {
-        blocks.push_back(std::pair<const block*, double>(
-            m_grid.access(i, j).block(),
-            m_grid.access(i, j).density()));
+        blocks.push_back(perceived_block(m_grid.access(i, j).block(),
+                                         m_grid.access(i, j).density()));
       }
     } /* for(j..) */
   } /* for(i..) */
   return blocks;
 } /* blocks() */
 
-void perceived_arena_map::update_relevance(void) {
+void perceived_arena_map::update_density(void) {
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      m_grid.access(i, j).update_relevance();
+      m_grid.access(i, j).update_density();
     } /* for(j..) */
   } /* for(i..) */
-} /* update_relevance() */
+} /* update_density() */
 
 NS_END(representation, fordyca);

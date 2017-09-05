@@ -41,6 +41,19 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief A representation of the robot's current line-of-sight. The robot is
+ * only able to update its internal state based on the information present in
+ * the per-timestep updates to this object.
+ *
+ * The LOS for a robot is always square. Furthermore, it is always a multiple of
+ * 4, as the smallest LOS is a 2x2 grid, the next smallest a 4x4, etc., UNLESS
+ * the robot is near the edge of the arena, and a square grid would result in
+ * out-of-bounds array accesses. In that case, a truncated LOS is created.
+ *
+ * All coordinates within a LOS are relative to the LOS itself (not its location
+ * within the arena). The origin is in the lower left corner of the LOS.
+ */
 class line_of_sight {
  public:
   explicit line_of_sight(const grid_view<cell2D*> view,
@@ -48,11 +61,55 @@ class line_of_sight {
       m_center(center), m_view(view) {}
   std::list<const representation::block*> blocks(void);
 
+  /**
+   * @brief Get the size of the X dimension for a LOS.
+   *
+   * @return The X dimension.
+   */
   size_t sizex(void) const { return m_view.num_elements() / 2; }
+
+  /**
+   * @brief Get the size of the Y dimension for a LOS.
+   *
+   * @return The Y dimension.
+   */
   size_t sizey(void) const { return m_view.num_elements() / 2; }
+
+  /**
+   * @brief Get the # elements in a LOS.
+   *
+   * @return # elements.
+   */
   size_t size(void) const { return m_view.num_elements(); }
+
+  /**
+   * @brief Get the cell associated with a particular grid location within the
+   * LOS. Asserts that both coordinates are within the bounds of the grid
+   * underlying the LOS.
+   *
+   * @param i The RELATIVE X coord within the LOS.
+   * @param j The RELATIVE Y coord within the LOS.
+   *
+   * @return
+   */
   cell2D& cell(size_t i, size_t j) const;
+
+  /**
+   * @brief Translate the relative coordinates within a LOS to an absolute
+   * coordinate that can be used to index into the arena_map.
+   *
+   * @param i The relative X coord within the LOS.
+   * @param j The relative Y coord with the LOS.
+   *
+   * @return The absolute (X, Y) coordinates.
+   */
   discrete_coord cell_abs_coord(size_t i, size_t j) const;
+
+  /**
+   * @brief Get the coordinates for the center of the LOS.
+   *
+   * @return The center coordinates (discrete version).
+   */
   const discrete_coord& center(void) const { return m_center; }
 
  private:

@@ -44,8 +44,15 @@ class block_target_selector: public rcppsw::common::er_client {
   block_target_selector(const std::shared_ptr<rcppsw::common::er_server>& server,
                         argos::CVector2 nest_loc);
 
-  std::pair<const representation::block*, double> calc_best(
-      const std::list<std::pair<const representation::block*, double>> blocks,
+  /**
+   * @brief Given a list of blocks that a robot knows about (i.e. have not faded
+   * into an unknown state), compute which is the "best", for use in deciding
+   * which block to go attempt to pickup.
+   *
+   * @return A pointer to the "best" block, along with its utility value.
+   */
+  representation::perceived_block calc_best(
+      const std::list<representation::perceived_block> blocks,
       argos::CVector2 robot_loc);
 
  private:

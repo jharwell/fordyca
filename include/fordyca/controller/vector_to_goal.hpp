@@ -46,12 +46,36 @@ class vector_to_goal : public fsm::simple_fsm {
                  std::shared_ptr<sensor_manager> sensors,
                  std::shared_ptr<actuator_manager> actuators);
 
+  /**
+   * @brief Initialize/re-initialize the vector_to_goal fsm. After arriving at a
+   * goal, this function must be called before vectoring to a new goal will work.
+   */
   void init(void);
+
+  /**
+   * @brief Determine if the robot has arrived at the specified goal within the
+   * specified tolerance yet.
+   *
+   * @return TRUE if the condition is met, FALSE otherwise.
+   */
   bool arrived_at_goal(void) { return current_state() == ST_ARRIVED; }
+
+  /**
+   * @brief Determine if the robot is still on the way to the specified
+   * goal. Basically a way of checking if a robot is still in transit.
+   *
+   * @return TRUE if the condition is met, FALSE otherwise.
+   */
   bool in_progress(void) {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
   void run(void) { generated_event(true); state_engine(); }
+
+  /**
+   * @brief Restart the FSM, with a new goal.
+   *
+   * @param goal The (X, Y) coordinates of the new goal to drive to.
+   */
   void event_start(const argos::CVector2& goal);
 
  protected:
@@ -67,6 +91,10 @@ class vector_to_goal : public fsm::simple_fsm {
  private:
   /* types */
 
+  /**
+   * @brief A structure containing all the information needed for the controller
+   * to tell the FSM where to travel to next.
+   */
   struct goal_data : public fsm::event_data {
     explicit goal_data(argos::CVector2 goal_) : goal(goal_) {}
     goal_data(void) : goal() {}
@@ -83,11 +111,30 @@ class vector_to_goal : public fsm::simple_fsm {
   };
 
   /* constants */
+
+  /**
+   * @brief The # of timesteps according to collision recovery. This is mainly
+   * to ensure that you do not repeatedly get 2 robots butting heads as they try
+   * to travel to opposite goals.
+   */
   static int kCOLLISION_RECOVERY_TIME;
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered having arrived at a specified target location.
+   */
   static double kVECTOR_TO_GOAL_MIN_DIFF;
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+
+  /**
+   * @brief Calculates the relative vector from the robot to the current goal.
+   *
+   * @param goal The current goal.
+   *
+   * @return The vector, specified with the tail at the robot and the head
+   * pointing towards the goal.
+   */
   argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
   /* states */

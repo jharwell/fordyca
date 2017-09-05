@@ -88,6 +88,7 @@ class sub_area_utility: public rcppsw::math::expression<double> {
                    size_t squares) :
       expression(),
       m_squares(squares),
+      m_unexplored(squares),
       mc_center(area_center),
       mc_nest(nest_center),
       m_poa(area_center, nest_center) {}
@@ -304,7 +305,7 @@ class time_estimate : public rcppsw::math::expression<double> {
  * Depends on:
  *
  * - The reactivity parameter: How sensitive should robots be to abrupt changes
- *   in task estimates/execution times.n
+ *   in task estimates/execution times.
  * - Time estimates of the unpartitioned and two partitioned tasks.
  * - How long the robot has spent executing the current task.
  * - The offset parameter: Another parameter whose purpose I'm not quite sure
