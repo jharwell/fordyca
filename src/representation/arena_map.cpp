@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
+#include "fordyca/operations/block_drop.hpp"
+#include "fordyca/operations/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,7 +84,8 @@ void arena_map::event_block_pickup(block& block, size_t robot_index) {
   argos::CVector2 old_r(block.real_loc().GetX(),
                         block.real_loc().GetY());
   cell2D& cell = m_grid.access(old_d.first, old_d.second);
-  cell.event_empty();
+  operations::cell_empty op;
+  cell.accept(op);
   block.event_pickup(robot_index);
   ER_NOM("fb%zu picked up block%d from (%f, %f) -> (%zu, %zu)",
          robot_index, block.id(),
@@ -94,7 +97,8 @@ void arena_map::distribute_block(block& block, bool first_time) {
   m_block_distributor.distribute_block(block, first_time);
   cell2D& cell = m_grid.access(block.discrete_loc().first,
                                block.discrete_loc().second);
-  cell.event_has_block(&block);
+  operations::block_drop op(&block);
+  cell.accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu)",
          block.id(),
          block.real_loc().GetX(),
@@ -116,7 +120,8 @@ void arena_map::distribute_blocks(bool first_time) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
       if (!cell.state_has_block()) {
-        cell.event_empty();
+        operations::cell_empty op;
+        cell.accept(op);
       }
     } /* for(j..) */
   } /* for(i..) */
