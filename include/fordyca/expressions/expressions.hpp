@@ -115,37 +115,6 @@ class sub_area_utility: public rcppsw::math::expression<double> {
   sub_area_poa m_poa;
 };
 
-/**
- * @brief Calculates the pheromone density associated with a block or cache,
- * which decays over time.
- *
- * Depends on:
- *
- * - The pheromone decay parameter.
- * - The previous value of the pheromone density.
- */
-class pheromone_density: public rcppsw::math::expression<double> {
- public:
-  pheromone_density(void) : pheromone_density(0.0) {}
-  explicit pheromone_density(double rho) :
-      expression(), m_delta(0), m_rho(rho) {}
-
-  void rho(double rho) { m_rho = rho; }
-
-  double calc(void) {
-    double res = set_result((1.0 - m_rho) * last_result() + m_delta);
-    m_delta = 0;
-    return res;
-  }
-  void add_pheromone(double val) {
-    m_delta += val;
-  }
-
- private:
-  double m_delta;
-  double m_rho;
-};
-
 NS_START(forage);
 
 /**
@@ -241,94 +210,6 @@ class new_cache_utility: public rcppsw::math::expression<double> {
 NS_END(harvest);
 NS_START(tasks);
 
-/**
- * @brief Calculates the probability that a robot partitions its current task.
- *
- * Depends on:
- *
- * - The robot's time estimates of how long it takes to complete each of the two
- *   subtasks, as well as an estimate of how long it takes to complete the
- *   unpartitioned task.
- *
- * - The reactivity parameter: how sensitive should robots be to abrupt changes
- *   in the estimates?
- */
-class partition_probability: public rcppsw::math::expression<double> {
- public:
-  explicit partition_probability(double reactivity) :
-      m_reactivity(reactivity) {}
-
-  double calc(double task_time_estimate, double subtask1_time_estimate,
-              double subtask2_time_estimate) {
-    if (task_time_estimate > subtask1_time_estimate + subtask2_time_estimate) {
-      double res = 1 + std::exp(-m_reactivity *
-                                ((task_time_estimate /
-                                  (subtask1_time_estimate + subtask2_time_estimate)) - 1));
-      return set_result(1/res);
-    } else {
-      double res = 1 + std::exp(-m_reactivity * (1 -
-                                                 ((subtask1_time_estimate + subtask2_time_estimate) /
-                                                  task_time_estimate)));
-      return set_result(1/res);
-    }
-  }
- private:
-  double m_reactivity;
-};
-
-/**
- * @brief Calculates an estimate of how long a task will take.
- *
- * Depends on:
- *
- * - Alpha: How much weight to give the past estimate, and how much to give the
- *   new measurement?
- *
- * - The last value of the time estimate.
- */
-class time_estimate : public rcppsw::math::expression<double> {
- public:
-  explicit time_estimate(double alpha) : m_alpha(alpha) {}
-
-  double calc(double last_measure) {
-    return set_result(1 - m_alpha * last_result() + m_alpha * last_measure);
-  }
-
- private:
-  double m_alpha;
-};
-
-/**
- * @brief Calculates the probability that a robot will abort the task it is
- * currently working on.
- *
- * Depends on:
- *
- * - The reactivity parameter: How sensitive should robots be to abrupt changes
- *   in task estimates/execution times.
- * - Time estimates of the unpartitioned and two partitioned tasks.
- * - How long the robot has spent executing the current task.
- * - The offset parameter: Another parameter whose purpose I'm not quite sure
- *   of.
- */
-class abort_probability: public rcppsw::math::expression<double> {
- public:
-  abort_probability(double reactivity, double offset) :
-      m_reactivity(reactivity), m_offset(offset) {}
-
-  double calc(double exec_time,
-              const time_estimate& whole_task,
-              const time_estimate& subtask1,
-              const time_estimate& subtask2) {
-    double omega = m_reactivity * ((exec_time - whole_task.last_result())/
-                                    (subtask1.last_result() + subtask2.last_result()) + m_offset);
-    return set_result(1/(1 + std::exp(omega)));
-  }
-
- private:
-  double m_reactivity;
-  double m_offset;
-};
 
 NS_END(tasks);
 NS_END(expressions, fordyca);
