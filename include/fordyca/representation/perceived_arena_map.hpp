@@ -51,12 +51,47 @@ class perceived_arena_map: public rcppsw::common::er_client {
   perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
                       const struct perceived_grid_params* params);
 
-  std::list<std::pair<const block*, double>> blocks(void) const;
+  /**
+   * @brief Get a list of all blocks the robot is currently aware of/that are
+   * currently relevant.
+   *
+   * @return The list of perceived blocks (really a list of std::pair<block,
+   * double>).
+   */
+  std::list<perceived_block> blocks(void) const;
+
+  /**
+   * @brief Access a particular element in the discretized grid representing the
+   * robot's view of the arena. No bounds checking is performed, so if something
+   * is out of bounds, boost with fail with a bounds checking assertion.
+   *
+   * @param i X coord.
+   * @param j Y coord
+   *
+   * @return The cell.
+   */
   perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i, j); }
-  void update_relevance(void);
+
+  /**
+   * @brief Update the density of all cells in the perceived arena.
+   */
+  void update_density(void);
 
   /* events */
+  /**
+   * @brief Handle the event of a robot picking up a block, making updates to
+   * the arena map as necessary.
+   *
+   * @param block Handle of the block that has been picked up.
+   */
   void event_block_pickup(block* block);
+
+  /**
+   * @brief Handle the event of a robot acquiring a new line-of-sight (happens
+   * every timestep).
+   *
+   * @param los The new LOS.
+   */
   void event_new_los(const line_of_sight* los);
 
  private:

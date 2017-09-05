@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
 #include "fordyca/representation/cell_entity.hpp"
 
 /*******************************************************************************
@@ -44,10 +45,35 @@ class block : public cell_entity {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension),
-      m_robot_index(-1), m_carries(0) {}
+      m_robot_index(-1),
+      m_carries(0) {}
 
+  /**
+   * @brief Get how many carries this block has had on its way from its original
+   * arena location back to the nest.
+   *
+   * @return # carries.
+   */
   size_t carries(void) const { return m_carries; }
+
+  /**
+   * @brief Determine if a real-valued point lies within the extent of the block
+   * for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of a block.
+   *
+   * @param point The point to check.
+   *
+   * @return TRUE if the condition is met, and FALSE otherwise.
+   */
   bool contains_point(const argos::CVector2& point);
+
+  /**
+   * @brief Get the ID/index of the robot that is currently carrying this block
+   *
+   * @return The robot index, or -1 if no robot is currently carrying this block.
+   */
   int robot_index(void) const { return m_robot_index; }
 
   /* events */
@@ -58,6 +84,11 @@ class block : public cell_entity {
   int m_robot_index;
   size_t m_carries;
 };
+
+/*******************************************************************************
+ * Type Definitions
+ ******************************************************************************/
+typedef std::pair<const block*, double> perceived_block;
 
 NS_END(representation, fordyca);
 

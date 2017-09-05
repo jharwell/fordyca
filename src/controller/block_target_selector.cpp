@@ -32,8 +32,9 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_target_selector::block_target_selector(const std::shared_ptr<rcppsw::common::er_server>& server,
-                                             argos::CVector2 nest_loc) :
+block_target_selector::block_target_selector(
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    argos::CVector2 nest_loc) :
     er_client(server),
     m_nest_loc(nest_loc) {
   insmod("block_target_selector",
@@ -45,8 +46,8 @@ block_target_selector::block_target_selector(const std::shared_ptr<rcppsw::commo
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<const representation::block*, double> block_target_selector::calc_best(
-    const std::list<std::pair<const representation::block*, double>> blocks,
+representation::perceived_block block_target_selector::calc_best(
+    const std::list<representation::perceived_block> blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::block* best;
@@ -70,7 +71,7 @@ std::pair<const representation::block*, double> block_target_selector::calc_best
          best->discrete_loc().first,
          best->discrete_loc().second,
          max_utility);
-  return std::pair<const representation::block*, double>(best, max_utility);
+  return representation::perceived_block(best, max_utility);
 } /* calc_best() */
 
 NS_END(controller, fordyca);

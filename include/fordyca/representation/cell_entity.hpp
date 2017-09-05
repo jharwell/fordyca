@@ -37,6 +37,10 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief A base class from which objects that are able to occupy a cell within
+ * a 2D grid derive.
+ */
 class cell_entity {
  public:
   cell_entity(double x_dim, double y_dim) : m_id(-1),
@@ -46,14 +50,42 @@ class cell_entity {
 
   double xsize(void) const { return m_x_dim; }
   double ysize(void) const { return m_y_dim; }
+
+  /**
+   * @brief Set if the ID of the object be displayed during simulation for
+   * visualization purposes.
+   */
   void display_id(bool display_id) { m_display_id = display_id; }
+
+  /**
+   * @brief Should the ID of the object be displayed during simulation for
+   * visualization purposes?
+   */
   bool display_id(void) const { return m_display_id; }
 
+  /**
+   * @brief Get the real location of the object.
+   */
   const argos::CVector2& real_loc(void) const { return m_real_loc; }
+
+  /**
+   * @brief Get the discretized coordinates of the object, which can be used to
+   * index into an arena_map.
+   *
+   */
   const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
+
   void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
   void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
+
+  /**
+   * @brief Set the ID of the object.
+   */
   void id(int id) { m_id = id; }
+
+  /**
+   * @brief Get the ID of the object.
+   */
   int id(void) const { return m_id; }
 
  private:

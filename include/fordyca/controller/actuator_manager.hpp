@@ -42,20 +42,19 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class actuator_manager: public fsm::simple_fsm {
  public:
-  /* constructors */
   actuator_manager(const struct actuator_params* params,
                    argos::CCI_DifferentialSteeringActuator* const wheels,
                    argos::CCI_LEDsActuator* const leds,
                    argos::CCI_RangeAndBearingActuator* const raba);
 
-  /* member functions */
   void leds_set_color(const argos::CColor& color) {
     m_leds->SetAllColors(color);
   }
 
   /*
    * Gets a direction vector as input and transforms it into wheel
-   * actuation.
+   * actuation. Note that the heading is not absolute, but rather says "change
+   * this much from the direction you are currently going in".
    */
   void set_heading(const argos::CVector2& heading,
                    bool force_hard_turn = false);
@@ -64,10 +63,22 @@ class actuator_manager: public fsm::simple_fsm {
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
   void reset(void);
-  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
+
+  /**
+   * @brief Direct control over the linear/angular speeds of the wheels. This
+   * provides an alternative interface much more precise rather than just saying
+   * "go in this direction now" than you get with \ref set_heading(). However,
+   * it is also more difficult to use. Note that if lin_speed + ang_speed is
+   * greater than the specified parameter value for max wheel speed for either
+   * wheel it will saturate.
+   *
+   * @param lin_speed The desired linear speed.
+   * @param ang_speed The desired angular speed.
+   */
   void set_wheel_speeds(double lin_speed, double ang_speed);
 
  private:
+  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
   actuator_manager(const actuator_manager& fsm) = delete;
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
 

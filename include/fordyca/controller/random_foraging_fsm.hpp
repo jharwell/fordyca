@@ -41,6 +41,11 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief The FSM for the most basic foraging definition: each robot executing
+ * this FSM roams around randomly until it finds a block, and then brings the
+ * block back to the nest and repeat.
+ */
 class random_foraging_fsm : public fsm::simple_fsm {
  public:
   random_foraging_fsm(const struct foraging_fsm_params* params,
@@ -48,8 +53,22 @@ class random_foraging_fsm : public fsm::simple_fsm {
                       std::shared_ptr<sensor_manager> sensors,
                       std::shared_ptr<actuator_manager> actuators);
 
+  /**
+   * @brief If TRUE the robot is currently attempting to locate a block in the
+   * arena (either via exploration or via vectoring to a "known" block).
+   *
+   */
   virtual bool is_searching_for_block(void);
+
+  /**
+   * @brief If TRUE, the robot is returning to the nest, probably after having
+   * successfully picked up a block.
+   */
   virtual bool is_returning(void);
+
+  /**
+   * @brief If TRUE, the robot is currently engaged in collision avoidance.
+   */
   virtual bool is_avoiding_collision(void);
   void init(void);
   void event_block_found(void);

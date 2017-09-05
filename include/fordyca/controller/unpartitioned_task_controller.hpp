@@ -72,13 +72,41 @@ class unpartitioned_task_controller : public random_foraging_controller {
    */
   virtual void ControlStep(void);
 
+  /**
+   * @brief Set the robot's current line of sight (LOS). This sort of a hack,
+   * but is much easier than actually computing it, and helps me get on with teh
+   * actual reserach I'm interested in.
+   */
   void los(std::unique_ptr<representation::line_of_sight>& new_los) {
     sensors()->los(new_los);
   }
+
+  /**
+   * @brief Get the current LOS for the robot.
+   *
+   * @return The current LOS.
+   */
   const representation::line_of_sight* los(void) const { return sensors()->los(); }
+
+  /**
+   * @brief Set the current clock tick. In a real world, each robot would
+   * maintain its own clock tick, and overall there would no doubt be
+   * considerable skew; this is a simulation hack that makes things much
+   * nicer/easier to deal with.
+   */
   void tick(uint tick) { sensors()->tick(tick); }
-  argos::CVector2 robot_loc(void) { return sensors()->robot_loc(); }
+
+  /**
+   * @brief Set the current location of the robot.
+   *
+   * This is a hack, as real world robot's would have to do their own
+   * localization. This is far superior to that, in terms of ease of
+   * programming. Plus it helps me focus in on my actual research. Ideally,
+   * robot's would calculate this from sensor values, rather than it being set
+   * by the loop functions.
+   */
   void robot_loc(argos::CVector2 loc) { return sensors()->robot_loc(loc); }
+  argos::CVector2 robot_loc(void) { return sensors()->robot_loc(); }
 
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
@@ -90,6 +118,7 @@ class unpartitioned_task_controller : public random_foraging_controller {
   virtual void pickup_block(representation::block* block);
 
  private:
+  /** Should the robot's LOS be displayed as a circle?  */
   bool                                                 m_display_los;
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;

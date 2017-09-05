@@ -53,7 +53,9 @@ using index_range = boost::multi_array_types::index_range;
  * and caches are mapped as points with an extent.
  *
  * Each cell within the 2D grid has its own state machine for reacting to
- * events.
+ * events. The cell types used with this template must have zero parameter
+ * constructors available, as that is what the boost library requires (I can't
+ * figure out how to get around this requirement).
  */
 template<typename T>
 class grid2D {
@@ -79,7 +81,6 @@ class grid2D {
     } /* for(i..) */
   }
 
-  /* member functions */
   /**
    * @brief Create a subgrid (really an array view) from a grid. The grid is
    * clamped to the maximum boundaries of the parent grid, so rather than
@@ -111,12 +112,25 @@ class grid2D {
   }
   T& access(size_t i, size_t j) const { return *m_cells[i][j]; }
   double resolution(void) const { return m_resolution; }
+
+  /**
+   * @brief Get the size of the X dimension of the discretized subgrid, at
+   * whatever the resolution specified during object construction was.
+   */
   size_t xsize(void) const { return std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution); }
-  size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
+
+  /**
+   * @brief Get the size of the Y dimension of the discretized subgrid, at
+   * whatever the resolution specified during object construction was.
+   */
+size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
 
  private:
   double m_resolution;
+  /** The coordinate for the upper right corner of the grid */
   argos::CVector2 m_upper;
+
+  /** The coordinate for the lower left corner of the grid (usually (0,0)) */
   argos::CVector2 m_lower;
   grid_type<T*> m_cells;
 };

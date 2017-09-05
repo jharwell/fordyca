@@ -80,7 +80,18 @@ class sensor_manager {
     m_prev_robot_loc = m_robot_loc;
     m_robot_loc = robot_loc;
   }
+  /**
+   * @brief Get the robot's heading, which is computed from the previous 2
+   * calculated (ahem set) robot positions.
+   */
   argos::CVector2 robot_heading(void) { return m_robot_loc - m_prev_robot_loc; }
+
+  /**
+   * @brief Get the angle of the current robot's heading. A shortcut to help
+   * reduce the ache in my typing fingers.
+   *
+   * @return The heading angle.
+   */
   argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
   uint tick(void) const { return m_tick; }
   void tick(uint tick) { m_tick = tick; }
@@ -98,12 +109,17 @@ class sensor_manager {
    */
   argos::CVector2 calc_vector_to_light(void);
 
+  /**
+   * @brief Calcucate the location of the light within the arena...not sure when
+   * I would ever need to use this...
+   */
   argos::CVector2 calc_light_loc(const argos::CVector2& robot_loc);
 
  private:
   sensor_manager(const sensor_manager& fsm) = delete;
   sensor_manager& operator=(const sensor_manager& fsm) = delete;
 
+  /** The current timestep  */
   uint                                        m_tick;
   std::shared_ptr<const struct sensor_params> mc_params;
   argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */

@@ -36,14 +36,14 @@ const double perceived_cell2D::kEpsilon = 0.0001;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_cell2D::update_relevance(void) {
+void perceived_cell2D::update_density(void) {
   if (m_cell.state_is_known()) {
     m_density.calc();
     if (m_density.last_result() < kEpsilon) {
       m_cell.event_unknown();
     }
   }
-} /* update_relevance() */
+} /* update_density() */
 
 void perceived_cell2D::event_encounter(cell2D_fsm::state state,
                                        representation::block* block) {
