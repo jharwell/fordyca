@@ -55,7 +55,7 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
   virtual void PreStep();
   virtual bool IsExperimentFinished(void);
-  virtual void PostExperiment(void) { std::exit(0); }
+  virtual void PostExperiment(void);
 
  protected:
   virtual void pre_step_iter(argos::CFootBotEntity& robot);
@@ -74,6 +74,7 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   argos::CRange<argos::Real> m_nest_x;
   argos::CRange<argos::Real> m_nest_y;
   argos::CFloorEntity* m_floor;
+  std::string m_sim_type;
   std::unique_ptr<params::loop_function_repository> m_repo;
   std::unique_ptr<stat_collector> m_collector;
   std::unique_ptr<representation::arena_map> m_map;

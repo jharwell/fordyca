@@ -40,6 +40,7 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_nest_x(),
     m_nest_y(),
     m_floor(NULL),
+    m_sim_type(),
     m_repo(new params::loop_function_repository),
     m_collector(),
     m_map() {
@@ -71,6 +72,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
       m_repo->get_params("loop_functions"));
   m_nest_x = l_params->nest_x;
   m_nest_y = l_params->nest_y;
+  m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
   const struct grid_params * grid_params =
@@ -210,6 +212,11 @@ bool random_foraging_loop_functions::IsExperimentFinished(void) {
   return false;
 } /* IsExperimentFinished() */
 
+void random_foraging_loop_functions::PostExperiment(void) {
+  if (m_sim_type == "scripted") {
+    std::exit(0);
+  }
+} /* PostExperiment() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(random_foraging_loop_functions, "random_foraging_loop_functions")

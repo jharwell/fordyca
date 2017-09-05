@@ -76,6 +76,7 @@
                    robot_los="true"
                    block_id="true"
                    />
+    <simulation experiment="restartable"/>
   </loop_functions>
 
   <!-- *********************** -->
