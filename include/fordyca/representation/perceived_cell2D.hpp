@@ -29,7 +29,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/expressions/expressions.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -108,7 +108,7 @@ class perceived_cell2D  {
    * cell will transition back to an unknown state.
    */
   static const double kEpsilon;
-  expressions::pheromone_density m_density;
+  rcppsw::swarm::pheromone_density m_density;
   cell2D m_cell;
 };
 
