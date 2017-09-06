@@ -71,45 +71,23 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
   return -1;
 } /* robot_on_block() */
 
-void arena_map::event_block_nest_drop(block& block) {
-  distribute_block(block, false);
-  int robot_index = block.robot_index();
-  block.event_nest_drop();
-  ER_NOM("fb%d dropped block%d in nest", robot_index, block.id());
-} /* event_block_nest_drop() */
-
-void arena_map::event_block_pickup(block& block, size_t robot_index) {
-  representation::discrete_coord old_d(block.discrete_loc().first,
-                             block.discrete_loc().second);
-  argos::CVector2 old_r(block.real_loc().GetX(),
-                        block.real_loc().GetY());
-  cell2D& cell = m_grid.access(old_d.first, old_d.second);
-  operations::cell_empty op;
-  cell.accept(op);
-  block.event_pickup(robot_index);
-  ER_NOM("fb%zu picked up block%d from (%f, %f) -> (%zu, %zu)",
-         robot_index, block.id(),
-         old_r.GetX(), old_r.GetY(),
-         old_d.first, old_d.second);
-} /* event_block_pickup() */
-
-void arena_map::distribute_block(block& block, bool first_time) {
-  m_block_distributor.distribute_block(block, first_time);
-  cell2D& cell = m_grid.access(block.discrete_loc().first,
-                               block.discrete_loc().second);
-  operations::block_drop op(&block);
+void arena_map::distribute_block(block* const block, bool first_time) {
+  m_block_distributor.distribute_block(*block, first_time);
+  cell2D& cell = m_grid.access(block->discrete_loc().first,
+                               block->discrete_loc().second);
+  operations::block_drop op(m_server, block);
   cell.accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu)",
-         block.id(),
-         block.real_loc().GetX(),
-         block.real_loc().GetY(),
-         block.discrete_loc().first,
-         block.discrete_loc().second);
+         block->id(),
+         block->real_loc().GetX(),
+         block->real_loc().GetY(),
+         block->discrete_loc().first,
+         block->discrete_loc().second);
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    distribute_block(m_blocks[i], first_time);
+    distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
   /*

@@ -1,6 +1,6 @@
 /**
- * @file block.cpp
- *
+ * @file cell_empty.hpp
+n *
  * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
@@ -18,30 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_
+#define INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <assert.h>
-#include "fordyca/representation/block.hpp"
+#include "fordyca/operations/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace representation {
+class cell2D_fsm;
+} /* namespace representation */
+
+NS_START(operations);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-bool block::contains_point(const argos::CVector2& point) {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  if (point.GetX() < (x + (.5 * xsize())) &&
-      point.GetX() > (x - (.5 * xsize())) &&
-      point.GetY() < (y + (.5 * xsize())) &&
-      point.GetY() > (y - (.5 * xsize()))) {
-    return true;
-  }
-  return false;
-} /* contains_point() */
+class cell_empty : public cell_op {
+ public:
+  cell_empty(void) {}
 
-NS_END(representation, fordyca);
+  void visit(representation::cell2D& cell);
+  void visit(representation::cell2D_fsm& cell);
+};
+
+NS_END(operations, fordyca);
+
+#endif /* INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_ */

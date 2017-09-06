@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <utility>
 #include "fordyca/representation/cell_entity.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,8 @@ NS_START(fordyca, representation);
  * have both real (where they actually live in the world) and discretized
  * locations (where they are mapped to within the arena map).
  */
-class block : public cell_entity {
+class block : public cell_entity,
+              public rcppsw::patterns::visitor::visitable<block> {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension),
@@ -55,6 +57,9 @@ class block : public cell_entity {
    * @return # carries.
    */
   size_t carries(void) const { return m_carries; }
+  void add_carry(void) { ++m_carries; }
+
+  void reset(void) { m_carries = 0; m_robot_index = -1; }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the block
@@ -75,10 +80,7 @@ class block : public cell_entity {
    * @return The robot index, or -1 if no robot is currently carrying this block.
    */
   int robot_index(void) const { return m_robot_index; }
-
-  /* events */
-  void event_pickup(size_t index);
-  void event_nest_drop(void) { m_carries = 0; m_robot_index = -1; }
+  void robot_index(size_t robot_index) { m_robot_index = robot_index; }
 
  private:
   int m_robot_index;

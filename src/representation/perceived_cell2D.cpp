@@ -49,26 +49,4 @@ void perceived_cell2D::update_density(void) {
   }
 } /* update_density() */
 
-void perceived_cell2D::event_encounter(cell2D_fsm::state state,
-                                       representation::block* block) {
-  operations::block_drop drop(block);
-  operations::cell_empty empty;
-  operations::cell_unknown unknown;
-
-  switch (state) {
-    case cell2D_fsm::ST_UNKNOWN:
-      m_cell.accept(unknown);
-      break;
-    case cell2D_fsm::ST_EMPTY:
-      m_cell.accept(empty);
-      break;
-    case cell2D_fsm::ST_HAS_BLOCK:
-      m_cell.accept(drop);
-      break;
-    default:
-      break;
-  } /* switch() */
-  m_density.add_pheromone(1.0);
-} /* encounter() */
-
 NS_END(representation, fordyca);

@@ -26,6 +26,8 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/operations/block_drop.hpp"
+#include "fordyca/operations/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -145,7 +147,9 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_collector->collect_from_block(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        m_map->event_block_nest_drop(*controller.block());
+        operations::block_drop drop_op(rcppsw::common::g_server,
+                                       controller.block());
+        m_map->accept(drop_op);
 
         /* Actually drop the block */
         controller.drop_block_in_nest();
@@ -160,7 +164,11 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         int block = robot_on_block(robot);
         if (-1 != block) {
           controller.pickup_block(&m_map->blocks()[block]);
-          m_map->event_block_pickup(m_map->blocks()[block], robot_id(robot));
+          operations::block_pickup pickup_op(rcppsw::common::g_server,
+                                             &m_map->blocks()[block],
+                                             robot_id(robot));
+
+          m_map->accept(pickup_op);
           controller.publish_event(controller::BLOCK_FOUND);
 
           /* The floor texture must be updated */

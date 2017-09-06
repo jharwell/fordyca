@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <algorithm>
 #include <utility>
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,11 +44,11 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-class perceived_cell2D  {
+class perceived_cell2D : public visitor::visitable<perceived_cell2D> {
  public:
   explicit perceived_cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server) :
-      m_density(), m_cell(server) {}
+      m_density(), m_server(server), m_cell(server) {}
 
   /**
    * @brief Set the relevance decay parameter for the cell.
@@ -88,19 +88,9 @@ class perceived_cell2D  {
    */
   void update_density(void);
 
-  /**
-   * @brief A robot has encountered this cell during exploring or travel
-   * (i.e. the cell fell within its LOS). Each timestep that the cell remains in
-   * the robot's LOS, it is encountered again. Each encounter causes a unit
-   * amout of pheromone to be deposited on the cell; the information relevance
-   * is reinforced.
-   *
-   * This is OK, because blocks CAN suddenly disappear from a robot's LOS if it
-   * is picked up by another robot (robots are generally unaware of each
-   * other).
-   */
-  void event_encounter(cell2D_fsm::state state,
-                       representation::block* block = nullptr);
+  void update_density(double density) { m_density.add_pheromone(density); }
+
+  cell2D& cell(void) { return m_cell; }
 
  private:
   /**
@@ -109,6 +99,7 @@ class perceived_cell2D  {
    */
   static const double kEpsilon;
   rcppsw::swarm::pheromone_density m_density;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
   cell2D m_cell;
 };
 

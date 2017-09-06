@@ -47,6 +47,7 @@ class cell_entity {
                                             m_display_id(false),
                                             m_x_dim(x_dim), m_y_dim(y_dim),
                                             m_real_loc(), m_discrete_loc() {}
+  virtual ~cell_entity(void) {}
 
   double xsize(void) const { return m_x_dim; }
   double ysize(void) const { return m_y_dim; }

@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "rcsw/utils/utils.h"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/operations/cell_perception.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,16 +56,6 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void perceived_arena_map::event_block_pickup(block* block) {
-  ER_NOM("Block%d picked up from (%f, %f) -> (%zu, %zu)",
-         block->id(),
-         block->real_loc().GetX(), block->real_loc().GetY(),
-         block->discrete_loc().first, block->discrete_loc().second);
-  perceived_cell2D& cell = m_grid.access(block->discrete_loc().first,
-                                         block->discrete_loc().second);
-  cell.event_encounter(cell2D_fsm::ST_EMPTY);
-} /* event_block_pickup() */
-
 void perceived_arena_map::event_new_los(const line_of_sight* los) {
   if (!IS_SIZE_ALIGNED(los->size(), 4)) {
     return;
@@ -80,12 +71,16 @@ void perceived_arena_map::event_new_los(const line_of_sight* los) {
           ER_NOM("Discovered block%d at (%zu, %zu)", block->id(), abs.first,
                  abs.second);
         }
-        m_grid.access(abs.first, abs.second).event_encounter(
-            cell2D_fsm::ST_HAS_BLOCK,
-            block);
+
+        operations::cell_perception percept_op(m_server,
+                                               cell2D_fsm::ST_HAS_BLOCK,
+                                               block);
+        m_grid.access(abs.first, abs.second).accept(percept_op);
       } else { /* must be empty if it doesn't have a block */
-        m_grid.access(abs.first, abs.second).event_encounter(
-            cell2D_fsm::ST_EMPTY);
+        operations::cell_perception percept_op(m_server,
+                                               cell2D_fsm::ST_EMPTY);
+
+        m_grid.access(abs.first, abs.second).accept(percept_op);
       }
     } /* for(y..) */
   } /* for(x..) */

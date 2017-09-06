@@ -101,6 +101,7 @@ class random_foraging_controller : public argos::CCI_Controller,
    * currently carrying a block.
    */
   representation::block* block(void) const { return m_block; }
+  void block(representation::block* block) { m_block = block; }
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.

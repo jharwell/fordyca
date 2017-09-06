@@ -25,11 +25,12 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
-#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +45,8 @@ NS_START(fordyca, representation);
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map: public rcppsw::common::er_client {
+class arena_map: public rcppsw::common::er_client,
+                 public rcppsw::patterns::visitor::visitable<arena_map> {
  public:
   arena_map(const struct grid_params* params,
             argos::CRange<argos::Real> nest_x,
@@ -75,7 +77,7 @@ class arena_map: public rcppsw::common::er_client {
    * @param block The block to distribute.
    * @param first_time Is this the first time distributing this block?
    */
-  void distribute_block(block& block, bool first_time);
+  void distribute_block(block* const block, bool first_time);
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -91,7 +93,9 @@ class arena_map: public rcppsw::common::er_client {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool respawn_enabled(void) const { return m_block_distributor.respawn_enabled(); }
+  bool respawn_enabled(void) const {
+    return m_block_distributor.respawn_enabled();
+  }
 
   /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the
@@ -124,10 +128,6 @@ class arena_map: public rcppsw::common::er_client {
     return m_grid.subgrid(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
-
-  /* events */
-  void event_block_pickup(block& block, size_t robot_index);
-  void event_block_nest_drop(block& block);
 
  private:
   std::vector<block> m_blocks;

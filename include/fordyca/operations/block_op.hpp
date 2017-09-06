@@ -1,5 +1,5 @@
 /**
- * @file block.cpp
+ * @file block_op.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_OPERATIONS_BLOCK_OP_HPP_
+#define INCLUDE_FORDYCA_OPERATIONS_BLOCK_OP_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <assert.h>
-#include "fordyca/representation/block.hpp"
+#include "fordyca/operations/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace visitor = rcppsw::patterns::visitor;
+namespace representation {
+class block;
+class arena_map;
+class perceived_arena_map;
+} /* namespace representation */
+
+NS_START(operations);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-bool block::contains_point(const argos::CVector2& point) {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  if (point.GetX() < (x + (.5 * xsize())) &&
-      point.GetX() > (x - (.5 * xsize())) &&
-      point.GetY() < (y + (.5 * xsize())) &&
-      point.GetY() > (y - (.5 * xsize()))) {
-    return true;
-  }
-  return false;
-} /* contains_point() */
+class block_op : public visitor::visitor,
+                 public visitor::can_visit<representation::block, void>,
+                 public visitor::can_visit<representation::arena_map, void> {
+ public:
+  block_op(void) {}
+};
 
-NS_END(representation, fordyca);
+NS_END(operations, fordyca);
+
+#endif /* INCLUDE_FORDYCA_OPERATIONS_BLOCK_OP_HPP_ */
