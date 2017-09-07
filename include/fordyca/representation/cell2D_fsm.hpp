@@ -26,12 +26,15 @@
  ******************************************************************************/
 #include "rcsw/common/common.h"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
 namespace fsm = rcppsw::patterns::state_machine;
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
@@ -40,7 +43,8 @@ namespace fsm = rcppsw::patterns::state_machine;
  * @brief Per-cell (2D square on arena map) state machine containing the current
  * state of the cell (empty, has a block, or unknown).
  */
-class cell2D_fsm : public fsm::simple_fsm {
+class cell2D_fsm : public fsm::simple_fsm,
+                   public visitor::visitable<cell2D_fsm> {
  public:
   enum state {
     ST_UNKNOWN,
@@ -51,7 +55,7 @@ class cell2D_fsm : public fsm::simple_fsm {
 
   explicit cell2D_fsm(
       const std::shared_ptr<rcppsw::common::er_server>& server);
-
+  virtual ~cell2D_fsm(void) {}
   bool state_is_known(void) { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) { return current_state() == ST_HAS_BLOCK; }
   bool state_is_empty(void) { return current_state() == ST_EMPTY; }
@@ -59,7 +63,7 @@ class cell2D_fsm : public fsm::simple_fsm {
   /* events */
   void event_unknown(void);
   void event_empty(void);
-  void event_has_block(void);
+  void event_block_drop(void);
   void init(void);
 
  private:

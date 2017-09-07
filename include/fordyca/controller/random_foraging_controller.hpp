@@ -27,6 +27,7 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/random_foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
@@ -35,6 +36,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Type Definitions
@@ -52,7 +55,8 @@ enum event_type {
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class random_foraging_controller : public argos::CCI_Controller,
-                            public rcppsw::common::er_client {
+                                   public rcppsw::common::er_client,
+                                   public visitor::visitable<random_foraging_controller> {
  public:
   random_foraging_controller(void);
 
@@ -64,7 +68,7 @@ class random_foraging_controller : public argos::CCI_Controller,
   void display_id(bool display_id) { m_display_id = display_id; }
   bool display_id(void) const { return m_display_id; }
 
-  virtual void publish_event(enum event_type event);
+  virtual void publish_fsm_event(enum event_type event);
 
   /*
    * @brief Initialize the controller.
@@ -101,24 +105,7 @@ class random_foraging_controller : public argos::CCI_Controller,
    * currently carrying a block.
    */
   representation::block* block(void) const { return m_block; }
-
-  /**
-   * @brief Drop a carried block in the nest, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because dropping of blocks
-   * needs to be done in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  virtual void drop_block_in_nest(void);
-
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  virtual void pickup_block(representation::block* block);
+  void block(representation::block* block) { m_block = block; }
 
  protected:
   const std::shared_ptr<sensor_manager>& sensors(void) const { return m_sensors; }

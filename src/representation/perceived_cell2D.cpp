@@ -22,6 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,27 +43,10 @@ void perceived_cell2D::update_density(void) {
   if (m_cell.state_is_known()) {
     m_density.calc();
     if (m_density.last_result() < kEpsilon) {
-      m_cell.event_unknown();
+      events::cell_unknown op;
+      m_cell.accept(op);
     }
   }
 } /* update_density() */
-
-void perceived_cell2D::event_encounter(cell2D_fsm::state state,
-                                       representation::block* block) {
-  switch (state) {
-    case cell2D_fsm::ST_UNKNOWN:
-      m_cell.event_unknown();
-      break;
-    case cell2D_fsm::ST_EMPTY:
-      m_cell.event_empty();
-      break;
-    case cell2D_fsm::ST_HAS_BLOCK:
-      m_cell.event_has_block(block);
-      break;
-    default:
-      break;
-  } /* switch() */
-  m_density.add_pheromone(1.0);
-} /* encounter() */
 
 NS_END(representation, fordyca);

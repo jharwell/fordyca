@@ -65,15 +65,15 @@ void cell2D_fsm::event_empty(void) {
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_empty() */
 
-void cell2D_fsm::event_has_block(void) {
+void cell2D_fsm::event_block_drop(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_HAS_BLOCK,   /* unknown */
         ST_HAS_BLOCK,     /* empty */
         ST_HAS_BLOCK, /* has block */
     };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], NULL);
-} /* event_has_block() */
+    external_event(kTRANSITIONS[current_state()], NULL);
+} /* event_block_drop() */
 
 /*******************************************************************************
  * State Functions

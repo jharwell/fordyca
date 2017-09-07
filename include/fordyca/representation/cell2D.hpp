@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <algorithm>
 #include <utility>
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
 
@@ -43,7 +43,7 @@ NS_START(fordyca, representation);
  * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
  * state is).
  */
-class cell2D {
+class cell2D : public visitor::visitable<cell2D> {
  public:
   explicit cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server =
@@ -51,24 +51,17 @@ class cell2D {
       m_entity(nullptr),
       m_fsm(server) { m_fsm.init(); }
 
-  /* events */
-  void event_unknown(void) { m_fsm.event_unknown(); m_entity = nullptr; }
-  void event_empty(void) { m_fsm.event_empty(); m_entity = nullptr; }
-  void event_has_block(representation::block* block) {
-    m_fsm.event_has_block();
-    m_entity = block;
-  }
-
   /* state inquiry */
   bool state_is_known(void) { return m_fsm.state_is_known(); }
   bool state_has_block(void) { return m_fsm.state_has_block(); }
   bool state_is_empty(void) { return m_fsm.state_is_empty(); }
 
   void reset(void) { m_fsm.init(); }
+  void entity(representation::cell_entity* entity) { m_entity = entity; }
+
   const representation::block* block(void) const {
     return static_cast<representation::block*>(m_entity); }
 
- protected:
   cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:

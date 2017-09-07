@@ -1,5 +1,5 @@
 /**
- * @file block_target_selector.hpp
+ * @file cell_empty.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,49 +18,28 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_TARGET_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_TARGET_SELECTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <utility>
-
-#include "rcppsw/common/er_client.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, events);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class block_target_selector: public rcppsw::common::er_client {
- public:
-  block_target_selector(const std::shared_ptr<rcppsw::common::er_server>& server,
-                        argos::CVector2 nest_loc);
+void cell_empty::visit(representation::cell2D& cell) {
+  cell.entity(nullptr);
+  cell.fsm().accept(*this);
+} /* visit() */
 
-  ~block_target_selector(void) { rmmod(); }
+void cell_empty::visit(representation::cell2D_fsm& fsm) {
+  fsm.event_empty();
+} /* visit() */
 
-  /**
-   * @brief Given a list of blocks that a robot knows about (i.e. have not faded
-   * into an unknown state), compute which is the "best", for use in deciding
-   * which block to go attempt to pickup.
-   *
-   * @return A pointer to the "best" block, along with its utility value.
-   */
-  representation::perceived_block calc_best(
-      const std::list<representation::perceived_block> blocks,
-      argos::CVector2 robot_loc);
-
- private:
-  argos::CVector2 m_nest_loc;
-};
-
-NS_END(fordyca, controller);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_TARGET_SELECTOR_HPP_ */
+NS_END(events, fordyca);

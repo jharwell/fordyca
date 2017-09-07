@@ -46,7 +46,8 @@ NS_START(fordyca, representation);
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class perceived_arena_map: public rcppsw::common::er_client {
+class perceived_arena_map: public rcppsw::common::er_client,
+                           public rcppsw::patterns::visitor::visitable<perceived_arena_map> {
  public:
   perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
                       const struct perceived_grid_params* params);
@@ -78,14 +79,6 @@ class perceived_arena_map: public rcppsw::common::er_client {
   void update_density(void);
 
   /* events */
-  /**
-   * @brief Handle the event of a robot picking up a block, making updates to
-   * the arena map as necessary.
-   *
-   * @param block Handle of the block that has been picked up.
-   */
-  void event_block_pickup(block* block);
-
   /**
    * @brief Handle the event of a robot acquiring a new line-of-sight (happens
    * every timestep).

@@ -26,6 +26,8 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/unpartitioned_task_loop_functions.hpp"
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -81,10 +83,12 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         collector()->collect_from_block(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        map()->event_block_nest_drop(*controller.block());
+        events::block_drop drop_op(rcppsw::common::g_server,
+                                       controller.block());
+        map()->accept(drop_op);
 
         /* Actually drop the block */
-        controller.drop_block_in_nest();
+        controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(drop_op);
 
         /* The floor texture must be updated */
         floor()->SetChanged();
@@ -95,9 +99,12 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          controller.pickup_block(&map()->blocks()[block]);
-          map()->event_block_pickup(map()->blocks()[block], robot_id(robot));
-          controller.publish_event(controller::BLOCK_FOUND);
+          events::block_pickup pickup_op(rcppsw::common::g_server,
+                                             &map()->blocks()[block],
+                                             robot_id(robot));
+          controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(pickup_op);
+          map()->accept(pickup_op);
+          controller.publish_fsm_event(controller::BLOCK_FOUND);
 
           /* The floor texture must be updated */
           floor()->SetChanged();

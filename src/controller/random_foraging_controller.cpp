@@ -56,17 +56,7 @@ random_foraging_controller::random_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void random_foraging_controller::drop_block_in_nest(void) {
-  ER_NOM("%s dropped block in nest", GetId().c_str());
-  m_block = nullptr;
-} /* drop_block_in_nest() */
-
-void random_foraging_controller::pickup_block(representation::block* block) {
-  ER_NOM("%s picked up block%d", GetId().c_str(), block->id());
-  m_block = block;
-} /* pickup_block() */
-
-void random_foraging_controller::publish_event(enum event_type type) {
+void random_foraging_controller::publish_fsm_event(enum event_type type) {
   switch (type) {
     case FSM_START:
       m_fsm->event_start();
