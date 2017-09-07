@@ -57,6 +57,14 @@ class block_drop : public block_op, public rcppsw::common::er_client {
   void visit(representation::cell2D_fsm& fsm);
   void visit(representation::arena_map& map);
   void visit(representation::block& block);
+
+  /**
+   * @brief Drop a carried block in the nest, updating state as appropriate.
+   *
+   * This needs to be here, rather than in the FSM, because dropping of blocks
+   * needs to be done in the loop functions so the area can correctly be drawn
+   * each timestep.
+   */
   void visit(controller::random_foraging_controller& controller);
   representation::block* block(void) const { return m_block; }
 

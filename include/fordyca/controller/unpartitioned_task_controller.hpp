@@ -42,7 +42,8 @@ NS_START(fordyca, controller);
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class unpartitioned_task_controller : public random_foraging_controller {
+class unpartitioned_task_controller : public random_foraging_controller,
+                                      public rcppsw::patterns::visitor::visitable<unpartitioned_task_controller> {
  public:
   unpartitioned_task_controller(void) :
       random_foraging_controller(),
@@ -54,7 +55,7 @@ class unpartitioned_task_controller : public random_foraging_controller {
   void display_los(bool display_los) { m_display_los = display_los; }
   bool display_los(void) const { return m_display_los; }
 
-  virtual void publish_event(enum event_type event);
+  virtual void publish_fsm_event(enum event_type event);
   virtual bool is_searching_for_block(void) { return m_fsm->is_searching_for_block(); }
 
   /*
@@ -108,14 +109,7 @@ class unpartitioned_task_controller : public random_foraging_controller {
   void robot_loc(argos::CVector2 loc) { return sensors()->robot_loc(loc); }
   argos::CVector2 robot_loc(void) { return sensors()->robot_loc(); }
 
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  virtual void pickup_block(representation::block* block);
+  representation::perceived_arena_map* map(void) const { return m_map.get(); }
 
  private:
   /** Should the robot's LOS be displayed as a circle?  */

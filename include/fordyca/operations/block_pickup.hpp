@@ -32,6 +32,11 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace controller {
+class random_foraging_controller;
+class unpartitioned_task_controller;
+} /* namespace controller */
+
 namespace representation {
 class arena_map;
 class block;
@@ -58,6 +63,24 @@ class block_pickup : public block_op, public rcppsw::common::er_client {
    */
   void visit(representation::perceived_arena_map& map);
   void visit(representation::block& block);
+
+  /**
+   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
+   *
+   * This needs to be here, rather than in the FSM, because picking up blocks
+   * needs to be handled in the loop functions so the area can correctly be drawn
+   * each timestep.
+   */
+  void visit(controller::random_foraging_controller& controller);
+
+  /**
+   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
+   *
+   * This needs to be here, rather than in the FSM, because picking up blocks
+   * needs to be handled in the loop functions so the area can correctly be drawn
+   * each timestep.
+   */
+  void visit(controller::unpartitioned_task_controller& controller);
 
  private:
   block_pickup(const block_pickup& op) = delete;

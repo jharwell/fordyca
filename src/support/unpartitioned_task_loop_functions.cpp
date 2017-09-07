@@ -88,7 +88,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         map()->accept(drop_op);
 
         /* Actually drop the block */
-        controller.drop_block_in_nest();
+        controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(drop_op);
 
         /* The floor texture must be updated */
         floor()->SetChanged();
@@ -99,12 +99,12 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          controller.pickup_block(&map()->blocks()[block]);
           operations::block_pickup pickup_op(rcppsw::common::g_server,
                                              &map()->blocks()[block],
                                              robot_id(robot));
+          controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(pickup_op);
           map()->accept(pickup_op);
-          controller.publish_event(controller::BLOCK_FOUND);
+          controller.publish_fsm_event(controller::BLOCK_FOUND);
 
           /* The floor texture must be updated */
           floor()->SetChanged();

@@ -44,7 +44,7 @@ void unpartitioned_task_controller::ControlStep(void) {
   m_fsm->run();
 } /* ControlStep() */
 
-void unpartitioned_task_controller::publish_event(enum event_type type) {
+void unpartitioned_task_controller::publish_fsm_event(enum event_type type) {
   switch (type) {
     case BLOCK_FOUND:
       m_fsm->event_block_found();
@@ -53,13 +53,6 @@ void unpartitioned_task_controller::publish_event(enum event_type type) {
       break;
   }
 } /* publish_event() */
-
-void unpartitioned_task_controller::pickup_block(representation::block* block) {
-  random_foraging_controller::pickup_block(block);
-  operations::block_pickup pickup_op(server(), block,
-                                     std::atoi(GetId().c_str()));
-  m_map->accept(pickup_op);
-} /* pickup_block() */
 
 void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
   params::unpartitioned_task_repository param_repo;
