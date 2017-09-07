@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_OPERATIONS_CELL_PERCEPTION_HPP_
-#define INCLUDE_FORDYCA_OPERATIONS_CELL_PERCEPTION_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,7 +38,7 @@ class perceived_cell2D;
 class cell_entity;
 } /* namespace representation */
 
-NS_START(operations);
+NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
@@ -73,6 +73,6 @@ class cell_perception : public visitor::visitor,
   std::shared_ptr<rcppsw::common::er_server> m_server;
 };
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_OPERATIONS_CELL_PERCEPTION_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_ */

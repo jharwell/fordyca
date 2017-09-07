@@ -1,6 +1,6 @@
 /**
- * @file cell_empty.hpp
-n *
+ * @file block_op.hpp
+ *
  * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
@@ -18,36 +18,38 @@ n *
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_
-#define INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/operations/cell_op.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class cell2D_fsm;
+class block;
+class arena_map;
+class perceived_arena_map;
 } /* namespace representation */
 
-NS_START(operations);
+NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_empty : public cell_op {
+class block_op : public visitor::visitor,
+                 public visitor::can_visit<representation::block, void>,
+                 public visitor::can_visit<representation::arena_map, void> {
  public:
-  cell_empty(void) {}
-
-  void visit(representation::cell2D& cell);
-  void visit(representation::cell2D_fsm& cell);
+  block_op(void) {}
 };
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_OPERATIONS_CELL_EMPTY_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_ */

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "rcsw/utils/utils.h"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/operations/cell_perception.hpp"
+#include "fordyca/events/cell_perception.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,12 +72,12 @@ void perceived_arena_map::event_new_los(const line_of_sight* los) {
                  abs.second);
         }
 
-        operations::cell_perception percept_op(m_server,
+        events::cell_perception percept_op(m_server,
                                                cell2D_fsm::ST_HAS_BLOCK,
                                                block);
         m_grid.access(abs.first, abs.second).accept(percept_op);
       } else { /* must be empty if it doesn't have a block */
-        operations::cell_perception percept_op(m_server,
+        events::cell_perception percept_op(m_server,
                                                cell2D_fsm::ST_EMPTY);
 
         m_grid.access(abs.first, abs.second).accept(percept_op);

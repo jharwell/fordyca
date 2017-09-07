@@ -24,7 +24,7 @@
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
 #include "fordyca/params/unpartitioned_task_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/operations/block_pickup.hpp"
+#include "fordyca/events/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces

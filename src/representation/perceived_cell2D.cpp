@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/operations/block_drop.hpp"
-#include "fordyca/operations/cell_empty.hpp"
-#include "fordyca/operations/cell_unknown.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +43,7 @@ void perceived_cell2D::update_density(void) {
   if (m_cell.state_is_known()) {
     m_density.calc();
     if (m_density.last_result() < kEpsilon) {
-      operations::cell_unknown op;
+      events::cell_unknown op;
       m_cell.accept(op);
     }
   }

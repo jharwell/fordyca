@@ -26,8 +26,8 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/operations/block_drop.hpp"
-#include "fordyca/operations/block_pickup.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -147,7 +147,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_collector->collect_from_block(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        operations::block_drop drop_op(rcppsw::common::g_server,
+        events::block_drop drop_op(rcppsw::common::g_server,
                                        controller.block());
         m_map->accept(drop_op);
 
@@ -163,7 +163,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          operations::block_pickup pickup_op(rcppsw::common::g_server,
+          events::block_pickup pickup_op(rcppsw::common::g_server,
                                              &m_map->blocks()[block],
                                              robot_id(robot));
           controller.accept(pickup_op);

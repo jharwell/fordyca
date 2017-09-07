@@ -27,7 +27,7 @@
 #include "rcsw/common/common.h"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/operations/cell_op.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces

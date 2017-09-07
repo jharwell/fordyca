@@ -25,16 +25,16 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/operations/block_pickup.hpp"
-#include "fordyca/operations/cell_empty.hpp"
-#include "fordyca/operations/cell_perception.hpp"
+#include "fordyca/events/block_pickup.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_perception.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, operations);
+NS_START(fordyca, events);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -57,7 +57,7 @@ void block_pickup::visit(representation::arena_map& map) {
   argos::CVector2 old_r(m_block->real_loc().GetX(),
                         m_block->real_loc().GetY());
   representation::cell2D& cell = map.access(old_d.first, old_d.second);
-  operations::cell_empty op;
+  events::cell_empty op;
   cell.accept(op);
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from (%f, %f) -> (%zu, %zu)", m_robot_index,
@@ -75,7 +75,7 @@ void block_pickup::visit(representation::perceived_arena_map& map) {
   representation::perceived_cell2D& cell = map.access(
       m_block->discrete_loc().first, m_block->discrete_loc().second);
 
-  operations::cell_perception percept_op(m_server,
+  events::cell_perception percept_op(m_server,
                                          representation::cell2D_fsm::ST_EMPTY);
   cell.accept(percept_op);
 } /* visit() */
@@ -105,4 +105,4 @@ void block_pickup::visit(controller::unpartitioned_task_controller& controller) 
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);

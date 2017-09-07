@@ -1,5 +1,5 @@
 /**
- * @file cell_op.hpp
+ * @file cell_empty.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_OPERATIONS_CELL_OP_HPP_
-#define INCLUDE_FORDYCA_OPERATIONS_CELL_OP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class cell2D;
-class arena_map;
+class cell2D_fsm;
 } /* namespace representation */
 
-NS_START(operations);
+NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_op : public visitor::visitor,
-                public visitor::can_visit<representation::cell2D, void> {
+class cell_empty : public cell_op {
  public:
-  cell_op(void) {}
+  cell_empty(void) {}
+
+  void visit(representation::cell2D& cell);
+  void visit(representation::cell2D_fsm& cell);
 };
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_OPERATIONS_CELL_OP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_ */

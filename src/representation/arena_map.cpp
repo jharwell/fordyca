@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/operations/block_drop.hpp"
-#include "fordyca/operations/cell_empty.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,7 +75,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
   m_block_distributor.distribute_block(*block, first_time);
   cell2D& cell = m_grid.access(block->discrete_loc().first,
                                block->discrete_loc().second);
-  operations::block_drop op(m_server, block);
+  events::block_drop op(m_server, block);
   cell.accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu)",
          block->id(),
@@ -98,7 +98,7 @@ void arena_map::distribute_blocks(bool first_time) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
       if (!cell.state_has_block()) {
-        operations::cell_empty op;
+        events::cell_empty op;
         cell.accept(op);
       }
     } /* for(j..) */

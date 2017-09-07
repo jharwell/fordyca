@@ -1,5 +1,5 @@
 /**
- * @file cell_empty.cpp
+ * @file cell_unknown.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,25 +21,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/operations/cell_empty.hpp"
+#include "fordyca/events/cell_unknown.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, operations);
+NS_START(fordyca, events);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_empty::visit(representation::cell2D& cell) {
+void cell_unknown::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_empty::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_empty();
+void cell_unknown::visit(representation::cell2D_fsm& fsm) {
+  fsm.event_unknown();
 } /* visit() */
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);

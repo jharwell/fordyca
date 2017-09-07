@@ -1,5 +1,5 @@
 /**
- * @file block_pickup.hpp
+ * @file block_drop.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,79 +18,62 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_OPERATIONS_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_OPERATIONS_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/operations/block_op.hpp"
+#include "fordyca/events/block_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
 namespace controller {
 class random_foraging_controller;
 class unpartitioned_task_controller;
 } /* namespace controller */
 
 namespace representation {
+class cell2D_fsm;
 class arena_map;
 class block;
 } /* namespace representation */
 
-NS_START(operations);
+NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public block_op, public rcppsw::common::er_client {
+class block_drop : public block_op, public rcppsw::common::er_client {
  public:
-  block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
-               representation::block* block, size_t robot_index);
-  ~block_pickup(void) { rmmod(); }
+  block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
+             representation::block* block);
+  ~block_drop(void) { rmmod(); }
 
+  void visit(representation::cell2D& cell);
+  void visit(representation::cell2D_fsm& fsm);
   void visit(representation::arena_map& map);
-
-  /**
-   * @brief Handle the event of a robot picking up a block, making updates to
-   * the arena map as necessary.
-   *
-   * @param map The robot's arena map.
-   */
-  void visit(representation::perceived_arena_map& map);
   void visit(representation::block& block);
 
   /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
+   * @brief Drop a carried block in the nest, updating state as appropriate.
    *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
+   * This needs to be here, rather than in the FSM, because dropping of blocks
+   * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
   void visit(controller::random_foraging_controller& controller);
-
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::unpartitioned_task_controller& controller);
+  representation::block* block(void) const { return m_block; }
 
  private:
-  block_pickup(const block_pickup& op) = delete;
-  block_pickup& operator=(const block_pickup& op) = delete;
-
-  size_t m_robot_index;
+  block_drop(const block_drop& op) = delete;
+  block_drop& operator=(const block_drop& op) = delete;
   representation::block* m_block;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
 };
 
-NS_END(operations, fordyca);
+NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_OPERATIONS_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_ */

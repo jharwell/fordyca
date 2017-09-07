@@ -1,5 +1,5 @@
 /**
- * @file block_drop.cpp
+ * @file cell_perception.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,55 +21,52 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/operations/block_drop.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/events/cell_perception.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, operations);
+NS_START(fordyca, events);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_drop::block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
-                       representation::block* block) :
-    er_client(server), m_block(block) {
-    insmod("block_drop",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
-}
+cell_perception::cell_perception(const std::shared_ptr<rcppsw::common::er_server>& server,
+                                 uint8_t cell_state,
+                                 representation::cell_entity* entity) :
+    m_cell_state(cell_state),
+    m_entity(entity),
+    m_server(server) {}
+
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_drop::visit(representation::cell2D& cell) {
-  cell.entity(m_block);
-  cell.fsm().accept(*this);
+void cell_perception::visit(representation::perceived_cell2D& cell) {
+  events::block_drop drop(m_server,
+                              dynamic_cast<representation::block*>(m_entity));
+  events::cell_empty empty;
+  events::cell_unknown unknown;
+
+  switch (m_cell_state) {
+    case representation::cell2D_fsm::ST_UNKNOWN:
+      cell.cell().accept(unknown);
+      break;
+    case representation::cell2D_fsm::ST_EMPTY:
+      cell.cell().accept(empty);
+      break;
+    case representation::cell2D_fsm::ST_HAS_BLOCK:
+      assert(drop.block());
+      cell.cell().accept(drop);
+      break;
+    default:
+      break;
+  } /* switch() */
+  cell.update_density(1.0);
 } /* visit() */
 
-void block_drop::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
-} /* visit() */
-
-void block_drop::visit(representation::arena_map& map) {
-  map.distribute_block(m_block, false);
-  int robot_index = m_block->robot_index();
-  assert(-1 != robot_index);
-  m_block->accept(*this);
-  ER_NOM("fb%d dropped block%d in nest", robot_index, m_block->id());
-} /* visit() */
-
-void block_drop::visit(representation::block& block) {
-  block.reset();
-} /* visit() */
-
-void block_drop::visit(controller::random_foraging_controller& controller) {
-  ER_NOM("%s dropped block in nest", controller.GetId().c_str());
-  controller.block(nullptr);
-} /* visit() */
-
-NS_END(operations, fordyca);
+NS_END(events, fordyca);

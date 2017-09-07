@@ -26,8 +26,8 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/unpartitioned_task_loop_functions.hpp"
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
-#include "fordyca/operations/block_drop.hpp"
-#include "fordyca/operations/block_pickup.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -83,7 +83,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         collector()->collect_from_block(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        operations::block_drop drop_op(rcppsw::common::g_server,
+        events::block_drop drop_op(rcppsw::common::g_server,
                                        controller.block());
         map()->accept(drop_op);
 
@@ -99,7 +99,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          operations::block_pickup pickup_op(rcppsw::common::g_server,
+          events::block_pickup pickup_op(rcppsw::common::g_server,
                                              &map()->blocks()[block],
                                              robot_id(robot));
           controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(pickup_op);
