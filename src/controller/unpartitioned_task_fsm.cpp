@@ -42,17 +42,17 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     const std::shared_ptr<sensor_manager>& sensors,
     const std::shared_ptr<actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    fsm::hfsm(server),
-    start(),
-    return_to_nest(),
-    leaving_nest(),
+    random_foraging_fsm(params, server, sensors, actuators),
+    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
     entry_return_to_nest(),
     entry_leaving_nest(),
     exit_leaving_nest(),
-    locate_block(),
-    explore(),
-    new_direction(),
-    collision_avoidance(),
+    HFSM_CONSTRUCT_STATE(locate_block, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(explore, &locate_block),
+    HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_new_direction(),
     entry_explore(),
     entry_collision_avoidance(),
@@ -79,19 +79,35 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void unpartitioned_task_fsm::event_block_found(void) {
+void unpartitioned_task_fsm::event_block_acquired(void) {
   HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_RETURN_TO_NEST,           /* start (robot might be on block initially) */
-        ST_RETURN_TO_NEST,           /* explore */
-        ST_RETURN_TO_NEST,           /* new direction */
+        ST_RETURN_TO_NEST,    /* explore */
+        fsm::event_signal::FATAL,    /* new direction */
         fsm::event_signal::IGNORED,  /* return to nest */
         fsm::event_signal::FATAL,    /* leaving nest */
-        ST_COLLISION_AVOIDANCE,      /* collision avoidance */
-        ST_RETURN_TO_NEST,           /* locate block */
+        fsm::event_signal::FATAL,    /* collision avoidance */
+        ST_RETURN_TO_NEST,           /* locate block (known block acquired) */
         };
   HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_FOUND,
+                 rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_ACQUIRED,
+                                                      fsm::event_type::NORMAL));
+}
+
+void unpartitioned_task_fsm::event_block_located(void) {
+  HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
+        ST_LOCATE_BLOCK,             /* start (block within initial LOS) */
+        ST_LOCATE_BLOCK,             /* explore */
+        ST_LOCATE_BLOCK,             /* new direction */
+        fsm::event_signal::IGNORED,  /* return to nest */
+        fsm::event_signal::FATAL,    /* leaving nest */
+        fsm::event_signal::FATAL,    /* collision avoidance */
+        fsm::event_signal::IGNORED   /* locate block */
+        };
+  HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  external_event(kTRANSITIONS[current_state()],
+                 rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_LOCATED,
                                                       fsm::event_type::NORMAL));
 }
 
@@ -103,10 +119,14 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
     ER_DIAG("Executing ST_EXPLORE");
   }
 
+  if (foraging_signal::BLOCK_ACQUIRED == data->type()) {
+    return fsm::event_signal::UNHANDLED;
+  }
+
   ++m_state.time_exploring_unsuccessfully;
-  argos::CVector2 a;
+
   /*
-   * Check for nearby obstacles, and if so go int obstacle avoidance. Time spent
+   * Check for nearby obstacles, and if so go into obstacle avoidance. Time spent
    * in collision avoidance still counts towards the direction change threshold.
    */
   if (m_sensors->calc_diffusion_vector(NULL)) {
@@ -128,61 +148,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
   m_actuators->set_heading(m_actuators->max_wheel_speed() * vector);
   return fsm::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, collision_avoidance, fsm::event_data) {
-  argos::CVector2 vector;
 
-  if (ST_COLLISION_AVOIDANCE != last_state()) {
-    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
-  }
-
-  if (m_sensors->calc_diffusion_vector(&vector)) {
-    m_actuators->set_heading(vector);
-  } else {
-    internal_event(previous_state());
-  }
-  return fsm::event_signal::HANDLED;
-}
-
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, new_direction, new_direction_data) {
-  static argos::CRadians new_dir;
-  static int count = 0;
-  argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
-
-  if (ST_NEW_DIRECTION != last_state()) {
-    ER_DIAG("Executing ST_NEW_DIRECTION");
-  }
-
-  /*
-   * The new direction is only passed the first time this state is entered, so
-   * save it.
-   */
-  if (data) {
-    count = 0;
-    new_dir = data->dir;
-  }
-  m_actuators->set_heading(argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
-                                           new_dir), true);
-
-  /* We have changed direction and started a new exploration */
-  if (std::fabs((current_dir - new_dir).GetValue()) < 0.1) {
-    m_state.time_exploring_unsuccessfully = 0;
-    internal_event(ST_EXPLORE);
-  }
-  ++count;
-  return fsm::event_signal::HANDLED;
-}
-HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_explore, fsm::no_event_data) {
-  ER_DIAG("Entering ST_EXPLORE");
-  m_actuators->leds_set_color(argos::CColor::MAGENTA);
-}
-HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_new_direction, fsm::no_event_data) {
-  ER_DIAG("Entering ST_NEW_DIRECTION");
-  m_actuators->leds_set_color(argos::CColor::CYAN);
-}
-HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_collision_avoidance, fsm::no_event_data) {
-  ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  m_actuators->leds_set_color(argos::CColor::RED);
-}
 
 /*******************************************************************************
  * Locate Block FSM
@@ -192,18 +158,17 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
     ER_DIAG("Executing ST_LOCATE_BLOCK");
   }
 
-
   /*
    * We are executing this state as part of the normal worker process.
    */
   if (fsm::event_type::NORMAL == data->type()) {
-    /* We found a known block */
-    if (acquire_block()) {
-      internal_event(ST_RETURN_TO_NEST);
-    }
+      /* We found a known block */
+      if (acquire_block()) {
+        internal_event(ST_RETURN_TO_NEST);
+      }
   } else if (fsm::event_type::CHILD == data->type()) {
     /* We have found a block through the exploration sub-fsm */
-    if (foraging_signal::BLOCK_FOUND == data->signal()) {
+    if (foraging_signal::BLOCK_ACQUIRED == data->signal()) {
       internal_event(ST_RETURN_TO_NEST);
     }
   }
@@ -212,69 +177,6 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
 
 HFSM_EXIT_DEFINE(unpartitioned_task_fsm, exit_locate_block) {
   m_vector_fsm.init();
-}
-/*******************************************************************************
- * Non-Hierarchical States
- ******************************************************************************/
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
-  if (ST_LEAVING_NEST != last_state()) {
-    ER_DIAG("Executing ST_LEAVING_NEST");
-  }
-
-  /*
-   * The vector returned by calc_vector_to_light() points to the light. Thus,
-   * the minus sign is because we want to go away from the light.
-   */
-  argos::CVector2 diff_vector;
-  argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
-  m_sensors->calc_diffusion_vector(&diff_vector);
-  m_actuators->set_heading(m_actuators->max_wheel_speed() * diff_vector -
-                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
-                                           current_heading));
-  if (!m_sensors->in_nest()) {
-    internal_event(ST_LOCATE_BLOCK,
-                   rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_FOUND,
-                                                        fsm::event_type::NORMAL));
-  }
-  return fsm::event_signal::HANDLED;
-}
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, start, fsm::no_event_data) {
-  internal_event(ST_LOCATE_BLOCK, rcppsw::make_unique<fsm::event_data>(fsm::event_signal::IGNORED,
-                                                                       fsm::event_type::NORMAL));
-  return fsm::event_signal::HANDLED;
-}
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, return_to_nest, fsm::no_event_data) {
-  argos::CVector2 vector;
-
-  if (ST_RETURN_TO_NEST != last_state()) {
-    ER_DIAG("Executing ST_RETURN_TO_NEST");
-  }
-
-  /*
-   * We have arrived at the nest and it's time to head back out again. The
-   * loop functions need to call the drop_block() function, as they have to
-   * redistribute it (the FSM has no idea how to do that).
-   */
-  if (m_sensors->in_nest()) {
-    internal_event(ST_LEAVING_NEST);
-  }
-
-  /* ignore all obstacles for now... */
-  m_actuators->set_heading(m_actuators->max_wheel_speed() *
-                           m_sensors->calc_vector_to_light());
-  return fsm::event_signal::HANDLED;
-}
-HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_leaving_nest, fsm::no_event_data) {
-  ER_DIAG("Entering ST_LEAVING_NEST");
-  m_actuators->leds_set_color(argos::CColor::WHITE);
-}
-HFSM_ENTRY_DEFINE(unpartitioned_task_fsm, entry_return_to_nest, fsm::no_event_data) {
-  ER_DIAG("Entering ST_RETURN_TO_NEST");
-  m_actuators->leds_set_color(argos::CColor::GREEN);
-}
-HFSM_EXIT_DEFINE(unpartitioned_task_fsm, exit_leaving_nest) {
-  ER_DIAG("Exiting ST_LEAVING_NEST");
-  m_state.time_exploring_unsuccessfully = 0;
 }
 
 /*******************************************************************************
@@ -286,13 +188,6 @@ void unpartitioned_task_fsm::init(void) {
   base_fsm::init();
   m_vector_fsm.init();
 } /* init() */
-
-argos::CVector2 unpartitioned_task_fsm::randomize_vector_angle(argos::CVector2 vector) {
-  argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
-                                       argos::CRadians(1.0));
-  vector.Rotate(m_rng->Uniform(range));
-  return vector;
-} /* randomize_vector_angle() */
 
 void unpartitioned_task_fsm::update_state(uint8_t new_state) {
   if (new_state != m_current_state) {

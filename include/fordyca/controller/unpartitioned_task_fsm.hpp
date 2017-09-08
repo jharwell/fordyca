@@ -35,6 +35,7 @@
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/controller/vector_to_goal.hpp"
+#include "fordyca/controller/random_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,8 @@ namespace fsm = rcppsw::patterns::state_machine;
 class foraging_signal : public fsm::event_signal {
  public:
   enum {
-    BLOCK_FOUND = fsm::event_signal::EXTERNAL_SIGNALS,
+    BLOCK_LOCATED = fsm::event_signal::EXTERNAL_SIGNALS,
+    BLOCK_ACQUIRED,
     ARRIVED_AT_TARGET
   };
 };
@@ -62,7 +64,7 @@ class foraging_signal : public fsm::event_signal {
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class unpartitioned_task_fsm : public fsm::hfsm {
+class unpartitioned_task_fsm : public random_foraging_fsm {
  public:
   unpartitioned_task_fsm(const struct foraging_fsm_params* params,
                const std::shared_ptr<rcppsw::common::er_server>& server,
@@ -74,19 +76,6 @@ class unpartitioned_task_fsm : public fsm::hfsm {
    * @brief Reset the FSM
    */
   void init(void);
-
-  /**
-   * @brief Get the current state of the FSM.
-   */
-  uint8_t current_state(void) const { return m_current_state; }
-  uint8_t max_states(void) const { return ST_MAX_STATES; }
-
-  /**
-   * @brief Get the previous state of the FSM. Note that this is not necessarily the state
-   * that the FSM was in last time the state engine was run, but that this is
-   * the last visited state that is NOT the current state.
-   */
-  uint8_t previous_state(void) const { return m_previous_state; }
 
   /**
    * @brief Get if the robot is currently searching for a block within the arena
@@ -102,33 +91,18 @@ class unpartitioned_task_fsm : public fsm::hfsm {
    * @brief Pass a block fround event from the controller's/robot's sensors to
    * the FSM, so that it can update state accordingly.
    */
-  void event_block_found(void);
+  void event_block_acquired(void);
+  void event_block_located(void);
+
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
   enum fsm_states {
-    ST_START,                 /* Initial state */
-    ST_EXPLORE,               /* No known blocks--roam around looking for one  */
-    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
-    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
-    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
-    ST_LOCATE_BLOCK,          /* superstate for finding a block */
+    ST_LOCATE_BLOCK = random_foraging_fsm::ST_MAX_STATES, /* superstate for finding a block */
     ST_MAX_STATES
   };
 
  private:
-  /* types */
-
-  /**
-   * @brief Inject randomness into robot exploring by having them change their
-   * direction every X timesteps if they have not yet located a block, where X
-   * is set in the .argos configuration file.
-   */
-  struct new_direction_data  : public fsm::event_data {
-    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
-    argos::CRadians dir;
-  };
   struct fsm_state {
     fsm_state(void) : time_exploring_unsuccessfully(0) {}
 
@@ -136,7 +110,14 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   };
 
   /* member functions */
-  argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  /**
+   * @brief Get the previous state of the FSM. Note that this is not necessarily the state
+   * that the FSM was in last time the state engine was run, but that this is
+   * the last visited state that is NOT the current state.
+   */
+  uint8_t previous_state(void) const { return m_previous_state; }
+  uint8_t current_state(void) const { return m_current_state; }
+  uint8_t max_states(void) const { return ST_MAX_STATES; }
   uint8_t next_state(void) const { return m_next_state; }
   uint8_t initial_state(void) const { return m_initial_state; }
   void next_state(uint8_t next_state) { m_next_state = next_state; }
@@ -158,61 +139,64 @@ class unpartitioned_task_fsm : public fsm::hfsm {
   void acquire_known_block(
       std::list<std::pair<const representation::block*, double>> blocks);
 
+ private:
   /* non-hierarchical states */
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     start, fsm::no_event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     return_to_nest, fsm::no_event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     leaving_nest, fsm::no_event_data);
+  HFSM_STATE_INHERIT(random_foraging_fsm, start, fsm::no_event_data);
+  HFSM_STATE_INHERIT(random_foraging_fsm, return_to_nest, fsm::no_event_data);
+  HFSM_STATE_INHERIT(random_foraging_fsm, leaving_nest, fsm::no_event_data);
 
-  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_return_to_nest, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_leaving_nest, fsm::no_event_data);
-  HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_leaving_nest);
+  HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_return_to_nest,
+                     fsm::no_event_data);
+  HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_leaving_nest,
+                     fsm::no_event_data);
+
+  HFSM_EXIT_INHERIT(random_foraging_fsm, exit_leaving_nest);
 
   /*
-   * States for locate_block sub-fsm. Note that the states for the
+   * States for locate_block FSM. Note that the states for the
    * vector_to_goal sub-fsm cannot be part of the locate_block hfsm, because that
    * sub-fsm is initiated from multiple states, and hfsm states can only have
    * ONE parent state.
    **/
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, hfsm,
-                     top_state, fsm::no_event_data,
-                     locate_block, fsm::event_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, locate_block, fsm::event_data);
+
   /*
    * States for exploration sub-fsm (part of locate_block fsm).
    */
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
-                     locate_block, fsm::event_data,
-                     explore, fsm::event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
-                     locate_block, fsm::event_data,
-                     new_direction, new_direction_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, unpartitioned_task_fsm,
-                     locate_block, fsm::event_data,
-                     collision_avoidance, fsm::event_data);
-  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_new_direction, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_explore, fsm::no_event_data);
+  HFSM_STATE_INHERIT(random_foraging_fsm, new_direction, new_direction_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, explore, fsm::event_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, collision_avoidance,
+                     fsm::event_data);
+
+  HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_new_direction,
+                     fsm::no_event_data);
+  HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_explore, fsm::no_event_data);
   HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_collision_avoidance,
                      fsm::no_event_data);
+
   HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_locate_block);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
+    HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, &locate_block,
+                                    NULL,
+                                    &entry_explore, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, &locate_block,
+                                    NULL,
                                    &entry_new_direction, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
+                                    NULL,
                                    &entry_return_to_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
+                                    NULL,
                                    &entry_leaving_nest, &exit_leaving_nest),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
-                                   &entry_collision_avoidance, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&locate_block, NULL, NULL, &exit_locate_block)
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, &locate_block,
+                                    NULL,
+                                    &entry_collision_avoidance, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&locate_block, hfsm::top_state(),
+                                    NULL,
+                                    NULL, &exit_locate_block)
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
     return &kSTATE_MAP[0];

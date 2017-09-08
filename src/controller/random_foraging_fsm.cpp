@@ -40,19 +40,24 @@ random_foraging_fsm::random_foraging_fsm(
     std::shared_ptr<rcppsw::common::er_server> server,
     std::shared_ptr<sensor_manager> sensors,
     std::shared_ptr<actuator_manager> actuators) :
-    fsm::simple_fsm(server, ST_MAX_STATES),
-    start(),
-    explore(),
-    new_direction(),
-    return_to_nest(),
-    leaving_nest(),
-    collision_avoidance(),
+    fsm::hfsm(server),
+    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_explore(),
     entry_new_direction(),
     entry_return_to_nest(),
     entry_collision_avoidance(),
     entry_leaving_nest(),
     exit_leaving_nest(),
+    m_current_state(ST_START),
+    m_next_state(ST_START),
+    m_initial_state(ST_START),
+    m_previous_state(ST_START),
+    m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
     mc_params(params),
@@ -61,7 +66,7 @@ random_foraging_fsm::random_foraging_fsm(
   insmod("random_foraging_fsm");
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
-    }
+}
 
 /*******************************************************************************
  * Events
@@ -184,6 +189,7 @@ FSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
     internal_event(ST_LEAVING_NEST);
   }
 
+
   /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);
   m_actuators->set_heading(m_actuators->max_wheel_speed() * vector +
@@ -233,7 +239,7 @@ FSM_EXIT_DEFINE(random_foraging_fsm, exit_leaving_nest) {
 void random_foraging_fsm::init(void) {
   m_state.time_exploring_unsuccessfully = 0;
   m_actuators->reset();
-  simple_fsm::init();
+  hfsm::init();
 } /* init() */
 
 argos::CVector2 random_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
@@ -254,5 +260,13 @@ bool random_foraging_fsm::is_returning(void) {
 bool random_foraging_fsm::is_avoiding_collision(void) {
   return current_state() == ST_COLLISION_AVOIDANCE;
 } /* is_avoiding_collision() */
+
+void random_foraging_fsm::update_state(uint8_t new_state) {
+  if (new_state != m_current_state) {
+    m_previous_state = m_current_state;
+  }
+  m_last_state = m_current_state;
+  m_current_state = new_state;
+} /* update_state() */
 
 NS_END(controller, fordyca);

@@ -47,7 +47,7 @@ void unpartitioned_task_controller::ControlStep(void) {
 void unpartitioned_task_controller::publish_fsm_event(enum event_type type) {
   switch (type) {
     case BLOCK_FOUND:
-      m_fsm->event_block_found();
+      m_fsm->event_block_acquired();
       break;
     default:
       break;
