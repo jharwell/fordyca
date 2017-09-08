@@ -88,6 +88,14 @@ class random_foraging_fsm : public fsm::hfsm {
     argos::CRadians dir;
   };
 
+  struct fsm_state {
+    fsm_state(void) : time_exploring_unsuccessfully(0),
+                      last_collision_time(0) {}
+
+    size_t time_exploring_unsuccessfully;
+    uint last_collision_time;
+  };
+
   enum fsm_states {
     ST_START,                 /* Initial state */
     ST_EXPLORE,               /* No known blocks--roam around looking for one  */
@@ -100,6 +108,9 @@ class random_foraging_fsm : public fsm::hfsm {
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  void explore_time_reset(void) { m_state.time_exploring_unsuccessfully = 0; }
+  void explore_time_inc(void) { ++m_state.time_exploring_unsuccessfully; }
+  size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
 
   /* states */
   HFSM_STATE_DECLARE(random_foraging_fsm, start, fsm::no_event_data);
@@ -118,15 +129,6 @@ class random_foraging_fsm : public fsm::hfsm {
   HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_leaving_nest, fsm::no_event_data);
   HFSM_EXIT_DECLARE(random_foraging_fsm, exit_leaving_nest);
 
- private:
-  struct fsm_state {
-    fsm_state(void) : time_exploring_unsuccessfully(0),
-                      last_collision_time(0) {}
-
-    size_t time_exploring_unsuccessfully;
-    uint last_collision_time;
-  };
-
   /* member functions */
   uint8_t current_state(void) const { return m_current_state; }
   uint8_t max_states(void) const { return ST_MAX_STATES; }
@@ -136,7 +138,7 @@ class random_foraging_fsm : public fsm::hfsm {
   uint8_t last_state(void) const { return m_last_state; }
   void update_state(uint8_t update_state);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
@@ -156,7 +158,7 @@ class random_foraging_fsm : public fsm::hfsm {
                                     &entry_collision_avoidance, NULL),
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+  return (&kSTATE_MAP[index]);
   }
 
   random_foraging_fsm(const random_foraging_fsm& fsm) = delete;

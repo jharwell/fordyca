@@ -101,7 +101,9 @@ void random_foraging_fsm::event_start(void) {
  * States
  ******************************************************************************/
 FSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_LEAVING_NEST");
+  if (ST_LEAVING_NEST != last_state()) {
+    ER_DIAG("Executing ST_LEAVING_NEST");
+  }
 
   /*
    * The vector returned by calc_vector_to_light() points to the light. Thus,
@@ -119,9 +121,11 @@ FSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::no_event_data) {
-  ER_DIAG("Executing ST_EXPLORE");
+  if (ST_EXPLORE != last_state()) {
+    ER_DIAG("Executing ST_EXPLORE");
+  }
 
-  ++m_state.time_exploring_unsuccessfully;
+  explore_time_inc();
 
   /*
    * Check for nearby obstacles, and if so go int obstacle avoidance. Time spent
@@ -152,7 +156,10 @@ FSM_STATE_DEFINE(random_foraging_fsm, start, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
-  ER_DIAG("Executing ST_NEW_DIRECTION");
+  if (ST_NEW_DIRECTION != last_state()) {
+    ER_DIAG("Executing ST_NEW_DIRECTION");
+  }
+
   static argos::CRadians new_dir;
   static int count = 0;
   argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
@@ -177,7 +184,9 @@ FSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
-  ER_DIAG("Executing ST_RETURN_TO_NEST");
+  if (ST_RETURN_TO_NEST != last_state()) {
+    ER_DIAG("Executing ST_RETURN_TO_NEST");
+  }
   argos::CVector2 vector;
 
   /*
@@ -192,13 +201,15 @@ FSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
 
   /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);
-  m_actuators->set_heading(m_actuators->max_wheel_speed() * vector +
-                           m_actuators->max_wheel_speed() * m_sensors->calc_vector_to_light());
+  m_actuators->set_heading(m_actuators->max_wheel_speed() *
+                           m_sensors->calc_vector_to_light());
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(random_foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
-  ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  if (ST_COLLISION_AVOIDANCE != last_state()) {
+    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+  }
 
   if (m_sensors->calc_diffusion_vector(&vector)) {
     m_actuators->set_heading(vector);
@@ -231,8 +242,9 @@ FSM_ENTRY_DEFINE(random_foraging_fsm, entry_collision_avoidance, fsm::no_event_d
 
 FSM_EXIT_DEFINE(random_foraging_fsm, exit_leaving_nest) {
   ER_DIAG("Exiting ST_LEAVING_NEST");
-  m_state.time_exploring_unsuccessfully = 0;
+    explore_time_reset();
 }
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

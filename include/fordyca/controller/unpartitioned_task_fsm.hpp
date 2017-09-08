@@ -103,12 +103,6 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   };
 
  private:
-  struct fsm_state {
-    fsm_state(void) : time_exploring_unsuccessfully(0) {}
-
-    size_t time_exploring_unsuccessfully;
-  };
-
   /* member functions */
   /**
    * @brief Get the previous state of the FSM. Note that this is not necessarily the state
@@ -165,18 +159,18 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
    */
   HFSM_STATE_INHERIT(random_foraging_fsm, new_direction, new_direction_data);
   HFSM_STATE_DECLARE(unpartitioned_task_fsm, explore, fsm::event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, collision_avoidance,
+  HFSM_STATE_INHERIT(random_foraging_fsm, collision_avoidance,
                      fsm::event_data);
 
   HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_new_direction,
                      fsm::no_event_data);
   HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_explore, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(unpartitioned_task_fsm, entry_collision_avoidance,
+  HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_collision_avoidance,
                      fsm::no_event_data);
 
   HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_locate_block);
 
-HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, &locate_block,
@@ -199,7 +193,7 @@ HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
                                     NULL, &exit_locate_block)
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+  return &kSTATE_MAP[index];
   }
 
   unpartitioned_task_fsm(const unpartitioned_task_fsm& fsm) = delete;

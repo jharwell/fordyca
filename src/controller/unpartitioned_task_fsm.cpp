@@ -119,11 +119,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
     ER_DIAG("Executing ST_EXPLORE");
   }
 
-  if (foraging_signal::BLOCK_ACQUIRED == data->type()) {
-    return fsm::event_signal::UNHANDLED;
-  }
-
-  ++m_state.time_exploring_unsuccessfully;
+  explore_time_inc();
 
   /*
    * Check for nearby obstacles, and if so go into obstacle avoidance. Time spent
@@ -131,7 +127,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
    */
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
-  } else if (m_state.time_exploring_unsuccessfully >
+  } else if (explore_time() >
              mc_params->times.unsuccessful_explore_dir_change) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
                                          argos::CRadians(1.0));
@@ -183,7 +179,7 @@ HFSM_EXIT_DEFINE(unpartitioned_task_fsm, exit_locate_block) {
  * General Member Functions
  ******************************************************************************/
 void unpartitioned_task_fsm::init(void) {
-  m_state.time_exploring_unsuccessfully = 0;
+  explore_time_reset();
   m_actuators->reset();
   base_fsm::init();
   m_vector_fsm.init();
