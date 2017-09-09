@@ -65,7 +65,7 @@ random_foraging_fsm::random_foraging_fsm(
     m_actuators(actuators) {
   insmod("random_foraging_fsm");
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::VER);
 }
 
 /*******************************************************************************
@@ -84,25 +84,22 @@ void random_foraging_fsm::event_block_found(void) {
   external_event(kTRANSITIONS[current_state()], NULL);
 }
 
-void random_foraging_fsm::event_start(void) {
-  static const uint8_t kTRANSITIONS[] = {
-    ST_EXPLORE,                  /* start */
-    ST_EXPLORE,                  /* explore */
-    fsm::event_signal::IGNORED,  /* new direction */
-    fsm::event_signal::IGNORED,  /* return to nest */
-    fsm::event_signal::IGNORED,  /* leaving nest */
-    fsm::event_signal::IGNORED,  /* collision avoidance */
-  };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], NULL);
-}
 
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::event_data) {
   if (ST_LEAVING_NEST != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
+  }
+
+  if (data) {
+    ER_ASSERT(fsm::event_type::NORMAL == data->type(),
+              "FATAL: ST_LEAVING_NEST cannot handle child events");
+    ER_ASSERT(foraging_signal::BLOCK_ACQUIRED != data->signal(),
+              "FATAL: ST_LEAVING_NEST should never acquire blocks...");
+    ER_ASSERT(foraging_signal::BLOCK_LOCATED != data->signal(),
+              "FATAL: ST_LEAVING_NEST should never locate blocks...");
   }
 
   /*
@@ -120,11 +117,18 @@ HFSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
 
+  if (data) {
+    ER_ASSERT(fsm::event_type::NORMAL == data->type(),
+              "FATAL: ST_EXPLORE cannot handle child events");
+    ER_ASSERT(foraging_signal::BLOCK_ACQUIRED == data->signal(),
+              "FATAL: ST_EXPLORE can only can BLOCK_ACQUIRED signals");
+      internal_event(ST_RETURN_TO_NEST);
+  }
   explore_time_inc();
 
   /*
@@ -155,40 +159,40 @@ HFSM_STATE_DEFINE(random_foraging_fsm, start, fsm::no_event_data) {
   internal_event(ST_EXPLORE);
   return fsm::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, new_direction, fsm::event_data) {
   if (ST_NEW_DIRECTION != last_state()) {
     ER_DIAG("Executing ST_NEW_DIRECTION");
   }
+  /* all signals ignored in this state */
 
   static argos::CRadians new_dir;
-  static int count = 0;
   argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
-   * save it.
+   * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  if (data) {
-    count = 0;
-    new_dir = data->dir;
+  const new_direction_data* dir_data = dynamic_cast<const new_direction_data*>(data);
+  if (dir_data) {
+    new_dir = dir_data->dir;
   }
-  m_actuators->set_heading(argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
-                                           new_dir), true);
+  m_actuators->set_heading(argos::CVector2(
+      m_actuators->max_wheel_speed() * 0.25, new_dir), true);
 
   /* We have changed direction and started a new exploration */
   if (std::fabs((current_dir - new_dir).GetValue()) < 0.1) {
     m_state.time_exploring_unsuccessfully = 0;
     internal_event(ST_EXPLORE);
   }
-  ++count;
   return fsm::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
   if (ST_RETURN_TO_NEST != last_state()) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
   }
-  argos::CVector2 vector;
+  /* all signals ignored in this state */
 
+  argos::CVector2 vector;
   /*
    * We have arrived at the nest and it's time to head back out again. The
    * loop functions need to call the drop_block() function, as they have to
@@ -198,7 +202,6 @@ HFSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
     internal_event(ST_LEAVING_NEST);
   }
 
-
   /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);
   m_actuators->set_heading(m_actuators->max_wheel_speed() *
@@ -207,9 +210,12 @@ HFSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
+
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
+
+  /* all signals ignored in this state */
 
   if (m_sensors->calc_diffusion_vector(&vector)) {
     m_actuators->set_heading(vector);

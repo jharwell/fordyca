@@ -26,11 +26,12 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
+#include "rcsw/common/common.h"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "rcsw/common/common.h"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,7 +73,6 @@ class random_foraging_fsm : public fsm::hfsm {
   virtual bool is_avoiding_collision(void);
   void init(void);
   void event_block_found(void);
-  void event_start(void);
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
@@ -114,8 +114,8 @@ class random_foraging_fsm : public fsm::hfsm {
 
   /* states */
   HFSM_STATE_DECLARE(random_foraging_fsm, start, fsm::no_event_data);
-  HFSM_STATE_DECLARE(random_foraging_fsm, explore, fsm::no_event_data);
-  HFSM_STATE_DECLARE(random_foraging_fsm, new_direction, new_direction_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, explore, fsm::event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, new_direction, fsm::event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, return_to_nest, fsm::no_event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, leaving_nest, fsm::no_event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, collision_avoidance,

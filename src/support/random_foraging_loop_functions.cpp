@@ -102,7 +102,6 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
         dynamic_cast<controller::random_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
-    controller.publish_fsm_event(controller::FSM_START);
   } /* for(it..) */
   ER_NOM("Random foraging loop functions initialization finished");
 }
@@ -168,7 +167,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
                                              robot_id(robot));
           controller.accept(pickup_op);
           m_map->accept(pickup_op);
-          controller.publish_fsm_event(controller::BLOCK_FOUND);
+          controller.publish_fsm_event(controller::foraging_signal::BLOCK_ACQUIRED);
 
           /* The floor texture must be updated */
           m_floor->SetChanged();

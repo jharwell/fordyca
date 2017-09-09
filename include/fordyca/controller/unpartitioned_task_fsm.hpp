@@ -46,18 +46,6 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/**
- * @brief Signals that sub-states can return in order to notify their super
- * states that a conditiot that they do not know how to handle has arised.
- */
-class foraging_signal : public fsm::event_signal {
- public:
-  enum {
-    BLOCK_LOCATED = fsm::event_signal::EXTERNAL_SIGNALS,
-    BLOCK_ACQUIRED,
-    ARRIVED_AT_TARGET
-  };
-};
 
 /**
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
@@ -94,7 +82,7 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   void event_block_acquired(void);
   void event_block_located(void);
 
-  void run(void) { generated_event(true); state_engine(); }
+  void run(void);
 
  protected:
   enum fsm_states {
@@ -157,7 +145,7 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   /*
    * States for exploration sub-fsm (part of locate_block fsm).
    */
-  HFSM_STATE_INHERIT(random_foraging_fsm, new_direction, new_direction_data);
+  HFSM_STATE_INHERIT(random_foraging_fsm, new_direction, fsm::event_data);
   HFSM_STATE_DECLARE(unpartitioned_task_fsm, explore, fsm::event_data);
   HFSM_STATE_INHERIT(random_foraging_fsm, collision_avoidance,
                      fsm::event_data);

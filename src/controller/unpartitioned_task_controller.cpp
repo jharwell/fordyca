@@ -39,15 +39,24 @@ void unpartitioned_task_controller::ControlStep(void) {
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it.
    */
-  m_map->event_new_los(sensors()->los());
-  m_map->update_density();
-  m_fsm->run();
+  if (m_map->event_new_los(sensors()->los())) {
+    publish_fsm_event(foraging_signal::BLOCK_LOCATED);
+    m_map->update_density();
+  } else {
+    m_map->update_density();
+    m_fsm->run();
+  }
 } /* ControlStep() */
 
-void unpartitioned_task_controller::publish_fsm_event(enum event_type type) {
-  switch (type) {
-    case BLOCK_FOUND:
-      m_fsm->event_block_acquired();
+void unpartitioned_task_controller::publish_fsm_event(foraging_signal::type signal) {
+  switch (signal) {
+    case foraging_signal::BLOCK_LOCATED:
+      m_fsm->inject_event(foraging_signal::BLOCK_LOCATED,
+                          rcppsw::patterns::state_machine::event_type::NORMAL);
+      break;
+    case foraging_signal::BLOCK_ACQUIRED:
+      m_fsm->inject_event(foraging_signal::BLOCK_ACQUIRED,
+                          rcppsw::patterns::state_machine::event_type::NORMAL);
       break;
     default:
       break;

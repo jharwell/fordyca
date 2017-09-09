@@ -50,8 +50,8 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     entry_leaving_nest(),
     exit_leaving_nest(),
     HFSM_CONSTRUCT_STATE(locate_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(explore, &locate_block),
     HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(explore, &locate_block),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_new_direction(),
     entry_explore(),
@@ -71,9 +71,6 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     m_server(server),
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators) {
-  insmod("unpartitioned_task_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
     }
 
 /*******************************************************************************
@@ -118,6 +115,15 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
+  if (data) {
+    ER_ASSERT(fsm::event_type::NORMAL == data->type(),
+              "FATAL: ST_EXPLORE cannot handle child events");
+    ER_ASSERT(foraging_signal::BLOCK_ACQUIRED != data->signal(),
+              "FATAL: ST_EXPLORE should never acquire blocks...");
+    if (foraging_signal::BLOCK_LOCATED == data->signal()) {
+      return fsm::event_signal::UNHANDLED;
+    }
+  }
 
   explore_time_inc();
 
@@ -149,7 +155,6 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
   if (ST_LEAVING_NEST != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
-
   /*
    * The vector returned by calc_vector_to_light() points to the light. Thus,
    * the minus sign is because we want to go away from the light.
@@ -175,19 +180,37 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
   if (ST_LOCATE_BLOCK != last_state()) {
     ER_DIAG("Executing ST_LOCATE_BLOCK");
   }
+  ER_ASSERT(data, "FATAL: No event data passed to ST_LOCATE_BLOCK");
 
   /*
    * We are executing this state as part of the normal worker process.
    */
   if (fsm::event_type::NORMAL == data->type()) {
-      /* We found a known block */
+      /* We acquired a known block */
       if (acquire_block()) {
         internal_event(ST_RETURN_TO_NEST);
       }
   } else if (fsm::event_type::CHILD == data->type()) {
-    /* We have found a block through the exploration sub-fsm */
-    if (foraging_signal::BLOCK_ACQUIRED == data->signal()) {
-      internal_event(ST_RETURN_TO_NEST);
+    /*
+     * This is the first time we have been called via the exploration sub-fsm;
+     * we will take over execution.
+     */
+    if (!m_vector_fsm.in_progress()) {
+      update_state(ST_LOCATE_BLOCK);
+    }
+
+    /*
+     * We have found a block through the exploration sub-fsm; vector to it and
+     * pick it up
+     */
+    if (foraging_signal::BLOCK_LOCATED == data->signal()) {
+      ER_ASSERT(m_map->blocks().size(),
+                "FATAL: Block 'located' but empty block list");
+
+      /* We acquired a known block */
+      if (acquire_block()) {
+        internal_event(ST_RETURN_TO_NEST);
+      }
     }
   }
   return fsm::event_signal::HANDLED;
@@ -253,6 +276,10 @@ bool unpartitioned_task_fsm::acquire_block(void) {
   }
   return false;
 } /* acquire_block() */
+
+void unpartitioned_task_fsm::run(void) {
+  inject_event(fsm::event_signal::IGNORED, fsm::event_type::NORMAL);
+} /* run() */
 
 
 NS_END(controller, fordyca);

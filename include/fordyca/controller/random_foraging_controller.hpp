@@ -40,15 +40,6 @@ NS_START(fordyca, controller);
 namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-enum event_type {
-  NO_EVENT,
-  FSM_START,
-  BLOCK_FOUND
-};
-
-/*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
@@ -67,8 +58,6 @@ class random_foraging_controller : public argos::CCI_Controller,
   bool block_detected(void) const { return m_sensors->block_detected(); }
   void display_id(bool display_id) { m_display_id = display_id; }
   bool display_id(void) const { return m_display_id; }
-
-  virtual void publish_fsm_event(enum event_type event);
 
   /*
    * @brief Initialize the controller.
@@ -99,6 +88,7 @@ class random_foraging_controller : public argos::CCI_Controller,
    * @brief Return if the robot is currently carrying a block.
    */
   bool is_carrying_block(void) const { return nullptr != m_block; }
+  void publish_fsm_event(foraging_signal::type signal);
 
   /**
    * @brief Return the block robot is carrying, or NULL if the robot is not
