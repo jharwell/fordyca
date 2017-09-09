@@ -137,7 +137,7 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   /* non-hierarchical states */
   HFSM_STATE_INHERIT(random_foraging_fsm, start, fsm::no_event_data);
   HFSM_STATE_INHERIT(random_foraging_fsm, return_to_nest, fsm::no_event_data);
-  HFSM_STATE_INHERIT(random_foraging_fsm, leaving_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data);
 
   HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_return_to_nest,
                      fsm::no_event_data);

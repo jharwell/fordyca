@@ -118,15 +118,20 @@ class random_foraging_fsm : public fsm::hfsm {
   HFSM_STATE_DECLARE(random_foraging_fsm, new_direction, new_direction_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, return_to_nest, fsm::no_event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, leaving_nest, fsm::no_event_data);
-  HFSM_STATE_DECLARE(random_foraging_fsm, collision_avoidance, fsm::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, collision_avoidance,
+                     fsm::no_event_data);
 
-  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_explore, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_new_direction, fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_return_to_nest, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_explore,
+                     fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_new_direction,
+                     fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_return_to_nest,
+                     fsm::no_event_data);
 
   HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_collision_avoidance,
                     fsm::no_event_data);
-  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_leaving_nest, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_leaving_nest,
+                     fsm::no_event_data);
   HFSM_EXIT_DECLARE(random_foraging_fsm, exit_leaving_nest);
 
   /* member functions */

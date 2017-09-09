@@ -100,7 +100,7 @@ void random_foraging_fsm::event_start(void) {
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
   if (ST_LEAVING_NEST != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
@@ -120,7 +120,7 @@ FSM_STATE_DEFINE(random_foraging_fsm, leaving_nest, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::no_event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
@@ -151,11 +151,11 @@ FSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::no_event_data) {
   m_actuators->set_heading(m_actuators->max_wheel_speed() * vector);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(random_foraging_fsm, start, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, start, fsm::no_event_data) {
   internal_event(ST_EXPLORE);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
   if (ST_NEW_DIRECTION != last_state()) {
     ER_DIAG("Executing ST_NEW_DIRECTION");
   }
@@ -183,7 +183,7 @@ FSM_STATE_DEFINE(random_foraging_fsm, new_direction, new_direction_data) {
   ++count;
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
   if (ST_RETURN_TO_NEST != last_state()) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
   }
@@ -205,7 +205,7 @@ FSM_STATE_DEFINE(random_foraging_fsm, return_to_nest, fsm::no_event_data) {
                            m_sensors->calc_vector_to_light());
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(random_foraging_fsm, collision_avoidance, fsm::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
@@ -218,29 +218,29 @@ FSM_STATE_DEFINE(random_foraging_fsm, collision_avoidance, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_ENTRY_DEFINE(random_foraging_fsm, entry_leaving_nest, fsm::no_event_data) {
+HFSM_ENTRY_DEFINE(random_foraging_fsm, entry_leaving_nest, fsm::no_event_data) {
   ER_DIAG("Entering ST_LEAVING_NEST");
   m_actuators->leds_set_color(argos::CColor::WHITE);
 }
-FSM_ENTRY_DEFINE(random_foraging_fsm, entry_explore, fsm::no_event_data) {
+HFSM_ENTRY_DEFINE(random_foraging_fsm, entry_explore, fsm::no_event_data) {
   ER_DIAG("Entering ST_EXPLORE");
   m_actuators->leds_set_color(argos::CColor::MAGENTA);
 }
-FSM_ENTRY_DEFINE(random_foraging_fsm, entry_new_direction, fsm::no_event_data) {
+HFSM_ENTRY_DEFINE(random_foraging_fsm, entry_new_direction, fsm::no_event_data) {
   ER_DIAG("Entering ST_NEW_DIRECTION");
   m_actuators->leds_set_color(argos::CColor::CYAN);
 }
-FSM_ENTRY_DEFINE(random_foraging_fsm, entry_return_to_nest, fsm::no_event_data) {
+HFSM_ENTRY_DEFINE(random_foraging_fsm, entry_return_to_nest, fsm::no_event_data) {
   ER_DIAG("Entering ST_RETURN_TO_NEST");
   m_actuators->leds_set_color(argos::CColor::GREEN);
 }
-FSM_ENTRY_DEFINE(random_foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
+HFSM_ENTRY_DEFINE(random_foraging_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
   m_state.last_collision_time = m_sensors->tick();
 }
 
-FSM_EXIT_DEFINE(random_foraging_fsm, exit_leaving_nest) {
+HFSM_EXIT_DEFINE(random_foraging_fsm, exit_leaving_nest) {
   ER_DIAG("Exiting ST_LEAVING_NEST");
     explore_time_reset();
 }

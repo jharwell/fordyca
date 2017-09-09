@@ -145,6 +145,28 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
   return fsm::event_signal::HANDLED;
 }
 
+HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
+  if (ST_LEAVING_NEST != last_state()) {
+    ER_DIAG("Executing ST_LEAVING_NEST");
+  }
+
+  /*
+   * The vector returned by calc_vector_to_light() points to the light. Thus,
+   * the minus sign is because we want to go away from the light.
+   */
+  argos::CVector2 diff_vector;
+  argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
+  m_sensors->calc_diffusion_vector(&diff_vector);
+  m_actuators->set_heading(m_actuators->max_wheel_speed() * diff_vector -
+                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
+                                           current_heading));
+  if (!m_sensors->in_nest()) {
+    internal_event(ST_LOCATE_BLOCK,
+                   rcppsw::make_unique<fsm::event_data>(fsm::event_signal::IGNORED,
+                                                        fsm::event_type::NORMAL));
+  }
+  return fsm::event_signal::HANDLED;
+}
 
 /*******************************************************************************
  * Locate Block FSM
