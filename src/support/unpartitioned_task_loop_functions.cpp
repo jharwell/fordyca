@@ -104,7 +104,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
                                              robot_id(robot));
           controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(pickup_op);
           map()->accept(pickup_op);
-          controller.publish_fsm_event(controller::BLOCK_FOUND);
+          controller.publish_fsm_event(controller::foraging_signal::BLOCK_ACQUIRED);
 
           /* The floor texture must be updated */
           floor()->SetChanged();

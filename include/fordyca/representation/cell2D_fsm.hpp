@@ -71,14 +71,14 @@ class cell2D_fsm : public fsm::simple_fsm,
   FSM_STATE_DECLARE(cell2D_fsm, state_empty, fsm::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_block, fsm::no_event_data);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_block),
             };
   FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
-  return &kSTATE_MAP[0];
+  return &kSTATE_MAP[index];
   }
 };
 

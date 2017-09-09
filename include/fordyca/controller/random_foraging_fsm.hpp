@@ -26,11 +26,12 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
+#include "rcsw/common/common.h"
+#include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "rcsw/common/common.h"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +47,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest and repeat.
  */
-class random_foraging_fsm : public fsm::simple_fsm {
+class random_foraging_fsm : public fsm::hfsm {
  public:
   random_foraging_fsm(const struct foraging_fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,
@@ -72,22 +73,16 @@ class random_foraging_fsm : public fsm::simple_fsm {
   virtual bool is_avoiding_collision(void);
   void init(void);
   void event_block_found(void);
-  void event_start(void);
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
-  enum fsm_states {
-    ST_START,
-    ST_EXPLORE,
-    ST_NEW_DIRECTION,
-    ST_RETURN_TO_NEST,
-    ST_LEAVING_NEST,
-    ST_COLLISION_AVOIDANCE,
-    ST_MAX_STATES
-  };
-
- private:
   /* types */
+
+  /**
+   * @brief Inject randomness into robot exploring by having them change their
+   * direction every X timesteps if they have not yet located a block, where X
+   * is set in the .argos configuration file.
+   */
   struct new_direction_data : public fsm::event_data {
     explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
     argos::CRadians dir;
@@ -101,47 +96,85 @@ class random_foraging_fsm : public fsm::simple_fsm {
     uint last_collision_time;
   };
 
+  enum fsm_states {
+    ST_START,                 /* Initial state */
+    ST_EXPLORE,               /* No known blocks--roam around looking for one  */
+    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
+    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
+    ST_MAX_STATES
+  };
+
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  void explore_time_reset(void) { m_state.time_exploring_unsuccessfully = 0; }
+  void explore_time_inc(void) { ++m_state.time_exploring_unsuccessfully; }
+  size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
 
   /* states */
-  FSM_STATE_DECLARE(random_foraging_fsm, start, fsm::no_event_data);
-  FSM_STATE_DECLARE(random_foraging_fsm, explore, fsm::no_event_data);
-  FSM_STATE_DECLARE(random_foraging_fsm, new_direction, new_direction_data);
-  FSM_STATE_DECLARE(random_foraging_fsm, return_to_nest, fsm::no_event_data);
-  FSM_STATE_DECLARE(random_foraging_fsm, leaving_nest, fsm::no_event_data);
-  FSM_STATE_DECLARE(random_foraging_fsm, collision_avoidance, fsm::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, start, fsm::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, explore, fsm::event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, new_direction, fsm::event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, return_to_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, leaving_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, collision_avoidance,
+                     fsm::no_event_data);
 
-  FSM_ENTRY_DECLARE(random_foraging_fsm, entry_explore, fsm::no_event_data);
-  FSM_ENTRY_DECLARE(random_foraging_fsm, entry_new_direction, fsm::no_event_data);
-  FSM_ENTRY_DECLARE(random_foraging_fsm, entry_return_to_nest, fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_explore,
+                     fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_new_direction,
+                     fsm::no_event_data);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_return_to_nest,
+                     fsm::no_event_data);
 
-  FSM_ENTRY_DECLARE(random_foraging_fsm, entry_collision_avoidance,
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_collision_avoidance,
                     fsm::no_event_data);
-  FSM_ENTRY_DECLARE(random_foraging_fsm, entry_leaving_nest, fsm::no_event_data);
-  FSM_EXIT_DECLARE(random_foraging_fsm, exit_leaving_nest);
+  HFSM_ENTRY_DECLARE(random_foraging_fsm, entry_leaving_nest,
+                     fsm::no_event_data);
+  HFSM_EXIT_DECLARE(random_foraging_fsm, exit_leaving_nest);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
-  FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-        FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
+  /* member functions */
+  uint8_t current_state(void) const { return m_current_state; }
+  uint8_t max_states(void) const { return ST_MAX_STATES; }
+  uint8_t next_state(void) const { return m_next_state; }
+  uint8_t initial_state(void) const { return m_initial_state; }
+  void next_state(uint8_t next_state) { m_next_state = next_state; }
+  uint8_t last_state(void) const { return m_last_state; }
+  void update_state(uint8_t update_state);
+
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
+    HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
+                                    NULL,
+                                    &entry_explore, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, hfsm::top_state(),
+                                    NULL,
                                    &entry_new_direction, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
+                                    NULL,
                                    &entry_return_to_nest, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
+                                    NULL,
                                    &entry_leaving_nest, &exit_leaving_nest),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
-                                   &entry_collision_avoidance, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, hfsm::top_state(),
+                                    NULL,
+                                    &entry_collision_avoidance, NULL),
     };
-  FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
+  return (&kSTATE_MAP[index]);
   }
 
   random_foraging_fsm(const random_foraging_fsm& fsm) = delete;
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
 
   /* data members */
+  uint8_t m_current_state;
+  uint8_t m_next_state;
+  uint8_t m_initial_state;
+  uint8_t m_previous_state;
+  uint8_t m_last_state;
 
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;

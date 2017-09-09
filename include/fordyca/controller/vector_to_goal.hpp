@@ -151,7 +151,7 @@ class vector_to_goal : public fsm::simple_fsm {
   FSM_ENTRY_DECLARE(vector_to_goal, entry_collision_recovery,
                     fsm::no_event_data);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&vector, NULL, &entry_vector, NULL),
@@ -162,7 +162,7 @@ class vector_to_goal : public fsm::simple_fsm {
         FSM_STATE_MAP_ENTRY_EX_ALL(&arrived, NULL, NULL, NULL),
     };
   FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+    return &kSTATE_MAP[index];
   }
 
   vector_to_goal(const vector_to_goal& fsm) = delete;

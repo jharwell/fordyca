@@ -41,9 +41,9 @@ void perceived_grid_parser::parse(argos::TConfigurationNode& node) {
   res = parser.parse(arena->ToElement()->GetAttribute("size"));
   m_params->grid.resolution = std::atof(argos::GetNode(node,
                                                        "grid").GetAttribute("resolution").c_str());
-  m_params->grid.lower.Set(0.3, 0.3);
-  m_params->grid.upper.Set(std::atoi(res[0].c_str()) - 0.3,
-                      std::atoi(res[1].c_str()) - 0.3);
+  m_params->grid.lower.Set(0, 0);
+  m_params->grid.upper.Set(std::atoi(res[0].c_str()),
+                      std::atoi(res[1].c_str()));
   m_params->pheromone_rho = std::atof(argos::GetNode(node,
                                                      "grid").GetAttribute("pheromone_rho").c_str());
 } /* parse() */

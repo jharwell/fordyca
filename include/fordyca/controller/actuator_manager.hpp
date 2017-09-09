@@ -101,14 +101,14 @@ class actuator_manager: public fsm::simple_fsm {
   FSM_STATE_DECLARE(actuator_manager, no_turn, turn_data);
   FSM_STATE_DECLARE(actuator_manager, soft_turn, turn_data);
   FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {
     FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
       FSM_STATE_MAP_ENTRY(&no_turn),
           FSM_STATE_MAP_ENTRY(&soft_turn),
           FSM_STATE_MAP_ENTRY(&hard_turn),
           };
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+    return &kSTATE_MAP[index];
   }
 
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */

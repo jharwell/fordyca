@@ -56,13 +56,11 @@ random_foraging_controller::random_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void random_foraging_controller::publish_fsm_event(enum event_type type) {
-  switch (type) {
-    case FSM_START:
-      m_fsm->event_start();
-      break;
-    case BLOCK_FOUND:
-      m_fsm->event_block_found();
+void random_foraging_controller::publish_fsm_event(foraging_signal::type signal) {
+  switch (signal) {
+    case foraging_signal::BLOCK_ACQUIRED:
+      m_fsm->inject_event(foraging_signal::BLOCK_ACQUIRED,
+                          rcppsw::patterns::state_machine::event_type::NORMAL);
       break;
     default:
       break;

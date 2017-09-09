@@ -56,14 +56,16 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void perceived_arena_map::event_new_los(const line_of_sight* los) {
+bool perceived_arena_map::event_new_los(const line_of_sight* los) {
   if (!IS_SIZE_ALIGNED(los->size(), 4)) {
-    return;
+    return false;
   }
+  bool rval = false;
   for (size_t x = 0; x < los->sizex(); ++x) {
     for (size_t y = 0; y < los->sizey(); ++y) {
       discrete_coord abs = los->cell_abs_coord(x, y);
       if (los->cell(x, y).state_has_block()) {
+        rval = true;
         block* block = const_cast<representation::block*>(los->cell(x,
                                                                     y).block());
         ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
@@ -84,6 +86,7 @@ void perceived_arena_map::event_new_los(const line_of_sight* los) {
       }
     } /* for(y..) */
   } /* for(x..) */
+  return rval;
 } /* event_new_los() */
 
 /*******************************************************************************

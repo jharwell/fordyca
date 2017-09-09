@@ -55,7 +55,7 @@ class unpartitioned_task_controller : public random_foraging_controller,
   void display_los(bool display_los) { m_display_los = display_los; }
   bool display_los(void) const { return m_display_los; }
 
-  virtual void publish_fsm_event(enum event_type event);
+
   virtual bool is_searching_for_block(void) { return m_fsm->is_searching_for_block(); }
 
   /*
@@ -73,6 +73,7 @@ class unpartitioned_task_controller : public random_foraging_controller,
    */
   virtual void ControlStep(void);
 
+  void publish_fsm_event(foraging_signal::type signal);
   /**
    * @brief Set the robot's current line of sight (LOS). This sort of a hack,
    * but is much easier than actually computing it, and helps me get on with teh
