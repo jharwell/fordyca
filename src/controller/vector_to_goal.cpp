@@ -36,8 +36,8 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constants
  ******************************************************************************/
-int vector_to_goal::kCOLLISION_RECOVERY_TIME = 10;
-double vector_to_goal::kVECTOR_TO_GOAL_MIN_DIFF = 0.02;
+int vector_to_goal::kCOLLISION_RECOVERY_TIME = 50;
+double vector_to_goal::kVECTOR_TO_GOAL_MIN_DIFF = 0.03;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -60,9 +60,11 @@ vector_to_goal::vector_to_goal(double frequent_collision_thresh,
     m_freq_collision_thresh(frequent_collision_thresh),
     m_sensors(sensors),
     m_actuators(actuators) {
-  insmod("vector_to_goal");
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  if (ERROR == attmod("vector_to_goal")) {
+    insmod("vector_to_goal",
+           rcppsw::common::er_lvl::DIAG,
+           rcppsw::common::er_lvl::NOM);
+  }
     }
 
 /*******************************************************************************
@@ -141,7 +143,8 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
    */
   static rcppsw::control::pid_loop ang_pid(3.0, 0, 0,
                                              1,
-                                             -M_PI, M_PI);
+                                           -m_actuators->max_wheel_speed() * 0.9,
+                                           m_actuators->max_wheel_speed() * 0.9);
   static double ang_speed = 0;
   static rcppsw::control::pid_loop lin_pid(3.0, 0, 0.02,
                                            1,
@@ -165,15 +168,29 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   }
   argos::CVector2 robot_to_goal = calc_vector_to_goal(_goal.goal);
   argos::CVector2 heading = m_sensors->robot_heading();
-  if (lin_pid.integral() > 200) {
-    lin_pid.reset_integral();
-  }
-  ang_speed = ang_pid.calculate(robot_to_goal.Angle().GetValue(),
-                                m_sensors->heading_angle().GetValue());
+  static int prev;
+  /* if (std::fabs((robot_to_goal.Angle() - heading.Angle()).GetValue()) > 0.1) { */
+  /*   prev = 0; */
+  /*   lin_pid.min(m_actuators->max_wheel_speed() * 0.001); */
+  /*   lin_pid.max(m_actuators->max_wheel_speed() * 0.01); */
+  /* } else { */
+  /*   if (0 == prev) { */
+  /*     lin_pid.reset(); */
+  /*   } */
+  /*   prev = 1; */
+  /*   lin_pid.min(m_actuators->max_wheel_speed() * 0.75); */
+  /*   lin_pid.max(m_actuators->max_wheel_speed() * 0.9); */
+  /* } */
+  ang_speed = ang_pid.calculate(0,
+                                m_sensors->heading_angle().GetValue() -
+                                robot_to_goal.Angle().GetValue());
+
   lin_speed = lin_pid.calculate(0, -robot_to_goal.Length());
-  ER_VER("robot_to_target: vector=(%f, %f),len=%f robot_to_heading=(%f, %f), ang_speed=%f lin_speed=%f",
-         robot_to_goal.GetX(), robot_to_goal.GetY(), robot_to_goal.Length(),
-         heading.GetX(), heading.GetY(),
+
+  ER_VER("robot_to_target: vector=(%f, %f)@%f,len=%f robot_to_heading=(%f, %f)@%f ang_speed=%f lin_speed=%f",
+         robot_to_goal.GetX(), robot_to_goal.GetY(),
+         robot_to_goal.Angle().GetValue(), robot_to_goal.Length(),
+         heading.GetX(), heading.GetY(), heading.Angle().GetValue(),
          ang_speed, lin_speed);
   m_actuators->set_wheel_speeds(lin_speed,
                                 ang_speed);
