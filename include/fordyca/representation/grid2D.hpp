@@ -93,13 +93,11 @@ class grid2D {
    *
    * @return The subgrid.
    */
-  grid_view<T*> subgrid(double x, double y, double radius) {
-    size_t lower_x = std::max(0.0, x / m_resolution - radius / m_resolution);
-    size_t upper_x = std::min(x / m_resolution + radius / m_resolution,
-                              static_cast<double>(xsize()) - 1);
-    size_t lower_y = std::max(0.0, y / m_resolution - radius / m_resolution);
-    size_t upper_y = std::min(y / m_resolution + radius / m_resolution,
-                              static_cast<double>(ysize()) - 1);
+  grid_view<T*> subgrid(size_t x, size_t y, size_t radius) {
+    size_t lower_x = std::max(0UL, x - radius);
+    size_t upper_x = std::min(x + radius + 1, xsize() - 1);
+    size_t lower_y = std::max(0UL, y - radius);
+    size_t upper_y = std::min(y  + radius + 1, ysize() - 1);
     if (lower_x > upper_x) {
       lower_x = upper_x - 1;
     }

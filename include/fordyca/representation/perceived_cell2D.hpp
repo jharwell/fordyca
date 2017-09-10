@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <algorithm>
 #include <utility>
+#include <string>
+
 #include "rcppsw/swarm/pheromone_density.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -57,6 +59,7 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   void rho(double rho) { m_density.rho(rho); }
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
+  const std::string& robot_id(void) { return m_robot_id; }
 
   /**
    * @brief Get the current information relavence via the current pheromone

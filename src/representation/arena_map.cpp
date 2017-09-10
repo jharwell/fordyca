@@ -54,6 +54,13 @@ arena_map::arena_map(const struct grid_params* params,
 
   ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
          m_grid.resolution());
+  for (size_t i = 0; i < m_grid.xsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+      cell2D& cell = m_grid.access(i, j);
+      cell.loc(discrete_coord(i, j));
+    } /* for(j..) */
+  } /* for(i..) */
+
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     m_blocks[i].id(i);
   } /* for(i..) */

@@ -75,13 +75,6 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
     return current_state() == ST_EXPLORE ||
         (current_state() == ST_LOCATE_BLOCK && !m_vector_fsm.in_progress());
   }
-  /**
-   * @brief Pass a block fround event from the controller's/robot's sensors to
-   * the FSM, so that it can update state accordingly.
-   */
-  void event_block_acquired(void);
-  void event_block_located(void);
-
   void run(void);
 
  protected:
@@ -188,6 +181,9 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   unpartitioned_task_fsm& operator=(const unpartitioned_task_fsm& fsm) = delete;
 
   /* data members */
+  const double mc_unsuccessful_explore_dir_change;
+  const argos::CVector2 mc_nest_center;
+
   uint8_t m_current_state;
   uint8_t m_next_state;
   uint8_t m_initial_state;
@@ -196,7 +192,6 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
 
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
-  std::shared_ptr<const struct foraging_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
   std::shared_ptr<const representation::perceived_arena_map> m_map;

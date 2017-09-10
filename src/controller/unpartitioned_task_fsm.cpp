@@ -57,6 +57,8 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     entry_explore(),
     entry_collision_avoidance(),
     exit_locate_block(),
+    mc_unsuccessful_explore_dir_change(params->times.unsuccessful_explore_dir_change),
+    mc_nest_center(params->nest_center),
     m_current_state(ST_START),
     m_next_state(ST_START),
     m_initial_state(ST_START),
@@ -64,7 +66,6 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
-    mc_params(params),
     m_sensors(sensors),
     m_actuators(actuators),
     m_map(map),
@@ -72,41 +73,6 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators) {
     }
-
-/*******************************************************************************
- * Events
- ******************************************************************************/
-void unpartitioned_task_fsm::event_block_acquired(void) {
-  HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_RETURN_TO_NEST,           /* start (robot might be on block initially) */
-        ST_RETURN_TO_NEST,    /* explore */
-        fsm::event_signal::FATAL,    /* new direction */
-        fsm::event_signal::IGNORED,  /* return to nest */
-        fsm::event_signal::FATAL,    /* leaving nest */
-        fsm::event_signal::FATAL,    /* collision avoidance */
-        ST_RETURN_TO_NEST,           /* locate block (known block acquired) */
-        };
-  HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_ACQUIRED,
-                                                      fsm::event_type::NORMAL));
-}
-
-void unpartitioned_task_fsm::event_block_located(void) {
-  HFSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_LOCATE_BLOCK,             /* start (block within initial LOS) */
-        ST_LOCATE_BLOCK,             /* explore */
-        ST_LOCATE_BLOCK,             /* new direction */
-        fsm::event_signal::IGNORED,  /* return to nest */
-        fsm::event_signal::FATAL,    /* leaving nest */
-        fsm::event_signal::FATAL,    /* collision avoidance */
-        fsm::event_signal::IGNORED   /* locate block */
-        };
-  HFSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<fsm::event_data>(foraging_signal::BLOCK_LOCATED,
-                                                      fsm::event_type::NORMAL));
-}
 
 /*******************************************************************************
  * Exploration FSM
@@ -133,8 +99,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
    */
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
-  } else if (explore_time() >
-             mc_params->times.unsuccessful_explore_dir_change) {
+  } else if (explore_time() > mc_unsuccessful_explore_dir_change) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
                                          argos::CRadians(1.0));
     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
@@ -240,7 +205,7 @@ void unpartitioned_task_fsm::update_state(uint8_t new_state) {
 
 void unpartitioned_task_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
-  block_target_selector selector(m_server, mc_params->nest_center);
+  block_target_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(blocks, m_sensors->robot_loc());
   ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
          best.first->id(),

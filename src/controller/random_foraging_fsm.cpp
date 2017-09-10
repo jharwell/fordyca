@@ -53,6 +53,7 @@ random_foraging_fsm::random_foraging_fsm(
     entry_collision_avoidance(),
     entry_leaving_nest(),
     exit_leaving_nest(),
+    mc_unsuccessful_explore_dir_change(params->times.unsuccessful_explore_dir_change),
     m_current_state(ST_START),
     m_next_state(ST_START),
     m_initial_state(ST_START),
@@ -60,7 +61,6 @@ random_foraging_fsm::random_foraging_fsm(
     m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
-    mc_params(params),
     m_sensors(sensors),
     m_actuators(actuators) {
   insmod("random_foraging_fsm");
@@ -121,7 +121,7 @@ HFSM_STATE_DEFINE(random_foraging_fsm, explore, fsm::event_data) {
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (m_state.time_exploring_unsuccessfully >
-             mc_params->times.unsuccessful_explore_dir_change) {
+             mc_unsuccessful_explore_dir_change) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
                                          argos::CRadians(1.0));
     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);

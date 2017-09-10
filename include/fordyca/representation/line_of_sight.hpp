@@ -66,14 +66,14 @@ class line_of_sight {
    *
    * @return The X dimension.
    */
-  size_t sizex(void) const { return m_view.num_elements() / 2; }
+  size_t sizex(void) const { return m_view.shape()[0]; }
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
    *
    * @return The Y dimension.
    */
-  size_t sizey(void) const { return m_view.num_elements() / 2; }
+  size_t sizey(void) const { return m_view.shape()[1]; }
 
   /**
    * @brief Get the # elements in a LOS.

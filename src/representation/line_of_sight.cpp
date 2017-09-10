@@ -60,6 +60,8 @@ discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
   } else {
     abs_j_coord = m_center.second + j;
   }
+  assert(abs_i_coord > 0);
+  assert(abs_j_coord > 0);
   return discrete_coord(abs_i_coord, abs_j_coord);
 } /* cell_abs_coord() */
 
