@@ -44,11 +44,11 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-class perceived_cell2D : public visitor::visitable<perceived_cell2D> {
+class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
+                         public rcppsw::common::er_client {
  public:
   explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server) :
-      m_density(), m_server(server), m_cell(server) {}
+      const std::shared_ptr<rcppsw::common::er_server>& server);
 
   /**
    * @brief Set the relevance decay parameter for the cell.
@@ -56,6 +56,7 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D> {
    * @param rho The new value.
    */
   void rho(double rho) { m_density.rho(rho); }
+  void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
 
   /**
    * @brief Get the current information relavence via the current pheromone
@@ -77,7 +78,6 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D> {
    */
   const representation::block* block(void) const { return m_cell.block(); }
 
-
   /**
    * @brief Update the information relevance/pheromone density associated with
    * this cell.
@@ -98,8 +98,8 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D> {
    * cell will transition back to an unknown state.
    */
   static const double kEpsilon;
+  std::string m_robot_id;
   rcppsw::swarm::pheromone_density m_density;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
   cell2D m_cell;
 };
 

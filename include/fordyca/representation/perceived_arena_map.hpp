@@ -50,7 +50,8 @@ class perceived_arena_map: public rcppsw::common::er_client,
                            public rcppsw::patterns::visitor::visitable<perceived_arena_map> {
  public:
   perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
-                      const struct perceived_grid_params* params);
+                      const struct perceived_grid_params* params,
+                      const std::string& robot_id);
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of/that are

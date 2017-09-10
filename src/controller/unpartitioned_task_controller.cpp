@@ -74,7 +74,8 @@ void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
   m_map.reset(new representation::perceived_arena_map(
       server(),
       static_cast<const struct perceived_grid_params*>(
-          param_repo.get_params("perceived_grid"))));
+          param_repo.get_params("perceived_grid")),
+      GetId()));
 
   m_fsm.reset(
       new unpartitioned_task_fsm(static_cast<const struct foraging_fsm_params*>(

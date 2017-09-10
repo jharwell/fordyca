@@ -35,7 +35,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const struct perceived_grid_params* params) :
+    const struct perceived_grid_params* params, const std::string& robot_id) :
     m_server(server), m_grid(&params->grid) {
   deferred_init(m_server);
   insmod("perceived_arena_map",
@@ -49,6 +49,7 @@ perceived_arena_map::perceived_arena_map(
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       perceived_cell2D& cell = m_grid.access(i, j);
       cell.rho(params->pheromone_rho);
+      cell.robot_id(robot_id);
     } /* for(j..) */
   } /* for(i..) */
 }

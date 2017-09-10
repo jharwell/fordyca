@@ -44,6 +44,7 @@ NS_START(events);
 class cell_unknown : public cell_op {
  public:
   cell_unknown(void) {}
+
   void visit(representation::cell2D& cell);
   void visit(representation::cell2D_fsm& cell);
 };

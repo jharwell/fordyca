@@ -37,15 +37,32 @@ NS_START(fordyca, representation);
 const double perceived_cell2D::kEpsilon = 0.0001;
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+perceived_cell2D::perceived_cell2D(
+    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    er_client(server), m_robot_id(), m_density(),
+    m_cell(server) {
+  insmod("perceived_cell2D",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
+    }
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void perceived_cell2D::update_density(void) {
-  if (m_cell.state_is_known()) {
-    m_density.calc();
-    if (m_density.last_result() < kEpsilon) {
-      events::cell_unknown op;
-      m_cell.accept(op);
+  if (!m_cell.state_is_known()) {
+    return;
+  }
+  m_density.calc();
+  if (m_density.last_result() < kEpsilon) {
+    if (m_cell.state_has_block()) {
+      ER_NOM("Relevance of block%d is within %f of 0 for %s", block()->id(),
+             kEpsilon, m_robot_id.c_str());
     }
+    events::cell_unknown op;
+    m_cell.accept(op);
   }
 } /* update_density() */
 

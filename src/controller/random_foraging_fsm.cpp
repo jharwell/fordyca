@@ -65,25 +65,8 @@ random_foraging_fsm::random_foraging_fsm(
     m_actuators(actuators) {
   insmod("random_foraging_fsm");
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::VER);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
 }
-
-/*******************************************************************************
- * Events
- ******************************************************************************/
-void random_foraging_fsm::event_block_found(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_RETURN_TO_NEST,           /* start (robot might be on block initially) */
-        ST_RETURN_TO_NEST,           /* explore */
-        ST_RETURN_TO_NEST,           /* new direction */
-        fsm::event_signal::IGNORED,  /* return to nest */
-        fsm::event_signal::FATAL,    /* leaving nest */
-        ST_COLLISION_AVOIDANCE,      /* collision avoidance */
-        };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()], NULL);
-}
-
 
 /*******************************************************************************
  * States
