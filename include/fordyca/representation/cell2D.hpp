@@ -58,6 +58,8 @@ class cell2D : public visitor::visitable<cell2D> {
 
   void reset(void) { m_fsm.init(); }
   void entity(representation::cell_entity* entity) { m_entity = entity; }
+  void loc(discrete_coord loc) { m_loc = loc; }
+  discrete_coord loc(void) const { return m_loc; }
 
   const representation::block* block(void) const {
     return static_cast<representation::block*>(m_entity); }
@@ -68,7 +70,8 @@ class cell2D : public visitor::visitable<cell2D> {
   cell2D(const cell2D& other) = delete;
   cell2D& operator=(const cell2D& other) = delete;
 
-  representation::cell_entity* m_entity;
+  cell_entity* m_entity;
+  discrete_coord m_loc;
   cell2D_fsm m_fsm;
 };
 

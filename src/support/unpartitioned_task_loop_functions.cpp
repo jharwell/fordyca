@@ -140,8 +140,7 @@ void unpartitioned_task_loop_functions::set_robot_los(argos::CFootBotEntity& rob
           robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
-          map()->subgrid(pos.GetX(), pos.GetY(),
-                         map()->grid_resolution()),
+          map()->subgrid(robot_loc.first, robot_loc.second, 1),
           robot_loc);
   controller.los(new_los);
   controller.robot_loc(pos);

@@ -33,8 +33,8 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 discrete_coord real_to_discrete_coord(std::pair<double, double> real_coord,
                                       double resolution) {
-  return discrete_coord(real_coord.first / resolution - 1,
-                        real_coord.second / resolution - 1);
+  return discrete_coord(real_coord.first / resolution ,
+                        real_coord.second / resolution);
 } /* real_to_discrete_coord() */
 
 NS_END(representation, fordyca);
