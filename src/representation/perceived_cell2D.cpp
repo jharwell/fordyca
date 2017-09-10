@@ -43,9 +43,11 @@ perceived_cell2D::perceived_cell2D(
     const std::shared_ptr<rcppsw::common::er_server>& server) :
     er_client(server), m_robot_id(), m_density(),
     m_cell(server) {
-  insmod("perceived_cell2D",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+  if (ERROR == attmod("perceived_cell2D")) {
+    insmod("perceived_cell2D",
+           rcppsw::common::er_lvl::DIAG,
+           rcppsw::common::er_lvl::NOM);
+  }
     }
 
 /*******************************************************************************

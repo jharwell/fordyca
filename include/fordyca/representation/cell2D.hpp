@@ -48,8 +48,7 @@ class cell2D : public visitor::visitable<cell2D> {
   explicit cell2D(
       const std::shared_ptr<rcppsw::common::er_server>& server =
       rcppsw::common::g_server) :
-      m_entity(nullptr),
-      m_fsm(server) { m_fsm.init(); }
+      m_entity(nullptr), m_loc(), m_fsm(server) { m_fsm.init(); }
 
   /* state inquiry */
   bool state_is_known(void) { return m_fsm.state_is_known(); }
