@@ -169,6 +169,8 @@ class random_foraging_fsm : public fsm::hfsm {
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
 
   /* data members */
+  const double mc_unsuccessful_explore_dir_change;
+
   uint8_t m_current_state;
   uint8_t m_next_state;
   uint8_t m_initial_state;
@@ -177,7 +179,6 @@ class random_foraging_fsm : public fsm::hfsm {
 
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
-  std::shared_ptr<const struct foraging_fsm_params> mc_params;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
 };
