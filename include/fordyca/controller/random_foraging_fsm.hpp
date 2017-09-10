@@ -72,7 +72,6 @@ class random_foraging_fsm : public fsm::hfsm {
    */
   virtual bool is_avoiding_collision(void);
   void init(void);
-  void event_block_found(void);
   void run(void) { generated_event(true); state_engine(); }
 
  protected:

@@ -62,7 +62,7 @@ vector_to_goal::vector_to_goal(double frequent_collision_thresh,
     m_actuators(actuators) {
   insmod("vector_to_goal");
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::VER);
+  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
     }
 
 /*******************************************************************************
