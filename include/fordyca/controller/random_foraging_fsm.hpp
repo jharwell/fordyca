@@ -178,6 +178,7 @@ class random_foraging_fsm : public fsm::hfsm {
   uint8_t m_last_state;
 
   argos::CRandom::CRNG* m_rng;
+  argos::CRadians m_new_dir;
   struct fsm_state m_state;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;

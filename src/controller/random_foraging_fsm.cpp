@@ -60,6 +60,7 @@ random_foraging_fsm::random_foraging_fsm(
     m_previous_state(ST_START),
     m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
+    m_new_dir(),
     m_state(),
     m_sensors(sensors),
     m_actuators(actuators) {
@@ -148,7 +149,6 @@ HFSM_STATE_DEFINE(random_foraging_fsm, new_direction, fsm::event_data) {
   }
   /* all signals ignored in this state */
 
-  static argos::CRadians new_dir;
   argos::CRadians current_dir = m_sensors->calc_vector_to_light().Angle();
 
   /*
@@ -157,13 +157,13 @@ HFSM_STATE_DEFINE(random_foraging_fsm, new_direction, fsm::event_data) {
    */
   const new_direction_data* dir_data = dynamic_cast<const new_direction_data*>(data);
   if (dir_data) {
-    new_dir = dir_data->dir;
+    m_new_dir = dir_data->dir;
   }
   m_actuators->set_heading(argos::CVector2(
-      m_actuators->max_wheel_speed() * 0.25, new_dir), true);
+      m_actuators->max_wheel_speed() * 0.25, m_new_dir), true);
 
   /* We have changed direction and started a new exploration */
-  if (std::fabs((current_dir - new_dir).GetValue()) < 0.1) {
+  if (std::fabs((current_dir - m_new_dir).GetValue()) < 0.1) {
     m_state.time_exploring_unsuccessfully = 0;
     internal_event(ST_EXPLORE);
   }

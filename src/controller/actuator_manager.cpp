@@ -140,12 +140,12 @@ void actuator_manager::set_wheel_speeds(double speed1, double speed2,
 void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
   argos::Real left_wheel_speed, right_wheel_speed;
 
-  if (ang_speed > 0) {
+  if (ang_speed < 0) {
     right_wheel_speed = lin_speed + ang_speed;
     left_wheel_speed  = lin_speed;
   } else {
-    right_wheel_speed = lin_speed;
     left_wheel_speed  = lin_speed + ang_speed;
+     right_wheel_speed  = lin_speed;
   }
 
   /* Finally, set the wheel speeds */

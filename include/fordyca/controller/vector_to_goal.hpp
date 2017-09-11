@@ -29,6 +29,7 @@
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "rcppsw/control/pid_loop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -117,7 +118,8 @@ class vector_to_goal : public fsm::simple_fsm {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  static int kCOLLISION_RECOVERY_TIME;
+  static uint kCOLLISION_RECOVERY_TIME;
+
   /**
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at a specified target location.
@@ -172,8 +174,12 @@ class vector_to_goal : public fsm::simple_fsm {
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   uint m_freq_collision_thresh;
+  uint m_collision_rec_count;
   std::shared_ptr<sensor_manager> m_sensors;
   std::shared_ptr<actuator_manager> m_actuators;
+  argos::CVector2 m_goal;
+  rcppsw::control::pid_loop m_ang_pid;
+  rcppsw::control::pid_loop m_lin_pid;
 };
 
 NS_END(controller, fordyca);
