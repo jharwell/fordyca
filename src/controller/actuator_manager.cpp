@@ -144,8 +144,8 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
     right_wheel_speed = lin_speed + ang_speed;
     left_wheel_speed  = lin_speed;
   } else {
-    right_wheel_speed = lin_speed;
     left_wheel_speed  = lin_speed + ang_speed;
+     right_wheel_speed  = lin_speed;
   }
 
   /* Finally, set the wheel speeds */

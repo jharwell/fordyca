@@ -219,13 +219,14 @@ bool unpartitioned_task_fsm::acquire_block(void) {
   /* currently on our way to a known block */
   if (m_vector_fsm.in_progress()) {
     m_vector_fsm.run();
-    return false;
+     return false;
   } else if (m_vector_fsm.arrived_at_goal()) {
     if (m_sensors->block_detected()) {
       return true;
     } else {
       ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-    }
+      m_vector_fsm.init();
+     }
   }
   /* try again--someone beat us to our chosen block */
 
