@@ -49,7 +49,14 @@ class cell_entity {
                                             m_real_loc(), m_discrete_loc() {}
   virtual ~cell_entity(void) {}
 
+  /**
+   * @brief Get the size of the cell entity in the X direction
+   */
   double xsize(void) const { return m_x_dim; }
+
+  /**
+   * @brief Get the size of the cell entity in the y direction
+   */
   double ysize(void) const { return m_y_dim; }
 
   /**

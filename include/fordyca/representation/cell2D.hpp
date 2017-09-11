@@ -51,15 +51,38 @@ class cell2D : public visitor::visitable<cell2D> {
       m_entity(nullptr), m_loc(), m_fsm(server) { m_fsm.init(); }
 
   /* state inquiry */
+
+  /**
+   * @brief If TRUE, the state is currently KNOWN.
+   */
   bool state_is_known(void) { return m_fsm.state_is_known(); }
+
+  /**
+   * @brief If TRUE, the state is currently known to contain a block.
+   */
   bool state_has_block(void) { return m_fsm.state_has_block(); }
+
+  /**
+   * @brief If TRUE, the state is currently known to be empty.
+   */
   bool state_is_empty(void) { return m_fsm.state_is_empty(); }
 
+  /**
+   * @brief Reset the cell to its UNKNOWN state.
+   */
   void reset(void) { m_fsm.init(); }
+
+  /**
+   * @brief Set the entity associated with this cell.
+   */
   void entity(representation::cell_entity* entity) { m_entity = entity; }
   void loc(discrete_coord loc) { m_loc = loc; }
   discrete_coord loc(void) const { return m_loc; }
 
+  /**
+   * @brief Get the entity associated with this cell. Will be NULL unless it
+   * contains a block, so check the cell's state before calling this function.
+   */
   const representation::block* block(void) const {
     return static_cast<representation::block*>(m_entity); }
 

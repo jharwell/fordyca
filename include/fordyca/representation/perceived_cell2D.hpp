@@ -91,6 +91,11 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   void update_density(void);
 
+  /**
+   * @brief Add the specified amount to the pheromone density for this cell.
+   *
+   * @param density The amount of pheromone to add.
+   */
   void update_density(double density) { m_density.add_pheromone(density); }
 
   cell2D& cell(void) { return m_cell; }
@@ -101,7 +106,8 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    * cell will transition back to an unknown state.
    */
   static const double kEpsilon;
-  std::string m_robot_id;
+
+  std::string m_robot_id;  /// For debugging purposes only
   rcppsw::swarm::pheromone_density m_density;
   cell2D m_cell;
 };

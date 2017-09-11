@@ -51,7 +51,7 @@ void unpartitioned_task_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
     const representation::line_of_sight* los = controller.los();
     DrawCircle(argos::CVector3(0, 0, 0),
                argos::CQuaternion(),
-               (los->sizex()/2)*0.2,
+               (los->sizex()/2.0)*0.2,
                argos::CColor::RED,
                false);
   }

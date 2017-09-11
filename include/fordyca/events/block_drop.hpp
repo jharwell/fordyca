@@ -53,9 +53,34 @@ class block_drop : public block_op, public rcppsw::common::er_client {
              representation::block* block);
   ~block_drop(void) { rmmod(); }
 
+  /**
+   * @brief Update a cell on a block drop.
+   *
+   * @param cell The cell to update.
+   */
   void visit(representation::cell2D& cell);
+
+  /**
+   * @brief Update the FSM associated with a cell on a block drop.
+   *
+   * @param fsm The FSM associated with the cell to update.
+   */
   void visit(representation::cell2D_fsm& fsm);
+
+  /**
+   * @brief Update the arena_map on a block drop by distributing the block in a
+   * new location and updating the block so that it no longer thinks it is
+   * carried by a robot.
+   *
+   * @param map The map to update (there is only ever one...)
+   */
   void visit(representation::arena_map& map);
+
+  /**
+   * @brief Update a block with the knowledge that it has been dropped.
+   *
+   * @param block The block to update.
+   */
   void visit(representation::block& block);
 
   /**
@@ -66,6 +91,10 @@ class block_drop : public block_op, public rcppsw::common::er_client {
    * each timestep.
    */
   void visit(controller::random_foraging_controller& controller);
+
+  /**
+   * @brief Get the handle on the block that has been dropped.
+   */
   representation::block* block(void) const { return m_block; }
 
  private:

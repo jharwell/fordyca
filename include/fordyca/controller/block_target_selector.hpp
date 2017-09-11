@@ -41,8 +41,9 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 class block_target_selector: public rcppsw::common::er_client {
  public:
-  block_target_selector(const std::shared_ptr<rcppsw::common::er_server>& server,
-                        argos::CVector2 nest_loc);
+  block_target_selector(
+      const std::shared_ptr<rcppsw::common::er_server>& server,
+      argos::CVector2 nest_loc);
 
   ~block_target_selector(void) { rmmod(); }
 

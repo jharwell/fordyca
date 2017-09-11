@@ -79,7 +79,6 @@ class perceived_arena_map: public rcppsw::common::er_client,
    */
   void update_density(void);
 
-  /* events */
   /**
    * @brief Handle the event of a robot acquiring a new line-of-sight (happens
    * every timestep).

@@ -53,6 +53,12 @@ class block_pickup : public block_op, public rcppsw::common::er_client {
                representation::block* block, size_t robot_index);
   ~block_pickup(void) { rmmod(); }
 
+  /**
+   * @brief Update the arena_map with the block pickup event by making the block
+   * seem to disappear by moving it out of sight.
+   *
+   * @param map The arena_map.
+   */
   void visit(representation::arena_map& map);
 
   /**
@@ -62,6 +68,10 @@ class block_pickup : public block_op, public rcppsw::common::er_client {
    * @param map The robot's arena map.
    */
   void visit(representation::perceived_arena_map& map);
+
+  /**
+   * @brief Update a block with the knowledge that it is now carried by a robot.
+   */
   void visit(representation::block& block);
 
   /**

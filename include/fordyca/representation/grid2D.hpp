@@ -121,7 +121,7 @@ class grid2D {
    * @brief Get the size of the Y dimension of the discretized subgrid, at
    * whatever the resolution specified during object construction was.
    */
-size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
+  size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
 
  private:
   double m_resolution;

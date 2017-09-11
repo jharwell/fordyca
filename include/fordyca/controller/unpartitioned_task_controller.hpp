@@ -53,10 +53,19 @@ class unpartitioned_task_controller : public random_foraging_controller,
       m_fsm() {}
 
   void display_los(bool display_los) { m_display_los = display_los; }
+
+  /**
+   * @brief If TRUE, then the robot should display its approxibate LOS as a
+   * circle on the ground during simulation.
+   */
   bool display_los(void) const { return m_display_los; }
 
-
-  virtual bool is_searching_for_block(void) { return m_fsm->is_searching_for_block(); }
+  /**
+   * @brief If TRUE, then the robot is currently searching for a block.
+   */
+  virtual bool is_searching_for_block(void) {
+    return m_fsm->is_searching_for_block();
+  }
 
   /*
    * @brief Initialize the controller.

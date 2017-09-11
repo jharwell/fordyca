@@ -60,7 +60,19 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
  protected:
   virtual void pre_step_iter(argos::CFootBotEntity& robot);
   virtual void pre_step_final(void);
+
+  /**
+   * @brief Check if a robot is on top of a block. If, so return the block index.
+   *
+   * @param robot The robot to check
+   *
+   * @return The block index, or -1 if the robot is not on top of a block.
+   */
   int robot_on_block(const argos::CFootBotEntity& robot);
+
+  /**
+   * @brief Get the ID of the robot as an integer.
+   */
   int robot_id(const argos::CFootBotEntity& robot);
   representation::arena_map* map(void) const { return m_map.get(); }
   params::loop_function_repository* repo(void) const { return m_repo.get(); }
