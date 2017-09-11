@@ -70,6 +70,11 @@ class vector_to_goal : public fsm::simple_fsm {
   bool in_progress(void) {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
+
+  /**
+   * @brief Run the FSM in its current state, without injecting an event.
+   *
+   */
   void run(void) { generated_event(true); state_engine(); }
 
   /**

@@ -64,9 +64,9 @@ random_foraging_fsm::random_foraging_fsm(
     m_state(),
     m_sensors(sensors),
     m_actuators(actuators) {
-  insmod("random_foraging_fsm");
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::NOM);
+  insmod("random_foraging_fsm",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
 }
 
 /*******************************************************************************

@@ -71,12 +71,18 @@ class random_foraging_fsm : public fsm::hfsm {
    * @brief If TRUE, the robot is currently engaged in collision avoidance.
    */
   virtual bool is_avoiding_collision(void);
+
+  /**
+   * @brief (Re)-initialize the FSM.
+   */
   void init(void);
+
+  /**
+   * @brief Run the FSM in its current state, without injecting an event.
+   */
   void run(void) { generated_event(true); state_engine(); }
 
  protected:
-  /* types */
-
   /**
    * @brief Inject randomness into robot exploring by having them change their
    * direction every X timesteps if they have not yet located a block, where X
@@ -105,10 +111,24 @@ class random_foraging_fsm : public fsm::hfsm {
     ST_MAX_STATES
   };
 
-  /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+
+  /**
+   * @brief Reset the # of timesteps the robot has spent unsuccessfully looking
+   * for a block.
+   */
   void explore_time_reset(void) { m_state.time_exploring_unsuccessfully = 0; }
+
+  /**
+   * @brief Increment the # of timesteps the robot has spent unsuccessfully
+   * looking for a block.
+   */
   void explore_time_inc(void) { ++m_state.time_exploring_unsuccessfully; }
+
+  /**
+   * @brief Get the # of timesteps the robot has spent unsuccessfully looking
+   * for a block.
+   */
   size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
 
   /* states */
@@ -168,7 +188,10 @@ class random_foraging_fsm : public fsm::hfsm {
   random_foraging_fsm(const random_foraging_fsm& fsm) = delete;
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
 
-  /* data members */
+  /**
+   * How many timesteps to spend on a particular vector when exploring before
+   * changing.
+   */
   const double mc_unsuccessful_explore_dir_change;
 
   uint8_t m_current_state;

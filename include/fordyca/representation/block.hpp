@@ -46,9 +46,7 @@ class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable<block> {
  public:
   explicit block(double dimension) :
-      cell_entity(dimension, dimension),
-      m_robot_index(-1),
-      m_carries(0) {}
+      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
 
   /**
    * @brief Get how many carries this block has had on its way from its original
@@ -57,8 +55,16 @@ class block : public cell_entity,
    * @return # carries.
    */
   size_t carries(void) const { return m_carries; }
+
+  /**
+   * @brief Increment the # of carries this block has undergone on its way back
+   * to the nest.
+   */
   void add_carry(void) { ++m_carries; }
 
+  /**
+   * @brief Reset the state of the block (i.e. not carried by a robot anymore).
+   */
   void reset(void) { m_carries = 0; m_robot_index = -1; }
 
   /**

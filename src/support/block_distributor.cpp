@@ -52,7 +52,7 @@ void block_distributor::distribute_block(representation::block& block,
 
 void block_distributor::dist_random(representation::block& block) {
   block.real_loc(dist_outside_range(block.xsize(),
-                                        m_nest_x, m_nest_y));
+                                    m_nest_x, m_nest_y));
   block.discrete_loc(representation::real_to_discrete_coord(
       std::pair<double, double>(block.real_loc().GetX(),
                                 block.real_loc().GetY()), m_resolution));
@@ -85,6 +85,8 @@ argos::CVector2 block_distributor::dist_outside_range(
     argos::CRange<argos::Real> x_range,
     argos::CRange<argos::Real> y_range) {
   double x, y;
+  x_range.Set(x_range.GetMin() - dimension, x_range.GetMax() + dimension);
+  y_range.Set(y_range.GetMin() - dimension, y_range.GetMax() + dimension);
   do {
     x = m_rng->Uniform(
         argos::CRange<argos::Real>(m_arena_x.GetMin() + dimension,

@@ -75,6 +75,10 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
     return current_state() == ST_EXPLORE ||
         (current_state() == ST_LOCATE_BLOCK && !m_vector_fsm.in_progress());
   }
+
+  /**
+   * @brief Run the FSM in its current state without injecting an event into it.
+   */
   void run(void);
 
  protected:
@@ -84,7 +88,6 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   };
 
  private:
-  /* member functions */
   /**
    * @brief Get the previous state of the FSM. Note that this is not necessarily the state
    * that the FSM was in last time the state engine was run, but that this is
@@ -109,7 +112,9 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   bool acquire_block(void);
 
   /**
-   * @brief Acquire a known block.
+   * @brief Acquire a known block. If the robot's knowledge of the chosen
+   * block's existence expires during the pursuit of a known block, that is
+   * ignored.
    */
   void acquire_known_block(
       std::list<std::pair<const representation::block*, double>> blocks);

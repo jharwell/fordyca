@@ -60,10 +60,18 @@ class block_distributor {
 
   /**
    * @brief Distribute all blocks in the arena.
+   *
+   * @param first_time Whether or not this is the first time to distribute a
+   * block. Only matters if respawn is not enabled.
    */
   void distribute_blocks(std::vector<representation::block>& blocks,
                          bool first_time);
   void distribute_block(representation::block& block, bool first_time);
+
+  /**
+   * @brief If TRUE, then blocks should be respawned every time they are placed
+   * in the nest.
+   */
   bool respawn_enabled(void) const { return m_respawn; }
 
  private:
@@ -76,6 +84,11 @@ class block_distributor {
    * @param i The index of the block to place/distribute.
    */
   void dist_random(representation::block& block);
+
+  /**
+   * @brief Distribute a block within a small range about 75% of the way between
+   * the nest and the far wall. Assumes a horizontally rectangular arena.
+   */
   void dist_single_src(representation::block& block);
   argos::CVector2 dist_in_range(argos::CRange<argos::Real> x_range,
                                 argos::CRange<argos::Real> y_range);

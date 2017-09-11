@@ -59,8 +59,22 @@ class sensor_manager {
     return m_ground->GetReadings();
   }
 
+  /**
+   * @brief If TRUE, a block has *possibly* been detected. Only possibly,
+   * because there are some false positives, such as the first timestep, before
+   * ARGoS has finished initializing things.
+   */
   bool block_detected(void);
+
+  /**
+   * @brief If TRUE, the robot is currently in the nest, as reported by 3/4 of
+   * its ground sensors.
+   */
   bool in_nest(void);
+
+  /**
+   * @brief Get the robot's current line-of-sight (LOS)
+   */
   const representation::line_of_sight* los(void) const { return m_los.get(); }
 
   /**
@@ -75,11 +89,23 @@ class sensor_manager {
     m_los = std::move(los);
   }
 
+  /**
+   * @brief Get the robot's current location.
+   *
+   * Note that this is set via loop functions, and that robots are not capable
+   * of self-localizing. That's not the point of this project, and this was much
+   * faster/easier.
+   */
   argos::CVector2 robot_loc(void) const { return m_robot_loc; }
+
+  /**
+   * @brief Set the robot's current location.
+   */
   void robot_loc(argos::CVector2 robot_loc) {
     m_prev_robot_loc = m_robot_loc;
     m_robot_loc = robot_loc;
   }
+
   /**
    * @brief Get the robot's heading, which is computed from the previous 2
    * calculated (ahem set) robot positions.
@@ -93,7 +119,15 @@ class sensor_manager {
    * @return The heading angle.
    */
   argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
+
+  /**
+   * @brief Get the current simulation time tick.
+   */
   uint tick(void) const { return m_tick; }
+
+  /**
+   * @brief Set the current simulation time tick.
+   */
   void tick(uint tick) { m_tick = tick; }
 
   /*

@@ -47,9 +47,9 @@ class cell_perception : public visitor::visitor,
                         public visitor::can_visit<representation::perceived_cell2D,
                                                   void> {
  public:
-  explicit cell_perception(const std::shared_ptr<rcppsw::common::er_server>& server,
-                           uint8_t cell_state,
-                           representation::cell_entity* entity = nullptr);
+  cell_perception(const std::shared_ptr<rcppsw::common::er_server>& server,
+                  uint8_t cell_state,
+                  representation::cell_entity* entity = nullptr);
 
   /**
    * @brief A robot has encountered this cell during exploring or travel

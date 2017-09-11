@@ -67,12 +67,8 @@ class stat_collector {
   void collect_from_robot(const controller::random_foraging_controller& controller);
   void collect_from_block(const representation::block& block);
   void store_foraging_stats(uint timestep);
-  void store_block_stats(uint timestep);
 
  private:
-  /* member functions */
-
-  /* data members */
   struct foraging_stats m_foraging_stats;
   struct block_stats m_block_stats;
   std::string m_ofname;

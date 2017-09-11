@@ -43,7 +43,8 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief  A controller is simply an implementation of the CCI_Controller class.
+ * @brief  The most basic form of a foraging controller: roam around randomly
+ * until you find a block, and then bring it to the nest.
  */
 class random_foraging_controller : public argos::CCI_Controller,
                                    public rcppsw::common::er_client,
@@ -51,12 +52,42 @@ class random_foraging_controller : public argos::CCI_Controller,
  public:
   random_foraging_controller(void);
 
+  /**
+   * @brief If TRUE, the robot is currently searching for a block.
+   */
   bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
+
+  /**
+   * @brief If TRUE, the robot is currently returning to the nest carrying a block.
+   */
   bool is_returning(void) const { return m_fsm->is_returning(); }
+
+  /**
+   * @brief If TRUE, the robot is current engaged in collision avoidance.
+   */
   bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
+
+  /**
+   * @brief If TRUE, the robot is currently at least most of the way in the nest.
+   */
   bool in_nest(void) const { return m_sensors->in_nest(); }
+
+  /**
+   * @brief If TRUE, then the robot thinks that it is on top of a block. Note
+   * that this may be a false positive...
+   */
   bool block_detected(void) const { return m_sensors->block_detected(); }
+
+  /**
+   * @brief Set whether or not a robot is supposed to display it's ID above its
+   * head during simulation.
+   */
   void display_id(bool display_id) { m_display_id = display_id; }
+
+  /**
+   * @brief Return whether or not a robot is supposed to display it's ID above
+   * its head during simulation.
+   */
   bool display_id(void) const { return m_display_id; }
 
   /*

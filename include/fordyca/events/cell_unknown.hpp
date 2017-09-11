@@ -45,7 +45,19 @@ class cell_unknown : public cell_op {
  public:
   cell_unknown(void) {}
 
+  /**
+   * @brief Update a cell with the knowledge that it is now unknown.
+   *
+   * @param cell The cell to update.
+   */
   void visit(representation::cell2D& cell);
+
+  /**
+   * @brief Update the FSM associated with a cell with the knowledge that it is
+   * now unknown.
+   *
+   * @param cell The FSM associated with the cell to update.
+   */
   void visit(representation::cell2D_fsm& cell);
 };
 

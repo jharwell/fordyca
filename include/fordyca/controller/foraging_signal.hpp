@@ -42,9 +42,12 @@ namespace fsm = rcppsw::patterns::state_machine;
 class foraging_signal : public fsm::event_signal {
  public:
   enum type {
+    /**
+     * A block has been located (i.e. appeared within a robot's LOS)
+     */
     BLOCK_LOCATED = fsm::event_signal::EXTERNAL_SIGNALS,
-    BLOCK_ACQUIRED,
-    ARRIVED_AT_TARGET
+    BLOCK_ACQUIRED,    /// A robot has picked up a block
+    ARRIVED_AT_TARGET  /// A robot has arrived at its target
   };
 };
 
