@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/common.hpp"
+#include <utility>
+#include "fordyca/representation/cell_entity.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,26 +36,67 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block {
+/**
+ * @brief A representation of a block within the arena map. Blocks do not have
+ * state (other than if they are currently being carried by a robot). Blocks
+ * have both real (where they actually live in the world) and discretized
+ * locations (where they are mapped to within the arena map).
+ */
+class block : public cell_entity,
+              public rcppsw::patterns::visitor::visitable<block> {
  public:
-  explicit block(double dimension) : m_loc(), m_robot_index(-1),
-                                     m_carries(0), m_dimension(dimension) {}
+  explicit block(double dimension) :
+      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
 
-  const argos::CVector2& loc(void) const { return m_loc; }
+  /**
+   * @brief Get how many carries this block has had on its way from its original
+   * arena location back to the nest.
+   *
+   * @return # carries.
+   */
   size_t carries(void) const { return m_carries; }
 
-  void set_loc(const argos::CVector2& loc) { m_loc = loc; }
-  void update_on_robot_pickup(size_t index);
-  void update_on_nest_drop(void) { m_carries = 0; m_robot_index = -1; }
-  void update_on_arena_drop(const argos::CVector2& loc);
+  /**
+   * @brief Increment the # of carries this block has undergone on its way back
+   * to the nest.
+   */
+  void add_carry(void) { ++m_carries; }
+
+  /**
+   * @brief Reset the state of the block (i.e. not carried by a robot anymore).
+   */
+  void reset(void) { m_carries = 0; m_robot_index = -1; }
+
+  /**
+   * @brief Determine if a real-valued point lies within the extent of the block
+   * for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of a block.
+   *
+   * @param point The point to check.
+   *
+   * @return TRUE if the condition is met, and FALSE otherwise.
+   */
   bool contains_point(const argos::CVector2& point);
 
+  /**
+   * @brief Get the ID/index of the robot that is currently carrying this block
+   *
+   * @return The robot index, or -1 if no robot is currently carrying this block.
+   */
+  int robot_index(void) const { return m_robot_index; }
+  void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+
  private:
-  argos::CVector2 m_loc;
   int m_robot_index;
   size_t m_carries;
-  double m_dimension;
 };
+
+/*******************************************************************************
+ * Type Definitions
+ ******************************************************************************/
+typedef std::pair<const block*, double> perceived_block;
 
 NS_END(representation, fordyca);
 

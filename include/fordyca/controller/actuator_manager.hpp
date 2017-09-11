@@ -42,20 +42,19 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class actuator_manager: public fsm::simple_fsm {
  public:
-  /* constructors */
   actuator_manager(const struct actuator_params* params,
                    argos::CCI_DifferentialSteeringActuator* const wheels,
                    argos::CCI_LEDsActuator* const leds,
                    argos::CCI_RangeAndBearingActuator* const raba);
 
-  /* member functions */
   void leds_set_color(const argos::CColor& color) {
     m_leds->SetAllColors(color);
   }
 
   /*
    * Gets a direction vector as input and transforms it into wheel
-   * actuation.
+   * actuation. Note that the heading is not absolute, but rather says "change
+   * this much from the direction you are currently going in".
    */
   void set_heading(const argos::CVector2& heading,
                    bool force_hard_turn = false);
@@ -65,10 +64,23 @@ class actuator_manager: public fsm::simple_fsm {
   void set_raba_data(int data) { m_raba->SetData(0, data); }
   void reset(void);
 
+  /**
+   * @brief Direct control over the linear/angular speeds of the wheels. This
+   * provides an alternative interface much more precise rather than just saying
+   * "go in this direction now" than you get with \ref set_heading(). However,
+   * it is also more difficult to use. Note that if lin_speed + ang_speed is
+   * greater than the specified parameter value for max wheel speed for either
+   * wheel it will saturate.
+   *
+   * @param lin_speed The desired linear speed.
+   * @param ang_speed The desired angular speed.
+   */
+  void set_wheel_speeds(double lin_speed, double ang_speed);
+
  private:
+  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
   actuator_manager(const actuator_manager& fsm) = delete;
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
-  void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
 
   /*
    * The robot can be in three different turning states.
@@ -89,14 +101,14 @@ class actuator_manager: public fsm::simple_fsm {
   FSM_STATE_DECLARE(actuator_manager, no_turn, turn_data);
   FSM_STATE_DECLARE(actuator_manager, soft_turn, turn_data);
   FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {
     FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
       FSM_STATE_MAP_ENTRY(&no_turn),
           FSM_STATE_MAP_ENTRY(&soft_turn),
           FSM_STATE_MAP_ENTRY(&hard_turn),
           };
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
-    return &kSTATE_MAP[0];
+    return &kSTATE_MAP[index];
   }
 
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */

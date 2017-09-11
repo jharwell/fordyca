@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -40,7 +40,7 @@ NS_START(fordyca, support);
 class stat_collector {
  public:
   struct foraging_stats {
-    uint n_exploring;
+    uint n_searching;
     uint n_returning;
     uint n_avoiding;
   };
@@ -50,10 +50,10 @@ class stat_collector {
     uint total_carries;
   };
 
-  stat_collector(void) : m_foraging_stats(), m_block_stats(),
-                         m_ofname(), m_ofile() {}
+  explicit stat_collector(const std::string ofname) :
+      m_foraging_stats(), m_block_stats(), m_ofname(ofname), m_ofile() {}
 
-  void reset(const std::string& ofname);
+  void reset();
   void finalize(void) { m_ofile.close(); }
   uint n_collected_blocks(void) const { return m_block_stats.total_collected; }
 
@@ -64,15 +64,11 @@ class stat_collector {
    *
    * @param controller The controller to collect from.
    */
-  void collect_from_robot(const controller::foraging_controller& controller);
+  void collect_from_robot(const controller::random_foraging_controller& controller);
   void collect_from_block(const representation::block& block);
   void store_foraging_stats(uint timestep);
-  void store_block_stats(uint timestep);
 
  private:
-  /* member functions */
-
-  /* data members */
   struct foraging_stats m_foraging_stats;
   struct block_stats m_block_stats;
   std::string m_ofname;

@@ -31,6 +31,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/params.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,17 +52,83 @@ class sensor_manager {
       argos::CCI_FootBotMotorGroundSensor* const ground);
 
   /* member functions */
-  const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) {
+  const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) const {
     return m_rabs->GetReadings();
   }
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& ground(void) {
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& ground(void) const {
     return m_ground->GetReadings();
   }
 
-  void update_position(argos::CVector2& new_pos);
-
+  /**
+   * @brief If TRUE, a block has *possibly* been detected. Only possibly,
+   * because there are some false positives, such as the first timestep, before
+   * ARGoS has finished initializing things.
+   */
   bool block_detected(void);
+
+  /**
+   * @brief If TRUE, the robot is currently in the nest, as reported by 3/4 of
+   * its ground sensors.
+   */
   bool in_nest(void);
+
+  /**
+   * @brief Get the robot's current line-of-sight (LOS)
+   */
+  const representation::line_of_sight* los(void) const { return m_los.get(); }
+
+  /**
+   * @brief This is a hack to make it easy for me to run simulations, as I can
+   * computer the line of sight for a robot within the loop functions, and just
+   * pass it in here. In real robots this routine would be MUCH messier and
+   * harder to work with.
+   *
+   * @param los The new los
+   */
+  void los(std::unique_ptr<representation::line_of_sight>& los) {
+    m_los = std::move(los);
+  }
+
+  /**
+   * @brief Get the robot's current location.
+   *
+   * Note that this is set via loop functions, and that robots are not capable
+   * of self-localizing. That's not the point of this project, and this was much
+   * faster/easier.
+   */
+  argos::CVector2 robot_loc(void) const { return m_robot_loc; }
+
+  /**
+   * @brief Set the robot's current location.
+   */
+  void robot_loc(argos::CVector2 robot_loc) {
+    m_prev_robot_loc = m_robot_loc;
+    m_robot_loc = robot_loc;
+  }
+
+  /**
+   * @brief Get the robot's heading, which is computed from the previous 2
+   * calculated (ahem set) robot positions.
+   */
+  argos::CVector2 robot_heading(void) { return m_robot_loc - m_prev_robot_loc; }
+
+  /**
+   * @brief Get the angle of the current robot's heading. A shortcut to help
+   * reduce the ache in my typing fingers.
+   *
+   * @return The heading angle.
+   */
+  argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
+
+  /**
+   * @brief Get the current simulation time tick.
+   */
+  uint tick(void) const { return m_tick; }
+
+  /**
+   * @brief Set the current simulation time tick.
+   */
+  void tick(uint tick) { m_tick = tick; }
 
   /*
    * Calculates the diffusion vector. If there is a close obstacle, it points
@@ -76,15 +143,26 @@ class sensor_manager {
    */
   argos::CVector2 calc_vector_to_light(void);
 
+  /**
+   * @brief Calcucate the location of the light within the arena...not sure when
+   * I would ever need to use this...
+   */
+  argos::CVector2 calc_light_loc(const argos::CVector2& robot_loc);
+
  private:
   sensor_manager(const sensor_manager& fsm) = delete;
   sensor_manager& operator=(const sensor_manager& fsm) = delete;
 
-  std::shared_ptr<const struct sensor_params>          mc_params;
-  argos::CCI_RangeAndBearingSensor*    m_rabs; /* range and bearing sensor */
-  argos::CCI_FootBotProximitySensor*   m_proximity; /* proximity sensor */
-  argos::CCI_FootBotLightSensor*       m_light; /* light sensor */
-  argos::CCI_FootBotMotorGroundSensor* m_ground; /* motor ground sensor */
+  /** The current timestep  */
+  uint                                        m_tick;
+  std::shared_ptr<const struct sensor_params> mc_params;
+  argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
+  argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */
+  argos::CCI_FootBotLightSensor*              m_light; /* light sensor */
+  argos::CCI_FootBotMotorGroundSensor*        m_ground; /* motor ground sensor */
+  std::unique_ptr<representation::line_of_sight> m_los;
+  argos::CVector2                             m_robot_loc;
+  argos::CVector2                             m_prev_robot_loc;
 };
 
 NS_END(controller, fordyca);

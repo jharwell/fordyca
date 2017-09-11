@@ -23,8 +23,8 @@
   <!-- *************** -->
   <controllers>
 
-    <foraging_controller id="ffc"
-                                 library="build/lib/libfordyca">
+    <unpartitioned_task_controller id="ffc"
+                         library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -37,7 +37,9 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <grid cell_decay_delta="0.001"/>
+        <grid pheromone_rho="0.01"
+              resolution="0.2"
+              />
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />
@@ -45,12 +47,15 @@
         <actuators>
           <wheels hard_turn_angle_threshold="90"
                   soft_turn_angle_threshold="70"
-                  no_turn_angle_threshold="10"
+                  no_turn_angle_threshold="5"
                   max_speed="10" />
         </actuators>
-        <fsm unsuccessful_explore_dir_change="600"/>
+        <fsm unsuccessful_explore_dir_change="600"
+             frequent_collision_thresh="100"
+             nest="5, 2.5"
+             />
       </params>
-    </foraging_controller>
+    </unpartitioned_task_controller>
 
   </controllers>
 
@@ -58,47 +63,52 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="foraging_loop_functions">
-    <logging sim_stats="base-foraging-stats.txt"
-             />
+                  label="unpartitioned_task_loop_functions">
+    <logging sim_stats="base-foraging-stats.txt"/>
+    <grid resolution="0.2"/>
     <blocks n_blocks="25"
             dimension="0.2"
             dist_model="random"
             respawn="true"
             />
-    <nest size="0.5, 0.5" center="-3, 0" />
+    <nest size="0.5, 0.5" center="5, 2.5" />
+    <visualization robot_id="true"
+                   robot_los="true"
+                   block_id="true"
+                   />
+    <simulation experiment="restartable"/>
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 5, 2" center="0,0,1">
+  <arena size="10, 5, 2" center="5,2.5,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="8,0.1,0.5" movable="false">
-      <body position="0,2,0" orientation="0,0,0" />
+    <box id="wall_north" size="10,0.1,0.5" movable="false">
+      <body position="5,5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="8,0.1,0.5" movable="false">
-      <body position="0,-2,0" orientation="0,0,0" />
+    <box id="wall_south" size="10,0.1,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,4,0.5" movable="false">
-      <body position="4,0,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,5,0.5" movable="false">
+      <body position="10,2.5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,4,0.5" movable="false">
-      <body position="-4,0,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,5,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
-           position="-3,0,1.0"
+           position="5,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="4.0"
            medium="leds" />
     <distribute>
-      <position method="uniform" min="-2,-2,0" max="2,2,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="20" max_trials="100">
         <foot-bot id="fb">
@@ -131,13 +141,13 @@
     <qt-opengl>
       <camera>
         <placement idx="0"
-                   position="0,0,4.34"
-                   look_at="0,0,0"
+                   position="5,2.5,4"
+                   look_at="5,2.5,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="qt_user_functions" />
+      <user_functions label="unpartitioned_task_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

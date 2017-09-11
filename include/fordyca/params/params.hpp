@@ -50,11 +50,19 @@ struct threshold_times {
    * footboot will randomly change direction.
    */
   size_t unsuccessful_explore_dir_change;
+  /*
+   * The number of time steps between two successive collisions that will be
+   * considered excessive, and result in a random direction being added to the
+   * avoidance heading to help avoid collisions in the immediate future.
+   */
+  uint frequent_collision_thresh;
 };
 
 struct foraging_fsm_params : public base_params {
+  foraging_fsm_params(void) : deltas(), times(), nest_center() {}
   struct prob_deltas deltas;
   struct threshold_times times;
+  argos::CVector2 nest_center;
 };
 
 /*
@@ -109,7 +117,11 @@ struct sensor_params : public base_params {
 };
 
 struct block_params : public base_params {
-  block_params(void) : n_blocks(), dimension(), dist_model(), respawn() {}
+  block_params(uint n_blocks_ = 0, argos::Real dimension_ = 0.0,
+               std::string dist_model_ =  "", bool respawn_ = false) :
+      n_blocks(n_blocks_), dimension(dimension_), dist_model(dist_model_),
+      respawn(respawn_) {}
+
   uint n_blocks;
   argos::Real dimension;
   std::string dist_model;
@@ -118,28 +130,38 @@ struct block_params : public base_params {
 
 struct logging_params : public base_params {
   logging_params(void) : sim_stats() {}
+
   std::string sim_stats;
 };
 
 struct loop_functions_params : public base_params {
   loop_functions_params(void) :
-      arena_x(),
-      arena_y(),
-      nest_x(),
-      nest_y() {}
-  argos::CRange<argos::Real> arena_x;
-  argos::CRange<argos::Real> arena_y;
+      nest_x(), nest_y(), display_robot_id(false), display_robot_los(false),
+      display_block_id(false), simulation_type() {}
   argos::CRange<argos::Real> nest_x;
   argos::CRange<argos::Real> nest_y;
+  bool display_robot_id;
+  bool display_robot_los;
+  bool display_block_id;
+  std::string simulation_type;
 };
 
 struct grid_params : public base_params {
-  grid_params(void) : resolution(0.0), cell_delta(0.0),
-                      upper(), lower() {}
+  grid_params(double resolution_ = 0.0,
+              argos::CVector2 upper_ = argos::CVector2(),
+              argos::CVector2 lower_ = argos::CVector2(),
+              struct block_params block_ = block_params()) :
+      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
   double resolution;
-  double cell_delta;
   argos::CVector2 upper;
   argos::CVector2 lower;
+  struct block_params block;
+};
+
+struct perceived_grid_params : public base_params {
+  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
+  struct grid_params grid;
+  double pheromone_rho;
 };
 
 NS_END(fordyca);
