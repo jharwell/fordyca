@@ -76,16 +76,14 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
-        /*
-         * Get stats from carried block before it's dropped and its state
-         * changes.
-         */
-        block_collector()->collect(*controller.block());
 
         /* Update arena map state due to a block nest drop */
         events::block_drop drop_op(rcppsw::common::g_server,
                                        controller.block());
         map()->accept(drop_op);
+
+        /* Get stats from carried block before it's dropped */
+        block_collector()->accept(drop_op);
 
         /* Actually drop the block */
         controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(drop_op);

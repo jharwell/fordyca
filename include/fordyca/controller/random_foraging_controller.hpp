@@ -24,13 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/random_foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/base_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +46,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief  The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it to the nest.
  */
-class random_foraging_controller : public argos::CCI_Controller,
+class random_foraging_controller : public base_foraging_controller,
                                    public rcppsw::common::er_client,
                                    public visitor::visitable<random_foraging_controller> {
  public:

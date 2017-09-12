@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/base_stat_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,11 +38,13 @@ class block;
 } /* namespace representation */
 
 NS_START(support);
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_stat_collector : public base_stat_collector {
+class block_stat_collector : public base_stat_collector,
+                             public visitor::visitable<block_stat_collector> {
  public:
   explicit block_stat_collector(const std::string ofname) :
       base_stat_collector(ofname), m_block_stats() {}
@@ -49,6 +52,8 @@ class block_stat_collector : public base_stat_collector {
   virtual void reset(void);
   void collect(const representation::block& block);
   uint total_collected(void) const { return m_block_stats.total_collected; }
+  void inc_total_collected(void) { ++m_block_stats.total_collected; }
+  void inc_total_carries(uint carries) { m_block_stats.total_carries += carries; }
 
  private:
   struct block_stats {
