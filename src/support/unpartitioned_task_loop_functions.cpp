@@ -21,13 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/support/unpartitioned_task_loop_functions.hpp"
 #include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/support/unpartitioned_task_loop_functions.hpp"
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/block_pickup.hpp"
+#include "fordyca/params/loop_functions_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +53,8 @@ void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
     controller::unpartitioned_task_controller& controller =
         dynamic_cast<controller::unpartitioned_task_controller&>(
             robot.GetControllableEntity().GetController());
-    const struct loop_functions_params * l_params =
-        static_cast<const struct loop_functions_params*>(
+    const struct params::loop_functions_params * l_params =
+        static_cast<const struct params::loop_functions_params*>(
             repo()->get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);

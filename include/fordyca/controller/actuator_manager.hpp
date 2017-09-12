@@ -29,12 +29,18 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "fordyca/params/params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace params {
+struct actuator_params;
+} /* namespace params */
+
+NS_START(controller);
+
 namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
@@ -42,7 +48,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 class actuator_manager: public fsm::simple_fsm {
  public:
-  actuator_manager(const struct actuator_params* params,
+  actuator_manager(const struct params::actuator_params* params,
                    argos::CCI_DifferentialSteeringActuator* const wheels,
                    argos::CCI_LEDsActuator* const leds,
                    argos::CCI_RangeAndBearingActuator* const raba);
@@ -59,7 +65,7 @@ class actuator_manager: public fsm::simple_fsm {
   void set_heading(const argos::CVector2& heading,
                    bool force_hard_turn = false);
 
-  argos::Real max_wheel_speed(void) { return mc_params->wheels.max_speed; }
+  double max_wheel_speed(void) const;
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
   void reset(void);
@@ -114,7 +120,7 @@ class actuator_manager: public fsm::simple_fsm {
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
-  std::shared_ptr<const struct actuator_params>  mc_params;
+  std::shared_ptr<const struct params::actuator_params>  mc_params;
 
 };
 

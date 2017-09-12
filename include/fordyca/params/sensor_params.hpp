@@ -1,5 +1,5 @@
 /**
- * @file line_of_sight.cpp
+ * @file sensor_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,53 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include <argos3/core/utility/math/range.h>
+#include <argos3/core/utility/math/angles.h>
+#include "fordyca/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-std::list<const representation::block*> line_of_sight::blocks(void) {
-  std::list<const representation::block*> blocks;
-  for (auto i = m_view.origin();
-       i < m_view.origin() + m_view.num_elements(); ++i) {
-    if ((*i)->state_has_block()) {
-      blocks.push_back((*i)->block());
-    }
-  } /* for(i..) */
-  return blocks;
-} /* blocks() */
+struct diffusion_params {
+  diffusion_params() :
+      delta(0.0),
+      go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
 
-cell2D& line_of_sight::cell(size_t i, size_t j) const {
-  assert(i < m_view.shape()[0]);
-  assert(j < m_view.shape()[1]);
-  return *m_view[i][j];
-}
+  /*
+   * Maximum tolerance for the proximity reading between the robot and the
+   * closest obstacle.  The proximity reading is 0 when nothing is detected and
+   * grows exponentially to 1 when the obstacle is touching the robot.
+   */
+  double delta;
 
-discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
-  int abs_i_coord, abs_j_coord;
-  if (i < sizex()/2) {
-    abs_i_coord = m_center.first - i;
-  } else {
-    abs_i_coord = m_center.first + i;
-  }
-  if (j < sizey()/2) {
-    abs_j_coord = m_center.second - j;
-  } else {
-    abs_j_coord = m_center.second + j;
-  }
-  assert(abs_i_coord > 0);
-  assert(abs_j_coord > 0);
-  return discrete_coord(abs_i_coord, abs_j_coord);
-} /* cell_abs_coord() */
+  /* Angle tolerance range to go straight. */
+  argos::CRange<argos::CRadians> go_straight_angle_range;
+};
 
-NS_END(representation, fordyca);
+struct sensor_params : public base_params {
+  sensor_params(void) : diffusion() {}
+
+  struct diffusion_params diffusion;
+};
+
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_ */

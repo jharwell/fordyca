@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
 #include "fordyca/params/base_parser.hpp"
+#include "fordyca/params/logging_params.hpp"
 
 /*******************************************************************************
  * Namespaces

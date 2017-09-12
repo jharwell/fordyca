@@ -97,8 +97,6 @@ class cell2D : public visitor::visitable<cell2D> {
   cell2D_fsm m_fsm;
 };
 
-
 NS_END(representation, fordyca);
-
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */

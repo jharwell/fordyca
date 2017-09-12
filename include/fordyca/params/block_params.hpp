@@ -1,32 +1,31 @@
 /**
- * @file actuator_parser.hpp
+ * @file block_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of RCPPSW.
+ * This file is part of FORDYCA.
  *
- * RCPPSW is free software: you can redistribute it and/or modify it under the
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * RCPPSW.  If not, see <http://www.gnu.org/licenses/
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/actuator_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include <string>
+#include "fordyca/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +33,20 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class actuator_parser : public base_parser {
- public:
-  actuator_parser(void) : m_params() {}
+struct block_params : public base_params {
+  block_params(uint n_blocks_ = 0, double dimension_ = 0.0,
+               std::string dist_model_ =  "", bool respawn_ = false) :
+      n_blocks(n_blocks_), dimension(dimension_), dist_model(dist_model_),
+      respawn(respawn_) {}
 
-  void parse(argos::TConfigurationNode& node);
-  const struct actuator_params* get_results(void) { return m_params.get(); }
-  void show(std::ostream& stream);
-
- private:
-  std::unique_ptr<struct actuator_params> m_params;
+  uint n_blocks;
+  double dimension;
+  std::string dist_model;
+  bool respawn;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_ */

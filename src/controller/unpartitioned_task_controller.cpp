@@ -25,6 +25,7 @@
 #include "fordyca/params/unpartitioned_task_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_pickup.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,12 +74,12 @@ void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
 
   m_map.reset(new representation::perceived_arena_map(
       server(),
-      static_cast<const struct perceived_grid_params*>(
+      static_cast<const struct params::perceived_grid_params*>(
           param_repo.get_params("perceived_grid")),
       GetId()));
 
   m_fsm.reset(
-      new unpartitioned_task_fsm(static_cast<const struct foraging_fsm_params*>(
+      new unpartitioned_task_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
                        server(),
                        sensors(),

@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include <list>
 #include <utility>
+#include <string>
 
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "rcppsw/common/er_server.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +41,8 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+class line_of_sight;
+
 /**
  * @brief The arena map stores a logical representation of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
@@ -50,7 +52,7 @@ class perceived_arena_map: public rcppsw::common::er_client,
                            public rcppsw::patterns::visitor::visitable<perceived_arena_map> {
  public:
   perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
-                      const struct perceived_grid_params* params,
+                      const struct params::perceived_grid_params* params,
                       const std::string& robot_id);
 
   /**

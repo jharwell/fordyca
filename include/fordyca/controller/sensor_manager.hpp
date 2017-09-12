@@ -30,28 +30,32 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+
+namespace params {
+struct sensor_params;
+} /* namespace params */
+
+NS_START(controller);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class sensor_manager {
  public:
-  /* constructors */
   sensor_manager(
-      const struct sensor_params* params,
+      const struct params::sensor_params* params,
       argos::CCI_RangeAndBearingSensor* const rabs,
       argos::CCI_FootBotProximitySensor* const proximity,
       argos::CCI_FootBotLightSensor* const light,
       argos::CCI_FootBotMotorGroundSensor* const ground);
 
-  /* member functions */
   const argos::CCI_RangeAndBearingSensor::TReadings& range_and_bearing(void) const {
     return m_rabs->GetReadings();
   }
@@ -158,7 +162,7 @@ class sensor_manager {
 
   /** The current timestep  */
   uint                                        m_tick;
-  std::shared_ptr<const struct sensor_params> mc_params;
+  std::shared_ptr<const struct params::sensor_params> mc_params;
   argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
   argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */
   argos::CCI_FootBotLightSensor*              m_light; /* light sensor */

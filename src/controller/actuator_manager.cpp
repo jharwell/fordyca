@@ -26,6 +26,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
+#include "fordyca/params/actuator_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +37,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 actuator_manager::actuator_manager(
-    const struct actuator_params* params,
+    const struct params::actuator_params* params,
     argos::CCI_DifferentialSteeringActuator* const wheels,
     argos::CCI_LEDsActuator* const leds,
     argos::CCI_RangeAndBearingActuator* const raba) :
@@ -90,7 +91,7 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
     internal_event(ST_NO_TURN);
   }
   /* Both wheels go straight, but one is faster than the other */
-  argos::Real speed_factor = (mc_params->wheels.hard_turn_threshold -
+  double speed_factor = (mc_params->wheels.hard_turn_threshold -
                               Abs(data->heading.Angle())) /
                              mc_params->wheels.hard_turn_threshold;
   double speed1 = data->heading.Length() - data->heading.Length() *
@@ -118,7 +119,7 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
  ******************************************************************************/
 void actuator_manager::set_wheel_speeds(double speed1, double speed2,
                                         argos::CRadians heading) {
-  argos::Real left_wheel_speed, right_wheel_speed;
+  double left_wheel_speed, right_wheel_speed;
   if (heading > argos::CRadians::ZERO) {
     /* Turn Left */
     left_wheel_speed  = speed1;
@@ -130,15 +131,15 @@ void actuator_manager::set_wheel_speeds(double speed1, double speed2,
   }
 
   /* Finally, set the wheel speeds */
-  left_wheel_speed = argos::Min<argos::Real>(left_wheel_speed,
+  left_wheel_speed = argos::Min<double>(left_wheel_speed,
                                              mc_params->wheels.max_speed);
-  right_wheel_speed = argos::Min<argos::Real>(right_wheel_speed,
+  right_wheel_speed = argos::Min<double>(right_wheel_speed,
                                              mc_params->wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
 void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
-  argos::Real left_wheel_speed, right_wheel_speed;
+  double left_wheel_speed, right_wheel_speed;
 
   if (ang_speed < 0) {
     right_wheel_speed = lin_speed + ang_speed;
@@ -148,7 +149,6 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
      right_wheel_speed  = lin_speed;
   }
 
-  /* Finally, set the wheel speeds */
   left_wheel_speed = std::min(left_wheel_speed, mc_params->wheels.max_speed);
   right_wheel_speed = std::min(right_wheel_speed, mc_params->wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
@@ -158,5 +158,9 @@ void actuator_manager::reset(void) {
   m_raba->ClearData();
   simple_fsm::init();
 } /* reset() */
+
+double actuator_manager::max_wheel_speed(void) const {
+  return mc_params->wheels.max_speed;
+} /* max_wheel_speed() */
 
 NS_END(controller, fordyca);

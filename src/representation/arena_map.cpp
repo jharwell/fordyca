@@ -33,7 +33,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct grid_params* params,
+arena_map::arena_map(const struct params::grid_params* params,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
     m_blocks(params->block.n_blocks,

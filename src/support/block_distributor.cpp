@@ -22,11 +22,31 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/params/block_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+block_distributor::block_distributor(double resolution,
+                                     argos::CRange<double> arena_x,
+                                     argos::CRange<double> arena_y,
+                                     argos::CRange<double> nest_x,
+                                     argos::CRange<double> nest_y,
+                                     const struct params::block_params* params) :
+    m_resolution(resolution),
+    m_dist_model(params->dist_model),
+    m_respawn(params->respawn),
+    m_arena_x(arena_x),
+    m_arena_y(arena_y),
+    m_nest_x(nest_x),
+    m_nest_y(nest_y),
+    m_rng(argos::CRandom::CreateRNG("argos")) {}
 
 /*******************************************************************************
  * Member Functions
@@ -63,8 +83,8 @@ void block_distributor::dist_single_src(representation::block& block) {
    * Find the 3/4 point between the nest and the source along the Y (horizontal)
    * direction, and put all the blocks around there.
    */
-  argos::CRange<argos::Real> y_range = m_nest_y;
-  argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(
+  argos::CRange<double> y_range = m_nest_y;
+  argos::CRange<double> x_range = argos::CRange<double>(
       m_arena_x.GetMax() * 0.75 - 0.5,
       m_arena_x.GetMax() * 0.75);
   block.real_loc(dist_in_range(x_range, y_range));
@@ -74,25 +94,25 @@ void block_distributor::dist_single_src(representation::block& block) {
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(
-    argos::CRange<argos::Real> x_range,
-    argos::CRange<argos::Real> y_range) {
+    argos::CRange<double> x_range,
+    argos::CRange<double> y_range) {
   return argos::CVector2(m_rng->Uniform(x_range),
                          m_rng->Uniform(y_range));
 } /* dist_in_range() */
 
 argos::CVector2 block_distributor::dist_outside_range(
     double dimension,
-    argos::CRange<argos::Real> x_range,
-    argos::CRange<argos::Real> y_range) {
+    argos::CRange<double> x_range,
+    argos::CRange<double> y_range) {
   double x, y;
   x_range.Set(x_range.GetMin() - dimension, x_range.GetMax() + dimension);
   y_range.Set(y_range.GetMin() - dimension, y_range.GetMax() + dimension);
   do {
     x = m_rng->Uniform(
-        argos::CRange<argos::Real>(m_arena_x.GetMin() + dimension,
+        argos::CRange<double>(m_arena_x.GetMin() + dimension,
                                    m_arena_x.GetMax() - dimension));
     y = m_rng->Uniform(
-        argos::CRange<argos::Real>(m_arena_y.GetMin() + dimension,
+        argos::CRange<double>(m_arena_y.GetMin() + dimension,
                                    m_arena_y.GetMax() - dimension));
   } while (x_range.WithinMinBoundIncludedMaxBoundIncluded(x) &&
            y_range.WithinMinBoundIncludedMaxBoundIncluded(y));

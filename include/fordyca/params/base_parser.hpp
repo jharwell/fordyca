@@ -27,7 +27,7 @@
 #include <fstream>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces

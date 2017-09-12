@@ -27,6 +27,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+#include "fordyca/params/sensor_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +38,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 sensor_manager::sensor_manager(
-    const struct sensor_params* params,
+    const struct params::sensor_params* params,
     argos::CCI_RangeAndBearingSensor* const rabs,
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,

@@ -24,6 +24,9 @@
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/params/random_foraging_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,13 +82,13 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
   param_repo.show_all(server_handle()->log_stream());
 
   m_actuators.reset(new actuator_manager(
-      static_cast<const struct actuator_params*>(
+      static_cast<const struct params::actuator_params*>(
           param_repo.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
   m_sensors.reset(new sensor_manager(
-      static_cast<const struct sensor_params*>(
+      static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
@@ -93,7 +96,7 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
   m_fsm.reset(
-      new random_foraging_fsm(static_cast<const struct foraging_fsm_params*>(
+      new random_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
                        m_server,
                        m_sensors,

@@ -25,6 +25,7 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +37,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 random_foraging_fsm::random_foraging_fsm(
-    const struct foraging_fsm_params* params,
+    const struct params::fsm_params* params,
     std::shared_ptr<rcppsw::common::er_server> server,
     std::shared_ptr<sensor_manager> sensors,
     std::shared_ptr<actuator_manager> actuators) :
