@@ -26,6 +26,7 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/support/block_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,6 +62,11 @@ void block_drop::visit(representation::arena_map& map) {
   assert(-1 != robot_index);
   m_block->accept(*this);
   ER_NOM("fb%d dropped block%d in nest", robot_index, m_block->id());
+} /* visit() */
+
+void block_drop::visit(support::block_stat_collector& collector) {
+  collector.inc_total_collected();
+  collector.inc_total_carries(m_block->carries());
 } /* visit() */
 
 void block_drop::visit(representation::block& block) {

@@ -51,6 +51,7 @@ random_foraging_controller::random_foraging_controller(void) :
          rcppsw::common::er_lvl::NOM);
   server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
   server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
+
 }
 
 /*******************************************************************************

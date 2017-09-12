@@ -42,6 +42,10 @@ class arena_map;
 class block;
 } /* namespace representation */
 
+namespace support {
+class block_stat_collector;
+} /* namespace support */
+
 NS_START(events);
 
 /*******************************************************************************
@@ -82,6 +86,8 @@ class block_drop : public block_op, public rcppsw::common::er_client {
    * @param block The block to update.
    */
   void visit(representation::block& block);
+
+  void visit(support::block_stat_collector& collector);
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.

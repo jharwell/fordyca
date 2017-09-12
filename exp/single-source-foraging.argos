@@ -65,6 +65,7 @@
                   label="unpartitioned_task_loop_functions">
     <logging robot_stats="robot-stats.txt"
              block_stats="block-stats.txt"
+             />
     <grid resolution="0.2"/>
     <blocks n_blocks="25"
             dimension="0.2"
