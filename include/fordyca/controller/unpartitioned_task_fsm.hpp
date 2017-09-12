@@ -71,9 +71,13 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool is_searching_for_block(void) {
+  bool is_searching_for_block(void) const {
     return current_state() == ST_EXPLORE ||
         (current_state() == ST_LOCATE_BLOCK && !m_vector_fsm.in_progress());
+  }
+
+  bool is_vectoring(void) const {
+    return current_state() == ST_LOCATE_BLOCK && m_vector_fsm.in_progress();
   }
 
   /**

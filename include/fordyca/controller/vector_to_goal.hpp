@@ -59,7 +59,7 @@ class vector_to_goal : public fsm::simple_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool arrived_at_goal(void) { return current_state() == ST_ARRIVED; }
+  bool arrived_at_goal(void) const { return current_state() == ST_ARRIVED; }
 
   /**
    * @brief Determine if the robot is still on the way to the specified
@@ -67,7 +67,7 @@ class vector_to_goal : public fsm::simple_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool in_progress(void) {
+  bool in_progress(void) const {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
 

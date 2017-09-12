@@ -1,5 +1,5 @@
 /**
- * @file logging_parser.cpp
+ * @file block_stat_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,27 +21,41 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/logging_parser.hpp"
+#include "fordyca/support/block_stat_collector.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void logging_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct logging_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
-  argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "rblock_stats", m_params->block_stats);
-} /* parse() */
+std::string block_stat_collector::csv_header_build(const std::string& header) {
+  return base_stat_collector::csv_header_build(header) +
+      "collected_blocks;avg_carries";
+} /* csv_header_build() */
 
-void logging_parser::show(std::ostream& stream) {
-  stream << "====================\nLogging params\n====================\n";
-  stream << "robot_stats=" << m_params->robot_stats << std::endl;
-  stream << "block_stats=" << m_params->block_stats << std::endl;
-} /* show() */
+void block_stat_collector::reset(void) {
+  base_stat_collector::reset();
+  m_block_stats = {0, 0};
+} /* reset() */
 
-NS_END(params, fordyca);
+std::string block_stat_collector::csv_line_build(void) {
+  double avg_carries = 0;
+  if (m_block_stats.total_collected > 0) {
+    avg_carries = static_cast<double>(m_block_stats.total_collected/
+                                      m_block_stats.total_carries);
+  }
+  return std::to_string(m_block_stats.total_collected) + ";" +
+      std::to_string(avg_carries) + ";";
+} /* csv_line_build() */
+
+void block_stat_collector::collect(const representation::block& block) {
+  ++m_block_stats.total_collected;
+  m_block_stats.total_carries += block.carries();
+} /* collect() */
+
+
+NS_END(support, fordyca);

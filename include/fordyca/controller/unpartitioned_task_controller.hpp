@@ -63,9 +63,9 @@ class unpartitioned_task_controller : public random_foraging_controller,
   /**
    * @brief If TRUE, then the robot is currently searching for a block.
    */
-  virtual bool is_searching_for_block(void) {
-    return m_fsm->is_searching_for_block();
-  }
+  bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
+
+  bool is_vectoring(void) const { return m_fsm->is_vectoring(); }
 
   /*
    * @brief Initialize the controller.

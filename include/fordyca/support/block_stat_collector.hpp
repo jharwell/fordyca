@@ -1,5 +1,5 @@
 /**
- * @file logging_parser.cpp
+ * @file block_stat_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/logging_parser.hpp"
+#include <string>
+#include "fordyca/support/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca);
+
+namespace representation {
+class block;
+} /* namespace representation */
+
+NS_START(support);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void logging_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct logging_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
-  argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "rblock_stats", m_params->block_stats);
-} /* parse() */
+class block_stat_collector : public base_stat_collector {
+ public:
+  explicit block_stat_collector(const std::string ofname) :
+      base_stat_collector(ofname), m_block_stats() {}
 
-void logging_parser::show(std::ostream& stream) {
-  stream << "====================\nLogging params\n====================\n";
-  stream << "robot_stats=" << m_params->robot_stats << std::endl;
-  stream << "block_stats=" << m_params->block_stats << std::endl;
-} /* show() */
+  virtual void reset(void);
+  void collect(const representation::block& block);
+  uint total_collected(void) const { return m_block_stats.total_collected; }
 
-NS_END(params, fordyca);
+ private:
+  struct block_stats {
+    uint total_collected;
+    uint total_carries;
+  };
+
+  std::string csv_header_build(const std::string& header = "");
+  std::string csv_line_build(void);
+
+  struct block_stats m_block_stats;
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_ */

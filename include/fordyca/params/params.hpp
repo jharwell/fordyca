@@ -129,9 +129,10 @@ struct block_params : public base_params {
 };
 
 struct logging_params : public base_params {
-  logging_params(void) : sim_stats() {}
+  logging_params(void) : robot_stats(), block_stats() {}
 
-  std::string sim_stats;
+  std::string robot_stats;
+  std::string block_stats;
 };
 
 struct loop_functions_params : public base_params {

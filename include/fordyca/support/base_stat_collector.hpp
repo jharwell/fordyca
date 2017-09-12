@@ -1,5 +1,5 @@
 /**
- * @file logging_parser.cpp
+ * @file base_stat_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,47 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_STAT_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BASE_STAT_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/logging_parser.hpp"
+#include <string>
+#include <fstream>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void logging_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct logging_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
-  argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "rblock_stats", m_params->block_stats);
-} /* parse() */
+class base_stat_collector {
+ public:
+  explicit base_stat_collector(const std::string ofname) :
+      m_ofname(ofname), m_ofile() {}
+  virtual ~base_stat_collector(void) {}
 
-void logging_parser::show(std::ostream& stream) {
-  stream << "====================\nLogging params\n====================\n";
-  stream << "robot_stats=" << m_params->robot_stats << std::endl;
-  stream << "block_stats=" << m_params->block_stats << std::endl;
-} /* show() */
+  virtual void reset();
+  virtual void reset_on_timestep(void) {}
+  void csv_line_write(uint timestep);
+  void finalize(void) { m_ofile.close(); }
 
-NS_END(params, fordyca);
+ protected:
+  virtual std::string csv_header_build(const std::string& header = "");
+  virtual std::string csv_line_build(void) = 0;
+
+  void csv_header_write(void);
+  std::ofstream& ofile(void) { return m_ofile; }
+
+ private:
+  std::string m_ofname;
+  std::ofstream m_ofile;
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_STAT_COLLECTOR_HPP_ */

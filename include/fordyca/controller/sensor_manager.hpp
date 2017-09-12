@@ -131,12 +131,15 @@ class sensor_manager {
   void tick(uint tick) { m_tick = tick; }
 
   /*
-   * Calculates the diffusion vector. If there is a close obstacle, it points
-   * away from it; it there is none, it points forwards.  The b_collision
-   * parameter is used to return true or false whether a collision avoidance
-   * just happened or not. It is necessary for the collision rule.
+   * @brief Calculates the diffusion vector.
+   *
+   * If there is a close obstacle, it points away from it; it there is none, it
+   * points forwards.  The b_collision parameter is used to return true or false
+   * whether a collision avoidance just happened or not. It is necessary for the
+   * collision rule.
    */
   bool calc_diffusion_vector(argos::CVector2* const vector);
+
   /*
    * Calculates the vector to the light. Used to perform
    * phototaxis and antiphototaxis.
