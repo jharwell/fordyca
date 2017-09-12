@@ -31,7 +31,6 @@
 #include "rcppsw/swarm/pheromone_density.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces

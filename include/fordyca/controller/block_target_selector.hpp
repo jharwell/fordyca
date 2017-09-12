@@ -29,7 +29,6 @@
 
 #include "rcppsw/common/er_client.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces

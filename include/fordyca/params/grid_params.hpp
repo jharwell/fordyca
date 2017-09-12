@@ -1,5 +1,5 @@
 /**
- * @file line_of_sight.cpp
+ * @file grid_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,53 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "fordyca/params/base_params.hpp"
+#include "fordyca/params/block_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-std::list<const representation::block*> line_of_sight::blocks(void) {
-  std::list<const representation::block*> blocks;
-  for (auto i = m_view.origin();
-       i < m_view.origin() + m_view.num_elements(); ++i) {
-    if ((*i)->state_has_block()) {
-      blocks.push_back((*i)->block());
-    }
-  } /* for(i..) */
-  return blocks;
-} /* blocks() */
+struct grid_params : public base_params {
+  grid_params(double resolution_ = 0.0,
+              argos::CVector2 upper_ = argos::CVector2(),
+              argos::CVector2 lower_ = argos::CVector2(),
+              struct block_params block_ = block_params()) :
+      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
+  double resolution;
+  argos::CVector2 upper;
+  argos::CVector2 lower;
+  struct block_params block;
+};
 
-cell2D& line_of_sight::cell(size_t i, size_t j) const {
-  assert(i < m_view.shape()[0]);
-  assert(j < m_view.shape()[1]);
-  return *m_view[i][j];
-}
+struct perceived_grid_params : public base_params {
+  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
+  struct grid_params grid;
+  double pheromone_rho;
+};
 
-discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
-  int abs_i_coord, abs_j_coord;
-  if (i < sizex()/2) {
-    abs_i_coord = m_center.first - i;
-  } else {
-    abs_i_coord = m_center.first + i;
-  }
-  if (j < sizey()/2) {
-    abs_j_coord = m_center.second - j;
-  } else {
-    abs_j_coord = m_center.second + j;
-  }
-  assert(abs_i_coord > 0);
-  assert(abs_j_coord > 0);
-  return discrete_coord(abs_i_coord, abs_j_coord);
-} /* cell_abs_coord() */
+NS_END(params, fordyca);
 
-NS_END(representation, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_ */

@@ -29,7 +29,7 @@
 #include <string>
 #include <map>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/base_params.hpp"
 #include "fordyca/params/base_parser.hpp"
 #include "rcppsw/common/er_client.hpp"
 #include "rcppsw/patterns/factory/releasing_factory.hpp"

@@ -24,6 +24,7 @@
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/support/random_foraging_qt_user_functions.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -28,8 +28,6 @@
 #include <list>
 #include <utility>
 #include "fordyca/representation/grid2D.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
@@ -37,10 +35,12 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+class block;
+class cell2D;
+
 /**
  * @brief A representation of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in

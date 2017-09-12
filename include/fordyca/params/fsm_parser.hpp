@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************
@@ -41,11 +41,11 @@ class fsm_parser: public base_parser {
   fsm_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node);
-  const struct foraging_fsm_params* get_results(void) { return m_params.get(); }
+  const struct fsm_params* get_results(void) { return m_params.get(); }
   void show(std::ostream& stream);
 
  private:
-  std::unique_ptr<struct foraging_fsm_params> m_params;
+  std::unique_ptr<struct fsm_params> m_params;
 };
 
 NS_END(params, fordyca);

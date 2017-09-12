@@ -28,7 +28,6 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcsw/common/common.h"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
-#include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
@@ -36,7 +35,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace params {
+struct fsm_params;
+} /* namespace params */
+
+NS_START(controller);
 namespace fsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
@@ -49,7 +54,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  */
 class random_foraging_fsm : public fsm::hfsm {
  public:
-  random_foraging_fsm(const struct foraging_fsm_params* params,
+  random_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,
                       std::shared_ptr<sensor_manager> sensors,
                       std::shared_ptr<actuator_manager> actuators);

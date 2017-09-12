@@ -35,7 +35,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace params {
+struct grid_params;
+} /* namespace params */
+
+NS_START(representation);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,7 +54,7 @@ NS_START(fordyca, representation);
 class arena_map: public rcppsw::common::er_client,
                  public rcppsw::patterns::visitor::visitable<arena_map> {
  public:
-  arena_map(const struct grid_params* params,
+  arena_map(const struct params::grid_params* params,
             argos::CRange<argos::Real> nest_x,
             argos::CRange<argos::Real> nest_y);
 

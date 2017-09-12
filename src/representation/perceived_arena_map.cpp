@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/cell_perception.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/params/grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +36,8 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const struct perceived_grid_params* params, const std::string& robot_id) :
+    const struct params::perceived_grid_params* params,
+    const std::string& robot_id) :
     m_server(server), m_grid(&params->grid) {
   deferred_init(m_server);
   insmod("perceived_arena_map",

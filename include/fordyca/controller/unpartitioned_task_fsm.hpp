@@ -30,7 +30,6 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
-#include "fordyca/params/params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -40,9 +39,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-namespace fsm = rcppsw::patterns::state_machine;
+NS_START(fordyca);
 
+namespace params {
+struct fsm_params;
+} /* namespace params */
+
+NS_START(controller);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -54,7 +57,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  */
 class unpartitioned_task_fsm : public random_foraging_fsm {
  public:
-  unpartitioned_task_fsm(const struct foraging_fsm_params* params,
+  unpartitioned_task_fsm(const struct params::fsm_params* params,
                const std::shared_ptr<rcppsw::common::er_server>& server,
                const std::shared_ptr<sensor_manager>& sensors,
                const std::shared_ptr<actuator_manager>& actuators,

@@ -29,13 +29,21 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
-#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace representation {
+class block;
+} /* namespace representation */
+
+namespace params {
+struct block_params;
+} /* namespace params */
+
+NS_START(support);
 
 /*******************************************************************************
  * Class Definitions
@@ -43,20 +51,11 @@ NS_START(fordyca, support);
 class block_distributor {
  public:
   block_distributor(double resolution,
-                    argos::CRange<argos::Real> arena_x,
-                    argos::CRange<argos::Real> arena_y,
-                    argos::CRange<argos::Real> nest_x,
-                    argos::CRange<argos::Real> nest_y,
-                    const struct block_params* params) :
-      m_resolution(resolution),
-      m_dist_model(params->dist_model),
-      m_respawn(params->respawn),
-      m_arena_x(arena_x),
-      m_arena_y(arena_y),
-      m_nest_x(nest_x),
-      m_nest_y(nest_y),
-      m_rng(argos::CRandom::CreateRNG("argos")) {}
-
+                    argos::CRange<double> arena_x,
+                    argos::CRange<double> arena_y,
+                    argos::CRange<double> nest_x,
+                    argos::CRange<double> nest_y,
+                    const struct params::block_params* params);
 
   /**
    * @brief Distribute all blocks in the arena.
@@ -90,11 +89,11 @@ class block_distributor {
    * the nest and the far wall. Assumes a horizontally rectangular arena.
    */
   void dist_single_src(representation::block& block);
-  argos::CVector2 dist_in_range(argos::CRange<argos::Real> x_range,
-                                argos::CRange<argos::Real> y_range);
+  argos::CVector2 dist_in_range(argos::CRange<double> x_range,
+                                argos::CRange<double> y_range);
   argos::CVector2 dist_outside_range(double dimension,
-                                     argos::CRange<argos::Real> x_range,
-                                     argos::CRange<argos::Real> y_range);
+                                     argos::CRange<double> x_range,
+                                     argos::CRange<double> y_range);
 
   block_distributor(const block_distributor& s) = delete;
   block_distributor& operator=(const block_distributor& s) = delete;
@@ -102,10 +101,10 @@ class block_distributor {
   double m_resolution;
   std::string m_dist_model;
   bool m_respawn;
-  argos::CRange<argos::Real> m_arena_x;
-  argos::CRange<argos::Real> m_arena_y;
-  argos::CRange<argos::Real> m_nest_x;
-  argos::CRange<argos::Real> m_nest_y;
+  argos::CRange<double> m_arena_x;
+  argos::CRange<double> m_arena_y;
+  argos::CRange<double> m_nest_x;
+  argos::CRange<double> m_nest_y;
   argos::CRandom::CRNG* m_rng;
 };
 

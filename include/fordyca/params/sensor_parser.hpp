@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************

@@ -21,11 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/unpartitioned_task_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/unpartitioned_task_fsm.hpp"
 #include "fordyca/controller/block_target_selector.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +38,7 @@ namespace fsm = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 unpartitioned_task_fsm::unpartitioned_task_fsm(
-    const struct foraging_fsm_params* params,
+    const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<sensor_manager>& sensors,
     const std::shared_ptr<actuator_manager>& actuators,

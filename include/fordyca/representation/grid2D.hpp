@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <argos/core/utility/math/vector2.h>
 #include "rcppsw/common/er_server.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +61,7 @@ template<typename T>
 class grid2D {
  public:
   /* constructors/destructor */
-  explicit grid2D(const grid_params* params,
+  explicit grid2D(const params::grid_params* params,
                   const std::shared_ptr<rcppsw::common::er_server>& server =
                           rcppsw::common::g_server) :
       m_resolution(params->resolution),

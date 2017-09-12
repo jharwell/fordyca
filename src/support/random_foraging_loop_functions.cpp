@@ -28,6 +28,8 @@
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/block_pickup.hpp"
+#include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/params/logging_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,16 +72,16 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* Capture parsed parameters in logfile */
   m_repo->show_all(rcppsw::common::g_server->log_stream());
 
-  const struct loop_functions_params * l_params =
-      static_cast<const struct loop_functions_params*>(
+  const struct params::loop_functions_params * l_params =
+      static_cast<const struct params::loop_functions_params*>(
       m_repo->get_params("loop_functions"));
   m_nest_x = l_params->nest_x;
   m_nest_y = l_params->nest_y;
   m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
-  const struct grid_params * grid_params =
-      static_cast<const struct grid_params*>(
+  const struct params::grid_params * grid_params =
+      static_cast<const struct params::grid_params*>(
           m_repo->get_params("grid"));
   m_map.reset(new representation::arena_map(grid_params, m_nest_x, m_nest_y));
   m_map->distribute_blocks(true);
@@ -89,10 +91,10 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   /* initialize stat collecting */
   m_robot_collector.reset(new robot_stat_collector(
-      static_cast<const struct logging_params*>(
+      static_cast<const struct params::logging_params*>(
           m_repo->get_params("logging"))->robot_stats));
   m_block_collector.reset(new block_stat_collector(
-      static_cast<const struct logging_params*>(
+      static_cast<const struct params::logging_params*>(
           m_repo->get_params("logging"))->block_stats));
   m_block_collector->reset();
   m_robot_collector->reset();
