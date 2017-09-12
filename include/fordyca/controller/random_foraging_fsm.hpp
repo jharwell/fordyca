@@ -55,22 +55,20 @@ class random_foraging_fsm : public fsm::hfsm {
                       std::shared_ptr<actuator_manager> actuators);
 
   /**
-   * @brief If TRUE the robot is currently attempting to locate a block in the
-   * arena (either via exploration or via vectoring to a "known" block).
-   *
+   * @brief If TRUE the robot is roaming around looking for a block.
    */
-  virtual bool is_searching_for_block(void);
+  virtual bool is_exploring(void) const;
 
   /**
    * @brief If TRUE, the robot is returning to the nest, probably after having
    * successfully picked up a block.
    */
-  virtual bool is_returning(void);
+  virtual bool is_returning(void) const;
 
   /**
    * @brief If TRUE, the robot is currently engaged in collision avoidance.
    */
-  virtual bool is_avoiding_collision(void);
+  virtual bool is_avoiding_collision(void) const;
 
   /**
    * @brief (Re)-initialize the FSM.

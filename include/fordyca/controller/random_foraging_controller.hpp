@@ -55,7 +55,7 @@ class random_foraging_controller : public argos::CCI_Controller,
   /**
    * @brief If TRUE, the robot is currently searching for a block.
    */
-  bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
+  bool is_exploring(void) const { return m_fsm->is_exploring(); }
 
   /**
    * @brief If TRUE, the robot is currently returning to the nest carrying a block.

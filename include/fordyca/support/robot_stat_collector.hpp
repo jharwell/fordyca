@@ -55,6 +55,7 @@ class robot_stat_collector : public base_stat_collector {
  private:
   struct robot_stats {
     uint n_searching;
+    uint n_exploring;
     uint n_returning;
     uint n_avoiding;
     uint n_vectoring;

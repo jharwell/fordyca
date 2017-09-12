@@ -35,7 +35,7 @@ void logging_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct logging_params);
   argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
   argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "rblock_stats", m_params->block_stats);
+  argos::GetNodeAttribute(lnode, "block_stats", m_params->block_stats);
 } /* parse() */
 
 void logging_parser::show(std::ostream& stream) {

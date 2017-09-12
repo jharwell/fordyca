@@ -94,6 +94,8 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_block_collector.reset(new block_stat_collector(
       static_cast<const struct logging_params*>(
           m_repo->get_params("logging"))->block_stats));
+  m_block_collector->reset();
+  m_robot_collector->reset();
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -163,7 +165,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.is_searching_for_block() &&
+      if (!controller.in_nest() && controller.is_exploring() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
