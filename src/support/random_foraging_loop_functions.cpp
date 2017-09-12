@@ -44,7 +44,8 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_floor(NULL),
     m_sim_type(),
     m_repo(new params::loop_function_repository),
-    m_collector(),
+    m_robot_collector(),
+    m_block_collector(),
     m_map() {
   insmod("loop_functions",
          rcppsw::common::er_lvl::DIAG,
@@ -87,9 +88,14 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_collector.reset(new stat_collector(
+  m_robot_collector.reset(new robot_stat_collector(
       static_cast<const struct logging_params*>(
-          m_repo->get_params("logging"))->sim_stats));
+          m_repo->get_params("logging"))->robot_stats));
+  m_block_collector.reset(new block_stat_collector(
+      static_cast<const struct logging_params*>(
+          m_repo->get_params("logging"))->block_stats));
+  m_block_collector->reset();
+  m_robot_collector->reset();
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -107,12 +113,14 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 }
 
 void random_foraging_loop_functions::Reset() {
-  m_collector->reset();
+  m_block_collector->reset();
+  m_robot_collector->reset();
   m_map->distribute_blocks(true);
 }
 
 void random_foraging_loop_functions::Destroy() {
-  m_collector->finalize();
+  m_block_collector->finalize();
+  m_robot_collector->finalize();
 }
 
 argos::CColor random_foraging_loop_functions::GetFloorColor(
@@ -135,7 +143,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_collector->collect_from_robot(controller);
+    m_robot_collector->collect(controller);
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
@@ -143,7 +151,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
          * Get stats from carried block before it's dropped and its state
          * changes.
          */
-        m_collector->collect_from_block(*controller.block());
+        m_block_collector->collect(*controller.block());
 
         /* Update arena map state due to a block nest drop */
         events::block_drop drop_op(rcppsw::common::g_server,
@@ -157,7 +165,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.is_searching_for_block() &&
+      if (!controller.in_nest() && controller.is_exploring() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
@@ -177,7 +185,9 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
 } /* pre_step_iter() */
 
 void random_foraging_loop_functions::pre_step_final(void) {
-  m_collector->store_foraging_stats(GetSpace().GetSimulationClock());
+  m_block_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_robot_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_robot_collector->reset_on_timestep();
 } /* pre_step_final() */
 
 void random_foraging_loop_functions::PreStep() {
@@ -212,7 +222,7 @@ bool random_foraging_loop_functions::IsExperimentFinished(void) {
    * run until I cancel it.
    */
   if (!m_map->respawn_enabled() &&
-      m_collector->n_collected_blocks() == m_map->n_blocks()) {
+      m_block_collector->total_collected() == m_map->n_blocks()) {
     return true;
   }
   return false;

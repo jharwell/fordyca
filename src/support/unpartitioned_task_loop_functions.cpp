@@ -72,7 +72,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
     set_robot_tick(robot);
 
     /* get stats from this robot before its state changes */
-    collector()->collect_from_robot(controller);
+    robot_collector()->collect(controller);
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
@@ -80,7 +80,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
          * Get stats from carried block before it's dropped and its state
          * changes.
          */
-        collector()->collect_from_block(*controller.block());
+        block_collector()->collect(*controller.block());
 
         /* Update arena map state due to a block nest drop */
         events::block_drop drop_op(rcppsw::common::g_server,

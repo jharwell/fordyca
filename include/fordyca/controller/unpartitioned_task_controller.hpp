@@ -61,11 +61,26 @@ class unpartitioned_task_controller : public random_foraging_controller,
   bool display_los(void) const { return m_display_los; }
 
   /**
+   * @brief If TRUE, the robot is currently searching for a block.
+   */
+  bool is_exploring(void) const { return m_fsm->is_exploring(); }
+
+  /**
+   * @brief If TRUE, the robot is current engaged in collision avoidance.
+   */
+  bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
+
+  /**
+   * @brief If TRUE, the robot is currently returning to the nest carrying a block.
+   */
+  bool is_returning(void) const { return m_fsm->is_returning(); }
+
+  /**
    * @brief If TRUE, then the robot is currently searching for a block.
    */
-  virtual bool is_searching_for_block(void) {
-    return m_fsm->is_searching_for_block();
-  }
+  bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
+
+  bool is_vectoring(void) const { return m_fsm->is_vectoring(); }
 
   /*
    * @brief Initialize the controller.

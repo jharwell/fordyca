@@ -250,15 +250,15 @@ argos::CVector2 random_foraging_fsm::randomize_vector_angle(argos::CVector2 vect
   return vector;
 } /* randomize_vector_angle() */
 
-bool random_foraging_fsm::is_searching_for_block(void) {
+bool random_foraging_fsm::is_exploring(void) const {
   return current_state() == ST_EXPLORE || current_state() == ST_NEW_DIRECTION;
-} /* is_searching_for_block() */
+} /* is_exploring() */
 
-bool random_foraging_fsm::is_returning(void) {
+bool random_foraging_fsm::is_returning(void)  const {
   return current_state() == ST_RETURN_TO_NEST;
 } /* is_returning() */
 
-bool random_foraging_fsm::is_avoiding_collision(void) {
+bool random_foraging_fsm::is_avoiding_collision(void) const {
   return current_state() == ST_COLLISION_AVOIDANCE;
 } /* is_avoiding_collision() */
 

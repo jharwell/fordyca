@@ -21,57 +21,37 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/stat_collector.hpp"
+#include "fordyca/support/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
 
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stat_collector::reset(void) {
+void base_stat_collector::csv_line_write(uint timestep) {
+  m_ofile << std::to_string(timestep) + ";" +
+      csv_line_build() << std::endl;
+} /* csv_line_write() */
+
+void base_stat_collector::csv_header_write(void) {
+  std::string header = csv_header_build("");
+  m_ofile << header + "\n";
+} /* csv_header_write() */
+
+std::string base_stat_collector::csv_header_build(const std::string& header) {
+  return header + "clock;";
+} /* csv_header_build() */
+
+void base_stat_collector::reset(void) {
   /* Open output file and truncate */
   if (m_ofile.is_open()) {
     m_ofile.close();
   }
-  m_block_stats = {0, 0};
-  m_foraging_stats = {0, 0, 0};
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  m_ofile << "clock\tcollected_blocks\tavg_carries\tsearching\treturning\tcollision_avoidance\n";
+  csv_header_write();
 } /* reset() */
-
-void stat_collector::collect_from_robot(
-    const controller::random_foraging_controller& controller) {
-  /* Count how many foot-bots are in which state */
-  m_foraging_stats.n_searching += controller.is_searching_for_block();
-  m_foraging_stats.n_returning += controller.is_returning();
-  m_foraging_stats.n_avoiding += controller.is_avoiding_collision();
-} /* collect_from_robot() */
-
-void stat_collector::collect_from_block(const representation::block& block) {
-  ++m_block_stats.total_collected;
-  m_block_stats.total_carries += block.carries();
-} /* collect_from_block() */
-
-void stat_collector::store_foraging_stats(uint timestep) {
-  /* Output stuff to file */
-  double avg_carries = 0;
-  if (m_block_stats.total_collected > 0) {
-    avg_carries = (double)m_block_stats.total_collected/m_block_stats.total_carries;
-  }
-  m_ofile << timestep << "\t"
-          << m_block_stats.total_collected << "\t"
-          << avg_carries << "\t"
-          << m_foraging_stats.n_searching << "\t"
-          << m_foraging_stats.n_returning << "\t"
-          << m_foraging_stats.n_avoiding << std::endl;
-  m_foraging_stats.n_searching = 0;
-  m_foraging_stats.n_returning = 0;
-  m_foraging_stats.n_avoiding = 0;
-} /* store_foraging_stats() */
-
 
 NS_END(support, fordyca);

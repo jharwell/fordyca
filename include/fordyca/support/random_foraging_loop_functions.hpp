@@ -31,7 +31,8 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/support/stat_collector.hpp"
+#include "fordyca/support/block_stat_collector.hpp"
+#include "fordyca/support/robot_stat_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 
@@ -77,7 +78,8 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   representation::arena_map* map(void) const { return m_map.get(); }
   params::loop_function_repository* repo(void) const { return m_repo.get(); }
   argos::CFloorEntity* floor(void) const { return m_floor; }
-  stat_collector* collector(void) const { return m_collector.get(); }
+  robot_stat_collector* robot_collector(void) const { return m_robot_collector.get(); }
+  block_stat_collector* block_collector(void) const { return m_block_collector.get(); }
 
  private:
   random_foraging_loop_functions(const random_foraging_loop_functions& s) = delete;
@@ -88,7 +90,8 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   argos::CFloorEntity* m_floor;
   std::string m_sim_type;
   std::unique_ptr<params::loop_function_repository> m_repo;
-  std::unique_ptr<stat_collector> m_collector;
+  std::unique_ptr<robot_stat_collector> m_robot_collector;
+  std::unique_ptr<block_stat_collector> m_block_collector;
   std::unique_ptr<representation::arena_map> m_map;
 };
 

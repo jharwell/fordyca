@@ -1,5 +1,5 @@
 /**
- * @file logging_parser.cpp
+ * @file robot_stat_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,55 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_ROBOT_STAT_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_ROBOT_STAT_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/logging_parser.hpp"
+#include <string>
+#include "fordyca/support/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca);
+
+namespace controller {
+class random_foraging_controller;
+class unpartitioned_task_controller;
+} /* namespace controller */
+
+NS_START(support);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void logging_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct logging_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
-  argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "block_stats", m_params->block_stats);
-} /* parse() */
+class robot_stat_collector : public base_stat_collector {
+ public:
+  explicit robot_stat_collector(const std::string ofname) :
+      base_stat_collector(ofname), m_robot_stats() {}
 
-void logging_parser::show(std::ostream& stream) {
-  stream << "====================\nLogging params\n====================\n";
-  stream << "robot_stats=" << m_params->robot_stats << std::endl;
-  stream << "block_stats=" << m_params->block_stats << std::endl;
-} /* show() */
+  virtual void reset();
+  void collect(const controller::random_foraging_controller& controller);
+  void collect(const controller::unpartitioned_task_controller& controller);
+  virtual void reset_on_timestep(void);
 
-NS_END(params, fordyca);
+ private:
+  struct robot_stats {
+    uint n_searching;
+    uint n_exploring;
+    uint n_returning;
+    uint n_avoiding;
+    uint n_vectoring;
+  };
+
+  std::string csv_header_build(const std::string& header = "");
+  std::string csv_line_build(void);
+
+  struct robot_stats m_robot_stats;
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_ROBOT_STAT_COLLECTOR_HPP_ */

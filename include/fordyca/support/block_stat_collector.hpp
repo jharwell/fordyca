@@ -1,5 +1,5 @@
 /**
- * @file stat_collector.hpp
+ * @file block_stat_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,62 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_STAT_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
-#include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/support/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace representation {
+class block;
+} /* namespace representation */
+
+NS_START(support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class stat_collector {
+class block_stat_collector : public base_stat_collector {
  public:
-  struct foraging_stats {
-    uint n_searching;
-    uint n_returning;
-    uint n_avoiding;
-  };
+  explicit block_stat_collector(const std::string ofname) :
+      base_stat_collector(ofname), m_block_stats() {}
 
+  virtual void reset(void);
+  void collect(const representation::block& block);
+  uint total_collected(void) const { return m_block_stats.total_collected; }
+
+ private:
   struct block_stats {
     uint total_collected;
     uint total_carries;
   };
 
-  explicit stat_collector(const std::string ofname) :
-      m_foraging_stats(), m_block_stats(), m_ofname(ofname), m_ofile() {}
+  std::string csv_header_build(const std::string& header = "");
+  std::string csv_line_build(void);
 
-  void reset();
-  void finalize(void) { m_ofile.close(); }
-  uint n_collected_blocks(void) const { return m_block_stats.total_collected; }
-
-  /**
-   * @brief Collect statistics from a robot at the end of a timestep. Must be
-   * called before the robot state is updated (i.e. pickup/dropped blocks) by an
-   * external functions.
-   *
-   * @param controller The controller to collect from.
-   */
-  void collect_from_robot(const controller::random_foraging_controller& controller);
-  void collect_from_block(const representation::block& block);
-  void store_foraging_stats(uint timestep);
-
- private:
-  struct foraging_stats m_foraging_stats;
   struct block_stats m_block_stats;
-  std::string m_ofname;
-  std::ofstream m_ofile;
 };
 
 NS_END(support, fordyca);
-#endif /* INCLUDE_FORDYCA_SUPPORT_STAT_COLLECTOR_HPP_ */
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_STAT_COLLECTOR_HPP_ */
