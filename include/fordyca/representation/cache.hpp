@@ -1,5 +1,5 @@
 /**
- * @file block.hpp
+ * @file cache.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_BLOCK_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_BLOCK_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_CACHE_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_CACHE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <utility>
 #include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/representation/block.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
@@ -37,54 +38,29 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief A representation of a block within the arena map. Blocks do not have
- * state (other than if they are currently being carried by a robot). Blocks
- * have both real (where they actually live in the world) and discretized
- * locations (where they are mapped to within the arena map).
+ * @brief A representation of a cache within the arena map. Caches do not have
+ * state, and if/when a cache becomes empty, it needs to be deleted by an
+ * enclosing class. Caches have both real (where they actually live in the
+ * world) and discretized locations (where they are mapped to within the arena
+ * map).
  */
-class block : public cell_entity,
-              public rcppsw::patterns::visitor::visitable<block> {
+class cache : public cell_entity,
+              public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  explicit block(double dimension) :
-      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
+  explicit cache(double dimension, block* block) :
+      cell_entity(dimension, dimension), m_blocks() { m_blocks.push_back(block); }
 
-  /**
-   * @brief Get how many carries this block has had on its way from its original
-   * arena location back to the nest.
-   *
-   * @return # carries.
-   */
-  size_t carries(void) const { return m_carries; }
-
-  /**
-   * @brief Increment the # of carries this block has undergone on its way back
-   * to the nest.
-   */
-  void add_carry(void) { ++m_carries; }
-
-  /**
-   * @brief Reset the state of the block (i.e. not carried by a robot anymore).
-   */
-  void reset(void) { m_carries = 0; m_robot_index = -1; }
-
-  /**
-   * @brief Get the ID/index of the robot that is currently carrying this block
-   *
-   * @return The robot index, or -1 if no robot is currently carrying this block.
-   */
-  int robot_index(void) const { return m_robot_index; }
-  void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+  size_t n_blocks(void) const { return m_blocks.size(); }
 
  private:
-  int m_robot_index;
-  size_t m_carries;
+  std::list<block*> m_blocks;
 };
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<const block*, double> perceived_block;
+typedef std::pair<const cache*, double> perceived_cache;
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_BLOCK_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRSENTATION_CACHE_HPP_ */
