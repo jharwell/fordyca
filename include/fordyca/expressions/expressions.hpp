@@ -115,12 +115,9 @@ class sub_area_utility: public rcppsw::math::expression<double> {
   sub_area_poa m_poa;
 };
 
-NS_START(forage);
-
 /**
- * @brief Calculates the utility associated with a known block/cache, as part of
- * a robot's decision on whether or not to go and attempt to pick it up (block) or
- * pickup a block from it (cache).
+ * @brief Calculates the utility associated with a known block, as part of a
+ * robot's decision on whether or not to go and attempt to pick it up.
  *
  * Depends on:
  *
@@ -145,12 +142,6 @@ class block_utility: public rcppsw::math::expression<double>  {
   const argos::CVector2 mc_nest_loc;
 };
 
-
-typedef block_utility cache_utility;
-
-NS_END(forage);
-NS_START(harvest);
-
 /**
  * @brief Calculates the utility associated with an existing cache that the
  * robot knows about.
@@ -166,7 +157,7 @@ NS_START(harvest);
 class existing_cache_utility: public rcppsw::math::expression<double> {
  public:
   existing_cache_utility(const argos::CVector2& cache_loc,
-                const argos::CVector2& nest_loc) :
+                         const argos::CVector2& nest_loc) :
       mc_cache_loc(cache_loc), mc_nest_loc(nest_loc) {}
 
   double calc(const argos::CVector2& rloc, double density, size_t n_blocks) {
@@ -207,11 +198,6 @@ class new_cache_utility: public rcppsw::math::expression<double> {
   const argos::CVector2 mc_nest_loc;
 };
 
-NS_END(harvest);
-NS_START(tasks);
-
-
-NS_END(tasks);
 NS_END(expressions, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EXPRESSIONS_EXPRESSIONS_HPP_ */

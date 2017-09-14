@@ -87,6 +87,19 @@ class cell_entity {
   void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
 
   /**
+   * @brief Determine if a real-valued point lies within the extent of the entity
+   * for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of an entity.
+   *
+   * @param point The point to check.
+   *
+   * @return TRUE if the condition is met, and FALSE otherwise.
+   */
+  bool contains_point(const argos::CVector2& point);
+
+  /**
    * @brief Set the ID of the object.
    */
   void id(int id) { m_id = id; }
@@ -104,6 +117,11 @@ class cell_entity {
   argos::CVector2 m_real_loc;
   discrete_coord m_discrete_loc;
 };
+
+/*******************************************************************************
+ * Type Definitions
+ ******************************************************************************/
+typedef std::pair<const cell_entity*, double> perceived_entity;
 
 NS_END(representation, fordyca);
 

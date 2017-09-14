@@ -1,5 +1,5 @@
 /**
- * @file block.cpp
+ * @file cell_entity.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include <assert.h>
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,13 +32,13 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool block::contains_point(const argos::CVector2& point) {
+bool cell_entity::contains_point(const argos::CVector2& point) {
   double x = real_loc().GetX();
   double y = real_loc().GetY();
-  if (point.GetX() < (x + (.5 * xsize())) &&
-      point.GetX() > (x - (.5 * xsize())) &&
-      point.GetY() < (y + (.5 * xsize())) &&
-      point.GetY() > (y - (.5 * xsize()))) {
+  if (point.GetX() < (x + (0.5 * xsize())) &&
+      point.GetX() > (x - (0.5 * xsize())) &&
+      point.GetY() < (y + (0.5 * ysize())) &&
+      point.GetY() > (y - (0.5 * ysize()))) {
     return true;
   }
   return false;

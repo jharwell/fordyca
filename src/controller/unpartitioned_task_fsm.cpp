@@ -25,7 +25,7 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/block_target_selector.hpp"
+#include "fordyca/controller/block_selector.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -206,7 +206,7 @@ void unpartitioned_task_fsm::update_state(uint8_t new_state) {
 
 void unpartitioned_task_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
-  block_target_selector selector(m_server, mc_nest_center);
+  block_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(blocks, m_sensors->robot_loc());
   ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
          best.first->id(),

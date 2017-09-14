@@ -45,8 +45,8 @@ NS_START(fordyca, representation);
 class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable<block> {
  public:
-  explicit block(double dimension) :
-      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
+  explicit block(double dimension) : cell_entity(dimension, dimension),
+                                     m_robot_index(-1), m_carries(0) {}
 
   /**
    * @brief Get how many carries this block has had on its way from its original
@@ -68,25 +68,16 @@ class block : public cell_entity,
   void reset(void) { m_carries = 0; m_robot_index = -1; }
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the block
-   * for:
-   *
-   * 1. Visualization purposes.
-   * 2. Determining if a robot is on top of a block.
-   *
-   * @param point The point to check.
-   *
-   * @return TRUE if the condition is met, and FALSE otherwise.
-   */
-  bool contains_point(const argos::CVector2& point);
-
-  /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *
    * @return The robot index, or -1 if no robot is currently carrying this block.
    */
   int robot_index(void) const { return m_robot_index; }
   void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+
+  bool operator>(const block &other) const;
+  bool operator<(const block &other) const;
+  bool operator==(const block &other) const;
 
  private:
   int m_robot_index;
