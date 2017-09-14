@@ -45,8 +45,9 @@ NS_START(fordyca, representation);
 class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable<block> {
  public:
-  explicit block(double dimension) : cell_entity(dimension, dimension),
-                                     m_robot_index(-1), m_carries(0) {}
+  explicit block(double dimension) :
+      cell_entity(dimension, dimension, argos::CColor::BLACK), m_robot_index(-1),
+      m_carries(0) {}
 
   /**
    * @brief Get how many carries this block has had on its way from its original

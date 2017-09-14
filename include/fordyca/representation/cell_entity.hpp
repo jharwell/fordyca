@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <utility>
 #include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/datatypes/color.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
@@ -43,10 +44,10 @@ NS_START(fordyca, representation);
  */
 class cell_entity {
  public:
-  cell_entity(double x_dim, double y_dim) : m_id(-1),
-                                            m_display_id(false),
-                                            m_x_dim(x_dim), m_y_dim(y_dim),
-                                            m_real_loc(), m_discrete_loc() {}
+  cell_entity(double x_dim, double y_dim, argos::CColor color) :
+      m_id(-1), m_display_id(false), m_x_dim(x_dim), m_y_dim(y_dim),
+      m_color(color), m_real_loc(), m_discrete_loc() {}
+
   virtual ~cell_entity(void) {}
 
   /**
@@ -114,6 +115,7 @@ class cell_entity {
   bool m_display_id;
   double m_x_dim;
   double m_y_dim;
+  argos::CColor m_color;
   argos::CVector2 m_real_loc;
   discrete_coord m_discrete_loc;
 };

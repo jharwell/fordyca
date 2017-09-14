@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
 #include <utility>
+
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -47,9 +49,14 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  explicit cache(double dimension, block* block) :
-      cell_entity(dimension, dimension), m_blocks() { m_blocks.push_back(block); }
+  explicit cache(double dimension, std::pair<block*, block*> blocks) :
+      cell_entity(dimension, dimension, argos::CColor::BLUE), m_blocks() {
+    m_blocks.push_back(blocks.first);
+    m_blocks.push_back(blocks.second);
+  }
 
+  void block_add(block* block) { m_blocks.push_back(block); }
+  void block_remove(block* block) { m_blocks.remove(block); }
   size_t n_blocks(void) const { return m_blocks.size(); }
 
  private:
