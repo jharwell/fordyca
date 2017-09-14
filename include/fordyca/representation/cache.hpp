@@ -49,7 +49,9 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  explicit cache(double dimension, std::pair<block*, block*> blocks) :
+  typedef std::pair<representation::block*, representation::block*> starter_pair;
+  typedef std::pair<representation::block&, representation::block&> starter_pair_ref;
+  explicit cache(double dimension, starter_pair blocks) :
       cell_entity(dimension, dimension, argos::CColor::BLUE), m_blocks() {
     m_blocks.push_back(blocks.first);
     m_blocks.push_back(blocks.second);

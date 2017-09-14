@@ -68,6 +68,12 @@ class block : public cell_entity,
    */
   void reset(void) { m_carries = 0; m_robot_index = -1; }
 
+  void move_out_of_sight(void) {
+    real_loc(argos::CVector2(100.0, 100.0));
+    discrete_loc(discrete_coord(100, 100));
+  }
+
+
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *

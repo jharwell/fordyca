@@ -86,8 +86,7 @@ void block_pickup::visit(representation::block& block) {
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */
-  block.real_loc(argos::CVector2(100.0, 100.0));
-  block.discrete_loc(representation::discrete_coord(100, 100));
+  block.move_out_of_sight();
   ER_NOM("block: block%d is now carried by fb%zu",
          m_block->id(), m_robot_index);
 } /* visit() */
