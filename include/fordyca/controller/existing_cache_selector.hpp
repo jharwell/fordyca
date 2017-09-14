@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_TARGET_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_TARGET_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -63,4 +63,4 @@ class existing_cache_selector: public rcppsw::common::er_client {
 
 NS_END(fordyca, controller);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_TARGET_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */

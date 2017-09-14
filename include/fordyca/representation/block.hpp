@@ -45,8 +45,8 @@ NS_START(fordyca, representation);
 class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable<block> {
  public:
-  explicit block(double dimension) :
-      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
+  explicit block(double dimension) : cell_entity(dimension, dimension),
+                                     m_robot_index(-1), m_carries(0) {}
 
   /**
    * @brief Get how many carries this block has had on its way from its original
@@ -74,6 +74,10 @@ class block : public cell_entity,
    */
   int robot_index(void) const { return m_robot_index; }
   void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+
+  bool operator>(const block &other) const;
+  bool operator<(const block &other) const;
+  bool operator==(const block &other) const;
 
  private:
   int m_robot_index;

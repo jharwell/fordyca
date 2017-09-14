@@ -52,8 +52,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
   const representation::cache* best;
 
   for (auto pair : existing_caches) {
-    expressions::harvest::existing_cache_utility u(pair.first->real_loc(),
-                                                   m_nest_loc);
+    expressions::existing_cache_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second, pair.first->n_blocks());
     ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",

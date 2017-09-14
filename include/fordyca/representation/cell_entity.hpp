@@ -121,7 +121,7 @@ class cell_entity {
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<const cell_entity*, double> perceived_cell_entity;
+typedef std::pair<const cell_entity*, double> perceived_entity;
 
 NS_END(representation, fordyca);
 

@@ -37,9 +37,9 @@ block_selector::block_selector(
     argos::CVector2 nest_loc) :
     er_client(server),
     m_nest_loc(nest_loc) {
-  insmod("block_target_selector",
-          rcppsw::common::er_lvl::DIAG,
-          rcppsw::common::er_lvl::NOM);
+  insmod("block_selector",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -50,8 +50,9 @@ representation::perceived_block block_selector::calc_best(
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::block* best;
+
   for (auto pair : blocks) {
-    expressions::forage::block_utility u(pair.first->real_loc(), m_nest_loc);
+    expressions::block_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second);
     ER_DIAG("Utility for block%d loc=(%zu, %zu), density=%f: %f",
