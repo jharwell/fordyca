@@ -31,27 +31,23 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller {
-class random_foraging_controller;
-class unpartitioned_task_controller;
-} /* namespace controller */
-
-namespace representation {
-class cell2D_fsm;
-class arena_map;
-class block;
-} /* namespace representation */
 
 namespace support {
 class block_stat_collector;
 } /* namespace support */
+
+namespace representation {
+class cell2D_fsm;
+} /* namespace representation */
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_drop : public block_op, public rcppsw::common::er_client {
+class block_drop : public block_op, public rcppsw::common::er_client,
+                   public visitor::can_visit<support::block_stat_collector, void>,
+                   public visitor::can_visit<representation::cell2D_fsm, void> {
  public:
   block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
              representation::block* block);
@@ -62,7 +58,7 @@ class block_drop : public block_op, public rcppsw::common::er_client {
    *
    * @param cell The cell to update.
    */
-  void visit(representation::cell2D& cell);
+  void visit(class representation::cell2D& cell);
 
   /**
    * @brief Update the FSM associated with a cell on a block drop.
@@ -97,6 +93,8 @@ class block_drop : public block_op, public rcppsw::common::er_client {
    * each timestep.
    */
   void visit(controller::random_foraging_controller& controller);
+
+  void visit(support::cache_update_handler& handler);
 
   /**
    * @brief Get the handle on the block that has been dropped.

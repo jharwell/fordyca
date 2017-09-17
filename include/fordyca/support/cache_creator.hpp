@@ -1,5 +1,5 @@
 /**
- * @file block_op.hpp
+ * @file cache_creator.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,50 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_CREATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_CACHE_CREATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_op.hpp"
+#include <vector>
+#include <utility>
+
+#include "fordyca/representation/real_coord.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace visitor = rcppsw::patterns::visitor;
-
-namespace controller {
-class random_foraging_controller;
-} /* namespace controller */
-
-namespace representation {
-class block;
-class arena_map;
-class perceived_arena_map;
-} /* namespace representation */
-
-namespace support {
-class cache_update_handler;
-} /* namespace support */
-
-NS_START(events);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_op : public visitor::visitor,
-                 public visitor::can_visit<controller::random_foraging_controller, void>,
-                 public visitor::can_visit<representation::block, void>,
-                 public visitor::can_visit<representation::arena_map, void>,
-                 public visitor::can_visit<support::cache_update_handler, void> {
+class cache_creator : public rcppsw::common::er_client {
  public:
-  block_op(void) {}
-  ~block_op(void) {}
+  cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
+                std::shared_ptr<std::vector<representation::block>> blocks,
+                double min_dist, double cache_size);
+
+  /**
+   * @brief Scan the entire list of blocks currently in the arena, and create
+   * caches from all blocks that are close enough together.
+   *
+   *
+   * @return The list of current caches.
+   */
+  std::vector<representation::cache> create_all(void);
+
+ private:
+  representation::cache create_single(std::list<representation::block*> blocks);
+  argos::CVector2 calc_center(std::list<representation::block*> blocks);
+
+  double m_min_dist;
+  double m_cache_size;
+  std::shared_ptr<std::vector<representation::block>> m_blocks;
 };
+NS_END(support, fordyca);
 
-NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_OP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_CREATOR_HPP_ */

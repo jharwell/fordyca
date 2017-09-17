@@ -46,8 +46,8 @@ class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable<block> {
  public:
   explicit block(double dimension) :
-      cell_entity(dimension, dimension, argos::CColor::BLACK), m_robot_index(-1),
-      m_carries(0) {}
+      cell_entity(dimension, dimension, argos::CColor::BLACK),
+      m_robot_index(-1), m_carries(0) {}
 
   /**
    * @brief Get how many carries this block has had on its way from its original
@@ -67,6 +67,12 @@ class block : public cell_entity,
    * @brief Reset the state of the block (i.e. not carried by a robot anymore).
    */
   void reset(void) { m_carries = 0; m_robot_index = -1; }
+
+  void move_out_of_sight(void) {
+    real_loc(argos::CVector2(100.0, 100.0));
+    discrete_loc(discrete_coord(100, 100));
+    m_robot_index = -1;
+  }
 
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block

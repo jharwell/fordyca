@@ -33,21 +33,17 @@
 NS_START(fordyca);
 
 namespace controller {
-class random_foraging_controller;
 class unpartitioned_task_controller;
 } /* namespace controller */
-
-namespace representation {
-class arena_map;
-class block;
-} /* namespace representation */
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public block_op, public rcppsw::common::er_client {
+class block_pickup : public block_op,
+                     public rcppsw::common::er_client,
+                     public visitor::can_visit<controller::unpartitioned_task_controller, void> {
  public:
   block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
@@ -91,6 +87,8 @@ class block_pickup : public block_op, public rcppsw::common::er_client {
    * each timestep.
    */
   void visit(controller::unpartitioned_task_controller& controller);
+
+  void visit(support::cache_update_handler& handler);
 
  private:
   block_pickup(const block_pickup& op) = delete;

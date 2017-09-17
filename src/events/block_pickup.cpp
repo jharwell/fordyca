@@ -30,6 +30,7 @@
 #include "fordyca/events/cell_perception.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -86,8 +87,7 @@ void block_pickup::visit(representation::block& block) {
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */
-  block.real_loc(argos::CVector2(100.0, 100.0));
-  block.discrete_loc(representation::discrete_coord(100, 100));
+  block.move_out_of_sight();
   ER_NOM("block: block%d is now carried by fb%zu",
          m_block->id(), m_robot_index);
 } /* visit() */
@@ -103,6 +103,13 @@ void block_pickup::visit(controller::unpartitioned_task_controller& controller) 
   controller.map()->accept(*this);
   ER_NOM("unpartitioned_task_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+void block_pickup::visit(support::cache_update_handler& handler) {
+  representation::cache* cache = handler.map_to_cache(m_block);
+  if (cache) {
+    handler.block_remove(cache, m_block);
+  }
 } /* visit() */
 
 NS_END(events, fordyca);
