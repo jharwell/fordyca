@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 
+#include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "rcppsw/common/er_client.hpp"
@@ -42,17 +43,27 @@ NS_START(fordyca, support);
 class cache_creator : public rcppsw::common::er_client {
  public:
   cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
-                double min_dist, double cache_size) :
-      er_client(server), m_min_dist(min_dist), m_cache_size(cache_size) {}
+                std::shared_ptr<std::vector<representation::block>> blocks,
+                double min_dist, double cache_size);
 
+  /**
+   * @brief Scan the entire list of blocks currently in the arena, and create
+   * caches from all blocks that are close enough together.
+   *
+   * @param caches The list of current caches.
+   *
+   * @return The updated list of current caches.
+   */
   std::vector<representation::cache> create_all(
-      std::vector<representation::block>& blocks);
+      std::vector<representation::cache>& caches);
 
  private:
-  representation::cache create_single(representation::cache::starter_pair_ref blocks);
+  representation::cache create_single(std::list<representation::block*> blocks);
+  argos::CVector2 calc_center(std::list<representation::block*> blocks);
 
   double m_min_dist;
   double m_cache_size;
+  std::shared_ptr<std::vector<representation::block>> m_blocks;
 };
 NS_END(support, fordyca);
 

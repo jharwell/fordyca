@@ -29,37 +29,82 @@
 NS_START(fordyca, support);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cache_creator::cache_creator(
+    std::shared_ptr<rcppsw::common::er_server> server,
+    std::shared_ptr<std::vector<representation::block>> blocks,
+    double min_dist, double cache_size) :
+    er_client(server), m_min_dist(min_dist), m_cache_size(cache_size),
+    m_blocks(blocks) {
+      insmod("cache_creator",
+           rcppsw::common::er_lvl::DIAG,
+           rcppsw::common::er_lvl::NOM);
+    }
+
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> cache_creator::create_all(
-    std::vector<representation::block>& blocks) {
-  std::vector<representation::cache> caches;
+    std::vector<representation::cache>& caches) {
 
-  for (size_t i = 0; i < blocks.size() - 1; ++i) {
-    for (size_t j = i + 1; j < blocks.size(); ++j) {
-      if ((blocks[i].real_loc() - blocks[j].real_loc()).Length()) {
-        caches.push_back(create_single(
-            representation::cache::starter_pair_ref(blocks[i], blocks[j])));
+  std::vector<representation::block*> free_blocks;
 
+  /*
+   * We only consider blocks that do not currently belong to caches.
+   */
+  for (auto block : *m_blocks) {
+    bool free = true;
+    for (auto cache : caches) {
+      if (cache.contains_block(&block)) {
+        free = false;
+        break;
+      }
+    } /* for(cache..) */
+    if (free) {
+      free_blocks.push_back(&block);
+    }
+  } /* for(block..) */
+  ER_NOM("Creating caches: %zu free blocks", free_blocks.size());
+
+  for (size_t i = 0; i < free_blocks.size() - 1; ++i) {
+    std::list<representation::block*> starter_blocks;
+    for (size_t j = i + 1; j < free_blocks.size(); ++j) {
+      if ((free_blocks[i]->real_loc() - free_blocks[j]->real_loc()).Length() <=
+          m_min_dist && i != j) {
+        starter_blocks.push_back(free_blocks[i]);
       }
     } /* for(j..) */
+    caches.push_back(create_single(starter_blocks));
   } /* for(i..) */
   return caches;
 } /* create() */
 
 representation::cache cache_creator::create_single(
-    representation::cache::starter_pair_ref blocks) {
-  argos::CVector2 center((blocks.first.real_loc().GetX() +
-                          blocks.second.real_loc().GetX()) / 2,
-                         (blocks.first.real_loc().GetY() +
-                          blocks.second.real_loc().GetY()) / 2);
+    std::list<representation::block*> blocks) {
 
-  blocks.first.move_out_of_sight();
-  blocks.second.move_out_of_sight();
+  for (auto block : blocks) {
+    block->move_out_of_sight();
+  } /* for(block..) */
 
-  return representation::cache(
-      m_cache_size,
-      representation::cache::starter_pair(&blocks.first, &blocks.second));
+  argos::CVector2 center = calc_center(blocks);
+
+  ER_NOM("Create cache at (%f, %f) with  %zu blocks",
+         center.GetX(), center.GetY(), blocks.size());
+  return representation::cache(m_cache_size, calc_center(blocks), blocks);
 } /* create_single() */
+
+argos::CVector2 cache_creator::calc_center(
+    std::list<representation::block*> blocks) {
+  double x = 0;
+  double y = 0;
+  for (auto block : blocks) {
+    x += block->real_loc().GetX();
+    y += block->real_loc().GetY();
+  } /* for(block..) */
+
+  return argos::CVector2(x / blocks.size(), y / blocks.size());
+} /* calc_center() */
 
 NS_END(support, fordyca);

@@ -27,6 +27,7 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/support/block_stat_collector.hpp"
+#include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,7 +60,7 @@ void block_drop::visit(representation::cell2D_fsm& fsm) {
 void block_drop::visit(representation::arena_map& map) {
   map.distribute_block(m_block, false);
   int robot_index = m_block->robot_index();
-  assert(-1 != robot_index);
+  ER_ASSERT(-1 != robot_index, "FATAL: undefined robot index");
   m_block->accept(*this);
   ER_NOM("fb%d dropped block%d in nest", robot_index, m_block->id());
 } /* visit() */
@@ -69,9 +70,17 @@ void block_drop::visit(support::block_stat_collector& collector) {
   collector.inc_total_carries(m_block->carries());
 } /* visit() */
 
+void block_drop::visit(support::cache_update_handler& handler) {
+  representation::cache* cache = handler.map_to_cache(m_block);
+  if (cache) {
+    handler.block_add(cache, m_block);
+  }
+} /* visit() */
+
 void block_drop::visit(representation::block& block) {
   block.reset();
 } /* visit() */
+
 
 void block_drop::visit(controller::random_foraging_controller& controller) {
   ER_NOM("%s dropped block in nest", controller.GetId().c_str());

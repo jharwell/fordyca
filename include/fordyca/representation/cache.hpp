@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include <utility>
+#include <algorithm>
 
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
@@ -49,19 +50,27 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  typedef std::pair<representation::block*, representation::block*> starter_pair;
-  typedef std::pair<representation::block&, representation::block&> starter_pair_ref;
-  explicit cache(double dimension, starter_pair blocks) :
-      cell_entity(dimension, dimension, argos::CColor::BLUE), m_blocks() {
-    m_blocks.push_back(blocks.first);
-    m_blocks.push_back(blocks.second);
-  }
+  explicit cache(double dimension, argos::CVector2 center,
+                 std::list<block*> blocks) :
+      cell_entity(dimension, dimension, argos::CColor::BLUE),
+      m_center(center),
+      m_blocks(blocks) {}
 
-  void block_add(block* block) { m_blocks.push_back(block); }
+  bool contains_block(const block* const block) {
+    return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
+  }
+  bool block_within_boundaries(const block* const block) {
+    return (m_center - block->real_loc()).Length() <= cell_entity::xsize();
+  }
+  void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block) { m_blocks.remove(block); }
   size_t n_blocks(void) const { return m_blocks.size(); }
+  bool operator==(const cache &other) const {
+    return m_center == other.m_center && m_blocks == other.m_blocks;
+  }
 
  private:
+argos::CVector2 m_center;
   std::list<block*> m_blocks;
 };
 
