@@ -50,12 +50,10 @@ class cache_creator : public rcppsw::common::er_client {
    * @brief Scan the entire list of blocks currently in the arena, and create
    * caches from all blocks that are close enough together.
    *
-   * @param caches The list of current caches.
    *
-   * @return The updated list of current caches.
+   * @return The list of current caches.
    */
-  std::vector<representation::cache> create_all(
-      std::vector<representation::cache>& caches);
+  std::vector<representation::cache> create_all(void);
 
  private:
   representation::cache create_single(std::list<representation::block*> blocks);

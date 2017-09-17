@@ -46,34 +46,17 @@ cache_creator::cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::vector<representation::cache> cache_creator::create_all(
-    std::vector<representation::cache>& caches) {
+std::vector<representation::cache> cache_creator::create_all(void) {
+  std::vector<representation::cache> caches;
 
-  std::vector<representation::block*> free_blocks;
+  ER_NOM("Creating caches: %zu free blocks", m_blocks->size());
 
-  /*
-   * We only consider blocks that do not currently belong to caches.
-   */
-  for (auto block : *m_blocks) {
-    bool free = true;
-    for (auto cache : caches) {
-      if (cache.contains_block(&block)) {
-        free = false;
-        break;
-      }
-    } /* for(cache..) */
-    if (free) {
-      free_blocks.push_back(&block);
-    }
-  } /* for(block..) */
-  ER_NOM("Creating caches: %zu free blocks", free_blocks.size());
-
-  for (size_t i = 0; i < free_blocks.size() - 1; ++i) {
+  for (size_t i = 0; i < m_blocks->size() - 1; ++i) {
     std::list<representation::block*> starter_blocks;
-    for (size_t j = i + 1; j < free_blocks.size(); ++j) {
-      if ((free_blocks[i]->real_loc() - free_blocks[j]->real_loc()).Length() <=
+    for (size_t j = i + 1; j < m_blocks->size(); ++j) {
+      if ((m_blocks->at(i).real_loc() - m_blocks->at(j).real_loc()).Length() <=
           m_min_dist && i != j) {
-        starter_blocks.push_back(free_blocks[i]);
+        starter_blocks.push_back(&m_blocks->at(i));
       }
     } /* for(j..) */
     caches.push_back(create_single(starter_blocks));
