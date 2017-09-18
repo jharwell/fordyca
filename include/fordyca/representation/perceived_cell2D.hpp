@@ -70,6 +70,7 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
 
   bool state_is_known(void) { return m_cell.state_is_known(); }
   bool state_has_block(void) { return m_cell.state_has_block(); }
+  bool state_has_cache(void) { return m_cell.state_has_cache(); }
   bool state_is_empty(void) { return m_cell.state_is_empty(); }
 
   /**

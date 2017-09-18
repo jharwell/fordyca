@@ -49,6 +49,7 @@ class cell2D_fsm : public fsm::simple_fsm,
     ST_UNKNOWN,
     ST_EMPTY,
     ST_HAS_BLOCK,
+    ST_HAS_CACHE,
     ST_MAX_STATES
   };
 
@@ -57,28 +58,39 @@ class cell2D_fsm : public fsm::simple_fsm,
   virtual ~cell2D_fsm(void) {}
   bool state_is_known(void) { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) { return current_state() == ST_HAS_BLOCK; }
+  bool state_has_cache(void) { return current_state() == ST_HAS_CACHE; }
   bool state_is_empty(void) { return current_state() == ST_EMPTY; }
 
   /* events */
   void event_unknown(void);
   void event_empty(void);
+  void event_block_pickup(void);
   void event_block_drop(void);
   void init(void);
 
  private:
+  struct block_data : public fsm::event_data {
+    block_data(bool pickup_ = false) : pickup(pickup_) {}
+    bool pickup;
+  };
+
   FSM_STATE_DECLARE(cell2D_fsm, state_unknown, fsm::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_empty, fsm::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_block, fsm::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_block),
+        FSM_STATE_MAP_ENTRY(&state_cache),
             };
   FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
   return &kSTATE_MAP[index];
   }
+
+  uint m_block_count;
 };
 
 NS_END(representation, forydca);
