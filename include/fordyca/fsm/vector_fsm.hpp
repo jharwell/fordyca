@@ -1,5 +1,5 @@
 /**
- * @file vector_to_goal.hpp
+ * @file vector_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_VECTOR_TO_GOAL_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_VECTOR_TO_GOAL_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -40,15 +40,15 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class vector_to_goal : public fsm::simple_fsm {
+class vector_fsm : public fsm::simple_fsm {
  public:
-  vector_to_goal(double frequent_collision_thresh,
+  vector_fsm(double frequent_collision_thresh,
                  std::shared_ptr<rcppsw::common::er_server> server,
                  std::shared_ptr<sensor_manager> sensors,
                  std::shared_ptr<actuator_manager> actuators);
 
   /**
-   * @brief Initialize/re-initialize the vector_to_goal fsm. After arriving at a
+   * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
    * goal, this function must be called before vectoring to a new goal will work.
    */
   void init(void);
@@ -129,7 +129,7 @@ class vector_to_goal : public fsm::simple_fsm {
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at a specified target location.
    */
-  static double kVECTOR_TO_GOAL_MIN_DIFF;
+  static double kVECTOR_FSM_MIN_DIFF;
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
@@ -142,20 +142,20 @@ class vector_to_goal : public fsm::simple_fsm {
    * @return The vector, specified with the tail at the robot and the head
    * pointing towards the goal.
    */
-  argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
+  argos::CVector2 calc_vector_fsm(const argos::CVector2& goal);
 
   /* states */
-  FSM_STATE_DECLARE(vector_to_goal, start, fsm::no_event_data);
-  FSM_STATE_DECLARE(vector_to_goal, vector, struct goal_data);
-  FSM_STATE_DECLARE(vector_to_goal, collision_avoidance, fsm::no_event_data);
-  FSM_STATE_DECLARE(vector_to_goal, collision_recovery, fsm::no_event_data);
-  FSM_STATE_DECLARE(vector_to_goal, arrived, struct goal_data);
+  FSM_STATE_DECLARE(vector_fsm, start, fsm::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, vector, struct goal_data);
+  FSM_STATE_DECLARE(vector_fsm, collision_avoidance, fsm::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, collision_recovery, fsm::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);
 
-  FSM_ENTRY_DECLARE(vector_to_goal, entry_vector,
+  FSM_ENTRY_DECLARE(vector_fsm, entry_vector,
                     fsm::no_event_data);
-  FSM_ENTRY_DECLARE(vector_to_goal, entry_collision_avoidance,
+  FSM_ENTRY_DECLARE(vector_fsm, entry_collision_avoidance,
                     fsm::no_event_data);
-  FSM_ENTRY_DECLARE(vector_to_goal, entry_collision_recovery,
+  FSM_ENTRY_DECLARE(vector_fsm, entry_collision_recovery,
                     fsm::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
@@ -172,8 +172,8 @@ class vector_to_goal : public fsm::simple_fsm {
     return &kSTATE_MAP[index];
   }
 
-  vector_to_goal(const vector_to_goal& fsm) = delete;
-  vector_to_goal& operator=(const vector_to_goal& fsm) = delete;
+  vector_fsm(const vector_fsm& fsm) = delete;
+  vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
   /* data members */
   argos::CRandom::CRNG* m_rng;
@@ -189,4 +189,4 @@ class vector_to_goal : public fsm::simple_fsm {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_VECTOR_TO_GOAL_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_ */

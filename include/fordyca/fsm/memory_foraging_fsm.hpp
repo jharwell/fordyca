@@ -33,7 +33,7 @@
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/vector_to_goal.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
 
 /*******************************************************************************
@@ -141,7 +141,7 @@ class memory_foraging_fsm : public random_foraging_fsm {
 
   /*
    * States for locate_block FSM. Note that the states for the
-   * vector_to_goal sub-fsm cannot be part of the locate_block hfsm, because that
+   * vector_fsm sub-fsm cannot be part of the locate_block hfsm, because that
    * sub-fsm is initiated from multiple states, and hfsm states can only have
    * ONE parent state.
    **/
@@ -208,7 +208,7 @@ class memory_foraging_fsm : public random_foraging_fsm {
   std::shared_ptr<actuator_manager> m_actuators;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  vector_to_goal m_vector_fsm;
+  vector_fsm m_vector_fsm;
 };
 
 NS_END(controller, fordyca);

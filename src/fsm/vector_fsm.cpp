@@ -1,5 +1,5 @@
 /**
- * @file vector_to_goal.cpp
+ * @file vector_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -24,7 +24,7 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/vector_to_goal.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,13 +35,13 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constants
  ******************************************************************************/
-uint vector_to_goal::kCOLLISION_RECOVERY_TIME = 12;
-double vector_to_goal::kVECTOR_TO_GOAL_MIN_DIFF = 0.02;
+uint vector_fsm::kCOLLISION_RECOVERY_TIME = 12;
+double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_to_goal::vector_to_goal(double frequent_collision_thresh,
+vector_fsm::vector_fsm(double frequent_collision_thresh,
                                std::shared_ptr<rcppsw::common::er_server> server,
                                std::shared_ptr<sensor_manager> sensors,
                                std::shared_ptr<actuator_manager> actuators) :
@@ -69,7 +69,7 @@ vector_to_goal::vector_to_goal(double frequent_collision_thresh,
               1,
               m_actuators->max_wheel_speed() * 0.1,
               m_actuators->max_wheel_speed() * 0.7) {
-    insmod("vector_to_goal",
+    insmod("vector_fsm",
            rcppsw::common::er_lvl::DIAG,
            rcppsw::common::er_lvl::NOM);
     }
@@ -77,7 +77,7 @@ vector_to_goal::vector_to_goal(double frequent_collision_thresh,
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void vector_to_goal::event_start(const argos::CVector2& goal) {
+void vector_fsm::event_start(const argos::CVector2& goal) {
   static const uint8_t kTRANSITIONS[] = {
     ST_VECTOR,                  /* start */
     ST_VECTOR,                  /* vector */
@@ -93,11 +93,11 @@ void vector_to_goal::event_start(const argos::CVector2& goal) {
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(vector_to_goal, start, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_fsm, start, fsm::no_event_data) {
   return fsm::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(vector_to_goal, collision_avoidance, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_fsm, collision_avoidance, fsm::no_event_data) {
   argos::CVector2 vector;
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
@@ -122,7 +122,7 @@ FSM_STATE_DEFINE(vector_to_goal, collision_avoidance, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_to_goal, collision_recovery, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_fsm, collision_recovery, fsm::no_event_data) {
   if (ST_COLLISION_RECOVERY != last_state()) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
@@ -133,7 +133,7 @@ FSM_STATE_DEFINE(vector_to_goal, collision_recovery, fsm::no_event_data) {
   }
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
+FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   if (ST_VECTOR != last_state()) {
     ER_DIAG("Executing ST_VECTOR");
   }
@@ -148,14 +148,14 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
   if ((m_goal - m_sensors->robot_loc()).Length() <=
-      kVECTOR_TO_GOAL_MIN_DIFF) {
+      kVECTOR_FSM_MIN_DIFF) {
     lin_speed = 0;
     ang_speed = 0;
     m_ang_pid.reset();
     m_lin_pid.reset();
     internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(m_goal));
   }
-  argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal);
+  argos::CVector2 robot_to_goal = calc_vector_fsm(m_goal);
   argos::CVector2 heading = m_sensors->robot_heading();
   double angle_diff = heading.Angle().GetValue() -
                       robot_to_goal.Angle().GetValue();
@@ -174,42 +174,42 @@ FSM_STATE_DEFINE(vector_to_goal, vector, goal_data) {
   m_actuators->set_wheel_speeds(lin_speed, ang_speed);
   return fsm::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_to_goal, arrived, struct goal_data) {
+FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_VECTOR != last_state()) {
     ER_DIAG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
             data->goal.GetX(), data->goal.GetY(),
-            kVECTOR_TO_GOAL_MIN_DIFF);
+            kVECTOR_FSM_MIN_DIFF);
   }
   return fsm::event_signal::HANDLED;
 }
 
-FSM_ENTRY_DEFINE(vector_to_goal, entry_vector, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_vector, fsm::no_event_data) {
   ER_DIAG("Entering ST_VECTOR");
   m_actuators->leds_set_color(argos::CColor::BLUE);
 }
-FSM_ENTRY_DEFINE(vector_to_goal, entry_collision_avoidance, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_collision_avoidance, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
   m_state.last_collision_time = m_sensors->tick();
 }
-FSM_ENTRY_DEFINE(vector_to_goal, entry_collision_recovery, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, fsm::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void vector_to_goal::init(void) {
+void vector_fsm::init(void) {
   m_state.time_exploring_unsuccessfully = 0;
   m_actuators->reset();
   simple_fsm::init();
 } /* init() */
 
-argos::CVector2 vector_to_goal::calc_vector_to_goal(const argos::CVector2& goal) {
+argos::CVector2 vector_fsm::calc_vector_fsm(const argos::CVector2& goal) {
   return goal - m_sensors->robot_loc();
-} /* calc_vector_to_goal() */
+} /* calc_vector_fsm() */
 
-argos::CVector2 vector_to_goal::randomize_vector_angle(argos::CVector2 vector) {
+argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
   vector.Rotate(m_rng->Uniform(range));
