@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_fsm.cpp
+ * @file memory_foraging_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/unpartitioned_task_fsm.hpp"
+#include "fordyca/fsm/memory_foraging_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
@@ -37,7 +37,7 @@ namespace fsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-unpartitioned_task_fsm::unpartitioned_task_fsm(
+memory_foraging_fsm::memory_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<sensor_manager>& sensors,
@@ -78,7 +78,7 @@ unpartitioned_task_fsm::unpartitioned_task_fsm(
 /*******************************************************************************
  * Exploration FSM
  ******************************************************************************/
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
+HFSM_STATE_DEFINE(memory_foraging_fsm, explore, fsm::event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
@@ -117,7 +117,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, explore, fsm::event_data) {
   return fsm::event_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
+HFSM_STATE_DEFINE(memory_foraging_fsm, leaving_nest, fsm::no_event_data) {
   if (ST_LEAVING_NEST != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
@@ -142,7 +142,7 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data) {
 /*******************************************************************************
  * Locate Block FSM
  ******************************************************************************/
-HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
+HFSM_STATE_DEFINE(memory_foraging_fsm, locate_block, fsm::event_data) {
   if (ST_LOCATE_BLOCK != last_state()) {
     ER_DIAG("Executing ST_LOCATE_BLOCK");
   }
@@ -182,21 +182,21 @@ HFSM_STATE_DEFINE(unpartitioned_task_fsm, locate_block, fsm::event_data) {
   return fsm::event_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(unpartitioned_task_fsm, exit_locate_block) {
+HFSM_EXIT_DEFINE(memory_foraging_fsm, exit_locate_block) {
   m_vector_fsm.init();
 }
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void unpartitioned_task_fsm::init(void) {
+void memory_foraging_fsm::init(void) {
   explore_time_reset();
   m_actuators->reset();
   base_fsm::init();
   m_vector_fsm.init();
 } /* init() */
 
-void unpartitioned_task_fsm::update_state(uint8_t new_state) {
+void memory_foraging_fsm::update_state(uint8_t new_state) {
   if (new_state != m_current_state) {
     m_previous_state = m_current_state;
   }
@@ -204,7 +204,7 @@ void unpartitioned_task_fsm::update_state(uint8_t new_state) {
   m_current_state = new_state;
 } /* update_state() */
 
-void unpartitioned_task_fsm::acquire_known_block(
+void memory_foraging_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
   block_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(blocks, m_sensors->robot_loc());
@@ -216,7 +216,7 @@ void unpartitioned_task_fsm::acquire_known_block(
   m_vector_fsm.event_start(best.first->real_loc());
 } /* acquire_known_block() */
 
-bool unpartitioned_task_fsm::acquire_block(void) {
+bool memory_foraging_fsm::acquire_block(void) {
   /* currently on our way to a known block */
   if (m_vector_fsm.in_progress()) {
     m_vector_fsm.run();
@@ -244,7 +244,7 @@ bool unpartitioned_task_fsm::acquire_block(void) {
   return false;
 } /* acquire_block() */
 
-void unpartitioned_task_fsm::run(void) {
+void memory_foraging_fsm::run(void) {
   inject_event(fsm::event_signal::IGNORED, fsm::event_type::NORMAL);
 } /* run() */
 

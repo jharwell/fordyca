@@ -29,7 +29,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/cell_perception.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
@@ -98,10 +98,10 @@ void block_pickup::visit(controller::random_foraging_controller& controller) {
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void block_pickup::visit(controller::unpartitioned_task_controller& controller) {
+void block_pickup::visit(controller::memory_foraging_controller& controller) {
   static_cast<controller::random_foraging_controller&>(controller).accept(*this);
   controller.map()->accept(*this);
-  ER_NOM("unpartitioned_task_controller: %s picked up block%d",
+  ER_NOM("memory_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 

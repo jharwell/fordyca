@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/random_foraging_fsm.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>

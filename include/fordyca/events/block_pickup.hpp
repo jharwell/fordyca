@@ -33,7 +33,7 @@
 NS_START(fordyca);
 
 namespace controller {
-class unpartitioned_task_controller;
+class memory_foraging_controller;
 } /* namespace controller */
 
 NS_START(events);
@@ -43,7 +43,7 @@ NS_START(events);
  ******************************************************************************/
 class block_pickup : public block_op,
                      public rcppsw::common::er_client,
-                     public visitor::can_visit<controller::unpartitioned_task_controller, void> {
+                     public visitor::can_visit<controller::memory_foraging_controller, void> {
  public:
   block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
@@ -86,7 +86,7 @@ class block_pickup : public block_op,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::unpartitioned_task_controller& controller);
+  void visit(controller::memory_foraging_controller& controller);
 
   void visit(support::cache_update_handler& handler);
 

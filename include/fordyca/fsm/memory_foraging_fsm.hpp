@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_fsm.hpp
+ * @file memory_foraging_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -34,7 +34,7 @@
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/controller/vector_to_goal.hpp"
-#include "fordyca/controller/random_foraging_fsm.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,9 +55,9 @@ NS_START(controller);
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class unpartitioned_task_fsm : public random_foraging_fsm {
+class memory_foraging_fsm : public random_foraging_fsm {
  public:
-  unpartitioned_task_fsm(const struct params::fsm_params* params,
+  memory_foraging_fsm(const struct params::fsm_params* params,
                const std::shared_ptr<rcppsw::common::er_server>& server,
                const std::shared_ptr<sensor_manager>& sensors,
                const std::shared_ptr<actuator_manager>& actuators,
@@ -130,7 +130,7 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   /* non-hierarchical states */
   HFSM_STATE_INHERIT(random_foraging_fsm, start, fsm::no_event_data);
   HFSM_STATE_INHERIT(random_foraging_fsm, return_to_nest, fsm::no_event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, leaving_nest, fsm::no_event_data);
+  HFSM_STATE_DECLARE(memory_foraging_fsm, leaving_nest, fsm::no_event_data);
 
   HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_return_to_nest,
                      fsm::no_event_data);
@@ -145,13 +145,13 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
    * sub-fsm is initiated from multiple states, and hfsm states can only have
    * ONE parent state.
    **/
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, locate_block, fsm::event_data);
+  HFSM_STATE_DECLARE(memory_foraging_fsm, locate_block, fsm::event_data);
 
   /*
    * States for exploration sub-fsm (part of locate_block fsm).
    */
   HFSM_STATE_INHERIT(random_foraging_fsm, new_direction, fsm::event_data);
-  HFSM_STATE_DECLARE(unpartitioned_task_fsm, explore, fsm::event_data);
+  HFSM_STATE_DECLARE(memory_foraging_fsm, explore, fsm::event_data);
   HFSM_STATE_INHERIT(random_foraging_fsm, collision_avoidance,
                      fsm::event_data);
 
@@ -161,7 +161,7 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   HFSM_ENTRY_INHERIT(random_foraging_fsm, entry_collision_avoidance,
                      fsm::no_event_data);
 
-  HFSM_EXIT_DECLARE(unpartitioned_task_fsm, exit_locate_block);
+  HFSM_EXIT_DECLARE(memory_foraging_fsm, exit_locate_block);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
@@ -189,8 +189,8 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
   return &kSTATE_MAP[index];
   }
 
-  unpartitioned_task_fsm(const unpartitioned_task_fsm& fsm) = delete;
-  unpartitioned_task_fsm& operator=(const unpartitioned_task_fsm& fsm) = delete;
+  memory_foraging_fsm(const memory_foraging_fsm& fsm) = delete;
+  memory_foraging_fsm& operator=(const memory_foraging_fsm& fsm) = delete;
 
   /* data members */
   const double mc_unsuccessful_explore_dir_change;
@@ -213,4 +213,4 @@ class unpartitioned_task_fsm : public random_foraging_fsm {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_ */
