@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_controller.hpp
+ * @file memory_foraging_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_UNPARTITIONED_TASK_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,7 +29,7 @@
 #include <boost/shared_ptr.hpp>
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/unpartitioned_task_fsm.hpp"
+#include "fordyca/fsm/memory_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,10 +42,10 @@ NS_START(fordyca, controller);
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class unpartitioned_task_controller : public random_foraging_controller,
-                                      public rcppsw::patterns::visitor::visitable<unpartitioned_task_controller> {
+class memory_foraging_controller : public random_foraging_controller,
+                                   public rcppsw::patterns::visitor::visitable<memory_foraging_controller> {
  public:
-  unpartitioned_task_controller(void) :
+  memory_foraging_controller(void) :
       random_foraging_controller(),
       m_display_los(false),
       m_light_loc(),
@@ -86,7 +86,7 @@ class unpartitioned_task_controller : public random_foraging_controller,
    * @brief Initialize the controller.
    *
    * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><unpartitioned_task_controller_controller> section.
+   *               <controllers><memory_foraging_controller_controller> section.
    */
   virtual void Init(argos::TConfigurationNode& t_node);
 
@@ -141,9 +141,9 @@ class unpartitioned_task_controller : public random_foraging_controller,
   bool                                                 m_display_los;
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::shared_ptr<unpartitioned_task_fsm>              m_fsm;
+  std::shared_ptr<memory_foraging_fsm>                 m_fsm;
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_UNPARTITIONED_TASK_CONTROLLER_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_MEMORY_FORAGING_CONTROLLER_CONTROLLER_HPP_ */

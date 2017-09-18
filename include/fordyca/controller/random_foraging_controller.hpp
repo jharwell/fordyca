@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/random_foraging_fsm.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"

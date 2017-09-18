@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_repository.hpp
+ * @file memory_foraging_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,30 +17,31 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_PARAMS_UNPARTITIONED_TASK_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_UNPARTITIONED_TASK_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
-#include "fordyca/params/base_controller_repository.hpp"
+#include "fordyca/support/random_foraging_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-class unpartitioned_task_repository: public base_controller_repository {
+class memory_foraging_qt_user_functions : public random_foraging_qt_user_functions {
  public:
-  unpartitioned_task_repository(void);
+  memory_foraging_qt_user_functions(void);
+
+  virtual ~memory_foraging_qt_user_functions() {}
+
+  virtual void Draw(argos::CFootBotEntity& c_entity);
 };
 
-NS_END(params, fordyca);
+NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_UNPARTITIONED_TASK_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_ */

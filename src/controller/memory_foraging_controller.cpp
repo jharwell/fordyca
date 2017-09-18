@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_controller.cpp
+ * @file memory_foraging_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/unpartitioned_task_controller.hpp"
-#include "fordyca/params/unpartitioned_task_repository.hpp"
+#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/params/memory_foraging_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/fsm_params.hpp"
@@ -35,7 +35,7 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void unpartitioned_task_controller::ControlStep(void) {
+void memory_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it.
@@ -49,7 +49,7 @@ void unpartitioned_task_controller::ControlStep(void) {
   }
 } /* ControlStep() */
 
-void unpartitioned_task_controller::publish_fsm_event(foraging_signal::type signal) {
+void memory_foraging_controller::publish_fsm_event(foraging_signal::type signal) {
   switch (signal) {
     case foraging_signal::BLOCK_LOCATED:
       m_fsm->inject_event(foraging_signal::BLOCK_LOCATED,
@@ -64,11 +64,11 @@ void unpartitioned_task_controller::publish_fsm_event(foraging_signal::type sign
   }
 } /* publish_event() */
 
-void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
-  params::unpartitioned_task_repository param_repo;
+void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
+  params::memory_foraging_repository param_repo;
 
   random_foraging_controller::Init(node);
-  ER_NOM("Initializing unpartitioned_task controller");
+  ER_NOM("Initializing memory_foraging controller");
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
 
@@ -79,13 +79,13 @@ void unpartitioned_task_controller::Init(argos::TConfigurationNode& node) {
       GetId()));
 
   m_fsm.reset(
-      new unpartitioned_task_fsm(static_cast<const struct params::fsm_params*>(
+      new memory_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
                        server(),
                        sensors(),
                        actuators(),
                        m_map));
-ER_NOM("unpartitioned_task controller initialization finished");
+ER_NOM("memory_foraging controller initialization finished");
 } /* Init() */
 
 /*
@@ -94,6 +94,6 @@ ER_NOM("unpartitioned_task controller initialization finished");
  * which is then available in the XML.
  */
 using namespace argos;
-REGISTER_CONTROLLER(unpartitioned_task_controller, "unpartitioned_task_controller")
+REGISTER_CONTROLLER(memory_foraging_controller, "memory_foraging_controller")
 
 NS_END(controller, fordyca);

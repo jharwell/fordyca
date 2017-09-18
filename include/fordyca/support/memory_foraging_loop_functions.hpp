@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_repository.cpp
+ * @file memory_foraging_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,23 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/unpartitioned_task_repository.hpp"
-#include "fordyca/params/perceived_grid_parser.hpp"
+#include <string>
+#include <vector>
+#include "fordyca/support/random_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Classes
  ******************************************************************************/
-unpartitioned_task_repository::unpartitioned_task_repository(void) {
-    factory().register_type<perceived_grid_parser>("perceived_grid");
-    parsers()["perceived_grid"] = factory().create("perceived_grid");
-}
+class memory_foraging_loop_functions : public random_foraging_loop_functions {
+ public:
+  memory_foraging_loop_functions() {}
+  virtual ~memory_foraging_loop_functions(void) {}
 
-NS_END(params, fordyca);
+  virtual void Init(argos::TConfigurationNode& node);
+  virtual void PreStep();
+
+ protected:
+  void pre_step_iter(argos::CFootBotEntity& robot);
+
+ private:
+  memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
+  memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;
+  void set_robot_los(argos::CFootBotEntity& robot);
+  void set_robot_tick(argos::CFootBotEntity& robot);
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_qt_user_functions.cpp
+ * @file memory_foraging_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/support/unpartitioned_task_qt_user_functions.hpp"
-#include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/support/memory_foraging_qt_user_functions.hpp"
+#include "fordyca/controller/memory_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,19 +33,19 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-unpartitioned_task_qt_user_functions::unpartitioned_task_qt_user_functions() {
-  RegisterUserFunction<unpartitioned_task_qt_user_functions,
-                       argos::CFootBotEntity>(&unpartitioned_task_qt_user_functions::Draw);
+memory_foraging_qt_user_functions::memory_foraging_qt_user_functions() {
+  RegisterUserFunction<memory_foraging_qt_user_functions,
+                       argos::CFootBotEntity>(&memory_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void unpartitioned_task_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void memory_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   random_foraging_qt_user_functions::Draw(c_entity);
 
-  controller::unpartitioned_task_controller& controller =
-      dynamic_cast<controller::unpartitioned_task_controller&>(
+  controller::memory_foraging_controller& controller =
+      dynamic_cast<controller::memory_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
   if (controller.display_los()) {
     const representation::line_of_sight* los = controller.los();
@@ -58,7 +58,7 @@ void unpartitioned_task_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
 }
 
 using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(unpartitioned_task_qt_user_functions,
-                                 "unpartitioned_task_qt_user_functions")
+REGISTER_QTOPENGL_USER_FUNCTIONS(memory_foraging_qt_user_functions,
+                                 "memory_foraging_qt_user_functions")
 
 NS_END(support, fordyca);

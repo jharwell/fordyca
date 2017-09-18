@@ -34,7 +34,7 @@ NS_START(fordyca);
 
 namespace controller {
 class random_foraging_controller;
-class unpartitioned_task_controller;
+class memory_foraging_controller;
 } /* namespace controller */
 
 NS_START(support);
@@ -49,7 +49,7 @@ class robot_stat_collector : public base_stat_collector {
 
   virtual void reset();
   void collect(const controller::random_foraging_controller& controller);
-  void collect(const controller::unpartitioned_task_controller& controller);
+  void collect(const controller::memory_foraging_controller& controller);
   virtual void reset_on_timestep(void);
 
  private:

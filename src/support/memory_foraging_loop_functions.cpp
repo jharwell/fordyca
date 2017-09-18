@@ -1,5 +1,5 @@
 /**
- * @file unpartitioned_task_loop_functions.cpp
+ * @file memory_foraging_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,11 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/unpartitioned_task_loop_functions.hpp"
+#include "fordyca/support/memory_foraging_loop_functions.hpp"
 #include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/unpartitioned_task_controller.hpp"
+#include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
@@ -38,10 +38,10 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
+void memory_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   random_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing unpartitioned_task loop functions");
+  ER_NOM("Initializing memory_foraging loop functions");
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -50,8 +50,8 @@ void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::unpartitioned_task_controller& controller =
-        dynamic_cast<controller::unpartitioned_task_controller&>(
+    controller::memory_foraging_controller& controller =
+        dynamic_cast<controller::memory_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     const struct params::loop_functions_params * l_params =
         static_cast<const struct params::loop_functions_params*>(
@@ -60,12 +60,12 @@ void unpartitioned_task_loop_functions::Init(argos::TConfigurationNode& node) {
     controller.display_los(l_params->display_robot_los);
     set_robot_los(robot);
   } /* for(it..) */
-  ER_NOM("unpartitioned_task loop functions initialization finished");
+  ER_NOM("memory_foraging loop functions initialization finished");
 }
 
-void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-    controller::unpartitioned_task_controller& controller =
-        dynamic_cast<controller::unpartitioned_task_controller&>(
+void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+    controller::memory_foraging_controller& controller =
+        dynamic_cast<controller::memory_foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* Send the robot its new line of sight */
@@ -87,7 +87,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         block_collector()->accept(drop_op);
 
         /* Actually drop the block */
-        controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(drop_op);
+        controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);
 
         /* The floor texture must be updated */
         floor()->SetChanged();
@@ -101,7 +101,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
           events::block_pickup pickup_op(rcppsw::common::g_server,
                                              &map()->blocks()[block],
                                              robot_id(robot));
-          controller.visitor::visitable<controller::unpartitioned_task_controller>::accept(pickup_op);
+          controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
           map()->accept(pickup_op);
           controller.publish_fsm_event(controller::foraging_signal::BLOCK_ACQUIRED);
 
@@ -112,7 +112,7 @@ void unpartitioned_task_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
     }
 } /* pre_step_iter() */
 
-void unpartitioned_task_loop_functions::PreStep() {
+void memory_foraging_loop_functions::PreStep() {
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -125,7 +125,7 @@ void unpartitioned_task_loop_functions::PreStep() {
   random_foraging_loop_functions::pre_step_final();
 } /* PreStep() */
 
-void unpartitioned_task_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
+void memory_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
@@ -134,8 +134,8 @@ void unpartitioned_task_loop_functions::set_robot_los(argos::CFootBotEntity& rob
       representation::real_to_discrete_coord(
           std::pair<double, double>(pos.GetX(), pos.GetY()),
           map()->grid_resolution());
-  controller::unpartitioned_task_controller& controller =
-      dynamic_cast<controller::unpartitioned_task_controller&>(
+  controller::memory_foraging_controller& controller =
+      dynamic_cast<controller::memory_foraging_controller&>(
           robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
@@ -145,14 +145,14 @@ void unpartitioned_task_loop_functions::set_robot_los(argos::CFootBotEntity& rob
   controller.robot_loc(pos);
 } /* set_robot_los() */
 
-void unpartitioned_task_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
-  controller::unpartitioned_task_controller& controller =
-      dynamic_cast<controller::unpartitioned_task_controller&>(
+void memory_foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
+  controller::memory_foraging_controller& controller =
+      dynamic_cast<controller::memory_foraging_controller&>(
           robot.GetControllableEntity().GetController());
   controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
 
 using namespace argos;
-REGISTER_LOOP_FUNCTIONS(unpartitioned_task_loop_functions, "unpartitioned_task_loop_functions");
+REGISTER_LOOP_FUNCTIONS(memory_foraging_loop_functions, "memory_foraging_loop_functions");
 
 NS_END(support, fordyca);
