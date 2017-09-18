@@ -36,10 +36,13 @@ cell2D_fsm::cell2D_fsm(
     simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
     state_unknown(),
     state_empty(),
-    state_block() {
-    /* insmod("cell2D_fsm", */
-    /*        rcppsw::common::er_lvl::DIAG, */
-    /*        rcppsw::common::er_lvl::NOM); */
+    state_block(),
+    m_block_count(0) {
+  if (ERROR == attmod("cell2D_fsm")) {
+    insmod("cell2D_fsm",
+           rcppsw::common::er_lvl::DIAG,
+           rcppsw::common::er_lvl::NOM);
+  }
 }
 
 /*******************************************************************************
@@ -50,6 +53,7 @@ void cell2D_fsm::event_unknown(void) {
         ST_UNKNOWN,   /* unknown */
         ST_UNKNOWN,     /* empty */
         ST_UNKNOWN, /* has block */
+        ST_UNKNOWN  /* has cache */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
@@ -57,37 +61,81 @@ void cell2D_fsm::event_unknown(void) {
 
 void cell2D_fsm::event_empty(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_EMPTY,   /* unknown */
-        ST_EMPTY,     /* empty */
-        ST_EMPTY, /* has block */
-    };
+        ST_EMPTY,                 /* unknown */
+        ST_EMPTY,                 /* empty */
+        fsm::event_signal::FATAL, /* has block */
+        fsm::event_signal::FATAL  /* has cache */
+        };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_empty() */
 
 void cell2D_fsm::event_block_drop(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_HAS_BLOCK,   /* unknown */
-        ST_HAS_BLOCK,     /* empty */
-        ST_HAS_BLOCK, /* has block */
+        ST_HAS_BLOCK,             /* unknown */
+        ST_HAS_BLOCK,             /* empty */
+        ST_HAS_CACHE,             /* has block */
+        ST_HAS_CACHE              /* has cache */
     };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-    external_event(kTRANSITIONS[current_state()], NULL);
+  external_event(kTRANSITIONS[current_state()],
+                 rcppsw::make_unique<block_data>(false));
+} /* event_empty() */
+
+void cell2D_fsm::event_block_pickup(void) {
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
+        fsm::event_signal::FATAL,   /* unknown */
+        fsm::event_signal::FATAL,   /* empty */
+        ST_EMPTY,                   /* has block */
+        ST_HAS_CACHE                /* has cache */
+    };
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  external_event(kTRANSITIONS[current_state()],
+                 rcppsw::make_unique<block_data>(true));
 } /* event_block_drop() */
 
 /*******************************************************************************
  * State Functions
  ******************************************************************************/
 FSM_STATE_DEFINE(cell2D_fsm, state_unknown, fsm::no_event_data) {
-  ER_DIAG("Cell in UNKNOWN state.")
+  if (ST_UNKNOWN != last_state()) {
+    ER_DIAG("Cell in UNKNOWN state.");
+    m_block_count = 0;
+  }
   return fsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(cell2D_fsm, state_empty, fsm::no_event_data) {
-  ER_DIAG("Cell in EMPTY state.")
+  if (ST_EMPTY != last_state()) {
+    ER_DIAG("Cell in EMPTY state.");
+    m_block_count = 0;
+  }
   return fsm::event_signal::HANDLED;
 }
+
 FSM_STATE_DEFINE(cell2D_fsm, state_block, fsm::no_event_data) {
-  ER_DIAG("Cell HAS_BLOCK.")
+  if (ST_HAS_BLOCK != last_state()) {
+    m_block_count = 1;
+    ER_DIAG("Cell HAS_BLOCK.");
+  }
+  return fsm::event_signal::HANDLED;
+}
+
+FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
+  if (ST_HAS_CACHE != last_state()) {
+    ER_DIAG("Cell HAS_CACHE.");
+    ER_ASSERT(1 == m_block_count,
+              "FATAL: block count should be 1 on transition to HAS_CACHE");
+  }
+  if (data) {
+    if (data->pickup) {
+      ++m_block_count;
+    } else {
+      --m_block_count;
+    }
+  }
+  if (1 == m_block_count) {
+    internal_event(ST_HAS_BLOCK);
+  }
   return fsm::event_signal::HANDLED;
 }
 

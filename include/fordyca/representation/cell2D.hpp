@@ -63,6 +63,11 @@ class cell2D : public visitor::visitable<cell2D> {
   bool state_has_block(void) { return m_fsm.state_has_block(); }
 
   /**
+   * @brief If TRUE, the state is currently known to contain a cache.
+   */
+  bool state_has_cache(void) { return m_fsm.state_has_cache(); }
+
+  /**
    * @brief If TRUE, the state is currently known to be empty.
    */
   bool state_is_empty(void) { return m_fsm.state_is_empty(); }
