@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_fsm.hpp
+ * @file explore_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXPLORE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPLORE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,28 +29,19 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 
-#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/locate_free_block_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct fsm_params;
-} /* namespace params */
-
 namespace controller {
 class sensor_manager;
 class actuator_manager;
 } /* namespace controller */
 
-namespace representation {
-class perceived_arena_map;
-class block;
-} /* namespace representation */
+namespace state_machine = rcppsw::patterns::state_machine;
 
 NS_START(fsm);
 
@@ -63,14 +54,20 @@ NS_START(fsm);
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class memory_foraging_fsm : public base_foraging_fsm {
+class explore_fsm : public base_foraging_fsm {
  public:
-  memory_foraging_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::sensor_manager>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
-      const std::shared_ptr<const representation::perceived_arena_map>& map);
+  enum fsm_states {
+    ST_START,
+    ST_EXPLORE,               /* explore for stuff  */
+    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
+    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
+    ST_MAX_STATES
+  };
+
+  explore_fsm(double unsuccessful_dir_change_thresh,
+              const std::shared_ptr<rcppsw::common::er_server>& server,
+              const std::shared_ptr<controller::sensor_manager>& sensors,
+              const std::shared_ptr<controller::actuator_manager>& actuators);
 
   /**
    * @brief Reset the FSM
@@ -78,29 +75,38 @@ class memory_foraging_fsm : public base_foraging_fsm {
   void init(void);
 
   /**
-   * @brief Get if the robot is currently searching for a block within the arena
-   * (either vectoring towards a known block, or exploring for one).
+   * @brief Get if the robot is currently searching for something within the arena
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool is_searching_for_block(void) const { return m_block_fsm.is_searching_for_block(); }
+  bool is_searching(void) const { return (current_state() == ST_EXPLORE); }
 
-  bool is_exploring(void) const { return m_block_fsm.is_exploring(); }
-  bool is_vectoring(void) const { return m_block_fsm.is_vectoring(); }
+  bool is_avoiding_collision(void) const {
+    return current_state() == ST_COLLISION_AVOIDANCE;
+  }
 
   /**
    * @brief Run the FSM in its current state without injecting an event into it.
    */
   void run(void);
 
- protected:
-  enum fsm_states {
-    ST_START,
-    ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a block */
-    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
-    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_MAX_STATES
-  };
+  /**
+   * @brief Reset the # of timesteps the robot has spent unsuccessfully looking
+   * for a block.
+   */
+  void explore_time_reset(void) { m_state.time_exploring_unsuccessfully = 0; }
+
+  /**
+   * @brief Increment the # of timesteps the robot has spent unsuccessfully
+   * looking for a block.
+   */
+  void explore_time_inc(void) { ++m_state.time_exploring_unsuccessfully; }
+
+  /**
+   * @brief Get the # of timesteps the robot has spent unsuccessfully looking
+   * for a block.
+   */
+  size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
 
  private:
   /**
@@ -118,44 +124,59 @@ class memory_foraging_fsm : public base_foraging_fsm {
   void update_state(uint8_t update_state);
 
  private:
+  /**
+   * @brief Inject randomness into robot exploring by having them change their
+   * direction every X timesteps if they have not yet located a block, where X
+   * is set in the .argos configuration file.
+   */
+  struct new_direction_data : public state_machine::event_data {
+    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
+    argos::CRadians dir;
+  };
+
+  struct fsm_state {
+    fsm_state(void) : time_exploring_unsuccessfully(0) {}
+
+    size_t time_exploring_unsuccessfully;
+  };
+
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
-                     state_machine::no_event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     state_machine::no_event_data);
-
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_return_to_nest,
-                     state_machine::no_event_data);
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_leaving_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm, collision_avoidance,
+                     state_machine::event_data);
+  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_collision_avoidance,
                      state_machine::no_event_data);
 
-  /* memory foraging states */
-  HFSM_STATE_DECLARE(memory_foraging_fsm, start, state_machine::no_event_data);
-  HFSM_STATE_DECLARE(memory_foraging_fsm, acquire_free_block,
+  /* states for exploration FSM */
+  HFSM_STATE_DECLARE(explore_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(explore_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_DECLARE(explore_fsm, explore, state_machine::event_data);
+  HFSM_ENTRY_DECLARE(explore_fsm, entry_new_direction,
                      state_machine::no_event_data);
-  HFSM_EXIT_DECLARE(memory_foraging_fsm, exit_acquire_free_block);
+  HFSM_ENTRY_DECLARE(explore_fsm, entry_explore,
+                     state_machine::no_event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_free_block, hfsm::top_state(),
-                                    NULL, NULL, &exit_acquire_free_block),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
                                     NULL,
-                                    &entry_return_to_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
+                                    &entry_explore, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, hfsm::top_state(),
                                     NULL,
-                                    &entry_leaving_nest, NULL),
+                                    &entry_collision_avoidance, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, hfsm::top_state(),
+                                    NULL,
+                                    &entry_new_direction, NULL),
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
   return &kSTATE_MAP[index];
   }
 
-  memory_foraging_fsm(const memory_foraging_fsm& fsm) = delete;
-  memory_foraging_fsm& operator=(const memory_foraging_fsm& fsm) = delete;
+  explore_fsm(const explore_fsm& fsm) = delete;
+  explore_fsm& operator=(const explore_fsm& fsm) = delete;
 
   /* data members */
-  const argos::CVector2 mc_nest_center;
+  const double mc_unsuccessful_dir_change;
 
   uint8_t m_current_state;
   uint8_t m_next_state;
@@ -164,10 +185,10 @@ class memory_foraging_fsm : public base_foraging_fsm {
   uint8_t m_last_state;
 
   argos::CRandom::CRNG* m_rng;
-  vector_fsm m_vector_fsm;
-  locate_free_block_fsm m_block_fsm;
+  struct fsm_state m_state;
+  argos::CRadians m_new_dir;
 };
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXPLORE_FSM_HPP_ */

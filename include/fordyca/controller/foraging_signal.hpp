@@ -30,7 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace fsm = rcppsw::patterns::state_machine;
+namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
@@ -39,15 +39,17 @@ namespace fsm = rcppsw::patterns::state_machine;
  * @brief Signals that sub-states can return in order to notify their super
  * states that a conditiot that they do not know how to handle has arised.
  */
-class foraging_signal : public fsm::event_signal {
+class foraging_signal : public state_machine::event_signal {
  public:
   enum type {
     /**
      * A block has been located (i.e. appeared within a robot's LOS)
      */
-    BLOCK_LOCATED = fsm::event_signal::EXTERNAL_SIGNALS,
+    BLOCK_LOCATED = state_machine::event_signal::EXTERNAL_SIGNALS,
     BLOCK_ACQUIRED,    /// A robot has picked up a block
-    ARRIVED_AT_TARGET  /// A robot has arrived at its target
+    ARRIVED_AT_TARGET,  /// A robot has arrived at its target
+    ARRIVED_IN_NEST,
+    LEFT_NEST
   };
 };
 

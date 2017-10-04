@@ -31,6 +31,7 @@
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -150,7 +151,7 @@ class random_foraging_controller : public base_foraging_controller,
   std::shared_ptr<rcppsw::common::er_server> m_server;
   std::shared_ptr<actuator_manager>          m_actuators;
   std::shared_ptr<sensor_manager>            m_sensors;
-  std::unique_ptr<random_foraging_fsm>       m_fsm;
+  std::unique_ptr<fsm::random_foraging_fsm>  m_fsm;
 };
 
 NS_END(controller, fordyca);

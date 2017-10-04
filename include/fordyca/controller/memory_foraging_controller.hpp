@@ -141,7 +141,7 @@ class memory_foraging_controller : public random_foraging_controller,
   bool                                                 m_display_los;
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::shared_ptr<memory_foraging_fsm>                 m_fsm;
+  std::shared_ptr<fsm::memory_foraging_fsm>            m_fsm;
 };
 
 NS_END(controller, fordyca);

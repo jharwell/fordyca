@@ -79,7 +79,7 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   }
   set_wheel_speeds(data->heading.Length(), data->heading.Length(),
                    data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   if (data->force_hard ||
@@ -99,7 +99,7 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   double speed2 = data->heading.Length() + data->heading.Length() *
                   (1.0 - speed_factor);
   set_wheel_speeds(speed1, speed2, data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (Abs(data->heading.Angle().SignedNormalize()) <
@@ -111,7 +111,7 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   }
   set_wheel_speeds(-mc_params->wheels.max_speed, mc_params->wheels.max_speed,
                    data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
 /*******************************************************************************

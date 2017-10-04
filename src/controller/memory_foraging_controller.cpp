@@ -79,7 +79,7 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetId()));
 
   m_fsm.reset(
-      new memory_foraging_fsm(static_cast<const struct params::fsm_params*>(
+      new fsm::memory_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
                        server(),
                        sensors(),

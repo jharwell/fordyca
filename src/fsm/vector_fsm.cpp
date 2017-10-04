@@ -25,12 +25,14 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/fsm/vector_fsm.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-namespace fsm = rcppsw::patterns::state_machine;
+NS_START(fordyca, fsm);
+namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constants
@@ -42,10 +44,10 @@ double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(double frequent_collision_thresh,
-                               std::shared_ptr<rcppsw::common::er_server> server,
-                               std::shared_ptr<sensor_manager> sensors,
-                               std::shared_ptr<actuator_manager> actuators) :
-    fsm::simple_fsm(server, ST_MAX_STATES),
+                       std::shared_ptr<rcppsw::common::er_server> server,
+                       std::shared_ptr<controller::sensor_manager> sensors,
+                       std::shared_ptr<controller::actuator_manager> actuators) :
+    polled_simple_fsm(server, ST_MAX_STATES),
     start(),
     vector(),
     collision_avoidance(),
@@ -69,10 +71,10 @@ vector_fsm::vector_fsm(double frequent_collision_thresh,
               1,
               m_actuators->max_wheel_speed() * 0.1,
               m_actuators->max_wheel_speed() * 0.7) {
-    insmod("vector_fsm",
-           rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::NOM);
-    }
+  insmod("vector_fsm",
+         rcppsw::common::er_lvl::DIAG,
+         rcppsw::common::er_lvl::NOM);
+}
 
 /*******************************************************************************
  * Events
@@ -81,9 +83,9 @@ void vector_fsm::event_start(const argos::CVector2& goal) {
   static const uint8_t kTRANSITIONS[] = {
     ST_VECTOR,                  /* start */
     ST_VECTOR,                  /* vector */
-    fsm::event_signal::IGNORED,  /* collision avoidance */
-    fsm::event_signal::IGNORED,  /* collision recovery */
-    fsm::event_signal::IGNORED,  /* arrived */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision avoidance */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision recovery */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* arrived */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()],
@@ -93,11 +95,11 @@ void vector_fsm::event_start(const argos::CVector2& goal) {
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(vector_fsm, start, fsm::no_event_data) {
-  return fsm::event_signal::HANDLED;
+FSM_STATE_DEFINE(vector_fsm, start, state_machine::no_event_data) {
+  return state_machine::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(vector_fsm, collision_avoidance, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_fsm, collision_avoidance, state_machine::no_event_data) {
   argos::CVector2 vector;
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
@@ -120,9 +122,9 @@ FSM_STATE_DEFINE(vector_fsm, collision_avoidance, fsm::no_event_data) {
   } else {
     internal_event(ST_COLLISION_RECOVERY);
   }
-  return fsm::event_signal::HANDLED;
+  return rcppsw::patterns::state_machine::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, collision_recovery, fsm::no_event_data) {
+FSM_STATE_DEFINE(vector_fsm, collision_recovery, state_machine::no_event_data) {
   if (ST_COLLISION_RECOVERY != last_state()) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
@@ -131,7 +133,7 @@ FSM_STATE_DEFINE(vector_fsm, collision_recovery, fsm::no_event_data) {
     m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
-  return fsm::event_signal::HANDLED;
+  return rcppsw::patterns::state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   if (ST_VECTOR != last_state()) {
@@ -155,7 +157,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
     m_lin_pid.reset();
     internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(m_goal));
   }
-  argos::CVector2 robot_to_goal = calc_vector_fsm(m_goal);
+  argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal);
   argos::CVector2 heading = m_sensors->robot_heading();
   double angle_diff = heading.Angle().GetValue() -
                       robot_to_goal.Angle().GetValue();
@@ -172,7 +174,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
          heading.GetX(), heading.GetY(), heading.Angle().GetValue(),
          ang_speed, lin_speed);
   m_actuators->set_wheel_speeds(lin_speed, ang_speed);
-  return fsm::event_signal::HANDLED;
+  return rcppsw::patterns::state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_VECTOR != last_state()) {
@@ -180,19 +182,19 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
             data->goal.GetX(), data->goal.GetY(),
             kVECTOR_FSM_MIN_DIFF);
   }
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
-FSM_ENTRY_DEFINE(vector_fsm, entry_vector, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_vector, state_machine::no_event_data) {
   ER_DIAG("Entering ST_VECTOR");
   m_actuators->leds_set_color(argos::CColor::BLUE);
 }
-FSM_ENTRY_DEFINE(vector_fsm, entry_collision_avoidance, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_collision_avoidance, state_machine::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
   m_state.last_collision_time = m_sensors->tick();
 }
-FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, fsm::no_event_data) {
+FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, state_machine::no_event_data) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
@@ -200,14 +202,13 @@ FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, fsm::no_event_data) {
  * General Member Functions
  ******************************************************************************/
 void vector_fsm::init(void) {
-  m_state.time_exploring_unsuccessfully = 0;
   m_actuators->reset();
   simple_fsm::init();
 } /* init() */
 
-argos::CVector2 vector_fsm::calc_vector_fsm(const argos::CVector2& goal) {
+argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2& goal) {
   return goal - m_sensors->robot_loc();
-} /* calc_vector_fsm() */
+} /* calc_vector_to_goal() */
 
 argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
@@ -217,4 +218,4 @@ argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 vector) {
 } /* randomize_vector_angle() */
 
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);
