@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,7 +31,7 @@
 
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/locate_free_block_fsm.hpp"
+#include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -165,9 +165,9 @@ class memory_foraging_fsm : public base_foraging_fsm {
 
   argos::CRandom::CRNG* m_rng;
   vector_fsm m_vector_fsm;
-  locate_free_block_fsm m_block_fsm;
+  acquire_free_block_fsm m_block_fsm;
 };
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_ */
