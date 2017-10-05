@@ -58,25 +58,9 @@ class base_foraging_fsm : public state_machine::hfsm {
                     uint max_states);
 
   /**
-   * @brief If TRUE, the robot is returning to the nest, probably after having
-   * successfully picked up a block.
-   */
-  virtual bool is_returning(void) const;
-
-  /**
-   * @brief If TRUE, the robot is currently engaged in collision avoidance.
-   */
-  virtual bool is_avoiding_collision(void) const;
-
-  /**
    * @brief (Re)-initialize the FSM.
    */
   void init(void);
-
-  /**
-   * @brief Run the FSM in its current state, without injecting an event.
-   */
-  void run(void) { generated_event(true); state_engine(); }
 
  protected:
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);

@@ -74,10 +74,17 @@ class random_foraging_fsm : public base_foraging_fsm {
    */
   void run(void) { generated_event(true); state_engine(); }
 
+  /**
+   * @brief If TRUE, the robot is returning to the nest, probably after having
+   * successfully picked up a block.
+   */
   bool is_returning(void) const {
     return current_state() == ST_RETURN_TO_NEST;
   }
 
+  /**
+   * @brief If TRUE, the robot is currently engaged in collision avoidance.
+   */
   bool is_avoiding_collision(void) const {
     return m_explore_fsm.is_avoiding_collision();
   }

@@ -77,6 +77,10 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
 
+  bool is_avoiding_collision(void) const {
+    return ST_COLLISION_AVOIDANCE == current_state() ||
+        ST_COLLISION_AVOIDANCE == current_state();
+  }
   /**
    * @brief (Re)start the FSM, with a new goal.
    *

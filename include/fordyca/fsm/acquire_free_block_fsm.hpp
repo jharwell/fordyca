@@ -91,7 +91,9 @@ class acquire_free_block_fsm : public base_foraging_fsm,
   bool is_vectoring(void) const {
     return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.in_progress();
   }
-
+  bool is_avoiding_collision(void) const {
+    return m_explore_fsm.is_avoiding_collision();
+  }
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
 
