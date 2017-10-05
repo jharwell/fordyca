@@ -41,7 +41,7 @@ actuator_manager::actuator_manager(
     argos::CCI_DifferentialSteeringActuator* const wheels,
     argos::CCI_LEDsActuator* const leds,
     argos::CCI_RangeAndBearingActuator* const raba) :
-    simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
+    state_machine::simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
     no_turn(),
     soft_turn(),
     hard_turn(),
@@ -79,7 +79,7 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   }
   set_wheel_speeds(data->heading.Length(), data->heading.Length(),
                    data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   if (data->force_hard ||
@@ -99,7 +99,7 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   double speed2 = data->heading.Length() + data->heading.Length() *
                   (1.0 - speed_factor);
   set_wheel_speeds(speed1, speed2, data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (Abs(data->heading.Angle().SignedNormalize()) <
@@ -111,7 +111,7 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   }
   set_wheel_speeds(-mc_params->wheels.max_speed, mc_params->wheels.max_speed,
                    data->heading.Angle());
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
 /*******************************************************************************
@@ -156,7 +156,7 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
 
 void actuator_manager::reset(void) {
   m_raba->ClearData();
-  simple_fsm::init();
+  state_machine::simple_fsm::init();
 } /* reset() */
 
 double actuator_manager::max_wheel_speed(void) const {

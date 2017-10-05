@@ -18,34 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_VECTOR_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_VECTOR_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
+#include "rcppsw/task_allocation/polled_simple_fsm.hpp"
 #include "rcppsw/control/pid_loop.hpp"
+#include "fordyca/fsm/task_arguments.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-namespace fsm = rcppsw::patterns::state_machine;
+NS_START(fordyca);
+
+namespace controller {
+class sensor_manager;
+class actuator_manager;
+} /* namespace controller */
+
+namespace state_machine = rcppsw::patterns::state_machine;
+NS_START(fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class vector_fsm : public fsm::simple_fsm {
+class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
   vector_fsm(double frequent_collision_thresh,
-                 std::shared_ptr<rcppsw::common::er_server> server,
-                 std::shared_ptr<sensor_manager> sensors,
-                 std::shared_ptr<actuator_manager> actuators);
+             std::shared_ptr<rcppsw::common::er_server> server,
+             std::shared_ptr<controller::sensor_manager> sensors,
+             std::shared_ptr<controller::actuator_manager> actuators);
 
   /**
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
@@ -59,7 +65,7 @@ class vector_fsm : public fsm::simple_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool arrived_at_goal(void) const { return current_state() == ST_ARRIVED; }
+  bool task_finished(void) const  { return current_state() == ST_ARRIVED; }
 
   /**
    * @brief Determine if the robot is still on the way to the specified
@@ -72,17 +78,11 @@ class vector_fsm : public fsm::simple_fsm {
   }
 
   /**
-   * @brief Run the FSM in its current state, without injecting an event.
-   *
-   */
-  void run(void) { generated_event(true); state_engine(); }
-
-  /**
-   * @brief Restart the FSM, with a new goal.
+   * @brief (Re)start the FSM, with a new goal.
    *
    * @param goal The (X, Y) coordinates of the new goal to drive to.
    */
-  void event_start(const argos::CVector2& goal);
+  void task_start(const rcppsw::task_allocation::taskable_argument* const arg);
 
  protected:
   enum fsm_states {
@@ -101,7 +101,7 @@ class vector_fsm : public fsm::simple_fsm {
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
    */
-  struct goal_data : public fsm::event_data {
+  struct goal_data : public rcppsw::patterns::state_machine::event_data {
     explicit goal_data(argos::CVector2 goal_) : goal(goal_) {}
     goal_data(void) : goal() {}
 
@@ -109,10 +109,7 @@ class vector_fsm : public fsm::simple_fsm {
   };
 
   struct fsm_state {
-    fsm_state(void) : time_exploring_unsuccessfully(0),
-                      last_collision_time(0) {}
-
-    size_t time_exploring_unsuccessfully;
+    fsm_state(void) : last_collision_time(0) {}
     uint last_collision_time;
   };
 
@@ -142,21 +139,23 @@ class vector_fsm : public fsm::simple_fsm {
    * @return The vector, specified with the tail at the robot and the head
    * pointing towards the goal.
    */
-  argos::CVector2 calc_vector_fsm(const argos::CVector2& goal);
+  argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
   /* states */
-  FSM_STATE_DECLARE(vector_fsm, start, fsm::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, start, state_machine::no_event_data);
   FSM_STATE_DECLARE(vector_fsm, vector, struct goal_data);
-  FSM_STATE_DECLARE(vector_fsm, collision_avoidance, fsm::no_event_data);
-  FSM_STATE_DECLARE(vector_fsm, collision_recovery, fsm::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, collision_avoidance,
+                    state_machine::no_event_data);
+  FSM_STATE_DECLARE(vector_fsm, collision_recovery,
+                    state_machine::no_event_data);
   FSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);
 
   FSM_ENTRY_DECLARE(vector_fsm, entry_vector,
-                    fsm::no_event_data);
+                    state_machine::no_event_data);
   FSM_ENTRY_DECLARE(vector_fsm, entry_collision_avoidance,
-                    fsm::no_event_data);
+                    state_machine::no_event_data);
   FSM_ENTRY_DECLARE(vector_fsm, entry_collision_recovery,
-                    fsm::no_event_data);
+                    state_machine::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
@@ -180,13 +179,13 @@ class vector_fsm : public fsm::simple_fsm {
   struct fsm_state m_state;
   uint m_freq_collision_thresh;
   uint m_collision_rec_count;
-  std::shared_ptr<sensor_manager> m_sensors;
-  std::shared_ptr<actuator_manager> m_actuators;
+  std::shared_ptr<controller::sensor_manager> m_sensors;
+  std::shared_ptr<controller::actuator_manager> m_actuators;
   argos::CVector2 m_goal;
   rcppsw::control::pid_loop m_ang_pid;
   rcppsw::control::pid_loop m_lin_pid;
 };
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_VECTOR_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_VECTOR_FSM_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_fsm.hpp
+ * @file acquire_free_block_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,9 +29,11 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 
-#include "fordyca/fsm/vector_fsm.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
+#include "fordyca/fsm/explore_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,11 +49,6 @@ class sensor_manager;
 class actuator_manager;
 } /* namespace controller */
 
-namespace representation {
-class perceived_arena_map;
-class block;
-} /* namespace representation */
-
 NS_START(fsm);
 
 /*******************************************************************************
@@ -63,9 +60,10 @@ NS_START(fsm);
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class memory_foraging_fsm : public base_foraging_fsm {
+class acquire_free_block_fsm : public base_foraging_fsm,
+                               public  rcppsw::task_allocation::taskable {
  public:
-  memory_foraging_fsm(
+  acquire_free_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
       const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -83,69 +81,82 @@ class memory_foraging_fsm : public base_foraging_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool is_searching_for_block(void) const { return m_block_fsm.is_searching_for_block(); }
+  bool is_searching_for_block(void) const {
+    return is_vectoring() || is_exploring();
+  }
 
-  bool is_exploring(void) const { return m_block_fsm.is_exploring(); }
-  bool is_vectoring(void) const { return m_block_fsm.is_vectoring(); }
+  bool is_exploring(void) const {
+    return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching()); }
 
-  /**
-   * @brief Run the FSM in its current state without injecting an event into it.
-   */
-  void run(void);
+  bool is_vectoring(void) const {
+    return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.in_progress();
+  }
+
+  void task_execute(void) override;
+  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
 
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a block */
-    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
-    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ST_ACQUIRE_BLOCK, /* superstate for finding a free block */
+    ST_FINISHED,
     ST_MAX_STATES
   };
 
  private:
-  /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
+  /**
+   * @brief Acquire a free block.
+   *
+   * @return TRUE if a block has been acquired, FALSE otherwise.
+   */
+  bool acquire_free_block(void);
+
+  /**
+   * @brief Acquire a known block. If the robot's knowledge of the chosen
+   * block's existence expires during the pursuit of a known block, that is
+   * ignored.
+   */
+  void acquire_known_block(
+      std::list<std::pair<const representation::block*, double>> blocks);
+
+  /*
+   * States for locate_block FSM. Note that the states for the vector_fsm
+   * sub-fsm cannot be part of the locate_block hfsm, because that sub-fsm is
+   * initiated from multiple states, and hfsm states can only have ONE parent
+   * state.
+   **/
+  HFSM_STATE_DECLARE(acquire_free_block_fsm, start,
                      state_machine::no_event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
+  HFSM_STATE_DECLARE(acquire_free_block_fsm, acquire_block,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(acquire_free_block_fsm, finished,
                      state_machine::no_event_data);
 
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_return_to_nest,
-                     state_machine::no_event_data);
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_leaving_nest,
-                     state_machine::no_event_data);
-
-  /* memory foraging states */
-  HFSM_STATE_DECLARE(memory_foraging_fsm, start, state_machine::no_event_data);
-  HFSM_STATE_DECLARE(memory_foraging_fsm, acquire_free_block,
-                     state_machine::no_event_data);
-  HFSM_EXIT_DECLARE(memory_foraging_fsm, exit_acquire_free_block);
+  HFSM_EXIT_DECLARE(acquire_free_block_fsm, exit_acquire_block);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_free_block, hfsm::top_state(),
-                                    NULL, NULL, &exit_acquire_free_block),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, hfsm::top_state(),
                                     NULL,
-                                    &entry_return_to_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
-                                    NULL,
-                                    &entry_leaving_nest, NULL),
+                                    NULL, &exit_acquire_block),
+        HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state())
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
   return &kSTATE_MAP[index];
   }
 
-  memory_foraging_fsm(const memory_foraging_fsm& fsm) = delete;
-  memory_foraging_fsm& operator=(const memory_foraging_fsm& fsm) = delete;
+  acquire_free_block_fsm(const acquire_free_block_fsm& fsm) = delete;
+  acquire_free_block_fsm& operator=(const acquire_free_block_fsm& fsm) = delete;
 
-  /* data members */
   const argos::CVector2 mc_nest_center;
   argos::CRandom::CRNG* m_rng;
+  std::shared_ptr<const representation::perceived_arena_map> m_map;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
   vector_fsm m_vector_fsm;
-  acquire_free_block_fsm m_block_fsm;
+  explore_fsm m_explore_fsm;
 };
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_ */

@@ -41,12 +41,12 @@ struct actuator_params;
 
 NS_START(controller);
 
-namespace fsm = rcppsw::patterns::state_machine;
+namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class actuator_manager: public fsm::simple_fsm {
+class actuator_manager: public state_machine::simple_fsm {
  public:
   actuator_manager(const struct params::actuator_params* params,
                    argos::CCI_DifferentialSteeringActuator* const wheels,
@@ -71,12 +71,13 @@ class actuator_manager: public fsm::simple_fsm {
   void reset(void);
 
   /**
-   * @brief Direct control over the linear/angular speeds of the wheels. This
-   * provides an alternative interface much more precise rather than just saying
-   * "go in this direction now" than you get with \ref set_heading(). However,
-   * it is also more difficult to use. Note that if lin_speed + ang_speed is
-   * greater than the specified parameter value for max wheel speed for either
-   * wheel it will saturate.
+   * @brief Direct control over the linear/angular speeds of the wheels.
+   *
+   * This provides an alternative interface much more precise rather than just
+   * saying "go in this direction now" than you get with \ref
+   * set_heading(). However, it is also more difficult to use. Note that if
+   * lin_speed + ang_speed is greater than the specified parameter value for max
+   * wheel speed for either wheel it will saturate.
    *
    * @param lin_speed The desired linear speed.
    * @param ang_speed The desired angular speed.
@@ -98,7 +99,7 @@ class actuator_manager: public fsm::simple_fsm {
     ST_MAX_STATES
   };
 
-  struct turn_data : public fsm::event_data {
+  struct turn_data : public state_machine::event_data {
     turn_data(argos::CVector2 heading_, bool force_hard_) :
         heading(heading_), force_hard(force_hard_) {}
     argos::CVector2 heading;
@@ -121,7 +122,6 @@ class actuator_manager: public fsm::simple_fsm {
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   std::shared_ptr<const struct params::actuator_params>  mc_params;
-
 };
 
 NS_END(controller, fordyca);

@@ -33,7 +33,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 cell2D_fsm::cell2D_fsm(
     const std::shared_ptr<rcppsw::common::er_server>& server) :
-    simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
+    state_machine::simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
     state_unknown(),
     state_empty(),
     state_block(),
@@ -63,8 +63,8 @@ void cell2D_fsm::event_empty(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_EMPTY,                 /* unknown */
         ST_EMPTY,                 /* empty */
-        fsm::event_signal::FATAL, /* has block */
-        fsm::event_signal::FATAL  /* has cache */
+        state_machine::event_signal::FATAL, /* has block */
+        state_machine::event_signal::FATAL  /* has cache */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);
@@ -84,8 +84,8 @@ void cell2D_fsm::event_block_drop(void) {
 
 void cell2D_fsm::event_block_pickup(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        fsm::event_signal::FATAL,   /* unknown */
-        fsm::event_signal::FATAL,   /* empty */
+        state_machine::event_signal::FATAL,   /* unknown */
+        state_machine::event_signal::FATAL,   /* empty */
         ST_EMPTY,                   /* has block */
         ST_HAS_CACHE                /* has cache */
     };
@@ -97,27 +97,27 @@ void cell2D_fsm::event_block_pickup(void) {
 /*******************************************************************************
  * State Functions
  ******************************************************************************/
-FSM_STATE_DEFINE(cell2D_fsm, state_unknown, fsm::no_event_data) {
+FSM_STATE_DEFINE(cell2D_fsm, state_unknown, state_machine::no_event_data) {
   if (ST_UNKNOWN != last_state()) {
     ER_DIAG("Cell in UNKNOWN state.");
     m_block_count = 0;
   }
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_empty, fsm::no_event_data) {
+FSM_STATE_DEFINE(cell2D_fsm, state_empty, state_machine::no_event_data) {
   if (ST_EMPTY != last_state()) {
     ER_DIAG("Cell in EMPTY state.");
     m_block_count = 0;
   }
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(cell2D_fsm, state_block, fsm::no_event_data) {
+FSM_STATE_DEFINE(cell2D_fsm, state_block, state_machine::no_event_data) {
   if (ST_HAS_BLOCK != last_state()) {
     m_block_count = 1;
     ER_DIAG("Cell HAS_BLOCK.");
   }
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
 FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
@@ -136,14 +136,14 @@ FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
   if (1 == m_block_count) {
     internal_event(ST_HAS_BLOCK);
   }
-  return fsm::event_signal::HANDLED;
+  return state_machine::event_signal::HANDLED;
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void cell2D_fsm::init(void) {
-  simple_fsm::init();
+  state_machine::simple_fsm::init();
 } /* init() */
 
 NS_END(representation, fordyca);

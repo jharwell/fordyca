@@ -96,7 +96,7 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
   m_fsm.reset(
-      new random_foraging_fsm(static_cast<const struct params::fsm_params*>(
+      new fsm::random_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
                        m_server,
                        m_sensors,
