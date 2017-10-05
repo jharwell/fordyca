@@ -42,8 +42,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
 base_foraging_fsm::base_foraging_fsm(
     std::shared_ptr<rcppsw::common::er_server> server,
     std::shared_ptr<controller::sensor_manager> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators) :
-    state_machine::hfsm(server),
+    std::shared_ptr<controller::actuator_manager> actuators,
+    uint max_states) :
+    state_machine::hfsm(server, max_states),
     HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),

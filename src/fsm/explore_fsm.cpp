@@ -43,7 +43,7 @@ explore_fsm::explore_fsm(
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<controller::sensor_manager>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators) :
-    base_foraging_fsm(server, sensors, actuators),
+    base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -52,11 +52,6 @@ explore_fsm::explore_fsm(
     entry_new_direction(),
     entry_explore(),
     mc_unsuccessful_dir_change(unsuccessful_dir_change_thresh),
-    m_current_state(ST_START),
-    m_next_state(ST_START),
-    m_initial_state(ST_START),
-    m_previous_state(ST_START),
-    m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
     m_new_dir() {
@@ -147,14 +142,6 @@ void explore_fsm::init(void) {
   explore_time_reset();
   base_foraging_fsm::init();
 } /* init() */
-
-void explore_fsm::update_state(uint8_t new_state) {
-  if (new_state != m_current_state) {
-    m_previous_state = m_current_state;
-  }
-  m_last_state = m_current_state;
-  m_current_state = new_state;
-} /* update_state() */
 
 void explore_fsm::run(void) {
   inject_event(state_machine::event_signal::IGNORED,

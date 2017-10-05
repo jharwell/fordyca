@@ -54,7 +54,8 @@ class base_foraging_fsm : public state_machine::hfsm {
  public:
   base_foraging_fsm(std::shared_ptr<rcppsw::common::er_server> server,
                     std::shared_ptr<controller::sensor_manager> sensors,
-                    std::shared_ptr<controller::actuator_manager> actuators);
+                    std::shared_ptr<controller::actuator_manager> actuators,
+                    uint max_states);
 
   /**
    * @brief If TRUE, the robot is returning to the nest, probably after having

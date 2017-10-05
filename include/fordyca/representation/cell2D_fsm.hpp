@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
-namespace fsm = rcppsw::patterns::state_machine;
+namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
@@ -42,7 +42,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief Per-cell (2D square on arena map) state machine containing the current
  * state of the cell (empty, has a block, or unknown).
  */
-class cell2D_fsm : public fsm::simple_fsm,
+class cell2D_fsm : public state_machine::simple_fsm,
                    public visitor::visitable<cell2D_fsm> {
  public:
   enum state {
@@ -69,14 +69,14 @@ class cell2D_fsm : public fsm::simple_fsm,
   void init(void);
 
  private:
-  struct block_data : public fsm::event_data {
+  struct block_data : public state_machine::event_data {
     block_data(bool pickup_ = false) : pickup(pickup_) {}
     bool pickup;
   };
 
-  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, fsm::no_event_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_empty, fsm::no_event_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_block, fsm::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, state_machine::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_empty, state_machine::no_event_data);
+  FSM_STATE_DECLARE(cell2D_fsm, state_block, state_machine::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {

@@ -28,6 +28,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/task_allocation/polled_simple_fsm.hpp"
 #include "rcppsw/control/pid_loop.hpp"
+#include "fordyca/fsm/task_arguments.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,11 +78,11 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   }
 
   /**
-   * @brief Restart the FSM, with a new goal.
+   * @brief (Re)start the FSM, with a new goal.
    *
    * @param goal The (X, Y) coordinates of the new goal to drive to.
    */
-  void event_start(const argos::CVector2& goal);
+  void task_start(const rcppsw::task_allocation::taskable_argument* const arg);
 
  protected:
   enum fsm_states {

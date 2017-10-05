@@ -41,7 +41,7 @@ actuator_manager::actuator_manager(
     argos::CCI_DifferentialSteeringActuator* const wheels,
     argos::CCI_LEDsActuator* const leds,
     argos::CCI_RangeAndBearingActuator* const raba) :
-    simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
+    state_machine::simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
     no_turn(),
     soft_turn(),
     hard_turn(),
@@ -156,7 +156,7 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
 
 void actuator_manager::reset(void) {
   m_raba->ClearData();
-  simple_fsm::init();
+  state_machine::simple_fsm::init();
 } /* reset() */
 
 double actuator_manager::max_wheel_speed(void) const {

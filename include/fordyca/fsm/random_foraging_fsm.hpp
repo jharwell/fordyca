@@ -107,15 +107,6 @@ class random_foraging_fsm : public base_foraging_fsm {
   HFSM_STATE_DECLARE(random_foraging_fsm, acquire_block,
                      state_machine::no_event_data);
 
-  /* member functions */
-  uint8_t current_state(void) const { return m_current_state; }
-  uint8_t max_states(void) const { return ST_MAX_STATES; }
-  uint8_t next_state(void) const { return m_next_state; }
-  uint8_t initial_state(void) const { return m_initial_state; }
-  void next_state(uint8_t next_state) { m_next_state = next_state; }
-  uint8_t last_state(void) const { return m_last_state; }
-  void update_state(uint8_t update_state);
-
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
@@ -133,12 +124,6 @@ class random_foraging_fsm : public base_foraging_fsm {
 
   random_foraging_fsm(const random_foraging_fsm& fsm) = delete;
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
-
-  uint8_t m_current_state;
-  uint8_t m_next_state;
-  uint8_t m_initial_state;
-  uint8_t m_previous_state;
-  uint8_t m_last_state;
 
   argos::CRandom::CRNG* m_rng;
   explore_fsm m_explore_fsm;

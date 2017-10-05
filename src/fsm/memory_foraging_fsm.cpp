@@ -44,7 +44,7 @@ memory_foraging_fsm::memory_foraging_fsm(
     const std::shared_ptr<controller::sensor_manager>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server, sensors, actuators),
+    base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
     entry_return_to_nest(),
@@ -53,11 +53,6 @@ memory_foraging_fsm::memory_foraging_fsm(
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
     exit_acquire_free_block(),
     mc_nest_center(params->nest_center),
-    m_current_state(ST_START),
-    m_next_state(ST_START),
-    m_initial_state(ST_START),
-    m_previous_state(ST_START),
-    m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators),
@@ -97,14 +92,6 @@ void memory_foraging_fsm::init(void) {
   base_foraging_fsm::init();
   m_block_fsm.task_reset();
 } /* init() */
-
-void memory_foraging_fsm::update_state(uint8_t new_state) {
-  if (new_state != m_current_state) {
-    m_previous_state = m_current_state;
-  }
-  m_last_state = m_current_state;
-  m_current_state = new_state;
-} /* update_state() */
 
 void memory_foraging_fsm::run(void) {
   inject_event(state_machine::event_signal::IGNORED,

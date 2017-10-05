@@ -110,21 +110,6 @@ class explore_fsm : public base_foraging_fsm {
 
  private:
   /**
-   * @brief Get the previous state of the FSM. Note that this is not necessarily the state
-   * that the FSM was in last time the state engine was run, but that this is
-   * the last visited state that is NOT the current state.
-   */
-  uint8_t previous_state(void) const { return m_previous_state; }
-  uint8_t current_state(void) const { return m_current_state; }
-  uint8_t max_states(void) const { return ST_MAX_STATES; }
-  uint8_t next_state(void) const { return m_next_state; }
-  uint8_t initial_state(void) const { return m_initial_state; }
-  void next_state(uint8_t next_state) { m_next_state = next_state; }
-  uint8_t last_state(void) const { return m_last_state; }
-  void update_state(uint8_t update_state);
-
- private:
-  /**
    * @brief Inject randomness into robot exploring by having them change their
    * direction every X timesteps if they have not yet located a block, where X
    * is set in the .argos configuration file.
@@ -177,12 +162,6 @@ class explore_fsm : public base_foraging_fsm {
 
   /* data members */
   const double mc_unsuccessful_dir_change;
-
-  uint8_t m_current_state;
-  uint8_t m_next_state;
-  uint8_t m_initial_state;
-  uint8_t m_previous_state;
-  uint8_t m_last_state;
 
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;

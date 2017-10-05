@@ -77,22 +77,6 @@ vector_fsm::vector_fsm(double frequent_collision_thresh,
 }
 
 /*******************************************************************************
- * Events
- ******************************************************************************/
-void vector_fsm::event_start(const argos::CVector2& goal) {
-  static const uint8_t kTRANSITIONS[] = {
-    ST_VECTOR,                  /* start */
-    ST_VECTOR,                  /* vector */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision avoidance */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision recovery */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* arrived */
-  };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
-  external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<struct goal_data>(goal));
-}
-
-/*******************************************************************************
  * States
  ******************************************************************************/
 FSM_STATE_DEFINE(vector_fsm, start, state_machine::no_event_data) {
@@ -201,9 +185,24 @@ FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, state_machine::no_event_d
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
+void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
+  static const uint8_t kTRANSITIONS[] = {
+    ST_VECTOR,                  /* start */
+    ST_VECTOR,                  /* vector */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision avoidance */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision recovery */
+    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* arrived */
+  };
+  const vector_argument* const a = dynamic_cast<const vector_argument* const>(arg);
+  ER_ASSERT(a, "FATAL: bad argument passed");
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  external_event(kTRANSITIONS[current_state()],
+                 rcppsw::make_unique<struct goal_data>(a->vector()));
+}
+
 void vector_fsm::init(void) {
   m_actuators->reset();
-  simple_fsm::init();
+  state_machine::simple_fsm::init();
 } /* init() */
 
 argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2& goal) {

@@ -41,18 +41,13 @@ random_foraging_fsm::random_foraging_fsm(
     std::shared_ptr<rcppsw::common::er_server> server,
     std::shared_ptr<controller::sensor_manager> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
-    base_foraging_fsm(server, sensors, actuators),
+    base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(leaving_nest, &start),
     entry_return_to_nest(),
     entry_leaving_nest(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
-    m_current_state(ST_START),
-    m_next_state(ST_START),
-    m_initial_state(ST_START),
-    m_previous_state(ST_START),
-    m_last_state(ST_START),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
                   server, sensors, actuators) {
@@ -80,13 +75,5 @@ void random_foraging_fsm::init(void) {
 bool random_foraging_fsm::is_exploring(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
 } /* is_exploring() */
-
-void random_foraging_fsm::update_state(uint8_t new_state) {
-  if (new_state != m_current_state) {
-    m_previous_state = m_current_state;
-  }
-  m_last_state = m_current_state;
-  m_current_state = new_state;
-} /* update_state() */
 
 NS_END(fsm, fordyca);
