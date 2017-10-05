@@ -67,7 +67,7 @@ class random_foraging_fsm : public base_foraging_fsm {
   /**
    * @brief (Re)-initialize the FSM.
    */
-  void init(void);
+  void init(void) override;
 
   /**
    * @brief Run the FSM in its current state, without injecting an event.
@@ -114,7 +114,7 @@ class random_foraging_fsm : public base_foraging_fsm {
   HFSM_STATE_DECLARE(random_foraging_fsm, acquire_block,
                      state_machine::no_event_data);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_block, hfsm::top_state()),
