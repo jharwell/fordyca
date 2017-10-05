@@ -1,5 +1,5 @@
 /**
- * @file acquire_free_block_fsm.hpp
+ * @file acquire_cached_block_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -50,7 +50,7 @@ class actuator_manager;
 
 namespace representation {
 class perceived_arena_map;
-class block;
+class cache;
 } /* namespace representation */
 
 NS_START(fsm);
@@ -60,17 +60,16 @@ NS_START(fsm);
  ******************************************************************************/
 
 /**
- * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
- * arena.
+ *@brief The FSM for an acquiring a block from a cache in the arena.
  *
- * Each robot executing this FSM will look for a block (either a known block or
- * via random exploration). Once an existing block has been acquired, it signals
- * that it has completed its task.
+ * Each robot executing this FSM will look for a cache (either a known cache or
+ * via random exploration). Once a block has been acquired from an existing
+ * cache has been acquired, it signals that it has completed its task.
  */
-class acquire_free_block_fsm : public base_foraging_fsm,
-                               public  rcppsw::task_allocation::taskable {
+class acquire_cached_block_fsm : public base_foraging_fsm,
+                                 public rcppsw::task_allocation::taskable {
  public:
-  acquire_free_block_fsm(
+  acquire_cached_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
       const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -83,20 +82,20 @@ class acquire_free_block_fsm : public base_foraging_fsm,
   void init(void) override;
 
   /**
-   * @brief Get if the robot is currently searching for a block within the arena
+   * @brief Get if the robot is currently searching for a cache within the arena.
    * (either vectoring towards a known block, or exploring for one).
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool is_searching_for_block(void) const {
+  bool is_searching_for_cache(void) const {
     return is_vectoring() || is_exploring();
   }
 
   bool is_exploring(void) const {
-    return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching()); }
+    return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.is_searching()); }
 
   bool is_vectoring(void) const {
-    return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.in_progress();
+    return current_state() == ST_ACQUIRE_CACHE && m_vector_fsm.in_progress();
   }
   bool is_avoiding_collision(void) const {
     return m_explore_fsm.is_avoiding_collision();
@@ -107,26 +106,27 @@ class acquire_free_block_fsm : public base_foraging_fsm,
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_BLOCK, /* superstate for finding a free block */
+    ST_ACQUIRE_CACHE, /* superstate for finding a cache */
     ST_FINISHED,
     ST_MAX_STATES
   };
 
  private:
   /**
-   * @brief Acquire a free block.
+   * @brief Acquire a known cache or discover one via random exploration.
    *
    * @return TRUE if a block has been acquired, FALSE otherwise.
    */
-  bool acquire_free_block(void);
+  bool acquire_any_cache(void);
 
   /**
-   * @brief Acquire a known block. If the robot's knowledge of the chosen
-   * block's existence expires during the pursuit of a known block, that is
-   * ignored.
+   * @brief Acquirea known cache.
+   *
+   * If the robot's knowledge of the chosen cache's existence expires during the
+   * pursuit of said cache, that is ignored.
    */
-  void acquire_known_block(
-      std::list<std::pair<const representation::block*, double>> blocks);
+  void acquire_known_cache(
+      std::list<std::pair<const representation::cache*, double>> caches);
 
   /*
    * States for locate_block FSM. Note that the states for the vector_fsm
@@ -134,29 +134,29 @@ class acquire_free_block_fsm : public base_foraging_fsm,
    * initiated from multiple states, and hfsm states can only have ONE parent
    * state.
    **/
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, start,
+  HFSM_STATE_DECLARE(acquire_cached_block_fsm, start,
                      state_machine::no_event_data);
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, acquire_block,
+  HFSM_STATE_DECLARE(acquire_cached_block_fsm, acquire_cache,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, finished,
+  HFSM_STATE_DECLARE(acquire_cached_block_fsm, finished,
                      state_machine::no_event_data);
 
-  HFSM_EXIT_DECLARE(acquire_free_block_fsm, exit_acquire_block);
+  HFSM_EXIT_DECLARE(acquire_cached_block_fsm, exit_acquire_cache);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, hfsm::top_state(),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache, hfsm::top_state(),
                                     NULL,
-                                    NULL, &exit_acquire_block),
+                                    NULL, &exit_acquire_cache),
         HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state())
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
   return &kSTATE_MAP[index];
   }
 
-  acquire_free_block_fsm(const acquire_free_block_fsm& fsm) = delete;
-  acquire_free_block_fsm& operator=(const acquire_free_block_fsm& fsm) = delete;
+  acquire_cached_block_fsm(const acquire_cached_block_fsm& fsm) = delete;
+  acquire_cached_block_fsm& operator=(const acquire_cached_block_fsm& fsm) = delete;
 
   const argos::CVector2 mc_nest_center;
   argos::CRandom::CRNG* m_rng;
@@ -168,4 +168,4 @@ class acquire_free_block_fsm : public base_foraging_fsm,
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_ */

@@ -58,7 +58,6 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
  * Member Functions
  ******************************************************************************/
 void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
-
   rcppsw::common::g_server->change_logfile("loop-functions.txt");
   rcppsw::common::g_server->dbglvl(rcppsw::common::er_lvl::NOM);
   rcppsw::common::g_server->loglvl(rcppsw::common::er_lvl::DIAG);
@@ -129,11 +128,16 @@ argos::CColor random_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY50;
+    return argos::CColor::GRAY30;
   }
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     if (m_map->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::BLACK;
+    }
+  } /* for(i..) */
+  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
+    if (m_map->blocks()[i].contains_point(plane_pos)) {
+      return argos::CColor::GRAY70;
     }
   } /* for(i..) */
   return argos::CColor::WHITE;

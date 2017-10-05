@@ -55,20 +55,37 @@ random_foraging_fsm::random_foraging_fsm(
   insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
+  hfsm::change_parent(ST_RETURN_TO_NEST, &start);
+  hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event_data) {
-  internal_event(ST_ACQUIRE_BLOCK);
-  return state_machine::event_signal::HANDLED;
+__noreturn HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event_data) {
+  if (state_machine::event_type::NORMAL == data->type()) {
+    /* first time running FSM */
+    if (controller::foraging_signal::IGNORED == data->signal()) {
+      internal_event(ST_ACQUIRE_BLOCK);
+    }
+  } else if (state_machine::event_type::CHILD == data->type()) {
+    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
+      internal_event(ST_ACQUIRE_BLOCK);
+    } else if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
+      internal_event(ST_LEAVING_NEST);
+    }
+  }
+  ER_ASSERT(0, "FATAL: Unhandled signal type");
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
-  if (state_machine::event_type::CHILD == data->type() &&
-      controller::foraging_signal::BLOCK_LOCATED == data->signal()) {
+  if (state_machine::event_type::NORMAL == data->type() &&
+      controller::foraging_signal::BLOCK_ACQUIRED == data->signal()) {
       internal_event(ST_RETURN_TO_NEST);
   }
+  /*
+   * BLOCK_LOCATED signal ignored from explore FSM; we only care when the
+   * controller tells us we have actually picked up a block
+   */
   m_explore_fsm.run();
   return state_machine::event_signal::HANDLED;
 }

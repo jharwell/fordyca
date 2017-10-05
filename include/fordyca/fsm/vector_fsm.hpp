@@ -57,7 +57,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
    * goal, this function must be called before vectoring to a new goal will work.
    */
-  void init(void);
+  void init(void) override;
 
   /**
    * @brief Determine if the robot has arrived at the specified goal within the
@@ -65,7 +65,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool task_finished(void) const  { return current_state() == ST_ARRIVED; }
+  bool task_finished(void) const override { return current_state() == ST_ARRIVED; }
 
   /**
    * @brief Determine if the robot is still on the way to the specified
@@ -86,7 +86,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    *
    * @param goal The (X, Y) coordinates of the new goal to drive to.
    */
-  void task_start(const rcppsw::task_allocation::taskable_argument* const arg);
+  void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
 
  protected:
   enum fsm_states {
@@ -161,7 +161,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   FSM_ENTRY_DECLARE(vector_fsm, entry_collision_recovery,
                     state_machine::no_event_data);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
         FSM_STATE_MAP_ENTRY_EX_ALL(&vector, NULL, &entry_vector, NULL),

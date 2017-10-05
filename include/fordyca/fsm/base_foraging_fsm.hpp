@@ -56,11 +56,12 @@ class base_foraging_fsm : public state_machine::hfsm {
                     std::shared_ptr<controller::sensor_manager> sensors,
                     std::shared_ptr<controller::actuator_manager> actuators,
                     uint max_states);
+  virtual ~base_foraging_fsm(void) {}
 
   /**
    * @brief (Re)-initialize the FSM.
    */
-  void init(void);
+  virtual void init(void);
 
  protected:
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);

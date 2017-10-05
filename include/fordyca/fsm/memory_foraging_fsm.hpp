@@ -75,7 +75,7 @@ class memory_foraging_fsm : public base_foraging_fsm {
   /**
    * @brief Reset the FSM
    */
-  void init(void);
+  void init(void) override;
 
   /**
    * @brief Get if the robot is currently searching for a block within the arena
@@ -124,7 +124,7 @@ class memory_foraging_fsm : public base_foraging_fsm {
                      state_machine::no_event_data);
   HFSM_EXIT_DECLARE(memory_foraging_fsm, exit_acquire_free_block);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_free_block, hfsm::top_state(),

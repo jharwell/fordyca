@@ -30,7 +30,6 @@
 
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 #include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
@@ -63,6 +62,15 @@ class perceived_arena_map: public rcppsw::common::er_client,
    * double>).
    */
   std::list<perceived_block> blocks(void) const;
+
+  /**
+   * @brief Get a list of all caches the robot is currently aware of/that are
+   * currently relevant.
+   *
+   * @return The list of perceived caches (really a list of std::pair<cache,
+   * double>).
+   */
+  std::list<perceived_cache> caches(void) const;
 
   /**
    * @brief Access a particular element in the discretized grid representing the

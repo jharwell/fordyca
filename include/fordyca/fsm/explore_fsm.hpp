@@ -71,7 +71,7 @@ class explore_fsm : public base_foraging_fsm {
   /**
    * @brief Reset the FSM
    */
-  void init(void);
+  void init(void) override;
 
   /**
    * @brief Get if the robot is currently searching for something within the arena
@@ -138,7 +138,7 @@ class explore_fsm : public base_foraging_fsm {
   HFSM_ENTRY_DECLARE(explore_fsm, entry_explore,
                      state_machine::no_event_data);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
         HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
                                     NULL,

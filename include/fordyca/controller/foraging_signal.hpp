@@ -47,6 +47,7 @@ class foraging_signal : public state_machine::event_signal {
      */
     BLOCK_LOCATED = state_machine::event_signal::EXTERNAL_SIGNALS,
     BLOCK_ACQUIRED,    /// A robot has picked up a block
+    CACHE_LOCATED,
     ARRIVED_AT_TARGET,  /// A robot has arrived at its target
     ARRIVED_IN_NEST,
     LEFT_NEST

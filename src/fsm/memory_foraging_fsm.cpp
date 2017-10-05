@@ -61,9 +61,12 @@ memory_foraging_fsm::memory_foraging_fsm(
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
 
-HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
+__noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {
-    internal_event(ST_ACQUIRE_FREE_BLOCK);
+    /* first time running FSM */
+    if (controller::foraging_signal::IGNORED == data->signal()) {
+      internal_event(ST_ACQUIRE_FREE_BLOCK);
+    }
   } else if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
@@ -71,7 +74,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
       internal_event(ST_LEAVING_NEST);
     }
   }
-  return state_machine::event_signal::HANDLED;
+  ER_ASSERT(0, "FATAL: Unhandled signal type");
 }
 HFSM_STATE_DEFINE(memory_foraging_fsm, acquire_free_block, state_machine::event_data) {
   if (m_block_fsm.task_finished()) {

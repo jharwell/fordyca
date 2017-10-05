@@ -29,6 +29,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -85,11 +86,24 @@ class cell2D : public visitor::visitable<cell2D> {
   discrete_coord loc(void) const { return m_loc; }
 
   /**
-   * @brief Get the entity associated with this cell. Will be NULL unless it
-   * contains a block, so check the cell's state before calling this function.
+   * @brief Get the block entity associated with this cell.
+   *
+   * Will be NULL unless it contains a block, so check the cell's state before
+   * calling this function.
    */
   const representation::block* block(void) const {
-    return static_cast<representation::block*>(m_entity); }
+    return static_cast<representation::block*>(m_entity);
+  }
+
+  /**
+   * @brief Get the cache entity associated with this cell.
+   *
+   * Will be NULL unless it contains a block, so check the cell's state before
+   * calling this function.
+   */
+  const representation::cache* cache(void) const {
+    return static_cast<representation::cache*>(m_entity);
+  }
 
   cell2D_fsm& fsm(void) { return m_fsm; }
 

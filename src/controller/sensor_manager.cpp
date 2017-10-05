@@ -58,21 +58,21 @@ sensor_manager::sensor_manager(
  * Member Functions
  ******************************************************************************/
 bool sensor_manager::in_nest(void) {
-  /* Read stuff from the ground sensor */
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   /*
-   * You can say whether you are in the nest by checking the ground sensor
-   * placed close to the wheel motors. It returns a value between 0 and 1.  It
-   * is 1 when the robot is on a white area, it is 0 when the robot is on a
-   * black area and it is around 0.5 when the robot is on a gray area.
+   * The nest is a relatively light gray, so the sensors will return something
+   * in the range specified below.
+   *
+   * They return 1.0 when the robot is on a white area, it is 0.0 when the robot is on a
+   * black area.
    */
-  if (readings[0].Value > 0.25f && readings[0].Value < 0.75f &&
-      readings[1].Value > 0.25f && readings[1].Value < 0.75f &&
-      readings[2].Value > 0.25f && readings[2].Value < 0.75f &&
-      readings[3].Value > 0.25f && readings[3].Value < 0.75f) {
-    return true;
-  }
-  return false;
+  int sum = 0;
+  sum += readings[0].Value > 0.60 && readings[0].Value < 0.80;
+  sum += readings[1].Value > 0.60 && readings[1].Value < 0.80;
+  sum += readings[2].Value > 0.60 && readings[2].Value < 0.80;
+  sum += readings[3].Value > 0.60 && readings[3].Value < 0.80;
+
+  return sum >= 3;
 } /* in_nest() */
 
 bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
@@ -125,11 +125,31 @@ bool sensor_manager::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   int sum = 0;
 
-  /* We are on a block if at least 3 of the 4 ground sensors say we are */
+  /*
+   * We are on a block if at least 3 of the 4 ground sensors say we are. Blocks
+   * are black, and the sensor returns 0.0 for black areas.
+   */
   sum += readings[0].Value < 0.05;
   sum += readings[1].Value < 0.05;
   sum += readings[2].Value < 0.05;
   sum += readings[3].Value < 0.05;
+
+  return sum >= 3;
+} /* block_detected() */
+
+bool sensor_manager::cache_detected(void) {
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
+  int sum = 0;
+
+  /*
+   * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
+   * are a relatively dark gray, so the sensor should return something in the
+   * range specified below.
+   */
+  sum += readings[0].Value > 0.20 && readings[0].Value < 0.40;
+  sum += readings[1].Value > 0.20 && readings[1].Value < 0.40;
+  sum += readings[2].Value > 0.20 && readings[2].Value < 0.40;
+  sum += readings[3].Value > 0.20 && readings[3].Value < 0.40;
 
   return sum >= 3;
 } /* block_detected() */

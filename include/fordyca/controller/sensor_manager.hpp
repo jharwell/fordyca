@@ -64,11 +64,20 @@ class sensor_manager {
   }
 
   /**
-   * @brief If TRUE, a block has *possibly* been detected. Only possibly,
-   * because there are some false positives, such as the first timestep, before
-   * ARGoS has finished initializing things.
+   * @brief If TRUE, a block has *possibly* been detected.
+   *
+   * Only possibly, because there are some false positives, such as the first
+   * timestep, before ARGoS has finished initializing things.
    */
   bool block_detected(void);
+
+  /**
+   * @brief If TRUE, a block has *possibly* been detected.
+   *
+   * Only possibly, because there are some false positives, such as the first
+   * timestep, before ARGoS has finished initializing things.
+   */
+  bool cache_detected(void);
 
   /**
    * @brief If TRUE, the robot is currently in the nest, as reported by 3/4 of
