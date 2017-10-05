@@ -1,5 +1,5 @@
 /**
- * @file acquire_cached_block_fsm.cpp
+ * @file acquire_cache_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_cached_block_fsm.hpp"
+#include "fordyca/fsm/acquire_cache_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
@@ -42,7 +42,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cached_block_fsm::acquire_cached_block_fsm(
+acquire_cache_fsm::acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -64,11 +64,13 @@ acquire_cached_block_fsm::acquire_cached_block_fsm(
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_cache);
 }
 
-HFSM_STATE_DEFINE(acquire_cached_block_fsm, start, state_machine::no_event_data) {
-  return state_machine::event_signal::HANDLED;
+HFSM_STATE_DEFINE(acquire_cache_fsm, start, state_machine::no_event_data) {
+  ER_DIAG("Executing ST_START");
+  internal_event(ST_ACQUIRE_CACHE);
+  return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(acquire_cached_block_fsm, acquire_cache, state_machine::event_data) {
+HFSM_STATE_DEFINE(acquire_cache_fsm, acquire_cache, state_machine::event_data) {
   if (ST_ACQUIRE_CACHE != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_CACHE");
   }
@@ -99,11 +101,11 @@ HFSM_STATE_DEFINE(acquire_cached_block_fsm, acquire_cache, state_machine::event_
   return state_machine::event_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(acquire_cached_block_fsm, exit_acquire_cache) {
+HFSM_EXIT_DEFINE(acquire_cache_fsm, exit_acquire_cache) {
   m_vector_fsm.task_reset();
   m_explore_fsm.init();
 }
-FSM_STATE_DEFINE(acquire_cached_block_fsm, finished, state_machine::no_event_data) {
+FSM_STATE_DEFINE(acquire_cache_fsm, finished, state_machine::no_event_data) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
@@ -113,13 +115,13 @@ FSM_STATE_DEFINE(acquire_cached_block_fsm, finished, state_machine::no_event_dat
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void acquire_cached_block_fsm::init(void) {
+void acquire_cache_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
   m_explore_fsm.init();
 } /* init() */
 
-void acquire_cached_block_fsm::acquire_known_cache(
+void acquire_cache_fsm::acquire_known_cache(
     std::list<std::pair<const representation::cache*, double>> caches) {
   controller::existing_cache_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(caches,
@@ -133,7 +135,7 @@ void acquire_cached_block_fsm::acquire_known_cache(
   m_vector_fsm.task_start(&v);
 } /* acquire_known_cache() */
 
-bool acquire_cached_block_fsm::acquire_any_cache(void) {
+bool acquire_cache_fsm::acquire_any_cache(void) {
   /* currently on our way to a known cache */
   if (m_vector_fsm.in_progress()) {
     m_vector_fsm.task_execute();
@@ -161,8 +163,8 @@ bool acquire_cached_block_fsm::acquire_any_cache(void) {
   return false;
 } /* acquire_any_cache() */
 
-void acquire_cached_block_fsm::task_execute(void) {
-  inject_event(state_machine::event_signal::IGNORED,
+void acquire_cache_fsm::task_execute(void) {
+  inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 

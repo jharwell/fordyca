@@ -1,5 +1,5 @@
 /**
- * @file acquire_cached_block_fsm.hpp
+ * @file acquire_cache_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_CACHE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_ACQUIRE_CACHE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -66,10 +66,10 @@ NS_START(fsm);
  * via random exploration). Once a block has been acquired from an existing
  * cache has been acquired, it signals that it has completed its task.
  */
-class acquire_cached_block_fsm : public base_foraging_fsm,
+class acquire_cache_fsm : public base_foraging_fsm,
                                  public rcppsw::task_allocation::taskable {
  public:
-  acquire_cached_block_fsm(
+  acquire_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
       const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -134,14 +134,14 @@ class acquire_cached_block_fsm : public base_foraging_fsm,
    * initiated from multiple states, and hfsm states can only have ONE parent
    * state.
    **/
-  HFSM_STATE_DECLARE(acquire_cached_block_fsm, start,
+  HFSM_STATE_DECLARE(acquire_cache_fsm, start,
                      state_machine::no_event_data);
-  HFSM_STATE_DECLARE(acquire_cached_block_fsm, acquire_cache,
+  HFSM_STATE_DECLARE(acquire_cache_fsm, acquire_cache,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(acquire_cached_block_fsm, finished,
+  HFSM_STATE_DECLARE(acquire_cache_fsm, finished,
                      state_machine::no_event_data);
 
-  HFSM_EXIT_DECLARE(acquire_cached_block_fsm, exit_acquire_cache);
+  HFSM_EXIT_DECLARE(acquire_cache_fsm, exit_acquire_cache);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
@@ -155,8 +155,8 @@ class acquire_cached_block_fsm : public base_foraging_fsm,
   return &kSTATE_MAP[index];
   }
 
-  acquire_cached_block_fsm(const acquire_cached_block_fsm& fsm) = delete;
-  acquire_cached_block_fsm& operator=(const acquire_cached_block_fsm& fsm) = delete;
+  acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
+  acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
 
   const argos::CVector2 mc_nest_center;
   argos::CRandom::CRNG* m_rng;
@@ -168,4 +168,4 @@ class acquire_cached_block_fsm : public base_foraging_fsm,
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_CACHED_BLOCK_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_CACHE_FSM_HPP_ */

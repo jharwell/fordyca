@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/random_foraging_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
@@ -57,28 +54,29 @@ random_foraging_fsm::random_foraging_fsm(
          rcppsw::common::er_lvl::NOM);
   hfsm::change_parent(ST_RETURN_TO_NEST, &start);
   hfsm::change_parent(ST_LEAVING_NEST, &start);
+  m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
 /*******************************************************************************
  * States
  ******************************************************************************/
 __noreturn HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event_data) {
-  if (state_machine::event_type::NORMAL == data->type()) {
-    /* first time running FSM */
-    if (controller::foraging_signal::IGNORED == data->signal()) {
-      internal_event(ST_ACQUIRE_BLOCK);
-    }
-  } else if (state_machine::event_type::CHILD == data->type()) {
+  /* first time running FSM */
+  if (nullptr == data) {
+    internal_event(ST_ACQUIRE_BLOCK);
+  }
+
+  if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       internal_event(ST_ACQUIRE_BLOCK);
     } else if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
       internal_event(ST_LEAVING_NEST);
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal type");
+  ER_ASSERT(0, "FATAL: Unhandled signal");
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
-  if (state_machine::event_type::NORMAL == data->type() &&
+  if (state_machine::event_type::CHILD == data->type() &&
       controller::foraging_signal::BLOCK_ACQUIRED == data->signal()) {
       internal_event(ST_RETURN_TO_NEST);
   }
@@ -87,7 +85,7 @@ HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data)
    * controller tells us we have actually picked up a block
    */
   m_explore_fsm.run();
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
@@ -99,7 +97,7 @@ void random_foraging_fsm::init(void) {
 } /* init() */
 
 bool random_foraging_fsm::is_exploring(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK;
+  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching();
 } /* is_exploring() */
 
 NS_END(fsm, fordyca);
