@@ -62,6 +62,10 @@ acquire_free_block_fsm::acquire_free_block_fsm(
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
+HFSM_STATE_DEFINE(acquire_free_block_fsm, start, state_machine::no_event_data) {
+  return state_machine::event_signal::HANDLED;
+}
+
 HFSM_STATE_DEFINE(acquire_free_block_fsm, acquire_block, state_machine::event_data) {
   if (ST_ACQUIRE_BLOCK != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_BLOCK");

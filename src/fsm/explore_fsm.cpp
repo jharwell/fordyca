@@ -46,7 +46,6 @@ explore_fsm::explore_fsm(
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_collision_avoidance(),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
     entry_new_direction(),

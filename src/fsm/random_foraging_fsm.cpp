@@ -26,6 +26,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,6 +62,14 @@ random_foraging_fsm::random_foraging_fsm(
  ******************************************************************************/
 HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event_data) {
   internal_event(ST_ACQUIRE_BLOCK);
+  return state_machine::event_signal::HANDLED;
+}
+HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
+  if (state_machine::event_type::CHILD == data->type() &&
+      controller::foraging_signal::BLOCK_LOCATED == data->signal()) {
+      internal_event(ST_RETURN_TO_NEST);
+  }
+  m_explore_fsm.run();
   return state_machine::event_signal::HANDLED;
 }
 

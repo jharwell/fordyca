@@ -87,6 +87,10 @@ class memory_foraging_fsm : public base_foraging_fsm {
 
   bool is_exploring(void) const { return m_block_fsm.is_exploring(); }
   bool is_vectoring(void) const { return m_block_fsm.is_vectoring(); }
+  bool is_avoiding_collision(void) const {
+    return m_block_fsm.is_avoiding_collision() || m_vector_fsm.is_avoiding_collision();
+  }
+  bool is_returning(void) const { return current_state() == ST_RETURN_TO_NEST; }
 
   /**
    * @brief Run the FSM in its current state without injecting an event into it.
