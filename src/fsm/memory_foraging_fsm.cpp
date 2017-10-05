@@ -22,11 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/block_selector.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -45,47 +40,36 @@ memory_foraging_fsm::memory_foraging_fsm(
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
-    entry_return_to_nest(),
     entry_leaving_nest(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
-    exit_acquire_free_block(),
-    mc_nest_center(params->nest_center),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_vector_fsm(params->times.frequent_collision_thresh,
-                 server, sensors, actuators),
+    HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
     m_block_fsm(params, server, sensors, actuators, map) {
-  hfsm::change_parent(ST_RETURN_TO_NEST, &start);
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
 
 __noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
-  if (state_machine::event_type::NORMAL == data->type()) {
-    /* first time running FSM */
-    if (controller::foraging_signal::IGNORED == data->signal()) {
+  /* first time running FSM */
+  if (nullptr == data) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
-    }
-  } else if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
-      internal_event(ST_ACQUIRE_FREE_BLOCK);
-    } else if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
-      internal_event(ST_LEAVING_NEST);
-    }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal type");
+  if (state_machine::event_type::CHILD == data->type() &&
+      controller::foraging_signal::LEFT_NEST == data->signal()) {
+      internal_event(ST_ACQUIRE_FREE_BLOCK);
+  }
+  ER_ASSERT(0, "FATAL: Unhandled signal");
 }
-HFSM_STATE_DEFINE(memory_foraging_fsm, acquire_free_block, state_machine::event_data) {
+HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
+  if (nullptr == data) {
+    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+    m_block_fsm.task_start(&a);
+  }
   if (m_block_fsm.task_finished()) {
-    internal_event(ST_RETURN_TO_NEST);
+    m_block_fsm.task_reset();
+    internal_event(ST_LEAVING_NEST);
   }
   m_block_fsm.task_execute();
-    return state_machine::event_signal::HANDLED;
-}
-
-HFSM_EXIT_DEFINE(memory_foraging_fsm, exit_acquire_free_block) {
-  m_block_fsm.task_reset();
+    return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
@@ -97,9 +81,9 @@ void memory_foraging_fsm::init(void) {
 } /* init() */
 
 void memory_foraging_fsm::run(void) {
-  inject_event(state_machine::event_signal::IGNORED,
+  inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* run() */
 
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);

@@ -63,14 +63,12 @@ HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
-  if (data) {
-    ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
-              "FATAL: ST_EXPLORE cannot handle child events");
-    ER_ASSERT(controller::foraging_signal::BLOCK_ACQUIRED != data->signal(),
-              "FATAL: ST_EXPLORE should never acquire blocks...");
-    if (controller::foraging_signal::BLOCK_LOCATED == data->signal()) {
-      return state_machine::event_signal::UNHANDLED;
-    }
+  if (base_foraging_fsm::sensors()->block_detected()) {
+    ER_NOM("Block detected");
+    return controller::foraging_signal::BLOCK_LOCATED;
+  } else if (base_foraging_fsm::sensors()->cache_detected()) {
+    ER_NOM("Cache detected");
+    return controller::foraging_signal::CACHE_LOCATED;
   }
 
   explore_time_inc();
@@ -95,7 +93,7 @@ HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
   argos::CVector2 vector;
   base_foraging_fsm::sensors()->calc_diffusion_vector(&vector);
   base_foraging_fsm::actuators()->set_heading(base_foraging_fsm::actuators()->max_wheel_speed() * vector);
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
@@ -122,7 +120,7 @@ HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
     m_state.time_exploring_unsuccessfully = 0;
     internal_event(ST_EXPLORE);
   }
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 HFSM_ENTRY_DEFINE(explore_fsm, entry_explore, state_machine::no_event_data) {
@@ -143,7 +141,7 @@ void explore_fsm::init(void) {
 } /* init() */
 
 void explore_fsm::run(void) {
-  inject_event(state_machine::event_signal::IGNORED,
+  inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* run() */
 

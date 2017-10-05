@@ -80,7 +80,7 @@ vector_fsm::vector_fsm(double frequent_collision_thresh,
  * States
  ******************************************************************************/
 FSM_STATE_DEFINE(vector_fsm, start, state_machine::no_event_data) {
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 FSM_STATE_DEFINE(vector_fsm, collision_avoidance, state_machine::no_event_data) {
@@ -106,7 +106,7 @@ FSM_STATE_DEFINE(vector_fsm, collision_avoidance, state_machine::no_event_data) 
   } else {
     internal_event(ST_COLLISION_RECOVERY);
   }
-  return rcppsw::patterns::state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, collision_recovery, state_machine::no_event_data) {
   if (ST_COLLISION_RECOVERY != last_state()) {
@@ -117,7 +117,7 @@ FSM_STATE_DEFINE(vector_fsm, collision_recovery, state_machine::no_event_data) {
     m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
-  return rcppsw::patterns::state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   if (ST_VECTOR != last_state()) {
@@ -158,7 +158,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
          heading.GetX(), heading.GetY(), heading.Angle().GetValue(),
          ang_speed, lin_speed);
   m_actuators->set_wheel_speeds(lin_speed, ang_speed);
-  return rcppsw::patterns::state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_VECTOR != last_state()) {
@@ -166,7 +166,7 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
             data->goal.GetX(), data->goal.GetY(),
             kVECTOR_FSM_MIN_DIFF);
   }
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 FSM_ENTRY_DEFINE(vector_fsm, entry_vector, state_machine::no_event_data) {
@@ -189,9 +189,9 @@ void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* co
   static const uint8_t kTRANSITIONS[] = {
     ST_VECTOR,                  /* start */
     ST_VECTOR,                  /* vector */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision avoidance */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* collision recovery */
-    rcppsw::patterns::state_machine::event_signal::IGNORED,  /* arrived */
+    controller::foraging_signal::IGNORED,  /* collision avoidance */
+    controller::foraging_signal::IGNORED,  /* collision recovery */
+    controller::foraging_signal::IGNORED,  /* arrived */
   };
   const vector_argument* const a = dynamic_cast<const vector_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");

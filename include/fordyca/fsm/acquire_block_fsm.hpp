@@ -1,5 +1,5 @@
 /**
- * @file acquire_free_block_fsm.hpp
+ * @file acquire_block_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_ACQUIRE_BLOCK_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_ACQUIRE_BLOCK_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -67,10 +67,10 @@ NS_START(fsm);
  * via random exploration). Once an existing block has been acquired, it signals
  * that it has completed its task.
  */
-class acquire_free_block_fsm : public base_foraging_fsm,
+class acquire_block_fsm : public base_foraging_fsm,
                                public  rcppsw::task_allocation::taskable {
  public:
-  acquire_free_block_fsm(
+  acquire_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
       const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -118,7 +118,7 @@ class acquire_free_block_fsm : public base_foraging_fsm,
    *
    * @return TRUE if a block has been acquired, FALSE otherwise.
    */
-  bool acquire_free_block(void);
+  bool acquire_any_block(void);
 
   /**
    * @brief Acquire a known block. If the robot's knowledge of the chosen
@@ -134,16 +134,16 @@ class acquire_free_block_fsm : public base_foraging_fsm,
    * initiated from multiple states, and hfsm states can only have ONE parent
    * state.
    **/
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, start,
+  HFSM_STATE_DECLARE(acquire_block_fsm, start,
                      state_machine::no_event_data);
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, acquire_block,
+  HFSM_STATE_DECLARE(acquire_block_fsm, acquire_block,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(acquire_free_block_fsm, finished,
+  HFSM_STATE_DECLARE(acquire_block_fsm, finished,
                      state_machine::no_event_data);
 
-  HFSM_EXIT_DECLARE(acquire_free_block_fsm, exit_acquire_block);
+  HFSM_EXIT_DECLARE(acquire_block_fsm, exit_acquire_block);
 
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) {
+  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, hfsm::top_state(),
@@ -155,8 +155,8 @@ class acquire_free_block_fsm : public base_foraging_fsm,
   return &kSTATE_MAP[index];
   }
 
-  acquire_free_block_fsm(const acquire_free_block_fsm& fsm) = delete;
-  acquire_free_block_fsm& operator=(const acquire_free_block_fsm& fsm) = delete;
+  acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
+  acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   const argos::CVector2 mc_nest_center;
   argos::CRandom::CRNG* m_rng;
@@ -168,4 +168,4 @@ class acquire_free_block_fsm : public base_foraging_fsm,
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_FREE_BLOCK_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_ACQUIRE_BLOCK_FSM_HPP_ */

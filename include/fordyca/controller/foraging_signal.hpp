@@ -46,11 +46,14 @@ class foraging_signal : public state_machine::event_signal {
      * A block has been located (i.e. appeared within a robot's LOS)
      */
     BLOCK_LOCATED = state_machine::event_signal::EXTERNAL_SIGNALS,
+    FSM_RUN,
     BLOCK_ACQUIRED,    /// A robot has picked up a block
-    CACHE_LOCATED,
+    CACHE_LOCATED,    /// A robot has located a cache
     ARRIVED_AT_TARGET,  /// A robot has arrived at its target
     ARRIVED_IN_NEST,
-    LEFT_NEST
+    LEFT_NEST,
+    ACQUIRE_FREE_BLOCK,  /// Direct a robot to acquire a free block in the arena
+    ACQUIRE_CACHED_BLOCK  /// Directa a robot to acquire a block from a cache.
   };
 };
 

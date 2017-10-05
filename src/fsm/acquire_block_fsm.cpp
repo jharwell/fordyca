@@ -1,5 +1,5 @@
 /**
- * @file acquire_free_block_fsm.cpp
+ * @file acquire_block_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/fsm/acquire_block_fsm.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
@@ -41,7 +41,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_free_block_fsm::acquire_free_block_fsm(
+acquire_block_fsm::acquire_block_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<controller::sensor_manager>& sensors,
@@ -63,11 +63,12 @@ acquire_free_block_fsm::acquire_free_block_fsm(
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
-HFSM_STATE_DEFINE(acquire_free_block_fsm, start, state_machine::no_event_data) {
-  return state_machine::event_signal::HANDLED;
+HFSM_STATE_DEFINE(acquire_block_fsm, start, state_machine::no_event_data) {
+  internal_event(ST_ACQUIRE_BLOCK);
+  return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(acquire_free_block_fsm, acquire_block, state_machine::event_data) {
+HFSM_STATE_DEFINE(acquire_block_fsm, acquire_block, state_machine::event_data) {
   if (ST_ACQUIRE_BLOCK != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_BLOCK");
   }
@@ -78,48 +79,48 @@ HFSM_STATE_DEFINE(acquire_free_block_fsm, acquire_block, state_machine::event_da
    */
   if (state_machine::event_type::NORMAL == data->type()) {
       /* We acquired a block */
-      if (acquire_free_block()) {
+      if (acquire_any_block()) {
         internal_event(ST_FINISHED);
       }
   } else if (state_machine::event_type::CHILD == data->type()) {
     /*
      * We have found a block through the exploration sub-fsm; vector to it and
-     * pick it up
+     * pick it up.
      */
     if (controller::foraging_signal::BLOCK_LOCATED == data->signal()) {
       ER_ASSERT(m_map->blocks().size(),
                 "FATAL: Block 'located' but empty block list");
 
       /* We acquired a block */
-      if (acquire_free_block()) {
+      if (acquire_any_block()) {
         internal_event(ST_FINISHED);
       }
     }
   }
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(acquire_free_block_fsm, exit_acquire_block) {
+HFSM_EXIT_DEFINE(acquire_block_fsm, exit_acquire_block) {
   m_vector_fsm.task_reset();
   m_explore_fsm.init();
 }
-FSM_STATE_DEFINE(acquire_free_block_fsm, finished, state_machine::no_event_data) {
+FSM_STATE_DEFINE(acquire_block_fsm, finished, state_machine::no_event_data) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
-  return state_machine::event_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void acquire_free_block_fsm::init(void) {
+void acquire_block_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
   m_explore_fsm.init();
 } /* init() */
 
-void acquire_free_block_fsm::acquire_known_block(
+void acquire_block_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
   controller::block_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(blocks,
@@ -133,7 +134,7 @@ void acquire_free_block_fsm::acquire_known_block(
   m_vector_fsm.task_start(&v);
 } /* acquire_known_block() */
 
-bool acquire_free_block_fsm::acquire_free_block(void) {
+bool acquire_block_fsm::acquire_any_block(void) {
   /* currently on our way to a known block */
   if (m_vector_fsm.in_progress()) {
     m_vector_fsm.task_execute();
@@ -159,10 +160,10 @@ bool acquire_free_block_fsm::acquire_free_block(void) {
     m_explore_fsm.run();
   }
   return false;
-} /* acquire_free_block() */
+} /* acquire_any_block() */
 
-void acquire_free_block_fsm::task_execute(void) {
-  inject_event(state_machine::event_signal::IGNORED,
+void acquire_block_fsm::task_execute(void) {
+  inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
