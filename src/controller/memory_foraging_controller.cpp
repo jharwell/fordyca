@@ -38,31 +38,13 @@ NS_START(fordyca, controller);
 void memory_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
-   * the relevance of information within it.
+   * the relevance of information within it. Then, you can run the main FSM
+   * loop.
    */
-  if (m_map->event_new_los(sensors()->los())) {
-    publish_fsm_event(foraging_signal::BLOCK_LOCATED);
-    m_map->update_density();
-  } else {
-    m_map->update_density();
-    m_fsm->run();
-  }
+  m_map->event_new_los(sensors()->los());
+  m_map->update_density();
+  m_fsm->run();
 } /* ControlStep() */
-
-void memory_foraging_controller::publish_fsm_event(foraging_signal::type signal) {
-  switch (signal) {
-    case foraging_signal::BLOCK_LOCATED:
-      m_fsm->inject_event(foraging_signal::BLOCK_LOCATED,
-                          rcppsw::patterns::state_machine::event_type::NORMAL);
-      break;
-    case foraging_signal::BLOCK_ACQUIRED:
-      m_fsm->inject_event(foraging_signal::BLOCK_ACQUIRED,
-                          rcppsw::patterns::state_machine::event_type::NORMAL);
-      break;
-    default:
-      break;
-  }
-} /* publish_event() */
 
 void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::memory_foraging_repository param_repo;

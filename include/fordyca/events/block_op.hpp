@@ -33,8 +33,14 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 
+namespace fsm {
+class random_foraging_fsm;
+class memory_foraging_fsm;
+} /* namespace fsm */
+
 namespace controller {
 class random_foraging_controller;
+class memory_foraging_controller;
 } /* namespace controller */
 
 namespace representation {
@@ -53,13 +59,16 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class block_op : public visitor::visitor,
-                 public visitor::can_visit<controller::random_foraging_controller, void>,
-                 public visitor::can_visit<representation::block, void>,
-                 public visitor::can_visit<representation::arena_map, void>,
-                 public visitor::can_visit<support::cache_update_handler, void> {
+                 public visitor::can_visit<controller::random_foraging_controller>,
+                 public visitor::can_visit<controller::memory_foraging_controller>,
+                 public visitor::can_visit<fsm::random_foraging_fsm>,
+                 public visitor::can_visit<fsm::memory_foraging_fsm>,
+                 public visitor::can_visit<representation::block>,
+                 public visitor::can_visit<representation::arena_map>,
+                 public visitor::can_visit<support::cache_update_handler> {
  public:
   block_op(void) {}
-  ~block_op(void) {}
+  virtual ~block_op(void) {}
 };
 
 NS_END(events, fordyca);

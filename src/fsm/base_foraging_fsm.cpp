@@ -54,26 +54,26 @@ base_foraging_fsm::base_foraging_fsm(
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_sensors(sensors),
     m_actuators(actuators) {
-  insmod("base_foraging_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+  er_client::insmod("base_foraging_fsm",
+                    rcppsw::common::er_lvl::DIAG,
+                    rcppsw::common::er_lvl::NOM);
 }
 
 /*******************************************************************************
  * States
  ******************************************************************************/
 HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
+            "FATAL: ST_LEAVING_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
+            "FATAL: ST_LEAVING_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::BLOCK_DROP != data->signal(),
+            "FATAL: ST_LEAVING_NEST should never drop blocks...");
+  ER_ASSERT(controller::foraging_signal::BLOCK_LOCATED != data->signal(),
+            "FATAL: ST_LEAVING_NEST should never locate blocks...");
+
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
-  }
-
-  if (data) {
-    ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
-              "FATAL: ST_LEAVING_NEST cannot handle child events");
-    ER_ASSERT(controller::foraging_signal::BLOCK_ACQUIRED != data->signal(),
-              "FATAL: ST_LEAVING_NEST should never acquire blocks...");
-    ER_ASSERT(controller::foraging_signal::BLOCK_LOCATED != data->signal(),
-              "FATAL: ST_LEAVING_NEST should never locate blocks...");
   }
 
   /*

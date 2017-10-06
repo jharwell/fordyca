@@ -46,8 +46,6 @@ block_to_nest_fsm::block_to_nest_fsm(
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    exit_acquire_free_block(),
-    exit_acquire_cached_block(),
     m_block_fsm(params, server, sensors, actuators, map),
     m_cache_fsm(params, server, sensors, actuators, map) {
   hfsm::change_parent(ST_RETURN_TO_NEST, &start);
@@ -69,31 +67,42 @@ __noreturn HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data
   }
   ER_ASSERT(0, "FATAL: Unhandled signal type");
 }
-HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+  /*
+   * We wait in the finished state until an upper FSM/controller tells us a free
+   * block has been successfully picked up before we start moving back towards
+   * the nest.
+   */
   if (m_block_fsm.task_finished()) {
-    internal_event(ST_RETURN_TO_NEST);
+    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+      m_block_fsm.task_reset();
+      internal_event(ST_RETURN_TO_NEST);
+    }
+  } else {
+    m_block_fsm.task_execute();
   }
-  m_block_fsm.task_execute();
-    return controller::foraging_signal::HANDLED;
-}
-HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::no_event_data) {
-  if (m_cache_fsm.task_finished()) {
-    internal_event(ST_RETURN_TO_NEST);
-  }
-  m_cache_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
-
-
+HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+  /*
+   * We wait in the finished state until an upper FSM/controller tells us a
+   * block has been successfully picked up from a cache before we start moving
+   * back towards the nest.
+   */
+  if (m_cache_fsm.task_finished()) {
+    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+      m_cache_fsm.task_reset();
+      internal_event(ST_RETURN_TO_NEST);
+    }
+  } else {
+    m_cache_fsm.task_execute();
+  }
+  return controller::foraging_signal::HANDLED;
+}
 HFSM_STATE_DEFINE(block_to_nest_fsm, finished, state_machine::no_event_data) {
   return controller::foraging_signal::HANDLED;
-}
-
-HFSM_EXIT_DEFINE(block_to_nest_fsm, exit_acquire_free_block) {
-  m_block_fsm.task_reset();
-}
-HFSM_EXIT_DEFINE(block_to_nest_fsm, exit_acquire_cached_block) {
-  m_cache_fsm.task_reset();
 }
 
 /*******************************************************************************

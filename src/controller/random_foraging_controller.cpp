@@ -59,17 +59,6 @@ random_foraging_controller::random_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void random_foraging_controller::publish_fsm_event(foraging_signal::type signal) {
-  switch (signal) {
-    case foraging_signal::BLOCK_ACQUIRED:
-      m_fsm->inject_event(foraging_signal::BLOCK_ACQUIRED,
-                          rcppsw::patterns::state_machine::event_type::NORMAL);
-      break;
-    default:
-      break;
-  }
-} /* publish_event() */
-
 void random_foraging_controller::Init(argos::TConfigurationNode& node) {
     server_handle()->change_logfile(std::string(std::string("controller-") +
                                               GetId() +

@@ -103,7 +103,6 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
                                              robot_id(robot));
           controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
           map()->accept(pickup_op);
-          controller.publish_fsm_event(controller::foraging_signal::BLOCK_ACQUIRED);
 
           /* The floor texture must be updated */
           floor()->SetChanged();

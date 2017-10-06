@@ -44,10 +44,10 @@ block_pickup::block_pickup(const std::shared_ptr<rcppsw::common::er_server>& ser
                            representation::block* block, size_t robot_index) :
     er_client(server), m_robot_index(robot_index), m_block(block),
     m_server(server) {
-    insmod("block_pickup",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
-}
+  er_client::insmod("block_pickup",
+                    rcppsw::common::er_lvl::DIAG,
+                    rcppsw::common::er_lvl::NOM);
+    }
 
 /*******************************************************************************
  * Member Functions
@@ -94,8 +94,21 @@ void block_pickup::visit(representation::block& block) {
 
 void block_pickup::visit(controller::random_foraging_controller& controller) {
   controller.block(m_block);
+  controller.fsm()->accept(*this);
   ER_NOM("random_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+void block_pickup::visit(fsm::random_foraging_fsm& fsm) {
+  ER_NOM("random_foraging_fsm: register block_pickup event");
+  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
+void block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
+  ER_NOM("memory_foraging_fsm: register block_pickup event");
+  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
+                   state_machine::event_type::NORMAL);
 } /* visit() */
 
 void block_pickup::visit(controller::memory_foraging_controller& controller) {

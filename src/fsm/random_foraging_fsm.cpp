@@ -49,7 +49,7 @@ random_foraging_fsm::random_foraging_fsm(
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
                   server, sensors, actuators) {
-  insmod("random_foraging_fsm",
+  er_client::insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
   hfsm::change_parent(ST_RETURN_TO_NEST, &start);
@@ -76,13 +76,12 @@ __noreturn HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event
   ER_ASSERT(0, "FATAL: Unhandled signal");
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
-  if (state_machine::event_type::CHILD == data->type() &&
-      controller::foraging_signal::BLOCK_ACQUIRED == data->signal()) {
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
       internal_event(ST_RETURN_TO_NEST);
   }
   /*
    * BLOCK_LOCATED signal ignored from explore FSM; we only care when the
-   * controller tells us we have actually picked up a block
+   * controller tells us we have actually picked up a block.
    */
   m_explore_fsm.run();
   return controller::foraging_signal::HANDLED;

@@ -36,6 +36,10 @@ namespace controller {
 class memory_foraging_controller;
 } /* namespace controller */
 
+namespace representation {
+class perceived_arena_map;
+} /* namespace representation */
+
 NS_START(events);
 
 /*******************************************************************************
@@ -43,11 +47,11 @@ NS_START(events);
  ******************************************************************************/
 class block_pickup : public block_op,
                      public rcppsw::common::er_client,
-                     public visitor::can_visit<controller::memory_foraging_controller, void> {
+                     public visitor::can_visit<representation::perceived_arena_map> {
  public:
   block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
-  ~block_pickup(void) { rmmod(); }
+  ~block_pickup(void) { er_client::rmmod(); }
 
   /**
    * @brief Update the arena_map with the block pickup event by making the block
@@ -55,7 +59,7 @@ class block_pickup : public block_op,
    *
    * @param map The arena_map.
    */
-  void visit(representation::arena_map& map);
+  void visit(representation::arena_map& map) override;
 
   /**
    * @brief Handle the event of a robot picking up a block, making updates to
@@ -63,12 +67,12 @@ class block_pickup : public block_op,
    *
    * @param map The robot's arena map.
    */
-  void visit(representation::perceived_arena_map& map);
+  void visit(representation::perceived_arena_map& map) override;
 
   /**
    * @brief Update a block with the knowledge that it is now carried by a robot.
    */
-  void visit(representation::block& block);
+  void visit(representation::block& block) override;
 
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
@@ -77,7 +81,10 @@ class block_pickup : public block_op,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller);
+  void visit(controller::random_foraging_controller& controller) override;
+
+  void visit(fsm::random_foraging_fsm& fsm) override;
+  void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**
    * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
@@ -86,9 +93,9 @@ class block_pickup : public block_op,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::memory_foraging_controller& controller);
+  void visit(controller::memory_foraging_controller& controller) override;
 
-  void visit(support::cache_update_handler& handler);
+  void visit(support::cache_update_handler& handler) override;
 
  private:
   block_pickup(const block_pickup& op) = delete;

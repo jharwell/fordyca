@@ -44,8 +44,6 @@ block_to_cache_fsm::block_to_cache_fsm(
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    exit_acquire_free_block(),
-    exit_transport_to_cache(),
     m_block_fsm(params, server, sensors, actuators, map),
     m_cache_fsm(params, server, sensors, actuators, map) {}
 
@@ -57,31 +55,33 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
   if (m_block_fsm.task_finished()) {
-    internal_event(ST_TRANSPORT_TO_CACHE);
+    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+      m_block_fsm.task_reset();
+      internal_event(ST_TRANSPORT_TO_CACHE);
+    }
+  } else {
+    m_block_fsm.task_execute();
   }
-  m_block_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+
   if (m_cache_fsm.task_finished()) {
-    internal_event(ST_FINISHED);
+    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+      m_cache_fsm.task_reset();
+      internal_event(ST_TRANSPORT_TO_CACHE);
+    }
   }
   m_cache_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
 
-
-HFSM_STATE_DEFINE(block_to_cache_fsm, finished, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, finished, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
-}
-
-HFSM_EXIT_DEFINE(block_to_cache_fsm, exit_acquire_free_block) {
-  m_block_fsm.task_reset();
-}
-HFSM_EXIT_DEFINE(block_to_cache_fsm, exit_transport_to_cache) {
-  m_cache_fsm.task_reset();
 }
 
 /*******************************************************************************
