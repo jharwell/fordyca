@@ -41,11 +41,11 @@ class memory_foraging_loop_functions : public random_foraging_loop_functions {
   memory_foraging_loop_functions() {}
   virtual ~memory_foraging_loop_functions(void) {}
 
-  virtual void Init(argos::TConfigurationNode& node);
-  virtual void PreStep();
+  void Init(argos::TConfigurationNode& node) override;
+  void PreStep() override;
 
  protected:
-  void pre_step_iter(argos::CFootBotEntity& robot);
+  void pre_step_iter(argos::CFootBotEntity& robot) override;
 
  private:
   memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;

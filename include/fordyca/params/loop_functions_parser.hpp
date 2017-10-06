@@ -40,11 +40,11 @@ class loop_functions_parser: public base_parser {
  public:
   loop_functions_parser(void): m_params() {}
 
-  void parse(argos::TConfigurationNode& node);
-  const struct loop_functions_params* get_results(void) {
+  void parse(argos::TConfigurationNode& node) override;
+  const struct loop_functions_params* get_results(void) override {
     return m_params.get();
   }
-  void show(std::ostream& stream);
+  void show(std::ostream& stream) override;
 
  private:
   std::unique_ptr<struct loop_functions_params> m_params;

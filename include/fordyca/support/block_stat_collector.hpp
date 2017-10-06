@@ -49,7 +49,7 @@ class block_stat_collector : public base_stat_collector,
   explicit block_stat_collector(const std::string ofname) :
       base_stat_collector(ofname), m_block_stats() {}
 
-  virtual void reset(void);
+  void reset(void) override;
   void collect(const representation::block& block);
   uint total_collected(void) const { return m_block_stats.total_collected; }
   void inc_total_collected(void) { ++m_block_stats.total_collected; }
@@ -61,8 +61,8 @@ class block_stat_collector : public base_stat_collector,
     uint total_carries;
   };
 
-  std::string csv_header_build(const std::string& header = "");
-  std::string csv_line_build(void);
+  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_line_build(void) override;
 
   struct block_stats m_block_stats;
 };

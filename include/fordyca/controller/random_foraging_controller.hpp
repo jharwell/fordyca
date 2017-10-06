@@ -98,24 +98,24 @@ class random_foraging_controller : public base_foraging_controller,
    * @param t_node Points to the <parameters> section in the XML file in the
    *               <controllers><random_foraging_controller_controller> section.
    */
-  virtual void Init(argos::TConfigurationNode& t_node);
+  void Init(argos::TConfigurationNode& t_node) override;
 
   /*
    * @brief Called once every time step; length set in the XML file.
    *
    * Since the FSM does most of the work, this function just tells it run.
    */
-  virtual void ControlStep(void) { m_fsm->run(); }
+  void ControlStep(void) override { m_fsm->run(); }
 
   /*
    * @brief Reset controller to its state right after the Init().
    */
-  virtual void Reset(void);
+  void Reset(void) override;
 
   /*
    * @brief Cleanup whatever was done by Init().
    */
-  virtual void Destroy(void) {}
+  void Destroy(void) override {}
 
   /**
    * @brief Return if the robot is currently carrying a block.

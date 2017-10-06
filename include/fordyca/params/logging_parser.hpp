@@ -40,9 +40,9 @@ class logging_parser: public base_parser {
  public:
   logging_parser(void): m_params() {}
 
-  void parse(argos::TConfigurationNode& node);
-  const struct logging_params* get_results(void) { return m_params.get(); }
-  void show(std::ostream& stream);
+  void parse(argos::TConfigurationNode& node) override;
+  const struct logging_params* get_results(void) override { return m_params.get(); }
+  void show(std::ostream& stream) override;
 
  private:
   std::unique_ptr<struct logging_params> m_params;

@@ -39,7 +39,7 @@ class memory_foraging_qt_user_functions : public random_foraging_qt_user_functio
 
   virtual ~memory_foraging_qt_user_functions() {}
 
-  virtual void Draw(argos::CFootBotEntity& c_entity);
+  void Draw(argos::CFootBotEntity& c_entity) override;
 };
 
 NS_END(fordyca, support);
