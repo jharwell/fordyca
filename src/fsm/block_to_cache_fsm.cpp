@@ -1,5 +1,5 @@
 /**
- * @file block_to_nest_fsm.cpp
+ * @file block_to_cache_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/fsm/block_to_cache_fsm.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -33,86 +33,72 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-block_to_nest_fsm::block_to_nest_fsm(
+block_to_cache_fsm::block_to_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<controller::sensor_manager>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
-    entry_return_to_nest(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     exit_acquire_free_block(),
-    exit_acquire_cached_block(),
+    exit_transport_to_cache(),
     m_block_fsm(params, server, sensors, actuators, map),
-    m_cache_fsm(params, server, sensors, actuators, map) {
-  hfsm::change_parent(ST_RETURN_TO_NEST, &start);
-    }
+    m_cache_fsm(params, server, sensors, actuators, map) {}
 
-__noreturn HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   if (data) {
-   if (state_machine::event_type::NORMAL == data->type()) {
-     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
+    ER_ASSERT(controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal(),
+              "FATAL: Unhandled signal type");
         internal_event(ST_ACQUIRE_FREE_BLOCK);
-      } else if (controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
-        internal_event(ST_ACQUIRE_CACHED_BLOCK);
-      }
-    } else if (state_machine::event_type::CHILD == data->type()) {
-      if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
-        internal_event(ST_FINISHED);
-      }
-    }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal type");
+  return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::no_event_data) {
   if (m_block_fsm.task_finished()) {
-    internal_event(ST_RETURN_TO_NEST);
+    internal_event(ST_TRANSPORT_TO_CACHE);
   }
   m_block_fsm.task_execute();
-    return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::no_event_data) {
   if (m_cache_fsm.task_finished()) {
-    internal_event(ST_RETURN_TO_NEST);
+    internal_event(ST_FINISHED);
   }
   m_cache_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
 
 
-HFSM_STATE_DEFINE(block_to_nest_fsm, finished, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, finished, state_machine::no_event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(block_to_nest_fsm, exit_acquire_free_block) {
+HFSM_EXIT_DEFINE(block_to_cache_fsm, exit_acquire_free_block) {
   m_block_fsm.task_reset();
 }
-HFSM_EXIT_DEFINE(block_to_nest_fsm, exit_acquire_cached_block) {
+HFSM_EXIT_DEFINE(block_to_cache_fsm, exit_transport_to_cache) {
   m_cache_fsm.task_reset();
 }
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void block_to_nest_fsm::init(void) {
+void block_to_cache_fsm::init(void) {
   base_foraging_fsm::init();
   m_cache_fsm.task_reset();
   m_block_fsm.task_reset();
 } /* init() */
 
-void block_to_nest_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
-  const foraging_signal_argument* const a =
-      dynamic_cast<const foraging_signal_argument* const>(arg);
-  ER_ASSERT(a, "FATAL: bad argument passed");
-  inject_event(a->signal(), state_machine::event_type::NORMAL);
+void block_to_cache_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
+  inject_event(controller::foraging_signal::ACQUIRE_FREE_BLOCK,
+               state_machine::event_type::NORMAL);
 }
 
-void block_to_nest_fsm::task_execute(void) {
+void block_to_cache_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
