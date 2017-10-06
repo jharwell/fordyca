@@ -181,7 +181,6 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
                                              robot_id(robot));
           controller.accept(pickup_op);
           m_map->accept(pickup_op);
-          controller.publish_fsm_event(controller::foraging_signal::BLOCK_ACQUIRED);
 
           /* The floor texture must be updated */
           m_floor->SetChanged();

@@ -43,9 +43,10 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cell_op : public visitor::visitor,
-                public visitor::can_visit<representation::cell2D, void> {
+                public visitor::can_visit<representation::cell2D> {
  public:
   cell_op(void) {}
+  virtual ~cell_op(void) {}
 };
 
 NS_END(events, fordyca);

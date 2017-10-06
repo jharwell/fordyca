@@ -48,7 +48,7 @@ cell_perception::cell_perception(const std::shared_ptr<rcppsw::common::er_server
  ******************************************************************************/
 void cell_perception::visit(representation::perceived_cell2D& cell) {
   events::block_drop drop(m_server,
-                              dynamic_cast<representation::block*>(m_entity));
+                          dynamic_cast<representation::block*>(m_entity));
   events::cell_empty empty;
   events::cell_unknown unknown;
 

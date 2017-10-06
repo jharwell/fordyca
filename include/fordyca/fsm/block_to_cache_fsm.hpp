@@ -137,21 +137,17 @@ class block_to_cache_fsm : public base_foraging_fsm,
   /* memory foraging states */
   HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::no_event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, acquire_free_block,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, transport_to_cache,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, finished,
                      state_machine::no_event_data);
-  HFSM_EXIT_DECLARE(block_to_cache_fsm, exit_acquire_free_block);
-  HFSM_EXIT_DECLARE(block_to_cache_fsm, exit_transport_to_cache);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_free_block, hfsm::top_state(),
-                                    NULL, NULL, &exit_acquire_free_block),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_cache, hfsm::top_state(),
-                                    NULL, NULL, &exit_transport_to_cache),
+        HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block, hfsm::top_state()),
+        HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state()),
         };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);

@@ -48,7 +48,7 @@ memory_foraging_fsm::memory_foraging_fsm(
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
 
-__noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
+__noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::no_event_data) {
   /* first time running FSM */
   if (nullptr == data) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
@@ -60,16 +60,34 @@ __noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_da
   ER_ASSERT(0, "FATAL: Unhandled signal");
 }
 HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
+  /* first time running FSM; transitioned from START state */
   if (nullptr == data) {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     m_block_fsm.task_start(&a);
-  }
-  if (m_block_fsm.task_finished()) {
-    m_block_fsm.task_reset();
-    internal_event(ST_LEAVING_NEST);
-  }
-  m_block_fsm.task_execute();
     return controller::foraging_signal::HANDLED;
+  }
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+
+  /*
+   * Wait in the finished state until the controller tells us we have dropped a
+   * block.
+   */
+  if (m_block_fsm.task_finished()) {
+    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+      m_block_fsm.task_reset();
+      internal_event(ST_LEAVING_NEST);
+    }
+  }
+  /*
+   * If we have gotten the block pickup signal from the controller, relay it to
+   * the acquire_block sub-FSM so that it will start returning to the nest.
+   */
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.inject_event(data->type(), data->signal());
+  } else {
+    m_block_fsm.task_execute();
+  }
+  return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************

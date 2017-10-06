@@ -40,7 +40,8 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_empty : public cell_op {
+class cell_empty : public cell_op,
+                   public visitor::can_visit<representation::cell2D_fsm> {
  public:
   cell_empty(void) {}
 
@@ -49,7 +50,7 @@ class cell_empty : public cell_op {
    *
    * @param cell The cell to update.
    */
-  void visit(representation::cell2D& cell);
+  void visit(representation::cell2D& cell) override;
 
   /**
    * @brief Update the FSM associated with a cell with the knowledge that it is
@@ -57,7 +58,7 @@ class cell_empty : public cell_op {
    *
    * @param fsrm The FSM from the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm);
+  void visit(representation::cell2D_fsm& fsm) override;
 };
 
 NS_END(events, fordyca);

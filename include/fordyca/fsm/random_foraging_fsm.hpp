@@ -26,11 +26,14 @@
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_fsm.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace state_machine = rcppsw::patterns::state_machine;
+namespace visitor = rcppsw::patterns::visitor;
 
 namespace params {
 struct fsm_params;
@@ -40,9 +43,7 @@ namespace controller {
 class sensor_manager;
 class actuator_manager;
 } /* namespace controller */
-
 NS_START(fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
@@ -52,7 +53,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest and repeat.
  */
-class random_foraging_fsm : public base_foraging_fsm {
+class random_foraging_fsm : public base_foraging_fsm,
+                            public visitor::visitable<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,

@@ -37,6 +37,7 @@ class block_stat_collector;
 } /* namespace support */
 
 namespace representation {
+class cell2D;
 class cell2D_fsm;
 } /* namespace representation */
 
@@ -46,26 +47,27 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class block_drop : public block_op, public rcppsw::common::er_client,
-                   public visitor::can_visit<support::block_stat_collector, void>,
-                   public visitor::can_visit<representation::cell2D_fsm, void> {
+                   public visitor::can_visit<support::block_stat_collector>,
+                   public visitor::can_visit<representation::cell2D_fsm>,
+                   public visitor::can_visit<representation::cell2D> {
  public:
   block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
              representation::block* block);
-  ~block_drop(void) { rmmod(); }
+  ~block_drop(void) { er_client::rmmod(); }
 
   /**
    * @brief Update a cell on a block drop.
    *
    * @param cell The cell to update.
    */
-  void visit(class representation::cell2D& cell);
+  void visit(class representation::cell2D& cell) override;
 
   /**
    * @brief Update the FSM associated with a cell on a block drop.
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm);
+  void visit(representation::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
@@ -74,16 +76,16 @@ class block_drop : public block_op, public rcppsw::common::er_client,
    *
    * @param map The map to update (there is only ever one...)
    */
-  void visit(representation::arena_map& map);
+  void visit(representation::arena_map& map) override;
 
   /**
    * @brief Update a block with the knowledge that it has been dropped.
    *
    * @param block The block to update.
    */
-  void visit(representation::block& block);
+  void visit(representation::block& block) override;
 
-  void visit(support::block_stat_collector& collector);
+  void visit(support::block_stat_collector& collector) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -92,9 +94,14 @@ class block_drop : public block_op, public rcppsw::common::er_client,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller);
+  void visit(controller::random_foraging_controller& controller) override;
 
-  void visit(support::cache_update_handler& handler);
+  void visit(controller::memory_foraging_controller& controller) override;
+
+  void visit(support::cache_update_handler& handler) override;
+
+  void visit(fsm::random_foraging_fsm& fsm) override;
+  void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

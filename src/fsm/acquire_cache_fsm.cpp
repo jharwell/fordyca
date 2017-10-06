@@ -168,5 +168,4 @@ void acquire_cache_fsm::task_execute(void) {
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-
 NS_END(controller, fordyca);

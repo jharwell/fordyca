@@ -36,16 +36,17 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+NS_START(controller);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief  The most basic form of a foraging controller: roam around randomly
- * until you find a block, and then bring it to the nest.
+ * @brief The most basic form of a foraging controller: roam around randomly
+ * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
                                    public rcppsw::common::er_client,
@@ -120,7 +121,6 @@ class random_foraging_controller : public base_foraging_controller,
    * @brief Return if the robot is currently carrying a block.
    */
   bool is_carrying_block(void) const { return nullptr != m_block; }
-  void publish_fsm_event(foraging_signal::type signal);
 
   /**
    * @brief Return the block robot is carrying, or NULL if the robot is not
@@ -128,11 +128,13 @@ class random_foraging_controller : public base_foraging_controller,
    */
   representation::block* block(void) const { return m_block; }
   void block(representation::block* block) { m_block = block; }
+  fsm::random_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  protected:
   const std::shared_ptr<sensor_manager>& sensors(void) const { return m_sensors; }
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::common::er_server>& server(void) const { return m_server; }
+
 
  private:
   random_foraging_controller(const random_foraging_controller& other) = delete;

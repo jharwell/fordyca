@@ -35,6 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
@@ -43,7 +44,7 @@ NS_START(fordyca, controller);
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class memory_foraging_controller : public random_foraging_controller,
-                                   public rcppsw::patterns::visitor::visitable<memory_foraging_controller> {
+                                   public visitor::visitable<memory_foraging_controller> {
  public:
   memory_foraging_controller(void) :
       random_foraging_controller(),
@@ -97,7 +98,6 @@ class memory_foraging_controller : public random_foraging_controller,
    */
   virtual void ControlStep(void);
 
-  void publish_fsm_event(foraging_signal::type signal);
   /**
    * @brief Set the robot's current line of sight (LOS). This sort of a hack,
    * but is much easier than actually computing it, and helps me get on with teh

@@ -34,8 +34,8 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class perceived_cell2D;
 class cell_entity;
+class perceived_cell2D;
 } /* namespace representation */
 
 NS_START(events);
@@ -44,8 +44,7 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cell_perception : public visitor::visitor,
-                        public visitor::can_visit<representation::perceived_cell2D,
-                                                  void> {
+                        public visitor::can_visit<representation::perceived_cell2D> {
  public:
   cell_perception(const std::shared_ptr<rcppsw::common::er_server>& server,
                   uint8_t cell_state,
@@ -62,7 +61,7 @@ class cell_perception : public visitor::visitor,
    * is picked up by another robot (robots are generally unaware of each
    * other).
    */
-  void visit(representation::perceived_cell2D& cell);
+  void visit(representation::perceived_cell2D& cell) override;
 
  private:
   cell_perception(const cell_perception& op) = delete;
