@@ -89,14 +89,14 @@ class memory_foraging_controller : public random_foraging_controller,
    * @param t_node Points to the <parameters> section in the XML file in the
    *               <controllers><memory_foraging_controller_controller> section.
    */
-  virtual void Init(argos::TConfigurationNode& t_node);
+  void Init(argos::TConfigurationNode& t_node) override;
 
   /*
    * @brief Called once every time step; length set in the XML file.
    *
    * Since the FSM does most of the work, this function just tells it run.
    */
-  virtual void ControlStep(void);
+  void ControlStep(void) override;
 
   /**
    * @brief Set the robot's current line of sight (LOS). This sort of a hack,

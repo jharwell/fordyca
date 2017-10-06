@@ -66,7 +66,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   void event_empty(void);
   void event_block_pickup(void);
   void event_block_drop(void);
-  void init(void);
+  void init(void) override;
 
  private:
   struct block_data : public state_machine::event_data {
@@ -79,7 +79,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   FSM_STATE_DECLARE(cell2D_fsm, state_block, state_machine::no_event_data);
   FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
 
-  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) {
+  FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
   FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),

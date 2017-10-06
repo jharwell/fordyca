@@ -61,7 +61,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   /**
    * @brief (Re)-initialize the FSM.
    */
-  virtual void init(void);
+  void init(void) override;
 
  protected:
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);

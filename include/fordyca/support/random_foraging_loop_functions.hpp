@@ -50,13 +50,13 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   random_foraging_loop_functions(void);
   virtual ~random_foraging_loop_functions(void) {}
 
-  virtual void Init(argos::TConfigurationNode& node);
-  virtual void Reset();
-  virtual void Destroy();
-  virtual argos::CColor GetFloorColor(const argos::CVector2& plane_pos);
-  virtual void PreStep();
-  virtual bool IsExperimentFinished(void);
-  virtual void PostExperiment(void);
+  void Init(argos::TConfigurationNode& node) override;
+  void Reset() override;
+  void Destroy() override;
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  void PreStep() override;
+  bool IsExperimentFinished(void) override;
+  void PostExperiment(void) override;
 
  protected:
   virtual void pre_step_iter(argos::CFootBotEntity& robot);

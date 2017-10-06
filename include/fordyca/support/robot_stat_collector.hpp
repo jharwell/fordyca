@@ -47,10 +47,10 @@ class robot_stat_collector : public base_stat_collector {
   explicit robot_stat_collector(const std::string ofname) :
       base_stat_collector(ofname), m_robot_stats() {}
 
-  virtual void reset();
+  void reset() override;
   void collect(const controller::random_foraging_controller& controller);
   void collect(const controller::memory_foraging_controller& controller);
-  virtual void reset_on_timestep(void);
+  void reset_on_timestep(void) override;
 
  private:
   struct robot_stats {
@@ -61,8 +61,8 @@ class robot_stat_collector : public base_stat_collector {
     uint n_vectoring;
   };
 
-  std::string csv_header_build(const std::string& header = "");
-  std::string csv_line_build(void);
+  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_line_build(void) override;
 
   struct robot_stats m_robot_stats;
 };
