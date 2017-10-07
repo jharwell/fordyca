@@ -119,7 +119,7 @@ class memory_foraging_fsm : public base_foraging_fsm {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
     HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX(&block_to_nest, hfsm::top_state()),
-  HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
                                     NULL,
                                     &entry_leaving_nest, NULL),
     };
