@@ -28,7 +28,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/task_allocation/polled_simple_fsm.hpp"
 #include "rcppsw/control/pid_loop.hpp"
-#include "fordyca/fsm/task_arguments.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces

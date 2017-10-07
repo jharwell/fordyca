@@ -1,5 +1,5 @@
 /**
- * @file task_arguments.hpp
+ * @file argument.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_TASK_ARGUMENTS_HPP_
-#define INCLUDE_FORDYCA_FSM_TASK_ARGUMENTS_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_
+#define INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,12 +31,16 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm);
+NS_START(fordyca, tasks);
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief An argument that can be passed to a \ref task_start() function which
+ * contains a vector, mostly likely representing an arena location.
+ */
 class vector_argument : public task_allocation::taskable_argument {
  public:
   explicit vector_argument(const argos::CVector2& v) : m_vector(v) {}
@@ -47,6 +51,11 @@ class vector_argument : public task_allocation::taskable_argument {
   argos::CVector2 m_vector;
 };
 
+/**
+ * @brief An argument that can be passed to a \ref task_start() function which
+ * contains a foraging signal, for use in specifying initial conditions/commands
+ * for certain state machines.
+ */
 class foraging_signal_argument : public task_allocation::taskable_argument {
  public:
   explicit foraging_signal_argument(controller::foraging_signal::type s) :
@@ -58,6 +67,6 @@ class foraging_signal_argument : public task_allocation::taskable_argument {
   controller::foraging_signal::type m_signal;
 };
 
-NS_END(fsm, fordyca);
+NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_TASK_ARGUMENTS_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_ARGUMENT_HPP_ */
