@@ -130,7 +130,7 @@ void acquire_block_fsm::acquire_known_block(
          best.first->discrete_loc().first,
          best.first->discrete_loc().second,
          best.second);
-  vector_argument v(best.first->real_loc());
+  tasks::vector_argument v(best.first->real_loc());
   m_vector_fsm.task_start(&v);
 } /* acquire_known_block() */
 

@@ -34,7 +34,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 memory_foraging_repository::memory_foraging_repository(void) {
     factory().register_type<perceived_grid_parser>("perceived_grid");
-    parsers()["perceived_grid"] = factory().create("perceived_grid");
+    parsers()["perceived_grid"] = factory().create("perceived_grid").get();
 }
 
 NS_END(params, fordyca);

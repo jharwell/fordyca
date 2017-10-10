@@ -62,7 +62,7 @@ __noreturn HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::no_event
 HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
   /* first time running FSM; transitioned from START state */
   if (nullptr == data) {
-    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+    tasks::foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     m_block_fsm.task_start(&a);
     return controller::foraging_signal::HANDLED;
   }

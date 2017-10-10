@@ -193,7 +193,8 @@ void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* co
     controller::foraging_signal::IGNORED,  /* collision recovery */
     controller::foraging_signal::IGNORED,  /* arrived */
   };
-  const vector_argument* const a = dynamic_cast<const vector_argument* const>(arg);
+  const tasks::vector_argument* const a =
+      dynamic_cast<const tasks::vector_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()],

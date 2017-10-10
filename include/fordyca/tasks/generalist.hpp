@@ -44,13 +44,13 @@ namespace task_allocation = rcppsw::task_allocation;
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots).
  */
-class generalist : task_allocation::partitionable_polled_task<task_allocation::atomic_polled_task,
+class generalist : public task_allocation::partitionable_polled_task<task_allocation::atomic_polled_task,
                                                               task_allocation::atomic_polled_task> {
  public:
-  generalist(double alpha, double abort_reactivity,
+  generalist(double alpha, double reactivity,
              double abort_offset, task_allocation::taskable* taskable) :
-      partitionable_polled_task("generalist", alpha, abort_reactivity,
-                                abort_offset, taskable) {}
+      partitionable_polled_task("generalist", alpha, reactivity, abort_offset,
+                                taskable) {}
 };
 
 NS_END(tasks, fordyca);

@@ -41,12 +41,12 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the second half of the generalist task in depth 1
  * allocation.
  */
-class collector : task_allocation::atomic_polled_task {
+class collector : public task_allocation::atomic_polled_task {
  public:
   collector(double alpha, task_allocation::taskable * const taskable) :
       atomic_polled_task("collector", alpha, taskable) {}
 
-  void task_start(const task_allocation::taskable_argument* const arg) {
+  void task_start(__unused const task_allocation::taskable_argument* const arg) {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::atomic_polled_task::mechanism()->task_start(&a);
   }

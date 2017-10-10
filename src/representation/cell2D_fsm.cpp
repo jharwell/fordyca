@@ -39,9 +39,9 @@ cell2D_fsm::cell2D_fsm(
     state_block(),
     m_block_count(0) {
   if (ERROR == attmod("cell2D_fsm")) {
-    insmod("cell2D_fsm",
-           rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::NOM);
+    er_client::insmod("cell2D_fsm",
+                      rcppsw::common::er_lvl::DIAG,
+                      rcppsw::common::er_lvl::NOM);
   }
 }
 

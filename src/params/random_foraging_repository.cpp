@@ -38,9 +38,9 @@ random_foraging_repository::random_foraging_repository(void) {
   factory().register_type<actuator_parser>("actuators");
   factory().register_type<sensor_parser> ("sensors");
   factory().register_type<fsm_parser>("fsm");
-  parsers()["actuators"]        = factory().create("actuators");
-  parsers()["sensors"]          = factory().create("sensors");
-  parsers()["fsm"]              = factory().create("fsm");
+  parsers()["actuators"]        = factory().create("actuators").get();
+  parsers()["sensors"]          = factory().create("sensors").get();
+  parsers()["fsm"]              = factory().create("fsm").get();
 }
 
 NS_END(params, fordyca);

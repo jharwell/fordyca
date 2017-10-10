@@ -38,9 +38,9 @@ loop_function_repository::loop_function_repository(void) {
   factory().register_type<grid_parser>("grid");
   factory().register_type<logging_parser>("logging");
   factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["grid"]             = factory().create("grid");
-  parsers()["logging"]          = factory().create("logging");
-  parsers()["loop_functions"]   = factory().create("loop_functions");
+  parsers()["grid"]             = factory().create("grid").get();
+  parsers()["logging"]          = factory().create("logging").get();
+  parsers()["loop_functions"]   = factory().create("loop_functions").get();
 }
 
 NS_END(params, fordyca);
