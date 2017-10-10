@@ -27,7 +27,7 @@
 #include <fstream>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,9 @@ class base_parser {
 
   virtual void parse(__unused argos::TConfigurationNode& node) = 0;
   virtual void show(std::ostream& stream) = 0;
-  virtual const struct base_params* get_results(void) { return NULL; }
+  virtual const struct rcppsw::common::base_params* get_results(void) {
+    return NULL;
+  }
 };
 
 NS_END(params, fordyca);

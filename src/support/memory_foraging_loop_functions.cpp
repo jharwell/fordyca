@@ -29,6 +29,7 @@
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces

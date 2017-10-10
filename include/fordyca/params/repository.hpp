@@ -29,16 +29,17 @@
 #include <string>
 #include <map>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 #include "fordyca/params/base_parser.hpp"
 #include "rcppsw/common/er_client.hpp"
-#include "rcppsw/patterns/factory/releasing_factory.hpp"
+#include "rcppsw/patterns/factory/sharing_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
 namespace factory = rcppsw::patterns::factory;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -47,13 +48,13 @@ class repository {
   repository(void) : m_parsers(), m_factory() {}
 
   void parse_all(argos::TConfigurationNode& node);
-  const struct base_params* get_params(const std::string& name) {
+  const struct rcppsw::common::base_params* get_params(const std::string& name) {
     return m_parsers[name]->get_results();
   }
   void show_all(std::ostream& stream);
 
  protected:
-  factory::releasing_factory<base_parser>& factory(void) {
+  factory::sharing_factory<base_parser>& factory(void) {
     return m_factory;
   }
   std::map<std::string, base_parser*>& parsers(void) {
@@ -62,7 +63,7 @@ class repository {
 
  private:
   std::map<std::string, base_parser*> m_parsers;
-  factory::releasing_factory<base_parser> m_factory;
+  factory::sharing_factory<base_parser> m_factory;
 };
 
 NS_END(params, fordyca);

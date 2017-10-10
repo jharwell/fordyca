@@ -95,7 +95,6 @@ class block_drop : public block_op, public rcppsw::common::er_client,
    * each timestep.
    */
   void visit(controller::random_foraging_controller& controller) override;
-
   void visit(controller::memory_foraging_controller& controller) override;
 
   void visit(support::cache_update_handler& handler) override;

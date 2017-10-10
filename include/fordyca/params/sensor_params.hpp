@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/angles.h>
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +52,7 @@ struct diffusion_params {
   argos::CRange<argos::CRadians> go_straight_angle_range;
 };
 
-struct sensor_params : public base_params {
+struct sensor_params : public rcppsw::common::base_params {
   sensor_params(void) : diffusion() {}
 
   struct diffusion_params diffusion;

@@ -49,7 +49,6 @@ NS_START(controller);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
-                                   public rcppsw::common::er_client,
                                    public visitor::visitable<random_foraging_controller> {
  public:
   random_foraging_controller(void);
@@ -68,29 +67,6 @@ class random_foraging_controller : public base_foraging_controller,
    * @brief If TRUE, the robot is current engaged in collision avoidance.
    */
   bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
-
-  /**
-   * @brief If TRUE, the robot is currently at least most of the way in the nest.
-   */
-  bool in_nest(void) const { return m_sensors->in_nest(); }
-
-  /**
-   * @brief If TRUE, then the robot thinks that it is on top of a block. Note
-   * that this may be a false positive...
-   */
-  bool block_detected(void) const { return m_sensors->block_detected(); }
-
-  /**
-   * @brief Set whether or not a robot is supposed to display it's ID above its
-   * head during simulation.
-   */
-  void display_id(bool display_id) { m_display_id = display_id; }
-
-  /**
-   * @brief Return whether or not a robot is supposed to display it's ID above
-   * its head during simulation.
-   */
-  bool display_id(void) const { return m_display_id; }
 
   /*
    * @brief Initialize the controller.
@@ -112,47 +88,9 @@ class random_foraging_controller : public base_foraging_controller,
    */
   void Reset(void) override;
 
-  /*
-   * @brief Cleanup whatever was done by Init().
-   */
-  void Destroy(void) override {}
-
-  /**
-   * @brief Return if the robot is currently carrying a block.
-   */
-  bool is_carrying_block(void) const { return nullptr != m_block; }
-
-  /**
-   * @brief Return the block robot is carrying, or NULL if the robot is not
-   * currently carrying a block.
-   */
-  representation::block* block(void) const { return m_block; }
-  void block(representation::block* block) { m_block = block; }
   fsm::random_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
- protected:
-  const std::shared_ptr<sensor_manager>& sensors(void) const { return m_sensors; }
-  const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
-  const std::shared_ptr<rcppsw::common::er_server>& server(void) const { return m_server; }
-
-
  private:
-  random_foraging_controller(const random_foraging_controller& other) = delete;
-  random_foraging_controller& operator=(const random_foraging_controller& other) = delete;
-
-  /** Should the ID of the robot be displayed during visualization?  */
-  bool                                       m_display_id;
-
-  /**
-   * The current block that the robot is carrying, or NULL if the robot is not
-   * currently carrying a block.
-   */
-  representation::block*                     m_block;
-
-  /** The er_server that this and all derived classes will use */
-  std::shared_ptr<rcppsw::common::er_server> m_server;
-  std::shared_ptr<actuator_manager>          m_actuators;
-  std::shared_ptr<sensor_manager>            m_sensors;
   std::unique_ptr<fsm::random_foraging_fsm>  m_fsm;
 };
 

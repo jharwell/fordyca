@@ -68,7 +68,7 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
-                          public  task_allocation::taskable {
+                          public task_allocation::taskable {
  public:
   block_to_nest_fsm(
       const struct params::fsm_params* params,

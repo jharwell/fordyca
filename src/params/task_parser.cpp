@@ -1,5 +1,5 @@
 /**
- * @file base_params.hpp
+ * @file task_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/params/task_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,10 +30,22 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Member Functions
  ******************************************************************************/
-struct base_params {};
+void task_parser::parse(argos::TConfigurationNode& node) {
+  argos::TConfigurationNode task_node = argos::GetNode(node, "task");
+
+  m_params.reset(new task_params);
+
+  argos::GetNodeAttribute(task_node, "estimation_alpha",
+                          m_params->estimation_alpha);
+  argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
+} /* parse() */
+
+void task_parser::show(std::ostream& stream) {
+  stream << "====================\nTASK params\n====================\n";
+  stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
+  stream << "reactivity=" << m_params->reactivity << std::endl;
+} /* show() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_PARAMS_HPP_ */

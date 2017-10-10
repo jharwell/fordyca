@@ -26,6 +26,7 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,6 +36,19 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void memory_foraging_controller::robot_loc(argos::CVector2 loc) {
+   sensors()->robot_loc(loc);
+}
+argos::CVector2 memory_foraging_controller::robot_loc(void) const {
+  return sensors()->robot_loc();
+}
+const representation::line_of_sight* memory_foraging_controller::los(void) const {
+  return sensors()->los();
+}
+void memory_foraging_controller::los(
+    std::unique_ptr<representation::line_of_sight>& new_los) {
+  sensors()->los(new_los);
+}
 void memory_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
@@ -49,7 +63,7 @@ void memory_foraging_controller::ControlStep(void) {
 void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::memory_foraging_repository param_repo;
 
-  random_foraging_controller::Init(node);
+  base_foraging_controller::Init(node);
   ER_NOM("Initializing memory_foraging controller");
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
@@ -67,14 +81,9 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
                        sensors(),
                        actuators(),
                        m_map));
-ER_NOM("memory_foraging controller initialization finished");
+  ER_NOM("memory_foraging controller initialization finished");
 } /* Init() */
 
-/*
- * This statement notifies ARGoS of the existence of the controller.  It binds
- * the class passed as first argument to the string passed as second argument,
- * which is then available in the XML.
- */
 using namespace argos;
 REGISTER_CONTROLLER(memory_foraging_controller, "memory_foraging_controller")
 

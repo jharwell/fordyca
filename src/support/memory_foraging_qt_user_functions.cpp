@@ -24,6 +24,7 @@
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/support/memory_foraging_qt_user_functions.hpp"
 #include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces

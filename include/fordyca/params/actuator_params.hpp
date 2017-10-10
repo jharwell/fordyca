@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/angles.h>
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +50,7 @@ struct wheel_params {
 };
 
 
-struct actuator_params : public base_params {
+struct actuator_params : public rcppsw::common::base_params {
   actuator_params(void) : wheels() {}
 
   struct wheel_params wheels;

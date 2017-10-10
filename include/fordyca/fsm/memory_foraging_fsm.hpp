@@ -24,12 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <utility>
-
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,6 +47,7 @@ namespace representation {
 class perceived_arena_map;
 } /* namespace representation */
 
+namespace visitor = rcppsw::patterns::visitor;
 NS_START(fsm);
 
 /*******************************************************************************
@@ -60,7 +59,8 @@ NS_START(fsm);
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class memory_foraging_fsm : public base_foraging_fsm {
+class memory_foraging_fsm : public base_foraging_fsm,
+                            public visitor::visitable<memory_foraging_fsm> {
  public:
   memory_foraging_fsm(
       const struct params::fsm_params* params,

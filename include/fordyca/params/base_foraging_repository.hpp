@@ -1,5 +1,5 @@
 /**
- * @file grid_params.hpp
+ * @file base_foraging_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BASE_FORAGING_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BASE_FORAGING_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/block_params.hpp"
+#include <string>
+#include <map>
+#include "fordyca/params/repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,26 +34,13 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct grid_params : public rcppsw::common::base_params {
-  grid_params(double resolution_ = 0.0,
-              argos::CVector2 upper_ = argos::CVector2(),
-              argos::CVector2 lower_ = argos::CVector2(),
-              struct block_params block_ = block_params()) :
-      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
-  double resolution;
-  argos::CVector2 upper;
-  argos::CVector2 lower;
-  struct block_params block;
-};
-
-struct perceived_grid_params : public rcppsw::common::base_params {
-  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
-  struct grid_params grid;
-  double pheromone_rho;
+class base_foraging_repository: public repository {
+ public:
+  base_foraging_repository(void);
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BASE_FORAGING_REPOSITORY_HPP_ */

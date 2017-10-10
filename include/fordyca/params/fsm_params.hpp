@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,7 @@ struct threshold_times {
 };
 
 
-struct fsm_params : public base_params {
+struct fsm_params : public rcppsw::common::base_params {
   fsm_params(void) : times(), nest_center() {}
   struct threshold_times times;
   argos::CVector2 nest_center;
