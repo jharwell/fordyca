@@ -100,6 +100,8 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
 
   cell2D& cell(void) { return m_cell; }
 
+  double epsilon(void) const { return kEpsilon; }
+
  private:
   /**
    * The tolerance to zero which the pheromone density has to reach before the

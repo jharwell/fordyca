@@ -24,6 +24,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,6 +34,10 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void cell_empty::visit(representation::perceived_cell2D& cell) {
+  cell.cell().accept(*this);
+} /* visit() */
+
 void cell_empty::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);

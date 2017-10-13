@@ -34,6 +34,7 @@ NS_START(fordyca);
 namespace representation {
 class cell2D;
 class cell2D_fsm;
+class perceived_cell2D_fsm;
 } /* namespace representation */
 
 NS_START(events);
@@ -41,8 +42,7 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_unknown : public cell_op,
-                     public visitor::can_visit<representation::cell2D_fsm> {
+class cell_unknown : public cell_op {
  public:
   cell_unknown(void) {}
 
@@ -52,6 +52,8 @@ class cell_unknown : public cell_op,
    * @param cell The cell to update.
    */
   void visit(representation::cell2D& cell) override;
+
+  void visit(representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update the FSM associated with a cell with the knowledge that it is

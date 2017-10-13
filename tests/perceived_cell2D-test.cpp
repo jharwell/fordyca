@@ -25,45 +25,67 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_unknown.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/events/block_pickup.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/cache_found.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 using namespace fordyca::representation;
+using namespace fordyca;
 
 /*******************************************************************************
  * Test Cases
  ******************************************************************************/
 CATCH_TEST_CASE("init-test", "[perceived_cell2D]") {
-  perceived_cell2D cell;
+  perceived_cell2D cell(rcppsw::common::g_server);
   CATCH_REQUIRE(!cell.state_is_known());
-  CATCH_REQUIRE(cell.relevance() == 0.0);
+  CATCH_REQUIRE(cell.density() == 0.0);
 }
 
 CATCH_TEST_CASE("transition-test", "[perceived_cell2D]") {
-  perceived_cell2D cell;
-  cell.delta(0.1);
-  cell.event_encounter(cell2D_fsm::ST_EMPTY);
+  perceived_cell2D cell(rcppsw::common::g_server);
+  cell.rho(0.1);
+  events::cell_empty op;
+  cell.accept(op);
   CATCH_REQUIRE(cell.state_is_known());
   CATCH_REQUIRE(cell.state_is_empty());
-  CATCH_REQUIRE(std::fabs(cell.relevance() - 1.0) < perceived_cell2D::kEpsilon);
+  CATCH_REQUIRE(std::fabs(cell.density() - 1.0) < cell.epsilon());
 
   for (size_t i = 0; i < 10; ++i) {
-    cell.update_relevance();
-    CATCH_REQUIRE(cell.relevance() - 1.0 - 0.1 * (i+1) < 0.00001);
+    cell.update_density();
+    CATCH_REQUIRE(cell.density() - 1.0 - 0.1 * (i+1) < 0.00001);
   } /* for(i..) */
 
   CATCH_REQUIRE(!cell.state_is_known());
 
-  cell.event_encounter(cell2D_fsm::ST_HAS_BLOCK);
+  block* b = new block(0.2);
+  events::block_found op2(rcppsw::common::g_server, b);
+  cell.accept(op2);
   CATCH_REQUIRE(cell.state_is_known());
   CATCH_REQUIRE(cell.state_has_block());
-  CATCH_REQUIRE(std::fabs(cell.relevance() - 1.0) < perceived_cell2D::kEpsilon);
+  CATCH_REQUIRE(std::fabs(cell.density() - 1.0) < cell.epsilon());
 
   for (size_t i = 0; i < 10; ++i) {
-    cell.update_relevance();
-    CATCH_REQUIRE(cell.relevance() - 1.0 - 0.1 * (i+1) < 0.00001);
+    cell.update_density();
+    CATCH_REQUIRE(cell.density() - 1.0 - 0.1 * (i+1) < 0.00001);
   } /* for(i..) */
 
+  std::list<block*> list;
+  list.push_back(b);
+  list.push_back(b);
+  cache* c = new cache(0.2, argos::CVector2(0.0, 0.0), list);
+  events::cache_found op3(rcppsw::common::g_server, c);
+  cell.accept(op3);
+  CATCH_REQUIRE(cell.state_is_known());
+  CATCH_REQUIRE(cell.state_has_cache());
+  CATCH_REQUIRE(std::fabs(cell.density() - 1.0) < cell.epsilon());
+
+
   CATCH_REQUIRE(!cell.state_is_known());
+  delete b;
 }

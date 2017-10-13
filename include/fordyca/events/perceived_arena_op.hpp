@@ -1,5 +1,5 @@
 /**
- * @file cell_perception.hpp
+ * @file perceived_arena_op.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_PERCEIVED_ARENA_OP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_PERCEIVED_ARENA_OP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,9 +32,16 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+
+namespace controller {
+class memory_foraging_controller;
+} /* namespace controller */
+
 namespace representation {
-class cell_entity;
+class cell2D;
 class perceived_cell2D;
+class perceived_arena_map;
+class cell2D_fsm;
 } /* namespace representation */
 
 NS_START(events);
@@ -43,35 +49,17 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_perception : public visitor::visitor,
-                        public visitor::can_visit<representation::perceived_cell2D> {
+class perceived_arena_op : public visitor::visitor,
+                           public visitor::can_visit<controller::memory_foraging_controller>,
+                           public visitor::can_visit<representation::cell2D>,
+                           public visitor::can_visit<representation::perceived_cell2D>,
+                           public visitor::can_visit<representation::cell2D_fsm>,
+                           public visitor::can_visit<representation::perceived_arena_map> {
  public:
-  cell_perception(const std::shared_ptr<rcppsw::common::er_server>& server,
-                  uint8_t cell_state,
-                  representation::cell_entity* entity = nullptr);
-
-  /**
-   * @brief A robot has encountered this cell during exploring or travel
-   * (i.e. the cell fell within its LOS). Each timestep that the cell remains in
-   * the robot's LOS, it is encountered again. Each encounter causes a unit
-   * amout of pheromone to be deposited on the cell; the information relevance
-   * is reinforced.
-   *
-   * This is OK, because blocks CAN suddenly disappear from a robot's LOS if it
-   * is picked up by another robot (robots are generally unaware of each
-   * other).
-   */
-  void visit(representation::perceived_cell2D& cell) override;
-
- private:
-  cell_perception(const cell_perception& op) = delete;
-  cell_perception& operator=(const cell_perception& op) = delete;
-
-  uint8_t m_cell_state;
-  representation::cell_entity* m_entity;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  perceived_arena_op(void) {}
+  virtual ~perceived_arena_op(void) {}
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CELL_PERCEPTION_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_PERCEIVED_ARENA_OP_HPP_ */
