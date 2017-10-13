@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,7 +35,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct block_params : public base_params {
+struct block_params : public rcppsw::common::base_params {
   block_params(uint n_blocks_ = 0, double dimension_ = 0.0,
                std::string dist_model_ =  "", bool respawn_ = false) :
       n_blocks(n_blocks_), dimension(dimension_), dist_model(dist_model_),

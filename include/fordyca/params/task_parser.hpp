@@ -1,31 +1,32 @@
 /**
- * @file logging_params.hpp
+ * @file task_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_TASK_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_TASK_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params/task_params.hpp"
+#include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,15 +34,20 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct logging_params : public rcppsw::common::base_params {
-  logging_params(void) : robot_stats(), block_stats() {}
+class task_parser: public base_parser {
+ public:
+  task_parser(void) : m_params() {}
 
-  std::string robot_stats;
-  std::string block_stats;
+  void parse(argos::TConfigurationNode& node) override;
+  const struct task_params* get_results(void) override { return m_params.get(); }
+  void show(std::ostream& stream) override;
+
+ private:
+  std::unique_ptr<struct task_params> m_params;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_TASK_PARSER_HPP_ */

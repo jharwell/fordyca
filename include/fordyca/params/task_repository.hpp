@@ -1,5 +1,5 @@
 /**
- * @file base_controller_repository.hpp
+ * @file task_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_TASK_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_TASK_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 #include <map>
-#include "fordyca/params/repository.hpp"
+#include "fordyca/params/base_foraging_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,11 +36,11 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_controller_repository: public repository {
+class task_repository: public base_foraging_repository {
  public:
-  base_controller_repository(void);
+  task_repository(void);
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_TASK_REPOSITORY_HPP_ */

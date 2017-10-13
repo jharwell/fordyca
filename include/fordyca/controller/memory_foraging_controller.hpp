@@ -27,7 +27,7 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
-#include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
 
@@ -43,23 +43,14 @@ namespace visitor = rcppsw::patterns::visitor;
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class memory_foraging_controller : public random_foraging_controller,
+class memory_foraging_controller : public base_foraging_controller,
                                    public visitor::visitable<memory_foraging_controller> {
  public:
   memory_foraging_controller(void) :
-      random_foraging_controller(),
-      m_display_los(false),
+      base_foraging_controller(),
       m_light_loc(),
       m_map(),
       m_fsm() {}
-
-  void display_los(bool display_los) { m_display_los = display_los; }
-
-  /**
-   * @brief If TRUE, then the robot should display its approxibate LOS as a
-   * circle on the ground during simulation.
-   */
-  bool display_los(void) const { return m_display_los; }
 
   /**
    * @brief If TRUE, the robot is currently searching for a block.
@@ -103,24 +94,14 @@ class memory_foraging_controller : public random_foraging_controller,
    * but is much easier than actually computing it, and helps me get on with teh
    * actual reserach I'm interested in.
    */
-  void los(std::unique_ptr<representation::line_of_sight>& new_los) {
-    sensors()->los(new_los);
-  }
+  void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
   /**
    * @brief Get the current LOS for the robot.
    *
    * @return The current LOS.
    */
-  const representation::line_of_sight* los(void) const { return sensors()->los(); }
-
-  /**
-   * @brief Set the current clock tick. In a real world, each robot would
-   * maintain its own clock tick, and overall there would no doubt be
-   * considerable skew; this is a simulation hack that makes things much
-   * nicer/easier to deal with.
-   */
-  void tick(uint tick) { sensors()->tick(tick); }
+  const representation::line_of_sight* los(void) const;
 
   /**
    * @brief Set the current location of the robot.
@@ -131,14 +112,17 @@ class memory_foraging_controller : public random_foraging_controller,
    * robot's would calculate this from sensor values, rather than it being set
    * by the loop functions.
    */
-  void robot_loc(argos::CVector2 loc) { return sensors()->robot_loc(loc); }
-  argos::CVector2 robot_loc(void) { return sensors()->robot_loc(); }
-
+  void robot_loc(argos::CVector2 loc);
+  argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
+  fsm::memory_foraging_fsm* fsm(void) const { return m_fsm.get(); }
+
+ protected:
+  std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
+    return m_map;
+  }
 
  private:
-  /** Should the robot's LOS be displayed as a circle?  */
-  bool                                                 m_display_los;
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::shared_ptr<fsm::memory_foraging_fsm>            m_fsm;

@@ -67,7 +67,7 @@ NS_START(fsm);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                                 public rcppsw::task_allocation::taskable {
+                          public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(
       const struct params::fsm_params* params,
@@ -75,6 +75,11 @@ class acquire_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::sensor_manager>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
+
+  /* taskable overrides */
+  void task_execute(void) override;
+  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  void task_reset(void) override { init(); }
 
   /**
    * @brief Reset the FSM
@@ -100,8 +105,6 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const {
     return m_explore_fsm.is_avoiding_collision();
   }
-  void task_execute(void) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
 
  protected:
   enum fsm_states {

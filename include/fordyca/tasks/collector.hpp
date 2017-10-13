@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/task_allocation/atomic_polled_task.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
@@ -41,17 +41,18 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the second half of the generalist task in depth 1
  * allocation.
  */
-class collector : public task_allocation::atomic_polled_task {
+class collector : public task_allocation::polled_task {
  public:
-  collector(double alpha, task_allocation::taskable * const taskable) :
-      atomic_polled_task("collector", alpha, taskable) {}
+  collector(double alpha, std::unique_ptr<task_allocation::taskable>& taskable) :
+      polled_task("collector", alpha, taskable) {}
 
-  void task_start(__unused const task_allocation::taskable_argument* const arg) {
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
-    task_allocation::atomic_polled_task::mechanism()->task_start(&a);
+    task_allocation::polled_task::mechanism()->task_start(&a);
   }
+  executable_task* partition(void) override { return nullptr; }
+  double abort_prob(void) override { return 0.0; }
 };
-
 
 NS_END(tasks, fordyca);
 

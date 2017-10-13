@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/task_allocation/atomic_polled_task.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,10 +40,13 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the first half of the generalist task in depth 1
  * allocation.
  */
-class forager : public task_allocation::atomic_polled_task {
+class forager : public task_allocation::polled_task {
  public:
-  forager(double alpha, task_allocation::taskable * taskable) :
-      atomic_polled_task("forager", alpha, taskable) {}
+  forager(double alpha, std::unique_ptr<task_allocation::taskable>& taskable) :
+      polled_task("forager", alpha, taskable) {}
+
+  executable_task* partition(void) override { return nullptr; }
+  double abort_prob(void) override { return 0.0; }
 };
 
 NS_END(tasks, fordyca);

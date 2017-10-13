@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <argos3/core/utility/math/range.h>
-#include "fordyca/params/base_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct loop_functions_params : public base_params {
+struct loop_functions_params : public rcppsw::common::base_params {
   loop_functions_params(void) :
       nest_x(), nest_y(), display_robot_id(false), display_robot_los(false),
       display_block_id(false), simulation_type() {}

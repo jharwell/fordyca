@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <map>
-#include "fordyca/params/base_controller_repository.hpp"
+#include "fordyca/params/base_foraging_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class memory_foraging_repository: public base_controller_repository {
+class memory_foraging_repository: public base_foraging_repository {
  public:
   memory_foraging_repository(void);
 };

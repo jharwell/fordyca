@@ -1,5 +1,5 @@
 /**
- * @file grid_params.hpp
+ * @file task_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/block_params.hpp"
+#include "fordyca/params/task_repository.hpp"
+#include "fordyca/params/task_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,26 +30,11 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-struct grid_params : public rcppsw::common::base_params {
-  grid_params(double resolution_ = 0.0,
-              argos::CVector2 upper_ = argos::CVector2(),
-              argos::CVector2 lower_ = argos::CVector2(),
-              struct block_params block_ = block_params()) :
-      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
-  double resolution;
-  argos::CVector2 upper;
-  argos::CVector2 lower;
-  struct block_params block;
-};
-
-struct perceived_grid_params : public rcppsw::common::base_params {
-  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
-  struct grid_params grid;
-  double pheromone_rho;
-};
+task_repository::task_repository(void) {
+  factory().register_type<task_parser>("task");
+  parsers()["task"] = factory().create("task").get();
+}
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARAMS_HPP_ */

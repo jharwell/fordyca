@@ -32,10 +32,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-class memory_foraging_controller;
-} /* namespace controller */
-
 namespace representation {
 class perceived_arena_map;
 } /* namespace representation */

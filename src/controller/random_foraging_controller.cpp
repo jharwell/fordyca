@@ -37,65 +37,31 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 random_foraging_controller::random_foraging_controller(void) :
-    er_client(),
-    m_display_id(false),
-    m_block(nullptr),
-    m_server(std::make_shared<rcppsw::common::er_server>()),
-    m_actuators(),
-    m_sensors(),
-    m_fsm() {
-  /*
-   * Initially, all robots use the RCPPSW er_server to log parameters.
-   */
-  deferred_init(m_server);
-  /* diagnostic for logging, nominal for printing */
-  insmod("controller",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
-  server_handle()->mod_dbglvl(er_id(), rcppsw::common::er_lvl::DIAG);
-  server_handle()->mod_loglvl(er_id(), rcppsw::common::er_lvl::VER);
-}
+    m_fsm() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void random_foraging_controller::Init(argos::TConfigurationNode& node) {
-    server_handle()->change_logfile(std::string(std::string("controller-") +
-                                              GetId() +
-                                              std::string(".txt")));
-  ER_NOM("Initializing random foraging controller");
+  base_foraging_controller::Init(node);
+
+  ER_NOM("Initializing random_foraging controller");
 
   params::random_foraging_repository param_repo;
   param_repo.parse_all(node);
-  param_repo.show_all(server_handle()->log_stream());
-
-  m_actuators.reset(new actuator_manager(
-      static_cast<const struct params::actuator_params*>(
-          param_repo.get_params("actuators")),
-      GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
-      GetActuator<argos::CCI_LEDsActuator>("leds"),
-      GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
-  m_sensors.reset(new sensor_manager(
-      static_cast<const struct params::sensor_params*>(
-          param_repo.get_params("sensors")),
-      GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
-      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+  param_repo.show_all(er_client::server_handle()->log_stream());
 
   m_fsm.reset(
       new fsm::random_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
-                       m_server,
-                       m_sensors,
-                       m_actuators));
-  Reset();
-  ER_NOM("Random foraging controller initialization finished");
+                                   base_foraging_controller::server(),
+                                   base_foraging_controller::sensors(),
+                                   base_foraging_controller::actuators()));
+  ER_NOM("random_foraging controller initialization finished");
 } /* Init() */
 
 void random_foraging_controller::Reset(void) {
   m_fsm->init();
-  m_block = nullptr;
 } /* Reset() */
 
 /* Notifiy ARGoS of the existence of the controller. */

@@ -93,9 +93,16 @@ void block_pickup::visit(representation::block& block) {
 } /* visit() */
 
 void block_pickup::visit(controller::random_foraging_controller& controller) {
-  controller.block(m_block);
   controller.fsm()->accept(*this);
+  controller.block(m_block);
   ER_NOM("random_foraging_controller: %s picked up block%d",
+         controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+void block_pickup::visit(controller::memory_foraging_controller& controller) {
+  controller.map()->accept(*this);
+  controller.block(m_block);
+  ER_NOM("memory_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
@@ -109,13 +116,6 @@ void block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
   ER_NOM("memory_foraging_fsm: register block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
-} /* visit() */
-
-void block_pickup::visit(controller::memory_foraging_controller& controller) {
-  static_cast<controller::random_foraging_controller&>(controller).accept(*this);
-  controller.map()->accept(*this);
-  ER_NOM("memory_foraging_controller: %s picked up block%d",
-         controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
 void block_pickup::visit(support::cache_update_handler& handler) {

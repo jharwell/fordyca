@@ -1,5 +1,5 @@
 /**
- * @file base_controller_repository.cpp
+ * @file base_foraging_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/base_controller_repository.hpp"
+#include "fordyca/params/base_foraging_repository.hpp"
 #include "fordyca/params/actuator_parser.hpp"
 #include "fordyca/params/sensor_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
@@ -34,13 +34,11 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_controller_repository::base_controller_repository(void) {
+base_foraging_repository::base_foraging_repository(void) {
   factory().register_type<actuator_parser>("actuators");
   factory().register_type<sensor_parser> ("sensors");
-  factory().register_type<fsm_parser>("fsm");
   parsers()["actuators"]        = factory().create("actuators").get();
   parsers()["sensors"]          = factory().create("sensors").get();
-  parsers()["fsm"]              = factory().create("fsm").get();
 }
 
 NS_END(params, fordyca);
