@@ -112,6 +112,29 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     }
 } /* pre_step_iter() */
 
+argos::CColor memory_foraging_loop_functions::GetFloorColor(
+    const argos::CVector2& plane_pos) {
+
+  /* The nest is a light gray */
+  if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
+      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
+    return argos::CColor::GRAY30;
+  }
+  /* blocks are black */
+  for (size_t i = 0; i < map()->blocks().size(); ++i) {
+    if (map()->blocks()[i].contains_point(plane_pos)) {
+      return argos::CColor::BLACK;
+    }
+  } /* for(i..) */
+
+  for (size_t i = 0; i < map()->blocks().size(); ++i) {
+    if (map()->blocks()[i].contains_point(plane_pos)) {
+      return argos::CColor::GRAY70;
+    }
+  } /* for(i..) */
+  return argos::CColor::WHITE;
+} /* GetFloorColor() */
+
 void memory_foraging_loop_functions::PreStep() {
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 

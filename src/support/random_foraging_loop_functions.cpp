@@ -126,15 +126,19 @@ void random_foraging_loop_functions::Destroy() {
 
 argos::CColor random_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
+
+  /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY30;
   }
+  /* blocks are black */
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     if (m_map->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */
+
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     if (m_map->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::GRAY70;
