@@ -85,6 +85,11 @@ class arena_map: public rcppsw::common::er_client,
    */
   void distribute_block(block* const block, bool first_time);
 
+  /*
+   * @todo: Add a consolidate_blocks() function for optionally running after every block
+   * spawning to combine blocks that are close together into caches
+   */
+
   /**
    * @brief Get the # of blocks available in the arena.
    */

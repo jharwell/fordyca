@@ -53,7 +53,6 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   void Init(argos::TConfigurationNode& node) override;
   void Reset() override;
   void Destroy() override;
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void PreStep() override;
   bool IsExperimentFinished(void) override;
   void PostExperiment(void) override;
@@ -80,13 +79,16 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   argos::CFloorEntity* floor(void) const { return m_floor; }
   robot_stat_collector* robot_collector(void) const { return m_robot_collector.get(); }
   block_stat_collector* block_collector(void) const { return m_block_collector.get(); }
+  const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
+  const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
 
  private:
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   random_foraging_loop_functions(const random_foraging_loop_functions& s) = delete;
   random_foraging_loop_functions& operator=(const random_foraging_loop_functions& s) = delete;
 
-  argos::CRange<argos::Real> m_nest_x;
-  argos::CRange<argos::Real> m_nest_y;
+  argos::CRange<double> m_nest_x;
+  argos::CRange<double> m_nest_y;
   argos::CFloorEntity* m_floor;
   std::string m_sim_type;
   std::unique_ptr<params::loop_function_repository> m_repo;

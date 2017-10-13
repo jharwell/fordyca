@@ -48,10 +48,12 @@ class memory_foraging_loop_functions : public random_foraging_loop_functions {
   void pre_step_iter(argos::CFootBotEntity& robot) override;
 
  private:
-  memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
-  memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void set_robot_los(argos::CFootBotEntity& robot);
   void set_robot_tick(argos::CFootBotEntity& robot);
+
+  memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
+  memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;
 };
 
 NS_END(support, fordyca);
