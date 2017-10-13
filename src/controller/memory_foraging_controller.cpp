@@ -57,7 +57,12 @@ void memory_foraging_controller::ControlStep(void) {
    */
   m_map->event_new_los(sensors()->los());
   m_map->update_density();
-  m_fsm->run();
+  if (m_fsm->task_finished()) {
+    m_fsm->task_reset();
+    m_fsm->task_start(nullptr);
+  } else {
+    m_fsm->task_execute();
+  }
 } /* ControlStep() */
 
 void memory_foraging_controller::Init(argos::TConfigurationNode& node) {

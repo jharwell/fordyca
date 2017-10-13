@@ -77,6 +77,34 @@ class block_to_nest_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
+  /* taskable overrides */
+
+  /**
+   * @brief Run the next step of the FSM during task execution.
+   */
+  void task_execute(void) override;
+
+  /**
+   * @brief Start/restart the FSM. It can be told to retrieve a block from a
+   * cache or to look for a free block, via the argument.
+   */
+  void task_start(const task_allocation::taskable_argument * arg) override;
+
+  /**
+   * @brief Determine if a block has been brought to the nest, and the robot has
+   * subsequently left the nest, ready for its next task.
+   *
+   * @return \c TRUE if the condition is met, \c FALSE otherwise.
+   */
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
+
+  /**
+   * @brief Reset the task FSM to a state where it can be started again.
+   */
+  void task_reset(void) override { init(); }
+
   /**
    * @brief Reset the FSM
    */
@@ -88,40 +116,37 @@ class block_to_nest_fsm : public base_foraging_fsm,
    *
    * @return TRUE if the condition is met, FALSE otherwise.
    */
-  bool is_searching_for_block(void) const {
-    return m_block_fsm.is_searching_for_block();
-  }
+  bool is_searching_for_block(void) const;
 
   /**
    * @brief Get if the robot is currently searching for a cache within the arena
    * (either vectoring towards a known cache, or exploring for one).
    *
-   * @return TRUE if the condition is met, FALSE otherwise.
+   * @return \c TRUE if the condition is met, \c FALSE otherwise.
    */
-  bool is_searching_for_cache(void) const {
-    return m_cache_fsm.is_searching_for_cache();
-  }
-
-  bool is_exploring(void) const {
-    return m_block_fsm.is_exploring() ||
-        m_cache_fsm.is_exploring();
-  }
-  bool is_vectoring(void) const {
-    return m_block_fsm.is_vectoring() || m_cache_fsm.is_exploring();
-  }
-
-  bool is_avoiding_collision(void) const {
-    return m_block_fsm.is_avoiding_collision() ||
-        m_cache_fsm.is_avoiding_collision();
-  }
-  bool is_returning(void) const { return current_state() == ST_RETURN_TO_NEST; }
+  bool is_searching_for_cache(void) const;
 
   /**
-   * @brief Run the FSM in its current state without injecting an event into it.
+   * @brief If \c TRUE, the robot is currently exploring for a block (i.e. it does
+   * not know of any blocks in the arena).
    */
-  void task_execute(void) override;
-  void task_start(const task_allocation::taskable_argument * arg) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  bool is_exploring(void) const;
+
+  /**
+   * @brief If \c TRUE, the robot is currently vectoring towards a known block.
+   */
+  bool is_vectoring(void) const;
+
+  /**
+   * @brief If \c TRUE, the robot is currently engaged in collision avoidance.
+   */
+  bool is_avoiding_collision(void) const;
+
+  /**
+   * @brief If \c TRUE, the robot has obtained a block and is returning to the
+   * nest with it.
+   */
+  bool is_returning(void) const;
 
  protected:
   enum fsm_states {

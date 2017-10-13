@@ -127,6 +127,27 @@ void block_to_nest_fsm::task_execute(void) {
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
+bool block_to_nest_fsm::is_searching_for_block(void) const {
+  return m_block_fsm.is_searching_for_block();
+}
 
+bool block_to_nest_fsm::is_searching_for_cache(void) const {
+  return m_cache_fsm.is_searching_for_cache();
+}
+
+bool block_to_nest_fsm::is_exploring(void) const {
+  return m_block_fsm.is_exploring() || m_cache_fsm.is_exploring();
+}
+bool block_to_nest_fsm::is_vectoring(void) const {
+  return m_block_fsm.is_vectoring() || m_cache_fsm.is_exploring();
+}
+
+bool block_to_nest_fsm::is_avoiding_collision(void) const {
+  return m_block_fsm.is_avoiding_collision() ||
+      m_cache_fsm.is_avoiding_collision();
+}
+bool block_to_nest_fsm::is_returning(void) const {
+  return current_state() == ST_RETURN_TO_NEST;
+}
 
 NS_END(fsm, fordyca);

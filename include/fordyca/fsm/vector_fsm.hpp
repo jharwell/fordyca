@@ -53,11 +53,19 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
              std::shared_ptr<controller::sensor_manager> sensors,
              std::shared_ptr<controller::actuator_manager> actuators);
 
+  /* taskable overrides */
+
   /**
-   * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
-   * goal, this function must be called before vectoring to a new goal will work.
+   * @brief Reset the vector-to-goal task to a state where it can be restarted.
+  */
+  void task_reset(void) override { init(); }
+
+  /**
+   * @brief (Re)start the FSM, with a new goal.
+   *
+   * @param goal The (X, Y) coordinates of the new goal to drive to.
    */
-  void init(void) override;
+  void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
 
   /**
    * @brief Determine if the robot has arrived at the specified goal within the
@@ -66,6 +74,13 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * @return TRUE if the condition is met, FALSE otherwise.
    */
   bool task_finished(void) const override { return current_state() == ST_ARRIVED; }
+
+
+  /**
+   * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
+   * goal, this function must be called before vectoring to a new goal will work.
+   */
+  void init(void) override;
 
   /**
    * @brief Determine if the robot is still on the way to the specified
@@ -81,12 +96,6 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
     return ST_COLLISION_AVOIDANCE == current_state() ||
         ST_COLLISION_AVOIDANCE == current_state();
   }
-  /**
-   * @brief (Re)start the FSM, with a new goal.
-   *
-   * @param goal The (X, Y) coordinates of the new goal to drive to.
-   */
-  void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
 
  protected:
   enum fsm_states {

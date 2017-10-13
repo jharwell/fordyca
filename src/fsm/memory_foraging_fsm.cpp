@@ -44,6 +44,7 @@ memory_foraging_fsm::memory_foraging_fsm(
     entry_leaving_nest(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_block_fsm(params, server, sensors, actuators, map) {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
@@ -90,6 +91,10 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data)
   return controller::foraging_signal::HANDLED;
 }
 
+FSM_STATE_DEFINE(memory_foraging_fsm, finished, state_machine::no_event_data) {
+  return controller::foraging_signal::HANDLED;
+}
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -98,10 +103,10 @@ void memory_foraging_fsm::init(void) {
   m_block_fsm.task_reset();
 } /* init() */
 
-void memory_foraging_fsm::run(void) {
+void memory_foraging_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
-} /* run() */
+} /* task_execute() */
 
 
 NS_END(fsm, fordyca);

@@ -28,6 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,6 +49,8 @@ class perceived_arena_map;
 } /* namespace representation */
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace task_allocation = rcppsw::task_allocation;
+
 NS_START(fsm);
 
 /*******************************************************************************
@@ -60,6 +63,7 @@ NS_START(fsm);
  * pickup the block and bring it all the way back to the nest.
  */
 class memory_foraging_fsm : public base_foraging_fsm,
+                            public task_allocation::taskable,
                             public visitor::visitable<memory_foraging_fsm> {
  public:
   memory_foraging_fsm(
@@ -69,8 +73,28 @@ class memory_foraging_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
+  /* taskable overrides */
+
   /**
-   * @brief Reset the FSM
+   * @brief Reset the memory foraging task to a state where it can be restarted.
+   */
+  void task_reset(void) override { init(); }
+
+  /**
+   * @brief Run the memory foraging task.
+   */
+  void task_execute(void) override;
+
+  /**
+   * @brief Determine if a block has been retrieved, brought to the nest, and
+   * the robot has left the nest, ready for its next task.
+   *
+   * @return \c TRUE if the condition is met, \c FALSE otherwise.
+   */
+  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+
+  /**
+   * @brief Reset the FSM.
    */
   void init(void) override;
 
@@ -89,16 +113,12 @@ class memory_foraging_fsm : public base_foraging_fsm,
   }
   bool is_returning(void) const { return m_block_fsm.is_returning(); }
 
-  /**
-   * @brief Run the FSM in its current state without injecting an event into it.
-   */
-  void run(void);
-
  protected:
   enum fsm_states {
     ST_START,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a block */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ST_FINISHED,
     ST_MAX_STATES
   };
 
@@ -114,6 +134,7 @@ class memory_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(memory_foraging_fsm, start, state_machine::no_event_data);
   HFSM_STATE_DECLARE(memory_foraging_fsm, block_to_nest,
                      state_machine::no_event_data);
+  HFSM_STATE_DECLARE(memory_foraging_fsm, finished, state_machine::no_event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
@@ -122,6 +143,7 @@ class memory_foraging_fsm : public base_foraging_fsm,
         HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
                                     NULL,
                                     &entry_leaving_nest, NULL),
+        HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state()),
     };
   HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
   return &kSTATE_MAP[index];

@@ -74,7 +74,7 @@ void depth1_controller::Init(argos::TConfigurationNode& node) {
                                          collector_fsm));
   m_collector->set_atomic();
 
-  std::unique_ptr<task_allocation::taskable> forager_
+  std::unique_ptr<task_allocation::taskable> forager_fsm =
       rcppsw::make_unique<fsm::block_to_cache_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
@@ -84,13 +84,13 @@ void depth1_controller::Init(argos::TConfigurationNode& node) {
   m_forager.reset(new tasks::forager(p->estimation_alpha, forager_fsm));
   m_forager->set_atomic();
 
-  /* std::unique_ptr<task_allocation::taskable> generalist_fsm = */
-  /*     rcppsw::make_unique<fsm::memory_foraging_fsm>( */
-  /*         static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")), */
-  /*         base_foraging_controller::server(), */
-  /*         base_foraging_controller::sensors(), */
-  /*         base_foraging_controller::actuators(), */
-  /*         memory_foraging_controller::map_ref()); */
+  std::unique_ptr<task_allocation::taskable> generalist_fsm =
+      rcppsw::make_unique<fsm::memory_foraging_fsm>(
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          base_foraging_controller::server(),
+          base_foraging_controller::sensors(),
+          base_foraging_controller::actuators(),
+          memory_foraging_controller::map_ref());
   m_generalist.reset(new tasks::generalist(p, collector_fsm));
 
   ER_NOM("depth1 controller initialization finished");

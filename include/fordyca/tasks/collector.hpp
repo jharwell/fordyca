@@ -46,7 +46,7 @@ class collector : public task_allocation::polled_task {
   collector(double alpha, std::unique_ptr<task_allocation::taskable>& taskable) :
       polled_task("collector", alpha, taskable) {}
 
-  void task_start(__unused const task_allocation::taskable_argument* const arg) {
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
   }
