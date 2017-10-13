@@ -80,7 +80,7 @@ class random_foraging_fsm : public base_foraging_fsm,
    * @brief If TRUE, the robot is returning to the nest, probably after having
    * successfully picked up a block.
    */
-  bool is_returning(void) const {
+  bool is_transporting_to_nest(void) const {
     return current_state() == ST_RETURN_TO_NEST;
   }
 

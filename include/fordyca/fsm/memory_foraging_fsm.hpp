@@ -111,7 +111,7 @@ class memory_foraging_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const {
     return m_block_fsm.is_avoiding_collision();
   }
-  bool is_returning(void) const { return m_block_fsm.is_returning(); }
+  bool is_transporting_to_nest(void) const { return m_block_fsm.is_transporting_to_nest(); }
 
  protected:
   enum fsm_states {
