@@ -65,7 +65,7 @@ class memory_foraging_controller : public base_foraging_controller,
   /**
    * @brief If TRUE, the robot is currently returning to the nest carrying a block.
    */
-  bool is_returning(void) const { return m_fsm->is_returning(); }
+  bool is_transporting_to_nest(void) const { return m_fsm->is_transporting_to_nest(); }
 
   /**
    * @brief If TRUE, then the robot is currently searching for a block.

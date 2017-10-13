@@ -124,7 +124,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
    * @brief If \c TRUE, the robot has obtained a block and is returning to the
    * nest with it.
    */
-  bool is_returning(void) const;
+  bool is_transporting_to_nest(void) const;
 
   bool is_transporting_to_cache(void) const;
 

@@ -52,7 +52,7 @@ class depth1_controller : public memory_foraging_controller,
 
   const std::string& current_task(void) const;
   bool is_avoiding_collision(void) const = delete;
-  bool is_returning(void) const = delete;
+  bool is_transporting_to_nest(void) const = delete;
   bool is_vectoring(void) const = delete;
 
   /*

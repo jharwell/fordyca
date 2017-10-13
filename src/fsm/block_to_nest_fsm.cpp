@@ -146,7 +146,7 @@ bool block_to_nest_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
       m_cache_fsm.is_avoiding_collision();
 }
-bool block_to_nest_fsm::is_returning(void) const {
+bool block_to_nest_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_RETURN_TO_NEST;
 }
 
