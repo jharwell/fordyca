@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_op.hpp"
+#include "fordyca/events/concrete_arena_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -41,7 +41,7 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public block_op,
+class block_pickup : public concrete_arena_op,
                      public rcppsw::common::er_client,
                      public visitor::can_visit<representation::perceived_arena_map> {
  public:

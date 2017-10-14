@@ -25,6 +25,7 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
@@ -77,7 +78,19 @@ bool perceived_arena_map::event_new_los(const line_of_sight* los) {
 
         events::block_found op(m_server, block);
         m_grid.access(abs.first, abs.second).accept(op);
-      } else { /* must be empty if it doesn't have a block */
+      } else if (los->cell(x, y).state_has_cache()) {
+        rval = true;
+        cache* cache = const_cast<representation::cache*>(los->cell(x,
+                                                                    y).cache());
+        ER_ASSERT(cache, "ERROR: NULL cache on cell that should have cache");
+        if (!m_grid.access(abs.first, abs.second).state_has_cache()) {
+          ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(), abs.first,
+                 abs.second);
+        }
+
+        events::cache_found op(m_server, cache);
+        m_grid.access(abs.first, abs.second).accept(op);
+      } else { /* must be empty if it doesn't have a block or a cache */
         events::cell_empty op;
         m_grid.access(abs.first, abs.second).accept(op);
       }

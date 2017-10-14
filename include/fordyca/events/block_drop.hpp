@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/concrete_block_op.hpp"
+#include "fordyca/events/concrete_arena_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -36,14 +36,21 @@ namespace support {
 class block_stat_collector;
 } /* namespace support */
 
+namespace representation {
+class cell2D;
+class cell2D_fsm;
+} /* namespace representation */
+
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_drop : public concrete_block_op,
+class block_drop : public concrete_arena_op,
                    public rcppsw::common::er_client,
-                   public visitor::can_visit<support::block_stat_collector> {
+                   public visitor::can_visit<support::block_stat_collector>,
+                   public visitor::can_visit<representation::cell2D_fsm>,
+                   public visitor::can_visit<representation::cell2D> {
  public:
   block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
              representation::block* block);
