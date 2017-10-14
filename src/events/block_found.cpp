@@ -45,8 +45,14 @@ block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& serve
  * Member Functions
  ******************************************************************************/
 void block_found::visit(representation::perceived_cell2D& cell) {
-  cell.update_density(1.0);
+  cell.add_pheromone(1.0);
+  cell.update_density();
   cell.cell().accept(*this);
+} /* visit() */
+
+void block_found::visit(representation::cell2D& cell) {
+  cell.entity(m_block);
+  cell.fsm().accept(*this);
 } /* visit() */
 
 void block_found::visit(representation::cell2D_fsm& fsm) {

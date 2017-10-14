@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <utility>
 #include <string>
 
 #include "fordyca/representation/grid2D.hpp"

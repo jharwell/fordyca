@@ -50,6 +50,12 @@ class block_found : public perceived_arena_op,
 
   void visit(representation::cell2D& cell) override;
   void visit(representation::perceived_cell2D& cell) override;
+  /**
+   * @brief Update the FSM associated with a cell on a block drop.
+   *
+   * @param fsm The FSM associated with the cell to update.
+   */
+  void visit(representation::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
@@ -59,13 +65,6 @@ class block_found : public perceived_arena_op,
    * @param map The map to update (there is only ever one...)
    */
   void visit(representation::perceived_arena_map& map) override;
-
-    /**
-   * @brief Update the FSM associated with a cell on a block drop.
-   *
-   * @param fsm The FSM associated with the cell to update.
-   */
-  void visit(representation::cell2D_fsm& fsm) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.

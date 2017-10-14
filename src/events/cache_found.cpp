@@ -45,8 +45,13 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& serve
  * Member Functions
  ******************************************************************************/
 void cache_found::visit(representation::perceived_cell2D& cell) {
-  cell.update_density(1.0);
+  cell.add_pheromone(1.0);
+  cell.update_density();
   cell.cell().accept(*this);
+} /* visit() */
+
+void cache_found::visit(representation::cell2D& cell) {
+  cell.fsm().accept(*this);
 } /* visit() */
 
 void cache_found::visit(representation::cell2D_fsm& fsm) {
