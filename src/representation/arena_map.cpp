@@ -45,7 +45,7 @@ arena_map::arena_map(const struct params::grid_params* params,
                         nest_x, nest_y,
                         &params->block),
     m_server(rcppsw::common::g_server),
-    m_grid(params) {
+    m_grid(params, m_server) {
   deferred_init(m_server);
   insmod("arena_map",
          rcppsw::common::er_lvl::DIAG,

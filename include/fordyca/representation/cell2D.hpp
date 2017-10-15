@@ -3,7 +3,7 @@
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+nnnnnnn * This file is part of FORDYCA.
  *
  * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-#include <utility>
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/common/er_server.hpp"
 #include "fordyca/representation/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
@@ -46,10 +45,8 @@ NS_START(fordyca, representation);
  */
 class cell2D : public visitor::visitable<cell2D> {
  public:
-  explicit cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server =
-      rcppsw::common::g_server) :
-      m_entity(nullptr), m_loc(), m_fsm(server) { m_fsm.init(); }
+  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server =
+      rcppsw::common::g_server);
 
   /* state inquiry */
 

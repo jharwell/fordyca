@@ -40,7 +40,7 @@ perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const struct params::perceived_grid_params* params,
     const std::string& robot_id) :
-    m_server(server), m_grid(&params->grid) {
+    m_server(server), m_grid(&params->grid, m_server) {
   deferred_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::common::er_lvl::DIAG,
