@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
@@ -37,6 +36,7 @@ cell2D_fsm::cell2D_fsm(
     state_unknown(),
     state_empty(),
     state_block(),
+    state_cache(),
     m_block_count(0) {
   if (ERROR == attmod("cell2D_fsm")) {
     er_client::insmod("cell2D_fsm",
@@ -63,8 +63,8 @@ void cell2D_fsm::event_empty(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
         ST_EMPTY,                 /* unknown */
         ST_EMPTY,                 /* empty */
-        state_machine::event_signal::FATAL, /* has block */
-        state_machine::event_signal::FATAL  /* has cache */
+        ST_EMPTY,                 /* has block */
+        ST_EMPTY,                 /* has cache */
         };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
   external_event(kTRANSITIONS[current_state()], NULL);

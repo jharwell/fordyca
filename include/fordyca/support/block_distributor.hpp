@@ -29,6 +29,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
+#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,14 +59,13 @@ class block_distributor {
                     const struct params::block_params* params);
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * @brief Distribute a block in the arena.
    *
    * @param first_time Whether or not this is the first time to distribute a
    * block. Only matters if respawn is not enabled.
    */
-  void distribute_blocks(std::vector<representation::block>& blocks,
-                         bool first_time);
-  void distribute_block(representation::block& block, bool first_time);
+  bool distribute_block(const representation::block& block,
+                        bool first_time, argos::CVector2* const coord);
 
   /**
    * @brief If TRUE, then blocks should be respawned every time they are placed
@@ -82,13 +82,13 @@ class block_distributor {
    *
    * @param i The index of the block to place/distribute.
    */
-  void dist_random(representation::block& block);
+  argos::CVector2 dist_random(const representation::block& block);
 
   /**
    * @brief Distribute a block within a small range about 75% of the way between
    * the nest and the far wall. Assumes a horizontally rectangular arena.
    */
-  void dist_single_src(representation::block& block);
+  argos::CVector2 dist_single_src(const representation::block& block);
   argos::CVector2 dist_in_range(argos::CRange<double> x_range,
                                 argos::CRange<double> y_range);
   argos::CVector2 dist_outside_range(double dimension,

@@ -31,10 +31,10 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  *  Functions
  ******************************************************************************/
-discrete_coord real_to_discrete_coord(std::pair<double, double> real_coord,
+discrete_coord real_to_discrete_coord(const argos::CVector2& real_coord,
                                       double resolution) {
-  return discrete_coord(real_coord.first / resolution ,
-                        real_coord.second / resolution);
+  return discrete_coord(real_coord.GetX() / resolution ,
+                        real_coord.GetY() / resolution);
 } /* real_to_discrete_coord() */
 
 NS_END(representation, fordyca);
