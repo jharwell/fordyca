@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <utility>
 #include <string>
 
 #include "rcppsw/swarm/pheromone_density.hpp"
@@ -81,6 +80,8 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   const representation::block* block(void) const { return m_cell.block(); }
 
+  const representation::cache* cache(void) const { return m_cell.cache(); }
+
   /**
    * @brief Update the information relevance/pheromone density associated with
    * this cell.
@@ -94,11 +95,13 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
   /**
    * @brief Add the specified amount to the pheromone density for this cell.
    *
-   * @param density The amount of pheromone to add.
+   * @param amount The amount of pheromone to add.
    */
-  void update_density(double density) { m_density.add_pheromone(density); }
+  void add_pheromone(double amount) { m_density.add_pheromone(amount); }
 
   cell2D& cell(void) { return m_cell; }
+
+  double epsilon(void) const { return kEpsilon; }
 
  private:
   /**

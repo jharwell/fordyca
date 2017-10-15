@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <boost/multi_array.hpp>
-#include <list>
 #include <algorithm>
 #include <argos/core/utility/math/vector2.h>
 #include "rcppsw/common/er_server.hpp"

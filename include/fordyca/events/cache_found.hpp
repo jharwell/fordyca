@@ -1,5 +1,5 @@
 /**
- * @file block_drop.hpp
+ * @file cache_found.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CACHE_FOUND_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CACHE_FOUND_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/concrete_arena_op.hpp"
+#include "fordyca/events/perceived_arena_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -32,13 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace support {
-class block_stat_collector;
-} /* namespace support */
-
 namespace representation {
-class cell2D;
-class cell2D_fsm;
+class cache;
 } /* namespace representation */
 
 NS_START(events);
@@ -46,29 +41,15 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_drop : public concrete_arena_op,
-                   public rcppsw::common::er_client,
-                   public visitor::can_visit<support::block_stat_collector>,
-                   public visitor::can_visit<representation::cell2D_fsm>,
-                   public visitor::can_visit<representation::cell2D> {
+class cache_found : public perceived_arena_op,
+                    public rcppsw::common::er_client {
  public:
-  block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
-             representation::block* block);
-  ~block_drop(void) { er_client::rmmod(); }
+  cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
+              representation::cache* cache);
+  ~cache_found(void) { er_client::rmmod(); }
 
-  /**
-   * @brief Update a cell on a block drop.
-   *
-   * @param cell The cell to update.
-   */
-  void visit(class representation::cell2D& cell) override;
-
-  /**
-   * @brief Update the FSM associated with a cell on a block drop.
-   *
-   * @param fsm The FSM associated with the cell to update.
-   */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(representation::cell2D& cell) override;
+  void visit(representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
@@ -77,16 +58,14 @@ class block_drop : public concrete_arena_op,
    *
    * @param map The map to update (there is only ever one...)
    */
-  void visit(representation::arena_map& map) override;
+  void visit(representation::perceived_arena_map& map) override;
 
-  /**
-   * @brief Update a block with the knowledge that it has been dropped.
+    /**
+   * @brief Update the FSM associated with a cell on a block drop.
    *
-   * @param block The block to update.
+   * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::block& block) override;
-
-  void visit(support::block_stat_collector& collector) override;
+  void visit(representation::cell2D_fsm& fsm) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -95,25 +74,19 @@ class block_drop : public concrete_arena_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller) override;
   void visit(controller::memory_foraging_controller& controller) override;
-
-  void visit(support::cache_update_handler& handler) override;
-
-  void visit(fsm::random_foraging_fsm& fsm) override;
-  void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  representation::cache* cache(void) const { return m_cache; }
 
  private:
-  block_drop(const block_drop& op) = delete;
-  block_drop& operator=(const block_drop& op) = delete;
-  representation::block* m_block;
+  cache_found(const cache_found& op) = delete;
+  cache_found& operator=(const cache_found& op) = delete;
+  representation::cache* m_cache;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CACHE_FOUND_HPP_ */

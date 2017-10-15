@@ -135,7 +135,7 @@ class arena_map: public rcppsw::common::er_client,
    *
    * @return The subgrid.
    */
-  grid_view<cell2D*> subgrid(double x, double y, double radius) {
+  grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
     return m_grid.subgrid(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }

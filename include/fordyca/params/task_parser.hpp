@@ -25,13 +25,14 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/task_params.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -41,11 +42,11 @@ class task_parser: public base_parser {
   task_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct task_params* get_results(void) override { return m_params.get(); }
+  const struct task_allocation::task_params* get_results(void) override { return m_params.get(); }
   void show(std::ostream& stream) override;
 
  private:
-  std::unique_ptr<struct task_params> m_params;
+  std::unique_ptr<struct task_allocation::task_params> m_params;
 };
 
 NS_END(params, fordyca);

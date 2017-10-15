@@ -154,9 +154,7 @@ void memory_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot)
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
   representation::discrete_coord robot_loc =
-      representation::real_to_discrete_coord(
-          std::pair<double, double>(pos.GetX(), pos.GetY()),
-          map()->grid_resolution());
+      representation::real_to_discrete_coord(pos, map()->grid_resolution());
   controller::memory_foraging_controller& controller =
       dynamic_cast<controller::memory_foraging_controller&>(
           robot.GetControllableEntity().GetController());

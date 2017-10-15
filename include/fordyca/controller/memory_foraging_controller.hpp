@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/core/utility/math/rng.h>
 #include <boost/shared_ptr.hpp>
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"

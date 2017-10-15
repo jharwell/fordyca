@@ -27,7 +27,6 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/cell_perception.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/support/cache_update_handler.hpp"
@@ -57,9 +56,8 @@ void block_pickup::visit(representation::arena_map& map) {
                                        m_block->discrete_loc().second);
   argos::CVector2 old_r(m_block->real_loc().GetX(),
                         m_block->real_loc().GetY());
-  representation::cell2D& cell = map.access(old_d.first, old_d.second);
   events::cell_empty op;
-  cell.accept(op);
+  map.access(old_d.first, old_d.second).accept(op);
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from (%f, %f) -> (%zu, %zu)", m_robot_index,
          m_block->id(),
@@ -73,17 +71,14 @@ void block_pickup::visit(representation::perceived_arena_map& map) {
          m_block->id(),
          m_block->real_loc().GetX(), m_block->real_loc().GetY(),
          m_block->discrete_loc().first, m_block->discrete_loc().second);
-  representation::perceived_cell2D& cell = map.access(
-      m_block->discrete_loc().first, m_block->discrete_loc().second);
-
-  events::cell_perception percept_op(m_server,
-                                         representation::cell2D_fsm::ST_EMPTY);
-  cell.accept(percept_op);
+  events::cell_empty op;
+  map.access(m_block->discrete_loc().first,
+             m_block->discrete_loc().second).accept(op);
 } /* visit() */
 
 void block_pickup::visit(representation::block& block) {
   block.add_carry();
-  assert(-1 != block.id());
+  ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */

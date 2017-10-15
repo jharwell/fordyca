@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
@@ -79,32 +78,52 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
 } /* robot_on_block() */
 
 void arena_map::distribute_block(block* const block, bool first_time) {
-  m_block_distributor.distribute_block(*block, first_time);
+  while (1) {
+    argos::CVector2 r_coord;
+    if (m_block_distributor.distribute_block(*block, first_time, &r_coord)) {
+      discrete_coord d_coord = representation::real_to_discrete_coord(r_coord,
+                                                                      m_grid.resolution());
+      cell2D& cell = m_grid.access(d_coord.first, d_coord.second);
+
+      /*
+       * You can only distribute blocks to cells that do not currently have
+       * anything in them.
+       */
+      if (!cell.state_has_block() && !cell.state_has_cache()) {
+        block->real_loc(r_coord);
+        block->discrete_loc(d_coord);
+        break;
+      }
+    } else {
+      break;
+    }
+  } /* while() */
   cell2D& cell = m_grid.access(block->discrete_loc().first,
                                block->discrete_loc().second);
   events::block_drop op(m_server, block);
   cell.accept(op);
-  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu)",
+  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),
          block->real_loc().GetX(),
          block->real_loc().GetY(),
          block->discrete_loc().first,
-         block->discrete_loc().second);
+         block->discrete_loc().second, cell.block());
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
+    argos::CVector2 real_coord;
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
   /*
-   * Once all blocks have been distributed, all cells that do not have blocks
-   * are empty.
+   * Once all blocks have been distributed, all cells that do not have blocks or
+   * caches are empty.
    */
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
-      if (!cell.state_has_block()) {
+      if (!cell.state_has_block() && !cell.state_has_cache()) {
         events::cell_empty op;
         cell.accept(op);
       }

@@ -68,6 +68,8 @@ class cell2D_fsm : public state_machine::simple_fsm,
   void event_block_drop(void);
   void init(void) override;
 
+  uint block_count(void) const { return m_block_count; }
+
  private:
   struct block_data : public state_machine::event_data {
     block_data(bool pickup_ = false) : pickup(pickup_) {}

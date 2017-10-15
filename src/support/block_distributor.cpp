@@ -51,34 +51,26 @@ block_distributor::block_distributor(double resolution,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distributor::distribute_blocks(
-    std::vector<representation::block>& blocks,
-    bool first_time) {
-  for (size_t i = 0; i < blocks.size(); ++i) {
-    distribute_block(blocks[i], first_time);
-  } /* for(i..) */
-} /* distribute_blocks() */
-
-void block_distributor::distribute_block(representation::block& block,
-                                         bool first_time) {
+bool block_distributor::distribute_block(const representation::block& block,
+                                         bool first_time,
+                                         argos::CVector2* const coord) {
   if (!m_respawn && !first_time) {
-    return;
+    return false;
   } else if (m_dist_model == "random") {
-    dist_random(block);
+    *coord = dist_random(block);
+    return true;
   } else if (m_dist_model == "single_source") {
-    dist_single_src(block);
+    *coord = dist_single_src(block);
+    return true;
   }
+  return false;
 } /* distribute_block() */
 
-void block_distributor::dist_random(representation::block& block) {
-  block.real_loc(dist_outside_range(block.xsize(),
-                                    m_nest_x, m_nest_y));
-  block.discrete_loc(representation::real_to_discrete_coord(
-      std::pair<double, double>(block.real_loc().GetX(),
-                                block.real_loc().GetY()), m_resolution));
+argos::CVector2 block_distributor::dist_random(const representation::block& block) {
+  return dist_outside_range(block.xsize(), m_nest_x, m_nest_y);
 } /* dist_random() */
 
-void block_distributor::dist_single_src(representation::block& block) {
+argos::CVector2 block_distributor::dist_single_src(const representation::block& block) {
   /*
    * Find the 3/4 point between the nest and the source along the Y (horizontal)
    * direction, and put all the blocks around there.
@@ -87,10 +79,7 @@ void block_distributor::dist_single_src(representation::block& block) {
   argos::CRange<double> x_range = argos::CRange<double>(
       m_arena_x.GetMax() * 0.75 - 0.5,
       m_arena_x.GetMax() * 0.75);
-  block.real_loc(dist_in_range(x_range, y_range));
-  block.discrete_loc(representation::real_to_discrete_coord(
-      std::pair<double, double>(block.real_loc().GetX(),
-                                block.real_loc().GetY()), m_resolution));
+  return dist_in_range(x_range, y_range);
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(
