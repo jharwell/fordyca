@@ -31,15 +31,16 @@
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
+class block;
+class cache;
+class cell2D;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block;
-class cell2D;
 
 /**
  * @brief A representation of the robot's current line-of-sight. The robot is
@@ -59,7 +60,9 @@ class line_of_sight {
   explicit line_of_sight(const grid_view<cell2D*> view,
                          discrete_coord center) :
       m_center(center), m_view(view) {}
+
   std::list<const representation::block*> blocks(void);
+  std::list<const representation::cache*> caches(void);
 
   /**
    * @brief Get the size of the X dimension for a LOS.

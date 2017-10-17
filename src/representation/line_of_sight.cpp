@@ -22,11 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
 
@@ -43,6 +42,17 @@ std::list<const representation::block*> line_of_sight::blocks(void) {
   } /* for(i..) */
   return blocks;
 } /* blocks() */
+
+std::list<const representation::cache*> line_of_sight::caches(void) {
+  std::list<const representation::cache*> caches;
+  for (auto i = m_view.origin();
+       i < m_view.origin() + m_view.num_elements(); ++i) {
+    if ((*i)->state_has_cache()) {
+      caches.push_back((*i)->cache());
+    }
+  } /* for(i..) */
+  return caches;
+} /* caches() */
 
 cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
