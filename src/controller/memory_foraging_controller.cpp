@@ -26,6 +26,7 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/perceived_grid_params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************

@@ -23,6 +23,7 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/params/arena_map_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,20 +33,21 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::grid_params* params,
+arena_map::arena_map(const struct params::arena_map_params* params,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
     m_blocks(params->block.n_blocks,
              block(params->block.dimension)),
-    m_block_distributor(params->resolution,
-                        argos::CRange<argos::Real>(params->lower.GetX(),
-                                                   params->upper.GetX()),
-                        argos::CRange<argos::Real>(params->lower.GetY(),
-                                                   params->upper.GetY()),
+    m_caches(),
+    m_block_distributor(params->grid.resolution,
+                        argos::CRange<argos::Real>(params->grid.lower.GetX(),
+                                                   params->grid.upper.GetX()),
+                        argos::CRange<argos::Real>(params->grid.lower.GetY(),
+                                                   params->grid.upper.GetY()),
                         nest_x, nest_y,
                         &params->block),
     m_server(rcppsw::common::g_server),
-    m_grid(params, m_server) {
+    m_grid(&params->grid, m_server) {
   deferred_init(m_server);
   insmod("arena_map",
          rcppsw::common::er_lvl::DIAG,

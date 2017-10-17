@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/block_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,21 +36,11 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct grid_params : public rcppsw::common::base_params {
-  grid_params(double resolution_ = 0.0,
-              argos::CVector2 upper_ = argos::CVector2(),
-              argos::CVector2 lower_ = argos::CVector2(),
-              struct block_params block_ = block_params()) :
-      resolution(resolution_), upper(upper_), lower(lower_), block(block_) {}
+  grid_params(void) : resolution(0.0), upper(), lower() {}
+
   double resolution;
   argos::CVector2 upper;
   argos::CVector2 lower;
-  struct block_params block;
-};
-
-struct perceived_grid_params : public rcppsw::common::base_params {
-  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
-  struct grid_params grid;
-  double pheromone_rho;
 };
 
 NS_END(params, fordyca);

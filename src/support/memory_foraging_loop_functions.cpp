@@ -78,7 +78,6 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
-
         /* Update arena map state due to a block nest drop */
         events::block_drop drop_op(rcppsw::common::g_server,
                                        controller.block());

@@ -1,5 +1,5 @@
 /**
- * @file grid_parser.hpp
+ * @file arena_map_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/block_params.hpp"
+#include "fordyca/params/cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +36,16 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class grid_parser: public base_parser {
- public:
-  grid_parser(void): m_params() {}
+struct arena_map_params : public rcppsw::common::base_params {
+  arena_map_params(void) : grid(), block(), cache() {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct grid_params> m_params;
+  struct grid_params grid;
+  struct block_params block;
+  struct cache_params cache;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_ */

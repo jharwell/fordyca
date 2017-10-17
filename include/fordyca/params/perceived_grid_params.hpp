@@ -1,5 +1,5 @@
 /**
- * @file grid_parser.hpp
+ * @file perceived_grid_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/base_params.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +34,15 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class grid_parser: public base_parser {
- public:
-  grid_parser(void): m_params() {}
+struct perceived_grid_params : public rcppsw::common::base_params {
+  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct grid_params> m_params;
+  struct grid_params grid;
+  double pheromone_rho;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_ */
