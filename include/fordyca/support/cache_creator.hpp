@@ -30,6 +30,9 @@
 #include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/grid2D.hpp"
+#include "fordyca/representation/cell2D.hpp"
+
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -43,13 +46,13 @@ NS_START(fordyca, support);
 class cache_creator : public rcppsw::common::er_client {
  public:
   cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
-                std::shared_ptr<std::vector<representation::block>> blocks,
+                representation::grid2D<representation::cell2D>& grid,
+                std::vector<representation::block>& blocks,
                 double min_dist, double cache_size);
 
   /**
    * @brief Scan the entire list of blocks currently in the arena, and create
    * caches from all blocks that are close enough together.
-   *
    *
    * @return The list of current caches.
    */
@@ -61,7 +64,9 @@ class cache_creator : public rcppsw::common::er_client {
 
   double m_min_dist;
   double m_cache_size;
-  std::shared_ptr<std::vector<representation::block>> m_blocks;
+  std::vector<representation::block>& m_blocks;
+  representation::grid2D<representation::cell2D>& m_grid;
+  std::shared_ptr<rcppsw::common::er_server> m_server;
 };
 NS_END(support, fordyca);
 

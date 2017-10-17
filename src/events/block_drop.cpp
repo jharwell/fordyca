@@ -3,19 +3,19 @@
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of RCPPSW.
+ * This file is part of FORDYCA.
  *
- * RCPPSW is free software: you can redistribute it and/or modify it under the
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * RCPPSW.  If not, see <http://www.gnu.org/licenses/
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
 /*******************************************************************************
@@ -28,7 +28,6 @@
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/support/block_stat_collector.hpp"
-#include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,13 +68,6 @@ void block_drop::visit(representation::arena_map& map) {
 void block_drop::visit(support::block_stat_collector& collector) {
   collector.inc_total_collected();
   collector.inc_total_carries(m_block->carries());
-} /* visit() */
-
-void block_drop::visit(support::cache_update_handler& handler) {
-  representation::cache* cache = handler.map_to_cache(m_block);
-  if (cache) {
-    handler.block_add(cache, m_block);
-  }
 } /* visit() */
 
 void block_drop::visit(representation::block& block) {

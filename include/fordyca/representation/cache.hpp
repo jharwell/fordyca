@@ -64,13 +64,14 @@ class cache : public cell_entity,
   }
   void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block) { m_blocks.remove(block); }
+  block* block_get(void) { return m_blocks.front(); }
   size_t n_blocks(void) const { return m_blocks.size(); }
   bool operator==(const cache &other) const {
     return m_center == other.m_center && m_blocks == other.m_blocks;
   }
 
  private:
-argos::CVector2 m_center;
+  argos::CVector2 m_center;
   std::list<block*> m_blocks;
 };
 

@@ -38,7 +38,7 @@ NS_START(fordyca, controller);
  * Member Functions
  ******************************************************************************/
 void memory_foraging_controller::robot_loc(argos::CVector2 loc) {
-   sensors()->robot_loc(loc);
+  sensors()->robot_loc(loc);
 }
 argos::CVector2 memory_foraging_controller::robot_loc(void) const {
   return sensors()->robot_loc();

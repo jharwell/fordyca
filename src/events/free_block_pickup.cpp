@@ -1,5 +1,5 @@
 /**
- * @file block_pickup.cpp
+ * @file free_block_pickup.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_pickup.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
@@ -38,11 +38,12 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_pickup::block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
-                           representation::block* block, size_t robot_index) :
+free_block_pickup::free_block_pickup(
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    representation::block* block, size_t robot_index) :
     er_client(server), m_robot_index(robot_index), m_block(block),
     m_server(server) {
-  er_client::insmod("block_pickup",
+  er_client::insmod("free_block_pickup",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
     }
@@ -50,7 +51,7 @@ block_pickup::block_pickup(const std::shared_ptr<rcppsw::common::er_server>& ser
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_pickup::visit(representation::arena_map& map) {
+void free_block_pickup::visit(representation::arena_map& map) {
   representation::discrete_coord old_d(m_block->discrete_loc().first,
                                        m_block->discrete_loc().second);
   argos::CVector2 old_r(m_block->real_loc().GetX(),
@@ -64,7 +65,7 @@ void block_pickup::visit(representation::arena_map& map) {
          old_d.first, old_d.second);
 } /* visit() */
 
-void block_pickup::visit(representation::perceived_arena_map& map) {
+void free_block_pickup::visit(representation::perceived_arena_map& map) {
   ER_NOM("perceived_arena_map: fb%zu picked up block%d from (%f, %f) -> (%zu, %zu)",
          m_robot_index,
          m_block->id(),
@@ -75,7 +76,7 @@ void block_pickup::visit(representation::perceived_arena_map& map) {
              m_block->discrete_loc().second).accept(op);
 } /* visit() */
 
-void block_pickup::visit(representation::block& block) {
+void free_block_pickup::visit(representation::block& block) {
   block.add_carry();
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.robot_index(m_robot_index);
@@ -86,28 +87,28 @@ void block_pickup::visit(representation::block& block) {
          m_block->id(), m_robot_index);
 } /* visit() */
 
-void block_pickup::visit(controller::random_foraging_controller& controller) {
+void free_block_pickup::visit(controller::random_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
   ER_NOM("random_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void block_pickup::visit(controller::memory_foraging_controller& controller) {
+void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.block(m_block);
   ER_NOM("memory_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void block_pickup::visit(fsm::random_foraging_fsm& fsm) {
-  ER_NOM("random_foraging_fsm: register block_pickup event");
+void free_block_pickup::visit(fsm::random_foraging_fsm& fsm) {
+  ER_NOM("random_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
-  ER_NOM("memory_foraging_fsm: register block_pickup event");
+void free_block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
+  ER_NOM("memory_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

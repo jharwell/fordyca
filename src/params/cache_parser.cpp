@@ -36,11 +36,15 @@ void cache_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct cache_params);
 
   argos::TConfigurationNode bnode = argos::GetNode(node, "caches");
+  argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
+  argos::GetNodeAttribute(bnode, "min_dist", m_params->min_dist);
   argos::GetNodeAttribute(bnode, "create_caches", m_params->create_caches);
 } /* parse() */
 
 void cache_parser::show(std::ostream& stream) {
   stream << "====================\nCache params\n====================\n";
+  stream << "dimension=" << m_params->dimension << std::endl;
+  stream << "min_dist=" << m_params->min_dist << std::endl;
   stream << "create_caches=" << m_params->create_caches << std::endl;
 } /* show() */
 

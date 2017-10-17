@@ -48,10 +48,6 @@ class block;
 class arena_map;
 } /* namespace representation */
 
-namespace support {
-class cache_update_handler;
-} /* namespace support */
-
 NS_START(events);
 
 /*******************************************************************************
@@ -63,8 +59,7 @@ class concrete_arena_op : public visitor::visitor,
                           public visitor::can_visit<fsm::random_foraging_fsm>,
                           public visitor::can_visit<fsm::memory_foraging_fsm>,
                           public visitor::can_visit<representation::block>,
-                          public visitor::can_visit<representation::arena_map>,
-                          public visitor::can_visit<support::cache_update_handler> {
+                          public visitor::can_visit<representation::arena_map> {
  public:
   concrete_arena_op(void) {}
   virtual ~concrete_arena_op(void) {}

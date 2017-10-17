@@ -24,6 +24,8 @@
 #include "fordyca/events/block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/support/cache_creator.hpp"
+#include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,6 +38,7 @@ NS_START(fordyca, representation);
 arena_map::arena_map(const struct params::arena_map_params* params,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
+    mc_cache_params(params->cache),
     m_blocks(params->block.n_blocks,
              block(params->block.dimension)),
     m_caches(),
@@ -110,6 +113,10 @@ void arena_map::distribute_block(block* const block, bool first_time) {
          block->real_loc().GetY(),
          block->discrete_loc().first,
          block->discrete_loc().second, cell.block());
+
+  if (!first_time && mc_cache_params.create_caches) {
+    support::cache_update_handler c(m_server, m_caches);
+  }
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {
@@ -118,8 +125,16 @@ void arena_map::distribute_blocks(bool first_time) {
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
+  if (first_time && mc_cache_params.create_caches) {
+    support::cache_creator c(m_server, m_grid, m_blocks,
+                             mc_cache_params.min_dist,
+                             mc_cache_params.dimension);
+    m_caches = c.create_all();
+  }
+
   /*
-   * Once all blocks have been distributed, all cells that do not have blocks or
+   * Once all blocks have been distributed, and (possibly) all caches have been
+   * created via block consolidation, then all cells that do not have blocks or
    * caches are empty.
    */
   for (size_t i = 0; i < m_grid.xsize(); ++i) {

@@ -1,5 +1,5 @@
 /**
- * @file block_pickup.hpp
+ * @file free_block_pickup.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -41,13 +41,13 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public concrete_arena_op,
+class free_block_pickup : public concrete_arena_op,
                      public rcppsw::common::er_client,
                      public visitor::can_visit<representation::perceived_arena_map> {
  public:
-  block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
+  free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
-  ~block_pickup(void) { er_client::rmmod(); }
+  ~free_block_pickup(void) { er_client::rmmod(); }
 
   /**
    * @brief Update the arena_map with the block pickup event by making the block
@@ -92,8 +92,8 @@ class block_pickup : public concrete_arena_op,
   void visit(controller::memory_foraging_controller& controller) override;
 
  private:
-  block_pickup(const block_pickup& op) = delete;
-  block_pickup& operator=(const block_pickup& op) = delete;
+  free_block_pickup(const free_block_pickup& op) = delete;
+  free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   size_t m_robot_index;
   representation::block* m_block;
@@ -102,4 +102,4 @@ class block_pickup : public concrete_arena_op,
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_ */

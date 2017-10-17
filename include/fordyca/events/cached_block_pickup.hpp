@@ -1,5 +1,5 @@
 /**
- * @file block_pickup.hpp
+ * @file cached_block_pickup.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CACHED_BLOCK_PICKUP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CACHED_BLOCK_PICKUP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,22 +32,22 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class perceived_arena_map;
-} /* namespace representation */
+namespace representation { class perceived_arena_map; }
+namespace representation { class cache; class block; }
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public concrete_arena_op,
-                     public rcppsw::common::er_client,
-                     public visitor::can_visit<representation::perceived_arena_map> {
+class cached_block_pickup : public concrete_arena_op,
+                            public rcppsw::common::er_client,
+                            public visitor::can_visit<representation::perceived_arena_map>,
+                            public visitor::can_visit<representation::cache> {
  public:
-  block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
-               representation::block* block, size_t robot_index);
-  ~block_pickup(void) { er_client::rmmod(); }
+  cached_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
+                      representation::cache* cache, size_t robot_index);
+  ~cached_block_pickup(void) { er_client::rmmod(); }
 
   /**
    * @brief Update the arena_map with the block pickup event by making the block
@@ -70,16 +70,6 @@ class block_pickup : public concrete_arena_op,
    */
   void visit(representation::block& block) override;
 
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::random_foraging_controller& controller) override;
-
-  void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**
@@ -92,14 +82,15 @@ class block_pickup : public concrete_arena_op,
   void visit(controller::memory_foraging_controller& controller) override;
 
  private:
-  block_pickup(const block_pickup& op) = delete;
-  block_pickup& operator=(const block_pickup& op) = delete;
+  cached_block_pickup(const cached_block_pickup& op) = delete;
+  cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   size_t m_robot_index;
+  representation::cache* m_cache;
   representation::block* m_block;
   std::shared_ptr<rcppsw::common::er_server> m_server;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CACHED_BLOCK_PICKUP_HPP_ */

@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/cache_creator.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,12 +33,12 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_creator::cache_creator(
-    std::shared_ptr<rcppsw::common::er_server> server,
-    std::shared_ptr<std::vector<representation::block>> blocks,
-    double min_dist, double cache_size) :
+cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
+                             representation::grid2D<representation::cell2D>& grid,
+                             std::vector<representation::block>& blocks,
+                             double min_dist, double cache_size) :
     er_client(server), m_min_dist(min_dist), m_cache_size(cache_size),
-    m_blocks(blocks) {
+    m_blocks(blocks), m_grid(grid), m_server(server) {
       insmod("cache_creator",
            rcppsw::common::er_lvl::DIAG,
            rcppsw::common::er_lvl::NOM);
@@ -49,14 +51,14 @@ cache_creator::cache_creator(
 std::vector<representation::cache> cache_creator::create_all(void) {
   std::vector<representation::cache> caches;
 
-  ER_NOM("Creating caches: %zu free blocks", m_blocks->size());
+  ER_NOM("Creating caches: %zu free blocks", m_blocks.size());
 
-  for (size_t i = 0; i < m_blocks->size() - 1; ++i) {
+  for (size_t i = 0; i < m_blocks.size() - 1; ++i) {
     std::list<representation::block*> starter_blocks;
-    for (size_t j = i + 1; j < m_blocks->size(); ++j) {
-      if ((m_blocks->at(i).real_loc() - m_blocks->at(j).real_loc()).Length() <=
-          m_min_dist && i != j) {
-        starter_blocks.push_back(&m_blocks->at(i));
+    for (size_t j = i + 1; j < m_blocks.size(); ++j) {
+      if ((m_blocks[i].real_loc() - m_blocks[j].real_loc()).Length() <=
+          m_min_dist) {
+        starter_blocks.push_back(&m_blocks[i]);
       }
     } /* for(j..) */
     caches.push_back(create_single(starter_blocks));
@@ -67,11 +69,26 @@ std::vector<representation::cache> cache_creator::create_all(void) {
 representation::cache cache_creator::create_single(
     std::list<representation::block*> blocks) {
 
+  argos::CVector2 center = calc_center(blocks);
+
+  /*
+   * The cells for all blocks that will comprise the cache should be emptied,
+   * and all blocks be deposited in a single cell.
+   */
   for (auto block : blocks) {
-    block->move_out_of_sight();
+    events::cell_empty op;
+    m_grid.access(block->discrete_loc().first,
+                  block->discrete_loc().second).accept(op);
   } /* for(block..) */
 
-  argos::CVector2 center = calc_center(blocks);
+  for (auto block : blocks) {
+    events::block_drop op(m_server, block);
+    representation::cell2D& cell = m_grid.access(center.GetX(),
+                                                 center.GetY());
+    block->discrete_loc(cell.loc());
+    block->real_loc(argos::CVector2(cell.loc().first, cell.loc().second));
+    cell.accept(op);
+  } /* for(block..) */
 
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",
          center.GetX(), center.GetY(), blocks.size());

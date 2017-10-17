@@ -36,9 +36,11 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct cache_params : public rcppsw::common::base_params {
-  cache_params(void) : create_caches(false) {}
+  cache_params(void) : create_caches(false), dimension(0.0), min_dist(0.0) {}
 
-  uint create_caches;
+  bool create_caches;
+  double dimension;
+  double min_dist;
 };
 
 NS_END(params, fordyca);

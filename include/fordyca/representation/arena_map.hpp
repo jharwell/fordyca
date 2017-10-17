@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include "rcppsw/common/er_client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -33,6 +32,7 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/params/cache_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +66,7 @@ class arena_map: public rcppsw::common::er_client,
    */
   std::vector<block>& blocks(void) { return m_blocks; }
 
-  boost::ptr_vector<cache>& caches(void) { return m_caches; }
+  std::vector<cache>& caches(void) { return m_caches; }
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
 
   /**
@@ -148,8 +148,9 @@ class arena_map: public rcppsw::common::er_client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
+  const struct params::cache_params mc_cache_params;
   std::vector<block> m_blocks;
-  boost::ptr_vector<cache> m_caches;
+  std::vector<cache> m_caches;
   support::block_distributor m_block_distributor;
   std::shared_ptr<rcppsw::common::er_server> m_server;
   grid2D<cell2D> m_grid;

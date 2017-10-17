@@ -98,8 +98,6 @@ class block_drop : public concrete_arena_op,
   void visit(controller::random_foraging_controller& controller) override;
   void visit(controller::memory_foraging_controller& controller) override;
 
-  void visit(support::cache_update_handler& handler) override;
-
   void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
 
