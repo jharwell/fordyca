@@ -25,21 +25,21 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include "rcppsw/common/er_server.hpp"
+
+#include "rcppsw/common/er_client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/grid2D.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/params/cache_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct grid_params;
-} /* namespace params */
+namespace params { struct arena_map_params; }
 
 NS_START(representation);
 
@@ -54,7 +54,7 @@ NS_START(representation);
 class arena_map: public rcppsw::common::er_client,
                  public rcppsw::patterns::visitor::visitable<arena_map> {
  public:
-  arena_map(const struct params::grid_params* params,
+  arena_map(const struct params::arena_map_params* params,
             argos::CRange<argos::Real> nest_x,
             argos::CRange<argos::Real> nest_y);
 
@@ -65,6 +65,8 @@ class arena_map: public rcppsw::common::er_client,
    * by robots.
    */
   std::vector<block>& blocks(void) { return m_blocks; }
+
+  std::vector<cache>& caches(void) { return m_caches; }
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
 
   /**
@@ -94,6 +96,11 @@ class arena_map: public rcppsw::common::er_client,
    * @brief Get the # of blocks available in the arena.
    */
   size_t n_blocks(void) const { return m_blocks.size(); }
+
+  /**
+   * @brief Get the # of caches currently in the arena.
+   */
+  size_t n_caches(void) const { return m_caches.size(); }
 
   /**
    * @brief Check if FORDYCA was configured to have respawning blocks or not. If
@@ -141,7 +148,9 @@ class arena_map: public rcppsw::common::er_client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
+  const struct params::cache_params mc_cache_params;
   std::vector<block> m_blocks;
+  std::vector<cache> m_caches;
   support::block_distributor m_block_distributor;
   std::shared_ptr<rcppsw::common::er_server> m_server;
   grid2D<cell2D> m_grid;

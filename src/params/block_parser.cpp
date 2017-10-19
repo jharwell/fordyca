@@ -1,5 +1,5 @@
 /**
- * @file grid_parser.hpp
+ * @file block_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "fordyca/params/block_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +30,24 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class grid_parser: public base_parser {
- public:
-  grid_parser(void): m_params() {}
+void block_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct block_params);
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
+  argos::TConfigurationNode bnode = argos::GetNode(node, "blocks");
+  argos::GetNodeAttribute(bnode, "n_blocks", m_params->n_blocks);
+  argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
+  argos::GetNodeAttribute(bnode, "dist_model", m_params->dist_model);
+  argos::GetNodeAttribute(bnode, "respawn", m_params->respawn);
+} /* parse() */
 
- private:
-  std::unique_ptr<struct grid_params> m_params;
-};
+void block_parser::show(std::ostream& stream) {
+  stream << "====================\nBlock params\n====================\n";
+  stream << "n_blocks=" << m_params->n_blocks << std::endl;
+  stream << "dimension=" << m_params->dimension << std::endl;
+  stream << "dist_model=" << m_params->dist_model << std::endl;
+  stream << "respawn=" << m_params->respawn << std::endl;
+} /* show() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */

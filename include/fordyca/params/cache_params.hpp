@@ -1,5 +1,5 @@
 /**
- * @file grid_parser.hpp
+ * @file cache_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include <string>
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +33,16 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class grid_parser: public base_parser {
- public:
-  grid_parser(void): m_params() {}
+struct cache_params : public rcppsw::common::base_params {
+  cache_params(void) : create_caches(false), dimension(0.0), min_dist(0.0) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct grid_params> m_params;
+  bool create_caches;
+  double dimension;
+  double min_dist;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_ */

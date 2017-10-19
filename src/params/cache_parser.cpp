@@ -1,5 +1,5 @@
 /**
- * @file grid_parser.hpp
+ * @file cache_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "fordyca/params/cache_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,20 +30,22 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class grid_parser: public base_parser {
- public:
-  grid_parser(void): m_params() {}
+void cache_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct cache_params);
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
+  argos::TConfigurationNode bnode = argos::GetNode(node, "caches");
+  argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
+  argos::GetNodeAttribute(bnode, "min_dist", m_params->min_dist);
+  argos::GetNodeAttribute(bnode, "create_caches", m_params->create_caches);
+} /* parse() */
 
- private:
-  std::unique_ptr<struct grid_params> m_params;
-};
+void cache_parser::show(std::ostream& stream) {
+  stream << "====================\nCache params\n====================\n";
+  stream << "dimension=" << m_params->dimension << std::endl;
+  stream << "min_dist=" << m_params->min_dist << std::endl;
+  stream << "create_caches=" << m_params->create_caches << std::endl;
+} /* show() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_GRID_PARSER_HPP_ */

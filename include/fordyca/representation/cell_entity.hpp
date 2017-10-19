@@ -96,7 +96,7 @@ class cell_entity {
    *
    * @param point The point to check.
    *
-   * @return TRUE if the condition is met, and FALSE otherwise.
+   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const argos::CVector2& point);
 

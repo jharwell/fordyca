@@ -1,5 +1,5 @@
 /**
- * @file perceived_cell2D.cpp
+ * @file free_block_drop.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,49 +21,50 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/events/cell_unknown.hpp"
+#include "fordyca/events/free_block_drop.hpp"
+#include <argos/core/utility/math/vector2.h>
+
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/support/block_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-
-/*******************************************************************************
- * Constants
- ******************************************************************************/
-const double perceived_cell2D::kEpsilon = 0.0001;
+NS_START(fordyca, events);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-perceived_cell2D::perceived_cell2D(
-    const std::shared_ptr<rcppsw::common::er_server>& server) :
-    er_client(server), m_robot_id(), m_density(),
-    m_cell(server) {
-  if (ERROR == attmod("perceived_cell2D")) {
-    insmod("perceived_cell2D",
-           rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::NOM);
-  }
-    }
+free_block_drop::free_block_drop(
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    representation::block* block) :
+    er_client(server), m_block(block), m_dloc() {
+  er_client::insmod("free_block_drop",
+                    rcppsw::common::er_lvl::DIAG,
+                    rcppsw::common::er_lvl::NOM);
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_cell2D::update_density(void) {
-  m_density.calc();
-  if (m_density.last_result() < kEpsilon) {
-    if (m_cell.state_has_block()) {
-      ER_NOM("Relevance of block%d is within %f of 0 for %s", block()->id(),
-             kEpsilon, m_robot_id.c_str());
-    } else if (m_cell.state_has_cache()) {
-      ER_NOM("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
-             kEpsilon, m_robot_id.c_str());
-    }
-    events::cell_unknown op;
-    m_cell.accept(op);
-  }
-} /* update_density() */
+void free_block_drop::visit(representation::cell2D& cell) {
+  m_dloc = cell.loc();
+  cell.entity(m_block);
+  m_block->accept(*this);
+  cell.fsm().accept(*this);
+} /* visit() */
 
-NS_END(representation, fordyca);
+void free_block_drop::visit(representation::cell2D_fsm& fsm) {
+  fsm.event_block_drop();
+} /* visit() */
+
+void free_block_drop::visit(representation::block& block) {
+  block.real_loc(argos::CVector2(m_dloc.first, m_dloc.second));
+  block.discrete_loc(m_dloc);
+} /* visit() */
+
+NS_END(events, fordyca);

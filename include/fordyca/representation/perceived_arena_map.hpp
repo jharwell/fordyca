@@ -32,9 +32,11 @@
 #include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+namespace params { struct perceived_grid_params; }
+NS_START(representation);
 
 /*******************************************************************************
  * Class Definitions

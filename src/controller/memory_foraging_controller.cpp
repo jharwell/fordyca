@@ -24,8 +24,8 @@
 #include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/params/memory_foraging_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/events/block_pickup.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/perceived_grid_params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@ NS_START(fordyca, controller);
  * Member Functions
  ******************************************************************************/
 void memory_foraging_controller::robot_loc(argos::CVector2 loc) {
-   sensors()->robot_loc(loc);
+  sensors()->robot_loc(loc);
 }
 argos::CVector2 memory_foraging_controller::robot_loc(void) const {
   return sensors()->robot_loc();

@@ -26,8 +26,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/memory_foraging_controller.hpp"
-#include "fordyca/events/block_drop.hpp"
-#include "fordyca/events/block_pickup.hpp"
+#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
@@ -77,40 +77,54 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     robot_collector()->collect(controller);
 
     if (controller.is_carrying_block()) {
-      if (controller.in_nest()) {
-
-        /* Update arena map state due to a block nest drop */
-        events::block_drop drop_op(rcppsw::common::g_server,
-                                       controller.block());
-        map()->accept(drop_op);
-
-        /* Get stats from carried block before it's dropped */
-        block_collector()->accept(drop_op);
-
-        /* Actually drop the block */
-        controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);
-
-        /* The floor texture must be updated */
-        floor()->SetChanged();
-      }
+      handle_block_drop(controller);
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.is_searching_for_block() &&
-          controller.block_detected()) {
-        /* Check whether the foot-bot is actually on a block */
-        int block = robot_on_block(robot);
-        if (-1 != block) {
-          events::block_pickup pickup_op(rcppsw::common::g_server,
-                                             &map()->blocks()[block],
-                                             robot_id(robot));
-          controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
-          map()->accept(pickup_op);
-
-          /* The floor texture must be updated */
-          floor()->SetChanged();
-        }
-      }
+      handle_block_pickup(robot);
     }
 } /* pre_step_iter() */
+
+void memory_foraging_loop_functions::handle_block_pickup(
+    argos::CFootBotEntity& robot) {
+
+  controller::memory_foraging_controller& controller =
+      dynamic_cast<controller::memory_foraging_controller&>(
+          robot.GetControllableEntity().GetController());
+
+  if (!controller.in_nest() && controller.is_searching_for_block() &&
+      controller.block_detected()) {
+    /* Check whether the foot-bot is actually on a block */
+    int block = robot_on_block(robot);
+    if (-1 != block) {
+      events::free_block_pickup pickup_op(rcppsw::common::g_server,
+                                          &map()->blocks()[block],
+                                          robot_id(robot));
+      controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
+      map()->accept(pickup_op);
+
+      /* The floor texture must be updated */
+      floor()->SetChanged();
+    }
+  }
+} /* handle_block_pickup() */
+
+void memory_foraging_loop_functions::handle_block_drop(
+    controller::memory_foraging_controller& controller) {
+  if (controller.in_nest()) {
+    /* Update arena map state due to a block nest drop */
+    events::nest_block_drop drop_op(rcppsw::common::g_server,
+                                    controller.block());
+    map()->accept(drop_op);
+
+    /* Get stats from carried block before it's dropped */
+    block_collector()->accept(drop_op);
+
+    /* Actually drop the block */
+    controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);
+
+    /* The floor texture must be updated */
+    floor()->SetChanged();
+  }
+} /* handle_block_drop() */
 
 argos::CColor memory_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

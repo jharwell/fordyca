@@ -34,7 +34,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 cache_update_handler::cache_update_handler(
     std::shared_ptr<rcppsw::common::er_server> server,
-    std::shared_ptr<std::vector<representation::cache>> caches) :
+    std::vector<representation::cache>& caches) :
     er_client(server), m_caches(caches) {
   insmod("cache_update_handler",
          rcppsw::common::er_lvl::DIAG,
@@ -46,18 +46,18 @@ cache_update_handler::cache_update_handler(
  ******************************************************************************/
 representation::cache* cache_update_handler::map_to_cache(
     const representation::block* const block) {
-  for (size_t i = 0; i < m_caches->size(); ++i) {
-    ER_ASSERT(!m_caches->at(i).contains_block(block),
-              "FATAL: block already belongs to cache %d", m_caches->at(i).id());
-    if (m_caches->at(i).block_within_boundaries(block)) {
-      return &m_caches->at(i);
+  for (size_t i = 0; i < m_caches.size(); ++i) {
+    ER_ASSERT(!m_caches[i].contains_block(block),
+              "FATAL: block already belongs to cache %d", m_caches[i].id());
+    if (m_caches[i].block_within_boundaries(block)) {
+      return &m_caches[i];
     }
   } /* for(i..) */
   return nullptr;
 } /* map_to_cache() */
 
 void cache_update_handler::block_add(representation::cache* const cache,
-                                        representation::block* const block) {
+                                     representation::block* const block) {
   ER_ASSERT(!cache->contains_block(block),
             "FATAL: block%d already belongs to cache %d",
             block->id(), cache->id());
@@ -73,10 +73,8 @@ void cache_update_handler::block_remove(representation::cache* cache,
 
   cache->block_remove(block);
   if (0 == cache->n_blocks()) {
-    m_caches->erase(std::remove(m_caches->begin(), m_caches->end(), *cache));
+    m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), *cache));
   }
 } /* block_remove() */
-
-
 
 NS_END(support, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file block_pickup.hpp
+ * @file free_block_pickup.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/concrete_arena_op.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -32,22 +32,43 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace visitor = rcppsw::patterns::visitor;
+
+namespace fsm { class memory_foraging_fsm; class random_foraging_fsm; }
+namespace controller {
+class memory_foraging_controller;
+class random_foraging_controller;
+}
 namespace representation {
 class perceived_arena_map;
-} /* namespace representation */
+class cell2D;
+class perceived_cell2D;
+class cell2D_fsm;
+class block;
+class arena_map;
+}
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_pickup : public concrete_arena_op,
-                     public rcppsw::common::er_client,
-                     public visitor::can_visit<representation::perceived_arena_map> {
+class free_block_pickup : public visitor::visitor,
+                          public rcppsw::common::er_client,
+                          public visitor::can_visit<controller::memory_foraging_controller>,
+                          public visitor::can_visit<controller::random_foraging_controller>,
+                          public visitor::can_visit<fsm::memory_foraging_fsm>,
+                          public visitor::can_visit<fsm::random_foraging_fsm>,
+                          public visitor::can_visit<representation::block>,
+                          public visitor::can_visit<representation::arena_map>,
+                          public visitor::can_visit<representation::perceived_arena_map>,
+                          public visitor::can_visit<representation::cell2D>,
+                          public visitor::can_visit<representation::cell2D_fsm>,
+                          public visitor::can_visit<representation::perceived_cell2D> {
  public:
-  block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
+  free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
-  ~block_pickup(void) { er_client::rmmod(); }
+  ~free_block_pickup(void) { er_client::rmmod(); }
 
   /**
    * @brief Update the arena_map with the block pickup event by making the block
@@ -64,6 +85,10 @@ class block_pickup : public concrete_arena_op,
    * @param map The robot's arena map.
    */
   void visit(representation::perceived_arena_map& map) override;
+
+  void visit(representation::cell2D& cell) override;
+  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update a block with the knowledge that it is now carried by a robot.
@@ -91,11 +116,9 @@ class block_pickup : public concrete_arena_op,
    */
   void visit(controller::memory_foraging_controller& controller) override;
 
-  void visit(support::cache_update_handler& handler) override;
-
  private:
-  block_pickup(const block_pickup& op) = delete;
-  block_pickup& operator=(const block_pickup& op) = delete;
+  free_block_pickup(const free_block_pickup& op) = delete;
+  free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   size_t m_robot_index;
   representation::block* m_block;
@@ -104,4 +127,4 @@ class block_pickup : public concrete_arena_op,
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_ */

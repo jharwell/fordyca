@@ -21,8 +21,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/support/cache_creator.hpp"
+#include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,20 +35,22 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::grid_params* params,
+arena_map::arena_map(const struct params::arena_map_params* params,
                      argos::CRange<argos::Real> nest_x,
                      argos::CRange<argos::Real> nest_y) :
+    mc_cache_params(params->cache),
     m_blocks(params->block.n_blocks,
              block(params->block.dimension)),
-    m_block_distributor(params->resolution,
-                        argos::CRange<argos::Real>(params->lower.GetX(),
-                                                   params->upper.GetX()),
-                        argos::CRange<argos::Real>(params->lower.GetY(),
-                                                   params->upper.GetY()),
+    m_caches(),
+    m_block_distributor(params->grid.resolution,
+                        argos::CRange<argos::Real>(params->grid.lower.GetX(),
+                                                   params->grid.upper.GetX()),
+                        argos::CRange<argos::Real>(params->grid.lower.GetY(),
+                                                   params->grid.upper.GetY()),
                         nest_x, nest_y,
                         &params->block),
     m_server(rcppsw::common::g_server),
-    m_grid(params, m_server) {
+    m_grid(&params->grid, m_server) {
   deferred_init(m_server);
   insmod("arena_map",
          rcppsw::common::er_lvl::DIAG,
@@ -100,7 +105,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
   } /* while() */
   cell2D& cell = m_grid.access(block->discrete_loc().first,
                                block->discrete_loc().second);
-  events::block_drop op(m_server, block);
+  events::free_block_drop op(m_server, block);
   cell.accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),
@@ -108,6 +113,10 @@ void arena_map::distribute_block(block* const block, bool first_time) {
          block->real_loc().GetY(),
          block->discrete_loc().first,
          block->discrete_loc().second, cell.block());
+
+  if (!first_time && mc_cache_params.create_caches) {
+    support::cache_update_handler c(m_server, m_caches);
+  }
 } /* distribute_block() */
 
 void arena_map::distribute_blocks(bool first_time) {
@@ -116,8 +125,16 @@ void arena_map::distribute_blocks(bool first_time) {
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
+  if (first_time && mc_cache_params.create_caches) {
+    support::cache_creator c(m_server, m_grid, m_blocks,
+                             mc_cache_params.min_dist,
+                             mc_cache_params.dimension);
+    m_caches = c.create_all();
+  }
+
   /*
-   * Once all blocks have been distributed, all cells that do not have blocks or
+   * Once all blocks have been distributed, and (possibly) all caches have been
+   * created via block consolidation, then all cells that do not have blocks or
    * caches are empty.
    */
   for (size_t i = 0; i < m_grid.xsize(); ++i) {

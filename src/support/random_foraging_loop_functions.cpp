@@ -26,10 +26,11 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/events/block_drop.hpp"
-#include "fordyca/events/block_pickup.hpp"
+#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/logging_params.hpp"
+#include "fordyca/params/arena_map_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,10 +80,10 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
-  const struct params::grid_params * grid_params =
-      static_cast<const struct params::grid_params*>(
-          m_repo->get_params("grid"));
-  m_map.reset(new representation::arena_map(grid_params, m_nest_x, m_nest_y));
+  const struct params::arena_map_params * arena_params =
+      static_cast<const struct params::arena_map_params*>(
+          m_repo->get_params("arena_map"));
+  m_map.reset(new representation::arena_map(arena_params, m_nest_x, m_nest_y));
   m_map->distribute_blocks(true);
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     m_map->blocks()[i].display_id(l_params->display_block_id);
@@ -164,8 +165,8 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_block_collector->collect(*controller.block());
 
         /* Update arena map state due to a block nest drop */
-        events::block_drop drop_op(rcppsw::common::g_server,
-                                       controller.block());
+        events::nest_block_drop drop_op(rcppsw::common::g_server,
+                                        controller.block());
         m_map->accept(drop_op);
 
         /* Actually drop the block */
@@ -180,9 +181,9 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);
         if (-1 != block) {
-          events::block_pickup pickup_op(rcppsw::common::g_server,
-                                             &m_map->blocks()[block],
-                                             robot_id(robot));
+          events::free_block_pickup pickup_op(rcppsw::common::g_server,
+                                              &m_map->blocks()[block],
+                                              robot_id(robot));
           controller.accept(pickup_op);
           m_map->accept(pickup_op);
 
