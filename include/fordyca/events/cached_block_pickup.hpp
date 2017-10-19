@@ -32,8 +32,13 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class perceived_arena_map; }
-namespace representation { class cache; class block; }
+namespace representation {
+class perceived_arena_map;
+class cache;
+class cell2D;
+class perceived_cell2D;
+class cell2D_fsm;
+}
 
 NS_START(events);
 
@@ -43,7 +48,9 @@ NS_START(events);
 class cached_block_pickup : public concrete_arena_op,
                             public rcppsw::common::er_client,
                             public visitor::can_visit<representation::perceived_arena_map>,
-                            public visitor::can_visit<representation::cache> {
+                            public visitor::can_visit<representation::cell2D>,
+                            public visitor::can_visit<representation::cell2D_fsm>,
+                            public visitor::can_visit<representation::perceived_cell2D> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                       representation::cache* cache, size_t robot_index);
@@ -57,6 +64,9 @@ class cached_block_pickup : public concrete_arena_op,
    */
   void visit(representation::arena_map& map) override;
 
+  void visit(representation::cell2D& cell) override;
+  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(representation::perceived_cell2D& cell) override;
   /**
    * @brief Handle the event of a robot picking up a block, making updates to
    * the arena map as necessary.

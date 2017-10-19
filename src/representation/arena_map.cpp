@@ -21,7 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/support/cache_creator.hpp"
@@ -105,7 +105,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
   } /* while() */
   cell2D& cell = m_grid.access(block->discrete_loc().first,
                                block->discrete_loc().second);
-  events::block_drop op(m_server, block);
+  events::free_block_drop op(m_server, block);
   cell.accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),

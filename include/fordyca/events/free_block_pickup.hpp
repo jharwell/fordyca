@@ -34,7 +34,12 @@ NS_START(fordyca);
 
 namespace representation {
 class perceived_arena_map;
-} /* namespace representation */
+class cell2D;
+class perceived_cell2D;
+class cell2D_fsm;
+}
+namespace controller { class random_foraging_controller; }
+namespace fsm { class random_foraging_fsm; }
 
 NS_START(events);
 
@@ -42,8 +47,8 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class free_block_pickup : public concrete_arena_op,
-                     public rcppsw::common::er_client,
-                     public visitor::can_visit<representation::perceived_arena_map> {
+                          public rcppsw::common::er_client,
+                          public visitor::can_visit<representation::perceived_arena_map> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
@@ -65,6 +70,10 @@ class free_block_pickup : public concrete_arena_op,
    */
   void visit(representation::perceived_arena_map& map) override;
 
+  void visit(representation::cell2D& cell);
+  void visit(representation::cell2D_fsm& fsm);
+  void visit(representation::perceived_cell2D& cell);
+
   /**
    * @brief Update a block with the knowledge that it is now carried by a robot.
    */
@@ -77,9 +86,9 @@ class free_block_pickup : public concrete_arena_op,
    * needs to be handled in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller) override;
+  void visit(controller::random_foraging_controller& controller);
 
-  void visit(fsm::random_foraging_fsm& fsm) override;
+  void visit(fsm::random_foraging_fsm& fsm);
   void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**

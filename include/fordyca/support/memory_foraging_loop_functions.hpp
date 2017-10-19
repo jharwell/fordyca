@@ -52,7 +52,7 @@ class memory_foraging_loop_functions : public random_foraging_loop_functions {
   void set_robot_los(argos::CFootBotEntity& robot);
   void set_robot_tick(argos::CFootBotEntity& robot);
   void handle_block_drop(controller::memory_foraging_controller& controller);
-  void handle_block_pickup(controller::memory_foraging_controller& controller);
+  void handle_block_pickup(argos::CFootBotEntity& robot);
   memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
   memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;
 };

@@ -32,13 +32,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace representation {
-class block;
-} /* namespace representation */
-
-NS_START(support);
 namespace visitor = rcppsw::patterns::visitor;
+namespace representation { class block; }
+NS_START(support);
 
 /*******************************************************************************
  * Class Definitions

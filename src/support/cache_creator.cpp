@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,7 +82,7 @@ representation::cache cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::block_drop op(m_server, block);
+    events::free_block_drop op(m_server, block);
     representation::cell2D& cell = m_grid.access(center.GetX(),
                                                  center.GetY());
     block->discrete_loc(cell.loc());

@@ -24,7 +24,6 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
@@ -51,6 +50,24 @@ free_block_pickup::free_block_pickup(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void free_block_pickup::visit(representation::cell2D_fsm& fsm) {
+  fsm.event_block_drop();
+} /* visit() */
+
+void free_block_pickup::visit(representation::cell2D& cell) {
+  cell.fsm().accept(*this);
+  ER_NOM("cell2D: fb%zu block%d from (%zu, %zu)",
+         m_robot_index, m_block->id(), m_block->discrete_loc().first,
+         m_block->discrete_loc().second);
+} /* visit() */
+
+void free_block_pickup::visit(representation::perceived_cell2D& cell) {
+  cell.cell().accept(*this);
+  ER_NOM("perceived_cell2D: fb%zu block%d from (%zu, %zu)",
+         m_robot_index, m_block->id(),
+         m_block->discrete_loc().first, m_block->discrete_loc().second);
+} /* visit() */
+
 void free_block_pickup::visit(representation::arena_map& map) {
   representation::discrete_coord old_d(m_block->discrete_loc().first,
                                        m_block->discrete_loc().second);
