@@ -58,6 +58,7 @@ void cached_block_pickup::visit(representation::cell2D_fsm& fsm) {
 
 void cached_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
+  cell.entity(nullptr);
   ER_NOM("cell2D: fb%zu block%d from cache%d @(%zu, %zu)",
          m_robot_index, m_block->id(), m_cache->id(),
          m_cache->discrete_loc().first, m_cache->discrete_loc().second);

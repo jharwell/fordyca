@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/concrete_arena_op.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -32,18 +32,33 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace visitor = rcppsw::patterns::visitor;
+
+namespace fsm {
+class memory_foraging_fsm;
+class random_foraging_fsm;
+}
+namespace controller {
+class memory_foraging_controller;
+class random_foraging_controller;
+}
+namespace representation { class block; class arena_map; };
 namespace support { class block_stat_collector; }
-namespace controller { class random_foraging_controller; }
-namespace fsm { class random_foraging_fsm; }
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class nest_block_drop : public concrete_arena_op,
-                   public rcppsw::common::er_client,
-                   public visitor::can_visit<support::block_stat_collector> {
+class nest_block_drop : public visitor::visitor,
+                        public rcppsw::common::er_client,
+                        public visitor::can_visit<controller::memory_foraging_controller>,
+                        public visitor::can_visit<controller::random_foraging_controller>,
+                        public visitor::can_visit<fsm::memory_foraging_fsm>,
+                        public visitor::can_visit<fsm::random_foraging_fsm>,
+                        public visitor::can_visit<representation::block>,
+                        public visitor::can_visit<representation::arena_map>,
+                        public visitor::can_visit<support::block_stat_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
              representation::block* block);
@@ -74,10 +89,10 @@ class nest_block_drop : public concrete_arena_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller);
+  void visit(controller::random_foraging_controller& controller) override;
   void visit(controller::memory_foraging_controller& controller) override;
 
-  void visit(fsm::random_foraging_fsm& fsm);
+  void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
 
   /**

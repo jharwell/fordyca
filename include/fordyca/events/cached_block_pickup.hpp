@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/concrete_arena_op.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -32,21 +32,30 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class perceived_arena_map;
 class cache;
 class cell2D;
 class perceived_cell2D;
 class cell2D_fsm;
+class block;
+class arena_map;
 }
+namespace fsm { class memory_foraging_fsm; }
+namespace controller { class memory_foraging_controller; }
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cached_block_pickup : public concrete_arena_op,
+class cached_block_pickup : public visitor::visitor,
                             public rcppsw::common::er_client,
+                            public visitor::can_visit<controller::memory_foraging_controller>,
+                            public visitor::can_visit<fsm::memory_foraging_fsm>,
+                            public visitor::can_visit<representation::block>,
+                            public visitor::can_visit<representation::arena_map>,
                             public visitor::can_visit<representation::perceived_arena_map>,
                             public visitor::can_visit<representation::cell2D>,
                             public visitor::can_visit<representation::cell2D_fsm>,
