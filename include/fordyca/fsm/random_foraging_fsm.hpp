@@ -112,9 +112,9 @@ class random_foraging_fsm : public base_foraging_fsm,
                      state_machine::no_event_data);
 
   /* random foraging fsm states */
-  HFSM_STATE_DECLARE(random_foraging_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, acquire_block,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {

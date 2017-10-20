@@ -60,30 +60,37 @@ random_foraging_fsm::random_foraging_fsm(
 /*******************************************************************************
  * States
  ******************************************************************************/
-__noreturn HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::event_data) {
   /* first time running FSM */
   if (nullptr == data) {
+    ER_NOM("Starting foraging");
     internal_event(ST_ACQUIRE_BLOCK);
+    return controller::foraging_signal::HANDLED;
   }
 
   if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       internal_event(ST_ACQUIRE_BLOCK);
+      return controller::foraging_signal::HANDLED;
     } else if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
       internal_event(ST_LEAVING_NEST);
+      return controller::foraging_signal::HANDLED;
     }
   }
   ER_ASSERT(0, "FATAL: Unhandled signal");
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-      internal_event(ST_RETURN_TO_NEST);
+  if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    ER_NOM("Block acquired");
+    internal_event(ST_RETURN_TO_NEST);
+      return controller::foraging_signal::HANDLED;
+  } else {
+    /*
+     * BLOCK_LOCATED signal ignored from explore FSM; we only care when the
+     * controller tells us we have actually picked up a block.
+     */
+    m_explore_fsm.run();
   }
-  /*
-   * BLOCK_LOCATED signal ignored from explore FSM; we only care when the
-   * controller tells us we have actually picked up a block.
-   */
-  m_explore_fsm.run();
   return controller::foraging_signal::HANDLED;
 }
 

@@ -83,36 +83,33 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
 } /* robot_on_block() */
 
 void arena_map::distribute_block(block* const block, bool first_time) {
+  cell2D* cell = nullptr;
   while (1) {
     argos::CVector2 r_coord;
     if (m_block_distributor.distribute_block(*block, first_time, &r_coord)) {
       discrete_coord d_coord = representation::real_to_discrete_coord(r_coord,
                                                                       m_grid.resolution());
-      cell2D& cell = m_grid.access(d_coord.first, d_coord.second);
+      cell = &m_grid.access(d_coord.first, d_coord.second);
 
       /*
        * You can only distribute blocks to cells that do not currently have
        * anything in them.
        */
-      if (!cell.state_has_block() && !cell.state_has_cache()) {
-        block->real_loc(r_coord);
-        block->discrete_loc(d_coord);
+      if (!cell->state_has_block() && !cell->state_has_cache()) {
         break;
       }
     } else {
       break;
     }
   } /* while() */
-  cell2D& cell = m_grid.access(block->discrete_loc().first,
-                               block->discrete_loc().second);
-  events::free_block_drop op(m_server, block);
-  cell.accept(op);
+  events::free_block_drop op(m_server, block, m_grid.resolution());
+  cell->accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),
          block->real_loc().GetX(),
          block->real_loc().GetY(),
          block->discrete_loc().first,
-         block->discrete_loc().second, cell.block());
+         block->discrete_loc().second, cell->block());
 
   if (!first_time && mc_cache_params.create_caches) {
     support::cache_update_handler c(m_server, m_caches);
@@ -128,7 +125,7 @@ void arena_map::distribute_blocks(bool first_time) {
   if (first_time && mc_cache_params.create_caches) {
     support::cache_creator c(m_server, m_grid, m_blocks,
                              mc_cache_params.min_dist,
-                             mc_cache_params.dimension);
+                             mc_cache_params.dimension, m_grid.resolution());
     m_caches = c.create_all();
   }
 

@@ -54,9 +54,9 @@ base_foraging_fsm::base_foraging_fsm(
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_sensors(sensors),
     m_actuators(actuators) {
-  er_client::insmod("base_foraging_fsm",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  /* er_client::insmod("base_foraging_fsm", */
+  /*                   rcppsw::common::er_lvl::DIAG, */
+  /*                   rcppsw::common::er_lvl::NOM); */
 }
 
 /*******************************************************************************

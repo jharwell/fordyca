@@ -55,6 +55,7 @@ NS_START(fsm);
 class explore_fsm : public base_foraging_fsm {
  public:
   enum fsm_states {
+    ST_START,
     ST_EXPLORE,               /* explore for stuff  */
     ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
     ST_NEW_DIRECTION,         /* Time to change direction during exploration */
@@ -129,6 +130,7 @@ class explore_fsm : public base_foraging_fsm {
                      state_machine::no_event_data);
 
   /* states for exploration FSM */
+  HFSM_STATE_DECLARE(explore_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(explore_fsm, new_direction, state_machine::event_data);
   HFSM_STATE_DECLARE(explore_fsm, explore, state_machine::event_data);
   HFSM_ENTRY_DECLARE(explore_fsm, entry_new_direction,
@@ -138,6 +140,7 @@ class explore_fsm : public base_foraging_fsm {
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
+        HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
                                     NULL,
                                     &entry_explore, NULL),

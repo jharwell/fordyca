@@ -44,7 +44,8 @@ sensor_manager::sensor_manager(
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
     m_tick(0),
-    mc_params(params),
+    mc_diffusion_delta(params->diffusion.delta),
+    mc_go_straight_angle_range(params->diffusion.go_straight_angle_range),
     m_rabs(rabs),
     m_proximity(proximity),
     m_light(light),
@@ -94,8 +95,8 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
    * If the angle of the vector is small enough and the closest obstacle is far
    * enough, ignore the vector and go straight, otherwise return it.
    */
-  if (mc_params->diffusion.go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
-     vector->Length() < mc_params->diffusion.delta) {
+  if (mc_go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(vector->Angle()) &&
+     vector->Length() < mc_diffusion_delta) {
     *vector = argos::CVector2::X;
     return false;
   }

@@ -41,8 +41,8 @@ NS_START(fordyca, events);
  ******************************************************************************/
 free_block_drop::free_block_drop(
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    representation::block* block) :
-    er_client(server), m_block(block), m_dloc() {
+    representation::block* block, double resolution) :
+    er_client(server), m_resolution(resolution), m_block(block), m_dloc() {
   er_client::insmod("free_block_drop",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
@@ -63,7 +63,7 @@ void free_block_drop::visit(representation::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
-  block.real_loc(argos::CVector2(m_dloc.first, m_dloc.second));
+  block.real_loc(representation::discrete_to_real_coord(m_dloc, m_resolution));
   block.discrete_loc(m_dloc);
 } /* visit() */
 

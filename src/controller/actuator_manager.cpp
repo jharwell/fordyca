@@ -49,7 +49,7 @@ actuator_manager::actuator_manager(
     m_wheels(wheels),
     m_leds(leds),
     m_raba(raba),
-    mc_params(params) {}
+    mc_params(*params) {}
 
 /*******************************************************************************
  * Events
@@ -72,10 +72,10 @@ void actuator_manager::set_heading(const argos::CVector2& heading,
 FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   if (data->force_hard ||
       Abs(data->heading.Angle().SignedNormalize()) >
-      mc_params->wheels.hard_turn_threshold) {
+      mc_params.wheels.hard_turn_threshold) {
     internal_event(ST_HARD_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) >
-             mc_params->wheels.soft_turn_threshold) {
+             mc_params.wheels.soft_turn_threshold) {
     internal_event(ST_SOFT_TURN);
   }
   set_wheel_speeds(data->heading.Length(), data->heading.Length(),
@@ -85,16 +85,16 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   if (data->force_hard ||
       Abs(data->heading.Angle().SignedNormalize()) >
-      mc_params->wheels.hard_turn_threshold) {
+      mc_params.wheels.hard_turn_threshold) {
     internal_event(ST_HARD_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) <=
-             mc_params->wheels.no_turn_threshold) {
+             mc_params.wheels.no_turn_threshold) {
     internal_event(ST_NO_TURN);
   }
   /* Both wheels go straight, but one is faster than the other */
-  double speed_factor = (mc_params->wheels.hard_turn_threshold -
+  double speed_factor = (mc_params.wheels.hard_turn_threshold -
                               Abs(data->heading.Angle())) /
-                             mc_params->wheels.hard_turn_threshold;
+                             mc_params.wheels.hard_turn_threshold;
   double speed1 = data->heading.Length() - data->heading.Length() *
                   (1.0 - speed_factor);
   double speed2 = data->heading.Length() + data->heading.Length() *
@@ -104,13 +104,13 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (Abs(data->heading.Angle().SignedNormalize()) <
-      mc_params->wheels.hard_turn_threshold && !data->force_hard) {
+      mc_params.wheels.hard_turn_threshold && !data->force_hard) {
     internal_event(ST_SOFT_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) <=
-             mc_params->wheels.no_turn_threshold && !data->force_hard) {
+             mc_params.wheels.no_turn_threshold && !data->force_hard) {
     internal_event(ST_NO_TURN);
   }
-  set_wheel_speeds(-mc_params->wheels.max_speed, mc_params->wheels.max_speed,
+  set_wheel_speeds(-mc_params.wheels.max_speed, mc_params.wheels.max_speed,
                    data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
@@ -133,9 +133,9 @@ void actuator_manager::set_wheel_speeds(double speed1, double speed2,
 
   /* Finally, set the wheel speeds */
   left_wheel_speed = argos::Min<double>(left_wheel_speed,
-                                             mc_params->wheels.max_speed);
+                                             mc_params.wheels.max_speed);
   right_wheel_speed = argos::Min<double>(right_wheel_speed,
-                                             mc_params->wheels.max_speed);
+                                             mc_params.wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
@@ -150,8 +150,8 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
      right_wheel_speed  = lin_speed;
   }
 
-  left_wheel_speed = std::min(left_wheel_speed, mc_params->wheels.max_speed);
-  right_wheel_speed = std::min(right_wheel_speed, mc_params->wheels.max_speed);
+  left_wheel_speed = std::min(left_wheel_speed, mc_params.wheels.max_speed);
+  right_wheel_speed = std::min(right_wheel_speed, mc_params.wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
@@ -161,7 +161,7 @@ void actuator_manager::reset(void) {
 } /* reset() */
 
 double actuator_manager::max_wheel_speed(void) const {
-  return mc_params->wheels.max_speed;
+  return mc_params.wheels.max_speed;
 } /* max_wheel_speed() */
 
 NS_END(controller, fordyca);

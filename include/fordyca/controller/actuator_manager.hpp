@@ -29,17 +29,12 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
+#include "fordyca/params/actuator_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct actuator_params;
-} /* namespace params */
-
-NS_START(controller);
+NS_START(fordyca, controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 
@@ -121,7 +116,7 @@ class actuator_manager: public state_machine::simple_fsm {
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
-  std::shared_ptr<const struct params::actuator_params>  mc_params;
+  const struct params::actuator_params     mc_params;
 };
 
 NS_END(controller, fordyca);

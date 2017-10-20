@@ -46,6 +46,7 @@ explore_fsm::explore_fsm(
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
     entry_collision_avoidance(),
+    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
     entry_new_direction(),
@@ -56,9 +57,13 @@ explore_fsm::explore_fsm(
     m_new_dir() {
   insmod("explore_fsm",
          rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+         rcppsw::common::er_lvl::DIAG);
 }
 
+HFSM_STATE_DEFINE(explore_fsm, start, state_machine::no_event_data) {
+  internal_event(ST_EXPLORE);
+  return controller::foraging_signal::HANDLED;
+}
 HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
@@ -124,11 +129,9 @@ HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
 }
 
 HFSM_ENTRY_DEFINE(explore_fsm, entry_explore, state_machine::no_event_data) {
-  ER_DIAG("Entering ST_EXPLORE");
   base_foraging_fsm::actuators()->leds_set_color(argos::CColor::MAGENTA);
 }
 HFSM_ENTRY_DEFINE(explore_fsm, entry_new_direction, state_machine::no_event_data) {
-  ER_DIAG("Entering ST_NEW_DIRECTION");
   base_foraging_fsm::actuators()->leds_set_color(argos::CColor::CYAN);
 }
 

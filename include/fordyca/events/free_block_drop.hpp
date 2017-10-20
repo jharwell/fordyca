@@ -51,7 +51,7 @@ class free_block_drop : public visitor::visitor,
                         public visitor::can_visit<representation::cell2D_fsm> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
-                  representation::block* block);
+                  representation::block* block, double resolution);
   ~free_block_drop(void) { er_client::rmmod(); }
 
   /**
@@ -83,6 +83,8 @@ class free_block_drop : public visitor::visitor,
  private:
   free_block_drop(const free_block_drop& op) = delete;
   free_block_drop& operator=(const free_block_drop& op) = delete;
+
+  double m_resolution;
   representation::block* m_block;
   representation::discrete_coord m_dloc;
 };
