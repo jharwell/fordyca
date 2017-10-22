@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(explore_fsm, new_direction, struct new_direction_data) {
+HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
   if (ST_NEW_DIRECTION != last_state()) {
     ER_DIAG("Executing ST_NEW_DIRECTION");
   }
@@ -111,8 +111,9 @@ HFSM_STATE_DEFINE(explore_fsm, new_direction, struct new_direction_data) {
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  if (data) {
-    m_new_dir = data->dir;
+  const new_direction_data* dir_data = dynamic_cast<const new_direction_data*>(data);
+  if (dir_data) {
+    m_new_dir = dir_data->dir;
   }
   base_foraging_fsm::actuators()->set_heading(argos::CVector2(
       base_foraging_fsm::actuators()->max_wheel_speed() * 0.25, m_new_dir), true);

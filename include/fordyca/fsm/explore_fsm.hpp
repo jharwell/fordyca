@@ -152,7 +152,7 @@ class explore_fsm : public base_foraging_fsm {
    * state. Once the direction change has been accomplished, the robot will
    * transition back to \enum fsm_states::ST_EXPLORE.
    */
-  HFSM_STATE_DECLARE(explore_fsm, new_direction, struct new_direction_data);
+  HFSM_STATE_DECLARE(explore_fsm, new_direction, state_machine::event_data);
 
   /**
    * @brief The main state for the explore FSM. Robots in this state maintain
