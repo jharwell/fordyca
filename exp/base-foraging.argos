@@ -23,7 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <unpartitioned_task_controller id="ffc"
+    <random_foraging_controller id="ffc"
                          library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -55,7 +55,7 @@
              nest="5, 2.5"
              />
       </params>
-    </unpartitioned_task_controller>
+    </random_foraging_controller>
 
   </controllers>
 
@@ -63,7 +63,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="unpartitioned_task_loop_functions">
+                  label="random_foraging_loop_functions">
     <logging robot_stats="robot-stats.txt"
              block_stats="block-stats.txt"
              />
@@ -73,7 +73,7 @@
             dist_model="random"
             respawn="true"
             />
-    <caches create_caches="true"
+    <caches create_caches="false"
             dimension="0.6"
             min_dist="0.6"
       />
@@ -153,7 +153,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="unpartitioned_task_qt_user_functions" />
+      <user_functions label="random_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

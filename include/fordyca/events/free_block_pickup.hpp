@@ -53,6 +53,15 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class free_block_pickup
+ *
+ * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
+ * that is not part of a cache).
+ *
+ * This event is processed by both robots and \ref arena_map, as they both react
+ * to it in different ways.
+ */
 class free_block_pickup : public visitor::visitor,
                           public rcppsw::common::er_client,
                           public visitor::can_visit<controller::memory_foraging_controller>,

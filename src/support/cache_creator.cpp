@@ -36,9 +36,9 @@ NS_START(fordyca, support);
 cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
                              representation::grid2D<representation::cell2D>& grid,
                              std::vector<representation::block>& blocks,
-                             double min_dist, double cache_size) :
+                             double min_dist, double cache_size, double resolution) :
     er_client(server), m_min_dist(min_dist), m_cache_size(cache_size),
-    m_blocks(blocks), m_grid(grid), m_server(server) {
+    m_resolution(resolution), m_blocks(blocks), m_grid(grid), m_server(server) {
       insmod("cache_creator",
            rcppsw::common::er_lvl::DIAG,
            rcppsw::common::er_lvl::NOM);
@@ -82,7 +82,7 @@ representation::cache cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block);
+    events::free_block_drop op(m_server, block, m_resolution);
     representation::cell2D& cell = m_grid.access(center.GetX(),
                                                  center.GetY());
     block->discrete_loc(cell.loc());

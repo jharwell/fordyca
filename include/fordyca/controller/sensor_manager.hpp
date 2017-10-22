@@ -37,10 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-
-namespace params {
-struct sensor_params;
-} /* namespace params */
+namespace params { struct sensor_params; }
 
 NS_START(controller);
 
@@ -171,7 +168,8 @@ class sensor_manager {
 
   /** The current timestep  */
   uint                                        m_tick;
-  std::shared_ptr<const struct params::sensor_params> mc_params;
+  const double                                mc_diffusion_delta;
+  const argos::CRange<argos::CRadians>        mc_go_straight_angle_range;
   argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
   argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */
   argos::CCI_FootBotLightSensor*              m_light; /* light sensor */

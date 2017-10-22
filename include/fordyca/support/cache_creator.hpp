@@ -48,7 +48,7 @@ class cache_creator : public rcppsw::common::er_client {
   cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
                 representation::grid2D<representation::cell2D>& grid,
                 std::vector<representation::block>& blocks,
-                double min_dist, double cache_size);
+                double min_dist, double cache_size, double resolution);
 
   /**
    * @brief Scan the entire list of blocks currently in the arena, and create
@@ -64,6 +64,7 @@ class cache_creator : public rcppsw::common::er_client {
 
   double m_min_dist;
   double m_cache_size;
+  double m_resolution;
   std::vector<representation::block>& m_blocks;
   representation::grid2D<representation::cell2D>& m_grid;
   std::shared_ptr<rcppsw::common::er_server> m_server;

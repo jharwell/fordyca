@@ -131,7 +131,7 @@ argos::CColor random_foraging_loop_functions::GetFloorColor(
   /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY30;
+    return argos::CColor::GRAY70;
   }
   /* blocks are black */
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
@@ -140,11 +140,6 @@ argos::CColor random_foraging_loop_functions::GetFloorColor(
     }
   } /* for(i..) */
 
-  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
-    if (m_map->blocks()[i].contains_point(plane_pos)) {
-      return argos::CColor::GRAY70;
-    }
-  } /* for(i..) */
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 

@@ -49,6 +49,8 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class random_foraging_fsm
+ *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest and repeat.
@@ -74,7 +76,7 @@ class random_foraging_fsm : public base_foraging_fsm,
   /**
    * @brief Run the FSM in its current state, without injecting an event.
    */
-  void run(void) { generated_event(true); state_engine(); }
+  void run(void);
 
   /**
    * @brief If TRUE, the robot is returning to the nest, probably after having
@@ -112,13 +114,13 @@ class random_foraging_fsm : public base_foraging_fsm,
                      state_machine::no_event_data);
 
   /* random foraging fsm states */
-  HFSM_STATE_DECLARE(random_foraging_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(random_foraging_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(random_foraging_fsm, acquire_block,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-    HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
+        HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_block, hfsm::top_state()),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
                                 NULL,
