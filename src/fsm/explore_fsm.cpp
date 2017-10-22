@@ -57,7 +57,7 @@ explore_fsm::explore_fsm(
     m_new_dir() {
   insmod("explore_fsm",
          rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::DIAG);
+         rcppsw::common::er_lvl::NOM);
 }
 
 HFSM_STATE_DEFINE(explore_fsm, start, state_machine::no_event_data) {
@@ -101,21 +101,18 @@ HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
+HFSM_STATE_DEFINE(explore_fsm, new_direction, struct new_direction_data) {
   if (ST_NEW_DIRECTION != last_state()) {
     ER_DIAG("Executing ST_NEW_DIRECTION");
   }
-  /* all signals ignored in this state */
-
   argos::CRadians current_dir = base_foraging_fsm::sensors()->calc_vector_to_light().Angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  const new_direction_data* dir_data = dynamic_cast<const new_direction_data*>(data);
-  if (dir_data) {
-    m_new_dir = dir_data->dir;
+  if (data) {
+    m_new_dir = data->dir;
   }
   base_foraging_fsm::actuators()->set_heading(argos::CVector2(
       base_foraging_fsm::actuators()->max_wheel_speed() * 0.25, m_new_dir), true);

@@ -50,6 +50,13 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class nest_block_drop
+ *
+ * @brief Fired whenever a robot drops a block in the nest. Processed by both
+ * \ref arena_map and the robots, as they each need to react to it in different
+ * ways.
+ */
 class nest_block_drop : public visitor::visitor,
                         public rcppsw::common::er_client,
                         public visitor::can_visit<controller::memory_foraging_controller>,

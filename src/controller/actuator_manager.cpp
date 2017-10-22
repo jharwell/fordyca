@@ -157,6 +157,7 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
 
 void actuator_manager::reset(void) {
   m_raba->ClearData();
+  stop_wheels();
   state_machine::simple_fsm::init();
 } /* reset() */
 

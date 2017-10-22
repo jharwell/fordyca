@@ -62,35 +62,42 @@ random_foraging_fsm::random_foraging_fsm(
  ******************************************************************************/
 HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::event_data) {
   /* first time running FSM */
-  if (nullptr == data) {
+  if (state_machine::event_type::NORMAL == data->type()) {
     ER_NOM("Starting foraging");
     internal_event(ST_ACQUIRE_BLOCK);
     return controller::foraging_signal::HANDLED;
   }
-
   if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
+      m_explore_fsm.init();
       internal_event(ST_ACQUIRE_BLOCK);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
+    } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_LEAVING_NEST);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::LEFT_NEST == data->signal()) {
+      internal_event(ST_ACQUIRE_BLOCK);
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal");
+  return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
-  if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+  /*
+   * All signals propagated up from the explore FSM are ignored; we only care
+   * when the controller tells us we have actually picked up a block.
+   *
+   * BUGFIX 10/19/17: For some reason, you cannot call m_explore_fsm.run() from
+   * this function IF the explore sub-FSM was what brought you to this function
+   * in the first place (i.e. it does not play nice with recursion).
+   */
+  if (data && state_machine::event_type::CHILD == data->type()) {
+    return controller::foraging_signal::HANDLED;
+  } else if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     ER_NOM("Block acquired");
     internal_event(ST_RETURN_TO_NEST);
-      return controller::foraging_signal::HANDLED;
-  } else {
-    /*
-     * BLOCK_LOCATED signal ignored from explore FSM; we only care when the
-     * controller tells us we have actually picked up a block.
-     */
-    m_explore_fsm.run();
   }
+  m_explore_fsm.run();
   return controller::foraging_signal::HANDLED;
 }
 
@@ -105,5 +112,10 @@ void random_foraging_fsm::init(void) {
 bool random_foraging_fsm::is_exploring(void) const {
   return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching();
 } /* is_exploring() */
+
+void random_foraging_fsm::run(void) {
+  inject_event(controller::foraging_signal::FSM_RUN,
+               state_machine::event_type::NORMAL);
+} /* run() */
 
 NS_END(fsm, fordyca);

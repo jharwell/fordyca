@@ -92,20 +92,31 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(base_foraging_fsm, return_to_nest, state_machine::no_event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
+            "FATAL: ST_RETURN_TO_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
+            "FATAL: ST_RETURN_TO_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::BLOCK_LOCATED != data->signal(),
+            "FATAL: ST_RETURN_TO_NEST should never locate blocks...");
+
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_RETURN_TO_NEST");
   }
-  /* all signals ignored in this state */
 
-  argos::CVector2 vector;
   /*
    * We have arrived at the nest and it's time to head back out again. The
    * loop functions need to call the drop_block() function, as they have to
    * redistribute it (the FSM has no idea how to do that).
+   *
+   * The BLOCK_DROP signal comes from the loop functions the same timestep as we
+   * realize that we are in the nest, so we need to be sure that we return the
+   * BLOCK_DROP signal to the upper FSM, as that it what it is listening for.
    */
-  if (m_sensors->in_nest()) {
-    return controller::foraging_signal::ARRIVED_IN_NEST;
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    ER_ASSERT(m_sensors->in_nest(), "FATAL: BLOCK_DROP outside nest");
+    return data->signal();
   }
+  argos::CVector2 vector;
 
   /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);

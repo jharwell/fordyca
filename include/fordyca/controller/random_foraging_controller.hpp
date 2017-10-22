@@ -45,6 +45,8 @@ NS_START(controller);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class random_foraging_controller
+ *
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
@@ -59,12 +61,12 @@ class random_foraging_controller : public base_foraging_controller,
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
 
   /**
-   * @brief If TRUE, the robot is currently returning to the nest carrying a block.
+   * @brief If \c TRUE, the robot is currently returning to the nest carrying a block.
    */
   bool is_transporting_to_nest(void) const { return m_fsm->is_transporting_to_nest(); }
 
-  /**
-   * @brief If TRUE, the robot is current engaged in collision avoidance.
+  /**p
+   * @brief If \c TRUE, the robot is current engaged in collision avoidance.
    */
   bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
 
@@ -79,7 +81,7 @@ class random_foraging_controller : public base_foraging_controller,
   /*
    * @brief Called once every time step; length set in the XML file.
    *
-   * Since the FSM does most of the work, this function just tells it run.
+   * Since the FSM does all the work, this function just tells it run.
    */
   void ControlStep(void) override { m_fsm->run(); }
 

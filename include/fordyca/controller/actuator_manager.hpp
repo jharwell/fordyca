@@ -41,6 +41,17 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class actuator_manager
+ *
+ * @brief Handles the control of all actuators on the robot.
+ *
+ * Currently, that is:
+ *
+ * - \ref argos::CCI_DifferentSteeringActuator
+ * - \ref argos::CCI_LEDsActuator
+ * - \ref argos::CCI_RangeAndBearingActuator
+ */
 class actuator_manager: public state_machine::simple_fsm {
  public:
   actuator_manager(const struct params::actuator_params* params,
@@ -48,21 +59,45 @@ class actuator_manager: public state_machine::simple_fsm {
                    argos::CCI_LEDsActuator* const leds,
                    argos::CCI_RangeAndBearingActuator* const raba);
 
+  /**
+   * @brief Set the color of the robot's LEDs.
+   *
+   * @param color The new color.
+   */
   void leds_set_color(const argos::CColor& color) {
     m_leds->SetAllColors(color);
   }
 
   /*
-   * Gets a direction vector as input and transforms it into wheel
-   * actuation. Note that the heading is not absolute, but rather says "change
-   * this much from the direction you are currently going in".
+   * @brief Gets a direction vector as input and transforms it into wheel
+   * actuation commands
+   *
+   * @param heading The new heading. Note that the direction is relative (i.e."change
+   * this much from the direction you are currently going in"), but the
+   * magnitude is absolute (i.e. "change to this speed").
+   *
+   * @param force_hard_turn Whether or not a hard turn should be performed,
+   * regardless of the angle difference. If this is not passed, then a hard turn
+   * is performed only when the heading change is sufficiently different from
+   * the current heading (as determined by paremeters).
    */
   void set_heading(const argos::CVector2& heading,
                    bool force_hard_turn = false);
 
+  /**
+   * @brief Get the max wheel speed
+   */
   double max_wheel_speed(void) const;
+
+  /**
+   * @brief Stop the robot
+   */
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
   void set_raba_data(int data) { m_raba->SetData(0, data); }
+
+  /**
+   * @brief Reset the actuators, including stopping the robot.
+   */
   void reset(void);
 
   /**
@@ -85,23 +120,44 @@ class actuator_manager: public state_machine::simple_fsm {
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
 
   /*
-   * The robot can be in three different turning states.
+   * @enum The robot can be in three different turning states.
    */
   enum fsm_states {
-    ST_NO_TURN,     /* go straight */
-    ST_SOFT_TURN,   /* both wheels are turning forwards, but at different speeds */
-    ST_HARD_TURN,   /* wheels are turning with opposite speeds */
+    ST_NO_TURN,     /// Go straight
+    ST_SOFT_TURN,   /// Both wheels are turning forwards, but at different speeds
+    ST_HARD_TURN,   /// Wheels are turning with opposite & max speeds
     ST_MAX_STATES
   };
 
+  /**
+   * @brief Turning data for input into the state machine, to translate the
+   * desired heading change into wheel speeds.
+   */
   struct turn_data : public state_machine::event_data {
     turn_data(argos::CVector2 heading_, bool force_hard_) :
         heading(heading_), force_hard(force_hard_) {}
+
     argos::CVector2 heading;
     bool force_hard;
   };
+
+  /**
+   * @brief Robots in this state will continue forward without turning.
+   */
   FSM_STATE_DECLARE(actuator_manager, no_turn, turn_data);
+
+  /**
+   * @brief Robots in this state will execute a gradual turn in the desired
+   * heading direction. Threshold for this type of turn is controlled by
+   * parameters.
+   */
   FSM_STATE_DECLARE(actuator_manager, soft_turn, turn_data);
+
+  /**
+   * @brief Robots in this state will execute an in-place turn (a spin really)
+   * in the direction of the desired heading. Threshold for this type of turn
+   * is controlled by parameters.
+   */
   FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
     FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {

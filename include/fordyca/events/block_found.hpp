@@ -41,6 +41,13 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_found
+ *
+ * @brief Event that is created whenever a block is found, via floor sensor
+ * detection, or via a block appearing in a robot's LOS. These events are not
+ * processed by the \ref arena_map, and exist only in a robot's perception.
+ */
 class block_found : public perceived_arena_op,
                     public rcppsw::common::er_client {
  public:
