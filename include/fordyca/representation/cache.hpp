@@ -41,6 +41,8 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class cache
+ *
  * @brief A representation of a cache within the arena map. Caches do not have
  * state, and if/when a cache becomes empty, it needs to be deleted by an
  * enclosing class. Caches have both real (where they actually live in the
@@ -50,8 +52,7 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  explicit cache(double dimension, argos::CVector2 center,
-                 std::list<block*> blocks) :
+cache(double dimension, argos::CVector2 center, std::list<block*> blocks) :
       cell_entity(dimension, dimension, argos::CColor::BLUE),
       m_center(center),
       m_blocks(blocks) {}

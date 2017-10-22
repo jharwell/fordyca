@@ -72,7 +72,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
 
  private:
   struct block_data : public state_machine::event_data {
-    block_data(bool pickup_ = false) : pickup(pickup_) {}
+    explicit block_data(bool pickup_) : pickup(pickup_) {}
     bool pickup;
   };
 

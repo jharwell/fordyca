@@ -46,6 +46,8 @@ using index_range = boost::multi_array_types::index_range;
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class grid2D
+ *
  * @brief A 2D logical grid that is overlayed over the arena as part of a
  * representation of arena state (either global or per-robot).  It discretizes
  * the continuous arena into a grid of a specified resolution onto which blocks
@@ -60,8 +62,8 @@ template<typename T>
 class grid2D {
  public:
   /* constructors/destructor */
-  explicit grid2D(const params::grid_params* params,
-                  const std::shared_ptr<rcppsw::common::er_server>& server) :
+  grid2D(const params::grid_params* params,
+         const std::shared_ptr<rcppsw::common::er_server>& server) :
       m_resolution(params->resolution),
       m_upper(params->upper),
       m_lower(params->lower),

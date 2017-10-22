@@ -41,8 +41,9 @@ class cell2D;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
+ * @class line_of_sight
+ *
  * @brief A representation of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
@@ -57,8 +58,7 @@ class cell2D;
  */
 class line_of_sight {
  public:
-  explicit line_of_sight(const grid_view<cell2D*> view,
-                         discrete_coord center) :
+  line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
       m_center(center), m_view(view) {}
 
   std::list<const representation::block*> blocks(void);
