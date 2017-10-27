@@ -100,7 +100,7 @@ class memory_foraging_controller : public base_foraging_controller,
    *
    * @return The current LOS.
    */
-  const representation::line_of_sight* los(void) const;
+  const representation::line_of_sight* los(void) const override;
 
   /**
    * @brief Set the current location of the robot.

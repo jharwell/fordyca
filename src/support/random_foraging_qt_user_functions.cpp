@@ -43,8 +43,8 @@ RegisterUserFunction<random_foraging_qt_user_functions,
  * Member Functions
  ******************************************************************************/
 void random_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  controller::random_foraging_controller& controller =
-      dynamic_cast<controller::random_foraging_controller&>(
+  controller::base_foraging_controller& controller =
+      dynamic_cast<controller::base_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.is_carrying_block()) {
