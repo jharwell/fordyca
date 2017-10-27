@@ -34,11 +34,10 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void grid_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct grid_params);
-  ticpp::Node *arena = node.NextSibling("arena");
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(arena->ToElement()->GetAttribute("size"));
+  res = parser.parse(argos::GetNode(node, "grid").GetAttribute("size"));
 
   m_params->resolution = std::atof(
       argos::GetNode(node, "grid").GetAttribute("resolution").c_str());

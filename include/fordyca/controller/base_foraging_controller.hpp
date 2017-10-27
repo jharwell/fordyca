@@ -34,6 +34,7 @@ NS_START(fordyca);
 
 namespace representation {
 class block;
+class line_of_sight;
 } /* namespace representation */
 
 NS_START(controller);
@@ -81,6 +82,8 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief If TRUE, the robot is currently at least most of the way in the nest.
    */
   bool in_nest(void) const;
+
+  virtual const representation::line_of_sight* los(void) const { return nullptr; }
 
   /**
    * @brief Return if the robot is currently carrying a block.

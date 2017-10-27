@@ -51,8 +51,8 @@ void memory_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::memory_foraging_controller& controller =
-        dynamic_cast<controller::memory_foraging_controller&>(
+    controller::base_foraging_controller& controller =
+        dynamic_cast<controller::base_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     const struct params::loop_functions_params * l_params =
         static_cast<const struct params::loop_functions_params*>(
@@ -141,9 +141,9 @@ argos::CColor memory_foraging_loop_functions::GetFloorColor(
     }
   } /* for(i..) */
 
-  for (size_t i = 0; i < map()->blocks().size(); ++i) {
+  for (size_t i = 0; i < map()->caches().size(); ++i) {
     if (map()->caches()[i].contains_point(plane_pos)) {
-      return argos::CColor::GRAY30;
+      return argos::CColor::GRAY40;
     }
   } /* for(i..) */
   return argos::CColor::WHITE;
