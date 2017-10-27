@@ -81,6 +81,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   void task_reset(void) override { init(); }
+  bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
 
   /**
    * @brief Reset the FSM
@@ -101,7 +102,7 @@ class acquire_block_fsm : public base_foraging_fsm,
     return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching()); }
 
   bool is_vectoring(void) const {
-    return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.in_progress();
+    return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.task_running();
   }
   bool is_avoiding_collision(void) const {
     return m_explore_fsm.is_avoiding_collision();
@@ -147,15 +148,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   HFSM_EXIT_DECLARE(acquire_block_fsm, exit_acquire_block);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-    HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, hfsm::top_state(),
-                                    NULL,
-                                    NULL, &exit_acquire_block),
-        HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state())
-    };
-  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-  return &kSTATE_MAP[index];
+    return &mc_state_map[index];
   }
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
@@ -167,6 +160,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   std::shared_ptr<rcppsw::common::er_server> m_server;
   vector_fsm m_vector_fsm;
   explore_fsm m_explore_fsm;
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

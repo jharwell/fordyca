@@ -48,7 +48,13 @@ random_foraging_fsm::random_foraging_fsm(
     HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                  server, sensors, actuators) {
+                  server, sensors, actuators),
+    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+      HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+                                  &entry_return_to_nest, NULL),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
+                                  &entry_leaving_nest, NULL)} {
   er_client::insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
@@ -75,12 +81,9 @@ HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::event_data) {
     } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_LEAVING_NEST);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::LEFT_NEST == data->signal()) {
-      internal_event(ST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::HANDLED;
     }
   }
-  return controller::foraging_signal::HANDLED;
+  ER_ASSERT(0, "FATAL: Unhandled signal");
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
   /*

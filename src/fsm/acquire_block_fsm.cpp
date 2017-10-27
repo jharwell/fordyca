@@ -59,7 +59,12 @@ acquire_block_fsm::acquire_block_fsm(
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                  server, sensors, actuators) {
+                  server, sensors, actuators),
+    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, NULL,
+                                  NULL, &exit_acquire_block),
+      HFSM_STATE_MAP_ENTRY_EX(&finished)}
+      {
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
@@ -136,7 +141,7 @@ void acquire_block_fsm::acquire_known_block(
 
 bool acquire_block_fsm::acquire_any_block(void) {
   /* currently on our way to a known block */
-  if (m_vector_fsm.in_progress()) {
+  if (m_vector_fsm.task_running()) {
     m_vector_fsm.task_execute();
      return false;
   } else if (m_vector_fsm.task_finished()) {

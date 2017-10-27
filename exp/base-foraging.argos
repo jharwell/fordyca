@@ -70,7 +70,7 @@
              />
     <grid resolution="0.2"
           size="10, 5, 2"/>
-    <blocks n_blocks="6"
+    <blocks n_blocks="25"
             dimension="0.2"
             dist_model="random"
             respawn="true"

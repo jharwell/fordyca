@@ -47,38 +47,42 @@ block_to_nest_fsm::block_to_nest_fsm(
     HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_block_fsm(params, server, sensors, actuators, map),
-    m_cache_fsm(params, server, sensors, actuators, map) {
+    m_cache_fsm(params, server, sensors, actuators, map),
+    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+        HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
+        HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
+                                    &entry_return_to_nest, NULL),
+        HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_RETURN_TO_NEST, &start);
     }
 
-__noreturn HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
-  if (data) {
-   if (state_machine::event_type::NORMAL == data->type()) {
-     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
-        internal_event(ST_ACQUIRE_FREE_BLOCK);
-      } else if (controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
-        internal_event(ST_ACQUIRE_CACHED_BLOCK);
-      }
-    } else if (state_machine::event_type::CHILD == data->type()) {
-      if (controller::foraging_signal::ARRIVED_IN_NEST == data->signal()) {
-        internal_event(ST_FINISHED);
-      }
+HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
+  if (state_machine::event_type::NORMAL == data->type()) {
+    if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
+      internal_event(ST_ACQUIRE_FREE_BLOCK);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
+      internal_event(ST_ACQUIRE_CACHED_BLOCK);
+      return controller::foraging_signal::HANDLED;
+    }
+  } else if (state_machine::event_type::CHILD == data->type()) {
+    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+      internal_event(ST_FINISHED);
+      return controller::foraging_signal::HANDLED;
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal type");
+  return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
   /*
-   * We wait in the finished state until an upper FSM/controller tells us a free
-   * block has been successfully picked up before we start moving back towards
-   * the nest.
+   * We wait until an upper FSM/controller tells us a free block has been
+   * successfully picked up before we start moving back towards the nest.
    */
-  if (m_block_fsm.task_finished()) {
-    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-      m_block_fsm.task_reset();
-      internal_event(ST_RETURN_TO_NEST);
-    }
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.task_reset();
+    internal_event(ST_RETURN_TO_NEST);
   } else {
     m_block_fsm.task_execute();
   }
