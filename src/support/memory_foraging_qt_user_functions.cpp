@@ -45,9 +45,10 @@ memory_foraging_qt_user_functions::memory_foraging_qt_user_functions() {
 void memory_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   random_foraging_qt_user_functions::Draw(c_entity);
 
-  controller::memory_foraging_controller& controller =
-      dynamic_cast<controller::memory_foraging_controller&>(
+  controller::base_foraging_controller& controller =
+      dynamic_cast<controller::base_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
+
   if (controller.display_los()) {
     const representation::line_of_sight* los = controller.los();
     DrawCircle(argos::CVector3(0, 0, 0),

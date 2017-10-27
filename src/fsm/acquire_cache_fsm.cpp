@@ -60,7 +60,11 @@ acquire_cache_fsm::acquire_cache_fsm(
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                  server, sensors, actuators) {
+                  server, sensors, actuators),
+    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache, NULL,
+                                  NULL, &exit_acquire_cache),
+      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_cache);
 }
 
@@ -137,7 +141,7 @@ void acquire_cache_fsm::acquire_known_cache(
 
 bool acquire_cache_fsm::acquire_any_cache(void) {
   /* currently on our way to a known cache */
-  if (m_vector_fsm.in_progress()) {
+  if (m_vector_fsm.task_running()) {
     m_vector_fsm.task_execute();
      return false;
   } else if (m_vector_fsm.task_finished()) {

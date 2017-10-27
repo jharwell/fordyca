@@ -23,7 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <random_foraging_controller id="ffc"
+    <memory_foraging_controller id="ffc"
                          library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -39,6 +39,7 @@
       <params>
         <grid pheromone_rho="0.01"
               resolution="0.2"
+              size="10, 5, 2"
               />
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
@@ -55,7 +56,7 @@
              nest="5, 2.5"
              />
       </params>
-    </random_foraging_controller>
+    </memory_foraging_controller>
 
   </controllers>
 
@@ -63,17 +64,18 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="random_foraging_loop_functions">
+                  label="memory_foraging_loop_functions">
     <logging robot_stats="robot-stats.txt"
              block_stats="block-stats.txt"
              />
-    <grid resolution="0.2"/>
+    <grid resolution="0.2"
+          size="10, 5, 2"/>
     <blocks n_blocks="25"
             dimension="0.2"
             dist_model="random"
             respawn="true"
             />
-    <caches create_caches="false"
+    <caches create_caches="true"
             dimension="0.6"
             min_dist="0.6"
       />
@@ -116,7 +118,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="20" max_trials="100">
+      <entity quantity="1" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -153,7 +155,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="random_foraging_qt_user_functions" />
+      <user_functions label="memory_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

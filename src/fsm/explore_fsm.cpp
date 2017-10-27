@@ -54,7 +54,14 @@ explore_fsm::explore_fsm(
     mc_unsuccessful_dir_change(unsuccessful_dir_change_thresh),
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_state(),
-    m_new_dir() {
+    m_new_dir(),
+    mc_state_map{
+        HFSM_STATE_MAP_ENTRY_EX(&start),
+            HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
+            HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                        &entry_collision_avoidance, NULL),
+            HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
+                                        &entry_new_direction, NULL)} {
   insmod("explore_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);

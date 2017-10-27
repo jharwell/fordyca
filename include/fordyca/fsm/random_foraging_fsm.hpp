@@ -119,18 +119,7 @@ class random_foraging_fsm : public base_foraging_fsm,
                      state_machine::event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-        HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX(&acquire_block, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, hfsm::top_state(),
-                                NULL,
-                                &entry_return_to_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
-                                    NULL,
-                                    &entry_leaving_nest, NULL),
-    };
-  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-  return (&kSTATE_MAP[index]);
+  return (&mc_state_map[index]);
   }
 
   random_foraging_fsm(const random_foraging_fsm& fsm) = delete;
@@ -138,6 +127,7 @@ class random_foraging_fsm : public base_foraging_fsm,
 
   argos::CRandom::CRNG* m_rng;
   explore_fsm m_explore_fsm;
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
 NS_END(controller, fordyca);

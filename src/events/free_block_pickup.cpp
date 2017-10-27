@@ -91,7 +91,7 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
   events::cell_empty op;
   map.access(m_block->discrete_loc().first,
              m_block->discrete_loc().second).accept(op);
-} /* visit() */
+  } /* visit() */
 
 void free_block_pickup::visit(representation::block& block) {
   block.add_carry();
@@ -113,6 +113,7 @@ void free_block_pickup::visit(controller::random_foraging_controller& controller
 
 void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
   controller.map()->accept(*this);
+  controller.fsm()->accept(*this);
   controller.block(m_block);
   ER_NOM("memory_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());

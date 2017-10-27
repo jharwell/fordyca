@@ -147,10 +147,10 @@ bool sensor_manager::cache_detected(void) {
    * are a relatively dark gray, so the sensor should return something in the
    * range specified below.
    */
-  sum += readings[0].Value > 0.20 && readings[0].Value < 0.40;
-  sum += readings[1].Value > 0.20 && readings[1].Value < 0.40;
-  sum += readings[2].Value > 0.20 && readings[2].Value < 0.40;
-  sum += readings[3].Value > 0.20 && readings[3].Value < 0.40;
+  sum += readings[0].Value > 0.30 && readings[0].Value < 0.50;
+  sum += readings[1].Value > 0.30 && readings[1].Value < 0.50;
+  sum += readings[2].Value > 0.30 && readings[2].Value < 0.50;
+  sum += readings[3].Value > 0.30 && readings[3].Value < 0.50;
 
   return sum >= 3;
 } /* block_detected() */

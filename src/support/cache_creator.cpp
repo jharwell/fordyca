@@ -58,10 +58,19 @@ std::vector<representation::cache> cache_creator::create_all(void) {
     for (size_t j = i + 1; j < m_blocks.size(); ++j) {
       if ((m_blocks[i].real_loc() - m_blocks[j].real_loc()).Length() <=
           m_min_dist) {
-        starter_blocks.push_back(&m_blocks[i]);
+        if (std::find(starter_blocks.begin(),
+                      starter_blocks.end(),
+                      &m_blocks[i]) == starter_blocks.end()) {
+          printf("Add block %d: (%f, %f)\n", i,m_blocks[i].real_loc().GetX(), m_blocks[i].real_loc().GetY());
+          starter_blocks.push_back(&m_blocks[i]);
+        }
+        starter_blocks.push_back(&m_blocks[j]);
+        printf("Add block %d: (%f, %f)\n", j,m_blocks[j].real_loc().GetX(), m_blocks[j].real_loc().GetY());
       }
     } /* for(j..) */
-    caches.push_back(create_single(starter_blocks));
+    if (starter_blocks.size()) {
+      caches.push_back(create_single(starter_blocks));
+    }
   } /* for(i..) */
   return caches;
 } /* create() */
@@ -89,10 +98,10 @@ representation::cache cache_creator::create_single(
     block->real_loc(argos::CVector2(cell.loc().first, cell.loc().second));
     cell.accept(op);
   } /* for(block..) */
-
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",
          center.GetX(), center.GetY(), blocks.size());
-  return representation::cache(m_cache_size, calc_center(blocks), blocks);
+
+  return representation::cache(m_cache_size, center, blocks);
 } /* create_single() */
 
 argos::CVector2 cache_creator::calc_center(
@@ -103,7 +112,6 @@ argos::CVector2 cache_creator::calc_center(
     x += block->real_loc().GetX();
     y += block->real_loc().GetY();
   } /* for(block..) */
-
   return argos::CVector2(x / blocks.size(), y / blocks.size());
 } /* calc_center() */
 

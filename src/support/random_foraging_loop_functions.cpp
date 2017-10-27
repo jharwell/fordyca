@@ -106,8 +106,8 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
        ++it) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
-    controller::random_foraging_controller& controller =
-        dynamic_cast<controller::random_foraging_controller&>(
+    controller::base_foraging_controller& controller =
+        dynamic_cast<controller::base_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
   } /* for(it..) */

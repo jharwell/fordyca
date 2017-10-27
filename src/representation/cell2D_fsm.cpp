@@ -55,7 +55,7 @@ void cell2D_fsm::event_unknown(void) {
         ST_UNKNOWN, /* has block */
         ST_UNKNOWN  /* has cache */
   };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_unknown() */
 
@@ -66,7 +66,7 @@ void cell2D_fsm::event_empty(void) {
         ST_EMPTY,                 /* has block */
         ST_EMPTY,                 /* has cache */
         };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_empty() */
 
@@ -77,7 +77,7 @@ void cell2D_fsm::event_block_drop(void) {
         ST_HAS_CACHE,             /* has block */
         ST_HAS_CACHE              /* has cache */
     };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<block_data>(false));
 } /* event_empty() */
@@ -89,7 +89,7 @@ void cell2D_fsm::event_block_pickup(void) {
         ST_EMPTY,                   /* has block */
         ST_HAS_CACHE                /* has cache */
     };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<block_data>(true));
 } /* event_block_drop() */
