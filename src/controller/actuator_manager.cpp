@@ -61,7 +61,7 @@ void actuator_manager::set_heading(const argos::CVector2& heading,
         ST_SOFT_TURN,  /* slow turn */
         ST_HARD_TURN,  /* hard turn */
         };
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<turn_data>(heading, force_hard_turn));
 } /* set_heading() */

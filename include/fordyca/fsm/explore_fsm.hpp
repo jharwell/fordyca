@@ -193,20 +193,7 @@ class explore_fsm : public base_foraging_fsm {
    * things will not work correctly.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-        HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, hfsm::top_state(),
-                                    NULL,
-                                    &entry_explore, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, hfsm::top_state(),
-                                    NULL,
-                                    &entry_collision_avoidance, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, hfsm::top_state(),
-                                    NULL,
-                                    &entry_new_direction, NULL),
-    };
-  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-  return &kSTATE_MAP[index];
+    return &mc_state_map[index];
   }
 
   explore_fsm(const explore_fsm& fsm) = delete;
@@ -217,6 +204,7 @@ class explore_fsm : public base_foraging_fsm {
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   argos::CRadians m_new_dir;
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

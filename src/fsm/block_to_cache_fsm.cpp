@@ -45,7 +45,11 @@ block_to_cache_fsm::block_to_cache_fsm(
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_block_fsm(params, server, sensors, actuators, map),
-    m_cache_fsm(params, server, sensors, actuators, map) {}
+    m_cache_fsm(params, server, sensors, actuators, map),
+    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+      HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
+      HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
+      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   if (data) {

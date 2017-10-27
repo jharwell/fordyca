@@ -196,7 +196,7 @@ void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* co
   const tasks::vector_argument* const a =
       dynamic_cast<const tasks::vector_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<struct goal_data>(a->vector()));
 }

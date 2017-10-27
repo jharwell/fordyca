@@ -73,9 +73,6 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     set_robot_los(robot);
     set_robot_tick(robot);
 
-    /* get stats from this robot before its state changes */
-    robot_collector()->collect(controller);
-
     if (controller.is_carrying_block()) {
       handle_block_drop(controller);
     } else { /* The foot-bot has no block item */
@@ -110,13 +107,17 @@ void memory_foraging_loop_functions::handle_block_pickup(
 void memory_foraging_loop_functions::handle_block_drop(
     controller::memory_foraging_controller& controller) {
   if (controller.in_nest()) {
+    /* get stats from this robot before its state changes */
+    random_foraging_loop_functions::robot_collector()->collect(controller);
+
     /* Update arena map state due to a block nest drop */
     events::nest_block_drop drop_op(rcppsw::common::g_server,
                                     controller.block());
-    map()->accept(drop_op);
 
     /* Get stats from carried block before it's dropped */
-    block_collector()->accept(drop_op);
+    random_foraging_loop_functions::block_collector()->accept(drop_op);
+
+    map()->accept(drop_op);
 
     /* Actually drop the block */
     controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);

@@ -61,6 +61,16 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   void task_reset(void) override { init(); }
 
   /**
+   * @brief Determine if the robot is still on the way to the specified
+   * goal. Basically a way of checking if a robot is still in transit.
+   *
+   * @return TRUE if the condition is met, FALSE otherwise.
+   */
+  bool task_running(void) const override {
+    return current_state() != ST_START && current_state() != ST_ARRIVED;
+  }
+
+  /**
    * @brief (Re)start the FSM, with a new goal.
    *
    * @param goal The (X, Y) coordinates of the new goal to drive to.
@@ -82,15 +92,6 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    */
   void init(void) override;
 
-  /**
-   * @brief Determine if the robot is still on the way to the specified
-   * goal. Basically a way of checking if a robot is still in transit.
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool in_progress(void) const {
-    return current_state() != ST_START && current_state() != ST_ARRIVED;
-  }
 
   bool is_avoiding_collision(void) const {
     return ST_COLLISION_AVOIDANCE == current_state() ||
@@ -171,16 +172,15 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
                     state_machine::no_event_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-        FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&vector, NULL, &entry_vector, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
-                                   &entry_collision_avoidance, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_recovery, NULL,
-                                   &entry_collision_recovery, NULL),
-        FSM_STATE_MAP_ENTRY_EX_ALL(&arrived, NULL, NULL, NULL),
-    };
-  FSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
+    FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
+      FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),
+          FSM_STATE_MAP_ENTRY_EX_ALL(&vector, NULL, &entry_vector, NULL),
+          FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                     &entry_collision_avoidance, NULL),
+          FSM_STATE_MAP_ENTRY_EX_ALL(&collision_recovery, NULL,
+                                     &entry_collision_recovery, NULL),
+          FSM_STATE_MAP_ENTRY_EX_ALL(&arrived, NULL, NULL, NULL)
+          };
     return &kSTATE_MAP[index];
   }
 
@@ -188,6 +188,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
   /* data members */
+
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   uint m_freq_collision_thresh;

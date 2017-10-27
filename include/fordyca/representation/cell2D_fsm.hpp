@@ -72,7 +72,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
 
  private:
   struct block_data : public state_machine::event_data {
-    block_data(bool pickup_ = false) : pickup(pickup_) {}
+    explicit block_data(bool pickup_) : pickup(pickup_) {}
     bool pickup;
   };
 
@@ -88,7 +88,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_block),
         FSM_STATE_MAP_ENTRY(&state_cache),
             };
-  FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
+  FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
   return &kSTATE_MAP[index];
   }
 

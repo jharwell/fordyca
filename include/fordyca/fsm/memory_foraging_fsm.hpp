@@ -93,6 +93,8 @@ class memory_foraging_fsm : public base_foraging_fsm,
    */
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
 
+  bool task_running(void) const override { return m_task_running; }
+
   /**
    * @brief Reset the FSM.
    */
@@ -137,23 +139,16 @@ class memory_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(memory_foraging_fsm, finished, state_machine::no_event_data);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  HFSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
-    HFSM_STATE_MAP_ENTRY_EX(&start, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX(&block_to_nest, hfsm::top_state()),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, hfsm::top_state(),
-                                    NULL,
-                                    &entry_leaving_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX(&finished, hfsm::top_state()),
-    };
-  HFSM_VERIFY_STATE_MAP(state_map_ex, kSTATE_MAP);
-  return &kSTATE_MAP[index];
+  return &mc_state_map[index];
   }
 
   memory_foraging_fsm(const memory_foraging_fsm& fsm) = delete;
   memory_foraging_fsm& operator=(const memory_foraging_fsm& fsm) = delete;
 
   /* data members */
+  bool m_task_running;
   block_to_nest_fsm m_block_fsm;
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

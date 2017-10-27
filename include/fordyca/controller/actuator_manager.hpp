@@ -165,7 +165,7 @@ class actuator_manager: public state_machine::simple_fsm {
           FSM_STATE_MAP_ENTRY(&soft_turn),
           FSM_STATE_MAP_ENTRY(&hard_turn),
           };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP);
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
 
