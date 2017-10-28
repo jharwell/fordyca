@@ -60,8 +60,8 @@ template<typename T>
 class grid2D {
  public:
   /* constructors/destructor */
-  explicit grid2D(const params::grid_params* params,
-                  const std::shared_ptr<rcppsw::common::er_server>& server) :
+  grid2D(const params::grid_params* params,
+         const std::shared_ptr<rcppsw::common::er_server>& server) :
       m_resolution(params->resolution),
       m_upper(params->upper),
       m_lower(params->lower),
@@ -92,10 +92,14 @@ class grid2D {
    * @return The subgrid.
    */
   grid_view<T*> subgrid(size_t x, size_t y, size_t radius) {
-    size_t lower_x = std::max(0UL, x - radius);
-    size_t upper_x = std::min(x + radius + 1, xsize() - 1);
-    size_t lower_y = std::max(0UL, y - radius);
-    size_t upper_y = std::min(y  + radius + 1, ysize() - 1);
+    index_range::index lower_x = static_cast<index_range::index>(
+        std::max(0UL, x - radius));
+    index_range::index lower_y = static_cast<index_range::index>(
+        std::max(0UL, y - radius));
+    index_range::index upper_x = static_cast<index_range::index>(
+        std::min(x + radius + 1, xsize() - 1));
+    index_range::index upper_y = static_cast<index_range::index>(
+        std::min(y  + radius + 1, ysize() - 1));
     if (lower_x > upper_x) {
       lower_x = upper_x - 1;
     }
@@ -106,20 +110,26 @@ class grid2D {
     return grid_view<T*>(m_cells[indices[index_range(lower_x, upper_x, 1)]
                                  [index_range(lower_y, upper_y, 1)]]);
   }
-  T& access(size_t i, size_t j) const { return *m_cells[i][j]; }
+  T& access(size_t i, size_t j) const {
+    return *m_cells[static_cast<index_range::index>(i)][static_cast<index_range::index>(j)];
+  }
   double resolution(void) const { return m_resolution; }
 
   /**
    * @brief Get the size of the X dimension of the discretized subgrid, at
    * whatever the resolution specified during object construction was.
    */
-  size_t xsize(void) const { return std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution); }
+  size_t xsize(void) const { return
+        static_cast<size_t>(std::ceil((m_upper.GetX() - m_lower.GetX()) / m_resolution));
+  }
 
   /**
    * @brief Get the size of the Y dimension of the discretized subgrid, at
    * whatever the resolution specified during object construction was.
    */
-  size_t ysize(void) const { return std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution); }
+  size_t ysize(void) const {
+    return static_cast<size_t>(std::ceil((m_upper.GetY() - m_lower.GetY()) / m_resolution));
+  }
 
  private:
   double m_resolution;

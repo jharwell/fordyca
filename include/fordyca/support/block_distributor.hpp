@@ -51,8 +51,7 @@ NS_START(support);
  ******************************************************************************/
 class block_distributor {
  public:
-  block_distributor(double resolution,
-                    argos::CRange<double> arena_x,
+  block_distributor(argos::CRange<double> arena_x,
                     argos::CRange<double> arena_y,
                     argos::CRange<double> nest_x,
                     argos::CRange<double> nest_y,
@@ -80,7 +79,7 @@ class block_distributor {
    * nest. Collisions are not checked, as having 2 blocks on 1 square is not a
    * big deal for now.
    *
-   * @param i The index of the block to place/distribute.
+   * @param block The block to place/distribute.
    */
   argos::CVector2 dist_random(const representation::block& block);
 
@@ -98,7 +97,6 @@ class block_distributor {
   block_distributor(const block_distributor& s) = delete;
   block_distributor& operator=(const block_distributor& s) = delete;
 
-  double m_resolution;
   std::string m_dist_model;
   bool m_respawn;
   argos::CRange<double> m_arena_x;

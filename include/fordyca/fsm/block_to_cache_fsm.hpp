@@ -142,13 +142,12 @@ class block_to_cache_fsm : public base_foraging_fsm,
 
  private:
   /* memory foraging states */
-  HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, acquire_free_block,
                      state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, transport_to_cache,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(block_to_cache_fsm, finished,
-                     state_machine::no_event_data);
+  HFSM_STATE_DECLARE_ND(block_to_cache_fsm, finished);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];

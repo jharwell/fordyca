@@ -57,8 +57,7 @@ class cell2D;
  */
 class line_of_sight {
  public:
-  explicit line_of_sight(const grid_view<cell2D*> view,
-                         discrete_coord center) :
+line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
       m_center(center), m_view(view) {}
 
   std::list<const representation::block*> blocks(void);
@@ -93,7 +92,7 @@ class line_of_sight {
    * @param i The RELATIVE X coord within the LOS.
    * @param j The RELATIVE Y coord within the LOS.
    *
-   * @return
+   * @return A reference to the cell.
    */
   cell2D& cell(size_t i, size_t j) const;
 

@@ -62,7 +62,7 @@ class cell_empty : public cell_op {
    * @brief Update the FSM associated with a cell with the knowledge that it is
    * now empty.
    *
-   * @param fsrm The FSM from the cell to update.
+   * @param fsm The FSM from the cell to update.
    */
   void visit(representation::cell2D_fsm& fsm) override;
 };

@@ -43,7 +43,7 @@ base_foraging_fsm::base_foraging_fsm(
     std::shared_ptr<rcppsw::common::er_server> server,
     std::shared_ptr<controller::sensor_manager> sensors,
     std::shared_ptr<controller::actuator_manager> actuators,
-    uint max_states) :
+    uint8_t max_states) :
     state_machine::hfsm(server, max_states),
     HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
@@ -84,14 +84,14 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
   m_sensors->calc_diffusion_vector(&diff_vector);
   m_actuators->set_heading(m_actuators->max_wheel_speed() * diff_vector -
-                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25f,
+                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
                                            current_heading));
   if (!m_sensors->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
   }
   return state_machine::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(base_foraging_fsm, return_to_nest, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, return_to_nest, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
             "FATAL: ST_RETURN_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
@@ -124,7 +124,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, return_to_nest, state_machine::no_event_dat
                            m_sensors->calc_vector_to_light());
   return state_machine::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(base_foraging_fsm, collision_avoidance, state_machine::no_event_data) {
+HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   argos::CVector2 vector;
 
   if (current_state() != last_state()) {
@@ -140,15 +140,15 @@ HFSM_STATE_DEFINE(base_foraging_fsm, collision_avoidance, state_machine::no_even
   }
   return state_machine::event_signal::HANDLED;
 }
-HFSM_ENTRY_DEFINE(base_foraging_fsm, entry_leaving_nest, state_machine::no_event_data) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
   ER_DIAG("Entering ST_LEAVING_NEST");
   m_actuators->leds_set_color(argos::CColor::WHITE);
 }
-HFSM_ENTRY_DEFINE(base_foraging_fsm, entry_return_to_nest, state_machine::no_event_data) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_return_to_nest) {
   ER_DIAG("Entering ST_RETURN_TO_NEST");
   m_actuators->leds_set_color(argos::CColor::GREEN);
 }
-HFSM_ENTRY_DEFINE(base_foraging_fsm, entry_collision_avoidance, state_machine::no_event_data) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
 }

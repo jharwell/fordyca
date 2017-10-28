@@ -48,6 +48,22 @@ class cell_entity {
       m_id(-1), m_display_id(false), m_x_dim(x_dim), m_y_dim(y_dim),
       m_color(color), m_real_loc(), m_discrete_loc() {}
 
+  cell_entity(const cell_entity& other) :
+      m_id(other.m_id), m_display_id(other.m_display_id),
+      m_x_dim(other.m_x_dim), m_y_dim(other.m_y_dim),
+      m_color(other.m_color), m_real_loc(other.m_real_loc),
+      m_discrete_loc(other.m_discrete_loc) {}
+  cell_entity& operator=(const cell_entity& other) {
+    this->m_id = other.m_id;
+    this->m_display_id = other.m_display_id;
+    this->m_x_dim = other.m_x_dim;
+    this->m_y_dim = other.m_y_dim;
+    this->m_color = other.m_color;
+    this->m_real_loc = other.m_real_loc;
+    this->m_discrete_loc = other.m_discrete_loc;
+    return *this;
+  }
+
   virtual ~cell_entity(void) {}
 
   /**

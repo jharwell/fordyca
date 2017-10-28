@@ -48,7 +48,7 @@ NS_START(fsm);
  ******************************************************************************/
 class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
-  vector_fsm(double frequent_collision_thresh,
+  vector_fsm(uint frequent_collision_thresh,
              std::shared_ptr<rcppsw::common::er_server> server,
              std::shared_ptr<controller::sensor_manager> sensors,
              std::shared_ptr<controller::actuator_manager> actuators);
@@ -73,7 +73,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   /**
    * @brief (Re)start the FSM, with a new goal.
    *
-   * @param goal The (X, Y) coordinates of the new goal to drive to.
+   * @param arg The (X, Y) coordinates of the new goal to drive to.
    */
   void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
 
@@ -143,7 +143,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   static double kVECTOR_FSM_MIN_DIFF;
 
   /* member functions */
-  argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  argos::CVector2 randomize_vector_angle(argos::CVector2 v);
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
@@ -158,18 +158,13 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   /* states */
   FSM_STATE_DECLARE(vector_fsm, start, state_machine::no_event_data);
   FSM_STATE_DECLARE(vector_fsm, vector, struct goal_data);
-  FSM_STATE_DECLARE(vector_fsm, collision_avoidance,
-                    state_machine::no_event_data);
-  FSM_STATE_DECLARE(vector_fsm, collision_recovery,
-                    state_machine::no_event_data);
+  FSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
+  FSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);
   FSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);
 
-  FSM_ENTRY_DECLARE(vector_fsm, entry_vector,
-                    state_machine::no_event_data);
-  FSM_ENTRY_DECLARE(vector_fsm, entry_collision_avoidance,
-                    state_machine::no_event_data);
-  FSM_ENTRY_DECLARE(vector_fsm, entry_collision_recovery,
-                    state_machine::no_event_data);
+  FSM_ENTRY_DECLARE_ND(vector_fsm, entry_vector);
+  FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_avoidance);
+  FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_recovery);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {

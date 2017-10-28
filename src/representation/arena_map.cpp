@@ -42,8 +42,7 @@ arena_map::arena_map(const struct params::arena_map_params* params,
     m_blocks(params->block.n_blocks,
              block(params->block.dimension)),
     m_caches(),
-    m_block_distributor(params->grid.resolution,
-                        argos::CRange<argos::Real>(params->grid.lower.GetX(),
+    m_block_distributor(argos::CRange<argos::Real>(params->grid.lower.GetX(),
                                                    params->grid.upper.GetX()),
                         argos::CRange<argos::Real>(params->grid.lower.GetY(),
                                                    params->grid.upper.GetY()),
@@ -66,9 +65,9 @@ arena_map::arena_map(const struct params::arena_map_params* params,
   } /* for(i..) */
 
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    m_blocks[i].id(i);
+    m_blocks[i].id(static_cast<int>(i));
   } /* for(i..) */
-    }
+}
 
 /*******************************************************************************
  * Member Functions
@@ -76,7 +75,7 @@ arena_map::arena_map(const struct params::arena_map_params* params,
 int arena_map::robot_on_block(const argos::CVector2& pos) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i].contains_point(pos)) {
-      return i;
+      return static_cast<int>(i);
     }
   } /* for(i..) */
   return -1;
@@ -109,7 +108,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
          block->real_loc().GetX(),
          block->real_loc().GetY(),
          block->discrete_loc().first,
-         block->discrete_loc().second, cell->block());
+         block->discrete_loc().second, static_cast<const void*>(cell->block()));
 
   if (!first_time && mc_cache_params.create_caches) {
     support::cache_update_handler c(m_server, m_caches);

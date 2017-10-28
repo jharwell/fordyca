@@ -68,7 +68,7 @@ acquire_block_fsm::acquire_block_fsm(
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
-HFSM_STATE_DEFINE(acquire_block_fsm, start, state_machine::no_event_data) {
+HFSM_STATE_DEFINE_ND(acquire_block_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
   return controller::foraging_signal::HANDLED;
 }
@@ -109,7 +109,7 @@ HFSM_EXIT_DEFINE(acquire_block_fsm, exit_acquire_block) {
   m_vector_fsm.task_reset();
   m_explore_fsm.init();
 }
-FSM_STATE_DEFINE(acquire_block_fsm, finished, state_machine::no_event_data) {
+HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }

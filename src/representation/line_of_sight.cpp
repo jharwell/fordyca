@@ -57,11 +57,11 @@ std::list<const representation::cache*> line_of_sight::caches(void) {
 cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
-  return *m_view[i][j];
+  return *m_view[static_cast<index_range::index>(i)][static_cast<index_range::index>(j)];
 }
 
 discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
-  int abs_i_coord, abs_j_coord;
+  size_t abs_i_coord, abs_j_coord;
   if (i < sizex()/2) {
     abs_i_coord = m_center.first - i;
   } else {

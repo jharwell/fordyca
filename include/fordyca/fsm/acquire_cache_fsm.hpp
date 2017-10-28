@@ -138,12 +138,10 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * initiated from multiple states, and hfsm states can only have ONE parent
    * state.
    **/
-  HFSM_STATE_DECLARE(acquire_cache_fsm, start,
-                     state_machine::no_event_data);
+  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE(acquire_cache_fsm, acquire_cache,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(acquire_cache_fsm, finished,
-                     state_machine::no_event_data);
+  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, finished);
 
   HFSM_EXIT_DECLARE(acquire_cache_fsm, exit_acquire_cache);
 

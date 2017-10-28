@@ -76,9 +76,9 @@ class cell2D_fsm : public state_machine::simple_fsm,
     bool pickup;
   };
 
-  FSM_STATE_DECLARE(cell2D_fsm, state_unknown, state_machine::no_event_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_empty, state_machine::no_event_data);
-  FSM_STATE_DECLARE(cell2D_fsm, state_block, state_machine::no_event_data);
+  FSM_STATE_DECLARE_ND(cell2D_fsm, state_unknown);
+  FSM_STATE_DECLARE_ND(cell2D_fsm, state_empty);
+  FSM_STATE_DECLARE_ND(cell2D_fsm, state_block);
   FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {

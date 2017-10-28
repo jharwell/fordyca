@@ -71,7 +71,7 @@ class perceived_arena_map: public rcppsw::common::er_client,
    * @return The list of perceived caches (really a list of std::pair<cache,
    * double>).
    */
-  std::list<perceived_cache> caches(void) const { return std::list<perceived_cache>(); };
+  std::list<perceived_cache> caches(void) const { return std::list<perceived_cache>(); }
 
   /**
    * @brief Access a particular element in the discretized grid representing the

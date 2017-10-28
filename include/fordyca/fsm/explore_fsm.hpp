@@ -136,15 +136,13 @@ class explore_fsm : public base_foraging_fsm {
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, collision_avoidance,
-                     state_machine::event_data);
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_collision_avoidance,
-                     state_machine::no_event_data);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /**
    * @brief Starting/reset state for FSM. Has no purpose other than that.
    */
-  HFSM_STATE_DECLARE(explore_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(explore_fsm, start);
 
   /**
    * @brief Robots entering this state will randomly change their exploration
@@ -171,21 +169,19 @@ class explore_fsm : public base_foraging_fsm {
    * whenever it finds anything, and leave it up to the higher level to decide
    * what, if anything, to do.
    */
-  HFSM_STATE_DECLARE(explore_fsm, explore, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(explore_fsm, explore);
 
   /**
    * @brief Simple state for entry into the new direction state, used to change
    * LED color for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE(explore_fsm, entry_new_direction,
-                     state_machine::no_event_data);
+  HFSM_ENTRY_DECLARE_ND(explore_fsm, entry_new_direction);
 
   /**
    * @brief Simple state for entry in the main exploration state, used to change
    * LED color for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE(explore_fsm, entry_explore,
-                     state_machine::no_event_data);
+  HFSM_ENTRY_DECLARE_ND(explore_fsm, entry_explore);
 
   /**
    * @brief Defines the state map for the FSM. Note that the order of the states
