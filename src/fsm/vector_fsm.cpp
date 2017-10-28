@@ -43,7 +43,7 @@ double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_fsm::vector_fsm(double frequent_collision_thresh,
+vector_fsm::vector_fsm(uint frequent_collision_thresh,
                        std::shared_ptr<rcppsw::common::er_server> server,
                        std::shared_ptr<controller::sensor_manager> sensors,
                        std::shared_ptr<controller::actuator_manager> actuators) :
@@ -79,12 +79,12 @@ vector_fsm::vector_fsm(double frequent_collision_thresh,
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(vector_fsm, start, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(vector_fsm, collision_avoidance, state_machine::no_event_data) {
-  argos::CVector2 vector;
+FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
+  argos::CVector2 diff_vector;
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
@@ -95,20 +95,20 @@ FSM_STATE_DEFINE(vector_fsm, collision_avoidance, state_machine::no_event_data) 
    * vector_to_target state to get back on trajectory, but not if we are
    * randomly exploring or doing something else.
    */
-  if (m_sensors->calc_diffusion_vector(&vector)) {
+  if (m_sensors->calc_diffusion_vector(&diff_vector)) {
     if (m_sensors->tick() - m_state.last_collision_time <
         m_freq_collision_thresh) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time, m_sensors->tick());
-      vector = randomize_vector_angle(vector);
+      diff_vector = randomize_vector_angle(diff_vector);
     }
-    m_actuators->set_heading(vector);
+    m_actuators->set_heading(diff_vector);
   } else {
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, collision_recovery, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   if (ST_COLLISION_RECOVERY != last_state()) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
@@ -169,16 +169,16 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_ENTRY_DEFINE(vector_fsm, entry_vector, state_machine::no_event_data) {
+FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DIAG("Entering ST_VECTOR");
   m_actuators->leds_set_color(argos::CColor::BLUE);
 }
-FSM_ENTRY_DEFINE(vector_fsm, entry_collision_avoidance, state_machine::no_event_data) {
+FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
   m_actuators->leds_set_color(argos::CColor::RED);
   m_state.last_collision_time = m_sensors->tick();
 }
-FSM_ENTRY_DEFINE(vector_fsm, entry_collision_recovery, state_machine::no_event_data) {
+FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
   m_actuators->leds_set_color(argos::CColor::YELLOW);
 }
@@ -194,7 +194,7 @@ void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* co
     controller::foraging_signal::IGNORED,  /* arrived */
   };
   const tasks::vector_argument* const a =
-      dynamic_cast<const tasks::vector_argument* const>(arg);
+      dynamic_cast<const tasks::vector_argument*>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
@@ -210,11 +210,11 @@ argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2& goal) {
   return goal - m_sensors->robot_loc();
 } /* calc_vector_to_goal() */
 
-argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 vector) {
+argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 v) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
-  vector.Rotate(m_rng->Uniform(range));
-  return vector;
+  v.Rotate(m_rng->Uniform(range));
+  return v;
 } /* randomize_vector_angle() */
 
 

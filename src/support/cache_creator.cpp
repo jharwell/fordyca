@@ -61,11 +61,13 @@ std::vector<representation::cache> cache_creator::create_all(void) {
         if (std::find(starter_blocks.begin(),
                       starter_blocks.end(),
                       &m_blocks[i]) == starter_blocks.end()) {
-          printf("Add block %d: (%f, %f)\n", i,m_blocks[i].real_loc().GetX(), m_blocks[i].real_loc().GetY());
+          ER_DIAG("Add block %zu: (%f, %f)", i,m_blocks[i].real_loc().GetX(),
+                  m_blocks[i].real_loc().GetY());
           starter_blocks.push_back(&m_blocks[i]);
         }
         starter_blocks.push_back(&m_blocks[j]);
-        printf("Add block %d: (%f, %f)\n", j,m_blocks[j].real_loc().GetX(), m_blocks[j].real_loc().GetY());
+        ER_DIAG("Add block %zu: (%f, %f)", j,m_blocks[j].real_loc().GetX(),
+                m_blocks[j].real_loc().GetY());
       }
     } /* for(j..) */
     if (starter_blocks.size()) {
@@ -92,8 +94,8 @@ representation::cache cache_creator::create_single(
 
   for (auto block : blocks) {
     events::free_block_drop op(m_server, block, m_resolution);
-    representation::cell2D& cell = m_grid.access(center.GetX(),
-                                                 center.GetY());
+    representation::cell2D& cell = m_grid.access(static_cast<size_t>(center.GetX()),
+                                                 static_cast<size_t>(center.GetY()));
     block->discrete_loc(cell.loc());
     block->real_loc(argos::CVector2(cell.loc().first, cell.loc().second));
     cell.accept(op);

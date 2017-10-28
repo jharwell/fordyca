@@ -79,7 +79,7 @@ class block : public cell_entity,
    * @return The robot index, or -1 if no robot is currently carrying this block.
    */
   int robot_index(void) const { return m_robot_index; }
-  void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+  void robot_index(size_t robot_index) { m_robot_index = static_cast<int>(robot_index); }
 
   bool operator>(const block &other) const;
   bool operator<(const block &other) const;

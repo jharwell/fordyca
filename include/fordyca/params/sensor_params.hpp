@@ -39,7 +39,7 @@ NS_START(fordyca, params);
 struct diffusion_params {
   diffusion_params() :
       delta(0.0),
-      go_straight_angle_range(argos::CRadians(-1.0f), argos::CRadians(1.0f)) {}
+      go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
   /*
    * Maximum tolerance for the proximity reading between the robot and the

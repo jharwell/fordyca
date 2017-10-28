@@ -36,21 +36,15 @@ void sensor_parser::parse(argos::TConfigurationNode& node) {
       argos::GetNode(node, "sensors"), "diffusion");
   m_params.reset(new sensor_params);
 
-    try {
-      argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0f),
-                                                     argos::CDegrees(10.0f));
+      argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0),
+                                                     argos::CDegrees(10.0));
       argos::GetNodeAttribute(diff_node,
                               "go_straight_angle_range",
                               m_params->diffusion.go_straight_angle_range);
       m_params->diffusion.go_straight_angle_range.Set(
-          argos::ToRadians(angle_range_deg.GetMin()),
-          argos::ToRadians(angle_range_deg.GetMax()));
+          m_params->diffusion.go_straight_angle_range.GetMin(),
+          m_params->diffusion.go_straight_angle_range.GetMax());
       argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
-    }
-    catch (argos::CARGoSException& ex) {
-      using namespace argos;
-      THROW_ARGOSEXCEPTION_NESTED("Error parsing sensor parameters.", ex);
-    }
 } /* parse() */
 
 void sensor_parser::show(std::ostream& stream) {

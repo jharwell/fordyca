@@ -67,11 +67,11 @@ explore_fsm::explore_fsm(
          rcppsw::common::er_lvl::NOM);
 }
 
-HFSM_STATE_DEFINE(explore_fsm, start, state_machine::no_event_data) {
+HFSM_STATE_DEFINE_ND(explore_fsm, start) {
   internal_event(ST_EXPLORE);
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(explore_fsm, explore, state_machine::event_data) {
+HFSM_STATE_DEFINE_ND(explore_fsm, explore) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
@@ -133,10 +133,10 @@ HFSM_STATE_DEFINE(explore_fsm, new_direction, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_ENTRY_DEFINE(explore_fsm, entry_explore, state_machine::no_event_data) {
+HFSM_ENTRY_DEFINE_ND(explore_fsm, entry_explore) {
   base_foraging_fsm::actuators()->leds_set_color(argos::CColor::MAGENTA);
 }
-HFSM_ENTRY_DEFINE(explore_fsm, entry_new_direction, state_machine::no_event_data) {
+HFSM_ENTRY_DEFINE_ND(explore_fsm, entry_new_direction) {
   base_foraging_fsm::actuators()->leds_set_color(argos::CColor::CYAN);
 }
 

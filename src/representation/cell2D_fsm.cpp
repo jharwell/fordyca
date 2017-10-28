@@ -97,14 +97,14 @@ void cell2D_fsm::event_block_pickup(void) {
 /*******************************************************************************
  * State Functions
  ******************************************************************************/
-FSM_STATE_DEFINE(cell2D_fsm, state_unknown, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(cell2D_fsm, state_unknown) {
   if (ST_UNKNOWN != last_state()) {
     ER_DIAG("Cell in UNKNOWN state.");
     m_block_count = 0;
   }
   return state_machine::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(cell2D_fsm, state_empty, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(cell2D_fsm, state_empty) {
   if (ST_EMPTY != last_state()) {
     ER_DIAG("Cell in EMPTY state.");
     m_block_count = 0;
@@ -112,7 +112,7 @@ FSM_STATE_DEFINE(cell2D_fsm, state_empty, state_machine::no_event_data) {
   return state_machine::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(cell2D_fsm, state_block, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
   if (ST_HAS_BLOCK != last_state()) {
     m_block_count = 1;
     ER_DIAG("Cell HAS_BLOCK.");

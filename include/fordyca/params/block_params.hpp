@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct block_params : public rcppsw::common::base_params {
-  block_params(void) : n_blocks(0), dimension(0), dist_model(""),
+  block_params(void) : n_blocks(0), dimension(0.0), dist_model(""),
                        respawn(false) {}
 
   uint n_blocks;

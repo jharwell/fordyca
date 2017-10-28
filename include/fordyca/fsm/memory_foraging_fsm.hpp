@@ -127,16 +127,15 @@ class memory_foraging_fsm : public base_foraging_fsm,
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     state_machine::no_event_data);
-
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_leaving_nest,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* memory foraging states */
-  HFSM_STATE_DECLARE(memory_foraging_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(memory_foraging_fsm, start,
+                     state_machine::event_data);
   HFSM_STATE_DECLARE(memory_foraging_fsm, block_to_nest,
-                     state_machine::no_event_data);
-  HFSM_STATE_DECLARE(memory_foraging_fsm, finished, state_machine::no_event_data);
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(memory_foraging_fsm, finished);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
