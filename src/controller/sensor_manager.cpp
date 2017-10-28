@@ -112,7 +112,7 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
     accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
   } /* for(i..) */
 
-  return argos::CVector2(1.0f, accum.Angle());
+  return argos::CVector2(1.0, accum.Angle());
 } /* calc_vector_to_light() */
 
 argos::CVector2 sensor_manager::calc_light_loc(const argos::CVector2& robot_loc) {

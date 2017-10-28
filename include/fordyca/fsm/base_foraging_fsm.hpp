@@ -57,7 +57,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   base_foraging_fsm(std::shared_ptr<rcppsw::common::er_server> server,
                     std::shared_ptr<controller::sensor_manager> sensors,
                     std::shared_ptr<controller::actuator_manager> actuators,
-                    uint max_states);
+                    uint8_t max_states);
   virtual ~base_foraging_fsm(void) {}
 
   /**
@@ -87,7 +87,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * nest unless it has a block (duh).
    */
   HFSM_STATE_DECLARE(base_foraging_fsm, return_to_nest,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
 
   /**
    * @brief Robots entering this state will leave the nest (they are assumed to
@@ -99,7 +99,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * parent state.
    */
   HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
 
   /**
    * @brief Robots entering this state perform collision avoidance.
@@ -114,29 +114,25 @@ class base_foraging_fsm : public state_machine::hfsm {
    * After completing avoidance, robots will return automatically to whatever
    * state they were in prior to this one.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, collision_avoidance,
-                     state_machine::no_event_data);
+  HFSM_STATE_DECLARE_ND(base_foraging_fsm, collision_avoidance);
 
   /**
    * @brief A simple entry state for returning to nest, used to set LED colors
    * for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE(base_foraging_fsm, entry_return_to_nest,
-                     state_machine::no_event_data);
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_return_to_nest);
 
   /**
    * @brief A simple entry state for collision avoidance, used to set LED colors
    * for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE(base_foraging_fsm, entry_collision_avoidance,
-                    state_machine::no_event_data);
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /**
    * @brief A simple entry state for leaving nest, used to set LED colors for
    * visualization purposes.
    */
-  HFSM_ENTRY_DECLARE(base_foraging_fsm, entry_leaving_nest,
-                     state_machine::no_event_data);
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_leaving_nest);
 
   base_foraging_fsm(const base_foraging_fsm& fsm) = delete;
   base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;

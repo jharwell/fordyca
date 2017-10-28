@@ -92,8 +92,8 @@ class actuator_manager: public state_machine::simple_fsm {
   /**
    * @brief Stop the robot
    */
-  void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0f, 0.0f); }
-  void set_raba_data(int data) { m_raba->SetData(0, data); }
+  void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0, 0.0); }
+  void set_raba_data(uint8_t data) { m_raba->SetData(0, data); }
 
   /**
    * @brief Reset the actuators, including stopping the robot.

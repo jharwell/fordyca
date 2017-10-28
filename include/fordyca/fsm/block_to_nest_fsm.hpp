@@ -162,18 +162,16 @@ class block_to_nest_fsm : public base_foraging_fsm,
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
-                     state_machine::no_event_data);
-  HFSM_ENTRY_INHERIT(base_foraging_fsm, entry_return_to_nest,
-                     state_machine::no_event_data);
+                     state_machine::event_data);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
 
   /* memory foraging states */
-  HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::no_event_data);
+  HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_nest_fsm, acquire_free_block,
                      state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_nest_fsm, acquire_cached_block,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(block_to_nest_fsm, finished,
-                     state_machine::no_event_data);
+  HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];

@@ -84,7 +84,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_d
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_cache_fsm, finished, state_machine::event_data) {
+HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

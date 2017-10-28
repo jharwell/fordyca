@@ -33,13 +33,11 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_distributor::block_distributor(double resolution,
-                                     argos::CRange<double> arena_x,
+block_distributor::block_distributor(argos::CRange<double> arena_x,
                                      argos::CRange<double> arena_y,
                                      argos::CRange<double> nest_x,
                                      argos::CRange<double> nest_y,
                                      const struct params::block_params* params) :
-    m_resolution(resolution),
     m_dist_model(params->dist_model),
     m_respawn(params->respawn),
     m_arena_x(arena_x),

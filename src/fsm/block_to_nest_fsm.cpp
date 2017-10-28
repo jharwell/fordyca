@@ -105,7 +105,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::event_
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_nest_fsm, finished, state_machine::no_event_data) {
+HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

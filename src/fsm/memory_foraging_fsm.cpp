@@ -55,7 +55,7 @@ memory_foraging_fsm::memory_foraging_fsm(
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
 
-HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::no_event_data) {
+HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
   /* first time running FSM */
   if (state_machine::event_type::NORMAL == data->type()) {
     ER_NOM("Starting foraging");
@@ -107,7 +107,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data)
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(memory_foraging_fsm, finished, state_machine::no_event_data) {
+FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
