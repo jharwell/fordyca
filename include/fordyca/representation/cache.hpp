@@ -41,6 +41,8 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class cache
+ *
  * @brief A representation of a cache within the arena map. Caches do not have
  * state, and if/when a cache becomes empty, it needs to be deleted by an
  * enclosing class. Caches have both real (where they actually live in the
