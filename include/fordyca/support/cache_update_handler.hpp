@@ -46,6 +46,7 @@ class cache_update_handler : public rcppsw::common::er_client,
  public:
   cache_update_handler(std::shared_ptr<rcppsw::common::er_server> server,
                        std::vector<representation::cache>& caches);
+  ~cache_update_handler(void) { er_client::rmmod(); }
 
   representation::cache* map_to_cache(const representation::block* const block);
   void block_add(representation::cache* cache,
