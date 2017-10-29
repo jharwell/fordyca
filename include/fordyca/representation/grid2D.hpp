@@ -46,6 +46,8 @@ using index_range = boost::multi_array_types::index_range;
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class grid2D
+ *
  * @brief A 2D logical grid that is overlayed over the arena as part of a
  * representation of arena state (either global or per-robot).  It discretizes
  * the continuous arena into a grid of a specified resolution onto which blocks

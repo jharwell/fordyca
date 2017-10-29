@@ -41,8 +41,9 @@ class cell2D;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
+ * @class line_of_sight
+ *
  * @brief A representation of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
