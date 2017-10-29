@@ -135,18 +135,23 @@ argos::CColor memory_foraging_loop_functions::GetFloorColor(
       nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY70;
   }
-  /* blocks are black */
+
+  /*
+   * Blocks are inside caches, so display the cache the point is inside FIRST,
+   * so that you don't have blocks renderin inside of caches.
+   */
+  for (size_t i = 0; i < map()->caches().size(); ++i) {
+    if (map()->caches()[i].contains_point(plane_pos)) {
+      return argos::CColor::GRAY40;
+    }
+  } /* for(i..) */
+
   for (size_t i = 0; i < map()->blocks().size(); ++i) {
     if (map()->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */
 
-  for (size_t i = 0; i < map()->caches().size(); ++i) {
-    if (map()->caches()[i].contains_point(plane_pos)) {
-      return argos::CColor::GRAY40;
-    }
-  } /* for(i..) */
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
