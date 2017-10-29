@@ -94,10 +94,9 @@ representation::cache cache_creator::create_single(
 
   for (auto block : blocks) {
     events::free_block_drop op(m_server, block, m_resolution);
-    representation::cell2D& cell = m_grid.access(static_cast<size_t>(center.GetX()),
-                                                 static_cast<size_t>(center.GetY()));
-    block->discrete_loc(cell.loc());
-    block->real_loc(argos::CVector2(cell.loc().first, cell.loc().second));
+    representation::cell2D& cell = m_grid.access(
+        static_cast<size_t>(std::ceil(center.GetX()/ m_resolution)),
+        static_cast<size_t>(std::ceil(center.GetY()/ m_resolution)));
     cell.accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",

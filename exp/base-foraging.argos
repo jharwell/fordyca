@@ -70,7 +70,7 @@
              />
     <grid resolution="0.2"
           size="10, 5, 2"/>
-    <blocks n_blocks="25"
+    <blocks n_blocks="6"
             dimension="0.2"
             dist_model="random"
             respawn="true"
@@ -118,7 +118,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="20" max_trials="100">
+      <entity quantity="1" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

@@ -98,7 +98,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
         break;
       }
     } else {
-      break;
+      return;
     }
   } /* while() */
   events::free_block_drop op(m_server, block, m_grid.resolution());

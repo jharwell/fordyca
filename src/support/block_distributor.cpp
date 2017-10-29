@@ -101,11 +101,11 @@ argos::CVector2 block_distributor::dist_outside_range(
   y_range.Set(y_range.GetMin() - dimension, y_range.GetMax() + dimension);
   do {
     x = m_rng->Uniform(
-        argos::CRange<double>(m_arena_x.GetMin() + dimension,
-                              m_arena_x.GetMax() - dimension));
+        argos::CRange<double>(m_arena_x.GetMin() + dimension*4,
+                              m_arena_x.GetMax() - dimension*4));
     y = m_rng->Uniform(
-        argos::CRange<double>(m_arena_y.GetMin() + dimension,
-                              m_arena_y.GetMax() - dimension));
+        argos::CRange<double>(m_arena_y.GetMin() + dimension*4,
+                              m_arena_y.GetMax() - dimension*4));
   } while (x_range.WithinMinBoundIncludedMaxBoundIncluded(x) &&
            y_range.WithinMinBoundIncludedMaxBoundIncluded(y));
   return argos::CVector2(x, y);
