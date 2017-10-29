@@ -44,7 +44,7 @@ cache_update_handler::cache_update_handler(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::cache* cache_update_handler::map_to_cache(
+__pure representation::cache* cache_update_handler::map_to_cache(
     const representation::block* const block) {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     ER_ASSERT(!m_caches[i].contains_block(block),

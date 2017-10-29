@@ -49,7 +49,7 @@ representation::perceived_block block_selector::calc_best(
     const std::list<representation::perceived_block> blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  const representation::block* best;
+  const representation::block* best = nullptr;
 
   for (auto pair : blocks) {
     expressions::block_utility u(pair.first->real_loc(), m_nest_loc);

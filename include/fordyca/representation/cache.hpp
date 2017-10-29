@@ -56,17 +56,17 @@ class cache : public cell_entity,
       cell_entity(dimension, dimension, argos::CColor::BLUE),
       m_blocks(blocks) { real_loc(center); }
 
-  bool contains_block(const block* const block) {
+  __pure bool contains_block(const block* const block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
   }
-  bool block_within_boundaries(const block* const block) {
+  __pure bool block_within_boundaries(const block* const block) const {
     return (cell_entity::real_loc() - block->real_loc()).Length() <= cell_entity::xsize();
   }
   void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block) { m_blocks.remove(block); }
   block* block_get(void) { return m_blocks.front(); }
   size_t n_blocks(void) const { return m_blocks.size(); }
-  bool operator==(const cache &other) const {
+  __pure bool operator==(const cache &other) const {
     return cell_entity::real_loc() == other.cell_entity::real_loc() &&
         m_blocks == other.m_blocks;
   }

@@ -161,7 +161,7 @@ void actuator_manager::reset(void) {
   state_machine::simple_fsm::init();
 } /* reset() */
 
-double actuator_manager::max_wheel_speed(void) const {
+__pure double actuator_manager::max_wheel_speed(void) const {
   return mc_params.wheels.max_speed;
 } /* max_wheel_speed() */
 
