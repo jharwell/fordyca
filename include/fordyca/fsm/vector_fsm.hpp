@@ -156,7 +156,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
   /* states */
-  FSM_STATE_DECLARE(vector_fsm, start, state_machine::no_event_data);
+  FSM_STATE_DECLARE_ND(vector_fsm, start);
   FSM_STATE_DECLARE(vector_fsm, vector, struct goal_data);
   FSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
   FSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);

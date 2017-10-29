@@ -41,7 +41,6 @@ class cell2D;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
  * @class line_of_sight
  *
@@ -94,7 +93,7 @@ line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
    * @param i The RELATIVE X coord within the LOS.
    * @param j The RELATIVE Y coord within the LOS.
    *
-   * @return
+   * @return A reference to the cell.
    */
   cell2D& cell(size_t i, size_t j) const;
 

@@ -117,7 +117,6 @@ void arena_map::distribute_block(block* const block, bool first_time) {
 
 void arena_map::distribute_blocks(bool first_time) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    argos::CVector2 real_coord;
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
