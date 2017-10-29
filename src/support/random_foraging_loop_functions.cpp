@@ -220,7 +220,7 @@ int random_foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& 
   return m_map->robot_on_block(pos);
 } /* robot_on_block() */
 
-bool random_foraging_loop_functions::IsExperimentFinished(void) {
+__pure bool random_foraging_loop_functions::IsExperimentFinished(void) {
   /*
    * If we are not respawning blocks and all blocks have been collected, signal
    * the end of the experiment. If respawn is enabled, then the experiment will

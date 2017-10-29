@@ -43,7 +43,14 @@ void cell_unknown::visit(representation::cell2D& cell) {
 } /* visit() */
 
 void cell_unknown::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_unknown();
+  /*
+   * Much faster to check this than to send a redundant event to the
+   * FSM. Doesn't matter for just a few robots, but it does when you have
+   * dozens/hundreds.
+   */
+  if (fsm.state_is_known()) {
+    fsm.event_unknown();
+  }
 } /* visit() */
 
 NS_END(events, fordyca);

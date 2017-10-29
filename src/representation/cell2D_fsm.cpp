@@ -38,11 +38,11 @@ cell2D_fsm::cell2D_fsm(
     state_block(),
     state_cache(),
     m_block_count(0) {
-  if (ERROR == attmod("cell2D_fsm")) {
-    er_client::insmod("cell2D_fsm",
-                      rcppsw::common::er_lvl::DIAG,
-                      rcppsw::common::er_lvl::NOM);
-  }
+  /* if (ERROR == attmod("cell2D_fsm")) { */
+    /* er_client::insmod("cell2D_fsm", */
+    /*                   rcppsw::common::er_lvl::nom, */
+    /*                   rcppsw::common::er_lvl::NOM); */
+  /* } */
 }
 
 /*******************************************************************************

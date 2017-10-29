@@ -73,6 +73,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
     }
   }
   ER_ASSERT(0, "FATAL: Unhandled signal");
+  return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
@@ -107,7 +108,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data)
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
+__const FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

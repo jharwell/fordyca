@@ -42,7 +42,7 @@ void memory_foraging_controller::robot_loc(argos::CVector2 loc) {
 argos::CVector2 memory_foraging_controller::robot_loc(void) const {
   return sensors()->robot_loc();
 }
-const representation::line_of_sight* memory_foraging_controller::los(void) const {
+__pure const representation::line_of_sight* memory_foraging_controller::los(void) const {
   return sensors()->los();
 }
 void memory_foraging_controller::los(
