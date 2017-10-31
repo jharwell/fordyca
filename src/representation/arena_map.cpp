@@ -95,14 +95,15 @@ void arena_map::distribute_block(block* const block, bool first_time) {
        * anything in them.
        */
       if (!cell->state_has_block() && !cell->state_has_cache()) {
+        events::free_block_drop op(m_server, block, d_coord.first,
+                                   d_coord.second, m_grid.resolution());
+        cell->accept(op);
         break;
       }
-    } else {
+    } else { /* no distributing needs to be done */
       return;
     }
   } /* while() */
-  events::free_block_drop op(m_server, block, m_grid.resolution());
-  cell->accept(op);
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),
          block->real_loc().GetX(),
@@ -136,7 +137,7 @@ void arena_map::distribute_blocks(bool first_time) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache()) {
-        events::cell_empty op;
+        events::cell_empty op(i, j);
         cell.accept(op);
       }
     } /* for(j..) */

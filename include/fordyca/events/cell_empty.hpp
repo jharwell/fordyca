@@ -32,7 +32,8 @@
 NS_START(fordyca);
 
 namespace representation {
-class cell2D_fsm;
+class arena_map;
+class perceived_arena_map;
 } /* namespace representation */
 
 NS_START(events);
@@ -40,9 +41,11 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cell_empty : public cell_op {
+class cell_empty : public cell_op,
+                   public visitor::can_visit<representation::arena_map>,
+                   public visitor::can_visit<representation::perceived_arena_map> {
  public:
-  cell_empty(void) {}
+  cell_empty(size_t x, size_t y) : cell_op(x, y) {}
 
   /**
    * @brief Update a cell with the knowledge that it is now empty.
@@ -65,6 +68,9 @@ class cell_empty : public cell_op {
    * @param fsm The FSM from the cell to update.
    */
   void visit(representation::cell2D_fsm& fsm) override;
+
+  void visit(representation::arena_map& map) override;
+  void visit(representation::perceived_arena_map& map) override;
 };
 
 NS_END(events, fordyca);

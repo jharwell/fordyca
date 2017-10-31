@@ -59,47 +59,6 @@ perceived_arena_map::perceived_arena_map(
 }
 
 /*******************************************************************************
- * Events
- ******************************************************************************/
-bool perceived_arena_map::event_new_los(const line_of_sight* los) {
-  bool rval = false;
-  for (size_t x = 0; x < los->sizex(); ++x) {
-    for (size_t y = 0; y < los->sizey(); ++y) {
-      representation::discrete_coord abs = los->cell(x, y).loc();
-      if (los->cell(x, y).state_has_block()) {
-        rval = true;
-        block* block = const_cast<representation::block*>(los->cell(x,
-                                                                    y).block());
-        ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
-        if (!m_grid.access(abs.first, abs.second).state_has_block()) {
-          ER_NOM("Discovered block%d at (%zu, %zu)", block->id(), abs.first,
-                 abs.second);
-        }
-
-        events::block_found op(m_server, block);
-        m_grid.access(abs.first, abs.second).accept(op);
-      } else if (los->cell(x, y).state_has_cache()) {
-        rval = true;
-        cache* cache = const_cast<representation::cache*>(los->cell(x,
-                                                                    y).cache());
-        ER_ASSERT(cache, "ERROR: NULL cache on cell that should have cache");
-        if (!m_grid.access(abs.first, abs.second).state_has_cache()) {
-          ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(), abs.first,
-                 abs.second);
-        }
-
-        events::cache_found op(m_server, cache);
-        m_grid.access(abs.first, abs.second).accept(op);
-      } else { /* must be empty if it doesn't have a block or a cache */
-        events::cell_empty op;
-        m_grid.access(abs.first, abs.second).accept(op);
-      }
-    } /* for(y..) */
-  } /* for(x..) */
-  return rval;
-} /* event_new_los() */
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::list<perceived_block> perceived_arena_map::blocks(void) const {

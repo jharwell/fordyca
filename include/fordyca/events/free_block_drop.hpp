@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/er_client.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/events/cell_op.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
@@ -34,24 +34,20 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class cell2D;
-class cell2D_fsm;
-class block;
-}
+namespace representation { class block; }
+
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class free_block_drop : public visitor::visitor,
+class free_block_drop : public cell_op,
                         public rcppsw::common::er_client,
-                        public visitor::can_visit<representation::block>,
-                        public visitor::can_visit<representation::cell2D>,
-                        public visitor::can_visit<representation::cell2D_fsm> {
+                        public visitor::can_visit<representation::block> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
-                  representation::block* block, double resolution);
+                  representation::block* block, size_t x, size_t y,
+                  double resolution);
   ~free_block_drop(void) { er_client::rmmod(); }
 
   /**
@@ -75,6 +71,8 @@ class free_block_drop : public visitor::visitor,
    */
   void visit(representation::block& block) override;
 
+  void visit(__unused representation::perceived_cell2D& block) override {}
+
   /**
    * @brief Get the handle on the block that has been dropped.
    */
@@ -86,7 +84,6 @@ class free_block_drop : public visitor::visitor,
 
   double m_resolution;
   representation::block* m_block;
-  representation::discrete_coord m_dloc;
 };
 
 NS_END(events, fordyca);

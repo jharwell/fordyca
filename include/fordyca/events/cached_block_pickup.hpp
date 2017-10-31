@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/common/er_client.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,9 +36,6 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class perceived_arena_map;
 class cache;
-class cell2D;
-class perceived_cell2D;
-class cell2D_fsm;
 class block;
 class arena_map;
 }
@@ -50,16 +47,13 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cached_block_pickup : public visitor::visitor,
+class cached_block_pickup : public cell_op,
                             public rcppsw::common::er_client,
                             public visitor::can_visit<controller::memory_foraging_controller>,
                             public visitor::can_visit<fsm::memory_foraging_fsm>,
                             public visitor::can_visit<representation::block>,
                             public visitor::can_visit<representation::arena_map>,
-                            public visitor::can_visit<representation::perceived_arena_map>,
-                            public visitor::can_visit<representation::cell2D>,
-                            public visitor::can_visit<representation::cell2D_fsm>,
-                            public visitor::can_visit<representation::perceived_cell2D> {
+                            public visitor::can_visit<representation::perceived_arena_map> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                       representation::cache* cache, size_t robot_index);

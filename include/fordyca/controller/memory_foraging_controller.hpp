@@ -95,6 +95,8 @@ class memory_foraging_controller : public base_foraging_controller,
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
+  void process_los(const representation::line_of_sight* const los);
+
   /**
    * @brief Get the current LOS for the robot.
    *

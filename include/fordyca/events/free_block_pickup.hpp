@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -40,8 +40,7 @@ class memory_foraging_controller;
 class random_foraging_controller;
 }
 namespace representation {
-class cell2D;
-class cell2D_fsm;
+class perceived_arena_map;
 class block;
 class arena_map;
 }
@@ -60,7 +59,7 @@ NS_START(events);
  * This event is processed by both robots and \ref arena_map, as they both react
  * to it in different ways.
  */
-class free_block_pickup : public visitor::visitor,
+class free_block_pickup : public cell_op,
                           public rcppsw::common::er_client,
                           public visitor::can_visit<controller::memory_foraging_controller>,
                           public visitor::can_visit<controller::random_foraging_controller>,
@@ -68,11 +67,10 @@ class free_block_pickup : public visitor::visitor,
                           public visitor::can_visit<fsm::random_foraging_fsm>,
                           public visitor::can_visit<representation::block>,
                           public visitor::can_visit<representation::arena_map>,
-                          public visitor::can_visit<representation::cell2D>,
-                          public visitor::can_visit<representation::cell2D_fsm> {
+                          public visitor::can_visit<representation::perceived_arena_map> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
-               representation::block* block, size_t robot_index);
+                    representation::block* block, size_t robot_index);
   ~free_block_pickup(void) { er_client::rmmod(); }
 
   /**
@@ -83,8 +81,17 @@ class free_block_pickup : public visitor::visitor,
    */
   void visit(representation::arena_map& map) override;
 
+  /**
+   * @brief Handle the event of a robot picking up a block, making updates to
+   * the arena map as necessary.
+   *
+   * @param map The robot's arena map.
+   */
+  void visit(representation::perceived_arena_map& map) override;
+
   void visit(representation::cell2D& cell) override;
   void visit(representation::cell2D_fsm& fsm) override;
+  void visit(representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update a block with the knowledge that it is now carried by a robot.

@@ -39,8 +39,12 @@ NS_START(fordyca, events);
  ******************************************************************************/
 free_block_pickup::free_block_pickup(
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    representation::block* block, size_t robot_index) :
-    er_client(server), m_robot_index(robot_index), m_block(block),
+    representation::block* block,  size_t robot_index) :
+    cell_op(block->discrete_loc().first,
+            block->discrete_loc().second),
+    er_client(server),
+    m_robot_index(robot_index),
+    m_block(block),
     m_server(server) {
   er_client::insmod("free_block_pickup",
                     rcppsw::common::er_lvl::DIAG,
@@ -61,18 +65,32 @@ void free_block_pickup::visit(representation::cell2D& cell) {
          m_block->discrete_loc().second);
 } /* visit() */
 
+void free_block_pickup::visit(representation::perceived_cell2D& cell) {
+  cell.cell().accept(*this);
+} /* visit() */
+
 void free_block_pickup::visit(representation::arena_map& map) {
-  representation::discrete_coord old_d(m_block->discrete_loc().first,
-                                       m_block->discrete_loc().second);
+  ER_ASSERT(m_block->discrete_loc() == representation::discrete_coord(cell_op::x(),
+                                                                      cell_op::y()),
+            "FATAL: Coordinates for block/cell do not agree");
   argos::CVector2 old_r(m_block->real_loc().GetX(),
                         m_block->real_loc().GetY());
-  events::cell_empty op;
-  map.access(old_d.first, old_d.second).accept(op);
+  events::cell_empty op(cell_op::x(), cell_op::y());
+  map.accept(op);
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from (%f, %f) -> (%zu, %zu)", m_robot_index,
-         m_block->id(),
-         old_r.GetX(), old_r.GetY(),
-         old_d.first, old_d.second);
+         m_block->id(), old_r.GetX(), old_r.GetY(), cell_op::x(), cell_op::y());
+} /* visit() */
+
+void free_block_pickup::visit(representation::perceived_arena_map& map) {
+  ER_ASSERT(m_block->discrete_loc() == representation::discrete_coord(cell_op::x(),
+                                                                      cell_op::y()),
+            "FATAL: Coordinates for block/cell do not agree");
+
+  events::cell_empty op(cell_op::x(), cell_op::y());
+  map.accept(op);
+  ER_NOM("perceived_arena_map: fb%zu: (%zu, %zu) is now empty", m_robot_index,
+         cell_op::x(), cell_op::y());
 } /* visit() */
 
 void free_block_pickup::visit(representation::block& block) {
@@ -94,6 +112,7 @@ void free_block_pickup::visit(controller::random_foraging_controller& controller
 } /* visit() */
 
 void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
+  controller.map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   ER_NOM("memory_foraging_controller: %s picked up block%d",

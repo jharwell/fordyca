@@ -48,8 +48,15 @@ class cell_op : public visitor::visitor,
                 public visitor::can_visit<representation::perceived_cell2D>,
                 public visitor::can_visit<representation::cell2D_fsm> {
  public:
-  cell_op(void) {}
+  cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
   virtual ~cell_op(void) {}
+
+  size_t x(void) const { return m_x; }
+  size_t y(void) const { return m_y; }
+
+ private:
+  size_t m_x;
+  size_t m_y;
 };
 
 NS_END(events, fordyca);

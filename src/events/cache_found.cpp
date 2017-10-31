@@ -34,8 +34,10 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                       representation::cache* cache) :
-    er_client(server), m_cache(cache) {
+                         representation::cache* cache, size_t x, size_t y) :
+    perceived_cell_op(x, y),
+    er_client(server),
+    m_cache(cache) {
   er_client::insmod("cache_found",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
@@ -66,8 +68,7 @@ void cache_found::visit(controller::memory_foraging_controller& controller) {
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {
-  map.access(m_cache->discrete_loc().first,
-             m_cache->discrete_loc().second).accept(*this);
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

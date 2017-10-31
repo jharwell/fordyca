@@ -87,17 +87,17 @@ representation::cache cache_creator::create_single(
    * and all blocks be deposited in a single cell.
    */
   for (auto block : blocks) {
-    events::cell_empty op;
-    m_grid.access(block->discrete_loc().first,
-                  block->discrete_loc().second).accept(op);
+    events::cell_empty op(block->discrete_loc().first,
+                          block->discrete_loc().second);
+    m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block, m_resolution);
-    representation::cell2D& cell = m_grid.access(
-        static_cast<size_t>(std::ceil(center.GetX()/ m_resolution)),
-        static_cast<size_t>(std::ceil(center.GetY()/ m_resolution)));
-    cell.accept(op);
+    events::free_block_drop op(m_server, block,
+                               static_cast<size_t>(std::ceil(center.GetX()/ m_resolution)),
+                               static_cast<size_t>(std::ceil(center.GetY()/ m_resolution)),
+                               m_resolution);
+    m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",
          center.GetX(), center.GetY(), blocks.size());

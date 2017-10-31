@@ -27,6 +27,9 @@
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/events/cache_found.hpp"
+#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,10 +58,7 @@ void memory_foraging_controller::ControlStep(void) {
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  m_map->event_new_los(sensors()->los());
-  if (this->GetId() == "fb8") {
-    printf("blocks: %zu\n", m_map->blocks().size());
-  }
+  process_los(sensors()->los());
   m_map->update_density();
   if (m_fsm->task_finished()) {
     m_fsm->task_reset();
@@ -91,6 +91,42 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
                        m_map));
   ER_NOM("memory_foraging controller initialization finished");
 } /* Init() */
+
+void memory_foraging_controller::process_los(const representation::line_of_sight* const los) {
+  for (size_t x = 0; x < los->sizex(); ++x) {
+    for (size_t y = 0; y < los->sizey(); ++y) {
+      representation::discrete_coord abs = los->cell(x, y).loc();
+      if (los->cell(x, y).state_has_block()) {
+        representation::block* block = const_cast<representation::block*>(los->cell(x,
+                                                                    y).block());
+        ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
+        if (!m_map->access(abs.first, abs.second).state_has_block()) {
+          ER_NOM("Discovered block%d at (%zu, %zu)", block->id(), abs.first,
+                 abs.second);
+        }
+
+        events::block_found op(base_foraging_controller::server(), block,
+                               abs.first, abs.second);
+        m_map->accept(op);
+      } else if (los->cell(x, y).state_has_cache()) {
+        representation::cache* cache = const_cast<representation::cache*>(los->cell(x,
+                                                                    y).cache());
+        ER_ASSERT(cache, "ERROR: NULL cache on cell that should have cache");
+        if (!m_map->access(abs.first, abs.second).state_has_cache()) {
+          ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(), abs.first,
+                 abs.second);
+        }
+
+        events::cache_found op(base_foraging_controller::server(), cache,
+                               abs.first, abs.second);
+        m_map->accept(op);
+      } else { /* must be empty if it doesn't have a block or a cache */
+        events::cell_empty op(abs.first, abs.second);
+        m_map->accept(op);
+      }
+    } /* for(y..) */
+  } /* for(x..) */
+} /* process_los() */
 
 using namespace argos;
 REGISTER_CONTROLLER(memory_foraging_controller, "memory_foraging_controller")

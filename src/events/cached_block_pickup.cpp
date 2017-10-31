@@ -39,8 +39,13 @@ NS_START(fordyca, events);
 cached_block_pickup::cached_block_pickup(
     const std::shared_ptr<rcppsw::common::er_server>& server,
     representation::cache* cache, size_t robot_index) :
-    er_client(server), m_robot_index(robot_index), m_cache(cache),
-    m_block(nullptr), m_server(server) {
+    cell_op(cache->discrete_loc().first,
+            cache->discrete_loc().second),
+    er_client(server),
+    m_robot_index(robot_index),
+    m_cache(cache),
+    m_block(nullptr),
+    m_server(server) {
   er_client::insmod("cached_block_pickup",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
@@ -61,7 +66,7 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   ER_NOM("cell2D: fb%zu block%d from cache%d @(%zu, %zu)",
          m_robot_index, m_block->id(), m_cache->id(),
-         m_cache->discrete_loc().first, m_cache->discrete_loc().second);
+         cell_op::x(), cell_op::y());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
@@ -75,6 +80,9 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
   int cache_id = m_cache->id();
   representation::discrete_coord coord = m_cache->discrete_loc();
+  ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
+                                                    cell_op::y()),
+            "FATAL: Coordinates for cache/cell do not agree");
 
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
@@ -84,26 +92,25 @@ void cached_block_pickup::visit(representation::arena_map& map) {
    */
   if (m_cache->n_blocks() > 2) {
     m_cache->block_remove(m_block);
-    map.access(m_cache->discrete_loc().first,
-               m_cache->discrete_loc().second).accept(*this);
+    map.access(cell_op::x(), cell_op::y()).accept(*this);
   } else {
-    map.access(m_cache->discrete_loc().first,
-               m_cache->discrete_loc().second).accept(*this);
+    map.access(cell_op::x(), cell_op::y()).accept(*this);
 
     map.caches().erase(std::remove(map.caches().begin(),
                                    map.caches().end(), *m_cache));
   }
-  representation::discrete_coord old_d(m_cache->discrete_loc().first,
-                                       m_cache->discrete_loc().second);
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu)", m_robot_index,
-         m_block->id(), cache_id, coord.first, coord.second);
+         m_block->id(), cache_id, cell_op::x(), cell_op::y());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
   int cache_id = m_cache->id();
   representation::discrete_coord coord = m_cache->discrete_loc();
+  ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
+                                                    cell_op::y()),
+            "FATAL: Coordinates for cache/cell do not agree");
 
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
@@ -113,11 +120,9 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
    */
   if (m_cache->n_blocks() > 2) {
     m_cache->block_remove(m_block);
-    map.access(m_cache->discrete_loc().first,
-               m_cache->discrete_loc().second).accept(*this);
+    map.access(cell_op::x(), cell_op::y()).accept(*this);
   } else {
-    map.access(m_cache->discrete_loc().first,
-               m_cache->discrete_loc().second).accept(*this);
+    map.access(cell_op::x(), cell_op::y()).accept(*this);
     auto it = map.caches().begin();
     while (it != map.caches().end()) {
       if (it->first == m_cache) {
@@ -127,10 +132,8 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
       }
     } /* while() */
   }
-  representation::discrete_coord old_d(m_cache->discrete_loc().first,
-                                       m_cache->discrete_loc().second);
   ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu)",
-         m_robot_index, m_block->id(), cache_id, coord.first, coord.second);
+         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {

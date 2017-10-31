@@ -51,8 +51,7 @@ sensor_manager::sensor_manager(
     m_light(light),
     m_ground(ground),
     m_los(),
-    m_robot_loc(),
-    m_prev_robot_loc() {}
+    m_robot_loc() {}
 
 
 /*******************************************************************************
