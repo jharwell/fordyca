@@ -70,13 +70,13 @@ argos::CVector2 block_distributor::dist_random(const representation::block& bloc
 
 argos::CVector2 block_distributor::dist_single_src(const representation::block& block) {
   /*
-   * Find the 3/4 point between the nest and the source along the Y (horizontal)
+   * Find the 3/4 point between the nest and the source along the X (horizontal)
    * direction, and put all the blocks around there.
    */
   argos::CRange<double> y_range = m_nest_y;
   argos::CRange<double> x_range = argos::CRange<double>(
-      m_arena_x.GetMax() * 0.75 - 0.5,
-      m_arena_x.GetMax() * 0.75);
+      m_arena_x.GetMax() * 0.9 - 0.5 ,
+      m_arena_x.GetMax() * 0.9);
   x_range.Set(x_range.GetMin() - block.xsize(),
               x_range.GetMax() + block.xsize());
   y_range.Set(y_range.GetMin() - block.xsize(),

@@ -40,9 +40,7 @@ class memory_foraging_controller;
 class random_foraging_controller;
 }
 namespace representation {
-class perceived_arena_map;
 class cell2D;
-class perceived_cell2D;
 class cell2D_fsm;
 class block;
 class arena_map;
@@ -70,10 +68,8 @@ class free_block_pickup : public visitor::visitor,
                           public visitor::can_visit<fsm::random_foraging_fsm>,
                           public visitor::can_visit<representation::block>,
                           public visitor::can_visit<representation::arena_map>,
-                          public visitor::can_visit<representation::perceived_arena_map>,
                           public visitor::can_visit<representation::cell2D>,
-                          public visitor::can_visit<representation::cell2D_fsm>,
-                          public visitor::can_visit<representation::perceived_cell2D> {
+                          public visitor::can_visit<representation::cell2D_fsm> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                representation::block* block, size_t robot_index);
@@ -87,17 +83,8 @@ class free_block_pickup : public visitor::visitor,
    */
   void visit(representation::arena_map& map) override;
 
-  /**
-   * @brief Handle the event of a robot picking up a block, making updates to
-   * the arena map as necessary.
-   *
-   * @param map The robot's arena map.
-   */
-  void visit(representation::perceived_arena_map& map) override;
-
   void visit(representation::cell2D& cell) override;
   void visit(representation::cell2D_fsm& fsm) override;
-  void visit(representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update a block with the knowledge that it is now carried by a robot.

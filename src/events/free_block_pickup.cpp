@@ -51,7 +51,7 @@ free_block_pickup::free_block_pickup(
  * Member Functions
  ******************************************************************************/
 void free_block_pickup::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
+  fsm.event_block_pickup();
 } /* visit() */
 
 void free_block_pickup::visit(representation::cell2D& cell) {
@@ -59,13 +59,6 @@ void free_block_pickup::visit(representation::cell2D& cell) {
   ER_NOM("cell2D: fb%zu block%d from (%zu, %zu)",
          m_robot_index, m_block->id(), m_block->discrete_loc().first,
          m_block->discrete_loc().second);
-} /* visit() */
-
-void free_block_pickup::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
-  ER_NOM("perceived_cell2D: fb%zu block%d from (%zu, %zu)",
-         m_robot_index, m_block->id(),
-         m_block->discrete_loc().first, m_block->discrete_loc().second);
 } /* visit() */
 
 void free_block_pickup::visit(representation::arena_map& map) {
@@ -81,17 +74,6 @@ void free_block_pickup::visit(representation::arena_map& map) {
          old_r.GetX(), old_r.GetY(),
          old_d.first, old_d.second);
 } /* visit() */
-
-void free_block_pickup::visit(representation::perceived_arena_map& map) {
-  ER_NOM("perceived_arena_map: fb%zu picked up block%d from (%f, %f) -> (%zu, %zu)",
-         m_robot_index,
-         m_block->id(),
-         m_block->real_loc().GetX(), m_block->real_loc().GetY(),
-         m_block->discrete_loc().first, m_block->discrete_loc().second);
-  events::cell_empty op;
-  map.access(m_block->discrete_loc().first,
-             m_block->discrete_loc().second).accept(op);
-  } /* visit() */
 
 void free_block_pickup::visit(representation::block& block) {
   block.add_carry();
@@ -112,7 +94,6 @@ void free_block_pickup::visit(controller::random_foraging_controller& controller
 } /* visit() */
 
 void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
-  controller.map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   ER_NOM("memory_foraging_controller: %s picked up block%d",

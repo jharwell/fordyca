@@ -56,6 +56,9 @@ void memory_foraging_controller::ControlStep(void) {
    * loop.
    */
   m_map->event_new_los(sensors()->los());
+  if (this->GetId() == "fb8") {
+    printf("blocks: %zu\n", m_map->blocks().size());
+  }
   m_map->update_density();
   if (m_fsm->task_finished()) {
     m_fsm->task_reset();

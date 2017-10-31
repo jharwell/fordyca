@@ -39,9 +39,9 @@ cell2D_fsm::cell2D_fsm(
     state_cache(),
     m_block_count(0) {
   /* if (ERROR == attmod("cell2D_fsm")) { */
-    /* er_client::insmod("cell2D_fsm", */
-    /*                   rcppsw::common::er_lvl::nom, */
-    /*                   rcppsw::common::er_lvl::NOM); */
+  /*   er_client::insmod("cell2D_fsm", */
+  /*                     rcppsw::common::er_lvl::NOM, */
+  /*                     rcppsw::common::er_lvl::NOM); */
   /* } */
 }
 
@@ -115,7 +115,7 @@ FSM_STATE_DEFINE_ND(cell2D_fsm, state_empty) {
 FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
   if (ST_HAS_BLOCK != last_state()) {
     m_block_count = 1;
-    ER_DIAG("Cell HAS_BLOCK.");
+    printf("Cell HAS_BLOCK.");
   }
   return state_machine::event_signal::HANDLED;
 }
