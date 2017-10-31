@@ -44,7 +44,7 @@ NS_START(events);
  ******************************************************************************/
 class cell_unknown : public cell_op {
  public:
-  cell_unknown(void) {}
+  cell_unknown(size_t x, size_t y) : cell_op(x, y) {}
 
   /**
    * @brief Update a cell with the knowledge that it is now unknown.

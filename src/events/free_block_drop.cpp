@@ -41,8 +41,11 @@ NS_START(fordyca, events);
  ******************************************************************************/
 free_block_drop::free_block_drop(
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    representation::block* block, double resolution) :
-    er_client(server), m_resolution(resolution), m_block(block), m_dloc() {
+    representation::block* block, size_t x, size_t y, double resolution) :
+    cell_op(x, y),
+    er_client(server),
+    m_resolution(resolution),
+    m_block(block) {
   er_client::insmod("free_block_drop",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
@@ -52,7 +55,6 @@ free_block_drop::free_block_drop(
  * Member Functions
  ******************************************************************************/
 void free_block_drop::visit(representation::cell2D& cell) {
-  m_dloc = cell.loc();
   cell.entity(m_block);
   m_block->accept(*this);
   cell.fsm().accept(*this);
@@ -63,8 +65,9 @@ void free_block_drop::visit(representation::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
-  block.real_loc(representation::discrete_to_real_coord(m_dloc, m_resolution));
-  block.discrete_loc(m_dloc);
+  representation::discrete_coord d(cell_op::x(),cell_op::y());
+  block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
+  block.discrete_loc(d);
 } /* visit() */
 
 NS_END(events, fordyca);

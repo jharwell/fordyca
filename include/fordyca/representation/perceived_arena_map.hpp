@@ -90,16 +90,6 @@ class perceived_arena_map: public rcppsw::common::er_client,
    */
   void update_density(void);
 
-  /**
-   * @brief Handle the event of a robot acquiring a new line-of-sight (happens
-   * every timestep).
-   *
-   * @param los The new LOS.
-   *
-   * @return Whethor or not any new blocks have been detected.
-   */
-  bool event_new_los(const line_of_sight* los);
-
  private:
   std::shared_ptr<rcppsw::common::er_server> m_server;
   grid2D<perceived_cell2D> m_grid;

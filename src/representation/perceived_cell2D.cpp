@@ -61,7 +61,7 @@ void perceived_cell2D::update_density(void) {
       ER_VER("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
              kEpsilon, m_robot_id.c_str());
     }
-    events::cell_unknown op;
+    events::cell_unknown op(m_cell.loc().first, m_cell.loc().second);
     m_cell.accept(op);
   }
 } /* update_density() */

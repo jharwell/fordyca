@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_arena_op.hpp"
+#include "fordyca/events/perceived_cell_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -41,11 +41,11 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cache_found : public perceived_arena_op,
+class cache_found : public perceived_cell_op,
                     public rcppsw::common::er_client {
  public:
   cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-              representation::cache* cache);
+              representation::cache* cache, size_t x, size_t y);
   ~cache_found(void) { er_client::rmmod(); }
 
   void visit(representation::cell2D& cell) override;

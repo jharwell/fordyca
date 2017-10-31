@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_arena_op.hpp"
+#include "fordyca/events/perceived_cell_op.hpp"
 #include "rcppsw/common/er_client.hpp"
 
 /*******************************************************************************
@@ -48,11 +48,11 @@ NS_START(events);
  * detection, or via a block appearing in a robot's LOS. These events are not
  * processed by the \ref arena_map, and exist only in a robot's perception.
  */
-class block_found : public perceived_arena_op,
+class block_found : public perceived_cell_op,
                     public rcppsw::common::er_client {
  public:
   block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-             representation::block* block);
+              representation::block* block, size_t x, size_t y);
   ~block_found(void) { er_client::rmmod(); }
 
   void visit(representation::cell2D& cell) override;

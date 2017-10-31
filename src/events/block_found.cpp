@@ -34,8 +34,10 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                       representation::block* block) :
-    er_client(server), m_block(block) {
+                         representation::block* block, size_t x, size_t y) :
+    perceived_cell_op(x, y),
+    er_client(server),
+    m_block(block) {
   er_client::insmod("block_found",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
@@ -68,9 +70,7 @@ void block_found::visit(controller::memory_foraging_controller& controller) {
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {
-  map.access(m_block->discrete_loc().first,
-             m_block->discrete_loc().second).accept(*this);
-  ER_NOM("perceived_arena_map:found block%d", m_block->id());
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -43,7 +43,7 @@ void depth1_controller::ControlStep(void) {
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  memory_foraging_controller::map()->event_new_los(
+  memory_foraging_controller::process_los(
       base_foraging_controller::sensors()->los());
   memory_foraging_controller::map()->update_density();
 } /* ControlStep() */

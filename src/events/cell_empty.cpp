@@ -25,6 +25,8 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/representation/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,5 +48,14 @@ void cell_empty::visit(representation::cell2D& cell) {
 void cell_empty::visit(representation::cell2D_fsm& fsm) {
   fsm.event_empty();
 } /* visit() */
+
+void cell_empty::visit(representation::arena_map& map) {
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
+} /* visit() */
+
+void cell_empty::visit(representation::perceived_arena_map& map) {
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
+} /* visit() */
+
 
 NS_END(events, fordyca);
