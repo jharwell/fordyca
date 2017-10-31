@@ -52,7 +52,11 @@ void block_found::visit(representation::perceived_cell2D& cell) {
 
 void block_found::visit(representation::cell2D& cell) {
   cell.entity(m_block);
-  cell.fsm().accept(*this);
+  ER_ASSERT(!cell.fsm().state_has_cache(),
+            "FATAL: block found on cell that has a cache");
+  if (!cell.fsm().state_has_block()) {
+    cell.fsm().accept(*this);
+  }
 } /* visit() */
 
 void block_found::visit(representation::cell2D_fsm& fsm) {
@@ -61,13 +65,12 @@ void block_found::visit(representation::cell2D_fsm& fsm) {
 
 void block_found::visit(controller::memory_foraging_controller& controller) {
   controller.map()->accept(*this);
-  ER_NOM("memory_foraging_controller: %s found block%d",
-         controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {
   map.access(m_block->discrete_loc().first,
              m_block->discrete_loc().second).accept(*this);
+  ER_NOM("perceived_arena_map:found block%d", m_block->id());
 } /* visit() */
 
 NS_END(events, fordyca);

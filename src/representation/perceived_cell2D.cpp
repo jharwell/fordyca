@@ -44,7 +44,7 @@ perceived_cell2D::perceived_cell2D(
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
            rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::NOM);
+           rcppsw::common::er_lvl::VER);
   }
     }
 
@@ -55,10 +55,10 @@ void perceived_cell2D::update_density(void) {
   m_density.calc();
   if (m_density.last_result() < kEpsilon) {
     if (m_cell.state_has_block()) {
-      ER_NOM("Relevance of block%d is within %f of 0 for %s", block()->id(),
+      ER_VER("Relevance of block%d is within %f of 0 for %s", block()->id(),
              kEpsilon, m_robot_id.c_str());
     } else if (m_cell.state_has_cache()) {
-      ER_NOM("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
+      ER_VER("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
              kEpsilon, m_robot_id.c_str());
     }
     events::cell_unknown op;
