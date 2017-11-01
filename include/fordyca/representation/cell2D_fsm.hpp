@@ -56,10 +56,10 @@ class cell2D_fsm : public state_machine::simple_fsm,
   explicit cell2D_fsm(
       const std::shared_ptr<rcppsw::common::er_server>& server);
   virtual ~cell2D_fsm(void) {}
-  bool state_is_known(void) { return current_state() != ST_UNKNOWN; }
-  bool state_has_block(void) { return current_state() == ST_HAS_BLOCK; }
-  bool state_has_cache(void) { return current_state() == ST_HAS_CACHE; }
-  bool state_is_empty(void) { return current_state() == ST_EMPTY; }
+  bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
+  bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
+  bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
+  bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
 
   /* events */
   void event_unknown(void);
