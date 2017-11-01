@@ -155,6 +155,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a  free block */
     ST_ACQUIRE_CACHED_BLOCK,  /* superstate for finding a cached block */
     ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_COLLISION_AVOIDANCE,
     ST_FINISHED,
     ST_MAX_STATES,
   };
@@ -163,7 +164,9 @@ class block_to_nest_fsm : public base_foraging_fsm,
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
                      state_machine::event_data);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /* memory foraging states */
   HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);

@@ -40,6 +40,8 @@ block_to_cache_fsm::block_to_cache_fsm(
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+    HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
+    entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
@@ -49,14 +51,22 @@ block_to_cache_fsm::block_to_cache_fsm(
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
       HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                  &entry_collision_avoidance, NULL),
       HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
-  if (data) {
-    ER_ASSERT(controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal(),
-              "FATAL: Unhandled signal type");
-        internal_event(ST_ACQUIRE_FREE_BLOCK);
+  if (state_machine::event_type::NORMAL == data->type()) {
+    if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
+      internal_event(ST_ACQUIRE_FREE_BLOCK);
+    }
+  } else if (state_machine::event_type::CHILD == data->type()) {
+    if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+      internal_event(ST_COLLISION_AVOIDANCE);
+      return controller::foraging_signal::HANDLED;
+    }
   }
+  ER_ASSERT(0, "FATAL: Unhandled signal type");
   return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::event_data) {

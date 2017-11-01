@@ -54,7 +54,8 @@ class foraging_signal : public state_machine::event_signal {
     ARRIVED_IN_NEST,      /// A robot has arrived in the nest
     LEFT_NEST,            /// A robot has left the nest
     ACQUIRE_FREE_BLOCK,   /// Direct a robot to acquire a free block in the arena
-    ACQUIRE_CACHED_BLOCK   /// Directa a robot to acquire a block from a cache.
+    ACQUIRE_CACHED_BLOCK,  /// Directa a robot to acquire a block from a cache.
+    COLLISION_IMMINENT
   };
 };
 
