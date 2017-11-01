@@ -40,7 +40,7 @@ memory_foraging_fsm::memory_foraging_fsm(
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(leaving_nest, &start),
     entry_leaving_nest(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
@@ -75,7 +75,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
   ER_ASSERT(0, "FATAL: Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
+  HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
   /* first time running FSM; transitioned from START state */

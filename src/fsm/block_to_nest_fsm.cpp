@@ -40,8 +40,10 @@ block_to_nest_fsm::block_to_nest_fsm(
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(return_to_nest, &start),
+    HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
     entry_return_to_nest(),
+    entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
@@ -53,9 +55,9 @@ block_to_nest_fsm::block_to_nest_fsm(
         HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
                                     &entry_return_to_nest, NULL),
-        HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  hfsm::change_parent(ST_RETURN_TO_NEST, &start);
-    }
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                  &entry_collision_avoidance, NULL),
+      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {
@@ -69,6 +71,9 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
   } else if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_FINISHED);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+      internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
   }

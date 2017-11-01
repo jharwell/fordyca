@@ -40,10 +40,12 @@ random_foraging_fsm::random_foraging_fsm(
     std::shared_ptr<controller::sensor_manager> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(return_to_nest, &start),
     HFSM_CONSTRUCT_STATE(leaving_nest, &start),
+    HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
     entry_return_to_nest(),
     entry_leaving_nest(),
+    entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
     m_rng(argos::CRandom::CreateRNG("argos")),
@@ -54,12 +56,12 @@ random_foraging_fsm::random_foraging_fsm(
       HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
                                   &entry_return_to_nest, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
-                                  &entry_leaving_nest, NULL)} {
+                                  &entry_leaving_nest, NULL),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
+                                  &entry_collision_avoidance, NULL)} {
   er_client::insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
-  hfsm::change_parent(ST_RETURN_TO_NEST, &start);
-  hfsm::change_parent(ST_LEAVING_NEST, &start);
   m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
 }
 
@@ -80,6 +82,9 @@ HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_LEAVING_NEST);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+      internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
   }

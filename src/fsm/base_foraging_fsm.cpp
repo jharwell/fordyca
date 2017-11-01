@@ -118,6 +118,13 @@ HFSM_STATE_DEFINE(base_foraging_fsm, return_to_nest, state_machine::event_data) 
   }
   argos::CVector2 vector;
 
+  /*
+   * Check for nearby obstacles, and if so go into obstacle avoidance.
+   */
+  if (base_foraging_fsm::sensors()->calc_diffusion_vector(NULL)) {
+    return controller::foraging_signal::COLLISION_IMMINENT;
+  }
+
   /* ignore all obstacles for now... */
   m_sensors->calc_diffusion_vector(&vector);
   m_actuators->set_heading(m_actuators->max_wheel_speed() *

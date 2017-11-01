@@ -99,6 +99,7 @@ class random_foraging_fsm : public base_foraging_fsm,
     ST_ACQUIRE_BLOCK,
     ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
   };
 
@@ -107,9 +108,11 @@ class random_foraging_fsm : public base_foraging_fsm,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
 
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /* random foraging fsm states */
   HFSM_STATE_DECLARE(random_foraging_fsm, start, state_machine::event_data);

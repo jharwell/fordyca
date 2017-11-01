@@ -86,8 +86,9 @@ HFSM_STATE_DEFINE_ND(explore_fsm, explore) {
   explore_time_inc();
 
   /*
-   * Check for nearby obstacles, and if so go into obstacle avoidance. Time spent
-   * in collision avoidance still counts towards the direction change threshold.
+   * Check for nearby obstacles, and if so go into obstacle avoidance. Time
+   * spent in collision avoidance still counts towards the direction change
+   * threshold.
    */
   if (base_foraging_fsm::sensors()->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);

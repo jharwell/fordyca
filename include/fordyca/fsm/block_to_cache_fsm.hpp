@@ -136,12 +136,17 @@ class block_to_cache_fsm : public base_foraging_fsm,
     ST_START,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a free block */
     ST_TRANSPORT_TO_CACHE,    /* Block found--bring it back to a cache */
+    ST_COLLISION_AVOIDANCE,
     ST_FINISHED,
     ST_MAX_STATES,
   };
 
  private:
-  /* memory foraging states */
+  /* inherited states */
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
+
+  /* block to cache states */
   HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(block_to_cache_fsm, acquire_free_block,
                      state_machine::event_data);

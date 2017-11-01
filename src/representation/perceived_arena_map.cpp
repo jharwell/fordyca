@@ -22,11 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
