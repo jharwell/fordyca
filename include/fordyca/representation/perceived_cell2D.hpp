@@ -28,6 +28,7 @@
 #include <string>
 
 #include "rcppsw/swarm/pheromone_density.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
@@ -35,6 +36,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+namespace decorator = rcppsw::patterns::decorator;
 
 /*******************************************************************************
  * Class Definitions
@@ -44,7 +46,8 @@ NS_START(fordyca, representation);
  * is disabled, so you can't use any of the standard event reporting macros
  * without modifying \ref grid2D.
  */
-class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
+class perceived_cell2D : public decorator::decorator<cell2D>,
+                         public visitor::visitable<perceived_cell2D>,
                          public rcppsw::common::er_client {
  public:
   explicit perceived_cell2D(
@@ -67,10 +70,10 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   double density(void) const { return m_density.last_result(); }
 
-  bool state_is_known(void) { return m_cell.state_is_known(); }
-  bool state_has_block(void) { return m_cell.state_has_block(); }
-  bool state_has_cache(void) { return m_cell.state_has_cache(); }
-  bool state_is_empty(void) { return m_cell.state_is_empty(); }
+  bool state_is_known(void) const { return decorator::decoratee().state_is_known(); }
+  bool state_has_block(void) const { return decorator::decoratee().state_has_block(); }
+  bool state_has_cache(void) const { return decorator::decoratee().state_has_cache(); }
+  bool state_is_empty(void) const { return decorator::decoratee().state_is_empty(); }
 
   /**
    * @brief Get the block current associated with this cell. NULL if no block
@@ -78,9 +81,9 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    *
    * @return The associated block.
    */
-  const representation::block* block(void) const { return m_cell.block(); }
+  const representation::block* block(void) const { return decorator::decoratee().block(); }
 
-  const representation::cache* cache(void) const { return m_cell.cache(); }
+  const representation::cache* cache(void) const { return decorator::decoratee().cache(); }
 
   /**
    * @brief Update the information relevance/pheromone density associated with
@@ -99,7 +102,7 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   void add_pheromone(double amount) { m_density.add_pheromone(amount); }
 
-  cell2D& cell(void) { return m_cell; }
+  cell2D& cell(void) { return decorator::decoratee(); }
 
   double epsilon(void) const { return kEpsilon; }
 
@@ -112,7 +115,6 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
 
   std::string m_robot_id;  /// For debugging purposes only
   rcppsw::swarm::pheromone_density m_density;
-  cell2D m_cell;
 };
 
 NS_END(representation, fordyca);

@@ -53,22 +53,22 @@ class cell2D : public visitor::visitable<cell2D> {
   /**
    * @brief If TRUE, the state is currently KNOWN.
    */
-  bool state_is_known(void) { return m_fsm.state_is_known(); }
+  bool state_is_known(void) const { return m_fsm.state_is_known(); }
 
   /**
    * @brief If TRUE, the state is currently known to contain a block.
    */
-  bool state_has_block(void) { return m_fsm.state_has_block(); }
+  bool state_has_block(void) const { return m_fsm.state_has_block(); }
 
   /**
    * @brief If TRUE, the state is currently known to contain a cache.
    */
-  bool state_has_cache(void) { return m_fsm.state_has_cache(); }
+  bool state_has_cache(void) const { return m_fsm.state_has_cache(); }
 
   /**
    * @brief If TRUE, the state is currently known to be empty.
    */
-  bool state_is_empty(void) { return m_fsm.state_is_empty(); }
+  bool state_is_empty(void) const { return m_fsm.state_is_empty(); }
 
   /**
    * @brief Reset the cell to its UNKNOWN state.

@@ -39,8 +39,10 @@ const double perceived_cell2D::kEpsilon = 0.0001;
  ******************************************************************************/
 perceived_cell2D::perceived_cell2D(
     const std::shared_ptr<rcppsw::common::er_server>& server) :
-    er_client(server), m_robot_id(), m_density(),
-    m_cell(server) {
+    decorator(server),
+    er_client(server),
+    m_robot_id(),
+    m_density() {
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
            rcppsw::common::er_lvl::DIAG,
@@ -54,15 +56,16 @@ perceived_cell2D::perceived_cell2D(
 void perceived_cell2D::update_density(void) {
   m_density.calc();
   if (m_density.last_result() < kEpsilon) {
-    if (m_cell.state_has_block()) {
+    if (decorator::decoratee().state_has_block()) {
       ER_VER("Relevance of block%d is within %f of 0 for %s", block()->id(),
              kEpsilon, m_robot_id.c_str());
-    } else if (m_cell.state_has_cache()) {
+    } else if (decorator::decoratee().state_has_cache()) {
       ER_VER("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
              kEpsilon, m_robot_id.c_str());
     }
-    events::cell_unknown op(m_cell.loc().first, m_cell.loc().second);
-    m_cell.accept(op);
+    events::cell_unknown op(decorator::decoratee().loc().first,
+                            decorator::decoratee().loc().second);
+    decorator::decoratee().accept(op);
   }
 } /* update_density() */
 
