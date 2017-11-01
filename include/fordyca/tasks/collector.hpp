@@ -43,8 +43,8 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class collector : public task_allocation::polled_task {
  public:
-  collector(double alpha, std::unique_ptr<task_allocation::taskable>& taskable) :
-      polled_task("collector", alpha, taskable) {}
+  collector(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
+      polled_task("collector", alpha, mechanism) {}
 
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);

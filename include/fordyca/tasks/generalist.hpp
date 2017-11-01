@@ -48,8 +48,8 @@ class generalist : public task_allocation::partitionable_polled_task<
   task_allocation::polled_task> {
  public:
   generalist(const struct task_allocation::task_params * const params,
-             std::unique_ptr<task_allocation::taskable>& taskable) :
-      partitionable_polled_task("generalist", params, taskable) {}
+             std::unique_ptr<task_allocation::taskable>& mechanism) :
+      partitionable_polled_task("generalist", params, mechanism) {}
   logical_task* partition(void) override { return partitionable_task::partition(); }
 };
 

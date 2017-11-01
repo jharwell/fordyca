@@ -42,8 +42,8 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class forager : public task_allocation::polled_task {
  public:
-  forager(double alpha, std::unique_ptr<task_allocation::taskable>& taskable) :
-      polled_task("forager", alpha, taskable) {}
+  forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
+      polled_task("forager", alpha, mechanism) {}
 
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
