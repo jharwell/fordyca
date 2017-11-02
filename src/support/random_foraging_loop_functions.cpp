@@ -83,7 +83,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   const struct params::arena_map_params * arena_params =
       static_cast<const struct params::arena_map_params*>(
           m_repo->get_params("arena_map"));
-  m_map.reset(new representation::arena_map(arena_params, m_nest_x, m_nest_y));
+  m_map.reset(new representation::arena_map(arena_params));
   m_map->distribute_blocks(true);
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     m_map->blocks()[i].display_id(l_params->display_block_id);

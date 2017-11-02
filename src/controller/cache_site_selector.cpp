@@ -1,5 +1,5 @@
 /**
- * @file arena_map_params.hpp
+ * @file cache_site_selector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,38 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/block_params.hpp"
-#include "fordyca/params/cache_params.hpp"
-#include "fordyca/params/grid_params.hpp"
+#include "fordyca/controller/cache_site_selector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-struct arena_map_params : public rcppsw::common::base_params {
-  arena_map_params(void) : grid(), block(), cache(), nest_center(), nest_xsize(),
-                           nest_ysize() {}
+cache_site_selector::cache_site_selector(
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    argos::CVector2 nest_loc) :
+    er_client(server),
+    m_nest_loc(nest_loc) {
+  er_client::insmod("cache_site_selector",
+                    rcppsw::common::er_lvl::DIAG,
+                    rcppsw::common::er_lvl::NOM);
+}
 
-  struct grid_params grid;
-  struct block_params block;
-  struct cache_params cache;
-  argos::CVector2 nest_center;
-  argos::CRange<double> nest_xsize;
-  argos::CRange<double> nest_ysize;
-};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+argos::CVector2 cache_site_selector::calc_best(
+    const std::list<representation::perceived_cache>,
+    argos::CVector2 robot_loc) {
 
-NS_END(params, fordyca);
+  argos::CVector2 site((robot_loc.GetX() - m_nest_loc.GetX()) / 2.0,
+                       m_nest_loc.GetY());
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_MAP_PARAMS_HPP_ */
+  ER_NOM("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
+  return site;
+} /* calc_best() */
+
+NS_END(controller, fordyca);

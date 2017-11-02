@@ -72,6 +72,8 @@ class block_distributor {
    */
   bool respawn_enabled(void) const { return m_respawn; }
 
+  argos::CRange<double> single_src_xrange(void);
+
  private:
   /**
    * @brief Distribute a block randomly in the arena (excluding nest extent)

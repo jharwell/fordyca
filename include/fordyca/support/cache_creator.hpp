@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include <utility>
+#include <argos/core/utility/math/vector2.h>
 
 #include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/block.hpp"
@@ -47,25 +47,26 @@ class cache_creator : public rcppsw::common::er_client {
  public:
   cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
                 representation::grid2D<representation::cell2D>& grid,
-                std::vector<representation::block>& blocks,
-                double min_dist, double cache_size, double resolution);
+                double cache_size, double resolution);
 
   /**
-   * @brief Scan the entire list of blocks currently in the arena, and create
-   * caches from all blocks that are close enough together.
+   * @brief Scan the entire vector of blocks currently in the arena, and create
+   * caches from some/all blocks.
    *
-   * @return The list of current caches.
+   * @return A vector of created caches.
    */
-  std::vector<representation::cache> create_all(void);
+  virtual std::vector<representation::cache> create_all(
+      std::vector<representation::block>& blocks) = 0;
+
+ protected:
+  representation::grid2D<representation::cell2D>& grid(void) const { return m_grid; }
+  rcppsw::common::er_server* server(void) const { return m_server.get(); }
+  representation::cache create_single(std::list<representation::block*> blocks,
+                                      const argos::CVector2& center);
 
  private:
-  representation::cache create_single(std::list<representation::block*> blocks);
-  argos::CVector2 calc_center(std::list<representation::block*> blocks);
-
-  double m_min_dist;
   double m_cache_size;
   double m_resolution;
-  std::vector<representation::block>& m_blocks;
   representation::grid2D<representation::cell2D>& m_grid;
   std::shared_ptr<rcppsw::common::er_server> m_server;
 };

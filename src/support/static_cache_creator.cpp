@@ -1,5 +1,5 @@
 /**
- * @file cache_creator.cpp
+ * @file static_cache_creator.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/cache_creator.hpp"
+#include "fordyca/support/static_cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 
@@ -33,15 +33,14 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
-                             representation::grid2D<representation::cell2D>& grid,
-                             double cache_size, double resolution) :
-    er_client(server),
-    m_cache_size(cache_size),
-    m_resolution(resolution),
-    m_grid(grid),
-    m_server(server) {
-  er_client::insmod("cache_creator",
+static_cache_creator::static_cache_creator(
+    std::shared_ptr<rcppsw::common::er_server> server,
+    representation::grid2D<representation::cell2D>& grid,
+    const argos::CVector2& center,
+    double cache_size, double resolution) :
+    cache_creator(server, grid, cache_size, resolution),
+    m_center(center) {
+  er_client::insmod("static_cache_creator",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
     }
@@ -49,31 +48,21 @@ cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::cache cache_creator::create_single(
-    std::list<representation::block*> blocks,
-    const argos::CVector2& center) {
+std::vector<representation::cache> static_cache_creator::create_all(
+    std::vector<representation::block>& blocks) {
+  std::vector<representation::cache> caches;
 
-  /*
-   * The cells for all blocks that will comprise the cache should be emptied,
-   * and all blocks be deposited in a single cell.
-   */
-  for (auto block : blocks) {
-    events::cell_empty op(block->discrete_loc().first,
-                          block->discrete_loc().second);
-    m_grid.access(op.x(), op.y()).accept(op);
-  } /* for(block..) */
+  ER_ASSERT(blocks.size() >= 2,
+            "FATAL: Cannot create static cache from <= 2 blocks");
+  ER_NOM("Creating static cache @(%f, %f) from %zu free blocks", m_center.GetX(),
+         m_center.GetY(), blocks.size());
+  std::list<representation::block*> starter_blocks;
+  for (auto b : blocks) {
+  starter_blocks.push_back(&b);
+  } /* for(i..) */
 
-  for (auto block : blocks) {
-    events::free_block_drop op(m_server, block,
-                               static_cast<size_t>(std::ceil(center.GetX()/ m_resolution)),
-                               static_cast<size_t>(std::ceil(center.GetY()/ m_resolution)),
-                               m_resolution);
-    m_grid.access(op.x(), op.y()).accept(op);
-  } /* for(block..) */
-  ER_NOM("Create cache at (%f, %f) with  %zu blocks",
-         center.GetX(), center.GetY(), blocks.size());
-
-  return representation::cache(m_cache_size, center, blocks);
-} /* create_single() */
+  caches.push_back(cache_creator::create_single(starter_blocks, m_center));
+  return caches;
+} /* create() */
 
 NS_END(support, fordyca);

@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
-#include "fordyca/expressions/expressions.hpp"
+#include "fordyca/expressions/block_utility.hpp"
 
 /*******************************************************************************
  * Namespaces

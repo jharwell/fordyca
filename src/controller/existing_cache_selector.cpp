@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/existing_cache_selector.hpp"
-#include "fordyca/expressions/expressions.hpp"
+#include "fordyca/expressions/existing_cache_utility.hpp"
 
 /*******************************************************************************
  * Namespaces

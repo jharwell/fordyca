@@ -54,9 +54,7 @@ NS_START(representation);
 class arena_map: public rcppsw::common::er_client,
                  public rcppsw::patterns::visitor::visitable<arena_map> {
  public:
-  arena_map(const struct params::arena_map_params* params,
-            argos::CRange<argos::Real> nest_x,
-            argos::CRange<argos::Real> nest_y);
+  arena_map(const struct params::arena_map_params* params);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -149,6 +147,7 @@ class arena_map: public rcppsw::common::er_client,
 
  private:
   const struct params::cache_params mc_cache_params;
+  const argos::CVector2 mc_nest_center;
   std::vector<block> m_blocks;
   std::vector<cache> m_caches;
   support::block_distributor m_block_distributor;
