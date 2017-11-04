@@ -1,5 +1,5 @@
 /**
- * @file static_cache_creator.hpp
+ * @file occupancy_grid.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,42 +18,26 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_STATIC_CACHE_CREATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_STATIC_CACHE_CREATOR_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/cache_creator.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, representation);
+class cell2D;
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-class static_cache_creator : public cache_creator {
- public:
-  static_cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
-                       representation::occupancy_grid& grid,
-                       const argos::CVector2& center,
-                       double cache_size, double resolution);
+typedef rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::common::er_server>&> occupancy_grid;
 
-  /**
-   * @brief Scan the entire list of blocks currently in the arena, and create
-   * caches from all blocks that are close enough together.
-   *
-   * @return The list of current caches.
-   */
-  std::vector<representation::cache> create_all(
-    std::vector<representation::block>& blocks) override;
+NS_END(representation, fordyca);
 
- private:
-  argos::CVector2 m_center;
-};
-
-NS_END(support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_STATIC_CACHE_CREATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_ */

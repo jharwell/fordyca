@@ -27,7 +27,7 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "fordyca/representation/grid2D.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,8 @@ class cell2D;
  */
 class line_of_sight {
  public:
-line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
+  line_of_sight(const rcppsw::ds::grid_view<cell2D*> view,
+                discrete_coord center) :
       m_center(center), m_view(view) {}
 
   std::list<const representation::block*> blocks(void) const;
@@ -117,7 +118,7 @@ line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
 
  private:
   discrete_coord m_center;
-  grid_view<cell2D*> m_view;
+  rcppsw::ds::grid_view<cell2D*> m_view;
 };
 
 NS_END(representation, fordyca);

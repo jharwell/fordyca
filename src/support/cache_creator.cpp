@@ -24,6 +24,7 @@
 #include "fordyca/support/cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +35,7 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
-                             representation::grid2D<representation::cell2D>& grid,
+                             representation::occupancy_grid& grid,
                              double cache_size, double resolution) :
     er_client(server),
     m_cache_size(cache_size),

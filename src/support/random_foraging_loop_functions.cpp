@@ -31,6 +31,7 @@
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/logging_params.hpp"
 #include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
