@@ -28,11 +28,11 @@
 
 #include "rcppsw/common/er_client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/grid2D.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "fordyca/params/cache_params.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,6 +42,8 @@ NS_START(fordyca);
 namespace params { struct arena_map_params; }
 
 NS_START(representation);
+
+class cell2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -88,10 +90,6 @@ class arena_map: public rcppsw::common::er_client,
   void static_cache_create(void);
 
   bool has_static_cache(void) const { return mc_cache_params.create_static_cache; }
-  /*
-   * @todo: Add a consolidate_blocks() function for optionally running after every block
-   * spawning to combine blocks that are close together into caches
-   */
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -143,8 +141,8 @@ class arena_map: public rcppsw::common::er_client,
    *
    * @return The subgrid.
    */
-  grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
-    return m_grid.subgrid(x, y, radius);
+  rcppsw::ds::grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
+    return m_grid.subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
 
@@ -155,7 +153,7 @@ class arena_map: public rcppsw::common::er_client,
   std::vector<cache> m_caches;
   support::block_distributor m_block_distributor;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  grid2D<cell2D> m_grid;
+  occupancy_grid m_grid;
 };
 
 NS_END(representation, fordyca);

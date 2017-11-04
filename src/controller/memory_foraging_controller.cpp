@@ -30,6 +30,7 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces

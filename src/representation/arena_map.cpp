@@ -25,8 +25,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/support/static_cache_creator.hpp"
-#include "fordyca/support/dynamic_cache_creator.hpp"
 #include "fordyca/support/cache_update_handler.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,8 @@ arena_map::arena_map(const struct params::arena_map_params* params) :
                         params->nest_x, params->nest_y,
                         &params->block),
     m_server(rcppsw::common::g_server),
-    m_grid(&params->grid, m_server) {
+    m_grid(params->grid.resolution, params->grid.upper.GetX(),
+           params->grid.upper.GetY(), m_server) {
   deferred_init(m_server);
   insmod("arena_map",
          rcppsw::common::er_lvl::DIAG,

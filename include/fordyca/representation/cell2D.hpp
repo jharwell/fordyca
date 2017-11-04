@@ -3,7 +3,7 @@
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
-nnnnnnn * This file is part of FORDYCA.
+ * This file is part of FORDYCA.
  *
  * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -45,8 +45,7 @@ NS_START(fordyca, representation);
  */
 class cell2D : public visitor::visitable<cell2D> {
  public:
-  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server =
-      rcppsw::common::g_server);
+  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server);
 
   /* state inquiry */
 

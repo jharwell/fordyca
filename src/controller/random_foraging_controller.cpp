@@ -27,6 +27,7 @@
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "rcppsw/common/er_server.hpp"
 
 /*******************************************************************************
  * Namespaces
