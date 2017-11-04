@@ -24,6 +24,7 @@
 #include "fordyca/controller/depth1_controller.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/params/task_repository.hpp"
+#include "fordyca/params/memory_foraging_repository.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -46,11 +47,14 @@ void depth1_controller::ControlStep(void) {
   memory_foraging_controller::process_los(
       base_foraging_controller::sensors()->los());
   memory_foraging_controller::map()->update_density();
+
+  m_executive->run();
+  m_executive->current_task()->update_exec_time(m_executive->current_task()->exec_time() + 1);
 } /* ControlStep() */
 
 void depth1_controller::Init(argos::TConfigurationNode& node) {
   params::task_repository task_repo;
-  params::task_repository fsm_repo;
+  params::memory_foraging_repository fsm_repo;
 
   memory_foraging_controller::Init(node);
   task_repo.parse_all(node);
@@ -91,8 +95,12 @@ void depth1_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::sensors(),
           base_foraging_controller::actuators(),
           memory_foraging_controller::map_ref());
-  m_generalist.reset(new tasks::generalist(p, collector_fsm));
-
+  m_generalist.reset(new tasks::generalist(p, generalist_fsm));
+  m_generalist->partition1(m_forager.get());
+  m_generalist->partition2(m_collector.get());
+  m_generalist->parent(m_generalist.get());
+  m_executive.reset(new task_allocation::polled_executive(base_foraging_controller::server(),
+                                                          m_generalist.get()));
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 

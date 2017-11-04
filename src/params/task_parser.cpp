@@ -40,12 +40,14 @@ void task_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(task_node, "estimation_alpha",
                           m_params->estimation_alpha);
   argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
+  argos::GetNodeAttribute(task_node, "abort_offset", m_params->abort_offset);
 } /* parse() */
 
 void task_parser::show(std::ostream& stream) {
   stream << "====================\nTASK params\n====================\n";
   stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
   stream << "reactivity=" << m_params->reactivity << std::endl;
+  stream << "abort_offset=" << m_params->abort_offset << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

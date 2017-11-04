@@ -47,6 +47,7 @@ class forager : public task_allocation::polled_task {
 
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
 };
 
 NS_END(tasks, fordyca);

@@ -78,6 +78,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_execute(void) override;
+  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return ST_ACQUIRE_CACHE == current_state(); }
   void task_reset(void) override { init(); }
