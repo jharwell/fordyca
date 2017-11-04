@@ -34,12 +34,9 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void loop_functions_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct loop_functions_params);
-  ticpp::Node *arena = node.NextSibling("arena");
   std::vector<std::string> res, res2;
 
   rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(arena->ToElement()->GetAttribute("size"));
-
   res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
   res2 = parser.parse(node.FirstChildElement("nest")->GetAttribute("size"));
 

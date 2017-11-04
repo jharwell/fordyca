@@ -52,9 +52,7 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public rcppsw::patterns::visitor::visitable<cache> {
  public:
-  cache(double dimension, argos::CVector2 center, std::list<block*> blocks) :
-      cell_entity(dimension, dimension, argos::CColor::BLUE),
-      m_blocks(blocks) { real_loc(center); }
+  cache(double dimension, argos::CVector2 center, std::list<block*> blocks);
 
   __pure bool contains_block(const block* const block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
@@ -72,6 +70,7 @@ class cache : public cell_entity,
   }
 
  private:
+  static int m_next_id;
   std::list<block*> m_blocks;
 };
 

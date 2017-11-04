@@ -34,7 +34,7 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                         representation::block* block, size_t x, size_t y) :
+                         const representation::block* block, size_t x, size_t y) :
     perceived_cell_op(x, y),
     er_client(server),
     m_block(block) {
@@ -53,7 +53,7 @@ void block_found::visit(representation::perceived_cell2D& cell) {
 } /* visit() */
 
 void block_found::visit(representation::cell2D& cell) {
-  cell.entity(m_block);
+  cell.entity(const_cast<representation::block*>(m_block));
   ER_ASSERT(!cell.fsm().state_has_cache(),
             "FATAL: block found on cell that has a cache");
   if (!cell.fsm().state_has_block()) {

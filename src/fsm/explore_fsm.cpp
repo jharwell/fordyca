@@ -76,10 +76,10 @@ HFSM_STATE_DEFINE_ND(explore_fsm, explore) {
     ER_DIAG("Executing ST_EXPLORE");
   }
   if (base_foraging_fsm::sensors()->block_detected()) {
-    ER_NOM("Block detected");
+    ER_DIAG("Block detected");
     return controller::foraging_signal::BLOCK_LOCATED;
   } else if (base_foraging_fsm::sensors()->cache_detected()) {
-    ER_NOM("Cache detected");
+    ER_DIAG("Cache detected");
     return controller::foraging_signal::CACHE_LOCATED;
   }
 

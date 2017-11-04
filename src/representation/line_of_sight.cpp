@@ -32,7 +32,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const representation::block*> line_of_sight::blocks(void) {
+std::list<const representation::block*> line_of_sight::blocks(void) const {
   std::list<const representation::block*> blocks;
   for (auto i = m_view.origin();
        i < m_view.origin() + m_view.num_elements(); ++i) {
@@ -43,7 +43,7 @@ std::list<const representation::block*> line_of_sight::blocks(void) {
   return blocks;
 } /* blocks() */
 
-std::list<const representation::cache*> line_of_sight::caches(void) {
+std::list<const representation::cache*> line_of_sight::caches(void) const {
   std::list<const representation::cache*> caches;
   for (auto i = m_view.origin();
        i < m_view.origin() + m_view.num_elements(); ++i) {

@@ -65,15 +65,17 @@ representation::cache cache_creator::create_single(
 
   for (auto block : blocks) {
     events::free_block_drop op(m_server, block,
-                               static_cast<size_t>(std::ceil(center.GetX()/ m_resolution)),
-                               static_cast<size_t>(std::ceil(center.GetY()/ m_resolution)),
+                               static_cast<size_t>(center.GetX()/ m_resolution),
+                               static_cast<size_t>(center.GetY()/ m_resolution),
                                m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",
          center.GetX(), center.GetY(), blocks.size());
 
-  return representation::cache(m_cache_size, center, blocks);
+  representation::cache c(m_cache_size, center, blocks);
+  c.discrete_loc(representation::real_to_discrete_coord(center, m_resolution));
+  return c;
 } /* create_single() */
 
 NS_END(support, fordyca);

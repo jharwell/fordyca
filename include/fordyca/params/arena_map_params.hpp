@@ -39,15 +39,16 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct arena_map_params : public rcppsw::common::base_params {
-  arena_map_params(void) : grid(), block(), cache(), nest_center(), nest_xsize(),
-                           nest_ysize() {}
+  arena_map_params(void) : grid(), block(), cache(), nest_center(), nest_x(),
+                           nest_y() {}
 
   struct grid_params grid;
   struct block_params block;
+
   struct cache_params cache;
   argos::CVector2 nest_center;
-  argos::CRange<double> nest_xsize;
-  argos::CRange<double> nest_ysize;
+  argos::CRange<double> nest_x;
+  argos::CRange<double> nest_y;
 };
 
 NS_END(params, fordyca);

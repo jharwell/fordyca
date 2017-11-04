@@ -93,11 +93,18 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   if (m_cache->n_blocks() > 2) {
     m_cache->block_remove(m_block);
     map.access(cell_op::x(), cell_op::y()).accept(*this);
+    ER_ASSERT(map.access(cell_op::x(), cell_op::y()).state_has_cache(),
+              "FATAL: cell with >= 2 blocks does not have cache");
   } else {
     map.access(cell_op::x(), cell_op::y()).accept(*this);
+    ER_ASSERT(map.access(cell_op::x(), cell_op::y()).state_has_block(),
+              "FATAL: cell with 1 block has cache");
 
     map.caches().erase(std::remove(map.caches().begin(),
                                    map.caches().end(), *m_cache));
+  }
+  if (map.has_static_cache() && 0 == map.caches().size()) {
+    map.static_cache_create();
   }
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu)", m_robot_index,

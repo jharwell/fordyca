@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/arena_map_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,6 +40,19 @@ void arena_map_parser::parse(argos::TConfigurationNode& node) {
   m_params->grid = *m_grid_parser.get_results();
   m_params->block = *m_block_parser.get_results();
   m_params->cache = *m_cache_parser.get_results();
+
+  std::vector<std::string> res, res2;
+  rcppsw::utils::line_parser parser(' ');
+
+  res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
+  res2 = parser.parse(node.FirstChildElement("nest")->GetAttribute("size"));
+
+  m_params->nest_center = argos::CVector2(std::atof(res[0].c_str()),
+                                          std::atof(res[1].c_str()));
+  m_params->nest_x.Set(std::atof(res[0].c_str()) - std::atof(res2[0].c_str()),
+                       std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
+  m_params->nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
+                       std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) {
@@ -46,6 +60,9 @@ void arena_map_parser::show(std::ostream& stream) {
   m_grid_parser.show(stream);
   m_block_parser.show(stream);
   m_cache_parser.show(stream);
+  stream << "nest_x=" << m_params->nest_x << std:: endl;
+  stream << "nest_y=" << m_params->nest_y << std:: endl;
+  stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

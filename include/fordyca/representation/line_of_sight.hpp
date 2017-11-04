@@ -61,8 +61,8 @@ class line_of_sight {
 line_of_sight(const grid_view<cell2D*> view, discrete_coord center) :
       m_center(center), m_view(view) {}
 
-  std::list<const representation::block*> blocks(void);
-  std::list<const representation::cache*> caches(void);
+  std::list<const representation::block*> blocks(void) const;
+  std::list<const representation::cache*> caches(void) const;
 
   /**
    * @brief Get the size of the X dimension for a LOS.

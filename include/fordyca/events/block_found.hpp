@@ -52,7 +52,7 @@ class block_found : public perceived_cell_op,
                     public rcppsw::common::er_client {
  public:
   block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-              representation::block* block, size_t x, size_t y);
+              const representation::block* block, size_t x, size_t y);
   ~block_found(void) { er_client::rmmod(); }
 
   void visit(representation::cell2D& cell) override;
@@ -85,12 +85,12 @@ class block_found : public perceived_cell_op,
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  const representation::block* block(void) const { return m_block; }
 
  private:
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
-  representation::block* m_block;
+  const representation::block* m_block;
 };
 
 NS_END(events, fordyca);

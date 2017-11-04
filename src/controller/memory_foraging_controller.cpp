@@ -93,39 +93,28 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
 } /* Init() */
 
 void memory_foraging_controller::process_los(const representation::line_of_sight* const los) {
-  for (size_t x = 0; x < los->sizex(); ++x) {
-    for (size_t y = 0; y < los->sizey(); ++y) {
-      representation::discrete_coord abs = los->cell(x, y).loc();
-      if (los->cell(x, y).state_has_block()) {
-        representation::block* block = const_cast<representation::block*>(los->cell(x,
-                                                                    y).block());
-        ER_ASSERT(block, "ERROR: NULL block on cell that should have block");
-        if (!m_map->access(abs.first, abs.second).state_has_block()) {
-          ER_NOM("Discovered block%d at (%zu, %zu)", block->id(), abs.first,
-                 abs.second);
-        }
-
-        events::block_found op(base_foraging_controller::server(), block,
-                               abs.first, abs.second);
-        m_map->accept(op);
-      } else if (los->cell(x, y).state_has_cache()) {
-        representation::cache* cache = const_cast<representation::cache*>(los->cell(x,
-                                                                    y).cache());
-        ER_ASSERT(cache, "ERROR: NULL cache on cell that should have cache");
-        if (!m_map->access(abs.first, abs.second).state_has_cache()) {
-          ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(), abs.first,
-                 abs.second);
-        }
-
-        events::cache_found op(base_foraging_controller::server(), cache,
-                               abs.first, abs.second);
-        m_map->accept(op);
-      } else { /* must be empty if it doesn't have a block or a cache */
-        events::cell_empty op(abs.first, abs.second);
-        m_map->accept(op);
-      }
-    } /* for(y..) */
-  } /* for(x..) */
+  for (auto block : los->blocks()) {
+    if (!m_map->access(block->discrete_loc().first,
+                       block->discrete_loc().second).state_has_block()) {
+      events::block_found op(base_foraging_controller::server(), block,
+                             block->discrete_loc().first,
+                             block->discrete_loc().second);
+      m_map->accept(op);
+      ER_NOM("Discovered block%d at (%zu, %zu)", block->id(),
+             block->discrete_loc().first, block->discrete_loc().second);
+    }
+  } /* for(block..) */
+  for (auto cache : los->caches()) {
+    if (!m_map->access(cache->discrete_loc().first,
+                       cache->discrete_loc().second).state_has_cache()) {
+      events::cache_found op(base_foraging_controller::server(), cache,
+                             cache->discrete_loc().first,
+                             cache->discrete_loc().second);
+      m_map->accept(op);
+      ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(),
+             cache->discrete_loc().first, cache->discrete_loc().second);
+    }
+  } /* for(cache..) */
 } /* process_los() */
 
 using namespace argos;

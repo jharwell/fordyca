@@ -115,7 +115,7 @@ FSM_STATE_DEFINE_ND(cell2D_fsm, state_empty) {
 FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
   if (ST_HAS_BLOCK != last_state()) {
     m_block_count = 1;
-    printf("Cell HAS_BLOCK.");
+    ER_DIAG("Cell HAS_BLOCK.");
   }
   return state_machine::event_signal::HANDLED;
 }
@@ -128,9 +128,9 @@ FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
   }
   if (data) {
     if (data->pickup) {
-      ++m_block_count;
-    } else {
       --m_block_count;
+    } else {
+      ++m_block_count;
     }
   }
   if (1 == m_block_count) {

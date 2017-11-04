@@ -63,8 +63,8 @@ bool sensor_manager::in_nest(void) {
    * The nest is a relatively light gray, so the sensors will return something
    * in the range specified below.
    *
-   * They return 1.0 when the robot is on a white area, it is 0.0 when the robot is on a
-   * black area.
+   * They return 1.0 when the robot is on a white area, it is 0.0 when the robot
+   * is on a black area.
    */
   int sum = 0;
   sum += readings[0].Value > 0.60 && readings[0].Value < 0.80;

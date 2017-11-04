@@ -75,11 +75,13 @@
             dist_model="single_source"
             respawn="true"
             />
-    <caches create_caches="false"
+    <caches create_static_cache="true"
+            create_dynamic_caches="false"
+            static_cache_size="5"
             dimension="0.6"
             min_dist="0.6"
       />
-    <nest size="0.5, 0.5" center="5, 2.5" />
+    <nest size="0.5, 0.5" center="2, 2.5" />
     <visualization robot_id="true"
                    robot_los="true"
                    block_id="true"
@@ -110,7 +112,7 @@
     </box>
 
     <light id="light_1"
-           position="5,2.5,1.0"
+           position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="4.0"
@@ -118,7 +120,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="10" max_trials="100">
+      <entity quantity="20" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

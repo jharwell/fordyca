@@ -1,5 +1,5 @@
 /**
- * @file cache_params.hpp
+ * @file cache.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,37 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Structure Definitions
+ * Global Variables
  ******************************************************************************/
-struct cache_params : public rcppsw::common::base_params {
-  cache_params(void) : create_static_cache(false),
-                       create_dynamic_caches(false),
-                       static_cache_size(0),
-                       dimension(0.0),
-                       min_dist(0.0) {}
+int cache::m_next_id = 0;
 
-  bool create_static_cache;
-  bool create_dynamic_caches;
-  uint static_cache_size;
-  double dimension;
-  double min_dist;
-};
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cache::cache(double dimension,
+             argos::CVector2 center,
+             std::list<block*> blocks) :
+    cell_entity(dimension, dimension, argos::CColor::BLUE),
+  m_blocks(blocks) {
+  real_loc(center);
+  id(m_next_id++);
+  }
 
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_PARAMS_HPP_ */
+NS_END(fordyca, representation);
