@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_selector.hpp
+ * @file block_utility.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,54 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
+#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <utility>
-
-#include "rcppsw/common/er_client.hpp"
-#include "fordyca/representation/cache.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/expression.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, expressions);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_selector
- * @brief Selects from among existing caches for the best one to go get a block
- * from.
+ * @brief Calculates the utility associated with a known block, as part of a
+ * robot's decision on whether or not to go and attempt to pick it up.
+ *
+ * Depends on:
+ *
+ * - Distance of block to nest (Further is better).
+ * - Distance of block to robot's current position (closer is better).
+ * - Pheromone density associated with the block information (higher is better).
  */
-class existing_cache_selector: public rcppsw::common::er_client {
+class block_utility: public rcppsw::math::expression<double>  {
  public:
-  existing_cache_selector(
-      const std::shared_ptr<rcppsw::common::er_server>& server,
-      argos::CVector2 nest_loc);
+  block_utility(const argos::CVector2& block_loc,
+                const argos::CVector2& nest_loc) :
+      mc_block_loc(block_loc),
+      mc_nest_loc(nest_loc) {}
 
-  ~existing_cache_selector(void) { rmmod(); }
-
-  /**
-   * @brief Given a list of existing caches that a robot knows about (i.e. have
-   * not faded into an unknown state), compute which is the "best", for use in
-   * deciding which cache to go to and attempt to pickup from.
-   *
-   * @return A pointer to the "best" existing cache, along with its utility value.
-   */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache> existing_caches,
-      argos::CVector2 robot_loc);
+  double calc(const argos::CVector2& rloc, double density) {
+    return set_result(((mc_block_loc - mc_nest_loc).Length() /
+                       (mc_block_loc - rloc).Length()) * std::exp(-density));
+  }
 
  private:
-  argos::CVector2 m_nest_loc;
+  const argos::CVector2 mc_block_loc;
+  const argos::CVector2 mc_nest_loc;
 };
 
-NS_END(fordyca, controller);
+NS_END(expressions, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_selector.hpp
+ * @file cache_site_selector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_CACHE_SITE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_CACHE_SITE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,27 +39,27 @@ NS_START(fordyca, controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_selector
- * @brief Selects from among existing caches for the best one to go get a block
- * from.
+ * @class cache_site_selector
+ * @brief Selects the best cache site between the location of the block pickup
+ * and the nest (ideally the halfway point), subject to constraints such as it
+ * can't be too new other known caches.
  */
-class existing_cache_selector: public rcppsw::common::er_client {
+class cache_site_selector: public rcppsw::common::er_client {
  public:
-  existing_cache_selector(
+  cache_site_selector(
       const std::shared_ptr<rcppsw::common::er_server>& server,
       argos::CVector2 nest_loc);
 
-  ~existing_cache_selector(void) { rmmod(); }
+  ~cache_site_selector(void) { er_client::rmmod(); }
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
-   * not faded into an unknown state), compute which is the "best", for use in
-   * deciding which cache to go to and attempt to pickup from.
+   * not faded into an unknown state), compute the best site for a new cache.
    *
-   * @return A pointer to the "best" existing cache, along with its utility value.
+   * @return A pointer to the "best" cache site, along with its utility value.
    */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache> existing_caches,
+  argos::CVector2 calc_best(
+      const std::list<representation::perceived_cache> known_caches,
       argos::CVector2 robot_loc);
 
  private:
@@ -68,4 +68,4 @@ class existing_cache_selector: public rcppsw::common::er_client {
 
 NS_END(fordyca, controller);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_CACHE_SITE_SELECTOR_HPP_ */

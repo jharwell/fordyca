@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_selector.hpp
+ * @file dynamic_cache_creator.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,54 +18,43 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DYNAMIC_CACHE_CREATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DYNAMIC_CACHE_CREATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <utility>
-
-#include "rcppsw/common/er_client.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/support/cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/**
- * @class existing_cache_selector
- * @brief Selects from among existing caches for the best one to go get a block
- * from.
- */
-class existing_cache_selector: public rcppsw::common::er_client {
+class dynamic_cache_creator : public cache_creator {
  public:
-  existing_cache_selector(
-      const std::shared_ptr<rcppsw::common::er_server>& server,
-      argos::CVector2 nest_loc);
-
-  ~existing_cache_selector(void) { rmmod(); }
+  dynamic_cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
+                        representation::grid2D<representation::cell2D>& grid,
+                        double cache_size, double resolution, double min_dist);
 
   /**
-   * @brief Given a list of existing caches that a robot knows about (i.e. have
-   * not faded into an unknown state), compute which is the "best", for use in
-   * deciding which cache to go to and attempt to pickup from.
+   * @brief Scan the entire list of blocks currently in the arena, and create
+   * caches from all blocks that are close enough together.
    *
-   * @return A pointer to the "best" existing cache, along with its utility value.
+   * @return The list of current caches.
    */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache> existing_caches,
-      argos::CVector2 robot_loc);
+  std::vector<representation::cache> create_all(
+    std::vector<representation::block>& blocks) override;
 
  private:
-  argos::CVector2 m_nest_loc;
+  argos::CVector2 calc_center(std::list<representation::block*> blocks);
+
+  double m_min_dist;
 };
 
-NS_END(fordyca, controller);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DYNAMIC_CACHE_CREATOR_HPP_ */

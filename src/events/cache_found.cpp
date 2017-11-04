@@ -34,7 +34,7 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                         representation::cache* cache, size_t x, size_t y) :
+                         const representation::cache* cache, size_t x, size_t y) :
     perceived_cell_op(x, y),
     er_client(server),
     m_cache(cache) {
@@ -53,12 +53,18 @@ void cache_found::visit(representation::perceived_cell2D& cell) {
 } /* visit() */
 
 void cache_found::visit(representation::cell2D& cell) {
+  cell.entity(const_cast<representation::cache*>(m_cache));
   cell.fsm().accept(*this);
 } /* visit() */
 
 void cache_found::visit(representation::cell2D_fsm& fsm) {
-  ER_ASSERT(fsm.block_count() >= 1, "FATAL: Bad call to create cache on cell");
+  if (fsm.state_has_cache()) {
+    return;
+  }
   fsm.event_block_drop();
+  if (!fsm.state_has_cache()) {
+    fsm.event_block_drop();
+  }
 } /* visit() */
 
 void cache_found::visit(controller::memory_foraging_controller& controller) {

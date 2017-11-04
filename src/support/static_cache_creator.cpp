@@ -1,5 +1,5 @@
 /**
- * @file block_found.cpp
+ * @file static_cache_creator.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,56 +21,48 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/support/static_cache_creator.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                         const representation::block* block, size_t x, size_t y) :
-    perceived_cell_op(x, y),
-    er_client(server),
-    m_block(block) {
-  er_client::insmod("block_found",
+static_cache_creator::static_cache_creator(
+    std::shared_ptr<rcppsw::common::er_server> server,
+    representation::grid2D<representation::cell2D>& grid,
+    const argos::CVector2& center,
+    double cache_size, double resolution) :
+    cache_creator(server, grid, cache_size, resolution),
+    m_center(center) {
+  er_client::insmod("static_cache_creator",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
-}
+    }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_found::visit(representation::perceived_cell2D& cell) {
-  cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
-} /* visit() */
+std::vector<representation::cache> static_cache_creator::create_all(
+    std::vector<representation::block>& blocks) {
+  std::vector<representation::cache> caches;
 
-void block_found::visit(representation::cell2D& cell) {
-  cell.entity(const_cast<representation::block*>(m_block));
-  ER_ASSERT(!cell.fsm().state_has_cache(),
-            "FATAL: block found on cell that has a cache");
-  if (!cell.fsm().state_has_block()) {
-    cell.fsm().accept(*this);
-  }
-} /* visit() */
+  ER_ASSERT(blocks.size() >= 2,
+            "FATAL: Cannot create static cache from <= 2 blocks");
+  ER_NOM("Creating static cache @(%f, %f) from %zu free blocks", m_center.GetX(),
+         m_center.GetY(), blocks.size());
+  std::list<representation::block*> starter_blocks;
+  for (auto b : blocks) {
+  starter_blocks.push_back(&b);
+  } /* for(i..) */
 
-void block_found::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
-} /* visit() */
+  caches.push_back(cache_creator::create_single(starter_blocks, m_center));
+  return caches;
+} /* create() */
 
-void block_found::visit(controller::memory_foraging_controller& controller) {
-  controller.map()->accept(*this);
-} /* visit() */
-
-void block_found::visit(representation::perceived_arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-NS_END(events, fordyca);
+NS_END(support, fordyca);

@@ -24,7 +24,8 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
-#include "fordyca/support/cache_creator.hpp"
+#include "fordyca/support/static_cache_creator.hpp"
+#include "fordyca/support/dynamic_cache_creator.hpp"
 #include "fordyca/support/cache_update_handler.hpp"
 
 /*******************************************************************************
@@ -35,18 +36,17 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::arena_map_params* params,
-                     argos::CRange<argos::Real> nest_x,
-                     argos::CRange<argos::Real> nest_y) :
+arena_map::arena_map(const struct params::arena_map_params* params) :
     mc_cache_params(params->cache),
+    mc_nest_center(params->nest_center),
     m_blocks(params->block.n_blocks,
              block(params->block.dimension)),
     m_caches(),
-    m_block_distributor(argos::CRange<argos::Real>(params->grid.lower.GetX(),
-                                                   params->grid.upper.GetX()),
-                        argos::CRange<argos::Real>(params->grid.lower.GetY(),
-                                                   params->grid.upper.GetY()),
-                        nest_x, nest_y,
+    m_block_distributor(argos::CRange<double>(params->grid.lower.GetX(),
+                                              params->grid.upper.GetX()),
+                        argos::CRange<double>(params->grid.lower.GetY(),
+                                              params->grid.upper.GetY()),
+                        params->nest_x, params->nest_y,
                         &params->block),
     m_server(rcppsw::common::g_server),
     m_grid(&params->grid, m_server) {
@@ -100,7 +100,7 @@ void arena_map::distribute_block(block* const block, bool first_time) {
         cell->accept(op);
         break;
       }
-    } else { /* no distributing needs to be done */
+    } else { /* no distributing needs to be done (respawn is disabled) */
       return;
     }
   } /* while() */
@@ -110,22 +110,33 @@ void arena_map::distribute_block(block* const block, bool first_time) {
          block->real_loc().GetY(),
          block->discrete_loc().first,
          block->discrete_loc().second, static_cast<const void*>(cell->block()));
-
-  if (!first_time && mc_cache_params.create_caches) {
-    support::cache_update_handler c(m_server, m_caches);
-  }
 } /* distribute_block() */
+
+void arena_map::static_cache_create(void) {
+    double src_center = (m_block_distributor.single_src_xrange().GetMin() +
+                         m_block_distributor.single_src_xrange().GetMax()) / 2.0;
+    double x = (src_center + mc_nest_center.GetX()) / 2.0;
+    double y = mc_nest_center.GetY();
+
+    ER_DIAG("(Re)-Creating static cache");
+    support::static_cache_creator c(m_server, m_grid,
+                                    argos::CVector2(x, y),
+                                    mc_cache_params.dimension,
+                                    m_grid.resolution());
+    std::vector<representation::block> blocks(m_blocks.begin(),
+                                              m_blocks.begin() + mc_cache_params.static_cache_size);
+    m_caches = c.create_all(blocks);
+    m_grid.access(m_caches[0].discrete_loc().first,
+                  m_caches[0].discrete_loc().second).entity(&m_caches[0]);
+} /* static_cache_create() */
 
 void arena_map::distribute_blocks(bool first_time) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
-  if (first_time && mc_cache_params.create_caches) {
-    support::cache_creator c(m_server, m_grid, m_blocks,
-                             mc_cache_params.min_dist,
-                             mc_cache_params.dimension, m_grid.resolution());
-    m_caches = c.create_all();
+  if (first_time && mc_cache_params.create_static_cache) {
+    static_cache_create();
   }
 
   /*

@@ -63,9 +63,9 @@ NS_START(fsm);
 /**
  * @brief The FSM for the block-to-cache subtask.
  *
- * Each robot executing this FSM will locate for a block (either a known block or
- * via random exploration), pickup the block and bring it to the best cache it
- * knows about.
+ * Each robot executing this FSM will locate for a block (either a known block
+ * or via random exploration), pickup the block and bring it to the best cache
+ * it knows about.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
                            public task_allocation::taskable {
@@ -108,8 +108,8 @@ class block_to_cache_fsm : public base_foraging_fsm,
   bool is_searching_for_cache(void) const;
 
   /**
-   * @brief If \c TRUE, the robot is currently exploring for a block (i.e. it does
-   * not know of any blocks in the arena).
+   * @brief If \c TRUE, the robot is currently exploring for a block (i.e. it
+   * does not know of any blocks in the arena).
    */
   bool is_exploring(void) const;
 

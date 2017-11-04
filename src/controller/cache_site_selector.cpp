@@ -1,5 +1,5 @@
 /**
- * @file block_found.cpp
+ * @file cache_site_selector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,24 +21,22 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/cache_site_selector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
-                         const representation::block* block, size_t x, size_t y) :
-    perceived_cell_op(x, y),
+cache_site_selector::cache_site_selector(
+    const std::shared_ptr<rcppsw::common::er_server>& server,
+    argos::CVector2 nest_loc) :
     er_client(server),
-    m_block(block) {
-  er_client::insmod("block_found",
+    m_nest_loc(nest_loc) {
+  er_client::insmod("cache_site_selector",
                     rcppsw::common::er_lvl::DIAG,
                     rcppsw::common::er_lvl::NOM);
 }
@@ -46,31 +44,15 @@ block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& serve
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_found::visit(representation::perceived_cell2D& cell) {
-  cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
-} /* visit() */
+argos::CVector2 cache_site_selector::calc_best(
+    const std::list<representation::perceived_cache>,
+    argos::CVector2 robot_loc) {
 
-void block_found::visit(representation::cell2D& cell) {
-  cell.entity(const_cast<representation::block*>(m_block));
-  ER_ASSERT(!cell.fsm().state_has_cache(),
-            "FATAL: block found on cell that has a cache");
-  if (!cell.fsm().state_has_block()) {
-    cell.fsm().accept(*this);
-  }
-} /* visit() */
+  argos::CVector2 site((robot_loc.GetX() - m_nest_loc.GetX()) / 2.0,
+                       m_nest_loc.GetY());
 
-void block_found::visit(representation::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
-} /* visit() */
+  ER_NOM("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
+  return site;
+} /* calc_best() */
 
-void block_found::visit(controller::memory_foraging_controller& controller) {
-  controller.map()->accept(*this);
-} /* visit() */
-
-void block_found::visit(representation::perceived_arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-NS_END(events, fordyca);
+NS_END(controller, fordyca);
