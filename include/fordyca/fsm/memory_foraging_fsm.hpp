@@ -80,6 +80,8 @@ class memory_foraging_fsm : public base_foraging_fsm,
    */
   void task_reset(void) override { init(); }
 
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
+
   /**
    * @brief Run the memory foraging task.
    */

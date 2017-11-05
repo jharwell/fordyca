@@ -1,7 +1,5 @@
 /**
- * @file base_controller_repository.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,29 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
-#include "fordyca/params/repository.hpp"
+#include "fordyca/tasks/collector.hpp"
+#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, tasks);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class base_controller_repository: public repository {
- public:
-  base_controller_repository(void);
-};
+double collector::calc_elapsed_time(double exec_time) const {
+  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
+} /* calc_elapsed_time() */
 
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */
+NS_END(tasks, fordyca);

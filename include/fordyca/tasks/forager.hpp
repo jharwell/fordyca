@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,6 +48,11 @@ class forager : public task_allocation::polled_task {
 
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
+    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+    task_allocation::polled_task::mechanism()->task_start(&a);
+}
+  double calc_elapsed_time(double exec_time) const override;
 };
 
 NS_END(tasks, fordyca);

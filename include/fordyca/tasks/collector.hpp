@@ -52,6 +52,7 @@ class collector : public task_allocation::polled_task {
   }
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
+  double calc_elapsed_time(double exec_time) const override;
 };
 
 NS_END(tasks, fordyca);

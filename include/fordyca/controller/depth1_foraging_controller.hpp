@@ -1,5 +1,5 @@
 /**
- * @file depth1_controller.hpp
+ * @file depth1_foraging_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -40,10 +40,10 @@ namespace task_allocation = rcppsw::task_allocation;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth1_controller : public memory_foraging_controller,
-                          public visitor::visitable<depth1_controller> {
+class depth1_foraging_controller : public memory_foraging_controller,
+                          public visitor::visitable<depth1_foraging_controller> {
  public:
-  depth1_controller(void) :
+  depth1_foraging_controller(void) :
       memory_foraging_controller(),
       m_executive(),
       m_forager(),
@@ -59,7 +59,7 @@ class depth1_controller : public memory_foraging_controller,
    * @brief Initialize the controller.
    *
    * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><depth1_controller_controller> section.
+   *               <controllers><depth1_foraging_controller> section.
    */
   void Init(argos::TConfigurationNode& t_node) override;
 
@@ -79,4 +79,4 @@ class depth1_controller : public memory_foraging_controller,
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DEPTH1_CONTROLLER_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_CONTROLLER_HPP_ */

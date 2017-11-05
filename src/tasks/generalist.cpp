@@ -1,5 +1,5 @@
 /**
- * @file task_parser.cpp
+ * @file generalist.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,33 +21,20 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/utils/line_parser.hpp"
-#include "fordyca/params/task_parser.hpp"
+#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, tasks);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void task_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode task_node = argos::GetNode(node, "task");
+double generalist::calc_elapsed_time(double exec_time) const {
+  return dynamic_cast<fsm::memory_foraging_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
+} /* calc_elapsed_time() */
 
-  m_params.reset(new task_allocation::task_params);
-
-  argos::GetNodeAttribute(task_node, "estimation_alpha",
-                          m_params->estimation_alpha);
-  argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
-  argos::GetNodeAttribute(task_node, "abort_offset", m_params->abort_offset);
-} /* parse() */
-
-void task_parser::show(std::ostream& stream) {
-  stream << "====================\nTASK params\n====================\n";
-  stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
-  stream << "reactivity=" << m_params->reactivity << std::endl;
-  stream << "abort_offset=" << m_params->abort_offset << std::endl;
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(tasks, fordyca);

@@ -81,6 +81,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   void task_reset(void) override { init(); }
+  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
   bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
 
   /**
