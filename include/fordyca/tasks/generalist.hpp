@@ -52,6 +52,7 @@ class generalist : public task_allocation::partitionable_polled_task<
       partitionable_polled_task("generalist", params, mechanism) {}
   logical_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
+  double calc_elapsed_time(double exec_time) const override;
 };
 
 NS_END(tasks, fordyca);

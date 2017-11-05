@@ -65,6 +65,8 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   void init(void) override;
 
+  controller::sensor_manager*  sensors(void) const { return m_sensors.get(); }
+
  protected:
   /**
    * @brief Randomize the angle of a vector, for use in change robot heading
@@ -75,7 +77,6 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
   controller::actuator_manager*  actuators(void) const { return m_actuators.get(); }
-  controller::sensor_manager*  sensors(void) const { return m_sensors.get(); }
 
   /**
    * @brief Robots entering this state will return to the nest.

@@ -23,7 +23,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_controller id="ffc"
+    <depth1_foraging_controller id="ffc"
                          library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -43,7 +43,7 @@
               />
         <task estimation_alpha="0.5"
               reactivity="0.9"
-              abort_offset="10"/>
+              abort_offset="3"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />
@@ -54,12 +54,12 @@
                   no_turn_angle_threshold="5"
                   max_speed="10" />
         </actuators>
-        <fsm unsuccessful_explore_dir_change="600"
+        <fsm unsuccessful_explore_dir_change="1000"
              frequent_collision_thresh="100"
              nest="5, 2.5"
              />
       </params>
-    </depth1_controller>
+    </depth1_foraging_controller>
 
   </controllers>
 
@@ -67,7 +67,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="memory_foraging_loop_functions">
+                  label="depth1_foraging_loop_functions">
     <logging robot_stats="robot-stats.txt"
              block_stats="block-stats.txt"
              />
@@ -160,7 +160,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="memory_foraging_qt_user_functions" />
+      <user_functions label="depth1_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

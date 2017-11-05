@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_loop_functions.hpp
+ * @file depth1_foraging_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 #include <vector>
-#include "fordyca/support/random_foraging_loop_functions.hpp"
+#include "fordyca/support/memory_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,27 +36,23 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class memory_foraging_loop_functions : public random_foraging_loop_functions {
+class depth1_foraging_loop_functions : public memory_foraging_loop_functions {
  public:
-  memory_foraging_loop_functions() {}
-  virtual ~memory_foraging_loop_functions(void) {}
+  depth1_foraging_loop_functions() {}
+  virtual ~depth1_foraging_loop_functions(void) {}
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep() override;
 
  protected:
   void pre_step_iter(argos::CFootBotEntity& robot) override;
-  void set_robot_los(argos::CFootBotEntity& robot);
-  void set_robot_tick(argos::CFootBotEntity& robot);
-  void handle_block_drop(controller::memory_foraging_controller& controller);
-  void handle_block_pickup(argos::CFootBotEntity& robot);
 
  private:
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
-  memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;
+  depth1_foraging_loop_functions(const depth1_foraging_loop_functions& s) = delete;
+  depth1_foraging_loop_functions& operator=(const depth1_foraging_loop_functions& s) = delete;
 };
 
 NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_ */

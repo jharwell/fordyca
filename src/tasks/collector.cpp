@@ -1,5 +1,5 @@
 /**
- * @file forager.hpp
+ * @file collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,43 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_FORAGER_HPP_
-#define INCLUDE_FORDYCA_TASKS_FORAGER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/tasks/argument.hpp"
+#include "fordyca/tasks/collector.hpp"
+#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/controller/sensor_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
- * Structure Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @brief Class representing the first half of the generalist task in depth 1
- * allocation.
- */
-class forager : public task_allocation::polled_task {
- public:
-  forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
-      polled_task("forager", alpha, mechanism) {}
-
-  executable_task* partition(void) override { return nullptr; }
-  double abort_prob(void) override { return 0.0; }
-  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
-    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
-    task_allocation::polled_task::mechanism()->task_start(&a);
-}
-  double calc_elapsed_time(double exec_time) const override;
-};
+double collector::calc_elapsed_time(double exec_time) const {
+  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
+} /* calc_elapsed_time() */
 
 NS_END(tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_FORAGER_HPP_ */
