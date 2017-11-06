@@ -66,14 +66,13 @@ class cache_block_drop : public visitor::visitor,
                    representation::block* block, representation::cache* cache);
   ~cache_block_drop(void) { er_client::rmmod(); }
 
+  /* depth1 foraging */
   /**
    * @brief Update a cell on a block drop.
    *
    * @param cell The cell to update.
    */
   void visit(class representation::cell2D& cell) override;
-
-  void visit(class representation::perceived_cell2D& cell) override;
 
   /**
    * @brief Update the FSM associated with a cell on a block drop.
@@ -97,6 +96,7 @@ class cache_block_drop : public visitor::visitor,
    * @param block The block to update.
    */
   void visit(representation::block& block) override;
+  void visit(class representation::perceived_cell2D& cell) override;
   void visit(controller::depth1_foraging_controller& controller) override;
   void visit(fsm::block_to_cache_fsm& fsm) override;
   void visit(tasks::forager& task) override;

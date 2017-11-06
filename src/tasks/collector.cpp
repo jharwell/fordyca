@@ -24,6 +24,8 @@
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/nest_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,5 +38,8 @@ NS_START(fordyca, tasks);
 double collector::calc_elapsed_time(double exec_time) const {
   return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* calc_elapsed_time() */
+
+void collector::accept(events::cached_block_pickup &visitor) { visitor.visit(*this); }
+void collector::accept(events::nest_block_drop &visitor) { visitor.visit(*this); }
 
 NS_END(tasks, fordyca);

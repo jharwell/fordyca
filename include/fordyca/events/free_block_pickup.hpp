@@ -41,8 +41,9 @@ class block_to_cache_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
-class memory_foraging_controller;
 class random_foraging_controller;
+class memory_foraging_controller;
+class depth1_foraging_controller;
 }
 namespace representation {
 class perceived_arena_map;
@@ -68,10 +69,11 @@ NS_START(events);
  */
 class free_block_pickup : public cell_op,
                           public rcppsw::common::er_client,
-                          public visitor::visit_set<controller::memory_foraging_controller,
-                                                    controller::random_foraging_controller,
-                                                    fsm::memory_foraging_fsm,
+                          public visitor::visit_set<controller::random_foraging_controller,
+                                                    controller::memory_foraging_controller,
+                                                    controller::depth1_foraging_controller,
                                                     fsm::random_foraging_fsm,
+                                                    fsm::memory_foraging_fsm,
                                                     fsm::block_to_cache_fsm,
                                                     fsm::block_to_nest_fsm,
                                                     representation::block,
@@ -84,6 +86,7 @@ class free_block_pickup : public cell_op,
                     representation::block* block, size_t robot_index);
   ~free_block_pickup(void) { er_client::rmmod(); }
 
+  /* foraging support */
   /**
    * @brief Update the arena_map with the block pickup event by making the block
    * seem to disappear by moving it out of sight.
@@ -91,7 +94,18 @@ class free_block_pickup : public cell_op,
    * @param map The arena_map.
    */
   void visit(representation::arena_map& map) override;
+  void visit(representation::cell2D& cell) override;
+  void visit(representation::cell2D_fsm& fsm) override;
 
+  /* random foraging */
+  /**
+   * @brief Update a block with the knowledge that it is now carried by a robot.
+   */
+  void visit(representation::block& block) override;
+  void visit(controller::random_foraging_controller& controller) override;
+  void visit(fsm::random_foraging_fsm& fsm) override;
+
+  /* depth0 foraging */
   /**
    * @brief Handle the event of a robot picking up a block, making updates to
    * the arena map as necessary.
@@ -99,27 +113,16 @@ class free_block_pickup : public cell_op,
    * @param map The robot's arena map.
    */
   void visit(representation::perceived_arena_map& map) override;
-
-  void visit(representation::cell2D& cell) override;
-  void visit(representation::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
-
-  /**
-   * @brief Update a block with the knowledge that it is now carried by a robot.
-   */
-  void visit(representation::block& block) override;
-
-  void visit(controller::random_foraging_controller& controller) override;
-
-  void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
+  void visit(controller::memory_foraging_controller& controller) override;
+
+  /* depth1 foraging */
+  void visit(controller::depth1_foraging_controller& controller) override;
   void visit(fsm::block_to_cache_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
-
   void visit(tasks::generalist& task) override;
   void visit(tasks::forager& task) override;
-
-  void visit(controller::memory_foraging_controller& controller) override;
 
  private:
   free_block_pickup(const free_block_pickup& op) = delete;

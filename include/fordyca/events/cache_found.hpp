@@ -33,7 +33,6 @@
 NS_START(fordyca);
 
 namespace representation { class cache; }
-namespace tasks { class forager; class collector; }
 
 NS_START(events);
 
@@ -41,9 +40,7 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cache_found : public perceived_cell_op,
-                    public rcppsw::common::er_client,
-                    public visitor::visit_set<tasks::forager,
-                                              tasks::collector> {
+                    public rcppsw::common::er_client {
  public:
   cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
               const representation::cache* cache, size_t x, size_t y);
@@ -52,6 +49,7 @@ class cache_found : public perceived_cell_op,
   void visit(representation::cell2D& cell) override;
   void visit(representation::perceived_cell2D& cell) override;
 
+  /* depth1 foraging */
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
    * new location and updating the block so that it no longer thinks it is
@@ -67,9 +65,6 @@ class cache_found : public perceived_cell_op,
    * @param fsm The FSM associated with the cell to update.
    */
   void visit(representation::cell2D_fsm& fsm) override;
-
-  void visit(tasks::forager& task) override;
-  void visit(tasks::collector& task) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.

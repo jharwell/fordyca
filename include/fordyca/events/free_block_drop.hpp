@@ -50,6 +50,7 @@ class free_block_drop : public cell_op,
                   double resolution);
   ~free_block_drop(void) { er_client::rmmod(); }
 
+  /* foraging support */
   /**
    * @brief Update a cell on a block drop.
    *
@@ -71,7 +72,7 @@ class free_block_drop : public cell_op,
    */
   void visit(representation::block& block) override;
 
-  void visit(__unused representation::perceived_cell2D& block) override {}
+  void visit(representation::perceived_cell2D&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

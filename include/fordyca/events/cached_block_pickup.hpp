@@ -61,6 +61,7 @@ class cached_block_pickup : public cell_op,
                       representation::cache* cache, size_t robot_index);
   ~cached_block_pickup(void) { er_client::rmmod(); }
 
+  /* depth1 foraging */
   /**
    * @brief Update the arena_map with the block pickup event by making the block
    * seem to disappear by moving it out of sight.

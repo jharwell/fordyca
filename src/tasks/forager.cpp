@@ -45,8 +45,6 @@ double forager::calc_elapsed_time(double exec_time) const {
 } /* elapsed_time() */
 
 void forager::accept(events::cache_block_drop &visitor) { visitor.visit(*this); }
-void forager::accept(events::cache_found &visitor) { visitor.visit(*this); }
 void forager::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
-void forager::accept(events::block_found &visitor) { visitor.visit(*this); }
 
 NS_END(tasks, fordyca);

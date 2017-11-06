@@ -24,6 +24,8 @@
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,5 +38,8 @@ NS_START(fordyca, tasks);
 double generalist::calc_elapsed_time(double exec_time) const {
   return dynamic_cast<fsm::memory_foraging_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* calc_elapsed_time() */
+
+void generalist::accept(events::nest_block_drop &visitor) { visitor.visit(*this); }
+void generalist::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
 
 NS_END(tasks, fordyca);

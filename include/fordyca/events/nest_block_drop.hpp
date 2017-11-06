@@ -40,8 +40,9 @@ class random_foraging_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
-class memory_foraging_controller;
 class random_foraging_controller;
+class memory_foraging_controller;
+class depth1_foraging_controller;
 }
 namespace representation { class block; class arena_map; };
 namespace support { class block_stat_collector; }
@@ -63,6 +64,7 @@ class nest_block_drop : public visitor::visitor,
                         public rcppsw::common::er_client,
                         public visitor::visit_set<controller::memory_foraging_controller,
                                                   controller::random_foraging_controller,
+                                                  controller::depth1_foraging_controller,
                                                   fsm::memory_foraging_fsm,
                                                   fsm::random_foraging_fsm,
                                                   fsm::block_to_nest_fsm,
@@ -76,23 +78,24 @@ class nest_block_drop : public visitor::visitor,
              representation::block* block);
   ~nest_block_drop(void) { er_client::rmmod(); }
 
+  /* foraging support */
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
    * new location and updating the block so that it no longer thinks it is
    * carried by a robot.
    *
-   * @param map The map to update (there is only ever one...)
+   * @param map The map to update
    */
   void visit(representation::arena_map& map) override;
+  void visit(support::block_stat_collector& collector) override;
 
+  /* random foraging */
   /**
    * @brief Update a block with the knowledge that it has been dropped.
    *
    * @param block The block to update.
    */
   void visit(representation::block& block) override;
-
-  void visit(support::block_stat_collector& collector) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -102,12 +105,15 @@ class nest_block_drop : public visitor::visitor,
    * each timestep.
    */
   void visit(controller::random_foraging_controller& controller) override;
+
+  /* depth0 foraging */
   void visit(controller::memory_foraging_controller& controller) override;
-
-  void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
-  void visit(fsm::block_to_nest_fsm& fsm) override;
 
+  /* depth1 foraging */
+  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(fsm::random_foraging_fsm& fsm) override;
+  void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::collector& task) override;
   void visit(tasks::generalist& task) override;
 

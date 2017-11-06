@@ -49,12 +49,10 @@ class forager : public task_allocation::polled_task, base_task {
       polled_task("forager", alpha, mechanism) {}
 
   void accept(events::cache_block_drop &visitor) override;
-  void accept(events::cache_found &visitor) override;
   void accept(events::free_block_pickup &visitor) override;
-  void accept(events::block_found &visitor) override;
 
   void accept(events::cached_block_pickup &) override {};
-  void accept(events::block_nest_drop &) override {};
+  void accept(events::nest_block_drop &) override {};
 
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }

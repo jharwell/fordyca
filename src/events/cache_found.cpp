@@ -44,7 +44,7 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& serve
 }
 
 /*******************************************************************************
- * Member Functions
+ * Depth1 Foraging
  ******************************************************************************/
 void cache_found::visit(representation::perceived_cell2D& cell) {
   cell.add_pheromone(1.0);

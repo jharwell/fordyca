@@ -49,7 +49,7 @@ cache_block_drop::cache_block_drop(
 }
 
 /*******************************************************************************
- * Member Functions
+ * Depth1 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(representation::perceived_cell2D& cell) {
   cell.cell().accept(*this);

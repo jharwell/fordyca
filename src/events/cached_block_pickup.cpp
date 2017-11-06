@@ -58,7 +58,7 @@ cached_block_pickup::cached_block_pickup(
     }
 
 /*******************************************************************************
- * Member Functions
+ * Depth1 Foraging
  ******************************************************************************/
 void cached_block_pickup::visit(representation::cell2D_fsm& fsm) {
   fsm.event_block_pickup();

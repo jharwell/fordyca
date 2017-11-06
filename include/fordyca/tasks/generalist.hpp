@@ -53,11 +53,9 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
       partitionable_polled_task("generalist", params, mechanism) {}
 
   void accept(events::free_block_pickup &visitor) override;
-  void accept(events::block_found &visitor) override;
-  void accept(events::block_nest_drop &visitor) override;
+  void accept(events::nest_block_drop &visitor) override;
 
   void accept(events::cache_block_drop &) override {};
-  void accept(events::cache_found &) override {};
   void accept(events::cached_block_pickup &) override {};
 
   logical_task* partition(void) override { return partitionable_task::partition(); }

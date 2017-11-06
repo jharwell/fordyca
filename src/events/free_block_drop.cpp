@@ -48,7 +48,7 @@ free_block_drop::free_block_drop(
 }
 
 /*******************************************************************************
- * Member Functions
+ * Foraging Support
  ******************************************************************************/
 void free_block_drop::visit(representation::cell2D& cell) {
   cell.entity(m_block);

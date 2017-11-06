@@ -45,14 +45,8 @@ block_found::block_found(const std::shared_ptr<rcppsw::common::er_server>& serve
 }
 
 /*******************************************************************************
- * Member Functions
+ * Depth0 Foraging
  ******************************************************************************/
-void block_found::visit(representation::perceived_cell2D& cell) {
-  cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
-} /* visit() */
-
 void block_found::visit(representation::cell2D& cell) {
   cell.entity(const_cast<representation::block*>(m_block));
   ER_ASSERT(!cell.fsm().state_has_cache(),
@@ -66,16 +60,26 @@ void block_found::visit(representation::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void block_found::visit(controller::memory_foraging_controller& controller) {
-  controller.map()->accept(*this);
-} /* visit() */
-
-void block_found::visit(controller::depth1_foraging_controller& controller) {
-  controller.map()->accept(*this);
+void block_found::visit(representation::perceived_cell2D& cell) {
+  cell.add_pheromone(1.0);
+  cell.update_density();
+  cell.cell().accept(*this);
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
+
+void block_found::visit(controller::memory_foraging_controller& controller) {
+  controller.map()->accept(*this);
+} /* visit() */
+
+/*******************************************************************************
+ * Depth1 Foraging
+ ******************************************************************************/
+void block_found::visit(controller::depth1_foraging_controller& controller) {
+  controller.map()->accept(*this);
+} /* visit() */
+
 
 NS_END(events, fordyca);
