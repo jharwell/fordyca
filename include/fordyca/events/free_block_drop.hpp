@@ -43,7 +43,7 @@ NS_START(events);
  ******************************************************************************/
 class free_block_drop : public cell_op,
                         public rcppsw::common::er_client,
-                        public visitor::can_visit<representation::block> {
+                        public visitor::visit_set<representation::block> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
                   representation::block* block, size_t x, size_t y,

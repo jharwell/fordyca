@@ -32,9 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class block;
-} /* namespace representation */
+namespace representation { class block; }
+namespace tasks { class generalist; class forager; }
 
 NS_START(events);
 
@@ -49,7 +48,9 @@ NS_START(events);
  * processed by the \ref arena_map, and exist only in a robot's perception.
  */
 class block_found : public perceived_cell_op,
-                    public rcppsw::common::er_client {
+                    public rcppsw::common::er_client,
+                    public visitor::visit_set<tasks::generalist,
+                                              tasks::forager> {
  public:
   block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
               const representation::block* block, size_t x, size_t y);
@@ -81,6 +82,10 @@ class block_found : public perceived_cell_op,
    * each timestep.
    */
   void visit(controller::memory_foraging_controller& controller) override;
+
+  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(tasks::generalist& task) override;
+  void visit(tasks::forager& task) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

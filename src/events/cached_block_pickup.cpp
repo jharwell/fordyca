@@ -25,8 +25,11 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
-#include "fordyca/support/cache_update_handler.hpp"
+#include "fordyca/controller/depth1_foraging_controller.hpp"
+#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/fsm/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/tasks/base_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -153,16 +156,24 @@ void cached_block_pickup::visit(representation::block& block) {
   ER_NOM("block: block%d is now carried by fb%zu", block.id(), m_robot_index);
 } /* visit() */
 
-void cached_block_pickup::visit(controller::memory_foraging_controller& controller) {
+void cached_block_pickup::visit(controller::depth1_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.block(m_block);
-  controller.fsm()->accept(*this);
-  ER_NOM("memory_foraging_controller: %s picked up block%d",
+
+  dynamic_cast<tasks::base_task*>(
+      static_cast<task_allocation::polled_task*>(
+          controller.current_task()))->accept(*this);
+
+  ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void cached_block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
-  ER_NOM("memory_foraging_fsm: register cached_block_pickup event");
+void cached_block_pickup::visit(tasks::collector& task) {
+  static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
+  ER_NOM("block_to_nest_fsm: register cached_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

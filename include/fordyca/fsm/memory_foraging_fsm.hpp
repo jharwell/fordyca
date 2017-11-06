@@ -64,7 +64,7 @@ NS_START(fsm);
  */
 class memory_foraging_fsm : public base_foraging_fsm,
                             public task_allocation::taskable,
-                            public visitor::visitable<memory_foraging_fsm> {
+                            public visitor::visitable_any<memory_foraging_fsm> {
  public:
   memory_foraging_fsm(
       const struct params::fsm_params* params,

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
@@ -35,21 +36,12 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct fsm_params;
-} /* namespace params */
-
-namespace controller {
-class sensor_manager;
-class actuator_manager;
-} /* namespace controller */
-
-namespace representation {
-class perceived_arena_map;
-class block;
-} /* namespace representation */
+namespace params { struct fsm_params; }
+namespace controller { class sensor_manager; class actuator_manager; }
+namespace representation { class perceived_arena_map; class block; }
 
 namespace task_allocation = rcppsw::task_allocation;
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(fsm);
 
@@ -65,7 +57,8 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
-                          public task_allocation::taskable {
+                          public task_allocation::taskable,
+                          public visitor::visitable_any<block_to_nest_fsm> {
  public:
   block_to_nest_fsm(
       const struct params::fsm_params* params,

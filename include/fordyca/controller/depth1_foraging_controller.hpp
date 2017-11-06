@@ -41,7 +41,7 @@ namespace task_allocation = rcppsw::task_allocation;
  * Class Definitions
  ******************************************************************************/
 class depth1_foraging_controller : public memory_foraging_controller,
-                          public visitor::visitable<depth1_foraging_controller> {
+                                   public visitor::visitable_any<depth1_foraging_controller> {
  public:
   depth1_foraging_controller(void) :
       memory_foraging_controller(),
@@ -69,6 +69,8 @@ class depth1_foraging_controller : public memory_foraging_controller,
    * Since the FSM does most of the work, this function just tells it run.
    */
   void ControlStep(void) override;
+
+  task_allocation::executable_task* current_task(void) { return m_executive->current_task(); }
 
  private:
   std::unique_ptr<task_allocation::polled_executive> m_executive;

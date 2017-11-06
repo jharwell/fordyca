@@ -24,6 +24,13 @@
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/events/cache_found.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/events/block_found.hpp"
+
 
 /*******************************************************************************
  * Namespaces
@@ -36,5 +43,10 @@ NS_START(fordyca, tasks);
 double forager::calc_elapsed_time(double exec_time) const {
   return dynamic_cast<fsm::block_to_cache_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* elapsed_time() */
+
+void forager::accept(events::cache_block_drop &visitor) { visitor.visit(*this); }
+void forager::accept(events::cache_found &visitor) { visitor.visit(*this); }
+void forager::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
+void forager::accept(events::block_found &visitor) { visitor.visit(*this); }
 
 NS_END(tasks, fordyca);

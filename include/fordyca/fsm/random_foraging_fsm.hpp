@@ -56,7 +56,7 @@ NS_START(fsm);
  * block back to the nest and repeat.
  */
 class random_foraging_fsm : public base_foraging_fsm,
-                            public visitor::visitable<random_foraging_fsm> {
+                            public visitor::visitable_any<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,
@@ -64,7 +64,7 @@ class random_foraging_fsm : public base_foraging_fsm,
                       std::shared_ptr<controller::actuator_manager> actuators);
 
   /**
-   * @brief If TRUE the robot is roaming around looking for a block.
+   * @brief If \c TRUE the robot is roaming around looking for a block.
    */
   virtual bool is_exploring(void) const;
 
@@ -79,7 +79,7 @@ class random_foraging_fsm : public base_foraging_fsm,
   void run(void);
 
   /**
-   * @brief If TRUE, the robot is returning to the nest, probably after having
+   * @brief If \c TRUE, the robot is returning to the nest, probably after having
    * successfully picked up a block.
    */
   bool is_transporting_to_nest(void) const {

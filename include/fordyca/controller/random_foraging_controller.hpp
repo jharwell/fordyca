@@ -51,7 +51,7 @@ NS_START(controller);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
-                                   public visitor::visitable<random_foraging_controller> {
+                                   public visitor::visitable_any<random_foraging_controller> {
  public:
   random_foraging_controller(void);
 
@@ -61,11 +61,12 @@ class random_foraging_controller : public base_foraging_controller,
   bool is_exploring(void) const { return m_fsm->is_exploring(); }
 
   /**
-   * @brief If \c TRUE, the robot is currently returning to the nest carrying a block.
+   * @brief If \c TRUE, the robot is currently returning to the nest carrying a
+   * block.
    */
   bool is_transporting_to_nest(void) const { return m_fsm->is_transporting_to_nest(); }
 
-  /**p
+  /**
    * @brief If \c TRUE, the robot is current engaged in collision avoidance.
    */
   bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }

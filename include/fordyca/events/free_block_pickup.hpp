@@ -34,7 +34,12 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 
-namespace fsm { class memory_foraging_fsm; class random_foraging_fsm; }
+namespace fsm {
+class memory_foraging_fsm;
+class random_foraging_fsm;
+class block_to_cache_fsm;
+class block_to_nest_fsm;
+}
 namespace controller {
 class memory_foraging_controller;
 class random_foraging_controller;
@@ -44,6 +49,8 @@ class perceived_arena_map;
 class block;
 class arena_map;
 }
+
+namespace tasks { class generalist; class forager; }
 
 NS_START(events);
 
@@ -61,13 +68,17 @@ NS_START(events);
  */
 class free_block_pickup : public cell_op,
                           public rcppsw::common::er_client,
-                          public visitor::can_visit<controller::memory_foraging_controller>,
-                          public visitor::can_visit<controller::random_foraging_controller>,
-                          public visitor::can_visit<fsm::memory_foraging_fsm>,
-                          public visitor::can_visit<fsm::random_foraging_fsm>,
-                          public visitor::can_visit<representation::block>,
-                          public visitor::can_visit<representation::arena_map>,
-                          public visitor::can_visit<representation::perceived_arena_map> {
+                          public visitor::visit_set<controller::memory_foraging_controller,
+                                                    controller::random_foraging_controller,
+                                                    fsm::memory_foraging_fsm,
+                                                    fsm::random_foraging_fsm,
+                                                    fsm::block_to_cache_fsm,
+                                                    fsm::block_to_nest_fsm,
+                                                    representation::block,
+                                                    representation::arena_map,
+                                                    representation::perceived_arena_map,
+                                                    tasks::generalist,
+                                                    tasks::forager> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                     representation::block* block, size_t robot_index);
@@ -98,25 +109,16 @@ class free_block_pickup : public cell_op,
    */
   void visit(representation::block& block) override;
 
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
   void visit(controller::random_foraging_controller& controller) override;
 
   void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::memory_foraging_fsm& fsm) override;
+  void visit(fsm::block_to_cache_fsm& fsm) override;
+  void visit(fsm::block_to_nest_fsm& fsm) override;
 
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
+  void visit(tasks::generalist& task) override;
+  void visit(tasks::forager& task) override;
+
   void visit(controller::memory_foraging_controller& controller) override;
 
  private:

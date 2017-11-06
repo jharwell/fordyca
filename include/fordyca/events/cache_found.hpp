@@ -32,9 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class cache;
-} /* namespace representation */
+namespace representation { class cache; }
+namespace tasks { class forager; class collector; }
 
 NS_START(events);
 
@@ -42,7 +41,9 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cache_found : public perceived_cell_op,
-                    public rcppsw::common::er_client {
+                    public rcppsw::common::er_client,
+                    public visitor::visit_set<tasks::forager,
+                                              tasks::collector> {
  public:
   cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
               const representation::cache* cache, size_t x, size_t y);
@@ -67,6 +68,9 @@ class cache_found : public perceived_cell_op,
    */
   void visit(representation::cell2D_fsm& fsm) override;
 
+  void visit(tasks::forager& task) override;
+  void visit(tasks::collector& task) override;
+
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
    *
@@ -74,7 +78,8 @@ class cache_found : public perceived_cell_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::memory_foraging_controller& controller) override;
+  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(controller::memory_foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

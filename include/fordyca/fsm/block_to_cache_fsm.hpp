@@ -28,6 +28,7 @@
 #include <utility>
 
 #include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
@@ -53,6 +54,7 @@ class block;
 } /* namespace representation */
 
 namespace task_allocation = rcppsw::task_allocation;
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(fsm);
 
@@ -68,7 +70,8 @@ NS_START(fsm);
  * it knows about.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
-                           public task_allocation::taskable {
+                           public task_allocation::taskable,
+                           public visitor::visitable_any<block_to_cache_fsm> {
  public:
   block_to_cache_fsm(
       const struct params::fsm_params* params,

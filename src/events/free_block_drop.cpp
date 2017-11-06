@@ -26,10 +26,6 @@
 
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
-#include "fordyca/support/block_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces

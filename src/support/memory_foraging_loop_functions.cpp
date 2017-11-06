@@ -95,7 +95,7 @@ void memory_foraging_loop_functions::handle_block_pickup(
       events::free_block_pickup pickup_op(rcppsw::common::g_server,
                                           &map()->blocks()[block],
                                           robot_id(robot));
-      controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
+      controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(pickup_op);
       map()->accept(pickup_op);
 
       /* The floor texture must be updated */
@@ -120,7 +120,7 @@ void memory_foraging_loop_functions::handle_block_drop(
     map()->accept(drop_op);
 
     /* Actually drop the block */
-    controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);
+    controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(drop_op);
 
     /* The floor texture must be updated */
     floor()->SetChanged();
