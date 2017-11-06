@@ -95,7 +95,7 @@ void memory_foraging_loop_functions::handle_block_pickup(
       events::free_block_pickup pickup_op(rcppsw::common::g_server,
                                           &map()->blocks()[block],
                                           robot_id(robot));
-      controller.visitor::visitable<controller::memory_foraging_controller>::accept(pickup_op);
+      controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(pickup_op);
       map()->accept(pickup_op);
 
       /* The floor texture must be updated */
@@ -120,7 +120,7 @@ void memory_foraging_loop_functions::handle_block_drop(
     map()->accept(drop_op);
 
     /* Actually drop the block */
-    controller.visitor::visitable<controller::memory_foraging_controller>::accept(drop_op);
+    controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(drop_op);
 
     /* The floor texture must be updated */
     floor()->SetChanged();
@@ -135,16 +135,6 @@ argos::CColor memory_foraging_loop_functions::GetFloorColor(
       nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY70;
   }
-
-  /*
-   * Blocks are inside caches, so display the cache the point is inside FIRST,
-   * so that you don't have blocks renderin inside of caches.
-   */
-  for (size_t i = 0; i < map()->caches().size(); ++i) {
-    if (map()->caches()[i].contains_point(plane_pos)) {
-      return argos::CColor::GRAY40;
-    }
-  } /* for(i..) */
 
   for (size_t i = 0; i < map()->blocks().size(); ++i) {
     if (map()->blocks()[i].contains_point(plane_pos)) {

@@ -64,7 +64,7 @@ NS_START(fsm);
  */
 class memory_foraging_fsm : public base_foraging_fsm,
                             public task_allocation::taskable,
-                            public visitor::visitable<memory_foraging_fsm> {
+                            public visitor::visitable_any<memory_foraging_fsm> {
  public:
   memory_foraging_fsm(
       const struct params::fsm_params* params,
@@ -79,6 +79,8 @@ class memory_foraging_fsm : public base_foraging_fsm,
    * @brief Reset the memory foraging task to a state where it can be restarted.
    */
   void task_reset(void) override { init(); }
+
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
 
   /**
    * @brief Run the memory foraging task.

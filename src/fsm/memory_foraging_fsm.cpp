@@ -118,6 +118,7 @@ __const FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
 void memory_foraging_fsm::init(void) {
   base_foraging_fsm::init();
   m_block_fsm.task_reset();
+  m_task_running = false;
 } /* init() */
 
 void memory_foraging_fsm::task_execute(void) {

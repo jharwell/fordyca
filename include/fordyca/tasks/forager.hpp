@@ -26,6 +26,9 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/tasks/argument.hpp"
+#include "fordyca/tasks/base_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,13 +43,24 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the first half of the generalist task in depth 1
  * allocation.
  */
-class forager : public task_allocation::polled_task {
+class forager : public task_allocation::polled_task, base_task {
  public:
   forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
       polled_task("forager", alpha, mechanism) {}
 
+  void accept(events::cache_block_drop &visitor) override;
+  void accept(events::free_block_pickup &visitor) override;
+
+  void accept(events::cached_block_pickup &) override {};
+  void accept(events::nest_block_drop &) override {};
+
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
+  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
+    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+    task_allocation::polled_task::mechanism()->task_start(&a);
+}
+  double calc_elapsed_time(double exec_time) const override;
 };
 
 NS_END(tasks, fordyca);

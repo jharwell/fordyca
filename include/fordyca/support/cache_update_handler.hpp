@@ -42,7 +42,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 class cache_update_handler : public rcppsw::common::er_client,
-                             public visitor::visitable<cache_update_handler> {
+                             public visitor::visitable_any<cache_update_handler> {
  public:
   cache_update_handler(std::shared_ptr<rcppsw::common::er_server> server,
                        std::vector<representation::cache>& caches);

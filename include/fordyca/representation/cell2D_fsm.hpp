@@ -43,7 +43,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * state of the cell (empty, has a block, or unknown).
  */
 class cell2D_fsm : public state_machine::simple_fsm,
-                   public visitor::visitable<cell2D_fsm> {
+                   public visitor::visitable_any<cell2D_fsm> {
  public:
   enum state {
     ST_UNKNOWN,

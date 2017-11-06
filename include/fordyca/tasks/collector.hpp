@@ -27,6 +27,7 @@
 #include <string>
 #include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/tasks/base_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,10 +42,16 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the second half of the generalist task in depth 1
  * allocation.
  */
-class collector : public task_allocation::polled_task {
+class collector : public task_allocation::polled_task, public base_task {
  public:
   collector(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
       polled_task("collector", alpha, mechanism) {}
+
+  void accept(events::cached_block_pickup &visitor) override;
+  void accept(events::nest_block_drop &visitor) override;
+
+  void accept(events::cache_block_drop &) override {};
+  void accept(events::free_block_pickup &) override {};
 
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
@@ -52,6 +59,7 @@ class collector : public task_allocation::polled_task {
   }
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
+  double calc_elapsed_time(double exec_time) const override;
 };
 
 NS_END(tasks, fordyca);

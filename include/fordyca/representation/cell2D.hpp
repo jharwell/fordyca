@@ -43,7 +43,7 @@ NS_START(fordyca, representation);
  * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
  * state is).
  */
-class cell2D : public visitor::visitable<cell2D> {
+class cell2D : public visitor::visitable_any<cell2D> {
  public:
   explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server);
 

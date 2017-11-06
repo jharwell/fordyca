@@ -43,7 +43,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class memory_foraging_controller : public base_foraging_controller,
-                                   public visitor::visitable<memory_foraging_controller> {
+                                   public visitor::visitable_any<memory_foraging_controller> {
  public:
   memory_foraging_controller(void) :
       base_foraging_controller(),

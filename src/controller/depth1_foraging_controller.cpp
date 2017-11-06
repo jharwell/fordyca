@@ -1,5 +1,5 @@
 /**
- * @file depth1_controller.cpp
+ * @file depth1_foraging_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,9 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1_controller.hpp"
+#include "fordyca/controller/depth1_foraging_controller.hpp"
 #include "fordyca/controller/sensor_manager.hpp"
 #include "fordyca/params/task_repository.hpp"
+#include "fordyca/params/memory_foraging_repository.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -37,7 +38,7 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth1_controller::ControlStep(void) {
+void depth1_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it. Then, you can run the main FSM
@@ -46,11 +47,13 @@ void depth1_controller::ControlStep(void) {
   memory_foraging_controller::process_los(
       base_foraging_controller::sensors()->los());
   memory_foraging_controller::map()->update_density();
+
+  m_executive->run();
 } /* ControlStep() */
 
-void depth1_controller::Init(argos::TConfigurationNode& node) {
+void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::task_repository task_repo;
-  params::task_repository fsm_repo;
+  params::memory_foraging_repository fsm_repo;
 
   memory_foraging_controller::Init(node);
   task_repo.parse_all(node);
@@ -91,12 +94,21 @@ void depth1_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::sensors(),
           base_foraging_controller::actuators(),
           memory_foraging_controller::map_ref());
-  m_generalist.reset(new tasks::generalist(p, collector_fsm));
+  m_generalist.reset(new tasks::generalist(p, generalist_fsm));
 
+  m_generalist->partition1(m_forager.get());
+  m_generalist->partition2(m_collector.get());
+  m_generalist->parent(m_generalist.get());
+
+  m_forager->parent(m_generalist.get());
+  m_collector->parent(m_generalist.get());
+
+  m_executive.reset(new task_allocation::polled_executive(base_foraging_controller::server(),
+                                                          m_generalist.get()));
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 
 using namespace argos;
-REGISTER_CONTROLLER(depth1_controller, "depth1_controller")
+REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller");
 
 NS_END(controller, fordyca);

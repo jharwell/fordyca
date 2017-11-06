@@ -1,5 +1,5 @@
 /**
- * @file task_parser.cpp
+ * @file depth1_foraging_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,37 +17,29 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/utils/line_parser.hpp"
-#include "fordyca/params/task_parser.hpp"
+#include "fordyca/support/memory_foraging_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Member Functions
+ * Classes
  ******************************************************************************/
-void task_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode task_node = argos::GetNode(node, "task");
+class depth1_foraging_qt_user_functions : public memory_foraging_qt_user_functions {
+ public:
+  depth1_foraging_qt_user_functions(void) {}
 
-  m_params.reset(new task_allocation::task_params);
+  virtual ~depth1_foraging_qt_user_functions() {}
+};
 
-  argos::GetNodeAttribute(task_node, "estimation_alpha",
-                          m_params->estimation_alpha);
-  argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
-  argos::GetNodeAttribute(task_node, "abort_offset", m_params->abort_offset);
-} /* parse() */
+NS_END(fordyca, support);
 
-void task_parser::show(std::ostream& stream) {
-  stream << "====================\nTASK params\n====================\n";
-  stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
-  stream << "reactivity=" << m_params->reactivity << std::endl;
-  stream << "abort_offset=" << m_params->abort_offset << std::endl;
-} /* show() */
-
-NS_END(params, fordyca);
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_QT_USER_FUNCTIONS_HPP_ */

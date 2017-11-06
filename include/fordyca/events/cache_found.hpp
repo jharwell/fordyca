@@ -32,9 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class cache;
-} /* namespace representation */
+namespace representation { class cache; }
 
 NS_START(events);
 
@@ -51,6 +49,7 @@ class cache_found : public perceived_cell_op,
   void visit(representation::cell2D& cell) override;
   void visit(representation::perceived_cell2D& cell) override;
 
+  /* depth1 foraging */
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
    * new location and updating the block so that it no longer thinks it is
@@ -74,7 +73,8 @@ class cache_found : public perceived_cell_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::memory_foraging_controller& controller) override;
+  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(controller::memory_foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

@@ -40,7 +40,7 @@ NS_START(support);
  * Class Definitions
  ******************************************************************************/
 class block_stat_collector : public base_stat_collector,
-                             public visitor::visitable<block_stat_collector> {
+                             public visitor::visitable_any<block_stat_collector> {
  public:
   explicit block_stat_collector(const std::string ofname) :
       base_stat_collector(ofname), m_block_stats() {}

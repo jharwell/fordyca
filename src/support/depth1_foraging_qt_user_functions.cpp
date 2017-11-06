@@ -1,7 +1,5 @@
 /**
- * @file base_controller_repository.hpp
- *
- * Handles parsing of all XML parameters at runtime.
+ * @file depth1_foraging_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -20,29 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
-#include "fordyca/params/repository.hpp"
+#include "fordyca/support/depth1_foraging_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
-/*******************************************************************************
- * Class Definitions
- ******************************************************************************/
-class base_controller_repository: public repository {
- public:
-  base_controller_repository(void);
-};
+using namespace argos;
+REGISTER_QTOPENGL_USER_FUNCTIONS(depth1_foraging_qt_user_functions,
+                                 "depth1_foraging_qt_user_functions")
 
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */
+NS_END(support, fordyca);

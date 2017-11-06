@@ -50,7 +50,7 @@ NS_START(fordyca, representation);
  * map).
  */
 class cache : public cell_entity,
-              public rcppsw::patterns::visitor::visitable<cache> {
+              public rcppsw::patterns::visitor::visitable_any<cache> {
  public:
   cache(double dimension, argos::CVector2 center, std::list<block*> blocks);
 

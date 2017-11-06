@@ -43,7 +43,7 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public rcppsw::patterns::visitor::visitable<block> {
+              public rcppsw::patterns::visitor::visitable_any<block> {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension, argos::CColor::BLACK),

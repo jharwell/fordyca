@@ -32,9 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class block;
-} /* namespace representation */
+namespace representation { class block; }
 
 NS_START(events);
 
@@ -55,14 +53,18 @@ class block_found : public perceived_cell_op,
               const representation::block* block, size_t x, size_t y);
   ~block_found(void) { er_client::rmmod(); }
 
+  /* depth0 foraging */
   void visit(representation::cell2D& cell) override;
+  void visit(representation::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
   /**
-   * @brief Update the FSM associated with a cell on a block drop.
+   * @brief Drop a carried block in the nest, updating state as appropriate.
    *
-   * @param fsm The FSM associated with the cell to update.
+   * This needs to be here, rather than in the FSM, because dropping of blocks
+   * needs to be done in the loop functions so the area can correctly be drawn
+   * each timestep.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(controller::memory_foraging_controller& controller) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
@@ -73,14 +75,8 @@ class block_found : public perceived_cell_op,
    */
   void visit(representation::perceived_arena_map& map) override;
 
-  /**
-   * @brief Drop a carried block in the nest, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because dropping of blocks
-   * needs to be done in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::memory_foraging_controller& controller) override;
+  /* depth1 foraging */
+  void visit(controller::depth1_foraging_controller& controller) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

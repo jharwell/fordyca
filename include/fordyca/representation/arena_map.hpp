@@ -54,7 +54,7 @@ class cell2D;
  * the grid and move around as the state of the arena changes.
  */
 class arena_map: public rcppsw::common::er_client,
-                 public rcppsw::patterns::visitor::visitable<arena_map> {
+                 public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   arena_map(const struct params::arena_map_params* params);
 

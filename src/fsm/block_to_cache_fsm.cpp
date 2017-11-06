@@ -59,18 +59,22 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {
     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
+      return controller::foraging_signal::HANDLED;
     }
   } else if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+      internal_event(ST_FINISHED);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
       internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal type");
   return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+
   if (m_block_fsm.task_finished()) {
     if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
       m_block_fsm.task_reset();
@@ -108,6 +112,11 @@ void block_to_cache_fsm::init(void) {
 } /* init() */
 
 void block_to_cache_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
+  const tasks::foraging_signal_argument* const a =
+      dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
+  ER_ASSERT(a, "FATAL: bad argument passed");
+  inject_event(a->signal(), state_machine::event_type::NORMAL);
+
   inject_event(controller::foraging_signal::ACQUIRE_FREE_BLOCK,
                state_machine::event_type::NORMAL);
 }
