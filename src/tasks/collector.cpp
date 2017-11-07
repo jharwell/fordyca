@@ -39,7 +39,41 @@ double collector::calc_elapsed_time(double exec_time) const {
   return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* calc_elapsed_time() */
 
+/*******************************************************************************
+ * Event Handling
+ ******************************************************************************/
 void collector::accept(events::cached_block_pickup &visitor) { visitor.visit(*this); }
 void collector::accept(events::nest_block_drop &visitor) { visitor.visit(*this); }
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool collector::is_avoiding_collision(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool collector::is_transporting_to_nest(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->is_transporting_to_nest();
+} /* is_transporting_to_nest() */
+
+bool collector::is_vectoring(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->is_vectoring();
+} /* is_vectoring() */
+
+bool collector::is_exploring(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->is_exploring();
+} /* is_exploring() */
+
+/*******************************************************************************
+ * Depth1 Diagnostics
+ ******************************************************************************/
+bool collector::is_searching_for_cache(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->is_searching_for_cache();
+} /* is_searching_for_cache() */
 
 NS_END(tasks, fordyca);

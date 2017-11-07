@@ -1,5 +1,5 @@
 /**
- * @file stat_collector.cpp
+ * @file block_stat_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,37 +21,41 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/base_stat_collector.hpp"
+#include "fordyca/diagnostics/block_stat_collector.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_stat_collector::csv_line_write(uint timestep) {
-  m_ofile << std::to_string(timestep) + ";" +
-      csv_line_build() << std::endl;
-} /* csv_line_write() */
-
-void base_stat_collector::csv_header_write(void) {
-  std::string header = csv_header_build("");
-  m_ofile << header + "\n";
-} /* csv_header_write() */
-
-std::string base_stat_collector::csv_header_build(const std::string& header) {
-  return header + "clock;";
+std::string block_stat_collector::csv_header_build(const std::string& header) {
+  return base_stat_collector::csv_header_build(header) +
+      "collected_blocks;avg_carries";
 } /* csv_header_build() */
 
-void base_stat_collector::reset(void) {
-  /* Open output file and truncate */
-  if (m_ofile.is_open()) {
-    m_ofile.close();
-  }
-  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  csv_header_write();
+void block_stat_collector::reset(void) {
+  base_stat_collector::reset();
+  m_block_stats = {0, 0};
 } /* reset() */
 
-NS_END(support, fordyca);
+std::string block_stat_collector::csv_line_build(void) {
+  double avg_carries = 0;
+  if (m_block_stats.total_collected > 0) {
+    avg_carries = static_cast<double>(m_block_stats.total_collected/
+                                      m_block_stats.total_carries);
+  }
+  return std::to_string(m_block_stats.total_collected) + ";" +
+      std::to_string(avg_carries) + ";";
+} /* csv_line_build() */
+
+void block_stat_collector::collect(const representation::block& block) {
+  ++m_block_stats.total_collected;
+  m_block_stats.total_carries += block.carries();
+} /* collect() */
+
+
+NS_END(diagnostics, fordyca);

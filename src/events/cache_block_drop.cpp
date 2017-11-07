@@ -79,10 +79,7 @@ void cache_block_drop::visit(representation::block& block) {
 
 void cache_block_drop::visit(controller::depth1_foraging_controller& controller) {
   controller.block(nullptr);
-
-  dynamic_cast<tasks::base_task*>(
-      static_cast<task_allocation::polled_task*>(
-          controller.current_task()))->accept(*this);
+  controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s dropped block%d in cache%d",
          controller.GetId().c_str(), m_block->id(), m_cache->id());

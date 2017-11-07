@@ -1,5 +1,5 @@
 /**
- * @file block_stat_collector.cpp
+ * @file foraging_task.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,44 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_
+#define INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/block_stat_collector.hpp"
-#include "fordyca/representation/block.hpp"
+#include <string>
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "fordyca/tasks/argument.hpp"
+#include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace events {
+class cached_block_pickup;
+class cache_block_drop;
+class free_block_pickup;
+class nest_block_drop;
+}
+
+namespace visitor = rcppsw::patterns::visitor;
+
+NS_START(tasks);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-std::string block_stat_collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "collected_blocks;avg_carries";
-} /* csv_header_build() */
+class foraging_task : public diagnostics::depth1_diagnostics,
+                      public visitor::polymorphic_visitable<foraging_task,
+                                                            events::cached_block_pickup,
+                                                            events::cache_block_drop,
+                                                            events::free_block_pickup,
+                                                            events::nest_block_drop> {
+ public:
+  foraging_task(void) {}
+};
 
-void block_stat_collector::reset(void) {
-  base_stat_collector::reset();
-  m_block_stats = {0, 0};
-} /* reset() */
+NS_END(tasks, fordyca);
 
-std::string block_stat_collector::csv_line_build(void) {
-  double avg_carries = 0;
-  if (m_block_stats.total_collected > 0) {
-    avg_carries = static_cast<double>(m_block_stats.total_collected/
-                                      m_block_stats.total_carries);
-  }
-  return std::to_string(m_block_stats.total_collected) + ";" +
-      std::to_string(avg_carries) + ";";
-} /* csv_line_build() */
-
-void block_stat_collector::collect(const representation::block& block) {
-  ++m_block_stats.total_collected;
-  m_block_stats.total_carries += block.carries();
-} /* collect() */
-
-
-NS_END(support, fordyca);
+#endif /* INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_ */

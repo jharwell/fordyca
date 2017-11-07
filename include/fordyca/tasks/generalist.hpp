@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
-#include "fordyca/tasks/base_task.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,17 +46,29 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class generalist : public task_allocation::partitionable_polled_task<task_allocation::polled_task,
                                                                      task_allocation::polled_task>,
-                   public base_task {
+                   public foraging_task {
  public:
   generalist(const struct task_allocation::task_params * const params,
              std::unique_ptr<task_allocation::taskable>& mechanism) :
       partitionable_polled_task("generalist", params, mechanism) {}
 
+  /* event handling */
   void accept(events::free_block_pickup &visitor) override;
   void accept(events::nest_block_drop &visitor) override;
-
   void accept(events::cache_block_drop &) override {};
   void accept(events::cached_block_pickup &) override {};
+
+  /* depth0 diagnostics */
+  bool is_searching_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+  bool is_vectoring(void) const override;
+  bool is_exploring(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_searching_for_cache(void) const override { return false; }
+  bool is_transporting_to_cache(void) const override { return false; }
+  std::string task_name(void) const override { return "generalist"; };
 
   logical_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}

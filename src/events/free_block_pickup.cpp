@@ -146,10 +146,7 @@ void free_block_pickup::visit(controller::memory_foraging_controller& controller
 void free_block_pickup::visit(controller::depth1_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.block(m_block);
-
-  dynamic_cast<tasks::base_task*>(
-      static_cast<task_allocation::polled_task*>(
-          controller.current_task()))->accept(*this);
+  controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());

@@ -24,11 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/controller/memory_foraging_controller.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
+#include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +44,7 @@ namespace task_allocation = rcppsw::task_allocation;
  * Class Definitions
  ******************************************************************************/
 class depth1_foraging_controller : public memory_foraging_controller,
+                                   public diagnostics::depth1_diagnostics,
                                    public visitor::visitable_any<depth1_foraging_controller> {
  public:
   depth1_foraging_controller(void) :
@@ -50,10 +54,21 @@ class depth1_foraging_controller : public memory_foraging_controller,
       m_collector(),
       m_generalist() {}
 
-  const std::string& current_task(void) const;
-  bool is_avoiding_collision(void) const = delete;
-  bool is_transporting_to_nest(void) const = delete;
-  bool is_vectoring(void) const = delete;
+  tasks::foraging_task* current_task(void) const;
+
+  /* depth0 diagnostics */
+  bool is_searching_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+  bool is_vectoring(void) const override;
+  bool is_exploring(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_searching_for_cache(void) const override;
+  bool is_transporting_to_cache(void) const override;
+  std::string task_name(void) const override;
+
+  bool cache_detected(void) const;
 
   /*
    * @brief Initialize the controller.
@@ -69,8 +84,6 @@ class depth1_foraging_controller : public memory_foraging_controller,
    * Since the FSM does most of the work, this function just tells it run.
    */
   void ControlStep(void) override;
-
-  task_allocation::executable_task* current_task(void) { return m_executive->current_task(); }
 
  private:
   std::unique_ptr<task_allocation::polled_executive> m_executive;

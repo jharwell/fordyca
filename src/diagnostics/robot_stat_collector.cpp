@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/robot_stat_collector.hpp"
+#include "fordyca/diagnostics/robot_stat_collector.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/memory_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
  * Member Functions
@@ -72,4 +72,4 @@ void robot_stat_collector::reset_on_timestep(void) {
 } /* reset_on_timestep() */
 
 
-NS_END(support, fordyca);
+NS_END(diagnostics, fordyca);

@@ -66,7 +66,7 @@ void memory_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
 void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     controller::memory_foraging_controller& controller =
-        dynamic_cast<controller::memory_foraging_controller&>(
+        static_cast<controller::memory_foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* Send the robot its new line of sight */
@@ -74,17 +74,17 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     set_robot_tick(robot);
 
     if (controller.is_carrying_block()) {
-      handle_block_drop(controller);
+      handle_nest_block_drop(controller);
     } else { /* The foot-bot has no block item */
-      handle_block_pickup(robot);
+      handle_free_block_pickup(robot);
     }
 } /* pre_step_iter() */
 
-void memory_foraging_loop_functions::handle_block_pickup(
+void memory_foraging_loop_functions::handle_free_block_pickup(
     argos::CFootBotEntity& robot) {
 
   controller::memory_foraging_controller& controller =
-      dynamic_cast<controller::memory_foraging_controller&>(
+      static_cast<controller::memory_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
   if (!controller.in_nest() && controller.is_searching_for_block() &&
@@ -102,9 +102,9 @@ void memory_foraging_loop_functions::handle_block_pickup(
       floor()->SetChanged();
     }
   }
-} /* handle_block_pickup() */
+} /* handle_free_block_pickup() */
 
-void memory_foraging_loop_functions::handle_block_drop(
+void memory_foraging_loop_functions::handle_nest_block_drop(
     controller::memory_foraging_controller& controller) {
   if (controller.in_nest()) {
     /* get stats from this robot before its state changes */
@@ -125,7 +125,7 @@ void memory_foraging_loop_functions::handle_block_drop(
     /* The floor texture must be updated */
     floor()->SetChanged();
   }
-} /* handle_block_drop() */
+} /* handle_nest_block_drop() */
 
 argos::CColor memory_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

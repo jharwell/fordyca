@@ -1,5 +1,5 @@
 /**
- * @file depth1_foraging_loop_functions.hpp
+ * @file stat_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,45 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
-#include "fordyca/support/memory_foraging_loop_functions.hpp"
+#include "fordyca/diagnostics/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
- * Classes
+ * Member Functions
  ******************************************************************************/
-class depth1_foraging_loop_functions : public memory_foraging_loop_functions {
- public:
-  depth1_foraging_loop_functions() {}
-  virtual ~depth1_foraging_loop_functions(void) {}
+void base_stat_collector::csv_line_write(uint timestep) {
+  m_ofile << std::to_string(timestep) + ";" +
+      csv_line_build() << std::endl;
+} /* csv_line_write() */
 
-  void Init(argos::TConfigurationNode& node) override;
-  void PreStep() override;
+void base_stat_collector::csv_header_write(void) {
+  std::string header = csv_header_build("");
+  m_ofile << header + "\n";
+} /* csv_header_write() */
 
- protected:
-  void pre_step_iter(argos::CFootBotEntity& robot) override;
-  void handle_cache_block_drop(argos::CFootBotEntity& robot);
-  void handle_cached_block_pickup(argos::CFootBotEntity& robot);
-  int robot_on_cache(const argos::CFootBotEntity& robot);
+std::string base_stat_collector::csv_header_build(const std::string& header) {
+  return header + "clock;";
+} /* csv_header_build() */
 
- private:
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+void base_stat_collector::reset(void) {
+  /* Open output file and truncate */
+  if (m_ofile.is_open()) {
+    m_ofile.close();
+  }
+  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
+  csv_header_write();
+} /* reset() */
 
-  depth1_foraging_loop_functions(const depth1_foraging_loop_functions& s) = delete;
-  depth1_foraging_loop_functions& operator=(const depth1_foraging_loop_functions& s) = delete;
-};
-
-NS_END(support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_ */
+NS_END(diagnostics, fordyca);

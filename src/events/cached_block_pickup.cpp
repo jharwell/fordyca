@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
-#include "fordyca/tasks/base_task.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -159,10 +159,7 @@ void cached_block_pickup::visit(representation::block& block) {
 void cached_block_pickup::visit(controller::depth1_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.block(m_block);
-
-  dynamic_cast<tasks::base_task*>(
-      static_cast<task_allocation::polled_task*>(
-          controller.current_task()))->accept(*this);
+  controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());

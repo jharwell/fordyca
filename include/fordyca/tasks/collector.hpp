@@ -27,7 +27,7 @@
 #include <string>
 #include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "fordyca/tasks/base_task.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,18 +42,31 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the second half of the generalist task in depth 1
  * allocation.
  */
-class collector : public task_allocation::polled_task, public base_task {
+class collector : public task_allocation::polled_task, foraging_task {
  public:
-  collector(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
+  collector(double alpha,
+            std::unique_ptr<task_allocation::taskable>& mechanism) :
       polled_task("collector", alpha, mechanism) {}
 
+  /* event handling */
   void accept(events::cached_block_pickup &visitor) override;
   void accept(events::nest_block_drop &visitor) override;
-
   void accept(events::cache_block_drop &) override {};
   void accept(events::free_block_pickup &) override {};
 
-  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
+  /* depth0 diagnostics */
+  bool is_searching_for_block(void) const override { return false; };
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+  bool is_vectoring(void) const override;
+  bool is_exploring(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_searching_for_cache(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; }
+  std::string task_name(void) const override { return "collector"; };
+
+   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
   }
