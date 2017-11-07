@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/diagnostics/base_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,16 +34,13 @@ NS_START(fordyca, diagnostics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth0_diagnostics {
+class depth0_diagnostics : public base_diagnostics {
  public:
   depth0_diagnostics(void) {}
   virtual ~depth0_diagnostics(void) {}
 
-  virtual bool is_searching_for_block(void) const = 0;
-  virtual bool is_avoiding_collision(void) const = 0;
-  virtual bool is_transporting_to_nest(void) const = 0;
-  virtual bool is_vectoring(void) const = 0;
-  virtual bool is_exploring(void) const = 0;
+  virtual bool is_acquiring_block(void) const = 0;
+  virtual bool is_vectoring_to_block(void) const = 0;
 };
 
 NS_END(diagnostics, fordyca);

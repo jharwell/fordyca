@@ -95,9 +95,9 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_d
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
   if (m_cache_fsm.task_finished()) {
-    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       m_cache_fsm.task_reset();
-      internal_event(ST_TRANSPORT_TO_CACHE);
+      internal_event(ST_FINISHED);
     }
   }
   m_cache_fsm.task_execute();
@@ -106,6 +106,48 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_d
 
 __const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {
   return controller::foraging_signal::HANDLED;
+}
+
+/*******************************************************************************
+ * Base Diagnostics
+ ******************************************************************************/
+__pure bool block_to_cache_fsm::is_exploring_for_block(void) const {
+  return m_block_fsm.is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+__pure bool block_to_cache_fsm::is_avoiding_collision(void) const {
+  return m_block_fsm.is_avoiding_collision() ||
+      m_cache_fsm.is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+__pure bool block_to_cache_fsm::is_acquiring_block(void) const {
+  return m_block_fsm.is_acquiring_block();
+} /* is_acquiring_block */
+
+__pure bool block_to_cache_fsm::is_vectoring_to_block(void) const {
+  return m_block_fsm.is_vectoring_to_block();
+} /* is_vectoring_to_block */
+
+/*******************************************************************************
+ * Depth1 Diagnostics
+ ******************************************************************************/
+__pure bool block_to_cache_fsm::is_exploring_for_cache(void) const {
+  return m_cache_fsm.is_exploring_for_cache();
+} /* is_exploring_for_cache */
+
+__pure bool block_to_cache_fsm::is_vectoring_to_cache(void) const {
+  return m_cache_fsm.is_vectoring_to_cache();
+} /* is_vectoring_to_cache */
+
+__pure bool block_to_cache_fsm::is_acquiring_cache(void) const {
+  return m_cache_fsm.is_acquiring_cache();
+} /* is_acquiring_cache */
+
+__pure bool block_to_cache_fsm::is_transporting_to_cache(void) const {
+  return current_state() == ST_TRANSPORT_TO_CACHE;
 }
 
 /*******************************************************************************
@@ -131,30 +173,5 @@ void block_to_cache_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
-
-__pure bool block_to_cache_fsm::is_transporting_to_cache(void) const {
-  return current_state() == ST_TRANSPORT_TO_CACHE;
-}
-
-__pure bool block_to_cache_fsm::is_searching_for_block(void) const {
-  return m_block_fsm.is_searching_for_block();
-}
-
-__pure bool block_to_cache_fsm::is_searching_for_cache(void) const {
-  return m_cache_fsm.is_searching_for_cache();
-}
-
-__pure bool block_to_cache_fsm::is_exploring(void) const {
-  return m_block_fsm.is_exploring() || m_cache_fsm.is_exploring();
-}
-
-__pure bool block_to_cache_fsm::is_vectoring(void) const {
-  return m_block_fsm.is_vectoring() || m_cache_fsm.is_exploring();
-}
-
-__pure bool block_to_cache_fsm::is_avoiding_collision(void) const {
-  return m_block_fsm.is_avoiding_collision() ||
-      m_cache_fsm.is_avoiding_collision();
-}
 
 NS_END(fsm, fordyca);

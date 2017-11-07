@@ -65,6 +65,21 @@ void random_foraging_controller::Reset(void) {
   m_fsm->init();
 } /* Reset() */
 
+/*******************************************************************************
+ * Base Diagnostics
+ ******************************************************************************/
+bool random_foraging_controller::is_exploring_for_block(void) const {
+  return m_fsm->is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+bool random_foraging_controller::is_transporting_to_nest(void) const {
+  return m_fsm->is_transporting_to_nest();
+} /* is_transporting_to_nest() */
+
+bool random_foraging_controller::is_avoiding_collision(void) const {
+  return m_fsm->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;
 REGISTER_CONTROLLER(random_foraging_controller, "random_foraging_controller");

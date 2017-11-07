@@ -33,6 +33,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/explore_fsm.hpp"
+#include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,6 @@ NS_START(fsm);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
  *@brief The FSM for an acquiring a block from a cache in the arena.
  *
@@ -62,6 +62,7 @@ NS_START(fsm);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
+                          public diagnostics::depth1_diagnostics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(
@@ -78,30 +79,25 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool task_running(void) const override { return ST_ACQUIRE_CACHE == current_state(); }
   void task_reset(void) override { init(); }
 
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override { return false; };
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override { return false; }
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override { return false; };
+  bool is_vectoring_to_block(void) const override { return false; };
+
+  /* depth1 diagnostics */
+  bool is_exploring_for_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+  bool is_acquiring_cache(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; };
+
   /**
    * @brief Reset the FSM
    */
   void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently searching for a cache within the arena.
-   * (either vectoring towards a known block, or exploring for one).
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool is_searching_for_cache(void) const {
-    return is_vectoring() || is_exploring();
-  }
-
-  bool is_exploring(void) const {
-    return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.is_searching()); }
-
-  bool is_vectoring(void) const {
-    return current_state() == ST_ACQUIRE_CACHE && m_vector_fsm.task_running();
-  }
-  bool is_avoiding_collision(void) const {
-    return m_explore_fsm.is_avoiding_collision();
-  }
 
  protected:
   enum fsm_states {

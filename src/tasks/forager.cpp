@@ -52,35 +52,48 @@ void forager::accept(events::cache_block_drop &visitor) { visitor.visit(*this); 
 void forager::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Base Diagnostics
  ******************************************************************************/
-bool forager::is_searching_for_block(void) const {
+bool forager::is_exploring_for_block(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(
-      polled_task::mechanism())->is_searching_for_block();
-} /* is_searching_for_block() */
+      polled_task::mechanism())->is_exploring_for_block();
+} /* is_exploring_for_block() */
 
 bool forager::is_avoiding_collision(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(
       polled_task::mechanism())->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool forager::is_vectoring(void) const {
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool forager::is_acquiring_block(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(
-      polled_task::mechanism())->is_vectoring();
-} /* is_vectoring() */
+      polled_task::mechanism())->is_acquiring_block();
+} /* is_acquiring_block() */
 
-bool forager::is_exploring(void) const {
+bool forager::is_vectoring_to_block(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(
-      polled_task::mechanism())->is_exploring();
-} /* is_exploring() */
+      polled_task::mechanism())->is_vectoring_to_block();
+} /* is_vectoring_to_block() */
 
 /*******************************************************************************
  * Depth1 Diagnostics
  ******************************************************************************/
-bool forager::is_searching_for_cache(void) const {
+bool forager::is_exploring_for_cache(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(
-      polled_task::mechanism())->is_searching_for_cache();
-} /* is_searching_for_cache() */
+      polled_task::mechanism())->is_exploring_for_cache();
+} /* is_exploring_for_cache() */
+
+bool forager::is_vectoring_to_cache(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_vectoring_to_cache();
+} /* is_vectoring_to_cache() */
+
+bool forager::is_acquiring_cache(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_acquiring_cache();
+} /* is_acquiring_cache() */
 
 bool forager::is_transporting_to_cache(void) const {
   return static_cast<fsm::block_to_cache_fsm*>(

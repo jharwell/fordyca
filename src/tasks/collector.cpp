@@ -46,34 +46,34 @@ void collector::accept(events::cached_block_pickup &visitor) { visitor.visit(*th
 void collector::accept(events::nest_block_drop &visitor) { visitor.visit(*this); }
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Base Diagnostics
  ******************************************************************************/
 bool collector::is_avoiding_collision(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(
-      polled_task::mechanism())->is_avoiding_collision();
+return static_cast<fsm::block_to_nest_fsm*>(
+polled_task::mechanism())->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 bool collector::is_transporting_to_nest(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(
-      polled_task::mechanism())->is_transporting_to_nest();
+return static_cast<fsm::block_to_nest_fsm*>(
+polled_task::mechanism())->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
-
-bool collector::is_vectoring(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(
-      polled_task::mechanism())->is_vectoring();
-} /* is_vectoring() */
-
-bool collector::is_exploring(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(
-      polled_task::mechanism())->is_exploring();
-} /* is_exploring() */
 
 /*******************************************************************************
  * Depth1 Diagnostics
  ******************************************************************************/
-bool collector::is_searching_for_cache(void) const {
+bool collector::is_exploring_for_cache(void) const {
   return static_cast<fsm::block_to_nest_fsm*>(
-      polled_task::mechanism())->is_searching_for_cache();
-} /* is_searching_for_cache() */
+      polled_task::mechanism())->is_exploring_for_cache();
+} /* is_exploring_for_cache() */
+
+bool collector::is_vectoring_to_cache(void) const {
+return static_cast<fsm::block_to_nest_fsm*>(
+polled_task::mechanism())->is_vectoring_to_cache();
+} /* is_vectoring_to_cache() */
+
+bool collector::is_acquiring_cache(void) const {
+return static_cast<fsm::block_to_nest_fsm*>(
+polled_task::mechanism())->is_acquiring_cache();
+} /* is_acquiring_cache() */
 
 NS_END(tasks, fordyca);

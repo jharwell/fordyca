@@ -43,9 +43,9 @@ block_to_nest_fsm::block_to_nest_fsm(
     base_foraging_fsm(server,
                       std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
                       actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, &start),
+    HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
     HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
-    entry_return_to_nest(),
+    entry_transport_to_nest(),
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
@@ -57,8 +57,8 @@ block_to_nest_fsm::block_to_nest_fsm(
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
-                                    &entry_return_to_nest, NULL),
+        HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest, NULL,
+                                    &entry_transport_to_nest, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                   &entry_collision_avoidance, NULL),
       HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
@@ -91,7 +91,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::event_da
    */
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_block_fsm.task_reset();
-    internal_event(ST_RETURN_TO_NEST);
+    internal_event(ST_TRANSPORT_TO_NEST);
   } else {
     m_block_fsm.task_execute();
   }
@@ -107,7 +107,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::event_
   if (m_cache_fsm.task_finished()) {
     if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
       m_cache_fsm.task_reset();
-      internal_event(ST_RETURN_TO_NEST);
+      internal_event(ST_TRANSPORT_TO_NEST);
     }
   } else {
     m_cache_fsm.task_execute();
@@ -117,6 +117,48 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::event_
 __const HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
+
+/*******************************************************************************
+ * Base Diagnostics
+ ******************************************************************************/
+__pure bool block_to_nest_fsm::is_exploring_for_block(void) const {
+  return m_block_fsm.is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+__pure bool block_to_nest_fsm::is_avoiding_collision(void) const {
+  return m_block_fsm.is_avoiding_collision() ||
+      m_cache_fsm.is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+__pure bool block_to_nest_fsm::is_transporting_to_nest(void) const {
+  return current_state() == ST_TRANSPORT_TO_NEST;
+} /* is_transporting_to_nest() */
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+__pure bool block_to_nest_fsm::is_acquiring_block(void) const {
+  return m_block_fsm.is_acquiring_block();
+} /* is_acquiring_block() */
+
+__pure bool block_to_nest_fsm::is_vectoring_to_block(void) const {
+  return m_block_fsm.is_vectoring_to_block();
+} /* is_vectoring_to_block() */
+
+/*******************************************************************************
+ * Depth1 Diagnostics
+ ******************************************************************************/
+__pure bool block_to_nest_fsm::is_exploring_for_cache(void) const {
+  return m_cache_fsm.is_exploring_for_cache();
+} /* is_exploring_for_cache() */
+
+__pure bool block_to_nest_fsm::is_vectoring_to_cache(void) const {
+  return m_cache_fsm.is_vectoring_to_cache();
+} /* is_vectoring_to_cache() */
+
+__pure bool block_to_nest_fsm::is_acquiring_cache(void) const {
+  return m_cache_fsm.is_acquiring_cache();
+} /* is_acquiring_cache() */
 
 /*******************************************************************************
  * General Member Functions
@@ -138,29 +180,5 @@ void block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
-
-__pure bool block_to_nest_fsm::is_searching_for_block(void) const {
-  return m_block_fsm.is_searching_for_block();
-}
-
-__pure bool block_to_nest_fsm::is_searching_for_cache(void) const {
-  return m_cache_fsm.is_searching_for_cache();
-}
-
-__pure bool block_to_nest_fsm::is_exploring(void) const {
-  return m_block_fsm.is_exploring() || m_cache_fsm.is_exploring();
-}
-__pure bool block_to_nest_fsm::is_vectoring(void) const {
-  return m_block_fsm.is_vectoring() || m_cache_fsm.is_exploring();
-}
-
-__pure bool block_to_nest_fsm::is_avoiding_collision(void) const {
-  return m_block_fsm.is_avoiding_collision() ||
-      m_cache_fsm.is_avoiding_collision();
-}
-
-__pure bool block_to_nest_fsm::is_transporting_to_nest(void) const {
-  return current_state() == ST_RETURN_TO_NEST;
-}
 
 NS_END(fsm, fordyca);

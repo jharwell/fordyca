@@ -47,12 +47,12 @@ void generalist::accept(events::nest_block_drop &visitor) { visitor.visit(*this)
 void generalist::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Base Diagnostics
  ******************************************************************************/
-bool generalist::is_searching_for_block(void) const {
+bool generalist::is_exploring_for_block(void) const {
   return static_cast<fsm::memory_foraging_fsm*>(
-      polled_task::mechanism())->is_searching_for_block();
-} /* is_searching_for_block() */
+      polled_task::mechanism())->is_exploring_for_block();
+} /* is_exploring_for_block() */
 
 bool generalist::is_avoiding_collision(void) const {
   return static_cast<fsm::memory_foraging_fsm*>(
@@ -64,14 +64,17 @@ bool generalist::is_transporting_to_nest(void) const {
       polled_task::mechanism())->is_transporting_to_nest();
 } /* is_tranpsorting_to_nest() */
 
-bool generalist::is_vectoring(void) const {
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool generalist::is_acquiring_block(void) const {
   return static_cast<fsm::memory_foraging_fsm*>(
-      polled_task::mechanism())->is_vectoring();
-} /* is_vectoring() */
+      polled_task::mechanism())->is_acquiring_block();
+} /* is_acquiring_block() */
 
-bool generalist::is_exploring(void) const {
+bool generalist::is_vectoring_to_block(void) const {
   return static_cast<fsm::memory_foraging_fsm*>(
-      polled_task::mechanism())->is_exploring();
-} /* is_exploring() */
+      polled_task::mechanism())->is_vectoring_to_block();
+} /* is_vectoring_to_block() */
 
 NS_END(tasks, fordyca);

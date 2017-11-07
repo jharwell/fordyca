@@ -40,10 +40,10 @@ random_foraging_fsm::random_foraging_fsm(
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(return_to_nest, &start),
+    HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
     HFSM_CONSTRUCT_STATE(leaving_nest, &start),
     HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
-    entry_return_to_nest(),
+    entry_transport_to_nest(),
     entry_leaving_nest(),
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -53,8 +53,8 @@ random_foraging_fsm::random_foraging_fsm(
                   server, sensors, actuators),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest, NULL,
-                                  &entry_return_to_nest, NULL),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest, NULL,
+                                  &entry_transport_to_nest, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
                                   &entry_leaving_nest, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
@@ -104,11 +104,26 @@ HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data)
     return controller::foraging_signal::HANDLED;
   } else if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     ER_NOM("Block acquired");
-    internal_event(ST_RETURN_TO_NEST);
+    internal_event(ST_TRANSPORT_TO_NEST);
   }
   m_explore_fsm.run();
   return controller::foraging_signal::HANDLED;
 }
+
+/*******************************************************************************
+ * Base Diagnostics
+ ******************************************************************************/
+bool random_foraging_fsm::is_exploring_for_block(void) const {
+  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching();
+} /* is_exploring_for_block() */
+
+bool random_foraging_fsm::is_avoiding_collision(void) const {
+  return m_explore_fsm.is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool random_foraging_fsm::is_transporting_to_nest(void) const {
+  return current_state() == ST_TRANSPORT_TO_NEST;
+} /* is_transporting_to_nest() */
 
 /*******************************************************************************
  * General Member Functions
@@ -118,9 +133,6 @@ void random_foraging_fsm::init(void) {
   m_explore_fsm.init();
 } /* init() */
 
-bool random_foraging_fsm::is_exploring(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching();
-} /* is_exploring() */
 
 void random_foraging_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,

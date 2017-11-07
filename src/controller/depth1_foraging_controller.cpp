@@ -130,11 +130,11 @@ bool depth1_foraging_controller::cache_detected(void) const {
 } /* cache_detected() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Base Diagnostics
  ******************************************************************************/
-bool depth1_foraging_controller::is_searching_for_block(void) const {
-  return current_task()->is_searching_for_block();
-} /* is_searching_for_block() */
+bool depth1_foraging_controller::is_exploring_for_block(void) const {
+  return current_task()->is_exploring_for_block();
+} /* is_exploring_for_block() */
 
 bool depth1_foraging_controller::is_avoiding_collision(void) const {
   return current_task()->is_avoiding_collision();
@@ -144,20 +144,31 @@ bool depth1_foraging_controller::is_transporting_to_nest(void) const {
   return current_task()->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
-bool depth1_foraging_controller::is_vectoring(void) const {
-  return current_task()->is_vectoring();
-} /* is_vectoring() */
-
-bool depth1_foraging_controller::is_exploring(void) const {
-  return current_task()->is_exploring();
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool depth1_foraging_controller::is_acquiring_block(void) const {
+  return current_task()->is_acquiring_block();
 } /* is_exploring() */
+
+bool depth1_foraging_controller::is_vectoring_to_block(void) const {
+  return current_task()->is_vectoring_to_block();
+} /* is_vectoring_to_block() */
 
 /*******************************************************************************
  * Depth1 Diagnostics
  ******************************************************************************/
-bool depth1_foraging_controller::is_searching_for_cache(void) const {
-  return current_task()->is_searching_for_cache();
-} /* is_searching_for_cache() */
+bool depth1_foraging_controller::is_exploring_for_cache(void) const {
+  return current_task()->is_exploring_for_cache();
+} /* is_exploring_for_cache() */
+
+bool depth1_foraging_controller::is_vectoring_to_cache(void) const {
+  return current_task()->is_vectoring_to_cache();
+} /* is_vectoring_to_cache() */
+
+bool depth1_foraging_controller::is_acquiring_cache(void) const {
+  return current_task()->is_acquiring_cache();
+} /* is_acquring_to_cache() */
 
 bool depth1_foraging_controller::is_transporting_to_cache(void) const {
   return current_task()->is_transporting_to_cache();

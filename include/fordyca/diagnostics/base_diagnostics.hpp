@@ -1,5 +1,5 @@
 /**
- * @file depth1_diagnostics.hpp
+ * @file base_diagnostics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,16 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_DIAGNOSTICS_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_DIAGNOSTICS_HPP_
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "rcppsw/common/common.hpp"
-#include "fordyca/diagnostics/depth0_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,17 +34,16 @@ NS_START(fordyca, diagnostics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth1_diagnostics: public depth0_diagnostics {
+class base_diagnostics {
  public:
-  depth1_diagnostics(void) {}
-  virtual ~depth1_diagnostics(void) {}
+  base_diagnostics(void) {}
+  virtual ~base_diagnostics(void) {}
 
-  virtual bool is_exploring_for_cache(void) const = 0;
-  virtual bool is_vectoring_to_cache(void) const = 0;
-  virtual bool is_acquiring_cache(void) const = 0;
-  virtual bool is_transporting_to_cache(void) const = 0;
+  virtual bool is_exploring_for_block(void) const = 0;
+  virtual bool is_avoiding_collision(void) const = 0;
+  virtual bool is_transporting_to_nest(void) const = 0;
 };
 
 NS_END(diagnostics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_DIAGNOSTICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_ */

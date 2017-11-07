@@ -172,7 +172,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         m_floor->SetChanged();
       }
     } else { /* The foot-bot has no block item */
-      if (!controller.in_nest() && controller.is_exploring() &&
+      if (!controller.in_nest() && controller.is_exploring_for_block() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
         int block = robot_on_block(robot);

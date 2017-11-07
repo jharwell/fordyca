@@ -45,18 +45,18 @@ void robot_stat_collector::reset(void) {
 
 void robot_stat_collector::collect(
     const controller::random_foraging_controller& controller) {
-  m_robot_stats.n_exploring += controller.is_exploring();
+  m_robot_stats.n_exploring += controller.is_exploring_for_block();
   m_robot_stats.n_returning += controller.is_transporting_to_nest();
   m_robot_stats.n_avoiding += controller.is_avoiding_collision();
 } /* collect() */
 
 void robot_stat_collector::collect(
     const controller::memory_foraging_controller& controller) {
-  m_robot_stats.n_searching += controller.is_searching_for_block();
-  m_robot_stats.n_exploring += controller.is_exploring();
+  m_robot_stats.n_searching += controller.is_acquiring_block();
+  m_robot_stats.n_exploring += controller.is_exploring_for_block();
   m_robot_stats.n_returning += controller.is_transporting_to_nest();
   m_robot_stats.n_avoiding += controller.is_avoiding_collision();
-  m_robot_stats.n_vectoring += controller.is_vectoring();
+  m_robot_stats.n_vectoring += controller.is_vectoring_to_block();
 } /* collect() */
 
 std::string robot_stat_collector::csv_line_build(void) {

@@ -33,6 +33,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/acquire_cache_fsm.hpp"
+#include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +57,6 @@ NS_START(fsm);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
  * @brief The FSM for the block-to-cache subtask.
  *
@@ -65,6 +65,7 @@ NS_START(fsm);
  * it knows about.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
+                           public diagnostics::depth1_diagnostics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<block_to_cache_fsm> {
  public:
@@ -84,50 +85,25 @@ class block_to_cache_fsm : public base_foraging_fsm,
     return !(ST_FINISHED == current_state() || ST_START == current_state());
   }
 
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override { return false; }
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_exploring_for_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+  bool is_acquiring_cache(void) const override;
+  bool is_transporting_to_cache(void) const override;
+
   /**
    * @brief Reset the FSM
    */
   void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently searching for a block within the arena
-   * (either vectoring towards a known block, or exploring for one).
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool is_searching_for_block(void) const;
-
-  /**
-   * @brief Get if the robot is currently searching for a cache within the arena
-   * (either vectoring towards a known cache, or exploring for one).
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_searching_for_cache(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently exploring for a block (i.e. it
-   * does not know of any blocks in the arena).
-   */
-  bool is_exploring(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently vectoring towards a known block.
-   */
-  bool is_vectoring(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently engaged in collision avoidance.
-   */
-  bool is_avoiding_collision(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot has obtained a block and is returning to the
-   * nest with it.
-   */
-  bool is_transporting_to_nest(void) const;
-
-  bool is_transporting_to_cache(void) const;
 
   controller::depth1_foraging_sensors* sensors(void) const { return m_sensors.get(); }
 

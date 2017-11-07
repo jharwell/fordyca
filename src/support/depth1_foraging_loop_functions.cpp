@@ -54,7 +54,7 @@ void depth1_foraging_loop_functions::handle_cached_block_pickup(
       static_cast<controller::depth1_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
-  if (controller.is_searching_for_cache() && controller.cache_detected()) {
+  if (controller.is_exploring_for_cache() && controller.cache_detected()) {
     ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
 
     /* Check whether the foot-bot is actually on a cache */

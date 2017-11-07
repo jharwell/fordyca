@@ -58,15 +58,19 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
   void accept(events::cache_block_drop &) override {};
   void accept(events::cached_block_pickup &) override {};
 
-  /* depth0 diagnostics */
-  bool is_searching_for_block(void) const override;
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
-  bool is_vectoring(void) const override;
-  bool is_exploring(void) const override;
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
 
   /* depth1 diagnostics */
-  bool is_searching_for_cache(void) const override { return false; }
+  bool is_exploring_for_cache(void) const override { return false; }
+  bool is_vectoring_to_cache(void) const override { return false; }
+  bool is_acquiring_cache(void) const override { return false; }
   bool is_transporting_to_cache(void) const override { return false; }
   std::string task_name(void) const override { return "generalist"; };
 
