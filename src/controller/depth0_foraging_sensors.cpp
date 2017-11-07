@@ -1,5 +1,5 @@
 /**
- * @file depth0_foraging_sensor_manager.cpp
+ * @file depth0_foraging_sensors.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth0_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,13 +31,13 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth0_foraging_sensor_manager::depth0_foraging_sensor_manager(
+depth0_foraging_sensors::depth0_foraging_sensors(
     const struct params::sensor_params* params,
     argos::CCI_RangeAndBearingSensor* const rabs,
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
-    base_foraging_sensor_manager(params, rabs, proximity, light, ground),
+    base_foraging_sensors(params, rabs, proximity, light, ground),
     m_tick(0),
     m_los(),
     m_robot_loc(),

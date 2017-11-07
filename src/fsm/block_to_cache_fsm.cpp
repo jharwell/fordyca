@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -37,11 +37,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_cache_fsm::block_to_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::depth1_foraging_sensor_manager>& sensors,
+    const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensor_manager>(sensors),
+                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
                       actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
     entry_collision_avoidance(),
@@ -51,7 +51,7 @@ block_to_cache_fsm::block_to_cache_fsm(
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_sensors(sensors),
     m_block_fsm(params, server,
-                std::static_pointer_cast<controller::depth0_foraging_sensor_manager>(sensors),
+                std::static_pointer_cast<controller::depth0_foraging_sensors>(sensors),
                 actuators, map),
     m_cache_fsm(params, server, sensors, actuators, map),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),

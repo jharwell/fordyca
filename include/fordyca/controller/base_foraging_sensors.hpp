@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_sensor_manager.hpp
+ * @file base_foraging_sensors.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSORS_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSORS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -45,9 +45,9 @@ NS_START(controller);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_foraging_sensor_manager {
+class base_foraging_sensors {
  public:
-  base_foraging_sensor_manager(
+  base_foraging_sensors(
       const struct params::sensor_params* params,
       argos::CCI_RangeAndBearingSensor* const rabs,
       argos::CCI_FootBotProximitySensor* const proximity,
@@ -91,8 +91,8 @@ class base_foraging_sensor_manager {
   argos::CCI_FootBotMotorGroundSensor* ground(void) { return m_ground; }
 
  private:
-  base_foraging_sensor_manager(const base_foraging_sensor_manager& fsm) = delete;
-  base_foraging_sensor_manager& operator=(const base_foraging_sensor_manager& fsm) = delete;
+  base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
+  base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
 
   /** The current timestep  */
   const double                                mc_diffusion_delta;
@@ -105,4 +105,4 @@ class base_foraging_sensor_manager {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_SENSORS_HPP_ */

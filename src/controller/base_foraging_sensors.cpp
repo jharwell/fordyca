@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_sensor_manager.cpp
+ * @file base_foraging_sensors.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_foraging_sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
@@ -37,7 +37,7 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_foraging_sensor_manager::base_foraging_sensor_manager(
+base_foraging_sensors::base_foraging_sensors(
     const struct params::sensor_params* params,
     argos::CCI_RangeAndBearingSensor* const rabs,
     argos::CCI_FootBotProximitySensor* const proximity,
@@ -53,7 +53,7 @@ base_foraging_sensor_manager::base_foraging_sensor_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_foraging_sensor_manager::in_nest(void) {
+bool base_foraging_sensors::in_nest(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   /*
    * The nest is a relatively light gray, so the sensors will return something
@@ -71,7 +71,7 @@ bool base_foraging_sensor_manager::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-bool base_foraging_sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
+bool base_foraging_sensors::calc_diffusion_vector(argos::CVector2* const vector_in) {
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
   argos::CVector2* vector;
   argos::CVector2 tmp;
@@ -99,7 +99,7 @@ bool base_foraging_sensor_manager::calc_diffusion_vector(argos::CVector2* const 
   return true;
 }
 
-argos::CVector2 base_foraging_sensor_manager::calc_vector_to_light(void) {
+argos::CVector2 base_foraging_sensors::calc_vector_to_light(void) {
   const argos::CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
   argos::CVector2 accum;
 
@@ -110,7 +110,7 @@ argos::CVector2 base_foraging_sensor_manager::calc_vector_to_light(void) {
   return argos::CVector2(1.0, accum.Angle());
 } /* calc_vector_to_light() */
 
-bool base_foraging_sensor_manager::block_detected(void) {
+bool base_foraging_sensors::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   int sum = 0;
 

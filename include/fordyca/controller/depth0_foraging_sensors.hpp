@@ -1,5 +1,5 @@
 /**
- * @file depth0_foraging_sensor_manager.hpp
+ * @file depth0_foraging_sensors.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSORS_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSORS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_foraging_sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -35,9 +35,9 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth0_foraging_sensor_manager : public base_foraging_sensor_manager {
+class depth0_foraging_sensors : public base_foraging_sensors {
  public:
-  depth0_foraging_sensor_manager(
+  depth0_foraging_sensors(
       const struct params::sensor_params* params,
       argos::CCI_RangeAndBearingSensor* const rabs,
       argos::CCI_FootBotProximitySensor* const proximity,
@@ -103,8 +103,8 @@ class depth0_foraging_sensor_manager : public base_foraging_sensor_manager {
   void tick(uint tick) { m_tick = tick; }
 
  private:
-  depth0_foraging_sensor_manager(const depth0_foraging_sensor_manager& fsm) = delete;
-  depth0_foraging_sensor_manager& operator=(const depth0_foraging_sensor_manager& fsm) = delete;
+  depth0_foraging_sensors(const depth0_foraging_sensors& fsm) = delete;
+  depth0_foraging_sensors& operator=(const depth0_foraging_sensors& fsm) = delete;
 
   uint                                        m_tick;
   std::unique_ptr<representation::line_of_sight> m_los;
@@ -114,4 +114,4 @@ class depth0_foraging_sensor_manager : public base_foraging_sensor_manager {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_SENSORS_HPP_ */

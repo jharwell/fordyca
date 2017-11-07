@@ -36,7 +36,7 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -96,7 +96,7 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
           param_repo.get_params("perceived_grid")),
       GetId()));
 
-  m_sensors.reset(new depth1_foraging_sensor_manager(
+  m_sensors.reset(new depth1_foraging_sensors(
       static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),

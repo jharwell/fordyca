@@ -27,7 +27,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
-#include "fordyca/controller/base_foraging_sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/params/base_foraging_repository.hpp"
 #include "fordyca/params/actuator_params.hpp"
@@ -88,7 +88,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
-  m_sensors.reset(new base_foraging_sensor_manager(
+  m_sensors.reset(new base_foraging_sensors(
       static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),

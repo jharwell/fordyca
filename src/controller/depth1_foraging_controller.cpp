@@ -32,7 +32,7 @@
 #include "fordyca/params/memory_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
 
@@ -71,7 +71,7 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
       static_cast<const task_allocation::task_params*>(
           task_repo.get_params("task"));
 
-  m_sensors.reset(new depth1_foraging_sensor_manager(
+  m_sensors.reset(new depth1_foraging_sensors(
       static_cast<const struct params::sensor_params*>(
           fsm_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),

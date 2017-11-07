@@ -42,7 +42,7 @@ NS_START(fordyca);
 namespace params { struct fsm_params; }
 
 namespace controller {
-class depth1_foraging_sensor_manager;
+class depth1_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 
@@ -67,7 +67,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   acquire_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::depth1_foraging_sensor_manager>& sensors,
+      const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
@@ -152,7 +152,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   argos::CRandom::CRNG* m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  std::shared_ptr<controller::depth1_foraging_sensor_manager> m_sensors;
+  std::shared_ptr<controller::depth1_foraging_sensors> m_sensors;
 
   vector_fsm m_vector_fsm;
   explore_fsm m_explore_fsm;

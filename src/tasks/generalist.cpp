@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 

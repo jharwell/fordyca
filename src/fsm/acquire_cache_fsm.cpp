@@ -28,7 +28,7 @@
 
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -45,11 +45,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_cache_fsm::acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::depth1_foraging_sensor_manager>& sensors,
+    const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensor_manager>(sensors), actuators, ST_MAX_STATES),
+                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors), actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),

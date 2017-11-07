@@ -37,7 +37,7 @@
 NS_START(fordyca, controller);
 namespace visitor = rcppsw::patterns::visitor;
 
-class depth1_foraging_sensor_manager;
+class depth1_foraging_sensors;
 
 /*******************************************************************************
  * Class Definitions
@@ -125,7 +125,7 @@ class memory_foraging_controller : public base_foraging_controller,
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::shared_ptr<fsm::memory_foraging_fsm>            m_fsm;
-  std::shared_ptr<depth1_foraging_sensor_manager>      m_sensors;
+  std::shared_ptr<depth1_foraging_sensors>      m_sensors;
 };
 
 NS_END(controller, fordyca);

@@ -27,7 +27,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/base_foraging_sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 
 /*******************************************************************************
@@ -41,7 +41,7 @@ NS_START(fordyca, fsm);
 explore_fsm::explore_fsm(
     double unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::base_foraging_sensor_manager>& sensors,
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),

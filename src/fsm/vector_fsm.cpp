@@ -26,7 +26,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth0_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth0_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +45,7 @@ double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
  ******************************************************************************/
 vector_fsm::vector_fsm(uint frequent_collision_thresh,
                        std::shared_ptr<rcppsw::common::er_server> server,
-                       std::shared_ptr<controller::depth0_foraging_sensor_manager> sensors,
+                       std::shared_ptr<controller::depth0_foraging_sensors> sensors,
                        std::shared_ptr<controller::actuator_manager> actuators) :
     polled_simple_fsm(server, ST_MAX_STATES),
     start(),

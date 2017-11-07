@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
-#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"

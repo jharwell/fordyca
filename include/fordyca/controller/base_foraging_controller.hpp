@@ -37,7 +37,7 @@ namespace representation { class block; class line_of_sight; }
 NS_START(controller);
 
 class actuator_manager;
-class base_foraging_sensor_manager;
+class base_foraging_sensors;
 
 /*******************************************************************************
  * Class Definitions
@@ -107,7 +107,7 @@ class base_foraging_controller : public argos::CCI_Controller,
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::common::er_server>& server(void) const { return m_server; }
-  const std::shared_ptr<base_foraging_sensor_manager>& sensors(void) const { return m_sensors; }
+  const std::shared_ptr<base_foraging_sensors>& sensors(void) const { return m_sensors; }
 
  private:
   base_foraging_controller(const base_foraging_controller& other) = delete;
@@ -122,7 +122,7 @@ class base_foraging_controller : public argos::CCI_Controller,
    */
   representation::block*                        m_block;
   std::shared_ptr<actuator_manager>             m_actuators;
-  std::shared_ptr<base_foraging_sensor_manager> m_sensors;
+  std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::common::er_server>    m_server;
 };
 
