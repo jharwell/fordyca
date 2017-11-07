@@ -1,5 +1,5 @@
 /**
- * @file sensor_manager.cpp
+ * @file base_foraging_sensor_manager.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensor_manager.hpp"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
@@ -37,27 +37,23 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-sensor_manager::sensor_manager(
+base_foraging_sensor_manager::base_foraging_sensor_manager(
     const struct params::sensor_params* params,
     argos::CCI_RangeAndBearingSensor* const rabs,
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
-    m_tick(0),
     mc_diffusion_delta(params->diffusion.delta),
     mc_go_straight_angle_range(params->diffusion.go_straight_angle_range),
     m_rabs(rabs),
     m_proximity(proximity),
     m_light(light),
-    m_ground(ground),
-    m_los(),
-    m_robot_loc() {}
-
+    m_ground(ground) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool sensor_manager::in_nest(void) {
+bool base_foraging_sensor_manager::in_nest(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   /*
    * The nest is a relatively light gray, so the sensors will return something
@@ -75,7 +71,7 @@ bool sensor_manager::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
+bool base_foraging_sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   const argos::CCI_FootBotProximitySensor::TReadings& tProxReads = m_proximity->GetReadings();
   argos::CVector2* vector;
   argos::CVector2 tmp;
@@ -103,7 +99,7 @@ bool sensor_manager::calc_diffusion_vector(argos::CVector2* const vector_in) {
   return true;
 }
 
-argos::CVector2 sensor_manager::calc_vector_to_light(void) {
+argos::CVector2 base_foraging_sensor_manager::calc_vector_to_light(void) {
   const argos::CCI_FootBotLightSensor::TReadings& tLightReads = m_light->GetReadings();
   argos::CVector2 accum;
 
@@ -114,14 +110,7 @@ argos::CVector2 sensor_manager::calc_vector_to_light(void) {
   return argos::CVector2(1.0, accum.Angle());
 } /* calc_vector_to_light() */
 
-argos::CVector2 sensor_manager::calc_light_loc(const argos::CVector2& robot_loc) {
-  argos::CVector2 robot_to_light_vec = calc_vector_to_light();
-  return argos::CVector2(std::fabs(robot_loc.GetX() - robot_to_light_vec.GetX()),
-                         std::fabs(robot_loc.GetY() - robot_to_light_vec.GetY()));
-} /* calc_light_loc() */
-
-
-bool sensor_manager::block_detected(void) {
+bool base_foraging_sensor_manager::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
   int sum = 0;
 
@@ -133,23 +122,6 @@ bool sensor_manager::block_detected(void) {
   sum += readings[1].Value < 0.05;
   sum += readings[2].Value < 0.05;
   sum += readings[3].Value < 0.05;
-
-  return sum >= 3;
-} /* block_detected() */
-
-bool sensor_manager::cache_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings = m_ground->GetReadings();
-  int sum = 0;
-
-  /*
-   * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
-   * are a relatively dark gray, so the sensor should return something in the
-   * range specified below.
-   */
-  sum += readings[0].Value > 0.30 && readings[0].Value < 0.50;
-  sum += readings[1].Value > 0.30 && readings[1].Value < 0.50;
-  sum += readings[2].Value > 0.30 && readings[2].Value < 0.50;
-  sum += readings[3].Value > 0.30 && readings[3].Value < 0.50;
 
   return sum >= 3;
 } /* block_detected() */

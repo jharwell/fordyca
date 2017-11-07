@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/depth1_foraging_sensor_manager.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 
@@ -36,7 +36,8 @@ NS_START(fordyca, tasks);
  * Member Functions
  ******************************************************************************/
 double generalist::calc_elapsed_time(double exec_time) const {
-  return dynamic_cast<fsm::memory_foraging_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
+  return dynamic_cast<fsm::memory_foraging_fsm*>(
+      polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* calc_elapsed_time() */
 
 /*******************************************************************************

@@ -37,7 +37,10 @@
 NS_START(fordyca);
 
 namespace params { struct fsm_params; }
-namespace controller { class sensor_manager; class actuator_manager; }
+namespace controller {
+class depth1_foraging_sensor_manager;
+class actuator_manager;
+}
 namespace representation { class perceived_arena_map; class block; }
 
 namespace task_allocation = rcppsw::task_allocation;
@@ -63,7 +66,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::sensor_manager>& sensors,
+      const std::shared_ptr<controller::depth1_foraging_sensor_manager>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
@@ -142,6 +145,8 @@ class block_to_nest_fsm : public base_foraging_fsm,
    */
   bool is_transporting_to_nest(void) const;
 
+  controller::depth1_foraging_sensor_manager* sensors(void) const { return m_sensors.get(); }
+
  protected:
   enum fsm_states {
     ST_START,
@@ -177,6 +182,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm& operator=(const block_to_nest_fsm& fsm) = delete;
 
   /* data members */
+  std::shared_ptr<controller::depth1_foraging_sensor_manager>  m_sensors;
   acquire_block_fsm m_block_fsm;
   acquire_cache_fsm m_cache_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

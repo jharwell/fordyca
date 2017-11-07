@@ -36,7 +36,7 @@
 NS_START(fordyca);
 
 namespace controller {
-class sensor_manager;
+class depth0_foraging_sensor_manager;
 class actuator_manager;
 } /* namespace controller */
 
@@ -50,7 +50,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
   vector_fsm(uint frequent_collision_thresh,
              std::shared_ptr<rcppsw::common::er_server> server,
-             std::shared_ptr<controller::sensor_manager> sensors,
+             std::shared_ptr<controller::depth0_foraging_sensor_manager> sensors,
              std::shared_ptr<controller::actuator_manager> actuators);
 
   /* taskable overrides */
@@ -188,7 +188,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   struct fsm_state m_state;
   uint m_freq_collision_thresh;
   uint m_collision_rec_count;
-  std::shared_ptr<controller::sensor_manager> m_sensors;
+  std::shared_ptr<controller::depth0_foraging_sensor_manager> m_sensors;
   std::shared_ptr<controller::actuator_manager> m_actuators;
   argos::CVector2 m_goal;
   rcppsw::control::pid_loop m_ang_pid;

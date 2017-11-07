@@ -37,7 +37,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 random_foraging_fsm::random_foraging_fsm(
     const struct params::fsm_params* params,
     std::shared_ptr<rcppsw::common::er_server> server,
-    std::shared_ptr<controller::sensor_manager> sensors,
+    std::shared_ptr<controller::base_foraging_sensor_manager> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(return_to_nest, &start),

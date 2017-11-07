@@ -37,6 +37,8 @@
 NS_START(fordyca, controller);
 namespace visitor = rcppsw::patterns::visitor;
 
+class depth1_foraging_sensor_manager;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -51,7 +53,8 @@ class memory_foraging_controller : public base_foraging_controller,
       base_foraging_controller(),
       m_light_loc(),
       m_map(),
-      m_fsm() {}
+      m_fsm(),
+      m_sensors() {}
 
   /* depth0 diagnostics */
   bool is_searching_for_block(void) const override;
@@ -59,6 +62,14 @@ class memory_foraging_controller : public base_foraging_controller,
   bool is_transporting_to_nest(void) const override;
   bool is_vectoring(void) const override;
   bool is_exploring(void) const override;
+
+  /**
+   * @brief Set the current clock tick. In a real world, each robot would
+   * maintain its own clock tick, and overall there would no doubt be
+   * considerable skew; this is a simulation hack that makes things much
+   * nicer/easier to deal with.
+   */
+  void tick(uint tick);
 
   /*
    * @brief Initialize the controller.
@@ -114,6 +125,7 @@ class memory_foraging_controller : public base_foraging_controller,
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::shared_ptr<fsm::memory_foraging_fsm>            m_fsm;
+  std::shared_ptr<depth1_foraging_sensor_manager>      m_sensors;
 };
 
 NS_END(controller, fordyca);

@@ -35,7 +35,7 @@
 NS_START(fordyca);
 
 namespace controller {
-class sensor_manager;
+class base_foraging_sensor_manager;
 class actuator_manager;
 } /* namespace controller */
 
@@ -69,7 +69,7 @@ class explore_fsm : public base_foraging_fsm {
 
   explore_fsm(double unsuccessful_dir_change_thresh,
               const std::shared_ptr<rcppsw::common::er_server>& server,
-              const std::shared_ptr<controller::sensor_manager>& sensors,
+              const std::shared_ptr<controller::base_foraging_sensor_manager>& sensors,
               const std::shared_ptr<controller::actuator_manager>& actuators);
 
   /**
