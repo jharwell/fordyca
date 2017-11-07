@@ -26,8 +26,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/depth1_foraging_controller.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
@@ -47,6 +47,64 @@ void depth1_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
+void depth1_foraging_loop_functions::handle_cached_block_pickup(
+    argos::CFootBotEntity& robot) {
+
+  controller::depth1_foraging_controller& controller =
+      static_cast<controller::depth1_foraging_controller&>(
+          robot.GetControllableEntity().GetController());
+
+  if (controller.is_searching_for_cache() && controller.cache_detected()) {
+    ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
+
+    /* Check whether the foot-bot is actually on a cache */
+    int cache = robot_on_cache(robot);
+    if (-1 != cache) {
+      events::cached_block_pickup pickup_op(rcppsw::common::g_server,
+                                          &map()->caches()[cache],
+                                          robot_id(robot));
+      controller.visitor::visitable_any<controller::depth1_foraging_controller>::accept(pickup_op);
+      map()->accept(pickup_op);
+    }
+  }
+} /* handle_cached_block_pickup() */
+
+void depth1_foraging_loop_functions::handle_cache_block_drop(
+    argos::CFootBotEntity& robot) {
+  controller::depth1_foraging_controller& controller =
+      static_cast<controller::depth1_foraging_controller&>(
+          robot.GetControllableEntity().GetController());
+
+  if (controller.cache_detected()) {
+    /* get stats from this robot before its state changes */
+    random_foraging_loop_functions::robot_collector()->collect(controller);
+
+    /* Check whether the foot-bot is actually on a cache */
+    int cache = robot_on_cache(robot);
+    if (-1 != cache) {
+      /* Update arena map state due to a block nest drop */
+      events::cache_block_drop drop_op(rcppsw::common::g_server,
+                                       controller.block(),
+                                       &map()->caches()[cache]);
+
+    /* TODO: Get stats from carried block before it's dropped */
+    /* block_collector()->accept(drop_op); */
+
+    map()->accept(drop_op);
+
+    /* Actually drop the block */
+    controller.visitor::visitable_any<controller::depth1_foraging_controller>::accept(drop_op);
+    }
+  }
+} /* handle_cache_block_drop() */
+
+int depth1_foraging_loop_functions::robot_on_cache(const argos::CFootBotEntity& robot) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  return map()->robot_on_cache(pos);
+} /* robot_on_cache() */
+
 void depth1_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     controller::depth1_foraging_controller& controller =
         dynamic_cast<controller::depth1_foraging_controller&>(
@@ -57,9 +115,11 @@ void depth1_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     memory_foraging_loop_functions::set_robot_tick(robot);
 
     if (controller.is_carrying_block()) {
-      memory_foraging_loop_functions::handle_block_drop(controller);
+      memory_foraging_loop_functions::handle_nest_block_drop(controller);
+      handle_cache_block_drop(robot);
     } else { /* The foot-bot has no block item */
-      memory_foraging_loop_functions::handle_block_pickup(robot);
+      memory_foraging_loop_functions::handle_free_block_pickup(robot);
+      handle_cached_block_pickup(robot);
     }
 } /* pre_step_iter() */
 

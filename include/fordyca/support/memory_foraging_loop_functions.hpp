@@ -45,13 +45,13 @@ class memory_foraging_loop_functions : public random_foraging_loop_functions {
   void PreStep() override;
 
  protected:
-  void pre_step_iter(argos::CFootBotEntity& robot) override;
   void set_robot_los(argos::CFootBotEntity& robot);
   void set_robot_tick(argos::CFootBotEntity& robot);
-  void handle_block_drop(controller::memory_foraging_controller& controller);
-  void handle_block_pickup(argos::CFootBotEntity& robot);
+  void handle_nest_block_drop(controller::memory_foraging_controller& controller);
+  void handle_free_block_pickup(argos::CFootBotEntity& robot);
 
  private:
+  void pre_step_iter(argos::CFootBotEntity& robot) override;
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   memory_foraging_loop_functions(const memory_foraging_loop_functions& s) = delete;
   memory_foraging_loop_functions& operator=(const memory_foraging_loop_functions& s) = delete;

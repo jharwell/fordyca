@@ -44,7 +44,46 @@ double forager::calc_elapsed_time(double exec_time) const {
   return dynamic_cast<fsm::block_to_cache_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* elapsed_time() */
 
+/*******************************************************************************
+ * Event Handling
+ ******************************************************************************/
 void forager::accept(events::cache_block_drop &visitor) { visitor.visit(*this); }
 void forager::accept(events::free_block_pickup &visitor) { visitor.visit(*this); }
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool forager::is_searching_for_block(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_searching_for_block();
+} /* is_searching_for_block() */
+
+bool forager::is_avoiding_collision(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool forager::is_vectoring(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_vectoring();
+} /* is_vectoring() */
+
+bool forager::is_exploring(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_exploring();
+} /* is_exploring() */
+
+/*******************************************************************************
+ * Depth1 Diagnostics
+ ******************************************************************************/
+bool forager::is_searching_for_cache(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_searching_for_cache();
+} /* is_searching_for_cache() */
+
+bool forager::is_transporting_to_cache(void) const {
+  return static_cast<fsm::block_to_cache_fsm*>(
+      polled_task::mechanism())->is_transporting_to_cache();
+} /* is_transporting_to_cache() */
 
 NS_END(tasks, fordyca);

@@ -82,6 +82,15 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
   return -1;
 } /* robot_on_block() */
 
+int arena_map::robot_on_cache(const argos::CVector2& pos) {
+  for (size_t i = 0; i < m_caches.size(); ++i) {
+    if (m_caches[i].contains_point(pos)) {
+      return static_cast<int>(i);
+    }
+  } /* for(i..) */
+  return -1;
+} /* robot_on_cache() */
+
 void arena_map::distribute_block(block* const block, bool first_time) {
   cell2D* cell = nullptr;
   while (1) {

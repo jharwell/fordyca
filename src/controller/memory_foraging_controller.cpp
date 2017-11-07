@@ -118,6 +118,29 @@ void memory_foraging_controller::process_los(const representation::line_of_sight
   } /* for(cache..) */
 } /* process_los() */
 
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool memory_foraging_controller::is_searching_for_block(void) const {
+  return m_fsm->is_searching_for_block();
+} /* is_searching_for_block() */
+
+bool memory_foraging_controller::is_avoiding_collision(void) const {
+  return m_fsm->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool memory_foraging_controller::is_transporting_to_nest(void) const {
+  return m_fsm->is_transporting_to_nest();
+} /* is_transporting_to_nest() */
+
+bool memory_foraging_controller::is_vectoring(void) const {
+  return m_fsm->is_vectoring();
+} /* is_vectoring() */
+
+bool memory_foraging_controller::is_exploring(void) const {
+  return m_fsm->is_exploring();
+} /* is_exploring */
+
 using namespace argos;
 REGISTER_CONTROLLER(memory_foraging_controller, "memory_foraging_controller")
 

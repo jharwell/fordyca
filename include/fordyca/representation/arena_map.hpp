@@ -132,6 +132,8 @@ class arena_map: public rcppsw::common::er_client,
    */
   int robot_on_block(const argos::CVector2& pos);
 
+  int robot_on_cache(const argos::CVector2& pos);
+
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.
    *

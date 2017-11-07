@@ -91,10 +91,10 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_robot_collector.reset(new robot_stat_collector(
+  m_robot_collector.reset(new diagnostics::robot_stat_collector(
       static_cast<const struct params::logging_params*>(
           m_repo->get_params("logging"))->robot_stats));
-  m_block_collector.reset(new block_stat_collector(
+  m_block_collector.reset(new diagnostics::block_stat_collector(
       static_cast<const struct params::logging_params*>(
           m_repo->get_params("logging"))->block_stats));
   m_block_collector->reset();
@@ -108,7 +108,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
     argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
         it->second);
     controller::base_foraging_controller& controller =
-        dynamic_cast<controller::base_foraging_controller&>(
+        static_cast<controller::base_foraging_controller&>(
             robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
   } /* for(it..) */
@@ -146,7 +146,7 @@ argos::CColor random_foraging_loop_functions::GetFloorColor(
 
 void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     controller::random_foraging_controller& controller =
-        dynamic_cast<controller::random_foraging_controller&>(
+        static_cast<controller::random_foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */

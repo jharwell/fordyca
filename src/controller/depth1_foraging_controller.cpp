@@ -108,6 +108,52 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 
+tasks::foraging_task* depth1_foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
+} /* current_task() */
+
+bool depth1_foraging_controller::cache_detected(void) const {
+  return base_foraging_controller::sensors()->cache_detected();
+} /* cache_detected() */
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool depth1_foraging_controller::is_searching_for_block(void) const {
+  return current_task()->is_searching_for_block();
+} /* is_searching_for_block() */
+
+bool depth1_foraging_controller::is_avoiding_collision(void) const {
+  return current_task()->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool depth1_foraging_controller::is_transporting_to_nest(void) const {
+  return current_task()->is_transporting_to_nest();
+} /* is_transporting_to_nest() */
+
+bool depth1_foraging_controller::is_vectoring(void) const {
+  return current_task()->is_vectoring();
+} /* is_vectoring() */
+
+bool depth1_foraging_controller::is_exploring(void) const {
+  return current_task()->is_exploring();
+} /* is_exploring() */
+
+/*******************************************************************************
+ * Depth1 Diagnostics
+ ******************************************************************************/
+bool depth1_foraging_controller::is_searching_for_cache(void) const {
+  return current_task()->is_searching_for_cache();
+} /* is_searching_for_cache() */
+
+bool depth1_foraging_controller::is_transporting_to_cache(void) const {
+  return current_task()->is_transporting_to_cache();
+} /* is_transporting_to_cache() */
+
+std::string depth1_foraging_controller::task_name(void) const {
+  return current_task()->task_name();
+} /* task_name() */
+
 using namespace argos;
 REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller");
 

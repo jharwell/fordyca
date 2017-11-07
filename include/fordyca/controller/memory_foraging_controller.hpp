@@ -29,6 +29,7 @@
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/diagnostics/depth0_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,6 +44,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class memory_foraging_controller : public base_foraging_controller,
+                                   public diagnostics::depth0_diagnostics,
                                    public visitor::visitable_any<memory_foraging_controller> {
  public:
   memory_foraging_controller(void) :
@@ -51,27 +53,12 @@ class memory_foraging_controller : public base_foraging_controller,
       m_map(),
       m_fsm() {}
 
-  /**
-   * @brief If TRUE, the robot is currently searching for a block.
-   */
-  bool is_exploring(void) const { return m_fsm->is_exploring(); }
-
-  /**
-   * @brief If TRUE, the robot is current engaged in collision avoidance.
-   */
-  bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
-
-  /**
-   * @brief If TRUE, the robot is currently returning to the nest carrying a block.
-   */
-  bool is_transporting_to_nest(void) const { return m_fsm->is_transporting_to_nest(); }
-
-  /**
-   * @brief If TRUE, then the robot is currently searching for a block.
-   */
-  bool is_searching_for_block(void) const { return m_fsm->is_searching_for_block(); }
-
-  bool is_vectoring(void) const { return m_fsm->is_vectoring(); }
+  /* depth0 diagnostics */
+  bool is_searching_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+  bool is_vectoring(void) const override;
+  bool is_exploring(void) const override;
 
   /*
    * @brief Initialize the controller.

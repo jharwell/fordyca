@@ -28,7 +28,7 @@
 #include "fordyca/controller/random_foraging_controller.hpp"
 #include "fordyca/controller/memory_foraging_controller.hpp"
 #include "fordyca/controller/depth1_foraging_controller.hpp"
-#include "fordyca/support/block_stat_collector.hpp"
+#include "fordyca/diagnostics/block_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +57,7 @@ void nest_block_drop::visit(representation::arena_map& map) {
   ER_NOM("fb%d dropped block%d in nest", index, m_block->id());
 } /* visit() */
 
-void nest_block_drop::visit(support::block_stat_collector& collector) {
+void nest_block_drop::visit(diagnostics::block_stat_collector& collector) {
   collector.inc_total_collected();
   collector.inc_total_carries(m_block->carries());
 } /* visit() */
@@ -104,10 +104,8 @@ void nest_block_drop::visit(controller::memory_foraging_controller& controller) 
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth1_foraging_controller& controller) {
   controller.block(nullptr);
+  controller.current_task()->accept(*this);
 
-  dynamic_cast<tasks::base_task*>(
-      static_cast<task_allocation::polled_task*>(
-          controller.current_task()))->accept(*this);
   ER_NOM("depth1_foraging_controller: %s dropped block%d in nest",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
