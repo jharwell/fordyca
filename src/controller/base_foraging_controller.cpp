@@ -22,7 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/params/base_foraging_repository.hpp"
 #include "fordyca/params/actuator_params.hpp"
@@ -59,14 +64,13 @@ base_foraging_controller::base_foraging_controller(void) :
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_foraging_controller::tick(uint tick) { sensors()->tick(tick); }
 bool base_foraging_controller::in_nest(void) const {
-  return base_foraging_controller::sensors()->in_nest();
-}
+  return m_sensors->in_nest();
+} /* in_nest() */
 
 bool base_foraging_controller::block_detected(void) const {
   return m_sensors->block_detected();
-}
+} /* block_detected() */
 
 void base_foraging_controller::Init(argos::TConfigurationNode& node) {
   er_client::server_handle()->change_logfile(std::string(std::string("controller-") +
@@ -84,7 +88,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetActuator<argos::CCI_DifferentialSteeringActuator>("differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
-  m_sensors.reset(new sensor_manager(
+  m_sensors.reset(new base_foraging_sensors(
       static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),

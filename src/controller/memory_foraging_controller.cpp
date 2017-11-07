@@ -22,15 +22,21 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/memory_foraging_controller.hpp"
-#include "fordyca/params/memory_foraging_repository.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+
+#include "rcppsw/common/er_server.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/memory_foraging_repository.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,25 +47,32 @@ NS_START(fordyca, controller);
  * Member Functions
  ******************************************************************************/
 void memory_foraging_controller::robot_loc(argos::CVector2 loc) {
-  sensors()->robot_loc(loc);
+  m_sensors->robot_loc(loc);
 }
+
 argos::CVector2 memory_foraging_controller::robot_loc(void) const {
-  return sensors()->robot_loc();
+  return m_sensors->robot_loc();
 }
+
+void memory_foraging_controller::tick(uint tick) {
+  m_sensors->tick(tick);
+} /* tick() */
+
 __pure const representation::line_of_sight* memory_foraging_controller::los(void) const {
-  return sensors()->los();
+  return m_sensors->los();
 }
 void memory_foraging_controller::los(
     std::unique_ptr<representation::line_of_sight>& new_los) {
-  sensors()->los(new_los);
+  m_sensors->los(new_los);
 }
+
 void memory_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  process_los(sensors()->los());
+  process_los(m_sensors->los());
   m_map->update_density();
   if (m_fsm->task_finished()) {
     m_fsm->task_reset();
@@ -83,13 +96,22 @@ void memory_foraging_controller::Init(argos::TConfigurationNode& node) {
           param_repo.get_params("perceived_grid")),
       GetId()));
 
+  m_sensors.reset(new depth1_foraging_sensors(
+      static_cast<const struct params::sensor_params*>(
+          param_repo.get_params("sensors")),
+      GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
+      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+
   m_fsm.reset(
       new fsm::memory_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
-                       server(),
-                       sensors(),
-                       actuators(),
-                       m_map));
+                                   server(),
+                                   m_sensors,
+                                   base_foraging_controller::actuators(),
+                                   m_map));
+
   ER_NOM("memory_foraging controller initialization finished");
 } /* Init() */
 

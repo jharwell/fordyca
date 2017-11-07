@@ -40,7 +40,7 @@ struct fsm_params;
 } /* namespace params */
 
 namespace controller {
-class sensor_manager;
+class depth1_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 
@@ -69,7 +69,7 @@ class memory_foraging_fsm : public base_foraging_fsm,
   memory_foraging_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::sensor_manager>& sensors,
+      const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
@@ -117,6 +117,8 @@ class memory_foraging_fsm : public base_foraging_fsm,
   }
   bool is_transporting_to_nest(void) const { return m_block_fsm.is_transporting_to_nest(); }
 
+  controller::depth1_foraging_sensors* sensors(void) const { return m_sensors.get(); }
+
  protected:
   enum fsm_states {
     ST_START,
@@ -148,6 +150,7 @@ class memory_foraging_fsm : public base_foraging_fsm,
 
   /* data members */
   bool m_task_running;
+  std::shared_ptr<controller::depth1_foraging_sensors>  m_sensors;
   block_to_nest_fsm m_block_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

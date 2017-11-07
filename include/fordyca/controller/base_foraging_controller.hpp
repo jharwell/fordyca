@@ -32,15 +32,12 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class block;
-class line_of_sight;
-} /* namespace representation */
+namespace representation { class block; class line_of_sight; }
 
 NS_START(controller);
 
-class sensor_manager;
 class actuator_manager;
+class base_foraging_sensors;
 
 /*******************************************************************************
  * Class Definitions
@@ -69,14 +66,6 @@ class base_foraging_controller : public argos::CCI_Controller,
    * its head during simulation.
    */
   bool display_id(void) const { return m_display_id; }
-
-  /**
-   * @brief Set the current clock tick. In a real world, each robot would
-.   * maintain its own clock tick, and overall there would no doubt be
-   * considerable skew; this is a simulation hack that makes things much
-   * nicer/easier to deal with.
-   */
-  void tick(uint tick);
 
   /**
    * @brief If TRUE, the robot is currently at least most of the way in the nest.
@@ -116,10 +105,9 @@ class base_foraging_controller : public argos::CCI_Controller,
   void Destroy(void) override {}
 
  protected:
-  const std::shared_ptr<sensor_manager>& sensors(void) const { return m_sensors; }
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::common::er_server>& server(void) const { return m_server; }
-
+  const std::shared_ptr<base_foraging_sensors>& sensors(void) const { return m_sensors; }
 
  private:
   base_foraging_controller(const base_foraging_controller& other) = delete;
@@ -132,10 +120,10 @@ class base_foraging_controller : public argos::CCI_Controller,
    * The current block that the robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  representation::block*                     m_block;
-  std::shared_ptr<actuator_manager>          m_actuators;
-  std::shared_ptr<sensor_manager>            m_sensors;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  representation::block*                        m_block;
+  std::shared_ptr<actuator_manager>             m_actuators;
+  std::shared_ptr<base_foraging_sensors> m_sensors;
+  std::shared_ptr<rcppsw::common::er_server>    m_server;
 };
 
 NS_END(fordyca, controller);

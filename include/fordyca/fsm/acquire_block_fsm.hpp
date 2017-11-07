@@ -44,7 +44,7 @@ struct fsm_params;
 } /* namespace params */
 
 namespace controller {
-class sensor_manager;
+class depth0_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 
@@ -68,12 +68,12 @@ NS_START(fsm);
  * that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
-                          public  rcppsw::task_allocation::taskable {
+                          public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::sensor_manager>& sensors,
+      const std::shared_ptr<controller::depth0_foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
@@ -157,6 +157,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   argos::CRandom::CRNG* m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<controller::depth0_foraging_sensors> m_sensors;
   vector_fsm m_vector_fsm;
   explore_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

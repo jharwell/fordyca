@@ -40,7 +40,7 @@ struct fsm_params;
 } /* namespace params */
 
 namespace controller {
-class sensor_manager;
+class base_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 NS_START(fsm);
@@ -60,7 +60,7 @@ class random_foraging_fsm : public base_foraging_fsm,
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,
-                      std::shared_ptr<controller::sensor_manager> sensors,
+                      std::shared_ptr<controller::base_foraging_sensors> sensors,
                       std::shared_ptr<controller::actuator_manager> actuators);
 
   /**

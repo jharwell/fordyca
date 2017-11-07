@@ -26,7 +26,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
@@ -41,7 +41,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
     std::shared_ptr<rcppsw::common::er_server> server,
-    std::shared_ptr<controller::sensor_manager> sensors,
+    std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators,
     uint8_t max_states) :
     state_machine::hfsm(server, max_states),

@@ -25,13 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
-#include <boost/shared_ptr.hpp>
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -94,7 +90,7 @@ class random_foraging_controller : public base_foraging_controller,
   fsm::random_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:
-  std::unique_ptr<fsm::random_foraging_fsm>  m_fsm;
+  std::unique_ptr<fsm::random_foraging_fsm>     m_fsm;
 };
 
 NS_END(controller, fordyca);

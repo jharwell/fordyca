@@ -27,7 +27,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include "fordyca/controller/depth0_foraging_sensors.hpp"
 #include "fordyca/controller/block_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -44,10 +44,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_block_fsm::acquire_block_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::sensor_manager>& sensors,
+    const std::shared_ptr<controller::depth0_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+    base_foraging_fsm(server,
+                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors), actuators, ST_MAX_STATES),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
@@ -56,6 +57,7 @@ acquire_block_fsm::acquire_block_fsm(
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_map(map),
     m_server(server),
+    m_sensors(sensors),
     m_vector_fsm(params->times.frequent_collision_thresh,
                  server, sensors, actuators),
     m_explore_fsm(params->times.unsuccessful_explore_dir_change,
@@ -129,7 +131,7 @@ void acquire_block_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
   controller::block_selector selector(m_server, mc_nest_center);
   auto best = selector.calc_best(blocks,
-                                 base_foraging_fsm::sensors()->robot_loc());
+                                 m_sensors->robot_loc());
   ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
          best.first->id(),
          best.first->discrete_loc().first,
@@ -145,7 +147,7 @@ bool acquire_block_fsm::acquire_any_block(void) {
     m_vector_fsm.task_execute();
      return false;
   } else if (m_vector_fsm.task_finished()) {
-    if (base_foraging_fsm::sensors()->block_detected()) {
+    if (m_sensors->block_detected()) {
       return true;
     } else {
       ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");

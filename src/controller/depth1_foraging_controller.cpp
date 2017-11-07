@@ -22,11 +22,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1_foraging_controller.hpp"
-#include "fordyca/controller/sensor_manager.hpp"
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+
+#include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/task_repository.hpp"
 #include "fordyca/params/memory_foraging_repository.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/controller/depth1_foraging_sensors.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
 
@@ -44,8 +50,7 @@ void depth1_foraging_controller::ControlStep(void) {
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  memory_foraging_controller::process_los(
-      base_foraging_controller::sensors()->los());
+  memory_foraging_controller::process_los(m_sensors->los());
   memory_foraging_controller::map()->update_density();
 
   m_executive->run();
@@ -66,11 +71,19 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
       static_cast<const task_allocation::task_params*>(
           task_repo.get_params("task"));
 
+  m_sensors.reset(new depth1_foraging_sensors(
+      static_cast<const struct params::sensor_params*>(
+          fsm_repo.get_params("sensors")),
+      GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
+      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          base_foraging_controller::sensors(),
+          m_sensors,
           base_foraging_controller::actuators(),
           memory_foraging_controller::map_ref());
   m_collector.reset(new tasks::collector(p->estimation_alpha,
@@ -81,7 +94,7 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
       rcppsw::make_unique<fsm::block_to_cache_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          base_foraging_controller::sensors(),
+          m_sensors,
           base_foraging_controller::actuators(),
           memory_foraging_controller::map_ref());
   m_forager.reset(new tasks::forager(p->estimation_alpha, forager_fsm));
@@ -91,7 +104,7 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
       rcppsw::make_unique<fsm::memory_foraging_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          base_foraging_controller::sensors(),
+          m_sensors,
           base_foraging_controller::actuators(),
           memory_foraging_controller::map_ref());
   m_generalist.reset(new tasks::generalist(p, generalist_fsm));
@@ -113,7 +126,7 @@ tasks::foraging_task* depth1_foraging_controller::current_task(void) const {
 } /* current_task() */
 
 bool depth1_foraging_controller::cache_detected(void) const {
-  return base_foraging_controller::sensors()->cache_detected();
+  return m_sensors->cache_detected();
 } /* cache_detected() */
 
 /*******************************************************************************
