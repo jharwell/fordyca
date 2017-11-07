@@ -119,6 +119,32 @@ __const FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
 }
 
 /*******************************************************************************
+ * Base Diagnostics
+ ******************************************************************************/
+bool memory_foraging_fsm::is_exploring_for_block(void) const {
+  return m_block_fsm.is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+bool memory_foraging_fsm::is_avoiding_collision(void) const {
+  return m_block_fsm.is_avoiding_collision();
+} /* is_avoiding_collision() */
+
+bool memory_foraging_fsm::is_transporting_to_nest(void) const {
+  return m_block_fsm.is_transporting_to_nest();
+} /* is_transporting_to_nest() */
+
+/*******************************************************************************
+ * Depth0 Diagnostics
+ ******************************************************************************/
+bool memory_foraging_fsm::is_acquiring_block(void) const {
+  return m_block_fsm.is_acquiring_block();
+} /* is_acquiring_block() */
+
+bool memory_foraging_fsm::is_vectoring_to_block(void) const {
+  return m_block_fsm.is_vectoring_to_block();
+} /* is_vectoring_to_block() */
+
+/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void memory_foraging_fsm::init(void) {

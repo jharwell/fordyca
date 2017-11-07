@@ -87,7 +87,7 @@ void memory_foraging_loop_functions::handle_free_block_pickup(
       static_cast<controller::memory_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
-  if (!controller.in_nest() && controller.is_searching_for_block() &&
+  if (!controller.in_nest() && controller.is_exploring_for_block() &&
       controller.block_detected()) {
     /* Check whether the foot-bot is actually on a block */
     int block = robot_on_block(robot);

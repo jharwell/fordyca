@@ -28,6 +28,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/diagnostics/base_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,25 +48,15 @@ NS_START(controller);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
+                                   public diagnostics::base_diagnostics,
                                    public visitor::visitable_any<random_foraging_controller> {
  public:
   random_foraging_controller(void);
 
-  /**
-   * @brief If TRUE, the robot is currently searching for a block.
-   */
-  bool is_exploring(void) const { return m_fsm->is_exploring(); }
-
-  /**
-   * @brief If \c TRUE, the robot is currently returning to the nest carrying a
-   * block.
-   */
-  bool is_transporting_to_nest(void) const { return m_fsm->is_transporting_to_nest(); }
-
-  /**
-   * @brief If \c TRUE, the robot is current engaged in collision avoidance.
-   */
-  bool is_avoiding_collision(void) const { return m_fsm->is_avoiding_collision(); }
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_transporting_to_nest(void) const override;
+  bool is_avoiding_collision(void) const override;
 
   /*
    * @brief Initialize the controller.

@@ -30,6 +30,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/acquire_cache_fsm.hpp"
+#include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,6 +61,7 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
+                          public diagnostics::depth1_diagnostics,
                           public task_allocation::taskable,
                           public visitor::visitable_any<block_to_nest_fsm> {
  public:
@@ -102,48 +104,25 @@ class block_to_nest_fsm : public base_foraging_fsm,
    */
   void task_reset(void) override { init(); }
 
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_exploring_for_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+  bool is_acquiring_cache(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; };
+
   /**
    * @brief Reset the FSM
    */
   void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently searching for a block within the arena
-   * (either vectoring towards a known block, or exploring for one).
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool is_searching_for_block(void) const;
-
-  /**
-   * @brief Get if the robot is currently searching for a cache within the arena
-   * (either vectoring towards a known cache, or exploring for one).
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_searching_for_cache(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently exploring for a block (i.e. it does
-   * not know of any blocks in the arena).
-   */
-  bool is_exploring(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently vectoring towards a known block.
-   */
-  bool is_vectoring(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot is currently engaged in collision avoidance.
-   */
-  bool is_avoiding_collision(void) const;
-
-  /**
-   * @brief If \c TRUE, the robot has obtained a block and is returning to the
-   * nest with it.
-   */
-  bool is_transporting_to_nest(void) const;
 
   controller::depth1_foraging_sensors* sensors(void) const { return m_sensors.get(); }
 
@@ -152,7 +131,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
     ST_START,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a  free block */
     ST_ACQUIRE_CACHED_BLOCK,  /* superstate for finding a cached block */
-    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_COLLISION_AVOIDANCE,
     ST_FINISHED,
     ST_MAX_STATES,
@@ -160,10 +139,10 @@ class block_to_nest_fsm : public base_foraging_fsm,
 
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /* memory foraging states */

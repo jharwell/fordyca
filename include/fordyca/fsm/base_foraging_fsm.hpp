@@ -87,7 +87,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, return_to_nest,
+  HFSM_STATE_DECLARE(base_foraging_fsm, transport_to_nest,
                      state_machine::event_data);
 
   /**
@@ -121,7 +121,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @brief A simple entry state for returning to nest, used to set LED colors
    * for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_return_to_nest);
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_transport_to_nest);
 
   /**
    * @brief A simple entry state for collision avoidance, used to set LED colors

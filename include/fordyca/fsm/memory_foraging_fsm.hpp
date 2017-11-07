@@ -24,11 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
+#include "fordyca/diagnostics/depth0_diagnostics.hpp"
+
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,6 +65,7 @@ NS_START(fsm);
  * pickup the block and bring it all the way back to the nest.
  */
 class memory_foraging_fsm : public base_foraging_fsm,
+                            public diagnostics::depth0_diagnostics,
                             public task_allocation::taskable,
                             public visitor::visitable_any<memory_foraging_fsm> {
  public:
@@ -97,25 +100,19 @@ class memory_foraging_fsm : public base_foraging_fsm,
 
   bool task_running(void) const override { return m_task_running; }
 
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
+
   /**
    * @brief Reset the FSM.
    */
   void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently searching for a block within the arena
-   * (either vectoring towards a known block, or exploring for one).
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool is_searching_for_block(void) const { return m_block_fsm.is_searching_for_block(); }
-
-  bool is_exploring(void) const { return m_block_fsm.is_exploring(); }
-  bool is_vectoring(void) const { return m_block_fsm.is_vectoring(); }
-  bool is_avoiding_collision(void) const {
-    return m_block_fsm.is_avoiding_collision();
-  }
-  bool is_transporting_to_nest(void) const { return m_block_fsm.is_transporting_to_nest(); }
 
   controller::depth1_foraging_sensors* sensors(void) const { return m_sensors.get(); }
 

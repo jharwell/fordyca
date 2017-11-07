@@ -56,12 +56,14 @@ class memory_foraging_controller : public base_foraging_controller,
       m_fsm(),
       m_sensors() {}
 
-  /* depth0 diagnostics */
-  bool is_searching_for_block(void) const override;
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
-  bool is_vectoring(void) const override;
-  bool is_exploring(void) const override;
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
 
   /**
    * @brief Set the current clock tick. In a real world, each robot would
