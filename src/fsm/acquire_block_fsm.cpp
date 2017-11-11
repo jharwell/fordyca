@@ -65,44 +65,20 @@ acquire_block_fsm::acquire_block_fsm(
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, NULL,
                                   NULL, &exit_acquire_block),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)}
-      {
-  m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
-}
+      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE_ND(acquire_block_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(acquire_block_fsm, acquire_block, state_machine::event_data) {
+HFSM_STATE_DEFINE_ND(acquire_block_fsm, acquire_block) {
   if (ST_ACQUIRE_BLOCK != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_BLOCK");
   }
-  ER_ASSERT(data, "FATAL: No event data passed to ST_ACQUIRE_BLOCK");
 
-  /*
-   * We are executing this state as part of the normal block search process.
-   */
-  if (state_machine::event_type::NORMAL == data->type()) {
-      /* We acquired a block */
-      if (acquire_any_block()) {
-        internal_event(ST_FINISHED);
-      }
-  } else if (state_machine::event_type::CHILD == data->type()) {
-    /*
-     * We have found a block through the exploration sub-fsm; vector to it and
-     * pick it up.
-     */
-    if (controller::foraging_signal::BLOCK_LOCATED == data->signal()) {
-      ER_ASSERT(m_map->blocks().size(),
-                "FATAL: Block 'located' but empty block list");
-
-      /* We acquired a block */
-      if (acquire_any_block()) {
-        internal_event(ST_FINISHED);
-      }
-    }
+  if (acquire_any_block()) {
+    internal_event(ST_FINISHED);
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -122,7 +98,7 @@ HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
  * Base Diagnostics
  ******************************************************************************/
 bool acquire_block_fsm::is_exploring_for_block(void) const {
-  return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching());
+  return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running());
 } /* is_exploring_for_block() */
 
 bool acquire_block_fsm::is_avoiding_collision(void) const {
@@ -150,46 +126,63 @@ void acquire_block_fsm::init(void) {
   m_explore_fsm.init();
 } /* init() */
 
-void acquire_block_fsm::acquire_known_block(
+bool acquire_block_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
-  controller::block_selector selector(m_server, mc_nest_center);
-  auto best = selector.calc_best(blocks,
-                                 m_sensors->robot_loc());
-  ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
-         best.first->id(),
-         best.first->discrete_loc().first,
-         best.first->discrete_loc().second,
-         best.second);
-  tasks::vector_argument v(best.first->real_loc());
-  m_vector_fsm.task_start(&v);
-} /* acquire_known_block() */
-
-bool acquire_block_fsm::acquire_any_block(void) {
-  /* currently on our way to a known block */
-  if (m_vector_fsm.task_running()) {
-    m_vector_fsm.task_execute();
-     return false;
+  if (!blocks.size()) {
+    return false;
+  }
+  if (!m_vector_fsm.task_running()) {
+    controller::block_selector selector(m_server, mc_nest_center);
+    auto best = selector.calc_best(blocks,
+                                   m_sensors->robot_loc());
+    ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
+           best.first->id(),
+           best.first->discrete_loc().first,
+           best.first->discrete_loc().second,
+           best.second);
+    tasks::vector_argument v(best.first->real_loc());
+    m_vector_fsm.task_reset();
+    m_vector_fsm.task_start(&v);
   } else if (m_vector_fsm.task_finished()) {
     if (m_sensors->block_detected()) {
       return true;
     } else {
       ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-      m_vector_fsm.init();
-     }
-  }
-  /* try again--someone beat us to our chosen block */
-
-  /*
-   * If we know of ANY blocks in the arena, go to the location of the best one
-   * and pick it up. Otherwise, explore until you find one.
-   */
-  auto blocks = m_map->blocks();
-  if (blocks.size()) {
-    acquire_known_block(blocks);
+      return false;
+    }
   } else {
-    m_explore_fsm.run();
+    m_vector_fsm.task_execute();
   }
   return false;
+} /* acquire_known_block() */
+
+bool acquire_block_fsm::acquire_any_block(void) {
+  /*
+   * If we know of ANY blocks in the arena, go to the location of the best one
+   * and pick it up. Otherwise, explore until you find one. If during
+   * exploration we find one through our LOS, then stop exploring and go vector
+   * to it.
+   */
+  if (!acquire_known_block(m_map->blocks())) {
+    if (m_vector_fsm.task_running()) {
+      return false;
+    }
+
+    /* try again--someone beat us to our chosen block */
+    if (!m_explore_fsm.task_running()) {
+      m_explore_fsm.task_reset();
+      m_explore_fsm.task_start(nullptr);
+    }
+    m_explore_fsm.task_execute();
+    if (m_explore_fsm.task_finished()) {
+      ER_ASSERT(m_sensors->block_detected(),
+                "FATAL: No block detected after successful exploration");
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
 } /* acquire_any_block() */
 
 void acquire_block_fsm::task_execute(void) {

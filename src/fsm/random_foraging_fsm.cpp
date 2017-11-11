@@ -62,7 +62,7 @@ random_foraging_fsm::random_foraging_fsm(
   er_client::insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
-  m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_block);
+  m_explore_fsm.change_parent(explore_for_block_fsm::ST_EXPLORE, &acquire_block);
 }
 
 /*******************************************************************************
@@ -95,18 +95,12 @@ HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data)
   /*
    * All signals propagated up from the explore FSM are ignored; we only care
    * when the controller tells us we have actually picked up a block.
-   *
-   * BUGFIX 10/19/17: For some reason, you cannot call m_explore_fsm.run() from
-   * this function IF the explore sub-FSM was what brought you to this function
-   * in the first place (i.e. it does not play nice with recursion).
-   */
-  if (data && state_machine::event_type::CHILD == data->type()) {
-    return controller::foraging_signal::HANDLED;
-  } else if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+  */
+  if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     ER_NOM("Block acquired");
     internal_event(ST_TRANSPORT_TO_NEST);
   }
-  m_explore_fsm.run();
+  m_explore_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
 
@@ -114,7 +108,7 @@ HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data)
  * Base Diagnostics
  ******************************************************************************/
 bool random_foraging_fsm::is_exploring_for_block(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching();
+  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running();
 } /* is_exploring_for_block() */
 
 bool random_foraging_fsm::is_avoiding_collision(void) const {

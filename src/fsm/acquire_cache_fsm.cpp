@@ -67,7 +67,7 @@ acquire_cache_fsm::acquire_cache_fsm(
       HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache, NULL,
                                   NULL, &exit_acquire_cache),
       HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_fsm::ST_EXPLORE, &acquire_cache);
+  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE, &acquire_cache);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
@@ -76,33 +76,13 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(acquire_cache_fsm, acquire_cache, state_machine::event_data) {
+HFSM_STATE_DEFINE_ND(acquire_cache_fsm, acquire_cache) {
   if (ST_ACQUIRE_CACHE != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_CACHE");
   }
-  ER_ASSERT(data, "FATAL: No event data passed to ST_ACQUIRE_CACHE");
 
-  /*
-   * We are executing this state as part of the normal cache search process.
-   */
-  if (state_machine::event_type::NORMAL == data->type()) {
-      /* We acquired a cache */
-      if (acquire_any_cache()) {
-        internal_event(ST_FINISHED);
-      }
-  } else if (state_machine::event_type::CHILD == data->type()) {
-    /*
-     * We have found a cache through the exploration sub-fsm; vector to it
-     */
-    if (controller::foraging_signal::CACHE_LOCATED == data->signal()) {
-      ER_ASSERT(m_map->caches().size(),
-                "FATAL: Cache 'located' but empty cache list");
-
-      /* We acquired a cache */
-      if (acquire_any_cache()) {
-        internal_event(ST_FINISHED);
-      }
-    }
+  if (acquire_any_cache()) {
+    internal_event(ST_FINISHED);
   }
   return state_machine::event_signal::HANDLED;
 }
@@ -130,7 +110,7 @@ bool acquire_cache_fsm::is_avoiding_collision(void) const {
  * Depth1 Diagnostics
  ******************************************************************************/
 bool acquire_cache_fsm::is_exploring_for_cache(void) const {
-  return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.is_searching());
+  return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.task_running());
 } /* is_exploring_for_cache() */
 
 bool acquire_cache_fsm::is_vectoring_to_cache(void) const {
@@ -150,46 +130,63 @@ void acquire_cache_fsm::init(void) {
   m_explore_fsm.init();
 } /* init() */
 
-void acquire_cache_fsm::acquire_known_cache(
+bool acquire_cache_fsm::acquire_known_cache(
     std::list<std::pair<const representation::cache*, double>> caches) {
-  controller::existing_cache_selector selector(m_server, mc_nest_center);
-  auto best = selector.calc_best(caches,
-                                 m_sensors->robot_loc());
-  ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
-         best.first->id(),
-         best.first->discrete_loc().first,
-         best.first->discrete_loc().second,
-         best.second);
-  tasks::vector_argument v(best.first->real_loc());
-  m_vector_fsm.task_start(&v);
-} /* acquire_known_cache() */
-
-bool acquire_cache_fsm::acquire_any_cache(void) {
-  /* currently on our way to a known cache */
-  if (m_vector_fsm.task_running()) {
-    m_vector_fsm.task_execute();
-     return false;
+  if (!caches.size()) {
+    return false;
+  }
+  if (!m_vector_fsm.task_running()) {
+    controller::existing_cache_selector selector(m_server, mc_nest_center);
+    auto best = selector.calc_best(caches,
+                                   m_sensors->robot_loc());
+    ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
+           best.first->id(),
+           best.first->discrete_loc().first,
+           best.first->discrete_loc().second,
+           best.second);
+    tasks::vector_argument v(best.first->real_loc());
+    m_vector_fsm.task_reset();
+    m_vector_fsm.task_start(&v);
   } else if (m_vector_fsm.task_finished()) {
     if (m_sensors->cache_detected()) {
       return true;
     } else {
       ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");
-      m_vector_fsm.init();
-     }
-  }
-  /* try again--someone beat us to our chosen cache */
-
-  /*
-   * If we know of ANY caches in the arena, go to the location of the best one
-   * and pick it up. Otherwise, explore until you find one.
-   */
-  auto caches = m_map->caches();
-  if (caches.size()) {
-    acquire_known_cache(caches);
+      return false;
+    }
   } else {
-    m_explore_fsm.run();
+    m_vector_fsm.task_execute();
   }
   return false;
+} /* acquire_known_cache() */
+
+bool acquire_cache_fsm::acquire_any_cache(void) {
+  /*
+   * If we know of ANY caches in the arena, go to the location of the best one
+   * and pick it up. Otherwise, explore until you find one. If during
+   * exploration we find one through our LOS, then stop exploring and go vector
+   * to it.
+   */
+  if (!acquire_known_cache(m_map->caches())) {
+    if (m_vector_fsm.task_running()) {
+      return false;
+    }
+
+    /* try again--someone beat us to our chosen cache */
+    if (!m_explore_fsm.task_running()) {
+      m_explore_fsm.task_reset();
+      m_explore_fsm.task_start(nullptr);
+    }
+    m_explore_fsm.task_execute();
+    if (m_explore_fsm.task_finished()) {
+      ER_ASSERT(m_sensors->cache_detected(),
+                "FATAL: No cache detected after successful exploration");
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
 } /* acquire_any_cache() */
 
 void acquire_cache_fsm::task_execute(void) {
