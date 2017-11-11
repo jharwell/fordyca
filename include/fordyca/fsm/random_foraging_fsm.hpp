@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_fsm.hpp"
+#include "fordyca/fsm/explore_for_block_fsm.hpp"
 #include "fordyca/diagnostics/base_diagnostics.hpp"
 
 /*******************************************************************************
@@ -115,7 +115,7 @@ class random_foraging_fsm : public base_foraging_fsm,
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
 
   argos::CRandom::CRNG* m_rng;
-  explore_fsm m_explore_fsm;
+  explore_for_block_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

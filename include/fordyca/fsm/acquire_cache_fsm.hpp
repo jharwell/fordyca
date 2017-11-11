@@ -32,7 +32,7 @@
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/fsm/explore_fsm.hpp"
+#include "fordyca/fsm/explore_for_cache_fsm.hpp"
 #include "fordyca/diagnostics/depth1_diagnostics.hpp"
 
 /*******************************************************************************
@@ -121,7 +121,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * If the robot's knowledge of the chosen cache's existence expires during the
    * pursuit of said cache, that is ignored.
    */
-  void acquire_known_cache(
+  bool acquire_known_cache(
       std::list<std::pair<const representation::cache*, double>> caches);
 
   /*
@@ -131,8 +131,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * state.
    **/
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
-  HFSM_STATE_DECLARE(acquire_cache_fsm, acquire_cache,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, finished);
 
   HFSM_EXIT_DECLARE(acquire_cache_fsm, exit_acquire_cache);
@@ -151,7 +150,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   std::shared_ptr<controller::depth1_foraging_sensors> m_sensors;
 
   vector_fsm m_vector_fsm;
-  explore_fsm m_explore_fsm;
+  explore_for_cache_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
