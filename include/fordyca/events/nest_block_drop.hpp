@@ -35,15 +35,17 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-class depth0_foraging_fsm;
+namespace depth0 { class foraging_fsm; }
+namespace depth1 { class block_to_cache_fsm; }
 class random_foraging_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
 class random_foraging_controller;
-class depth0_foraging_controller;
-class depth1_foraging_controller;
+namespace depth0 {class foraging_controller; }
+namespace depth1 {class foraging_controller; }
 }
+
 namespace representation { class block; class arena_map; };
 namespace diagnostics { class block_stat_collector; }
 namespace tasks { class generalist; class collector; }
@@ -62,10 +64,10 @@ NS_START(events);
  */
 class nest_block_drop : public visitor::visitor,
                         public rcppsw::common::er_client,
-                        public visitor::visit_set<controller::depth0_foraging_controller,
+                        public visitor::visit_set<controller::depth0::foraging_controller,
                                                   controller::random_foraging_controller,
-                                                  controller::depth1_foraging_controller,
-                                                  fsm::depth0_foraging_fsm,
+                                                  controller::depth1::foraging_controller,
+                                                  fsm::depth0::foraging_fsm,
                                                   fsm::random_foraging_fsm,
                                                   fsm::block_to_nest_fsm,
                                                   representation::block,
@@ -107,11 +109,11 @@ class nest_block_drop : public visitor::visitor,
   void visit(controller::random_foraging_controller& controller) override;
 
   /* depth0 foraging */
-  void visit(controller::depth0_foraging_controller& controller) override;
-  void visit(fsm::depth0_foraging_fsm& fsm) override;
+  void visit(controller::depth0::foraging_controller& controller) override;
+  void visit(fsm::depth0::foraging_fsm& fsm) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::collector& task) override;

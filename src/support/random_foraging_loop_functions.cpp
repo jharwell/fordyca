@@ -91,7 +91,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_robot_collector.reset(new diagnostics::robot_stat_collector(
+  m_robot_collector.reset(new diagnostics::base_robot_stat_collector(
       static_cast<const struct params::logging_params*>(
           m_repo->get_params("logging"))->robot_stats));
   m_block_collector.reset(new diagnostics::block_stat_collector(

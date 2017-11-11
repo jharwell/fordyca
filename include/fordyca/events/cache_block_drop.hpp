@@ -42,8 +42,8 @@ class block;
 class arena_map;
 };
 
-namespace fsm { class block_to_cache_fsm; }
-namespace controller { class depth1_foraging_controller; }
+namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
+namespace controller { namespace depth1 { class foraging_controller; }}
 namespace tasks { class forager; }
 
 NS_START(events);
@@ -53,8 +53,8 @@ NS_START(events);
  ******************************************************************************/
 class cache_block_drop : public visitor::visitor,
                          public rcppsw::common::er_client,
-                         public visitor::visit_set<controller::depth1_foraging_controller,
-                                                   fsm::block_to_cache_fsm,
+                         public visitor::visit_set<controller::depth1::foraging_controller,
+                                                   fsm::depth1::block_to_cache_fsm,
                                                    tasks::forager,
                                                    representation::cell2D,
                                                    representation::cell2D_fsm,
@@ -97,8 +97,8 @@ class cache_block_drop : public visitor::visitor,
    */
   void visit(representation::block& block) override;
   void visit(class representation::perceived_cell2D& cell) override;
-  void visit(controller::depth1_foraging_controller& controller) override;
-  void visit(fsm::block_to_cache_fsm& fsm) override;
+  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::forager& task) override;
 
   /**

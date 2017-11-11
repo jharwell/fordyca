@@ -25,9 +25,9 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/depth1_foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "fordyca/fsm/block_to_cache_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,7 +77,7 @@ void cache_block_drop::visit(representation::block& block) {
   block.reset();
 } /* visit() */
 
-void cache_block_drop::visit(controller::depth1_foraging_controller& controller) {
+void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.current_task()->accept(*this);
 
@@ -86,10 +86,10 @@ void cache_block_drop::visit(controller::depth1_foraging_controller& controller)
 } /* visit() */
 
 void cache_block_drop::visit(tasks::forager& task) {
-  static_cast<fsm::block_to_cache_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_block_drop::visit(fsm::block_to_cache_fsm& fsm) {
+void cache_block_drop::visit(fsm::depth1::block_to_cache_fsm& fsm) {
   ER_NOM("block_to_cache_fsm: register cache_block_drop event");
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);

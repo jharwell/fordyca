@@ -40,7 +40,7 @@ class block;
 class arena_map;
 }
 namespace fsm { class block_to_nest_fsm; }
-namespace controller { class depth1_foraging_controller; }
+namespace controller { namespace depth1 {class foraging_controller; }}
 namespace tasks { class collector; }
 
 NS_START(events);
@@ -50,7 +50,7 @@ NS_START(events);
  ******************************************************************************/
 class cached_block_pickup : public cell_op,
                             public rcppsw::common::er_client,
-                            public visitor::visit_set<controller::depth1_foraging_controller,
+                            public visitor::visit_set<controller::depth1::foraging_controller,
                                                       fsm::block_to_nest_fsm,
                                                       tasks::collector,
                                                       representation::block,
@@ -89,7 +89,7 @@ class cached_block_pickup : public cell_op,
 
   void visit(fsm::block_to_nest_fsm& fsm) override;
 
-  void visit(controller::depth1_foraging_controller& controller) override;
+  void visit(controller::depth1::foraging_controller& controller) override;
   void visit(tasks::collector& task) override;
 
  private:
