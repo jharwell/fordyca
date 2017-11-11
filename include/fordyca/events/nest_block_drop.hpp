@@ -35,13 +35,13 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-class memory_foraging_fsm;
+class depth0_foraging_fsm;
 class random_foraging_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
 class random_foraging_controller;
-class memory_foraging_controller;
+class depth0_foraging_controller;
 class depth1_foraging_controller;
 }
 namespace representation { class block; class arena_map; };
@@ -62,10 +62,10 @@ NS_START(events);
  */
 class nest_block_drop : public visitor::visitor,
                         public rcppsw::common::er_client,
-                        public visitor::visit_set<controller::memory_foraging_controller,
+                        public visitor::visit_set<controller::depth0_foraging_controller,
                                                   controller::random_foraging_controller,
                                                   controller::depth1_foraging_controller,
-                                                  fsm::memory_foraging_fsm,
+                                                  fsm::depth0_foraging_fsm,
                                                   fsm::random_foraging_fsm,
                                                   fsm::block_to_nest_fsm,
                                                   representation::block,
@@ -107,8 +107,8 @@ class nest_block_drop : public visitor::visitor,
   void visit(controller::random_foraging_controller& controller) override;
 
   /* depth0 foraging */
-  void visit(controller::memory_foraging_controller& controller) override;
-  void visit(fsm::memory_foraging_fsm& fsm) override;
+  void visit(controller::depth0_foraging_controller& controller) override;
+  void visit(fsm::depth0_foraging_fsm& fsm) override;
 
   /* depth1 foraging */
   void visit(controller::depth1_foraging_controller& controller) override;

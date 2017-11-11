@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 #include "fordyca/controller/depth1_foraging_controller.hpp"
 
 /*******************************************************************************
@@ -70,7 +70,7 @@ void block_found::visit(representation::perceived_arena_map& map) {
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
-void block_found::visit(controller::memory_foraging_controller& controller) {
+void block_found::visit(controller::depth0_foraging_controller& controller) {
   controller.map()->accept(*this);
 } /* visit() */
 

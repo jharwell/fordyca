@@ -27,7 +27,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 #include "fordyca/controller/depth1_foraging_controller.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
 
@@ -125,17 +125,17 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
          cell_op::x(), cell_op::y());
 } /* visit() */
 
-void free_block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
-  ER_NOM("memory_foraging_fsm: register free_block_pickup event");
+void free_block_pickup::visit(fsm::depth0_foraging_fsm& fsm) {
+  ER_NOM("depth0_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
+void free_block_pickup::visit(controller::depth0_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
-  ER_NOM("memory_foraging_controller: %s picked up block%d",
+  ER_NOM("depth0_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
@@ -153,7 +153,7 @@ void free_block_pickup::visit(controller::depth1_foraging_controller& controller
 } /* visit() */
 
 void free_block_pickup::visit(tasks::generalist& task) {
-  static_cast<fsm::memory_foraging_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0_foraging_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::forager& task) {

@@ -28,7 +28,7 @@
 #include "fordyca/controller/depth1_foraging_controller.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/block_to_cache_fsm.hpp"
-#include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0_foraging_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************

@@ -35,14 +35,14 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-class memory_foraging_fsm;
+class depth0_foraging_fsm;
 class random_foraging_fsm;
 class block_to_cache_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
 class random_foraging_controller;
-class memory_foraging_controller;
+class depth0_foraging_controller;
 class depth1_foraging_controller;
 }
 namespace representation {
@@ -70,10 +70,10 @@ NS_START(events);
 class free_block_pickup : public cell_op,
                           public rcppsw::common::er_client,
                           public visitor::visit_set<controller::random_foraging_controller,
-                                                    controller::memory_foraging_controller,
+                                                    controller::depth0_foraging_controller,
                                                     controller::depth1_foraging_controller,
                                                     fsm::random_foraging_fsm,
-                                                    fsm::memory_foraging_fsm,
+                                                    fsm::depth0_foraging_fsm,
                                                     fsm::block_to_cache_fsm,
                                                     fsm::block_to_nest_fsm,
                                                     representation::block,
@@ -114,8 +114,8 @@ class free_block_pickup : public cell_op,
    */
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::perceived_cell2D& cell) override;
-  void visit(fsm::memory_foraging_fsm& fsm) override;
-  void visit(controller::memory_foraging_controller& controller) override;
+  void visit(fsm::depth0_foraging_fsm& fsm) override;
+  void visit(controller::depth0_foraging_controller& controller) override;
 
   /* depth1 foraging */
   void visit(controller::depth1_foraging_controller& controller) override;

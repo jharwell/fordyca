@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace controller {
-class memory_foraging_controller;
+class depth0_foraging_controller;
 class depth1_foraging_controller;
 } /* namespace controller */
 
@@ -48,7 +48,7 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class perceived_cell_op : public cell_op,
-                          public visitor::visit_set<controller::memory_foraging_controller,
+                          public visitor::visit_set<controller::depth0_foraging_controller,
                                                     controller::depth1_foraging_controller,
                                                     representation::perceived_arena_map> {
  public:

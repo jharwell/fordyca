@@ -64,7 +64,7 @@ class block_found : public perceived_cell_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::memory_foraging_controller& controller) override;
+  void visit(controller::depth0_foraging_controller& controller) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a

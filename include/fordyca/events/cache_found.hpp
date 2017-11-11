@@ -74,7 +74,7 @@ class cache_found : public perceived_cell_op,
    * each timestep.
    */
   void visit(controller::depth1_foraging_controller& controller) override;
-  void visit(controller::memory_foraging_controller&) override {}
+  void visit(controller::depth0_foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

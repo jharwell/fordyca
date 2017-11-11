@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <vector>
-#include "fordyca/support/memory_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class depth1_foraging_loop_functions : public memory_foraging_loop_functions {
+class depth1_foraging_loop_functions : public depth0_foraging_loop_functions {
  public:
   depth1_foraging_loop_functions() {}
   virtual ~depth1_foraging_loop_functions(void) {}
