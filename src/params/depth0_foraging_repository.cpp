@@ -1,5 +1,5 @@
 /**
- * @file depth1_foraging_loop_functions.hpp
+ * @file depth0_foraging_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,45 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
-#include "fordyca/support/depth0_foraging_loop_functions.hpp"
+#include "fordyca/params/depth0_foraging_repository.hpp"
+#include "fordyca/params/perceived_grid_parser.hpp"
+#include "fordyca/params/actuator_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/fsm_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Classes
+ * Constructors/Destructor
  ******************************************************************************/
-class depth1_foraging_loop_functions : public depth0_foraging_loop_functions {
- public:
-  depth1_foraging_loop_functions() {}
-  virtual ~depth1_foraging_loop_functions(void) {}
+depth0_foraging_repository::depth0_foraging_repository(void) {
+  factory().register_type<actuator_parser>("actuators");
+  factory().register_type<sensor_parser> ("sensors");
+  factory().register_type<fsm_parser>("fsm");
+  factory().register_type<perceived_grid_parser>("perceived_grid");
+  parsers()["actuators"]        = factory().create("actuators").get();
+  parsers()["sensors"]          = factory().create("sensors").get();
+  parsers()["fsm"]              = factory().create("fsm").get();
+  parsers()["perceived_grid"] = factory().create("perceived_grid").get();
+}
 
-  void Init(argos::TConfigurationNode& node) override;
-  void PreStep() override;
-
- protected:
-  void pre_step_iter(argos::CFootBotEntity& robot) override;
-  void handle_cache_block_drop(argos::CFootBotEntity& robot);
-  void handle_cached_block_pickup(argos::CFootBotEntity& robot);
-  int robot_on_cache(const argos::CFootBotEntity& robot);
-
- private:
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-
-  depth1_foraging_loop_functions(const depth1_foraging_loop_functions& s) = delete;
-  depth1_foraging_loop_functions& operator=(const depth1_foraging_loop_functions& s) = delete;
-};
-
-NS_END(support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_ */
+NS_END(params, fordyca);

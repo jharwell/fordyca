@@ -29,7 +29,7 @@
 
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/params/task_repository.hpp"
-#include "fordyca/params/memory_foraging_repository.hpp"
+#include "fordyca/params/depth0_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/controller/depth1_foraging_sensors.hpp"
@@ -50,17 +50,17 @@ void depth1_foraging_controller::ControlStep(void) {
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  memory_foraging_controller::process_los(m_sensors->los());
-  memory_foraging_controller::map()->update_density();
+  depth0_foraging_controller::process_los(m_sensors->los());
+  depth0_foraging_controller::map()->update_density();
 
   m_executive->run();
 } /* ControlStep() */
 
 void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::task_repository task_repo;
-  params::memory_foraging_repository fsm_repo;
+  params::depth0_foraging_repository fsm_repo;
 
-  memory_foraging_controller::Init(node);
+  depth0_foraging_controller::Init(node);
   task_repo.parse_all(node);
   task_repo.show_all(server_handle()->log_stream());
   fsm_repo.parse_all(node);
@@ -85,7 +85,7 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::server(),
           m_sensors,
           base_foraging_controller::actuators(),
-          memory_foraging_controller::map_ref());
+          depth0_foraging_controller::map_ref());
   m_collector.reset(new tasks::collector(p->estimation_alpha,
                                          collector_fsm));
   m_collector->set_atomic();
@@ -96,17 +96,17 @@ void depth1_foraging_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::server(),
           m_sensors,
           base_foraging_controller::actuators(),
-          memory_foraging_controller::map_ref());
+          depth0_foraging_controller::map_ref());
   m_forager.reset(new tasks::forager(p->estimation_alpha, forager_fsm));
   m_forager->set_atomic();
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::memory_foraging_fsm>(
+      rcppsw::make_unique<fsm::depth0_foraging_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           m_sensors,
           base_foraging_controller::actuators(),
-          memory_foraging_controller::map_ref());
+          depth0_foraging_controller::map_ref());
   m_generalist.reset(new tasks::generalist(p, generalist_fsm));
 
   m_generalist->partition1(m_forager.get());

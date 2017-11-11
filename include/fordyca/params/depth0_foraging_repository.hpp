@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_repository.cpp
+ * @file depth0_foraging_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_FORAGING_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_FORAGING_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/memory_foraging_repository.hpp"
-#include "fordyca/params/perceived_grid_parser.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
+#include <string>
+#include <map>
+#include "fordyca/params/base_foraging_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,17 +34,13 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-memory_foraging_repository::memory_foraging_repository(void) {
-  factory().register_type<actuator_parser>("actuators");
-  factory().register_type<sensor_parser> ("sensors");
-  factory().register_type<fsm_parser>("fsm");
-  factory().register_type<perceived_grid_parser>("perceived_grid");
-  parsers()["actuators"]        = factory().create("actuators").get();
-  parsers()["sensors"]          = factory().create("sensors").get();
-  parsers()["fsm"]              = factory().create("fsm").get();
-  parsers()["perceived_grid"] = factory().create("perceived_grid").get();
-}
+class depth0_foraging_repository: public base_foraging_repository {
+ public:
+  depth0_foraging_repository(void);
+};
 
 NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_FORAGING_REPOSITORY_HPP_ */

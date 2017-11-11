@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_fsm.cpp
+ * @file depth0_foraging_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0_foraging_fsm.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/depth1_foraging_sensors.hpp"
 
@@ -34,7 +34,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-memory_foraging_fsm::memory_foraging_fsm(
+depth0_foraging_fsm::depth0_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
     const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
@@ -61,7 +61,7 @@ memory_foraging_fsm::memory_foraging_fsm(
   hfsm::change_parent(ST_LEAVING_NEST, &start);
     }
 
-HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(depth0_foraging_fsm, start, state_machine::event_data) {
   /* first time running FSM */
   if (state_machine::event_type::NORMAL == data->type()) {
     ER_NOM("Starting foraging");
@@ -81,7 +81,7 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
   ER_ASSERT(0, "FATAL: Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
-  HFSM_STATE_DEFINE(memory_foraging_fsm, block_to_nest, state_machine::event_data) {
+  HFSM_STATE_DEFINE(depth0_foraging_fsm, block_to_nest, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
   /* first time running FSM; transitioned from START state */
@@ -114,46 +114,46 @@ HFSM_STATE_DEFINE(memory_foraging_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-__const FSM_STATE_DEFINE_ND(memory_foraging_fsm, finished) {
+__const FSM_STATE_DEFINE_ND(depth0_foraging_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
-bool memory_foraging_fsm::is_exploring_for_block(void) const {
+bool depth0_foraging_fsm::is_exploring_for_block(void) const {
   return m_block_fsm.is_exploring_for_block();
 } /* is_exploring_for_block() */
 
-bool memory_foraging_fsm::is_avoiding_collision(void) const {
+bool depth0_foraging_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool memory_foraging_fsm::is_transporting_to_nest(void) const {
+bool depth0_foraging_fsm::is_transporting_to_nest(void) const {
   return m_block_fsm.is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
  * Depth0 Diagnostics
  ******************************************************************************/
-bool memory_foraging_fsm::is_acquiring_block(void) const {
+bool depth0_foraging_fsm::is_acquiring_block(void) const {
   return m_block_fsm.is_acquiring_block();
 } /* is_acquiring_block() */
 
-bool memory_foraging_fsm::is_vectoring_to_block(void) const {
+bool depth0_foraging_fsm::is_vectoring_to_block(void) const {
   return m_block_fsm.is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void memory_foraging_fsm::init(void) {
+void depth0_foraging_fsm::init(void) {
   base_foraging_fsm::init();
   m_block_fsm.task_reset();
   m_task_running = false;
 } /* init() */
 
-void memory_foraging_fsm::task_execute(void) {
+void depth0_foraging_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */

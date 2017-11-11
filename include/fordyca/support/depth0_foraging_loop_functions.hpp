@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_repository.hpp
+ * @file depth0_foraging_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,29 +18,45 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_MEMORY_FORAGING_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_MEMORY_FORAGING_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <map>
-#include "fordyca/params/base_foraging_repository.hpp"
+#include <vector>
+#include "fordyca/support/random_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Classes
  ******************************************************************************/
-class memory_foraging_repository: public base_foraging_repository {
+class depth0_foraging_loop_functions : public random_foraging_loop_functions {
  public:
-  memory_foraging_repository(void);
+  depth0_foraging_loop_functions() {}
+  virtual ~depth0_foraging_loop_functions(void) {}
+
+  void Init(argos::TConfigurationNode& node) override;
+  void PreStep() override;
+
+ protected:
+  void set_robot_los(argos::CFootBotEntity& robot);
+  void set_robot_tick(argos::CFootBotEntity& robot);
+  void handle_nest_block_drop(controller::depth0_foraging_controller& controller);
+  void handle_free_block_pickup(argos::CFootBotEntity& robot);
+
+ private:
+  void pre_step_iter(argos::CFootBotEntity& robot) override;
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  depth0_foraging_loop_functions(const depth0_foraging_loop_functions& s) = delete;
+  depth0_foraging_loop_functions& operator=(const depth0_foraging_loop_functions& s) = delete;
 };
 
-NS_END(params, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_MEMORY_FORAGING_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_LOOP_FUNCTIONS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_loop_functions.cpp
+ * @file depth0_foraging_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,11 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/memory_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0_foraging_loop_functions.hpp"
 #include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
@@ -39,10 +39,10 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void memory_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+void depth0_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   random_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing memory_foraging loop functions");
+  ER_NOM("Initializing depth0_foraging loop functions");
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -61,12 +61,12 @@ void memory_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
     controller.display_los(l_params->display_robot_los);
     set_robot_los(robot);
   } /* for(it..) */
-  ER_NOM("memory_foraging loop functions initialization finished");
+  ER_NOM("depth0_foraging loop functions initialization finished");
 }
 
-void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-    controller::memory_foraging_controller& controller =
-        static_cast<controller::memory_foraging_controller&>(
+void depth0_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+    controller::depth0_foraging_controller& controller =
+        static_cast<controller::depth0_foraging_controller&>(
         robot.GetControllableEntity().GetController());
 
     /* Send the robot its new line of sight */
@@ -80,11 +80,11 @@ void memory_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
     }
 } /* pre_step_iter() */
 
-void memory_foraging_loop_functions::handle_free_block_pickup(
+void depth0_foraging_loop_functions::handle_free_block_pickup(
     argos::CFootBotEntity& robot) {
 
-  controller::memory_foraging_controller& controller =
-      static_cast<controller::memory_foraging_controller&>(
+  controller::depth0_foraging_controller& controller =
+      static_cast<controller::depth0_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
   if (!controller.in_nest() && controller.is_exploring_for_block() &&
@@ -95,7 +95,7 @@ void memory_foraging_loop_functions::handle_free_block_pickup(
       events::free_block_pickup pickup_op(rcppsw::common::g_server,
                                           &map()->blocks()[block],
                                           robot_id(robot));
-      controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(pickup_op);
+      controller.visitor::visitable_any<controller::depth0_foraging_controller>::accept(pickup_op);
       map()->accept(pickup_op);
 
       /* The floor texture must be updated */
@@ -104,8 +104,8 @@ void memory_foraging_loop_functions::handle_free_block_pickup(
   }
 } /* handle_free_block_pickup() */
 
-void memory_foraging_loop_functions::handle_nest_block_drop(
-    controller::memory_foraging_controller& controller) {
+void depth0_foraging_loop_functions::handle_nest_block_drop(
+    controller::depth0_foraging_controller& controller) {
   if (controller.in_nest()) {
     /* get stats from this robot before its state changes */
     random_foraging_loop_functions::robot_collector()->collect(controller);
@@ -120,14 +120,14 @@ void memory_foraging_loop_functions::handle_nest_block_drop(
     map()->accept(drop_op);
 
     /* Actually drop the block */
-    controller.visitor::visitable_any<controller::memory_foraging_controller>::accept(drop_op);
+    controller.visitor::visitable_any<controller::depth0_foraging_controller>::accept(drop_op);
 
     /* The floor texture must be updated */
     floor()->SetChanged();
   }
 } /* handle_nest_block_drop() */
 
-argos::CColor memory_foraging_loop_functions::GetFloorColor(
+argos::CColor depth0_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
 
   /* The nest is a light gray */
@@ -145,7 +145,7 @@ argos::CColor memory_foraging_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void memory_foraging_loop_functions::PreStep() {
+void depth0_foraging_loop_functions::PreStep() {
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
@@ -158,15 +158,15 @@ void memory_foraging_loop_functions::PreStep() {
   random_foraging_loop_functions::pre_step_final();
 } /* PreStep() */
 
-void memory_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
+void depth0_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
   representation::discrete_coord robot_loc =
       representation::real_to_discrete_coord(pos, map()->grid_resolution());
-  controller::memory_foraging_controller& controller =
-      dynamic_cast<controller::memory_foraging_controller&>(
+  controller::depth0_foraging_controller& controller =
+      dynamic_cast<controller::depth0_foraging_controller&>(
           robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
@@ -176,14 +176,14 @@ void memory_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot)
   controller.robot_loc(pos);
 } /* set_robot_los() */
 
-void memory_foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
-  controller::memory_foraging_controller& controller =
-      dynamic_cast<controller::memory_foraging_controller&>(
+void depth0_foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
+  controller::depth0_foraging_controller& controller =
+      dynamic_cast<controller::depth0_foraging_controller&>(
           robot.GetControllableEntity().GetController());
   controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
 
 using namespace argos;
-REGISTER_LOOP_FUNCTIONS(memory_foraging_loop_functions, "memory_foraging_loop_functions");
+REGISTER_LOOP_FUNCTIONS(depth0_foraging_loop_functions, "depth0_foraging_loop_functions");
 
 NS_END(support, fordyca);

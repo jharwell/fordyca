@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_fsm.hpp
+ * @file depth0_foraging_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_FORAGING_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH0_FORAGING_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -64,12 +64,12 @@ NS_START(fsm);
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and bring it all the way back to the nest.
  */
-class memory_foraging_fsm : public base_foraging_fsm,
+class depth0_foraging_fsm : public base_foraging_fsm,
                             public diagnostics::depth0_diagnostics,
                             public task_allocation::taskable,
-                            public visitor::visitable_any<memory_foraging_fsm> {
+                            public visitor::visitable_any<depth0_foraging_fsm> {
  public:
-  memory_foraging_fsm(
+  depth0_foraging_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
       const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
@@ -132,18 +132,18 @@ class memory_foraging_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* memory foraging states */
-  HFSM_STATE_DECLARE(memory_foraging_fsm, start,
+  HFSM_STATE_DECLARE(depth0_foraging_fsm, start,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(memory_foraging_fsm, block_to_nest,
+  HFSM_STATE_DECLARE(depth0_foraging_fsm, block_to_nest,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(memory_foraging_fsm, finished);
+  HFSM_STATE_DECLARE_ND(depth0_foraging_fsm, finished);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }
 
-  memory_foraging_fsm(const memory_foraging_fsm& fsm) = delete;
-  memory_foraging_fsm& operator=(const memory_foraging_fsm& fsm) = delete;
+  depth0_foraging_fsm(const depth0_foraging_fsm& fsm) = delete;
+  depth0_foraging_fsm& operator=(const depth0_foraging_fsm& fsm) = delete;
 
   /* data members */
   bool m_task_running;
@@ -154,4 +154,4 @@ class memory_foraging_fsm : public base_foraging_fsm,
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_MEMORY_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_FORAGING_FSM_HPP_ */

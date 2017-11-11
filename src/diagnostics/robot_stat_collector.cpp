@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/diagnostics/robot_stat_collector.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,7 @@ void robot_stat_collector::collect(
 } /* collect() */
 
 void robot_stat_collector::collect(
-    const controller::memory_foraging_controller& controller) {
+    const controller::depth0_foraging_controller& controller) {
   m_robot_stats.n_searching += controller.is_acquiring_block();
   m_robot_stats.n_exploring += controller.is_exploring_for_block();
   m_robot_stats.n_returning += controller.is_transporting_to_nest();

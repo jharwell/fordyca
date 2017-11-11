@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
@@ -45,12 +45,12 @@ class depth1_foraging_sensors;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth1_foraging_controller : public memory_foraging_controller,
+class depth1_foraging_controller : public depth0_foraging_controller,
                                    public diagnostics::depth1_task_diagnostics,
                                    public visitor::visitable_any<depth1_foraging_controller> {
  public:
   depth1_foraging_controller(void) :
-      memory_foraging_controller(),
+      depth0_foraging_controller(),
       m_sensors(),
       m_executive(),
       m_forager(),

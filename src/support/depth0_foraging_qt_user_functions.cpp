@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_qt_user_functions.cpp
+ * @file depth0_foraging_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/support/memory_foraging_qt_user_functions.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/support/depth0_foraging_qt_user_functions.hpp"
+#include "fordyca/controller/depth0_foraging_controller.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -34,15 +34,15 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-memory_foraging_qt_user_functions::memory_foraging_qt_user_functions() {
-  RegisterUserFunction<memory_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(&memory_foraging_qt_user_functions::Draw);
+depth0_foraging_qt_user_functions::depth0_foraging_qt_user_functions() {
+  RegisterUserFunction<depth0_foraging_qt_user_functions,
+                       argos::CFootBotEntity>(&depth0_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void memory_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void depth0_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   random_foraging_qt_user_functions::Draw(c_entity);
 
   controller::base_foraging_controller& controller =
@@ -60,7 +60,7 @@ void memory_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 }
 
 using namespace argos;
-REGISTER_QTOPENGL_USER_FUNCTIONS(memory_foraging_qt_user_functions,
-                                 "memory_foraging_qt_user_functions")
+REGISTER_QTOPENGL_USER_FUNCTIONS(depth0_foraging_qt_user_functions,
+                                 "depth0_foraging_qt_user_functions")
 
 NS_END(support, fordyca);

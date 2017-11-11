@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_controller.hpp
+ * @file depth0_foraging_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_MEMORY_FORAGING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/fsm/memory_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0_foraging_fsm.hpp"
 #include "fordyca/diagnostics/depth0_diagnostics.hpp"
 
 /*******************************************************************************
@@ -45,11 +45,11 @@ class depth1_foraging_sensors;
 /**
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
-class memory_foraging_controller : public base_foraging_controller,
+class depth0_foraging_controller : public base_foraging_controller,
                                    public diagnostics::depth0_diagnostics,
-                                   public visitor::visitable_any<memory_foraging_controller> {
+                                   public visitor::visitable_any<depth0_foraging_controller> {
  public:
-  memory_foraging_controller(void) :
+  depth0_foraging_controller(void) :
       base_foraging_controller(),
       m_light_loc(),
       m_map(),
@@ -77,7 +77,7 @@ class memory_foraging_controller : public base_foraging_controller,
    * @brief Initialize the controller.
    *
    * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><memory_foraging_controller_controller> section.
+   *               <controllers><depth0_foraging_controller_controller> section.
    */
   void Init(argos::TConfigurationNode& t_node) override;
 
@@ -116,7 +116,7 @@ class memory_foraging_controller : public base_foraging_controller,
   void robot_loc(argos::CVector2 loc);
   argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
-  fsm::memory_foraging_fsm* fsm(void) const { return m_fsm.get(); }
+  fsm::depth0_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  protected:
   std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
@@ -126,10 +126,10 @@ class memory_foraging_controller : public base_foraging_controller,
  private:
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::shared_ptr<fsm::memory_foraging_fsm>            m_fsm;
+  std::shared_ptr<fsm::depth0_foraging_fsm>            m_fsm;
   std::shared_ptr<depth1_foraging_sensors>      m_sensors;
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_MEMORY_FORAGING_CONTROLLER_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_DEPTH0_FORAGING_CONTROLLER_CONTROLLER_HPP_ */

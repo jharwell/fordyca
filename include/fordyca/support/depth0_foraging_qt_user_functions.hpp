@@ -1,5 +1,5 @@
 /**
- * @file memory_foraging_qt_user_functions.hpp
+ * @file depth0_foraging_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,15 +33,15 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class memory_foraging_qt_user_functions : public random_foraging_qt_user_functions {
+class depth0_foraging_qt_user_functions : public random_foraging_qt_user_functions {
  public:
-  memory_foraging_qt_user_functions(void);
+  depth0_foraging_qt_user_functions(void);
 
-  virtual ~memory_foraging_qt_user_functions() {}
+  virtual ~depth0_foraging_qt_user_functions() {}
 
   void Draw(argos::CFootBotEntity& c_entity) override;
 };
 
 NS_END(fordyca, support);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_MEMORY_FORAGING_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_FORAGING_QT_USER_FUNCTIONS_HPP_ */

@@ -40,7 +40,7 @@ NS_START(fordyca, support);
  * Member Functions
  ******************************************************************************/
 void depth1_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
-  memory_foraging_loop_functions::Init(node);
+  depth0_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth1_foraging loop functions");
 
@@ -111,14 +111,14 @@ void depth1_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         robot.GetControllableEntity().GetController());
 
     /* Send the robot its new line of sight */
-    memory_foraging_loop_functions::set_robot_los(robot);
-    memory_foraging_loop_functions::set_robot_tick(robot);
+    depth0_foraging_loop_functions::set_robot_los(robot);
+    depth0_foraging_loop_functions::set_robot_tick(robot);
 
     if (controller.is_carrying_block()) {
-      memory_foraging_loop_functions::handle_nest_block_drop(controller);
+      depth0_foraging_loop_functions::handle_nest_block_drop(controller);
       handle_cache_block_drop(robot);
     } else { /* The foot-bot has no block item */
-      memory_foraging_loop_functions::handle_free_block_pickup(robot);
+      depth0_foraging_loop_functions::handle_free_block_pickup(robot);
       handle_cached_block_pickup(robot);
     }
 } /* pre_step_iter() */
@@ -161,7 +161,7 @@ void depth1_foraging_loop_functions::PreStep() {
         it->second);
     pre_step_iter(robot);
   } /* for(it..) */
-  memory_foraging_loop_functions::pre_step_final();
+  depth0_foraging_loop_functions::pre_step_final();
 } /* PreStep() */
 
 using namespace argos;
