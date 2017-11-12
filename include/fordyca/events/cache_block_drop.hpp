@@ -36,13 +36,12 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class cell2D;
 class perceived_cell2D;
-class cell2D_fsm;
 class cache;
 class block;
 class arena_map;
 };
 
-namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
+namespace fsm { class cell2D_fsm; namespace depth1 { class block_to_cache_fsm; }}
 namespace controller { namespace depth1 { class foraging_controller; }}
 namespace tasks { class forager; }
 
@@ -57,7 +56,7 @@ class cache_block_drop : public visitor::visitor,
                                                    fsm::depth1::block_to_cache_fsm,
                                                    tasks::forager,
                                                    representation::cell2D,
-                                                   representation::cell2D_fsm,
+                                                   fsm::cell2D_fsm,
                                                    representation::perceived_cell2D,
                                                    representation::block,
                                                    representation::arena_map> {
@@ -79,7 +78,7 @@ class cache_block_drop : public visitor::visitor,
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a

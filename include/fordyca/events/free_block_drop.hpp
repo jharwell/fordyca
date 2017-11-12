@@ -63,7 +63,7 @@ class free_block_drop : public cell_op,
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update a block with the knowledge that it has been dropped.

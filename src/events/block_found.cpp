@@ -56,7 +56,7 @@ void block_found::visit(representation::cell2D& cell) {
   }
 } /* visit() */
 
-void block_found::visit(representation::cell2D_fsm& fsm) {
+void block_found::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 

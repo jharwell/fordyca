@@ -56,7 +56,7 @@ free_block_pickup::free_block_pickup(
 /*******************************************************************************
  * Foraging Support
  ******************************************************************************/
-void free_block_pickup::visit(representation::cell2D_fsm& fsm) {
+void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_pickup();
 } /* visit() */
 

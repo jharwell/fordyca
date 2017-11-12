@@ -56,7 +56,7 @@ void free_block_drop::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void free_block_drop::visit(representation::cell2D_fsm& fsm) {
+void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 

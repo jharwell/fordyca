@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_CELL2D_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_CELL2D_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,7 +31,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, fsm);
+
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -95,6 +96,6 @@ class cell2D_fsm : public state_machine::simple_fsm,
   uint m_block_count;
 };
 
-NS_END(representation, forydca);
+NS_END(fsm, forydca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_CELL2D_FSM_HPP_ */

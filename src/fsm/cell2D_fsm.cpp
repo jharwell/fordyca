@@ -20,12 +20,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell2D_fsm.hpp"
+#include "fordyca/fsm/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -146,4 +146,4 @@ void cell2D_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-NS_END(representation, fordyca);
+NS_END(fsm, fordyca);
