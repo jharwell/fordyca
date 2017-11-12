@@ -33,6 +33,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 #include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 /*******************************************************************************
@@ -67,6 +68,7 @@ NS_START(fsm);
  * that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
+                          public diagnostics::random_collectible_diagnostics,
                           public diagnostics::depth0::collectible_diagnostics,
                           public rcppsw::task_allocation::taskable {
  public:

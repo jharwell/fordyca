@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, diagnostics, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class collectible_task_diagnostics: public collectible_diagnostics {
+class collectible_task_diagnostics {
  public:
   collectible_task_diagnostics(void) {}
   virtual ~collectible_task_diagnostics(void) {}

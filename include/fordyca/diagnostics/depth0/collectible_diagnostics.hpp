@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca, diagnostics, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class collectible_diagnostics : public random_collectible_diagnostics {
+class collectible_diagnostics {
  public:
   collectible_diagnostics(void) {}
   virtual ~collectible_diagnostics(void) {}

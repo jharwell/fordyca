@@ -30,6 +30,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 #include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
 
 /*******************************************************************************
@@ -39,7 +41,7 @@ NS_START(fordyca);
 
 namespace params { struct fsm_params; }
 namespace controller {
-namespace depth1{ class foraging_sensors; }
+namespace depth1 { class foraging_sensors; }
 class actuator_manager;
 }
 namespace representation { class perceived_arena_map; class block; }
@@ -61,6 +63,8 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
+                          public diagnostics::random_collectible_diagnostics,
+                          public diagnostics::depth0::collectible_diagnostics,
                           public diagnostics::depth1::collectible_diagnostics,
                           public task_allocation::taskable,
                           public visitor::visitable_any<block_to_nest_fsm> {

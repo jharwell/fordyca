@@ -49,7 +49,7 @@ static_cache_creator::static_cache_creator(
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> static_cache_creator::create_all(
-    std::vector<representation::block>& blocks) {
+    std::vector<representation::block*>& blocks) {
   std::vector<representation::cache> caches;
 
   ER_ASSERT(blocks.size() >= 2,
@@ -58,7 +58,7 @@ std::vector<representation::cache> static_cache_creator::create_all(
          m_center.GetY(), blocks.size());
   std::list<representation::block*> starter_blocks;
   for (auto b : blocks) {
-  starter_blocks.push_back(&b);
+  starter_blocks.push_back(b);
   } /* for(i..) */
 
   caches.push_back(cache_creator::create_single(starter_blocks, m_center));

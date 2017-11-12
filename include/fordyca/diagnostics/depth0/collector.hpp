@@ -48,9 +48,6 @@ class collector : public base_stat_collector {
 
  private:
   struct stats {
-    uint n_exploring_for_block;
-    uint n_avoiding_collision;
-    uint n_transporting_to_nest;
     uint n_acquiring_block;
     uint n_vectoring_to_block;
   };

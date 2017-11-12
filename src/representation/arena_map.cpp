@@ -132,8 +132,22 @@ void arena_map::static_cache_create(void) {
                                             argos::CVector2(x, y),
                                             mc_cache_params.dimension,
                                             m_grid.resolution());
-    std::vector<representation::block> blocks(m_blocks.begin(),
-                                              m_blocks.begin() + mc_cache_params.static_cache_size);
+
+    std::vector<representation::block*> blocks;
+
+    /*
+     * Only blocks that are not currently carried by a robot are eligible for
+     * being used to re-create the static cache.
+     */
+    for (auto b : m_blocks) {
+      if (-1 == b.robot_index()) {
+        blocks.push_back(&b);
+      }
+      if (blocks.size() >= mc_cache_params.static_cache_size) {
+        break;
+      }
+    } /* for(b..) */
+
     m_caches = c.create_all(blocks);
     m_grid.access(m_caches[0].discrete_loc().first,
                   m_caches[0].discrete_loc().second).entity(&m_caches[0]);

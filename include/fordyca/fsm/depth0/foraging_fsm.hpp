@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 #include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
@@ -65,6 +66,7 @@ NS_START(fsm, depth0);
  * pickup the block and bring it all the way back to the nest.
  */
 class foraging_fsm : public base_foraging_fsm,
+                     public diagnostics::random_collectible_diagnostics,
                      public diagnostics::depth0::collectible_diagnostics,
                      public task_allocation::taskable,
                      public visitor::visitable_any<depth0::foraging_fsm> {
