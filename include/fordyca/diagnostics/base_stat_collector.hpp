@@ -42,7 +42,7 @@ class base_stat_collector {
       m_ofname(ofname), m_ofile() {}
   virtual ~base_stat_collector(void) {}
 
-  virtual void reset();
+  virtual void reset(void);
   virtual void reset_on_timestep(void) {}
   void csv_line_write(uint timestep);
   void finalize(void) { m_ofile.close(); }

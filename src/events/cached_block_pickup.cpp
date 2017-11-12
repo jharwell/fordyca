@@ -25,10 +25,10 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/depth1_foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "fordyca/fsm/block_to_cache_fsm.hpp"
-#include "fordyca/fsm/depth0_foraging_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth0/foraging_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -156,7 +156,7 @@ void cached_block_pickup::visit(representation::block& block) {
   ER_NOM("block: block%d is now carried by fb%zu", block.id(), m_robot_index);
 } /* visit() */
 
-void cached_block_pickup::visit(controller::depth1_foraging_controller& controller) {
+void cached_block_pickup::visit(controller::depth1::foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.block(m_block);
   controller.current_task()->accept(*this);

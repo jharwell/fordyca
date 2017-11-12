@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/diagnostics/base_diagnostics.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +57,7 @@ NS_START(fsm);
  * block back to the nest and repeat.
  */
 class random_foraging_fsm : public base_foraging_fsm,
-                            public diagnostics::base_diagnostics,
+                            public diagnostics::random_collectible_diagnostics,
                             public visitor::visitable_any<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,

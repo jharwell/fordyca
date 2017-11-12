@@ -27,8 +27,8 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth0_foraging_sensors.hpp"
-#include "fordyca/controller/block_selector.hpp"
+#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -44,7 +44,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_block_fsm::acquire_block_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::depth0_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server,
@@ -132,7 +132,7 @@ bool acquire_block_fsm::acquire_known_block(
     return false;
   }
   if (!m_vector_fsm.task_running()) {
-    controller::block_selector selector(m_server, mc_nest_center);
+    controller::depth0::block_selector selector(m_server, mc_nest_center);
     auto best = selector.calc_best(blocks,
                                    m_sensors->robot_loc());
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",

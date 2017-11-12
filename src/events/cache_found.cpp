@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/depth1_foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,7 +67,7 @@ void cache_found::visit(representation::cell2D_fsm& fsm) {
   }
 } /* visit() */
 
-void cache_found::visit(controller::depth1_foraging_controller& controller) {
+void cache_found::visit(controller::depth1::foraging_controller& controller) {
   controller.map()->accept(*this);
   ER_NOM("depth1_foraging_controller: %s found cache%d",
          controller.GetId().c_str(), m_cache->id());

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/depth1_foraging_sensors.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +37,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_nest_fsm::block_to_nest_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::common::er_server>& server,
-    const std::shared_ptr<controller::depth1_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
     const std::shared_ptr<const representation::perceived_arena_map>& map) :
     base_foraging_fsm(server,

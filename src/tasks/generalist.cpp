@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/generalist.hpp"
-#include "fordyca/fsm/depth0_foraging_fsm.hpp"
-#include "fordyca/controller/depth1_foraging_sensors.hpp"
+#include "fordyca/fsm/depth0/foraging_fsm.hpp"
+#include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 
@@ -36,7 +36,7 @@ NS_START(fordyca, tasks);
  * Member Functions
  ******************************************************************************/
 double generalist::calc_elapsed_time(double exec_time) const {
-  return dynamic_cast<fsm::depth0_foraging_fsm*>(
+  return dynamic_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->sensors()->tick() - exec_time;
 } /* calc_elapsed_time() */
 
@@ -50,17 +50,17 @@ void generalist::accept(events::free_block_pickup &visitor) { visitor.visit(*thi
  * Base Diagnostics
  ******************************************************************************/
 bool generalist::is_exploring_for_block(void) const {
-  return static_cast<fsm::depth0_foraging_fsm*>(
+  return static_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->is_exploring_for_block();
 } /* is_exploring_for_block() */
 
 bool generalist::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth0_foraging_fsm*>(
+  return static_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 bool generalist::is_transporting_to_nest(void) const {
-  return static_cast<fsm::depth0_foraging_fsm*>(
+  return static_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->is_transporting_to_nest();
 } /* is_tranpsorting_to_nest() */
 
@@ -68,12 +68,12 @@ bool generalist::is_transporting_to_nest(void) const {
  * Depth0 Diagnostics
  ******************************************************************************/
 bool generalist::is_acquiring_block(void) const {
-  return static_cast<fsm::depth0_foraging_fsm*>(
+  return static_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->is_acquiring_block();
 } /* is_acquiring_block() */
 
 bool generalist::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth0_foraging_fsm*>(
+  return static_cast<fsm::depth0::foraging_fsm*>(
       polled_task::mechanism())->is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 

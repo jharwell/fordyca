@@ -27,7 +27,7 @@
 #include <string>
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "fordyca/diagnostics/depth1_task_diagnostics.hpp"
+#include "fordyca/diagnostics/depth1/collectible_task_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,7 @@ NS_START(tasks);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-class foraging_task : public diagnostics::depth1_task_diagnostics,
+class foraging_task : public diagnostics::depth1::collectible_task_diagnostics,
                       public visitor::polymorphic_visitable<foraging_task,
                                                             events::cached_block_pickup,
                                                             events::cache_block_drop,

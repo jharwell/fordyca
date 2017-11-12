@@ -73,8 +73,8 @@ class cache_found : public perceived_cell_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::depth1_foraging_controller& controller) override;
-  void visit(controller::depth0_foraging_controller&) override {}
+  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(controller::depth0::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

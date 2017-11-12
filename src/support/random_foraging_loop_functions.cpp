@@ -21,7 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
@@ -29,9 +28,10 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/params/logging_params.hpp"
+#include "fordyca/params/diagnostics_params.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +47,6 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_nest_y(),
     m_floor(NULL),
     m_sim_type(),
-    m_repo(new params::loop_function_repository),
     m_robot_collector(),
     m_block_collector(),
     m_map() {
@@ -67,15 +66,17 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   m_floor = &GetSpace().GetFloorEntity();
 
+  params::loop_function_repository repo;
+
   /* parse all environment parameters */
-  m_repo->parse_all(node);
+  repo.parse_all(node);
 
   /* Capture parsed parameters in logfile */
-  m_repo->show_all(rcppsw::common::g_server->log_stream());
+  repo.show_all(rcppsw::common::g_server->log_stream());
 
   const struct params::loop_functions_params * l_params =
       static_cast<const struct params::loop_functions_params*>(
-      m_repo->get_params("loop_functions"));
+      repo.get_params("loop_functions"));
   m_nest_x = l_params->nest_x;
   m_nest_y = l_params->nest_y;
   m_sim_type = l_params->simulation_type;
@@ -83,7 +84,7 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize arena map and distribute blocks */
   const struct params::arena_map_params * arena_params =
       static_cast<const struct params::arena_map_params*>(
-          m_repo->get_params("arena_map"));
+          repo.get_params("arena_map"));
   m_map.reset(new representation::arena_map(arena_params));
   m_map->distribute_blocks(true);
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
@@ -91,12 +92,12 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_robot_collector.reset(new diagnostics::robot_stat_collector(
-      static_cast<const struct params::logging_params*>(
-          m_repo->get_params("logging"))->robot_stats));
+  m_robot_collector.reset(new diagnostics::random_diagnostics_collector(
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("diagnostics"))->robot_fname));
   m_block_collector.reset(new diagnostics::block_stat_collector(
-      static_cast<const struct params::logging_params*>(
-          m_repo->get_params("logging"))->block_stats));
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("diagnostics"))->block_fname));
   m_block_collector->reset();
   m_robot_collector->reset();
 
