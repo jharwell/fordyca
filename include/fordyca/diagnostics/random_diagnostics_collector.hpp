@@ -48,13 +48,13 @@ class random_diagnostics_collector : public base_stat_collector {
 
  private:
   struct stats {
-    uint n_exploring_for_block;
-    uint n_avoiding_collision;
-    uint n_transporting_to_nest;
+    size_t n_exploring_for_block;
+    size_t n_avoiding_collision;
+    size_t n_transporting_to_nest;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
-  std::string csv_line_build(void) override;
+  bool csv_line_build(std::string& line) override;
 
   struct stats m_stats;
 };

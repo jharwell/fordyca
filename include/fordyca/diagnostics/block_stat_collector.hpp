@@ -25,16 +25,16 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/diagnostics/base_stat_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/diagnostics/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, diagnostics);
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class block; }
-NS_START(diagnostics);
+
+class carryable_object_diagnostics;
 
 /*******************************************************************************
  * Class Definitions
@@ -43,24 +43,24 @@ class block_stat_collector : public base_stat_collector,
                              public visitor::visitable_any<block_stat_collector> {
  public:
   explicit block_stat_collector(const std::string ofname) :
-      base_stat_collector(ofname), m_block_stats() {}
+      base_stat_collector(ofname), m_stats() {}
 
   void reset(void) override;
-  void collect(const representation::block& block);
-  uint total_collected(void) const { return m_block_stats.total_collected; }
-  void inc_total_collected(void) { ++m_block_stats.total_collected; }
-  void inc_total_carries(uint carries) { m_block_stats.total_carries += carries; }
+  void reset_on_timestep(void) override { m_stats.block_carries = 0; }
+  void collect(const carryable_object_diagnostics& block);
+  size_t total_collected(void) const { return m_stats.total_collected; }
 
  private:
-  struct block_stats {
-    uint total_collected;
-    uint total_carries;
+  struct stats {
+    size_t total_collected; /* aggregate across blocks, not reset each timestep*/
+    size_t total_carries; /* aggregate across blocks, not reset each timstep */
+    size_t block_carries; /* for one block, reset each timestep */
   };
 
   std::string csv_header_build(const std::string& header = "") override;
-  std::string csv_line_build(void) override;
+  bool csv_line_build(std::string& line) override;
 
-  struct block_stats m_block_stats;
+  struct stats m_stats;
 };
 
 NS_END(diagnostics, fordyca);

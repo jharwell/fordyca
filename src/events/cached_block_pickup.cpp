@@ -72,6 +72,10 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
          cell_op::x(), cell_op::y());
 } /* visit() */
 
+void cached_block_pickup::visit(representation::cache& cache) {
+  cache.inc_block_pickups();
+} /* visit() */
+
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
   cell.cell().accept(*this);
   ER_NOM("perceived_cell2D: fb%zu block%d from cache%d @(%zu, %zu)",

@@ -69,12 +69,17 @@ void cache_block_drop::visit(representation::arena_map& map) {
   map.distribute_block(m_block, false);
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
   m_block->accept(*this);
+  m_cache->accept(*this);
   ER_NOM("fb%d dropped block%d in cache%d", m_block->robot_index(), m_block->id(),
          m_cache->id());
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {
-  block.reset();
+  block.robot_index(-1);
+} /* visit() */
+
+void cache_block_drop::visit(representation::cache& cache) {
+  cache.inc_block_drops();
 } /* visit() */
 
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {

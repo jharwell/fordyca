@@ -48,12 +48,12 @@ class collector : public base_stat_collector {
 
  private:
   struct stats {
-    uint n_acquiring_block;
-    uint n_vectoring_to_block;
+    size_t n_acquiring_block;
+    size_t n_vectoring_to_block;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
-  std::string csv_line_build(void) override;
+  bool csv_line_build(std::string& line) override;
 
   struct stats m_stats;
 };

@@ -58,8 +58,7 @@ void nest_block_drop::visit(representation::arena_map& map) {
 } /* visit() */
 
 void nest_block_drop::visit(diagnostics::block_stat_collector& collector) {
-  collector.inc_total_collected();
-  collector.inc_total_carries(m_block->carries());
+  collector.collect(*m_block);
 } /* visit() */
 
 /*******************************************************************************

@@ -39,22 +39,25 @@ std::string block_stat_collector::csv_header_build(const std::string& header) {
 
 void block_stat_collector::reset(void) {
   base_stat_collector::reset();
-  m_block_stats = {0, 0};
+  m_stats = {0, 0, 0};
 } /* reset() */
 
-std::string block_stat_collector::csv_line_build(void) {
+bool block_stat_collector::csv_line_build(std::string& line) {
   double avg_carries = 0;
-  if (m_block_stats.total_collected > 0) {
-    avg_carries = static_cast<double>(m_block_stats.total_collected/
-                                      m_block_stats.total_carries);
+  if (m_stats.block_carries > 0) {
+    avg_carries = static_cast<double>(m_stats.total_collected/
+                                      m_stats.total_carries);
+    line = std::to_string(m_stats.total_collected) + ";" +
+           std::to_string(avg_carries) + ";";
+    return true;
   }
-  return std::to_string(m_block_stats.total_collected) + ";" +
-      std::to_string(avg_carries) + ";";
+  return false;
 } /* csv_line_build() */
 
-void block_stat_collector::collect(const representation::block& block) {
-  ++m_block_stats.total_collected;
-  m_block_stats.total_carries += block.carries();
+void block_stat_collector::collect(const carryable_object_diagnostics& block) {
+  ++m_stats.total_collected;
+  m_stats.block_carries = block.n_carries();
+  m_stats.total_carries += block.n_carries();
 } /* collect() */
 
 

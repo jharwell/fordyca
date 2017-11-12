@@ -1,5 +1,5 @@
 /**
- * @file random_diagnostics_collector.cpp
+ * @file carryable_object_diagnostics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,11 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/random_diagnostics_collector.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,33 +32,22 @@
 NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string random_diagnostics_collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest";
-} /* csv_header_build() */
+class carryable_object_diagnostics {
+ public:
+  carryable_object_diagnostics(void) {}
+  virtual ~carryable_object_diagnostics(void) {}
 
-void random_diagnostics_collector::reset(void) {
-  base_stat_collector::reset();
-  reset_on_timestep();
-} /* reset() */
-
-void random_diagnostics_collector::collect(const random_collectible_diagnostics& diag) {
-  m_stats.n_exploring_for_block += diag.is_exploring_for_block();
-  m_stats.n_transporting_to_nest += diag.is_transporting_to_nest();
-  m_stats.n_avoiding_collision += diag.is_avoiding_collision();
-} /* collect() */
-
-bool random_diagnostics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_exploring_for_block) + ";" +
-         std::to_string(m_stats.n_avoiding_collision) + ";" +
-         std::to_string(m_stats.n_transporting_to_nest);
-  return true;
-} /* store_foraging_stats() */
-
-void random_diagnostics_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0};
-} /* reset_on_timestep() */
+  /**
+   * @brief Get how many carries this object has had on its way from its
+   * original arena location back to the nest.
+   *
+   * @return # carries.
+   */
+  virtual size_t n_carries(void) const = 0;
+};
 
 NS_END(diagnostics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_ */
