@@ -66,35 +66,37 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
-void foraging_loop_functions::handle_cached_block_pickup(
+template<typename T>
+bool foraging_loop_functions::handle_cached_block_pickup(
     argos::CFootBotEntity& robot) {
 
-  controller::depth1::foraging_controller& controller =
-      static_cast<controller::depth1::foraging_controller&>(
-          robot.GetControllableEntity().GetController());
+  T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (controller.is_exploring_for_cache() && controller.cache_detected()) {
+  if (controller.is_acquiring_cache() && controller.cache_detected() &&
+      !controller.is_transporting_to_cache()) {
     ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
 
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
       events::cached_block_pickup pickup_op(rcppsw::common::g_server,
-                                          &map()->caches()[cache],
-                                          robot_id(robot));
-      controller.visitor::visitable_any<controller::depth1::foraging_controller>::accept(pickup_op);
+                                            &map()->caches()[cache],
+                                            robot_id(robot));
+      controller.visitor::template visitable_any<T>::accept(pickup_op);
       map()->accept(pickup_op);
+      return true;
     }
   }
+  return false;
 } /* handle_cached_block_pickup() */
 
-void foraging_loop_functions::handle_cache_block_drop(
+template<typename T>
+bool foraging_loop_functions::handle_cache_block_drop(
     argos::CFootBotEntity& robot) {
-  controller::depth1::foraging_controller& controller =
-      static_cast<controller::depth1::foraging_controller&>(
-          robot.GetControllableEntity().GetController());
+  T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (controller.cache_detected()) {
+  if (controller.is_acquiring_cache() && controller.cache_detected() &&
+      controller.is_transporting_to_cache()) {
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
@@ -103,15 +105,14 @@ void foraging_loop_functions::handle_cache_block_drop(
                                        controller.block(),
                                        &map()->caches()[cache]);
 
-    /* TODO: Get stats from carried block before it's dropped */
-    /* block_collector()->accept(drop_op); */
-
     map()->accept(drop_op);
 
     /* Actually drop the block */
-    controller.visitor::visitable_any<controller::depth1::foraging_controller>::accept(drop_op);
+    controller.visitor::template visitable_any<T>::accept(drop_op);
+    return true;
     }
   }
+  return false;
 } /* handle_cache_block_drop() */
 
 int foraging_loop_functions::robot_on_cache(const argos::CFootBotEntity& robot) {
@@ -132,15 +133,15 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     m_depth1_collector->collect(controller);
 
     /* Send the robot its new line of sight */
-    depth0::foraging_loop_functions::set_robot_los(robot);
-    depth0::foraging_loop_functions::set_robot_tick(robot);
+    set_robot_los<controller::depth1::foraging_controller>(robot);
+    set_robot_tick<controller::depth1::foraging_controller>(robot);
 
     if (controller.is_carrying_block()) {
-      depth0::foraging_loop_functions::handle_nest_block_drop(controller);
-      handle_cache_block_drop(robot);
+      handle_nest_block_drop<controller::depth1::foraging_controller>(robot);
+      handle_cache_block_drop<controller::depth1::foraging_controller>(robot);
     } else { /* The foot-bot has no block item */
-      depth0::foraging_loop_functions::handle_free_block_pickup(robot);
-      handle_cached_block_pickup(robot);
+      handle_free_block_pickup<controller::depth1::foraging_controller>(robot);
+      handle_cached_block_pickup<controller::depth1::foraging_controller>(robot);
     }
 } /* pre_step_iter() */
 

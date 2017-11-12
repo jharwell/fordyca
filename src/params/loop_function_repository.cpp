@@ -39,7 +39,7 @@ loop_function_repository::loop_function_repository(void) {
   factory().register_type<diagnostics_parser>("diagnostics");
   factory().register_type<loop_functions_parser>("loop_functions");
   parsers()["arena_map"]        = factory().create("arena_map").get();
-  parsers()["logging"]          = factory().create("logging").get();
+  parsers()["diagnostics"]          = factory().create("diagnostics").get();
   parsers()["loop_functions"]   = factory().create("loop_functions").get();
 }
 

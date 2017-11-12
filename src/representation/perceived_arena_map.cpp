@@ -72,6 +72,19 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
   return blocks;
 } /* blocks() */
 
+std::list<perceived_cache> perceived_arena_map::caches(void) const {
+  std::list<perceived_cache> caches;
+  for (size_t i = 0; i < m_grid.xsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+      if (m_grid.access(i, j).state_has_cache()) {
+        caches.push_back(perceived_cache(m_grid.access(i, j).cache(),
+                                         m_grid.access(i, j).density()));
+      }
+    } /* for(j..) */
+  } /* for(i..) */
+  return caches;
+} /* caches() */
+
 void perceived_arena_map::update_density(void) {
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {

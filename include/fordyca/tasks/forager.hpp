@@ -43,7 +43,7 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the first half of the generalist task in depth 1
  * allocation.
  */
-class forager : public task_allocation::polled_task, foraging_task {
+class forager : public task_allocation::polled_task, public foraging_task {
  public:
   forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
       polled_task("forager", alpha, mechanism) {}

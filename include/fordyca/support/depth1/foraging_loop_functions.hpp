@@ -53,8 +53,10 @@ class foraging_loop_functions : public depth0::foraging_loop_functions {
   void Reset(void) override;
 
  protected:
-  void handle_cache_block_drop(argos::CFootBotEntity& robot);
-  void handle_cached_block_pickup(argos::CFootBotEntity& robot);
+  template<typename T>
+  bool handle_cache_block_drop(argos::CFootBotEntity& robot);
+  template<typename T>
+  bool handle_cached_block_pickup(argos::CFootBotEntity& robot);
   int robot_on_cache(const argos::CFootBotEntity& robot);
 
  private:

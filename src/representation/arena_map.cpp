@@ -139,7 +139,7 @@ void arena_map::static_cache_create(void) {
      * Only blocks that are not currently carried by a robot are eligible for
      * being used to re-create the static cache.
      */
-    for (auto b : m_blocks) {
+    for (auto&& b : m_blocks) {
       if (-1 == b.robot_index()) {
         blocks.push_back(&b);
       }

@@ -26,6 +26,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/depth0/foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
@@ -75,7 +76,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
             repo.get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);
-    set_robot_los(robot);
+    set_robot_los<controller::depth0::foraging_controller>(robot);
   } /* for(it..) */
   ER_NOM("depth0_foraging loop functions initialization finished");
 }
@@ -90,24 +91,22 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     m_depth0_collector->collect(controller);
 
     /* Send the robot its new line of sight */
-    set_robot_los(robot);
-    set_robot_tick(robot);
+    set_robot_los<controller::depth0::foraging_controller>(robot);
+    set_robot_tick<controller::depth0::foraging_controller>(robot);
 
     if (controller.is_carrying_block()) {
-      handle_nest_block_drop(controller);
+      handle_nest_block_drop<controller::depth0::foraging_controller>(robot);
     } else { /* The foot-bot has no block item */
-      handle_free_block_pickup(robot);
+      handle_free_block_pickup<controller::depth0::foraging_controller>(robot);
     }
 } /* pre_step_iter() */
 
-void foraging_loop_functions::handle_free_block_pickup(
-    argos::CFootBotEntity& robot) {
+template<typename T>
+bool foraging_loop_functions::handle_free_block_pickup(argos::CFootBotEntity& robot) {
 
-  controller::depth0::foraging_controller& controller =
-      static_cast<controller::depth0::foraging_controller&>(
-          robot.GetControllableEntity().GetController());
+ T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (!controller.in_nest() && controller.is_exploring_for_block() &&
+  if (!controller.in_nest() && controller.is_acquiring_block() &&
       controller.block_detected()) {
     /* Check whether the foot-bot is actually on a block */
     int block = robot_on_block(robot);
@@ -115,18 +114,21 @@ void foraging_loop_functions::handle_free_block_pickup(
       events::free_block_pickup pickup_op(rcppsw::common::g_server,
                                           &map()->blocks()[block],
                                           robot_id(robot));
-      controller.visitor::visitable_any<controller::depth0::foraging_controller>::accept(pickup_op);
+      controller.visitor::template visitable_any<T>::accept(pickup_op);
       map()->accept(pickup_op);
 
       /* The floor texture must be updated */
       floor()->SetChanged();
+      return true;
     }
   }
+  return false;
 } /* handle_free_block_pickup() */
 
-void foraging_loop_functions::handle_nest_block_drop(
-    controller::depth0::foraging_controller& controller) {
-  if (controller.in_nest()) {
+template <typename T>
+bool foraging_loop_functions::handle_nest_block_drop(argos::CFootBotEntity& robot) {
+  T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+  if (controller.in_nest() && controller.is_transporting_to_nest()) {
 
     /* Update arena map state due to a block nest drop */
     events::nest_block_drop drop_op(rcppsw::common::g_server,
@@ -138,11 +140,13 @@ void foraging_loop_functions::handle_nest_block_drop(
     map()->accept(drop_op);
 
     /* Actually drop the block */
-    controller.visitor::visitable_any<controller::depth0::foraging_controller>::accept(drop_op);
+    controller.visitor::template visitable_any<T>::accept(drop_op);
 
     /* The floor texture must be updated */
     floor()->SetChanged();
+    return true;
   }
+  return false;
 } /* handle_nest_block_drop() */
 
 argos::CColor foraging_loop_functions::GetFloorColor(
@@ -194,6 +198,7 @@ void foraging_loop_functions::PreStep() {
   pre_step_final();
 } /* PreStep() */
 
+template<typename T>
 void foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
@@ -201,9 +206,7 @@ void foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
 
   representation::discrete_coord robot_loc =
       representation::real_to_discrete_coord(pos, map()->grid_resolution());
-  controller::depth0::foraging_controller& controller =
-      dynamic_cast<controller::depth0::foraging_controller&>(
-          robot.GetControllableEntity().GetController());
+  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
           map()->subgrid(robot_loc.first, robot_loc.second, 1),
@@ -212,12 +215,16 @@ void foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
   controller.robot_loc(pos);
 } /* set_robot_los() */
 
+template<typename T>
 void foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
-  controller::depth0::foraging_controller& controller =
-      dynamic_cast<controller::depth0::foraging_controller&>(
-          robot.GetControllableEntity().GetController());
+  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
+
+template void foraging_loop_functions::set_robot_los<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
+template void foraging_loop_functions::set_robot_tick<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
+template bool foraging_loop_functions::handle_nest_block_drop<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
+template bool foraging_loop_functions::handle_free_block_pickup<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

@@ -40,8 +40,6 @@ NS_START(fordyca, controller, depth1);
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
-class foraging_sensors;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -52,7 +50,6 @@ class foraging_controller : public depth0::foraging_controller,
  public:
   foraging_controller(void) :
       depth0::foraging_controller(),
-      m_sensors(),
       m_executive(),
       m_forager(),
       m_collector(),
@@ -77,6 +74,7 @@ class foraging_controller : public depth0::foraging_controller,
   std::string task_name(void) const override;
 
   bool cache_detected(void) const;
+  void process_los(const representation::line_of_sight* const los) override;
 
   /*
    * @brief Initialize the controller.
@@ -94,7 +92,6 @@ class foraging_controller : public depth0::foraging_controller,
   void ControlStep(void) override;
 
  private:
-  std::shared_ptr<foraging_sensors>  m_sensors;
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager> m_forager;
   std::unique_ptr<tasks::collector> m_collector;

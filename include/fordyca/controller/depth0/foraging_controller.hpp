@@ -98,7 +98,7 @@ class foraging_controller : public base_foraging_controller,
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
-  void process_los(const representation::line_of_sight* const los);
+  virtual void process_los(const representation::line_of_sight* const los);
 
   /**
    * @brief Get the current LOS for the robot.
@@ -110,6 +110,10 @@ class foraging_controller : public base_foraging_controller,
   std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
     return m_map;
   }
+  std::shared_ptr<depth1::foraging_sensors>& sensors_ref(void) {
+    return m_sensors;
+  }
+  depth1::foraging_sensors* sensors(void) const { return m_sensors.get(); }
 
   /**
    * @brief Set the current location of the robot.

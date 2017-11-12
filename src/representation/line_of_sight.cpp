@@ -38,6 +38,7 @@ std::list<const representation::block*> line_of_sight::blocks(void) const {
        i < m_view.origin() + m_view.num_elements(); ++i) {
     if ((*i)->state_has_block()) {
       blocks.push_back((*i)->block());
+      assert((*i)->block());
     }
   } /* for(i..) */
   return blocks;
@@ -48,6 +49,7 @@ std::list<const representation::cache*> line_of_sight::caches(void) const {
   for (auto i = m_view.origin();
        i < m_view.origin() + m_view.num_elements(); ++i) {
     if ((*i)->state_has_cache()) {
+      assert((*i)->cache());
       caches.push_back((*i)->cache());
     }
   } /* for(i..) */

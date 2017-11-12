@@ -123,7 +123,7 @@ bool acquire_block_fsm::is_vectoring_to_block(void) const {
 void acquire_block_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
-  m_explore_fsm.init();
+  m_explore_fsm.task_reset();
 } /* init() */
 
 bool acquire_block_fsm::acquire_known_block(
@@ -141,6 +141,7 @@ bool acquire_block_fsm::acquire_known_block(
            best.first->discrete_loc().second,
            best.second);
     tasks::vector_argument v(best.first->real_loc());
+    m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
   } else if (m_vector_fsm.task_finished()) {

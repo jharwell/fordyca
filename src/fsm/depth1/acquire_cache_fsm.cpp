@@ -89,12 +89,13 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, acquire_cache) {
 
 HFSM_EXIT_DEFINE(acquire_cache_fsm, exit_acquire_cache) {
   m_vector_fsm.task_reset();
-  m_explore_fsm.init();
+  m_explore_fsm.task_reset();
 }
 HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
+
   return state_machine::event_signal::HANDLED;
 }
 
@@ -104,7 +105,7 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
       m_vector_fsm.is_avoiding_collision();
-} /* is_avoiding_collision(0) */
+} /* is_avoiding_collision() */
 
 /*******************************************************************************
  * Depth1 Diagnostics
@@ -118,7 +119,14 @@ bool acquire_cache_fsm::is_vectoring_to_cache(void) const {
 } /* is_vectoring_to_cache() */
 
 bool acquire_cache_fsm::is_acquiring_cache(void) const {
-  return is_vectoring_to_cache() || is_exploring_for_cache();
+  /*
+   * task_finished() covers the case where you arrive at a cache with the
+   * exploration FSM, so that you do not missing the one-time signal from the
+   * simulation saying that a block has been picked up.
+   *
+   * TODO: Fix this so it is less hacky. See issue #152.
+   */
+  return is_vectoring_to_cache() || is_exploring_for_cache() || task_finished();
 } /* is_acquring_cache() */
 
 /*******************************************************************************
@@ -127,7 +135,7 @@ bool acquire_cache_fsm::is_acquiring_cache(void) const {
 void acquire_cache_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
-  m_explore_fsm.init();
+  m_explore_fsm.task_reset();
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
@@ -146,6 +154,7 @@ bool acquire_cache_fsm::acquire_known_cache(
            best.first->discrete_loc().second,
            best.second);
     tasks::vector_argument v(best.first->real_loc());
+    m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
   } else if (m_vector_fsm.task_finished()) {

@@ -37,7 +37,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constants
  ******************************************************************************/
-uint vector_fsm::kCOLLISION_RECOVERY_TIME = 12;
+uint vector_fsm::kCOLLISION_RECOVERY_TIME = 20;
 double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
 
 /*******************************************************************************
@@ -135,8 +135,6 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   }
   if ((m_goal - m_sensors->robot_loc()).Length() <=
       kVECTOR_FSM_MIN_DIFF) {
-    lin_speed = 0;
-    ang_speed = 0;
     m_ang_pid.reset();
     m_lin_pid.reset();
     internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(m_goal));
@@ -146,8 +144,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   double angle_diff = heading.Angle().GetValue() -
                       robot_to_goal.Angle().GetValue();
 
-  ang_speed = m_ang_pid.calculate(0, angle_diff);
-  lin_speed = m_lin_pid.calculate(0, -0.1/std::fabs(angle_diff));
+  ang_speed += m_ang_pid.calculate(0, angle_diff);
+  lin_speed = m_lin_pid.calculate(0, -1.0/std::fabs(angle_diff));
 
   ER_VER("target: (%f, %f)@%f", m_goal.GetX(), m_goal.GetY(),
          m_goal.Angle().GetValue());

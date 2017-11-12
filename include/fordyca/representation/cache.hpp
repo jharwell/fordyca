@@ -70,6 +70,8 @@ class cache : public cell_entity,
   __pure bool block_within_boundaries(const block* const block) const {
     return (cell_entity::real_loc() - block->real_loc()).Length() <= cell_entity::xsize();
   }
+  std::list<block*>& blocks(void) { return m_blocks; }
+
   void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block) { m_blocks.remove(block); }
   block* block_get(void) { return m_blocks.front(); }
