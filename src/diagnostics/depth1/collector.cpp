@@ -49,12 +49,13 @@ void collector::collect(const collectible_diagnostics& diag) {
   m_stats.n_transporting_to_cache += diag.is_transporting_to_cache();
 } /* collect() */
 
-std::string collector::csv_line_build(void) {
-  return std::to_string(m_stats.n_exploring_for_cache) + ";" +
-      std::to_string(m_stats.n_acquiring_cache) + ";" +
-      std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-      std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-      std::to_string(m_stats.n_transporting_to_cache);
+bool collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_exploring_for_cache) + ";" +
+         std::to_string(m_stats.n_acquiring_cache) + ";" +
+         std::to_string(m_stats.n_vectoring_to_cache) + ";" +
+         std::to_string(m_stats.n_vectoring_to_cache) + ";" +
+         std::to_string(m_stats.n_transporting_to_cache);
+  return true;
 } /* store_foraging_stats() */
 
 void collector::reset_on_timestep(void) {

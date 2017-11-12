@@ -32,8 +32,11 @@ NS_START(fordyca, diagnostics);
  * Member Functions
  ******************************************************************************/
 void base_stat_collector::csv_line_write(uint timestep) {
-  m_ofile << std::to_string(timestep) + ";" +
-      csv_line_build() << std::endl;
+  std::string line;
+  if (csv_line_build(line)) {
+    m_ofile << std::to_string(timestep) + ";" +
+        line << std::endl;
+  }
 } /* csv_line_write() */
 
 void base_stat_collector::csv_header_write(void) {

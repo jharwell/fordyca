@@ -47,9 +47,10 @@ void collector::collect(const collectible_diagnostics& diag) {
   m_stats.n_vectoring_to_block += diag.is_vectoring_to_block();
 } /* collect() */
 
-std::string collector::csv_line_build(void) {
-  return std::to_string(m_stats.n_acquiring_block) + ";" +
-      std::to_string(m_stats.n_vectoring_to_block);
+bool collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_acquiring_block) + ";" +
+         std::to_string(m_stats.n_vectoring_to_block);
+  return true;
 } /* store_foraging_stats() */
 
 void collector::reset_on_timestep(void) {

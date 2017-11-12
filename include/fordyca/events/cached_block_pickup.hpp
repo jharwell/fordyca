@@ -54,6 +54,7 @@ class cached_block_pickup : public cell_op,
                                                       fsm::block_to_nest_fsm,
                                                       tasks::collector,
                                                       representation::block,
+                                                      representation::cache,
                                                       representation::arena_map,
                                                       representation::perceived_arena_map> {
  public:
@@ -86,6 +87,7 @@ class cached_block_pickup : public cell_op,
    * @brief Update a block with the knowledge that it is now carried by a robot.
    */
   void visit(representation::block& block) override;
+  void visit(representation::cache& block) override;
 
   void visit(fsm::block_to_nest_fsm& fsm) override;
 

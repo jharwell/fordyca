@@ -40,7 +40,9 @@ cache::cache(double dimension,
              argos::CVector2 center,
              std::list<block*> blocks) :
     cell_entity(dimension, dimension, argos::CColor::BLUE),
-  m_blocks(blocks) {
+    m_n_block_pickups(),
+    m_n_block_drops(),
+    m_blocks(blocks) {
   real_loc(center);
   id(m_next_id++);
   }
