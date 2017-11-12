@@ -48,7 +48,7 @@ class static_cache_creator : public cache_creator {
    * @return The list of current caches.
    */
   std::vector<representation::cache> create_all(
-    std::vector<representation::block>& blocks) override;
+    std::vector<representation::block*>& blocks) override;
 
  private:
   argos::CVector2 m_center;

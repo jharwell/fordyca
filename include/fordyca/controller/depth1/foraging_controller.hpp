@@ -46,6 +46,7 @@ class foraging_sensors;
  * Class Definitions
  ******************************************************************************/
 class foraging_controller : public depth0::foraging_controller,
+                            public diagnostics::depth1::collectible_diagnostics,
                             public diagnostics::depth1::collectible_task_diagnostics,
                             public visitor::visitable_any<foraging_controller> {
  public:

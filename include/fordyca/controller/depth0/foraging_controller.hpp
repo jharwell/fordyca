@@ -29,6 +29,7 @@
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/foraging_fsm.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 #include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 /*******************************************************************************
@@ -47,6 +48,7 @@ NS_START(depth0);
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class foraging_controller : public base_foraging_controller,
+                            public diagnostics::random_collectible_diagnostics,
                             public diagnostics::depth0::collectible_diagnostics,
                             public visitor::visitable_any<foraging_controller> {
  public:

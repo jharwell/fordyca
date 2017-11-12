@@ -54,7 +54,7 @@ class cache_creator : public rcppsw::common::er_client {
    * @return A vector of created caches.
    */
   virtual std::vector<representation::cache> create_all(
-      std::vector<representation::block>& blocks) = 0;
+      std::vector<representation::block*>& blocks) = 0;
 
  protected:
   representation::occupancy_grid& grid(void) const { return m_grid; }

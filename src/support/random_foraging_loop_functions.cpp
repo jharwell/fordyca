@@ -47,7 +47,7 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_nest_y(),
     m_floor(NULL),
     m_sim_type(),
-    m_robot_collector(),
+    m_random_collector(),
     m_block_collector(),
     m_map() {
   insmod("loop_functions",
@@ -92,14 +92,14 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_robot_collector.reset(new diagnostics::random_diagnostics_collector(
+  m_random_collector.reset(new diagnostics::random_diagnostics_collector(
       static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->robot_fname));
+          repo.get_params("diagnostics"))->random_fname));
   m_block_collector.reset(new diagnostics::block_stat_collector(
       static_cast<const struct params::diagnostics_params*>(
           repo.get_params("diagnostics"))->block_fname));
+  m_random_collector->reset();
   m_block_collector->reset();
-  m_robot_collector->reset();
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -118,13 +118,13 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
 void random_foraging_loop_functions::Reset() {
   m_block_collector->reset();
-  m_robot_collector->reset();
+  m_random_collector->reset();
   m_map->distribute_blocks(true);
 }
 
 void random_foraging_loop_functions::Destroy() {
   m_block_collector->finalize();
-  m_robot_collector->finalize();
+  m_random_collector->finalize();
 }
 
 argos::CColor random_foraging_loop_functions::GetFloorColor(
@@ -151,7 +151,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_robot_collector->collect(controller);
+    m_random_collector->collect(controller);
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
@@ -193,8 +193,8 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
 
 void random_foraging_loop_functions::pre_step_final(void) {
   m_block_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_robot_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_robot_collector->reset_on_timestep();
+  m_random_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_random_collector->reset_on_timestep();
 } /* pre_step_final() */
 
 void random_foraging_loop_functions::PreStep() {

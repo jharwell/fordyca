@@ -56,9 +56,6 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   void PostExperiment(void) override;
 
  protected:
-  virtual void pre_step_iter(argos::CFootBotEntity& robot);
-  virtual void pre_step_final(void);
-
   /**
    * @brief Check if a robot is on top of a block. If, so return the block index.
    *
@@ -74,12 +71,13 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   int robot_id(const argos::CFootBotEntity& robot);
   representation::arena_map* map(void) const { return m_map.get(); }
   argos::CFloorEntity* floor(void) const { return m_floor; }
-  diagnostics::random_diagnostics_collector* robot_collector(void) const { return m_robot_collector.get(); }
   diagnostics::block_stat_collector* block_collector(void) const { return m_block_collector.get(); }
   const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
 
  private:
+  void pre_step_iter(argos::CFootBotEntity& robot);
+  void pre_step_final(void);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   random_foraging_loop_functions(const random_foraging_loop_functions& s) = delete;
   random_foraging_loop_functions& operator=(const random_foraging_loop_functions& s) = delete;
@@ -88,7 +86,7 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
   argos::CRange<double> m_nest_y;
   argos::CFloorEntity* m_floor;
   std::string m_sim_type;
-  std::unique_ptr<diagnostics::random_diagnostics_collector> m_robot_collector;
+  std::unique_ptr<diagnostics::random_diagnostics_collector> m_random_collector;
   std::unique_ptr<diagnostics::block_stat_collector> m_block_collector;
   std::unique_ptr<representation::arena_map> m_map;
 };
