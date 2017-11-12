@@ -78,9 +78,9 @@ class block : public cell_entity,
   int robot_index(void) const { return m_robot_index; }
   void robot_index(int robot_index) { m_robot_index = robot_index; }
 
-  bool operator>(const block &other) const;
-  bool operator<(const block &other) const;
-  bool operator==(const block &other) const;
+  bool operator==(const block &other) const {
+    return this->id() == other.id();
+  }
 
  private:
   int m_robot_index;

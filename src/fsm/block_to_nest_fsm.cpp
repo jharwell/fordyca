@@ -107,20 +107,23 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_cached_block, state_machine::event_
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
   /*
-   * We wait in the finished state until an upper FSM/controller tells us a
-   * block has been successfully picked up from a cache before we start moving
-   * back towards the nest.
+   * We may get a BLOCK_PICKUP signal even if we have not yet finished vectoring
+   * to our chosen cache, if we happened to have executed a task that ended
+   * inside a cache (i.e. a forager). As such, as soon as we get this signal,
+   * reset the FSM and switch states.
    */
-  if (m_cache_fsm.task_finished()) {
-    if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-      m_cache_fsm.task_reset();
-      internal_event(ST_TRANSPORT_TO_NEST);
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    if (!m_cache_fsm.task_finished()) {
+      ER_WARN("WARNING: BLOCK_PICKUP received while still acquiring block--possibly spurious");
     }
+    m_cache_fsm.task_reset();
+    internal_event(ST_TRANSPORT_TO_NEST);
   } else {
     m_cache_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }
+
 __const HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }

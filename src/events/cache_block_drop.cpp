@@ -65,13 +65,13 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(representation::arena_map& map) {
-  map.distribute_block(m_block, false);
+void cache_block_drop::visit(representation::arena_map&) {
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
   int index = m_block->robot_index();
   m_block->accept(*this);
   m_cache->accept(*this);
-  ER_NOM("arena_map: fb%d dropped block%d in cache%d", index, m_block->id(), m_cache->id());
+  ER_NOM("arena_map: fb%d dropped block%d in cache%d (%zu blocks total)",
+         index, m_block->id(), m_cache->id(), m_cache->n_blocks());
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {
@@ -79,6 +79,7 @@ void cache_block_drop::visit(representation::block& block) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::cache& cache) {
+  cache.block_add(m_block);
   cache.inc_block_drops();
 } /* visit() */
 

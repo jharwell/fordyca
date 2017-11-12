@@ -80,8 +80,8 @@ bool foraging_loop_functions::handle_cached_block_pickup(
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
       events::cached_block_pickup pickup_op(rcppsw::common::g_server,
-                                          &map()->caches()[cache],
-                                          robot_id(robot));
+                                            &map()->caches()[cache],
+                                            robot_id(robot));
       controller.visitor::template visitable_any<T>::accept(pickup_op);
       map()->accept(pickup_op);
       return true;

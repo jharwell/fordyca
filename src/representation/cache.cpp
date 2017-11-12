@@ -45,6 +45,6 @@ cache::cache(double dimension,
     m_blocks(blocks) {
   real_loc(center);
   id(m_next_id++);
-  }
+    }
 
 NS_END(fordyca, representation);
