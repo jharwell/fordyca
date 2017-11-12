@@ -1,5 +1,5 @@
 /**
- * @file diagnostics_parser.cpp
+ * @file cache_stat_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,34 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_CACHE_STAT_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_CACHE_STAT_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/diagnostics_parser.hpp"
+#include <string>
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/diagnostics/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, diagnostics);
+namespace visitor = rcppsw::patterns::visitor;
+
+class cache_diagnostics;
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void diagnostics_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct diagnostics_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "diagnostics");
-  argos::GetNodeAttribute(lnode, "random_fname", m_params->random_fname);
-  argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
-  argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
-  argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
-} /* parse() */
+class cache_stat_collector : public base_stat_collector,
+                             public visitor::visitable_any<cache_stat_collector> {
+ public:
+  explicit cache_stat_collector(const std::string ofname) :
+      base_stat_collector(ofname), m_new_data(false), m_stats() {}
 
-void diagnostics_parser::show(std::ostream& stream) {
-  stream << "====================\nDiagnostics params\n====================\n";
-  stream << "random_fname=" << m_params->random_fname << std::endl;
-  stream << "depth0_fname=" << m_params->depth0_fname << std::endl;
-  stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
-  stream << "block_fname=" << m_params->block_fname << std::endl;
-} /* show() */
+  void reset(void) override;
+  void collect(const cache_diagnostics& cache);
 
-NS_END(params, fordyca);
+ private:
+  struct stats {
+    size_t total_blocks;
+    size_t total_pickups;
+    size_t total_drops;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  bool csv_line_build(std::string& line) override;
+
+  bool m_new_data;
+  struct stats m_stats;
+};
+
+NS_END(diagnostics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_CACHE_STAT_COLLECTOR_HPP_ */

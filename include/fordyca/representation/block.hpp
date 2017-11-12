@@ -25,8 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <utility>
-#include "fordyca/representation/cell_entity.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/diagnostics/carryable_object_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,19 +44,15 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
+              public diagnostics::carryable_object_diagnostics,
               public rcppsw::patterns::visitor::visitable_any<block> {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension, argos::CColor::BLACK),
       m_robot_index(-1), m_carries(0) {}
 
-  /**
-   * @brief Get how many carries this block has had on its way from its original
-   * arena location back to the nest.
-   *
-   * @return # carries.
-   */
-  size_t carries(void) const { return m_carries; }
+  /* diagnostics */
+  size_t n_carries(void) const override { return m_carries; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -79,7 +76,7 @@ class block : public cell_entity,
    * @return The robot index, or -1 if no robot is currently carrying this block.
    */
   int robot_index(void) const { return m_robot_index; }
-  void robot_index(size_t robot_index) { m_robot_index = static_cast<int>(robot_index); }
+  void robot_index(int robot_index) { m_robot_index = robot_index; }
 
   bool operator>(const block &other) const;
   bool operator<(const block &other) const;

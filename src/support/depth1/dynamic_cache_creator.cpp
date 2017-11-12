@@ -46,7 +46,7 @@ dynamic_cache_creator::dynamic_cache_creator(
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> dynamic_cache_creator::create_all(
-    std::vector<representation::block>& blocks) {
+    std::vector<representation::block*>& blocks) {
   std::vector<representation::cache> caches;
 
   ER_NOM("Dynamically creating caches: %zu free blocks", blocks.size());
@@ -54,18 +54,18 @@ std::vector<representation::cache> dynamic_cache_creator::create_all(
   for (size_t i = 0; i < blocks.size() - 1; ++i) {
     std::list<representation::block*> starter_blocks;
     for (size_t j = i + 1; j < blocks.size(); ++j) {
-      if ((blocks[i].real_loc() - blocks[j].real_loc()).Length() <=
+      if ((blocks[i]->real_loc() - blocks[j]->real_loc()).Length() <=
           m_min_dist) {
         if (std::find(starter_blocks.begin(),
                       starter_blocks.end(),
-                      &blocks[i]) == starter_blocks.end()) {
-          ER_DIAG("Add block %zu: (%f, %f)", i,blocks[i].real_loc().GetX(),
-                  blocks[i].real_loc().GetY());
-          starter_blocks.push_back(&blocks[i]);
+                      blocks[i]) == starter_blocks.end()) {
+          ER_DIAG("Add block %zu: (%f, %f)", i, blocks[i]->real_loc().GetX(),
+                  blocks[i]->real_loc().GetY());
+          starter_blocks.push_back(blocks[i]);
         }
-        starter_blocks.push_back(&blocks[j]);
-        ER_DIAG("Add block %zu: (%f, %f)", j,blocks[j].real_loc().GetX(),
-                blocks[j].real_loc().GetY());
+        starter_blocks.push_back(blocks[j]);
+        ER_DIAG("Add block %zu: (%f, %f)", j, blocks[j]->real_loc().GetX(),
+                blocks[j]->real_loc().GetY());
       }
     } /* for(j..) */
     if (starter_blocks.size()) {

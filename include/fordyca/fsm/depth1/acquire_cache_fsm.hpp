@@ -33,6 +33,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 #include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
 
 /*******************************************************************************
@@ -62,6 +64,8 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
+                          public diagnostics::random_collectible_diagnostics,
+                          public diagnostics::depth0::collectible_diagnostics,
                           public diagnostics::depth1::collectible_diagnostics,
                           public rcppsw::task_allocation::taskable {
  public:

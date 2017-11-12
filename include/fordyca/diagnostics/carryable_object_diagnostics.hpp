@@ -1,5 +1,5 @@
 /**
- * @file diagnostics_parser.cpp
+ * @file carryable_object_diagnostics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,34 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/diagnostics_parser.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void diagnostics_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct diagnostics_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "diagnostics");
-  argos::GetNodeAttribute(lnode, "random_fname", m_params->random_fname);
-  argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
-  argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
-  argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
-} /* parse() */
+class carryable_object_diagnostics {
+ public:
+  carryable_object_diagnostics(void) {}
+  virtual ~carryable_object_diagnostics(void) {}
 
-void diagnostics_parser::show(std::ostream& stream) {
-  stream << "====================\nDiagnostics params\n====================\n";
-  stream << "random_fname=" << m_params->random_fname << std::endl;
-  stream << "depth0_fname=" << m_params->depth0_fname << std::endl;
-  stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
-  stream << "block_fname=" << m_params->block_fname << std::endl;
-} /* show() */
+  /**
+   * @brief Get how many carries this object has had on its way from its
+   * original arena location back to the nest.
+   *
+   * @return # carries.
+   */
+  virtual size_t n_carries(void) const = 0;
+};
 
-NS_END(params, fordyca);
+NS_END(diagnostics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_ */

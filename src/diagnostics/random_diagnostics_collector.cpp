@@ -48,10 +48,11 @@ void random_diagnostics_collector::collect(const random_collectible_diagnostics&
   m_stats.n_avoiding_collision += diag.is_avoiding_collision();
 } /* collect() */
 
-std::string random_diagnostics_collector::csv_line_build(void) {
-  return std::to_string(m_stats.n_exploring_for_block) + ";" +
-      std::to_string(m_stats.n_avoiding_collision) + ";" +
-      std::to_string(m_stats.n_transporting_to_nest);
+bool random_diagnostics_collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_exploring_for_block) + ";" +
+         std::to_string(m_stats.n_avoiding_collision) + ";" +
+         std::to_string(m_stats.n_transporting_to_nest);
+  return true;
 } /* store_foraging_stats() */
 
 void random_diagnostics_collector::reset_on_timestep(void) {

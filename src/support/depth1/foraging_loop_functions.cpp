@@ -50,10 +50,18 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_robot_collector.reset(new diagnostics::depth1::collector(
+  m_random_collector.reset(new diagnostics::random_diagnostics_collector(
       static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("logging"))->robot_fname));
-  m_robot_collector->reset();
+          repo.get_params("diagnostics"))->random_fname));
+  m_depth0_collector.reset(new diagnostics::depth0::collector(
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("diagnostics"))->depth0_fname));
+  m_depth1_collector.reset(new diagnostics::depth1::collector(
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("diagnostics"))->depth1_fname));
+  m_random_collector->reset();
+  m_depth0_collector->reset();
+  m_depth1_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -87,9 +95,6 @@ void foraging_loop_functions::handle_cache_block_drop(
           robot.GetControllableEntity().GetController());
 
   if (controller.cache_detected()) {
-    /* get stats from this robot before its state changes */
-    /* random_foraging_loop_functions::robot_collector()->collect(controller); */
-
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
@@ -122,7 +127,9 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_robot_collector->collect(controller);
+    m_random_collector->collect(controller);
+    m_depth0_collector->collect(controller);
+    m_depth1_collector->collect(controller);
 
     /* Send the robot its new line of sight */
     depth0::foraging_loop_functions::set_robot_los(robot);
@@ -175,8 +182,38 @@ void foraging_loop_functions::PreStep() {
         it->second);
     pre_step_iter(robot);
   } /* for(it..) */
-  depth0::foraging_loop_functions::pre_step_final();
+  pre_step_final();
 } /* PreStep() */
+
+void foraging_loop_functions::Reset() {
+  m_random_collector->reset();
+  m_depth0_collector->reset();
+  m_depth1_collector->reset();
+  map()->distribute_blocks(true);
+}
+
+void foraging_loop_functions::Destroy() {
+  m_random_collector->finalize();
+  m_depth0_collector->finalize();
+  m_depth1_collector->finalize();
+}
+
+void foraging_loop_functions::pre_step_final(void) {
+  m_random_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_depth0_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_depth1_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_random_collector->reset_on_timestep();
+  m_depth0_collector->reset_on_timestep();
+  m_depth1_collector->reset_on_timestep();
+
+  /*
+   * If the static cache has vanished because a robot took the 2nd to last
+   * block, re-create it.
+   */
+  if (!map()->caches().size()) {
+      map()->static_cache_create();
+  }
+} /* pre_step_final() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

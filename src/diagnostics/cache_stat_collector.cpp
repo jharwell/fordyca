@@ -1,5 +1,5 @@
 /**
- * @file diagnostics_parser.cpp
+ * @file cache_stat_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,31 +21,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/diagnostics_parser.hpp"
+#include "fordyca/diagnostics/cache_stat_collector.hpp"
+#include "fordyca/diagnostics/cache_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void diagnostics_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct diagnostics_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "diagnostics");
-  argos::GetNodeAttribute(lnode, "random_fname", m_params->random_fname);
-  argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
-  argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
-  argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
-} /* parse() */
+std::string cache_stat_collector::csv_header_build(const std::string& header) {
+  return base_stat_collector::csv_header_build(header) +
+      "total_blocks;total_pickups;total_drops";
+} /* csv_header_build() */
 
-void diagnostics_parser::show(std::ostream& stream) {
-  stream << "====================\nDiagnostics params\n====================\n";
-  stream << "random_fname=" << m_params->random_fname << std::endl;
-  stream << "depth0_fname=" << m_params->depth0_fname << std::endl;
-  stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
-  stream << "block_fname=" << m_params->block_fname << std::endl;
-} /* show() */
+void cache_stat_collector::reset(void) {
+  base_stat_collector::reset();
+  m_stats = {0, 0, 0};
+} /* reset() */
 
-NS_END(params, fordyca);
+bool cache_stat_collector::csv_line_build(std::string& line) {
+  if (!m_new_data) {
+    return false;
+  }
+    line = std::to_string(m_stats.total_blocks) + ";" +
+           std::to_string(m_stats.total_pickups) + ";" +
+           std::to_string(m_stats.total_drops) + ";";
+    return true;
+} /* csv_line_build() */
+
+void cache_stat_collector::collect(const cache_diagnostics& cache) {
+  m_stats.total_blocks += cache.n_blocks();
+  m_stats.total_pickups += cache.n_block_pickups();
+  m_stats.total_drops += cache.n_block_drops();
+} /* collect() */
+
+
+NS_END(diagnostics, fordyca);

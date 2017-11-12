@@ -34,7 +34,7 @@ NS_START(fordyca, diagnostics, depth0);
  ******************************************************************************/
 std::string collector::csv_header_build(const std::string& header) {
   return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest;n_acquiring_block;n_vectoring_to_block";
+      "n_acquiring_block;n_vectoring_to_block";
 } /* csv_header_build() */
 
 void collector::reset(void) {
@@ -43,24 +43,18 @@ void collector::reset(void) {
 } /* reset() */
 
 void collector::collect(const collectible_diagnostics& diag) {
-  m_stats.n_exploring_for_block += diag.is_exploring_for_block();
-  m_stats.n_avoiding_collision += diag.is_avoiding_collision();
-  m_stats.n_transporting_to_nest += diag.is_transporting_to_nest();
-
   m_stats.n_acquiring_block += diag.is_acquiring_block();
   m_stats.n_vectoring_to_block += diag.is_vectoring_to_block();
 } /* collect() */
 
-std::string collector::csv_line_build(void) {
-  return std::to_string(m_stats.n_exploring_for_block) + ";" +
-      std::to_string(m_stats.n_avoiding_collision) + ";" +
-      std::to_string(m_stats.n_transporting_to_nest) + ";" +
-      std::to_string(m_stats.n_acquiring_block) + ";" +
-      std::to_string(m_stats.n_vectoring_to_block);
+bool collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_acquiring_block) + ";" +
+         std::to_string(m_stats.n_vectoring_to_block);
+  return true;
 } /* store_foraging_stats() */
 
 void collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0, 0, 0};
+  m_stats = {0, 0};
 } /* reset_on_timestep() */
 
 

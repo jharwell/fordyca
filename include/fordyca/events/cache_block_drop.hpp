@@ -59,6 +59,7 @@ class cache_block_drop : public visitor::visitor,
                                                    fsm::cell2D_fsm,
                                                    representation::perceived_cell2D,
                                                    representation::block,
+                                                   representation::cache,
                                                    representation::arena_map> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
@@ -89,21 +90,12 @@ class cache_block_drop : public visitor::visitor,
    */
   void visit(representation::arena_map& map) override;
 
-  /**
-   * @brief Update a block with the knowledge that it has been dropped.
-   *
-   * @param block The block to update.
-   */
   void visit(representation::block& block) override;
+  void visit(representation::cache& cache) override;
   void visit(class representation::perceived_cell2D& cell) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::forager& task) override;
-
-  /**
-   * @brief Get the handle on the block that has been dropped.
-   */
-  representation::block* block(void) const { return m_block; }
 
  private:
   cache_block_drop(const cache_block_drop& op) = delete;

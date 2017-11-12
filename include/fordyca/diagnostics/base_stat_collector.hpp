@@ -44,12 +44,13 @@ class base_stat_collector {
 
   virtual void reset(void);
   virtual void reset_on_timestep(void) {}
+
   void csv_line_write(uint timestep);
   void finalize(void) { m_ofile.close(); }
 
  protected:
   virtual std::string csv_header_build(const std::string& header = "");
-  virtual std::string csv_line_build(void) = 0;
+  virtual bool csv_line_build(std::string& line) = 0;
 
   void csv_header_write(void);
   std::ofstream& ofile(void) { return m_ofile; }

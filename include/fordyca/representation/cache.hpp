@@ -28,9 +28,10 @@
 #include <utility>
 #include <algorithm>
 
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/diagnostics/cache_diagnostics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,9 +51,18 @@ NS_START(fordyca, representation);
  * map).
  */
 class cache : public cell_entity,
+              public diagnostics::cache_diagnostics,
               public rcppsw::patterns::visitor::visitable_any<cache> {
  public:
   cache(double dimension, argos::CVector2 center, std::list<block*> blocks);
+
+  /* diagnostics */
+  size_t n_blocks(void) const override { return m_blocks.size(); }
+  size_t n_block_pickups(void) const override { return m_n_block_pickups; }
+  size_t n_block_drops(void) const override { return m_n_block_drops; }
+
+  void inc_block_pickups(void) { ++m_n_block_pickups; }
+  void inc_block_drops(void) { ++m_n_block_drops; }
 
   __pure bool contains_block(const block* const block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
@@ -63,7 +73,7 @@ class cache : public cell_entity,
   void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block) { m_blocks.remove(block); }
   block* block_get(void) { return m_blocks.front(); }
-  size_t n_blocks(void) const { return m_blocks.size(); }
+
   __pure bool operator==(const cache &other) const {
     return cell_entity::real_loc() == other.cell_entity::real_loc() &&
         m_blocks == other.m_blocks;
@@ -71,6 +81,8 @@ class cache : public cell_entity,
 
  private:
   static int m_next_id;
+  size_t m_n_block_pickups;
+  size_t m_n_block_drops;
   std::list<block*> m_blocks;
 };
 
