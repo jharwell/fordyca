@@ -24,11 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/diagnostics/base_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +46,7 @@ NS_START(controller);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
-                                   public diagnostics::base_diagnostics,
+                                   public diagnostics::random_collectible_diagnostics,
                                    public visitor::visitable_any<random_foraging_controller> {
  public:
   random_foraging_controller(void);

@@ -1,5 +1,5 @@
 /**
- * @file base_robot_stat_collector.hpp
+ * @file diagnostics_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,49 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_BASE_ROBOT_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_BASE_ROBOT_STAT_COLLECTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include "fordyca/params/diagnostics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller { class random_foraging_controller; }
-
-NS_START(diagnostics);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class base_robot_stat_collector : public base_stat_collector {
- public:
-  explicit base_robot_stat_collector(const std::string ofname) :
-      base_stat_collector(ofname), m_base_robot_stats() {}
+void diagnostics_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct diagnostics_params);
+  argos::TConfigurationNode lnode = argos::GetNode(node, "diagnostics");
+  argos::GetNodeAttribute(lnode, "robot_fname", m_params->robot_fname);
+  argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
+} /* parse() */
 
-  void reset() override;
-  void collect(const controller::random_foraging_controller& controller);
-  void reset_on_timestep(void) override;
+void diagnostics_parser::show(std::ostream& stream) {
+  stream << "====================\nDiagnostics params\n====================\n";
+  stream << "robot_fname=" << m_params->robot_fname << std::endl;
+  stream << "block_fname=" << m_params->block_fname << std::endl;
+} /* show() */
 
- private:
-  struct base_robot_stats {
-    uint n_exploring_for_block;
-    uint n_avoiding_collision;
-    uint n_transporting_to_nest;
-  };
-
-  std::string csv_header_build(const std::string& header = "") override;
-  std::string csv_line_build(void) override;
-
-  struct base_robot_stats m_base_robot_stats;
-};
-
-NS_END(diagnostics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_BASE_ROBOT_STAT_COLLECTOR_HPP_ */
+NS_END(params, fordyca);

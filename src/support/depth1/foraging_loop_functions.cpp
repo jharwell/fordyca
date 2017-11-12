@@ -29,7 +29,9 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/params/diagnostics_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,9 +44,18 @@ NS_START(fordyca, support, depth1);
 void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   depth0::foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing foraging loop functions");
+  ER_NOM("Initializing depth1_foraging loop functions");
+  params::loop_function_repository repo;
 
-  ER_NOM("foraging loop functions initialization finished");
+  repo.parse_all(node);
+
+  /* initialize stat collecting */
+  m_robot_collector.reset(new diagnostics::depth1::collector(
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("logging"))->robot_fname));
+  m_robot_collector->reset();
+
+  ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
 void foraging_loop_functions::handle_cached_block_pickup(
@@ -111,7 +122,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    /* m_robot_collector->collect(controller); */
+    m_robot_collector->collect(controller);
 
     /* Send the robot its new line of sight */
     depth0::foraging_loop_functions::set_robot_los(robot);

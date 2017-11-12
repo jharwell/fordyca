@@ -1,49 +1,53 @@
 /**
- * @file base_diagnostics.hpp
+ * @file diagnostics_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DIAGNOSTICS_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DIAGNOSTICS_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
+#include "fordyca/params/base_parser.hpp"
+#include "fordyca/params/diagnostics_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_diagnostics {
+class diagnostics_parser: public base_parser {
  public:
-  base_diagnostics(void) {}
-  virtual ~base_diagnostics(void) {}
+  diagnostics_parser(void): m_params() {}
 
-  virtual bool is_exploring_for_block(void) const = 0;
-  virtual bool is_avoiding_collision(void) const = 0;
-  virtual bool is_transporting_to_nest(void) const = 0;
+  void parse(argos::TConfigurationNode& node) override;
+  const struct diagnostics_params* get_results(void) override { return m_params.get(); }
+  void show(std::ostream& stream) override;
+
+ private:
+  std::unique_ptr<struct diagnostics_params> m_params;
 };
 
-NS_END(diagnostics, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_BASE_DIAGNOSTICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DIAGNOSTICS_PARSER_HPP_ */

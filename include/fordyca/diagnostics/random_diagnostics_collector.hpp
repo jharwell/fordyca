@@ -1,5 +1,5 @@
 /**
- * @file logging_parser.cpp
+ * @file random_diagnostics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,47 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/logging_parser.hpp"
+#include <string>
+#include "fordyca/diagnostics/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, diagnostics);
+
+class random_collectible_diagnostics;
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void logging_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct logging_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "logging");
-  argos::GetNodeAttribute(lnode, "robot_stats", m_params->robot_stats);
-  argos::GetNodeAttribute(lnode, "block_stats", m_params->block_stats);
-} /* parse() */
+class random_diagnostics_collector : public base_stat_collector {
+ public:
+  explicit random_diagnostics_collector(const std::string ofname) :
+      base_stat_collector(ofname), m_stats() {}
 
-void logging_parser::show(std::ostream& stream) {
-  stream << "====================\nLogging params\n====================\n";
-  stream << "robot_stats=" << m_params->robot_stats << std::endl;
-  stream << "block_stats=" << m_params->block_stats << std::endl;
-} /* show() */
+  void reset() override;
+  void collect(const random_collectible_diagnostics& diag);
+  void reset_on_timestep(void) override;
 
-NS_END(params, fordyca);
+ private:
+  struct stats {
+    uint n_exploring_for_block;
+    uint n_avoiding_collision;
+    uint n_transporting_to_nest;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_line_build(void) override;
+
+  struct stats m_stats;
+};
+
+NS_END(diagnostics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_ */

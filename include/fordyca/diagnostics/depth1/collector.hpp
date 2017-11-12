@@ -1,5 +1,5 @@
 /**
- * @file robot_stat_collector.hpp
+ * @file collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_ROBOT_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_ROBOT_STAT_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,16 +30,16 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth0);
+NS_START(fordyca, diagnostics, depth1);
 
 class collectible_diagnostics;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class robot_stat_collector : public base_stat_collector {
+class collector : public base_stat_collector {
  public:
-  explicit robot_stat_collector(const std::string ofname) :
+  explicit collector(const std::string ofname) :
       base_stat_collector(ofname), m_stats() {}
 
   void reset(void) override;
@@ -48,11 +48,10 @@ class robot_stat_collector : public base_stat_collector {
 
  private:
   struct stats {
-    uint n_exploring_for_block;
-    uint n_avoiding_collision;
-    uint n_transporting_to_nest;
-    uint n_acquiring_block;
-    uint n_vectoring_to_block;
+    uint n_exploring_for_cache;
+    uint n_vectoring_to_cache;
+    uint n_acquiring_cache;
+    uint n_transporting_to_cache;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
@@ -61,6 +60,6 @@ class robot_stat_collector : public base_stat_collector {
   struct stats m_stats;
 };
 
-NS_END(depth0, diagnostics, fordyca);
+NS_END(depth1, diagnostics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_ROBOT_STAT_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTOR_HPP_ */

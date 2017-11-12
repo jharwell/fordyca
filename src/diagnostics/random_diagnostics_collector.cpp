@@ -1,5 +1,5 @@
 /**
- * @file robot_stat_collector.cpp
+ * @file random_diagnostics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,44 +21,41 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/depth1/robot_stat_collector.hpp"
-#include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
+#include "fordyca/diagnostics/random_diagnostics_collector.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth1);
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string robot_stat_collector::csv_header_build(const std::string& header) {
+std::string random_diagnostics_collector::csv_header_build(const std::string& header) {
   return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest;n_acquiring_block;n_vectoring_to_block";
+      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest";
 } /* csv_header_build() */
 
-void robot_stat_collector::reset(void) {
+void random_diagnostics_collector::reset(void) {
   base_stat_collector::reset();
   reset_on_timestep();
 } /* reset() */
 
-void robot_stat_collector::collect(const collectible_diagnostics& diagnostics) {
-  m_stats.n_exploring_for_cache += diagnostics.is_exploring_for_cache();
-  m_stats.n_acquiring_cache += diagnostics.is_acquiring_cache();
-  m_stats.n_vectoring_to_cache += diagnostics.is_vectoring_to_cache();
-  m_stats.n_transporting_to_cache += diagnostics.is_transporting_to_cache();
+void random_diagnostics_collector::collect(const random_collectible_diagnostics& diag) {
+  m_stats.n_exploring_for_block += diag.is_exploring_for_block();
+  m_stats.n_transporting_to_nest += diag.is_transporting_to_nest();
+  m_stats.n_avoiding_collision += diag.is_avoiding_collision();
 } /* collect() */
 
-std::string robot_stat_collector::csv_line_build(void) {
-  return std::to_string(m_stats.n_exploring_for_cache) + ";" +
-      std::to_string(m_stats.n_acquiring_cache) + ";" +
-      std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-      std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-      std::to_string(m_stats.n_transporting_to_cache);
+std::string random_diagnostics_collector::csv_line_build(void) {
+  return std::to_string(m_stats.n_exploring_for_block) + ";" +
+      std::to_string(m_stats.n_avoiding_collision) + ";" +
+      std::to_string(m_stats.n_transporting_to_nest);
 } /* store_foraging_stats() */
 
-void robot_stat_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0, 0};
+void random_diagnostics_collector::reset_on_timestep(void) {
+  m_stats = {0, 0, 0};
 } /* reset_on_timestep() */
 
-NS_END(depth1, diagnostics, fordyca);
+NS_END(diagnostics, fordyca);

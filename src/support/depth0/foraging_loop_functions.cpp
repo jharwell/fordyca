@@ -28,8 +28,10 @@
 #include "fordyca/controller/depth0/foraging_controller.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
+#include "fordyca/params/diagnostics_params.hpp"
+#include "fordyca/params/loop_functions_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +44,16 @@ NS_START(fordyca, support, depth0);
 void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   random_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing foraging loop functions");
+  ER_NOM("Initializing depth0_foraging loop functions");
+  params::loop_function_repository repo;
+
+  repo.parse_all(node);
+
+  /* initialize stat collecting */
+  m_robot_collector.reset(new diagnostics::depth0::collector(
+      static_cast<const struct params::diagnostics_params*>(
+          repo.get_params("diagnostics"))->robot_fname));
+  m_robot_collector->reset();
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -56,12 +67,12 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
             robot.GetControllableEntity().GetController());
     const struct params::loop_functions_params * l_params =
         static_cast<const struct params::loop_functions_params*>(
-            repo()->get_params("loop_functions"));
+            repo.get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);
     set_robot_los(robot);
   } /* for(it..) */
-  ER_NOM("foraging loop functions initialization finished");
+  ER_NOM("depth0_foraging loop functions initialization finished");
 }
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
@@ -70,7 +81,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    /* m_robot_collector->collect(controller); */
+    m_robot_collector->collect(controller);
 
     /* Send the robot its new line of sight */
     set_robot_los(robot);

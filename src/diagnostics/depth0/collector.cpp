@@ -1,5 +1,5 @@
 /**
- * @file base_robot_stat_collector.cpp
+ * @file collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,42 +21,47 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/base_robot_stat_collector.hpp"
-#include "fordyca/controller/random_foraging_controller.hpp"
+#include "fordyca/diagnostics/depth0/collector.hpp"
+#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, diagnostics, depth0);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string base_robot_stat_collector::csv_header_build(const std::string& header) {
+std::string collector::csv_header_build(const std::string& header) {
   return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest";
+      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest;n_acquiring_block;n_vectoring_to_block";
 } /* csv_header_build() */
 
-void base_robot_stat_collector::reset(void) {
+void collector::reset(void) {
   base_stat_collector::reset();
   reset_on_timestep();
 } /* reset() */
 
-void base_robot_stat_collector::collect(
-    const controller::random_foraging_controller& controller) {
-  m_base_robot_stats.n_exploring_for_block += controller.is_exploring_for_block();
-  m_base_robot_stats.n_transporting_to_nest += controller.is_transporting_to_nest();
-  m_base_robot_stats.n_avoiding_collision += controller.is_avoiding_collision();
+void collector::collect(const collectible_diagnostics& diag) {
+  m_stats.n_exploring_for_block += diag.is_exploring_for_block();
+  m_stats.n_avoiding_collision += diag.is_avoiding_collision();
+  m_stats.n_transporting_to_nest += diag.is_transporting_to_nest();
+
+  m_stats.n_acquiring_block += diag.is_acquiring_block();
+  m_stats.n_vectoring_to_block += diag.is_vectoring_to_block();
 } /* collect() */
 
-std::string base_robot_stat_collector::csv_line_build(void) {
-  return std::to_string(m_base_robot_stats.n_exploring_for_block) + ";" +
-      std::to_string(m_base_robot_stats.n_avoiding_collision) + ";" +
-      std::to_string(m_base_robot_stats.n_transporting_to_nest);
+std::string collector::csv_line_build(void) {
+  return std::to_string(m_stats.n_exploring_for_block) + ";" +
+      std::to_string(m_stats.n_avoiding_collision) + ";" +
+      std::to_string(m_stats.n_transporting_to_nest) + ";" +
+      std::to_string(m_stats.n_acquiring_block) + ";" +
+      std::to_string(m_stats.n_vectoring_to_block);
 } /* store_foraging_stats() */
 
-void base_robot_stat_collector::reset_on_timestep(void) {
-  m_base_robot_stats = {0, 0, 0};
+void collector::reset_on_timestep(void) {
+  m_stats = {0, 0, 0, 0, 0};
 } /* reset_on_timestep() */
 
-NS_END(diagnostics, fordyca);
+
+NS_END(depth0, diagnostics, fordyca);

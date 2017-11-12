@@ -1,5 +1,5 @@
 /**
- * @file logging_params.hpp
+ * @file collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/diagnostics/base_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, diagnostics, depth0);
+
+class collectible_diagnostics;
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct logging_params : public rcppsw::common::base_params {
-  logging_params(void) : robot_stats(), block_stats() {}
+class collector : public base_stat_collector {
+ public:
+  explicit collector(const std::string ofname) :
+      base_stat_collector(ofname), m_stats() {}
 
-  std::string robot_stats;
-  std::string block_stats;
+  void reset(void) override;
+  void collect(const collectible_diagnostics& diag);
+  void reset_on_timestep(void) override;
+
+ private:
+  struct stats {
+    uint n_exploring_for_block;
+    uint n_avoiding_collision;
+    uint n_transporting_to_nest;
+    uint n_acquiring_block;
+    uint n_vectoring_to_block;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_line_build(void) override;
+
+  struct stats m_stats;
 };
 
-NS_END(params, fordyca);
+NS_END(depth0, diagnostics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_LOGGING_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_ */

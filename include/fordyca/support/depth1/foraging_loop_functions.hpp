@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 #include "fordyca/support/depth0/foraging_loop_functions.hpp"
+#include "fordyca/diagnostics/depth1/collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +41,7 @@ NS_START(depth1);
  ******************************************************************************/
 class foraging_loop_functions : public depth0::foraging_loop_functions {
  public:
-  foraging_loop_functions() {}
+  foraging_loop_functions(void) : m_robot_collector() {}
   virtual ~foraging_loop_functions(void) {}
 
   void Init(argos::TConfigurationNode& node) override;
@@ -57,6 +58,8 @@ class foraging_loop_functions : public depth0::foraging_loop_functions {
 
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
+
+  std::unique_ptr<diagnostics::depth1::collector> m_robot_collector;
 };
 
 NS_END(depth1, support, fordyca);

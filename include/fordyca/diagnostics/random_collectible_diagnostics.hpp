@@ -1,5 +1,5 @@
 /**
- * @file robot_stat_collector.hpp
+ * @file random_collectible_diagnostics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_ROBOT_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_ROBOT_STAT_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_COLLECTIBLE_DIAGNOSTICS_HPP_
+#define INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_COLLECTIBLE_DIAGNOSTICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth1);
-
-class collectible_diagnostics;
+NS_START(fordyca, diagnostics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class robot_stat_collector : public base_stat_collector {
+class random_collectible_diagnostics {
  public:
-  explicit robot_stat_collector(const std::string ofname) :
-      base_stat_collector(ofname), m_stats() {}
+  random_collectible_diagnostics(void) {}
+  virtual ~random_collectible_diagnostics(void) {}
 
-  void reset(void) override;
-  void collect(const collectible_diagnostics& diagnostics);
-  void reset_on_timestep(void) override;
-
- private:
-  struct stats {
-    uint n_exploring_for_cache;
-    uint n_vectoring_to_cache;
-    uint n_acquiring_cache;
-    uint n_transporting_to_cache;
-  };
-
-  std::string csv_header_build(const std::string& header = "") override;
-  std::string csv_line_build(void) override;
-
-  struct stats m_stats;
+  virtual bool is_exploring_for_block(void) const = 0;
+  virtual bool is_avoiding_collision(void) const = 0;
+  virtual bool is_transporting_to_nest(void) const = 0;
 };
 
-NS_END(depth1, diagnostics, fordyca);
+NS_END(diagnostics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_ROBOT_STAT_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_COLLECTIBLE_DIAGNOSTICS_HPP_ */
