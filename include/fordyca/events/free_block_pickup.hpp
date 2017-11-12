@@ -95,7 +95,7 @@ class free_block_pickup : public cell_op,
    */
   void visit(representation::arena_map& map) override;
   void visit(representation::cell2D& cell) override;
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /* random foraging */
   /**

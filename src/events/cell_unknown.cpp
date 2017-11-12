@@ -42,7 +42,7 @@ void cell_unknown::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_unknown::visit(representation::cell2D_fsm& fsm) {
+void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
   /*
    * Much faster to check this than to send a redundant event to the
    * FSM. Doesn't matter for just a few robots, but it does when you have

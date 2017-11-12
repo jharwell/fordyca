@@ -57,7 +57,7 @@ void cache_found::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cache_found::visit(representation::cell2D_fsm& fsm) {
+void cache_found::visit(fsm::cell2D_fsm& fsm) {
   if (fsm.state_has_cache()) {
     return;
   }

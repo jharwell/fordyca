@@ -55,7 +55,7 @@ class block_found : public perceived_cell_op,
 
   /* depth0 foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.

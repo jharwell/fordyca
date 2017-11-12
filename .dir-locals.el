@@ -32,10 +32,10 @@
               (list
                (concat
                 (projectile-project-root)
-                "src/*")
+                "src/*/*")
                (concat
                 (projectile-project-root)
-                "include/fordyca/*")
+                "include/fordyca/*/*")
                (concat
                 (projectile-project-root)
                 "include/fordyca")

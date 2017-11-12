@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/common/er_server.hpp"
-#include "fordyca/representation/cell2D_fsm.hpp"
+#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 
@@ -34,6 +34,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
@@ -101,7 +103,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
     return static_cast<representation::cache*>(m_entity);
   }
 
-  cell2D_fsm& fsm(void) { return m_fsm; }
+  fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
   cell2D(const cell2D& other) = delete;
@@ -109,7 +111,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
 
   cell_entity* m_entity;
   discrete_coord m_loc;
-  cell2D_fsm m_fsm;
+  fsm::cell2D_fsm m_fsm;
 };
 
 NS_END(representation, fordyca);

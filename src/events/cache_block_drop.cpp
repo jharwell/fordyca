@@ -60,7 +60,7 @@ void cache_block_drop::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cache_block_drop::visit(representation::cell2D_fsm& fsm) {
+void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
   ER_ASSERT(fsm.state_has_cache(), "FATAL: cell does not contain a cache");
   fsm.event_block_drop();
 } /* visit() */

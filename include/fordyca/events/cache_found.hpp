@@ -64,7 +64,7 @@ class cache_found : public perceived_cell_op,
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
