@@ -34,7 +34,6 @@
 #include "fordyca/params/depth0_foraging_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 
@@ -127,17 +126,6 @@ void foraging_controller::process_los(const representation::line_of_sight* const
              block->discrete_loc().first, block->discrete_loc().second);
     }
   } /* for(block..) */
-  for (auto cache : los->caches()) {
-    if (!m_map->access(cache->discrete_loc().first,
-                       cache->discrete_loc().second).state_has_cache()) {
-      events::cache_found op(base_foraging_controller::server(), cache,
-                             cache->discrete_loc().first,
-                             cache->discrete_loc().second);
-      m_map->accept(op);
-      ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(),
-             cache->discrete_loc().first, cache->discrete_loc().second);
-    }
-  } /* for(cache..) */
 } /* process_los() */
 
 /*******************************************************************************

@@ -34,7 +34,7 @@ NS_START(fordyca, diagnostics, depth1);
  ******************************************************************************/
 std::string collector::csv_header_build(const std::string& header) {
   return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest;n_acquiring_block;n_vectoring_to_block";
+      "n_acuiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
 } /* csv_header_build() */
 
 void collector::reset(void) {
@@ -50,10 +50,9 @@ void collector::collect(const collectible_diagnostics& diag) {
 } /* collect() */
 
 bool collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_exploring_for_cache) + ";" +
-         std::to_string(m_stats.n_acquiring_cache) + ";" +
+  line = std::to_string(m_stats.n_acquiring_cache) + ";" +
          std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-         std::to_string(m_stats.n_vectoring_to_cache) + ";" +
+         std::to_string(m_stats.n_exploring_for_cache) + ";" +
          std::to_string(m_stats.n_transporting_to_cache);
   return true;
 } /* store_foraging_stats() */

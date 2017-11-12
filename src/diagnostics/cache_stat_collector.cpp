@@ -46,16 +46,18 @@ bool cache_stat_collector::csv_line_build(std::string& line) {
   if (!m_new_data) {
     return false;
   }
-    line = std::to_string(m_stats.total_blocks) + ";" +
-           std::to_string(m_stats.total_pickups) + ";" +
-           std::to_string(m_stats.total_drops) + ";";
-    return true;
+  line = std::to_string(m_stats.total_blocks) + ";" +
+         std::to_string(m_stats.total_pickups) + ";" +
+         std::to_string(m_stats.total_drops) + ";";
+  m_new_data = false;
+  return true;
 } /* csv_line_build() */
 
 void cache_stat_collector::collect(const cache_diagnostics& cache) {
   m_stats.total_blocks += cache.n_blocks();
   m_stats.total_pickups += cache.n_block_pickups();
   m_stats.total_drops += cache.n_block_drops();
+  m_new_data = true;
 } /* collect() */
 
 

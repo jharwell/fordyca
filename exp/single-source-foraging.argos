@@ -83,7 +83,7 @@
     <caches create_static_cache="true"
             create_dynamic_caches="false"
             static_cache_size="5"
-            dimension="0.6"
+            dimension="0.8"
             min_dist="0.6"
       />
     <nest size="0.5, 0.5" center="2, 2.5" />

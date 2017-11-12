@@ -51,10 +51,14 @@ class foraging_loop_functions : public random_foraging_loop_functions {
   void Reset(void) override;
 
  protected:
+  template<typename T>
+  bool handle_nest_block_drop(argos::CFootBotEntity& robot);
+  template<typename T>
+  bool handle_free_block_pickup(argos::CFootBotEntity& robot);
+  template<typename T>
   void set_robot_los(argos::CFootBotEntity& robot);
+  template<typename t>
   void set_robot_tick(argos::CFootBotEntity& robot);
-  void handle_nest_block_drop(controller::depth0::foraging_controller& controller);
-  void handle_free_block_pickup(argos::CFootBotEntity& robot);
 
  private:
   void pre_step_final(void);

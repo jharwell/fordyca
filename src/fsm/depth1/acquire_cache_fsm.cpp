@@ -104,7 +104,7 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
       m_vector_fsm.is_avoiding_collision();
-} /* is_avoiding_collision(0) */
+} /* is_avoiding_collision() */
 
 /*******************************************************************************
  * Depth1 Diagnostics
@@ -127,7 +127,7 @@ bool acquire_cache_fsm::is_acquiring_cache(void) const {
 void acquire_cache_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
-  m_explore_fsm.init();
+  m_explore_fsm.task_reset();
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
@@ -146,6 +146,7 @@ bool acquire_cache_fsm::acquire_known_cache(
            best.first->discrete_loc().second,
            best.second);
     tasks::vector_argument v(best.first->real_loc());
+    m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
   } else if (m_vector_fsm.task_finished()) {
