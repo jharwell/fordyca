@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& serve
 }
 
 /*******************************************************************************
- * Member Functions
+ * Depth1 Foraging
  ******************************************************************************/
 void cache_found::visit(representation::perceived_cell2D& cell) {
   cell.add_pheromone(1.0);
@@ -57,7 +57,7 @@ void cache_found::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cache_found::visit(representation::cell2D_fsm& fsm) {
+void cache_found::visit(fsm::cell2D_fsm& fsm) {
   if (fsm.state_has_cache()) {
     return;
   }
@@ -67,9 +67,9 @@ void cache_found::visit(representation::cell2D_fsm& fsm) {
   }
 } /* visit() */
 
-void cache_found::visit(controller::memory_foraging_controller& controller) {
+void cache_found::visit(controller::depth1::foraging_controller& controller) {
   controller.map()->accept(*this);
-  ER_NOM("memory_foraging_controller: %s found cache%d",
+  ER_NOM("depth1_foraging_controller: %s found cache%d",
          controller.GetId().c_str(), m_cache->id());
 } /* visit() */
 

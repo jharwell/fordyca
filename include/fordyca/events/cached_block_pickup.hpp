@@ -39,8 +39,9 @@ class cache;
 class block;
 class arena_map;
 }
-namespace fsm { class memory_foraging_fsm; }
-namespace controller { class memory_foraging_controller; }
+namespace fsm { class block_to_nest_fsm; }
+namespace controller { namespace depth1 {class foraging_controller; }}
+namespace tasks { class collector; }
 
 NS_START(events);
 
@@ -49,16 +50,18 @@ NS_START(events);
  ******************************************************************************/
 class cached_block_pickup : public cell_op,
                             public rcppsw::common::er_client,
-                            public visitor::can_visit<controller::memory_foraging_controller>,
-                            public visitor::can_visit<fsm::memory_foraging_fsm>,
-                            public visitor::can_visit<representation::block>,
-                            public visitor::can_visit<representation::arena_map>,
-                            public visitor::can_visit<representation::perceived_arena_map> {
+                            public visitor::visit_set<controller::depth1::foraging_controller,
+                                                      fsm::block_to_nest_fsm,
+                                                      tasks::collector,
+                                                      representation::block,
+                                                      representation::arena_map,
+                                                      representation::perceived_arena_map> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
                       representation::cache* cache, size_t robot_index);
   ~cached_block_pickup(void) { er_client::rmmod(); }
 
+  /* depth1 foraging */
   /**
    * @brief Update the arena_map with the block pickup event by making the block
    * seem to disappear by moving it out of sight.
@@ -68,8 +71,9 @@ class cached_block_pickup : public cell_op,
   void visit(representation::arena_map& map) override;
 
   void visit(representation::cell2D& cell) override;
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
+
   /**
    * @brief Handle the event of a robot picking up a block, making updates to
    * the arena map as necessary.
@@ -83,16 +87,10 @@ class cached_block_pickup : public cell_op,
    */
   void visit(representation::block& block) override;
 
-  void visit(fsm::memory_foraging_fsm& fsm) override;
+  void visit(fsm::block_to_nest_fsm& fsm) override;
 
-  /**
-   * @brief Pickup a block the robot is currently on top of, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because picking up blocks
-   * needs to be handled in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::memory_foraging_controller& controller) override;
+  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(tasks::collector& task) override;
 
  private:
   cached_block_pickup(const cached_block_pickup& op) = delete;

@@ -25,8 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,10 +43,32 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Class representing the first half of the generalist task in depth 1
  * allocation.
  */
-class forager : public task_allocation::polled_task {
+class forager : public task_allocation::polled_task, foraging_task {
  public:
   forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
       polled_task("forager", alpha, mechanism) {}
+
+  /* event handling */
+  void accept(events::cache_block_drop &visitor) override;
+  void accept(events::free_block_pickup &visitor) override;
+  void accept(events::cached_block_pickup &) override {};
+  void accept(events::nest_block_drop &) override {};
+
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override { return false; }
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
+
+  /* depth1 diagnostics */
+  bool is_exploring_for_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+  bool is_acquiring_cache(void) const override;
+  bool is_transporting_to_cache(void) const override;
+  std::string task_name(void) const override { return "forager"; };
 
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }

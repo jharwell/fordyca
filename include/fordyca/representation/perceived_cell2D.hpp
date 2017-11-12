@@ -47,7 +47,7 @@ namespace decorator = rcppsw::patterns::decorator;
  * without modifying \ref grid2D.
  */
 class perceived_cell2D : public decorator::decorator<cell2D>,
-                         public visitor::visitable<perceived_cell2D>,
+                         public visitor::visitable_any<perceived_cell2D>,
                          public rcppsw::common::er_client {
  public:
   explicit perceived_cell2D(

@@ -45,7 +45,7 @@ void cell_empty::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_empty::visit(representation::cell2D_fsm& fsm) {
+void cell_empty::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_empty();
 } /* visit() */
 

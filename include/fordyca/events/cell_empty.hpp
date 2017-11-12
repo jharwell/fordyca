@@ -67,7 +67,7 @@ class cell_empty : public cell_op,
    *
    * @param fsm The FSM from the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   void visit(representation::arena_map& map) override;
   void visit(representation::perceived_arena_map& map) override;

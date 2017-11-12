@@ -31,20 +31,19 @@
 
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/fsm/explore_fsm.hpp"
+#include "fordyca/fsm/depth0/vector_fsm.hpp"
+#include "fordyca/fsm/explore_for_block_fsm.hpp"
+#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct fsm_params;
-} /* namespace params */
+namespace params { struct fsm_params; }
 
 namespace controller {
-class sensor_manager;
+namespace depth0 { class foraging_sensors; }
 class actuator_manager;
 } /* namespace controller */
 
@@ -68,12 +67,13 @@ NS_START(fsm);
  * that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
-                          public  rcppsw::task_allocation::taskable {
+                          public diagnostics::depth0::collectible_diagnostics,
+                          public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::common::er_server>& server,
-      const std::shared_ptr<controller::sensor_manager>& sensors,
+      const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
@@ -84,30 +84,19 @@ class acquire_block_fsm : public base_foraging_fsm,
   void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
   bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
 
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override { return false; }
+
+  /* depth0 diagnostics */
+  bool is_acquiring_block(void) const override;
+  bool is_vectoring_to_block(void) const override;
+
   /**
    * @brief Reset the FSM
    */
   void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently searching for a block within the arena
-   * (either vectoring towards a known block, or exploring for one).
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool is_searching_for_block(void) const {
-    return is_vectoring() || is_exploring();
-  }
-
-  bool is_exploring(void) const {
-    return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.is_searching()); }
-
-  bool is_vectoring(void) const {
-    return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.task_running();
-  }
-  bool is_avoiding_collision(void) const {
-    return m_explore_fsm.is_avoiding_collision();
-  }
 
  protected:
   enum fsm_states {
@@ -130,7 +119,7 @@ class acquire_block_fsm : public base_foraging_fsm,
    * block's existence expires during the pursuit of a known block, that is
    * ignored.
    */
-  void acquire_known_block(
+  bool acquire_known_block(
       std::list<std::pair<const representation::block*, double>> blocks);
 
   /*
@@ -140,8 +129,7 @@ class acquire_block_fsm : public base_foraging_fsm,
    * state.
    **/
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
-  HFSM_STATE_DECLARE(acquire_block_fsm, acquire_block,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, finished);
 
   HFSM_EXIT_DECLARE(acquire_block_fsm, exit_acquire_block);
@@ -157,8 +145,9 @@ class acquire_block_fsm : public base_foraging_fsm,
   argos::CRandom::CRNG* m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::common::er_server> m_server;
-  vector_fsm m_vector_fsm;
-  explore_fsm m_explore_fsm;
+  std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
+  depth0::vector_fsm m_vector_fsm;
+  explore_for_block_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

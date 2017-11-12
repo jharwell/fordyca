@@ -54,7 +54,7 @@ class cell2D;
  * the grid and move around as the state of the arena changes.
  */
 class arena_map: public rcppsw::common::er_client,
-                 public rcppsw::patterns::visitor::visitable<arena_map> {
+                 public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   arena_map(const struct params::arena_map_params* params);
 
@@ -131,6 +131,8 @@ class arena_map: public rcppsw::common::er_client,
    * actually on a block.
    */
   int robot_on_block(const argos::CVector2& pos);
+
+  int robot_on_cache(const argos::CVector2& pos);
 
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.

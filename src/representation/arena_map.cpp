@@ -24,8 +24,7 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
-#include "fordyca/support/static_cache_creator.hpp"
-#include "fordyca/support/cache_update_handler.hpp"
+#include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -82,6 +81,15 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
   return -1;
 } /* robot_on_block() */
 
+int arena_map::robot_on_cache(const argos::CVector2& pos) {
+  for (size_t i = 0; i < m_caches.size(); ++i) {
+    if (m_caches[i].contains_point(pos)) {
+      return static_cast<int>(i);
+    }
+  } /* for(i..) */
+  return -1;
+} /* robot_on_cache() */
+
 void arena_map::distribute_block(block* const block, bool first_time) {
   cell2D* cell = nullptr;
   while (1) {
@@ -120,10 +128,10 @@ void arena_map::static_cache_create(void) {
     double y = mc_nest_center.GetY();
 
     ER_DIAG("(Re)-Creating static cache");
-    support::static_cache_creator c(m_server, m_grid,
-                                    argos::CVector2(x, y),
-                                    mc_cache_params.dimension,
-                                    m_grid.resolution());
+    support::depth1::static_cache_creator c(m_server, m_grid,
+                                            argos::CVector2(x, y),
+                                            mc_cache_params.dimension,
+                                            m_grid.resolution());
     std::vector<representation::block> blocks(m_blocks.begin(),
                                               m_blocks.begin() + mc_cache_params.static_cache_size);
     m_caches = c.create_all(blocks);

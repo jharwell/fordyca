@@ -35,7 +35,7 @@
 NS_START(fordyca);
 
 namespace controller {
-class sensor_manager;
+class base_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 
@@ -55,7 +55,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 class base_foraging_fsm : public state_machine::hfsm {
  public:
   base_foraging_fsm(std::shared_ptr<rcppsw::common::er_server> server,
-                    std::shared_ptr<controller::sensor_manager> sensors,
+                    std::shared_ptr<controller::base_foraging_sensors> sensors,
                     std::shared_ptr<controller::actuator_manager> actuators,
                     uint8_t max_states);
   virtual ~base_foraging_fsm(void) {}
@@ -65,7 +65,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   void init(void) override;
 
-  controller::sensor_manager*  sensors(void) const { return m_sensors.get(); }
+  controller::base_foraging_sensors*  sensors(void) const { return m_sensors.get(); }
 
  protected:
   /**
@@ -87,7 +87,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, return_to_nest,
+  HFSM_STATE_DECLARE(base_foraging_fsm, transport_to_nest,
                      state_machine::event_data);
 
   /**
@@ -121,7 +121,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @brief A simple entry state for returning to nest, used to set LED colors
    * for visualization purposes.
    */
-  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_return_to_nest);
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_transport_to_nest);
 
   /**
    * @brief A simple entry state for collision avoidance, used to set LED colors
@@ -139,7 +139,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;
 
   argos::CRandom::CRNG* m_rng;
-  std::shared_ptr<controller::sensor_manager> m_sensors;
+  std::shared_ptr<controller::base_foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager> m_actuators;
 };
 

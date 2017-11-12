@@ -33,19 +33,17 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-class random_foraging_controller;
-class memory_foraging_controller;
-}
-namespace fsm { class random_foraging_fsm; class memory_foraging_fsm; }
 namespace representation {
 class cell2D;
 class perceived_cell2D;
-class cell2D_fsm;
 class cache;
 class block;
 class arena_map;
 };
+
+namespace fsm { class cell2D_fsm; namespace depth1 { class block_to_cache_fsm; }}
+namespace controller { namespace depth1 { class foraging_controller; }}
+namespace tasks { class forager; }
 
 NS_START(events);
 
@@ -54,20 +52,20 @@ NS_START(events);
  ******************************************************************************/
 class cache_block_drop : public visitor::visitor,
                          public rcppsw::common::er_client,
-                         public visitor::can_visit<controller::memory_foraging_controller>,
-                         public visitor::can_visit<controller::random_foraging_controller>,
-                         public visitor::can_visit<fsm::memory_foraging_fsm>,
-                         public visitor::can_visit<fsm::random_foraging_fsm>,
-                         public visitor::can_visit<representation::cell2D>,
-                         public visitor::can_visit<representation::cell2D_fsm>,
-                         public visitor::can_visit<representation::perceived_cell2D>,
-                         public visitor::can_visit<representation::block>,
-                         public visitor::can_visit<representation::arena_map> {
+                         public visitor::visit_set<controller::depth1::foraging_controller,
+                                                   fsm::depth1::block_to_cache_fsm,
+                                                   tasks::forager,
+                                                   representation::cell2D,
+                                                   fsm::cell2D_fsm,
+                                                   representation::perceived_cell2D,
+                                                   representation::block,
+                                                   representation::arena_map> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
                    representation::block* block, representation::cache* cache);
   ~cache_block_drop(void) { er_client::rmmod(); }
 
+  /* depth1 foraging */
   /**
    * @brief Update a cell on a block drop.
    *
@@ -75,14 +73,12 @@ class cache_block_drop : public visitor::visitor,
    */
   void visit(class representation::cell2D& cell) override;
 
-  void visit(class representation::perceived_cell2D& cell) override;
-
   /**
    * @brief Update the FSM associated with a cell on a block drop.
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
@@ -99,19 +95,10 @@ class cache_block_drop : public visitor::visitor,
    * @param block The block to update.
    */
   void visit(representation::block& block) override;
-
-  /**
-   * @brief Drop a carried block in the nest, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because dropping of blocks
-   * needs to be done in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::random_foraging_controller& controller) override;
-  void visit(controller::memory_foraging_controller& controller) override;
-
-  void visit(fsm::random_foraging_fsm& fsm) override;
-  void visit(fsm::memory_foraging_fsm& fsm) override;
+  void visit(class representation::perceived_cell2D& cell) override;
+  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
+  void visit(tasks::forager& task) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

@@ -24,9 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/fsm/base_foraging_fsm.hpp"
+#include "fordyca/fsm/explore_for_block_fsm.hpp"
+#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +41,7 @@ struct fsm_params;
 } /* namespace params */
 
 namespace controller {
-class sensor_manager;
+class base_foraging_sensors;
 class actuator_manager;
 } /* namespace controller */
 NS_START(fsm);
@@ -56,17 +57,18 @@ NS_START(fsm);
  * block back to the nest and repeat.
  */
 class random_foraging_fsm : public base_foraging_fsm,
-                            public visitor::visitable<random_foraging_fsm> {
+                            public diagnostics::random_collectible_diagnostics,
+                            public visitor::visitable_any<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::common::er_server> server,
-                      std::shared_ptr<controller::sensor_manager> sensors,
+                      std::shared_ptr<controller::base_foraging_sensors> sensors,
                       std::shared_ptr<controller::actuator_manager> actuators);
 
-  /**
-   * @brief If TRUE the robot is roaming around looking for a block.
-   */
-  virtual bool is_exploring(void) const;
+  /* base diagnostics */
+  bool is_exploring_for_block(void) const override;
+  bool is_avoiding_collision(void) const override;
+  bool is_transporting_to_nest(void) const override;
 
   /**
    * @brief (Re)-initialize the FSM.
@@ -78,39 +80,25 @@ class random_foraging_fsm : public base_foraging_fsm,
    */
   void run(void);
 
-  /**
-   * @brief If TRUE, the robot is returning to the nest, probably after having
-   * successfully picked up a block.
-   */
-  bool is_transporting_to_nest(void) const {
-    return current_state() == ST_RETURN_TO_NEST;
-  }
-
-  /**
-   * @brief If TRUE, the robot is currently engaged in collision avoidance.
-   */
-  bool is_avoiding_collision(void) const {
-    return m_explore_fsm.is_avoiding_collision();
-  }
 
  protected:
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
-    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_COLLISION_AVOIDANCE,
     ST_MAX_STATES
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
 
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
@@ -127,7 +115,7 @@ class random_foraging_fsm : public base_foraging_fsm,
   random_foraging_fsm& operator=(const random_foraging_fsm& fsm) = delete;
 
   argos::CRandom::CRNG* m_rng;
-  explore_fsm m_explore_fsm;
+  explore_for_block_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

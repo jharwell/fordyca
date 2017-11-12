@@ -26,8 +26,9 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
-#include "fordyca/support/block_stat_collector.hpp"
+#include "fordyca/controller/depth0/foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/diagnostics/block_stat_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +47,7 @@ nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::common::er_server
 }
 
 /*******************************************************************************
- * Member Functions
+ * Foraging Support
  ******************************************************************************/
 void nest_block_drop::visit(representation::arena_map& map) {
   map.distribute_block(m_block, false);
@@ -56,11 +57,14 @@ void nest_block_drop::visit(representation::arena_map& map) {
   ER_NOM("fb%d dropped block%d in nest", index, m_block->id());
 } /* visit() */
 
-void nest_block_drop::visit(support::block_stat_collector& collector) {
+void nest_block_drop::visit(diagnostics::block_stat_collector& collector) {
   collector.inc_total_collected();
   collector.inc_total_carries(m_block->carries());
 } /* visit() */
 
+/*******************************************************************************
+ * Random Foraging
+ ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
   block.reset();
 } /* visit() */
@@ -72,12 +76,6 @@ void nest_block_drop::visit(controller::random_foraging_controller& controller) 
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void nest_block_drop::visit(controller::memory_foraging_controller& controller) {
-  controller.fsm()->accept(*this);
-  controller.block(nullptr);
-  ER_NOM("memory_foraging_controller: %s dropped block%d in nest",
-         controller.GetId().c_str(), m_block->id());
-} /* visit() */
 
 void nest_block_drop::visit(fsm::random_foraging_fsm& fsm) {
   ER_NOM("random_foraging_fsm: register nest_block_drop event");
@@ -85,10 +83,46 @@ void nest_block_drop::visit(fsm::random_foraging_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void nest_block_drop::visit(fsm::memory_foraging_fsm& fsm) {
-  ER_NOM("memory_foraging_fsm: register nest_block_drop event");
+/*******************************************************************************
+ * Depth0 Foraging
+ ******************************************************************************/
+void nest_block_drop::visit(fsm::depth0::foraging_fsm& fsm) {
+  ER_NOM("depth0_foraging_fsm: register nest_block_drop event");
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
+
+void nest_block_drop::visit(controller::depth0::foraging_controller& controller) {
+  controller.fsm()->accept(*this);
+  controller.block(nullptr);
+  ER_NOM("depth0_foraging_controller: %s dropped block%d in nest",
+         controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+/*******************************************************************************
+ * Depth1 Foraging
+ ******************************************************************************/
+void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {
+  controller.block(nullptr);
+  controller.current_task()->accept(*this);
+
+  ER_NOM("depth1_foraging_controller: %s dropped block%d in nest",
+         controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+void nest_block_drop::visit(tasks::generalist& task) {
+  static_cast<fsm::depth0::foraging_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void nest_block_drop::visit(tasks::collector& task) {
+  static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void nest_block_drop::visit(fsm::block_to_nest_fsm& fsm) {
+  ER_NOM("block_to_nest_fsm: register nest_block_drop event");
+  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
 
 NS_END(events, fordyca);

@@ -27,7 +27,9 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/memory_foraging_controller.hpp"
+#include "fordyca/controller/depth0/foraging_controller.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,9 +54,9 @@ free_block_pickup::free_block_pickup(
     }
 
 /*******************************************************************************
- * Member Functions
+ * Foraging Support
  ******************************************************************************/
-void free_block_pickup::visit(representation::cell2D_fsm& fsm) {
+void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_pickup();
 } /* visit() */
 
@@ -63,10 +65,6 @@ void free_block_pickup::visit(representation::cell2D& cell) {
   ER_NOM("cell2D: fb%zu block%d from (%zu, %zu)",
          m_robot_index, m_block->id(), m_block->discrete_loc().first,
          m_block->discrete_loc().second);
-} /* visit() */
-
-void free_block_pickup::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(representation::arena_map& map) {
@@ -82,17 +80,9 @@ void free_block_pickup::visit(representation::arena_map& map) {
          m_block->id(), old_r.GetX(), old_r.GetY(), cell_op::x(), cell_op::y());
 } /* visit() */
 
-void free_block_pickup::visit(representation::perceived_arena_map& map) {
-  ER_ASSERT(m_block->discrete_loc() == representation::discrete_coord(cell_op::x(),
-                                                                      cell_op::y()),
-            "FATAL: Coordinates for block/cell do not agree");
-
-  events::cell_empty op(cell_op::x(), cell_op::y());
-  map.accept(op);
-  ER_NOM("perceived_arena_map: fb%zu: (%zu, %zu) is now empty", m_robot_index,
-         cell_op::x(), cell_op::y());
-} /* visit() */
-
+/*******************************************************************************
+ * Random Foraging
+ ******************************************************************************/
 void free_block_pickup::visit(representation::block& block) {
   block.add_carry();
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
@@ -111,22 +101,73 @@ void free_block_pickup::visit(controller::random_foraging_controller& controller
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void free_block_pickup::visit(controller::memory_foraging_controller& controller) {
-  controller.map()->accept(*this);
-  controller.fsm()->accept(*this);
-  controller.block(m_block);
-  ER_NOM("memory_foraging_controller: %s picked up block%d",
-         controller.GetId().c_str(), m_block->id());
-} /* visit() */
-
 void free_block_pickup::visit(fsm::random_foraging_fsm& fsm) {
   ER_NOM("random_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::memory_foraging_fsm& fsm) {
-  ER_NOM("memory_foraging_fsm: register free_block_pickup event");
+/*******************************************************************************
+ * Depth0 Foraging
+ ******************************************************************************/
+void free_block_pickup::visit(representation::perceived_cell2D& cell) {
+  cell.cell().accept(*this);
+} /* visit() */
+
+void free_block_pickup::visit(representation::perceived_arena_map& map) {
+  ER_ASSERT(m_block->discrete_loc() == representation::discrete_coord(cell_op::x(),
+                                                                      cell_op::y()),
+            "FATAL: Coordinates for block/cell do not agree");
+
+  events::cell_empty op(cell_op::x(), cell_op::y());
+  map.accept(op);
+  ER_NOM("perceived_arena_map: fb%zu: (%zu, %zu) is now empty", m_robot_index,
+         cell_op::x(), cell_op::y());
+} /* visit() */
+
+void free_block_pickup::visit(fsm::depth0::foraging_fsm& fsm) {
+  ER_NOM("depth0_foraging_fsm: register free_block_pickup event");
+  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
+void free_block_pickup::visit(controller::depth0::foraging_controller& controller) {
+  controller.map()->accept(*this);
+  controller.fsm()->accept(*this);
+  controller.block(m_block);
+  ER_NOM("depth0_foraging_controller: %s picked up block%d",
+         controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+
+/*******************************************************************************
+ * Depth1 Foraging
+ ******************************************************************************/
+void free_block_pickup::visit(controller::depth1::foraging_controller& controller) {
+  controller.map()->accept(*this);
+  controller.block(m_block);
+  controller.current_task()->accept(*this);
+
+  ER_NOM("depth1_foraging_controller: %s picked up block%d",
+         controller.GetId().c_str(), m_block->id());
+} /* visit() */
+
+void free_block_pickup::visit(tasks::generalist& task) {
+  static_cast<fsm::depth0::foraging_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_pickup::visit(tasks::forager& task) {
+  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {
+  ER_NOM("block_to_cache_fsm: register free_block_pickup event");
+  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
+void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
+  ER_NOM("block_to_nest_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

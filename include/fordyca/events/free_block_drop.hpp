@@ -43,13 +43,14 @@ NS_START(events);
  ******************************************************************************/
 class free_block_drop : public cell_op,
                         public rcppsw::common::er_client,
-                        public visitor::can_visit<representation::block> {
+                        public visitor::visit_set<representation::block> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
                   representation::block* block, size_t x, size_t y,
                   double resolution);
   ~free_block_drop(void) { er_client::rmmod(); }
 
+  /* foraging support */
   /**
    * @brief Update a cell on a block drop.
    *
@@ -62,7 +63,7 @@ class free_block_drop : public cell_op,
    *
    * @param fsm The FSM associated with the cell to update.
    */
-  void visit(representation::cell2D_fsm& fsm) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 
   /**
    * @brief Update a block with the knowledge that it has been dropped.
@@ -71,7 +72,7 @@ class free_block_drop : public cell_op,
    */
   void visit(representation::block& block) override;
 
-  void visit(__unused representation::perceived_cell2D& block) override {}
+  void visit(representation::perceived_cell2D&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.
