@@ -1,5 +1,5 @@
 /**
- * @file collectible_diagnostics.hpp
+ * @file random_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,33 +18,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTIBLE_DIAGNOSTICS_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTIBLE_DIAGNOSTICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_RANDOM_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_RANDOM_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <string>
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth1);
+NS_START(fordyca, metrics);
+namespace collectible_metrics { namespace robot_metrics { class random_metrics; } }
+
+NS_START(collectors, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class collectible_diagnostics {
+class random_metrics_collector : public base_metric_collector {
  public:
-  collectible_diagnostics(void) {}
-  virtual ~collectible_diagnostics(void) {}
+  explicit random_metrics_collector(const std::string ofname) :
+      base_metric_collector(ofname), m_stats() {}
 
-  virtual bool is_exploring_for_cache(void) const = 0;
-  virtual bool is_vectoring_to_cache(void) const = 0;
-  virtual bool is_acquiring_cache(void) const = 0;
-  virtual bool is_transporting_to_cache(void) const = 0;
+  void reset() override;
+  void collect(const collectible_metrics::robot_metrics::random_metrics& metrics);
+  void reset_on_timestep(void) override;
+
+ private:
+  struct sim_stats {
+    size_t n_exploring_for_block;
+    size_t n_avoiding_collision;
+    size_t n_transporting_to_nest;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  bool csv_line_build(std::string& line) override;
+
+  struct sim_stats m_stats;
 };
 
-NS_END(depth1, diagnostics, fordyca);
+NS_END(robot_metrics, collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH1_COLLECTIBLE_DIAGNOSTICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_RANDOM_METRICS_COLLECTOR_HPP_ */

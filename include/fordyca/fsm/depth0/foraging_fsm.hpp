@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
@@ -66,8 +66,8 @@ NS_START(fsm, depth0);
  * pickup the block and bring it all the way back to the nest.
  */
 class foraging_fsm : public base_foraging_fsm,
-                     public diagnostics::random_collectible_diagnostics,
-                     public diagnostics::depth0::collectible_diagnostics,
+                     public metrics::collectible_metrics::robot_metrics::random_metrics,
+                     public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                      public task_allocation::taskable,
                      public visitor::visitable_any<depth0::foraging_fsm> {
  public:
@@ -102,12 +102,12 @@ class foraging_fsm : public base_foraging_fsm,
 
   bool task_running(void) const override { return m_task_running; }
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 

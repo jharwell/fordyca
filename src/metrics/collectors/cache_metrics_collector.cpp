@@ -1,5 +1,5 @@
 /**
- * @file random_diagnostics_collector.hpp
+ * @file cache_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include "fordyca/metrics/collectors/cache_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
-
-class random_collectible_diagnostics;
+NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class random_diagnostics_collector : public base_stat_collector {
- public:
-  explicit random_diagnostics_collector(const std::string ofname) :
-      base_stat_collector(ofname), m_stats() {}
+std::string cache_metrics_collector::csv_header_build(const std::string& header) {
+  return base_metric_collector::csv_header_build(header) +
+      "total_blocks;total_pickups;total_drops";
+} /* csv_header_build() */
 
-  void reset() override;
-  void collect(const random_collectible_diagnostics& diag);
-  void reset_on_timestep(void) override;
+void cache_metrics_collector::reset(void) {
+  base_metric_collector::reset();
+  m_stats = {0, 0, 0};
+} /* reset() */
 
- private:
-  struct sim_stats {
-    size_t n_exploring_for_block;
-    size_t n_avoiding_collision;
-    size_t n_transporting_to_nest;
-  };
+bool cache_metrics_collector::csv_line_build(std::string& line) {
+  if (!m_new_data) {
+    return false;
+  }
+  line = std::to_string(m_stats.total_blocks) + ";" +
+         std::to_string(m_stats.total_pickups) + ";" +
+         std::to_string(m_stats.total_drops) + ";";
+  m_new_data = false;
+  return true;
+} /* csv_line_build() */
 
-  std::string csv_header_build(const std::string& header = "") override;
-  bool csv_line_build(std::string& line) override;
+void cache_metrics_collector::collect(
+    const collectible_metrics::cache_metrics& metrics) {
 
-  struct sim_stats m_stats;
-};
+  m_stats.total_blocks += metrics.n_blocks();
+  m_stats.total_pickups += metrics.n_block_pickups();
+  m_stats.total_drops += metrics.n_block_drops();
+  m_new_data = true;
+} /* collect() */
 
-NS_END(diagnostics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_RANDOM_DIAGNOSTICS_COLLECTOR_HPP_ */
+NS_END(collectors, metrics, fordyca);

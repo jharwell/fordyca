@@ -33,8 +33,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,8 +68,8 @@ NS_START(fsm);
  * that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
-                          public diagnostics::random_collectible_diagnostics,
-                          public diagnostics::depth0::collectible_diagnostics,
+                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(
@@ -86,12 +86,12 @@ class acquire_block_fsm : public base_foraging_fsm,
   void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
   bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 

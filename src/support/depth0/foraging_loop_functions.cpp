@@ -31,13 +31,15 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/diagnostics_params.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Member Functions
@@ -51,9 +53,9 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_collector.reset(new diagnostics::depth0::collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->depth0_fname));
+  m_collector.reset(new robot_collectors::depth0_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->depth0_fname));
   m_collector->reset();
 
   /* configure robots */
@@ -213,6 +215,11 @@ void foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
   T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
+
+robot_collectors::depth0_collector* foraging_loop_functions::depth0_collector(void) const {
+  return m_collector.get();
+} /* depth0_collector() */
+
 
 template void foraging_loop_functions::set_robot_los<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
 template void foraging_loop_functions::set_robot_tick<controller::depth1::foraging_controller>(argos::CFootBotEntity&);

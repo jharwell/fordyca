@@ -1,5 +1,5 @@
 /**
- * @file block_stat_collector.cpp
+ * @file block_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BLOCK_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BLOCK_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/block_stat_collector.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, metrics, collectible_metrics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string block_stat_collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "collected_blocks;avg_carries";
-} /* csv_header_build() */
+class block_metrics : public base_collectible_metrics {
+ public:
+  block_metrics(void) {}
+  virtual ~block_metrics(void) {}
 
-void block_stat_collector::reset(void) {
-  base_stat_collector::reset();
-  m_stats = {0, 0, 0};
-} /* reset() */
+  /**
+   * @brief Get how many carries this object has had on its way from its
+   * original arena location back to the nest.
+   *
+   * @return # carries.
+   */
+  virtual size_t n_carries(void) const = 0;
+};
 
-bool block_stat_collector::csv_line_build(std::string& line) {
-  double avg_carries = 0;
-  if (m_stats.block_carries > 0) {
-    avg_carries = static_cast<double>(m_stats.total_collected/
-                                      m_stats.total_carries);
-    line = std::to_string(m_stats.total_collected) + ";" +
-           std::to_string(avg_carries) + ";";
-    m_stats.block_carries = 0;
-    return true;
-  }
-  return false;
-} /* csv_line_build() */
+NS_END(collectible_metrics, metrics, fordyca);
 
-void block_stat_collector::collect(const carryable_object_diagnostics& block) {
-  ++m_stats.total_collected;
-  m_stats.block_carries = block.n_carries();
-  m_stats.total_carries += block.n_carries();
-} /* collect() */
-
-
-NS_END(diagnostics, fordyca);
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BLOCK_METRICS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file base_stat_collector.hpp
+ * @file cache_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,52 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_BASE_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_BASE_STAT_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <fstream>
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, metrics);
+namespace collectible_metrics { class cache_metrics; }
+
+NS_START(collectors);
+
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class base_stat_collector {
+class cache_metrics_collector : public base_metric_collector,
+                                public visitor::visitable_any<cache_metrics_collector> {
  public:
-  explicit base_stat_collector(const std::string ofname) :
-      m_ofname(ofname), m_ofile() {}
-  virtual ~base_stat_collector(void) {}
+  explicit cache_metrics_collector(const std::string ofname) :
+      base_metric_collector(ofname), m_new_data(false), m_stats() {}
 
-  virtual void reset(void);
-  virtual void reset_on_timestep(void) {}
-
-  void csv_line_write(uint timestep);
-  void finalize(void) { m_ofile.close(); }
-
- protected:
-  virtual std::string csv_header_build(const std::string& header = "");
-  virtual bool csv_line_build(std::string& line) = 0;
-
-  void csv_header_write(void);
-  std::ofstream& ofile(void) { return m_ofile; }
+  void reset(void) override;
+  void collect(const collectible_metrics::cache_metrics& metrics);
 
  private:
-  std::string m_ofname;
-  std::ofstream m_ofile;
+  struct stats {
+    size_t total_blocks;
+    size_t total_pickups;
+    size_t total_drops;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  bool csv_line_build(std::string& line) override;
+
+  bool m_new_data;
+  struct stats m_stats;
 };
 
-NS_END(diagnostics, fordyca);
+NS_END(metrics, collectors, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_BASE_STAT_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_ */

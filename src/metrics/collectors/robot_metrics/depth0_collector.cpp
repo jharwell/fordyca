@@ -1,5 +1,5 @@
 /**
- * @file loop_function_repository.cpp
+ * @file depth0_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,26 +21,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/metrics_parser.hpp"
-#include "fordyca/params/loop_functions_parser.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Member Functions
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
-  factory().register_type<arena_map_parser>("arena_map");
-  factory().register_type<metrics_parser>("metrics");
-  factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["arena_map"]        = factory().create("arena_map").get();
-  parsers()["metrics"]          = factory().create("metrics").get();
-  parsers()["loop_functions"]   = factory().create("loop_functions").get();
-}
+std::string depth0_collector::csv_header_build(const std::string& header) {
+  return base_metric_collector::csv_header_build(header) +
+      "n_acquiring_block;n_vectoring_to_block";
+} /* csv_header_build() */
 
-NS_END(params, fordyca);
+void depth0_collector::reset(void) {
+  base_metric_collector::reset();
+  reset_on_timestep();
+} /* reset() */
+
+void depth0_collector::collect(
+    const collectible_metrics::robot_metrics::depth0_metrics& metrics) {
+  m_stats.n_acquiring_block += metrics.is_acquiring_block();
+  m_stats.n_vectoring_to_block += metrics.is_vectoring_to_block();
+} /* collect() */
+
+bool depth0_collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_acquiring_block) + ";" +
+         std::to_string(m_stats.n_vectoring_to_block);
+  return true;
+} /* store_foraging_stats() */
+
+void depth0_collector::reset_on_timestep(void) {
+  m_stats = {0, 0};
+} /* reset_on_timestep() */
+
+
+NS_END(robot_metrics, collectors, metrics, fordyca);

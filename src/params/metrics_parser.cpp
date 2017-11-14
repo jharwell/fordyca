@@ -1,5 +1,5 @@
 /**
- * @file diagnostics_parser.cpp
+ * @file metrics_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/diagnostics_parser.hpp"
+#include "fordyca/params/metrics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,9 +31,9 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void diagnostics_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct diagnostics_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "diagnostics");
+void metrics_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct metrics_params);
+  argos::TConfigurationNode lnode = argos::GetNode(node, "metrics");
   argos::GetNodeAttribute(lnode, "random_fname", m_params->random_fname);
   argos::GetNodeAttribute(lnode, "distance_fname", m_params->distance_fname);
   argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
@@ -42,8 +42,8 @@ void diagnostics_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(lnode, "n_robots", m_params->n_robots);
 } /* parse() */
 
-void diagnostics_parser::show(std::ostream& stream) {
-  stream << "====================\nDiagnostics params\n====================\n";
+void metrics_parser::show(std::ostream& stream) {
+  stream << "====================\nMetrics params\n====================\n";
   stream << "random_fname=" << m_params->random_fname << std::endl;
   stream << "distance_fname=" << m_params->distance_fname << std::endl;
   stream << "depth0_fname=" << m_params->depth0_fname << std::endl;

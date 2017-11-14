@@ -33,9 +33,9 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/vector_fsm.hpp"
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,9 +64,9 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                          public diagnostics::random_collectible_diagnostics,
-                          public diagnostics::depth0::collectible_diagnostics,
-                          public diagnostics::depth1::collectible_diagnostics,
+                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::depth0_metrics,
+                          public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(
@@ -83,16 +83,16 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool task_running(void) const override { return ST_ACQUIRE_CACHE == current_state(); }
   void task_reset(void) override { init(); }
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override { return false; };
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override { return false; };
   bool is_vectoring_to_block(void) const override { return false; };
 
-  /* depth1 diagnostics */
+  /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;

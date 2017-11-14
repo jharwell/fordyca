@@ -27,7 +27,7 @@
 #include <utility>
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell_entity.hpp"
-#include "fordyca/diagnostics/carryable_object_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,14 +44,14 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public diagnostics::carryable_object_diagnostics,
+              public metrics::collectible_metrics::block_metrics,
               public rcppsw::patterns::visitor::visitable_any<block> {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension, argos::CColor::BLACK),
       m_robot_index(-1), m_carries(0) {}
 
-  /* diagnostics */
+  /* metrics */
   size_t n_carries(void) const override { return m_carries; }
 
   /**

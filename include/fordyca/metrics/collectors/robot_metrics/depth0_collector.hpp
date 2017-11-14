@@ -1,5 +1,5 @@
 /**
- * @file block_stat_collector.hpp
+ * @file depth0_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,43 +18,39 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_BLOCK_STAT_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_BLOCK_STAT_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
-namespace visitor = rcppsw::patterns::visitor;
+NS_START(fordyca, metrics);
+namespace collectible_metrics { namespace robot_metrics { class depth0_metrics; } }
 
-class carryable_object_diagnostics;
+NS_START(collectors, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_stat_collector : public base_stat_collector,
-                             public visitor::visitable_any<block_stat_collector> {
+class depth0_collector : public base_metric_collector {
  public:
-  explicit block_stat_collector(const std::string ofname) :
-      base_stat_collector(ofname), m_stats() {}
+  explicit depth0_collector(const std::string ofname) :
+      base_metric_collector(ofname), m_stats() {}
 
   void reset(void) override;
-  void reset_on_timestep(void) override { m_stats.block_carries = 0; }
-  void collect(const carryable_object_diagnostics& block);
-  size_t total_collected(void) const { return m_stats.total_collected; }
+  void collect(const collectible_metrics::robot_metrics::depth0_metrics& metrics);
+  void reset_on_timestep(void) override;
 
  private:
   struct stats {
-    size_t total_collected; /* aggregate across blocks, not reset each timestep*/
-    size_t total_carries; /* aggregate across blocks, not reset each timstep */
-    size_t block_carries; /* for one block, reset each timestep */
+    size_t n_acquiring_block;
+    size_t n_vectoring_to_block;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
@@ -63,6 +59,6 @@ class block_stat_collector : public base_stat_collector,
   struct stats m_stats;
 };
 
-NS_END(diagnostics, fordyca);
+NS_END(robot_metrics, collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_BLOCK_STAT_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_DEPTH0_COLLECTOR_HPP_ */

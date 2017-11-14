@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +57,7 @@ NS_START(fsm);
  * block back to the nest and repeat.
  */
 class random_foraging_fsm : public base_foraging_fsm,
-                            public diagnostics::random_collectible_diagnostics,
+                            public metrics::collectible_metrics::robot_metrics::random_metrics,
                             public visitor::visitable_any<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
@@ -65,7 +65,7 @@ class random_foraging_fsm : public base_foraging_fsm,
                       std::shared_ptr<controller::base_foraging_sensors> sensors,
                       std::shared_ptr<controller::actuator_manager> actuators);
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;

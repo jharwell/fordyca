@@ -1,5 +1,5 @@
 /**
- * @file random_diagnostics_collector.cpp
+ * @file base_metric_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,42 +21,40 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/random_diagnostics_collector.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string random_diagnostics_collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest";
+void base_metric_collector::csv_line_write(uint timestep) {
+  std::string line;
+  if (csv_line_build(line)) {
+    m_ofile << std::to_string(timestep) + ";" +
+        line << std::endl;
+  }
+} /* csv_line_write() */
+
+void base_metric_collector::csv_header_write(void) {
+  std::string header = csv_header_build("");
+  m_ofile << header + "\n";
+} /* csv_header_write() */
+
+std::string base_metric_collector::csv_header_build(const std::string& header) {
+  return header + "clock;";
 } /* csv_header_build() */
 
-void random_diagnostics_collector::reset(void) {
-  base_stat_collector::reset();
-  reset_on_timestep();
+void base_metric_collector::reset(void) {
+  /* Open output file and truncate */
+  if (m_ofile.is_open()) {
+    m_ofile.close();
+  }
+  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
+  csv_header_write();
 } /* reset() */
 
-void random_diagnostics_collector::collect(const random_collectible_diagnostics& diag) {
-  m_stats.n_exploring_for_block += diag.is_exploring_for_block();
-  m_stats.n_transporting_to_nest += diag.is_transporting_to_nest();
-  m_stats.n_avoiding_collision += diag.is_avoiding_collision();
-} /* collect() */
-
-bool random_diagnostics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_exploring_for_block) + ";" +
-         std::to_string(m_stats.n_avoiding_collision) + ";" +
-         std::to_string(m_stats.n_transporting_to_nest);
-  return true;
-} /* store_foraging_stats() */
-
-void random_diagnostics_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0};
-} /* reset_on_timestep() */
-
-NS_END(diagnostics, fordyca);
+NS_END(collectors, metrics, fordyca);

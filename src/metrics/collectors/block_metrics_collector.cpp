@@ -1,5 +1,5 @@
 /**
- * @file collector.cpp
+ * @file block_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,44 +21,45 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/depth1/collector.hpp"
-#include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth1);
+NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "n_acuiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
+std::string block_metrics_collector::csv_header_build(const std::string& header) {
+  return base_metric_collector::csv_header_build(header) +
+      "collected_blocks;avg_carries";
 } /* csv_header_build() */
 
-void collector::reset(void) {
-  base_stat_collector::reset();
-  reset_on_timestep();
+void block_metrics_collector::reset(void) {
+  base_metric_collector::reset();
+  m_metrics = {0, 0, 0};
 } /* reset() */
 
-void collector::collect(const collectible_diagnostics& diag) {
-  m_stats.n_exploring_for_cache += diag.is_exploring_for_cache();
-  m_stats.n_acquiring_cache += diag.is_acquiring_cache();
-  m_stats.n_vectoring_to_cache += diag.is_vectoring_to_cache();
-  m_stats.n_transporting_to_cache += diag.is_transporting_to_cache();
+bool block_metrics_collector::csv_line_build(std::string& line) {
+  double avg_carries = 0;
+  if (m_metrics.block_carries > 0) {
+    avg_carries = static_cast<double>(m_metrics.total_collected/
+                                      m_metrics.total_carries);
+    line = std::to_string(m_metrics.total_collected) + ";" +
+           std::to_string(avg_carries) + ";";
+    m_metrics.block_carries = 0;
+    return true;
+  }
+  return false;
+} /* csv_line_build() */
+
+void block_metrics_collector::collect(
+    const collectible_metrics::block_metrics& metrics) {
+  ++m_metrics.total_collected;
+  m_metrics.block_carries = metrics.n_carries();
+  m_metrics.total_carries += metrics.n_carries();
 } /* collect() */
 
-bool collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_acquiring_cache) + ";" +
-         std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-         std::to_string(m_stats.n_exploring_for_cache) + ";" +
-         std::to_string(m_stats.n_transporting_to_cache);
-  return true;
-} /* store_foraging_stats() */
-
-void collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0, 0};
-} /* reset_on_timestep() */
-
-NS_END(depth1, diagnostics, fordyca);
+NS_END(collectors, metrics, fordyca);

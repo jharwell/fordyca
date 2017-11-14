@@ -1,5 +1,5 @@
 /**
- * @file carryable_object_diagnostics.hpp
+ * @file metrics_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <string>
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class carryable_object_diagnostics {
- public:
-  carryable_object_diagnostics(void) {}
-  virtual ~carryable_object_diagnostics(void) {}
+struct metrics_params : public rcppsw::common::base_params {
+  metrics_params(void) : block_fname(), random_fname(), distance_fname(),
+                         depth0_fname(), depth1_fname(), n_robots() {}
 
-  /**
-   * @brief Get how many carries this object has had on its way from its
-   * original arena location back to the nest.
-   *
-   * @return # carries.
-   */
-  virtual size_t n_carries(void) const = 0;
+  std::string block_fname;
+  std::string random_fname;
+  std::string distance_fname;
+  std::string depth0_fname;
+  std::string depth1_fname;
+  size_t n_robots;
 };
 
-NS_END(diagnostics, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_CARRYABLE_OBJECT_DIAGNOSTICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */

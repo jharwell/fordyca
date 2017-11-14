@@ -1,5 +1,5 @@
 /**
- * @file stat_collector.cpp
+ * @file task_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,43 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include <string>
+
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics);
+NS_START(fordyca, metrics, collectible_metrics, task_metrics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void base_stat_collector::csv_line_write(uint timestep) {
-  std::string line;
-  if (csv_line_build(line)) {
-    m_ofile << std::to_string(timestep) + ";" +
-        line << std::endl;
-  }
-} /* csv_line_write() */
+class task_metrics {
+ public:
+  task_metrics(void) {}
+  virtual ~task_metrics(void) {}
 
-void base_stat_collector::csv_header_write(void) {
-  std::string header = csv_header_build("");
-  m_ofile << header + "\n";
-} /* csv_header_write() */
+  virtual std::string task_name(void) const = 0;
+};
 
-std::string base_stat_collector::csv_header_build(const std::string& header) {
-  return header + "clock;";
-} /* csv_header_build() */
+NS_END(task_metrics, collectible_metrics, metrics, fordyca);
 
-void base_stat_collector::reset(void) {
-  /* Open output file and truncate */
-  if (m_ofile.is_open()) {
-    m_ofile.close();
-  }
-  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  csv_header_write();
-} /* reset() */
-
-NS_END(diagnostics, fordyca);
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_ */
