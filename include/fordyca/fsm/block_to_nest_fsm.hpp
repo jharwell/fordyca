@@ -30,9 +30,9 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/depth1/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,9 +63,9 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
-                          public diagnostics::random_collectible_diagnostics,
-                          public diagnostics::depth0::collectible_diagnostics,
-                          public diagnostics::depth1::collectible_diagnostics,
+                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::depth0_metrics,
+                          public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                           public task_allocation::taskable,
                           public visitor::visitable_any<block_to_nest_fsm> {
  public:
@@ -108,16 +108,16 @@ class block_to_nest_fsm : public base_foraging_fsm,
    */
   void task_reset(void) override { init(); }
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
-  /* depth1 diagnostics */
+  /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;

@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
-#include "fordyca/diagnostics/depth0/collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,7 +59,7 @@ class foraging_loop_functions : public random_foraging_loop_functions {
   template<typename t>
   void set_robot_tick(argos::CFootBotEntity& robot);
 
-  diagnostics::depth0::collector* depth0_collector(void) const { return m_collector.get(); }
+  metrics::collectors::robot_metrics::depth0_collector* depth0_collector(void) const;
   void pre_step_final(void) override;
 
  private:
@@ -69,7 +69,7 @@ class foraging_loop_functions : public random_foraging_loop_functions {
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
-  std::unique_ptr<diagnostics::depth0::collector> m_collector;
+  std::unique_ptr<metrics::collectors::robot_metrics::depth0_collector> m_collector;
 };
 
 NS_END(depth0, support, fordyca);

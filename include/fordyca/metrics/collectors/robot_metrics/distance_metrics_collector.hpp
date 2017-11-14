@@ -1,5 +1,5 @@
 /**
- * @file collector.hpp
+ * @file distance_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,46 +18,53 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DISTANCE_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DISTANCE_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/diagnostics/base_stat_collector.hpp"
+#include <vector>
+
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth0);
+NS_START(fordyca, metrics);
+namespace collectible_metrics { namespace robot_metrics { class distance_metrics; } }
 
-class collectible_diagnostics;
+NS_START(collectors, robot_metrics);
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class collector : public base_stat_collector {
+class distance_metrics_collector : public base_metric_collector,
+                                   public visitor::visitable_any<distance_metrics_collector> {
  public:
-  explicit collector(const std::string ofname) :
-      base_stat_collector(ofname), m_stats() {}
+  distance_metrics_collector(const std::string ofname, size_t n_robots) :
+      base_metric_collector(ofname), m_n_robots(n_robots), m_stats() {}
 
   void reset(void) override;
-  void collect(const collectible_diagnostics& diag);
-  void reset_on_timestep(void) override;
+  void collect(const collectible_metrics::robot_metrics::distance_metrics& metrics);
 
  private:
-  struct stats {
-    size_t n_acquiring_block;
-    size_t n_vectoring_to_block;
+  struct robot_stats {
+    size_t index;
+    double total_distance;
+    double timestep_distance;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
 
-  struct stats m_stats;
+  size_t m_n_robots;
+  std::vector<struct robot_stats> m_stats;
 };
 
-NS_END(depth0, diagnostics, fordyca);
+NS_END(robot_metrics, collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DISTANCE_METRICS_COLLECTOR_HPP_ */

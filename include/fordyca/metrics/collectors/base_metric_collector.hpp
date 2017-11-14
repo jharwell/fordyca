@@ -1,5 +1,5 @@
 /**
- * @file loop_function_repository.cpp
+ * @file base_metric_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,29 +18,52 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_BASE_METRIC_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_BASE_METRIC_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/metrics_parser.hpp"
-#include "fordyca/params/loop_functions_parser.hpp"
+#include <string>
+#include <fstream>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics);
+
+namespace collectible_metrics { class base_collectible_metrics; }
+
+NS_START(collectors);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
-  factory().register_type<arena_map_parser>("arena_map");
-  factory().register_type<metrics_parser>("metrics");
-  factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["arena_map"]        = factory().create("arena_map").get();
-  parsers()["metrics"]          = factory().create("metrics").get();
-  parsers()["loop_functions"]   = factory().create("loop_functions").get();
-}
+class base_metric_collector {
+ public:
+  explicit base_metric_collector(const std::string ofname) :
+      m_ofname(ofname), m_ofile() {}
+  virtual ~base_metric_collector(void) {}
 
-NS_END(params, fordyca);
+  virtual void reset(void);
+  virtual void reset_on_timestep(void) {}
+
+  void csv_line_write(uint timestep);
+  void finalize(void) { m_ofile.close(); }
+
+ protected:
+  virtual std::string csv_header_build(const std::string& header = "");
+  virtual bool csv_line_build(std::string& line) = 0;
+
+  void csv_header_write(void);
+  std::ofstream& ofile(void) { return m_ofile; }
+
+ private:
+  std::string m_ofname;
+  std::ofstream m_ofile;
+};
+
+NS_END(collectors, metrics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_BASE_METRIC_COLLECTOR_HPP_ */

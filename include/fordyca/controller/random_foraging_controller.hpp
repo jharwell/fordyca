@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/diagnostics/collectible_distance_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,6 +35,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+
 NS_START(controller);
 
 /*******************************************************************************
@@ -47,18 +48,18 @@ NS_START(controller);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class random_foraging_controller : public base_foraging_controller,
-                                   public diagnostics::random_collectible_diagnostics,
-                                   public diagnostics::collectible_distance_diagnostics,
+                                   public metrics::collectible_metrics::robot_metrics::random_metrics,
+                                   public metrics::collectible_metrics::robot_metrics::distance_metrics,
                                    public visitor::visitable_any<random_foraging_controller> {
  public:
   random_foraging_controller(void);
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_transporting_to_nest(void) const override;
   bool is_avoiding_collision(void) const override;
 
-  /* distance diagnostics */
+  /* distance metrics */
   size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 

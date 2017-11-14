@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include "fordyca/support/depth0/foraging_loop_functions.hpp"
-#include "fordyca/diagnostics/depth1/collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +64,7 @@ class foraging_loop_functions : public depth0::foraging_loop_functions {
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
-  std::unique_ptr<diagnostics::depth1::collector> m_collector;
+  std::unique_ptr<metrics::collectors::robot_metrics::depth1_collector> m_collector;
 };
 
 NS_END(depth1, support, fordyca);

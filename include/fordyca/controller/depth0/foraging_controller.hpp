@@ -29,9 +29,9 @@
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/foraging_fsm.hpp"
-#include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
-#include "fordyca/diagnostics/collectible_distance_diagnostics.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,9 +49,9 @@ NS_START(depth0);
  * @brief  A controller is simply an implementation of the CCI_Controller class.
  */
 class foraging_controller : public base_foraging_controller,
-                            public diagnostics::random_collectible_diagnostics,
-                            public diagnostics::collectible_distance_diagnostics,
-                            public diagnostics::depth0::collectible_diagnostics,
+                            public metrics::collectible_metrics::robot_metrics::random_metrics,
+                            public metrics::collectible_metrics::robot_metrics::distance_metrics,
+                            public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void) :
@@ -61,16 +61,16 @@ class foraging_controller : public base_foraging_controller,
       m_fsm(),
       m_sensors() {}
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
-  /* distance diagnostics */
+  /* distance metrics */
   size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 

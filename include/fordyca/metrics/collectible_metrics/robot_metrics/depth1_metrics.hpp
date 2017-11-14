@@ -1,5 +1,5 @@
 /**
- * @file collector.cpp
+ * @file depth1_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,44 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/diagnostics/depth0/collector.hpp"
-#include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
-
+#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth0);
+NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-std::string collector::csv_header_build(const std::string& header) {
-  return base_stat_collector::csv_header_build(header) +
-      "n_acquiring_block;n_vectoring_to_block";
-} /* csv_header_build() */
+class depth1_metrics : public base_collectible_metrics {
+ public:
+  depth1_metrics(void) {}
+  virtual ~depth1_metrics(void) {}
 
-void collector::reset(void) {
-  base_stat_collector::reset();
-  reset_on_timestep();
-} /* reset() */
+  virtual bool is_exploring_for_cache(void) const = 0;
+  virtual bool is_vectoring_to_cache(void) const = 0;
+  virtual bool is_acquiring_cache(void) const = 0;
+  virtual bool is_transporting_to_cache(void) const = 0;
+};
 
-void collector::collect(const collectible_diagnostics& diag) {
-  m_stats.n_acquiring_block += diag.is_acquiring_block();
-  m_stats.n_vectoring_to_block += diag.is_vectoring_to_block();
-} /* collect() */
+NS_END(robot_metrics, collectible_metrics, metrics, fordyca);
 
-bool collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_acquiring_block) + ";" +
-         std::to_string(m_stats.n_vectoring_to_block);
-  return true;
-} /* store_foraging_stats() */
-
-void collector::reset_on_timestep(void) {
-  m_stats = {0, 0};
-} /* reset_on_timestep() */
-
-
-NS_END(depth0, diagnostics, fordyca);
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_ */

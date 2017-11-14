@@ -68,7 +68,7 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="depth0_foraging_loop_functions">
-    <diagnostics random_fname="random-stats.csv"
+    <metrics random_fname="random-stats.csv"
                  depth0_fname="depth0-stats.csv"
                  depth1_fname="depth1-stats.csv"
                  block_fname="block-stats.csv"

@@ -28,7 +28,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/params/diagnostics_params.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
@@ -37,6 +37,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
+
+namespace collectors = metrics::collectors;
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -93,16 +96,16 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   } /* for(i..) */
 
   /* initialize stat collecting */
-  m_random_collector.reset(new diagnostics::random_diagnostics_collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->random_fname));
-  m_block_collector.reset(new diagnostics::block_stat_collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->block_fname));
-  const struct params::diagnostics_params* diag_p =
-      static_cast<const struct params::diagnostics_params*>(repo.get_params("diagnostics"));
+  m_random_collector.reset(new robot_collectors::random_metrics_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->random_fname));
+  m_block_collector.reset(new collectors::block_metrics_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->block_fname));
+  const struct params::metrics_params* diag_p =
+      static_cast<const struct params::metrics_params*>(repo.get_params("metrics"));
 
-  m_distance_collector.reset(new diagnostics::distance_diagnostics_collector(
+  m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
       diag_p->distance_fname, diag_p->n_robots));
   m_random_collector->reset();
   m_distance_collector->reset();
@@ -251,6 +254,18 @@ void random_foraging_loop_functions::PostExperiment(void) {
     std::exit(0);
   }
 } /* PostExperiment() */
+
+collectors::block_metrics_collector* random_foraging_loop_functions::block_collector(void) const {
+  return m_block_collector.get();
+} /* block_collector() */
+
+robot_collectors::distance_metrics_collector* random_foraging_loop_functions::distance_collector(void) const {
+  return m_distance_collector.get();
+} /* distance_collector() */
+
+robot_collectors::random_metrics_collector* random_foraging_loop_functions::random_collector(void) const {
+  return m_random_collector.get();
+} /* random_collector() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(random_foraging_loop_functions, "random_foraging_loop_functions")

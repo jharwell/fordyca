@@ -54,16 +54,16 @@ class collector : public task_allocation::polled_task, public foraging_task {
   void accept(events::cache_block_drop &) override {};
   void accept(events::free_block_pickup &) override {};
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override { return false; };
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override { return false; };
   bool is_vectoring_to_block(void) const override { return false; };
 
-  /* depth1 diagnostics */
+  /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;

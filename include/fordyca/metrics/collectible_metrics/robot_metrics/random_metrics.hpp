@@ -1,5 +1,5 @@
 /**
- * @file collectible_diagnostics.hpp
+ * @file random_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,31 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTIBLE_DIAGNOSTICS_HPP_
-#define INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTIBLE_DIAGNOSTICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_RANDOM_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_RANDOM_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, diagnostics, depth0);
+NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class collectible_diagnostics {
+class random_metrics : public base_collectible_metrics {
  public:
-  collectible_diagnostics(void) {}
-  virtual ~collectible_diagnostics(void) {}
+  random_metrics(void) {}
+  virtual ~random_metrics(void) {}
 
-  virtual bool is_acquiring_block(void) const = 0;
-  virtual bool is_vectoring_to_block(void) const = 0;
+  virtual bool is_exploring_for_block(void) const = 0;
+  virtual bool is_avoiding_collision(void) const = 0;
+  virtual bool is_transporting_to_nest(void) const = 0;
 };
 
-NS_END(depth0, diagnostics, fordyca);
+NS_END(robot_metrics, collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DIAGNOSTICS_DEPTH0_COLLECTIBLE_DIAGNOSTICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_RANDOM_METRICS_HPP_ */

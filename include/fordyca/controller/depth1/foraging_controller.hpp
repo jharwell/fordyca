@@ -31,7 +31,8 @@
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
-#include "fordyca/diagnostics/depth1/collectible_task_diagnostics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/task_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,8 +45,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * Class Definitions
  ******************************************************************************/
 class foraging_controller : public depth0::foraging_controller,
-                            public diagnostics::depth1::collectible_diagnostics,
-                            public diagnostics::depth1::collectible_task_diagnostics,
+                            public metrics::collectible_metrics::robot_metrics::depth1_metrics,
+                            public metrics::collectible_metrics::task_metrics::task_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void) :
@@ -57,19 +58,19 @@ class foraging_controller : public depth0::foraging_controller,
 
   tasks::foraging_task* current_task(void) const;
 
-  /* distance diagnostics */
+  /* distance metrics */
   double timestep_distance(void) const override;
 
-  /* base diagnostics */
+  /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 diagnostics */
+  /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
-  /* depth1 diagnostics */
+  /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;

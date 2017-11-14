@@ -47,7 +47,7 @@ namespace depth1 {class foraging_controller; }
 }
 
 namespace representation { class block; class arena_map; };
-namespace diagnostics { class block_stat_collector; }
+namespace metrics { namespace collectors { class block_metrics_collector; }}
 namespace tasks { class generalist; class collector; }
 
 NS_START(events);
@@ -74,7 +74,7 @@ class nest_block_drop : public visitor::visitor,
                                                   representation::arena_map,
                                                   tasks::generalist,
                                                   tasks::collector,
-                                                  diagnostics::block_stat_collector> {
+                                                  metrics::collectors::block_metrics_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
              representation::block* block);
@@ -89,7 +89,7 @@ class nest_block_drop : public visitor::visitor,
    * @param map The map to update
    */
   void visit(representation::arena_map& map) override;
-  void visit(diagnostics::block_stat_collector& collector) override;
+  void visit(metrics::collectors::block_metrics_collector& collector) override;
 
   /* random foraging */
   /**

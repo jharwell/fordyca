@@ -1,5 +1,5 @@
 /**
- * @file loop_function_repository.cpp
+ * @file base_collectible_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,29 +18,27 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/metrics_parser.hpp"
-#include "fordyca/params/loop_functions_parser.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics, collectible_metrics);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
-  factory().register_type<arena_map_parser>("arena_map");
-  factory().register_type<metrics_parser>("metrics");
-  factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["arena_map"]        = factory().create("arena_map").get();
-  parsers()["metrics"]          = factory().create("metrics").get();
-  parsers()["loop_functions"]   = factory().create("loop_functions").get();
-}
+class base_collectible_metrics {
+ public:
+  virtual ~base_collectible_metrics(void) {}
+};
 
-NS_END(params, fordyca);
+NS_END(collectible_metrics, metrics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_ */

@@ -29,7 +29,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/params/diagnostics_params.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 
@@ -37,6 +37,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Member Functions
@@ -50,9 +52,9 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_collector.reset(new diagnostics::depth1::collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->depth1_fname));
+  m_collector.reset(new robot_collectors::depth1_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->depth1_fname));
   m_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");
