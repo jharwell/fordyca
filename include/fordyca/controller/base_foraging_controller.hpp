@@ -49,6 +49,7 @@ class base_foraging_controller : public argos::CCI_Controller,
   virtual ~base_foraging_controller(void) {}
 
   void display_los(bool display_los) { m_display_los = display_los; }
+
   /**
    * @brief If TRUE, then the robot should display its approxibate LOS as a
    * circle on the ground during simulation.

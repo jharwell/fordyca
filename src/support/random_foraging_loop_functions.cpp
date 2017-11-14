@@ -48,6 +48,7 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
     m_floor(NULL),
     m_sim_type(),
     m_random_collector(),
+    m_distance_collector(),
     m_block_collector(),
     m_map() {
   insmod("loop_functions",
@@ -98,7 +99,13 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_block_collector.reset(new diagnostics::block_stat_collector(
       static_cast<const struct params::diagnostics_params*>(
           repo.get_params("diagnostics"))->block_fname));
+  const struct params::diagnostics_params* diag_p =
+      static_cast<const struct params::diagnostics_params*>(repo.get_params("diagnostics"));
+
+  m_distance_collector.reset(new diagnostics::distance_diagnostics_collector(
+      diag_p->distance_fname, diag_p->n_robots));
   m_random_collector->reset();
+  m_distance_collector->reset();
   m_block_collector->reset();
 
   /* configure robots */
@@ -119,12 +126,14 @@ void random_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 void random_foraging_loop_functions::Reset() {
   m_block_collector->reset();
   m_random_collector->reset();
+  m_distance_collector->reset();
   m_map->distribute_blocks(true);
 }
 
 void random_foraging_loop_functions::Destroy() {
   m_block_collector->finalize();
   m_random_collector->finalize();
+  m_distance_collector->finalize();
 }
 
 argos::CColor random_foraging_loop_functions::GetFloorColor(
@@ -152,6 +161,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
 
     /* get stats from this robot before its state changes */
     m_random_collector->collect(controller);
+    m_distance_collector->collect(controller);
 
     if (controller.is_carrying_block()) {
       if (controller.in_nest()) {
@@ -194,6 +204,7 @@ void random_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot)
 void random_foraging_loop_functions::pre_step_final(void) {
   m_block_collector->csv_line_write(GetSpace().GetSimulationClock());
   m_random_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_distance_collector->csv_line_write(GetSpace().GetSimulationClock());
   m_random_collector->reset_on_timestep();
 } /* pre_step_final() */
 

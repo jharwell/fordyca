@@ -28,6 +28,7 @@
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "rcppsw/common/er_server.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,6 +80,17 @@ bool random_foraging_controller::is_transporting_to_nest(void) const {
 bool random_foraging_controller::is_avoiding_collision(void) const {
   return m_fsm->is_avoiding_collision();
 } /* is_avoiding_collision() */
+
+/*******************************************************************************
+ * Distance Diagnostics
+ ******************************************************************************/
+size_t random_foraging_controller::entity_id(void) const {
+  return std::atoi(GetId().c_str()+2);
+} /* entity_id() */
+
+double random_foraging_controller::timestep_distance(void) const {
+  return sensors()->robot_heading().Length();
+} /* timestep_distance() */
 
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;

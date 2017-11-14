@@ -50,18 +50,10 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_random_collector.reset(new diagnostics::random_diagnostics_collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->random_fname));
-  m_depth0_collector.reset(new diagnostics::depth0::collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->depth0_fname));
-  m_depth1_collector.reset(new diagnostics::depth1::collector(
+  m_collector.reset(new diagnostics::depth1::collector(
       static_cast<const struct params::diagnostics_params*>(
           repo.get_params("diagnostics"))->depth1_fname));
-  m_random_collector->reset();
-  m_depth0_collector->reset();
-  m_depth1_collector->reset();
+  m_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -128,11 +120,13 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_random_collector->collect(controller);
-    m_depth0_collector->collect(controller);
-    m_depth1_collector->collect(controller);
+    random_collector()->collect(controller);
+    distance_collector()->collect(controller);
+    depth0_collector()->collect(controller);
+    m_collector->collect(controller);
 
     /* Send the robot its new line of sight */
+    set_robot_pos<controller::depth1::foraging_controller>(robot);
     set_robot_los<controller::depth1::foraging_controller>(robot);
     set_robot_tick<controller::depth1::foraging_controller>(robot);
 
@@ -187,25 +181,19 @@ void foraging_loop_functions::PreStep() {
 } /* PreStep() */
 
 void foraging_loop_functions::Reset() {
-  m_random_collector->reset();
-  m_depth0_collector->reset();
-  m_depth1_collector->reset();
-  map()->distribute_blocks(true);
+  depth0::foraging_loop_functions::Reset();
+  m_collector->reset();
 }
 
 void foraging_loop_functions::Destroy() {
-  m_random_collector->finalize();
-  m_depth0_collector->finalize();
-  m_depth1_collector->finalize();
+  depth0::foraging_loop_functions::Destroy();
+  m_collector->finalize();
 }
 
 void foraging_loop_functions::pre_step_final(void) {
-  m_random_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_depth0_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_depth1_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_random_collector->reset_on_timestep();
-  m_depth0_collector->reset_on_timestep();
-  m_depth1_collector->reset_on_timestep();
+  depth0::foraging_loop_functions::pre_step_final();
+  m_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_collector->reset_on_timestep();
 
   /*
    * If the static cache has vanished because a robot took the 2nd to last

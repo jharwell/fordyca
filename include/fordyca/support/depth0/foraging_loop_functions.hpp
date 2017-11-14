@@ -27,7 +27,6 @@
 #include <string>
 #include <vector>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
-#include "fordyca/diagnostics/random_diagnostics_collector.hpp"
 #include "fordyca/diagnostics/depth0/collector.hpp"
 
 /*******************************************************************************
@@ -42,7 +41,7 @@ NS_START(support, depth0);
  ******************************************************************************/
 class foraging_loop_functions : public random_foraging_loop_functions {
  public:
-  foraging_loop_functions() : m_random_collector(), m_depth0_collector() {}
+  foraging_loop_functions() : m_collector() {}
   virtual ~foraging_loop_functions(void) {}
 
   void Init(argos::TConfigurationNode& node) override;
@@ -60,16 +59,17 @@ class foraging_loop_functions : public random_foraging_loop_functions {
   template<typename t>
   void set_robot_tick(argos::CFootBotEntity& robot);
 
+  diagnostics::depth0::collector* depth0_collector(void) const { return m_collector.get(); }
+  void pre_step_final(void) override;
+
  private:
-  void pre_step_final(void);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
-  std::unique_ptr<diagnostics::random_diagnostics_collector> m_random_collector;
-  std::unique_ptr<diagnostics::depth0::collector> m_depth0_collector;
+  std::unique_ptr<diagnostics::depth0::collector> m_collector;
 };
 
 NS_END(depth0, support, fordyca);

@@ -84,6 +84,38 @@ class base_foraging_sensors {
    */
   argos::CVector2 calc_vector_to_light(void);
 
+  /**
+   * @brief Get the robot's current location.
+   *
+   * Note that this is set via loop functions, and that robots are not capable
+   * of self-localizing. That's not the point of this project, and this was much
+   * faster/easier.
+   */
+  argos::CVector2 robot_loc(void) const { return m_robot_loc; }
+
+  /**
+   * @brief Set the robot's current location.
+   */
+  void robot_loc(argos::CVector2 robot_loc) {
+    m_prev_robot_loc = m_robot_loc;
+    m_robot_loc = robot_loc;
+  }
+
+
+  /**
+   * @brief Get the robot's heading, which is computed from the previous 2
+   * calculated (ahem set) robot positions.
+   */
+  argos::CVector2 robot_heading(void) { return m_robot_loc - m_prev_robot_loc; }
+
+  /**
+   * @brief Get the angle of the current robot's heading. A shortcut to help
+   * reduce the ache in my typing fingers.
+   *
+   * @return The heading angle.
+   */
+  argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
+
  protected:
   argos::CCI_RangeAndBearingSensor* rabs(void) { return m_rabs; }
   argos::CCI_FootBotProximitySensor* proximity(void) { return m_proximity; }
@@ -96,6 +128,8 @@ class base_foraging_sensors {
 
   /** The current timestep  */
   const double                                mc_diffusion_delta;
+  argos::CVector2                             m_robot_loc;
+  argos::CVector2                             m_prev_robot_loc;
   const argos::CRange<argos::CRadians>        mc_go_straight_angle_range;
   argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
   argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */

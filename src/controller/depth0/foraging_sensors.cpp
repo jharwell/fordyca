@@ -1,5 +1,5 @@
 /**
- * @file depth0_foraging_sensors.cpp
+ * @file foraging_sensors.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -39,8 +39,6 @@ foraging_sensors::foraging_sensors(
     argos::CCI_FootBotMotorGroundSensor* const ground) :
     base_foraging_sensors(params, rabs, proximity, light, ground),
     m_tick(0),
-    m_los(),
-    m_robot_loc(),
-    m_prev_robot_loc() {}
+    m_los() {}
 
 NS_END(depth0, controller, fordyca);

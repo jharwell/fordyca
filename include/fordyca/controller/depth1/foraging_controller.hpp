@@ -57,6 +57,9 @@ class foraging_controller : public depth0::foraging_controller,
 
   tasks::foraging_task* current_task(void) const;
 
+  /* distance diagnostics */
+  double timestep_distance(void) const override;
+
   /* base diagnostics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;

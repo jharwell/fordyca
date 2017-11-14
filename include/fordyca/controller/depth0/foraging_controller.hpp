@@ -30,6 +30,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/foraging_fsm.hpp"
 #include "fordyca/diagnostics/random_collectible_diagnostics.hpp"
+#include "fordyca/diagnostics/collectible_distance_diagnostics.hpp"
 #include "fordyca/diagnostics/depth0/collectible_diagnostics.hpp"
 
 /*******************************************************************************
@@ -49,6 +50,7 @@ NS_START(depth0);
  */
 class foraging_controller : public base_foraging_controller,
                             public diagnostics::random_collectible_diagnostics,
+                            public diagnostics::collectible_distance_diagnostics,
                             public diagnostics::depth0::collectible_diagnostics,
                             public visitor::visitable_any<foraging_controller> {
  public:
@@ -67,6 +69,10 @@ class foraging_controller : public base_foraging_controller,
   /* depth0 diagnostics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+
+  /* distance diagnostics */
+  size_t entity_id(void) const override;
+  double timestep_distance(void) const override;
 
   /**
    * @brief Set the current clock tick. In a real world, each robot would
@@ -125,6 +131,7 @@ class foraging_controller : public base_foraging_controller,
    * by the loop functions.
    */
   void robot_loc(argos::CVector2 loc);
+
   argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
   fsm::depth0::foraging_fsm* fsm(void) const { return m_fsm.get(); }

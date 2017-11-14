@@ -62,37 +62,6 @@ class foraging_sensors : public base_foraging_sensors {
   }
 
   /**
-   * @brief Get the robot's current location.
-   *
-   * Note that this is set via loop functions, and that robots are not capable
-   * of self-localizing. That's not the point of this project, and this was much
-   * faster/easier.
-   */
-  argos::CVector2 robot_loc(void) const { return m_robot_loc; }
-
-  /**
-   * @brief Set the robot's current location.
-   */
-  void robot_loc(argos::CVector2 robot_loc) {
-    m_prev_robot_loc = m_robot_loc;
-    m_robot_loc = robot_loc;
-  }
-
-  /**
-   * @brief Get the robot's heading, which is computed from the previous 2
-   * calculated (ahem set) robot positions.
-   */
-  argos::CVector2 robot_heading(void) { return m_robot_loc - m_prev_robot_loc; }
-
-  /**
-   * @brief Get the angle of the current robot's heading. A shortcut to help
-   * reduce the ache in my typing fingers.
-   *
-   * @return The heading angle.
-   */
-  argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
-
-  /**
    * @brief Get the current simulation time tick.
    */
   uint tick(void) const { return m_tick; }
@@ -108,8 +77,6 @@ class foraging_sensors : public base_foraging_sensors {
 
   uint                                        m_tick;
   std::unique_ptr<representation::line_of_sight> m_los;
-  argos::CVector2                             m_robot_loc;
-  argos::CVector2                             m_prev_robot_loc;
 };
 
 NS_END(depth0, controller, fordyca);
