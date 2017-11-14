@@ -27,6 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/diagnostics/collectible_distance_diagnostics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,6 +48,7 @@ NS_START(controller);
  */
 class random_foraging_controller : public base_foraging_controller,
                                    public diagnostics::random_collectible_diagnostics,
+                                   public diagnostics::collectible_distance_diagnostics,
                                    public visitor::visitable_any<random_foraging_controller> {
  public:
   random_foraging_controller(void);
@@ -56,10 +58,13 @@ class random_foraging_controller : public base_foraging_controller,
   bool is_transporting_to_nest(void) const override;
   bool is_avoiding_collision(void) const override;
 
+  /* distance diagnostics */
+  size_t entity_id(void) const override;
+  double timestep_distance(void) const override;
+
   /*
    * @brief Initialize the controller.
-   *
-   * @param t_node Points to the <parameters> section in the XML file in the
+   *   * @param t_node Points to the <parameters> section in the XML file in the
    *               <controllers><random_foraging_controller_controller> section.
    */
   void Init(argos::TConfigurationNode& t_node) override;

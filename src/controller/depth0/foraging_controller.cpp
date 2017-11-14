@@ -144,6 +144,25 @@ bool foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
+ * Distance Diagnostics
+ ******************************************************************************/
+size_t foraging_controller::entity_id(void) const {
+  return std::atoi(GetId().c_str()+2);
+} /* entity_id() */
+
+double foraging_controller::timestep_distance(void) const {
+  /*
+   * If you allow distance gathering at timesteps <= 2, you get a big jump
+   * because of the prev/current location not being set up properly yet. Might
+   * be worth fixing at some point...
+   */
+  if (m_sensors->tick() > 2) {
+    return m_sensors->robot_heading().Length();
+  }
+  return 0;
+} /* timestep_distance() */
+
+/*******************************************************************************
  * Depth0 Diagnostics
  ******************************************************************************/
 bool foraging_controller::is_acquiring_block(void) const {

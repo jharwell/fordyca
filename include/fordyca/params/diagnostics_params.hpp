@@ -36,12 +36,15 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct diagnostics_params : public rcppsw::common::base_params {
-  diagnostics_params(void) : block_fname(), random_fname(), depth0_fname(), depth1_fname() {}
+  diagnostics_params(void) : block_fname(), random_fname(), distance_fname(),
+                             depth0_fname(), depth1_fname(), n_robots() {}
 
   std::string block_fname;
   std::string random_fname;
+  std::string distance_fname;
   std::string depth0_fname;
   std::string depth1_fname;
+  size_t n_robots;
 };
 
 NS_END(params, fordyca);

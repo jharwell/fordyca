@@ -47,7 +47,7 @@ class random_diagnostics_collector : public base_stat_collector {
   void reset_on_timestep(void) override;
 
  private:
-  struct stats {
+  struct sim_stats {
     size_t n_exploring_for_block;
     size_t n_avoiding_collision;
     size_t n_transporting_to_nest;
@@ -56,7 +56,7 @@ class random_diagnostics_collector : public base_stat_collector {
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
 
-  struct stats m_stats;
+  struct sim_stats m_stats;
 };
 
 NS_END(diagnostics, fordyca);

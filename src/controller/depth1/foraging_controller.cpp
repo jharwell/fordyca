@@ -139,6 +139,21 @@ void foraging_controller::process_los(const representation::line_of_sight* const
 } /* process_los() */
 
 /*******************************************************************************
+ * Distance Diagnostics
+ ******************************************************************************/
+double foraging_controller::timestep_distance(void) const {
+  /*
+   * If you allow distance gathering at timesteps <= 2, you get a big jump
+   * because of the prev/current location not being set up properly yet. Might
+   * be worth fixing at some point...
+   */
+  if (sensors()->tick() > 2) {
+    return sensors()->robot_heading().Length();
+  }
+  return 0;
+} /* timestep_distance() */
+
+/*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
 bool foraging_controller::is_exploring_for_block(void) const {

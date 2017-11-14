@@ -51,15 +51,10 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_random_collector.reset(new diagnostics::random_diagnostics_collector(
-      static_cast<const struct params::diagnostics_params*>(
-          repo.get_params("diagnostics"))->random_fname));
-
-  m_depth0_collector.reset(new diagnostics::depth0::collector(
+  m_collector.reset(new diagnostics::depth0::collector(
       static_cast<const struct params::diagnostics_params*>(
           repo.get_params("diagnostics"))->depth0_fname));
-  m_random_collector->reset();
-  m_depth0_collector->reset();
+  m_collector->reset();
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -87,10 +82,12 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_random_collector->collect(controller);
-    m_depth0_collector->collect(controller);
+    distance_collector()->collect(controller);
+    random_collector()->collect(controller);
+    m_collector->collect(controller);
 
     /* Send the robot its new line of sight */
+    set_robot_pos<controller::depth0::foraging_controller>(robot);
     set_robot_los<controller::depth0::foraging_controller>(robot);
     set_robot_tick<controller::depth0::foraging_controller>(robot);
 
@@ -168,21 +165,18 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void foraging_loop_functions::Destroy(void) {
-  m_random_collector->finalize();
-  m_depth0_collector->finalize();
+  random_foraging_loop_functions::Destroy();
+  m_collector->finalize();
 }
 
 void foraging_loop_functions::Reset(void) {
-  m_random_collector->reset();
-  m_depth0_collector->reset();
-  map()->distribute_blocks(true);
+  random_foraging_loop_functions::Reset();
+  m_collector->reset();
 }
 
 void foraging_loop_functions::pre_step_final(void) {
-  m_random_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_depth0_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_random_collector->reset_on_timestep();
-  m_depth0_collector->reset_on_timestep();
+  random_foraging_loop_functions::pre_step_final();
+  m_collector->reset_on_timestep();
 } /* pre_step_final() */
 
 void foraging_loop_functions::PreStep() {
@@ -212,7 +206,6 @@ void foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
           map()->subgrid(robot_loc.first, robot_loc.second, 1),
           robot_loc);
   controller.los(new_los);
-  controller.robot_loc(pos);
 } /* set_robot_los() */
 
 template<typename T>

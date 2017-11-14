@@ -49,6 +49,7 @@ bool block_stat_collector::csv_line_build(std::string& line) {
                                       m_stats.total_carries);
     line = std::to_string(m_stats.total_collected) + ";" +
            std::to_string(avg_carries) + ";";
+    m_stats.block_carries = 0;
     return true;
   }
   return false;

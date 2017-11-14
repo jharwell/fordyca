@@ -29,7 +29,7 @@
 #include <algorithm>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/diagnostics/cache_diagnostics.hpp"
+#include "fordyca/diagnostics/collectible_cache_diagnostics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
 
@@ -51,7 +51,7 @@ NS_START(fordyca, representation);
  * map).
  */
 class cache : public cell_entity,
-              public diagnostics::cache_diagnostics,
+              public diagnostics::collectible_cache_diagnostics,
               public rcppsw::patterns::visitor::visitable_any<cache> {
  public:
   cache(double dimension, argos::CVector2 center, std::list<block*> blocks);
