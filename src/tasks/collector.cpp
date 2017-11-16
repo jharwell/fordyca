@@ -35,8 +35,13 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double collector::calc_elapsed_time(double exec_time) const {
-  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - exec_time;
+double collector::calc_elapsed_time(double start_time) const {
+  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())->sensors()->tick() - start_time;
+} /* calc_elapsed_time() */
+
+double collector::calc_start_time(void) const {
+  return dynamic_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->sensors()->tick();
 } /* calc_elapsed_time() */
 
 /*******************************************************************************

@@ -88,6 +88,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   bool task_running(void) const override {
     return !(ST_FINISHED == current_state() || ST_START == current_state());
   }
+  void task_reset(void) override { init(); }
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;

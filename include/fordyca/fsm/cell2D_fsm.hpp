@@ -69,7 +69,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   void event_block_drop(void);
   void init(void) override;
 
-  uint block_count(void) const { return m_block_count; }
+  size_t block_count(void) const { return m_block_count; }
 
  private:
   struct block_data : public state_machine::event_data {
@@ -93,7 +93,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   return &kSTATE_MAP[index];
   }
 
-  uint m_block_count;
+  size_t m_block_count;
 };
 
 NS_END(fsm, forydca);

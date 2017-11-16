@@ -89,8 +89,13 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   representation::discrete_coord coord = m_cache->discrete_loc();
   ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
                                                     cell_op::y()),
-            "FATAL: Coordinates for cache/cell do not agree");
+            "FATAL: Coordinates for cache%d (%zu, %zu)/cell(%zu, %zu) do not agree",
+            cache_id, coord.first, coord.second, cell_op::y(), cell_op::y());
 
+  representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+  ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
+            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
+            m_cache->n_blocks(), cell.block_count());
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
    * underlying cell. If there are only 2 left, do the same thing but also
@@ -99,13 +104,14 @@ void cached_block_pickup::visit(representation::arena_map& map) {
    */
   if (m_cache->n_blocks() > 2) {
     m_cache->block_remove(m_block);
-    map.access(cell_op::x(), cell_op::y()).accept(*this);
-    ER_ASSERT(map.access(cell_op::x(), cell_op::y()).state_has_cache(),
-              "FATAL: cell with >= 2 blocks does not have cache");
+    cell.accept(*this);
+    ER_ASSERT(cell.state_has_cache(),
+              "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
+              cell_op::x(), cell_op::y());
   } else {
-    map.access(cell_op::x(), cell_op::y()).accept(*this);
-    ER_ASSERT(map.access(cell_op::x(), cell_op::y()).state_has_block(),
-              "FATAL: cell with 1 block has cache");
+    cell.accept(*this);
+    ER_ASSERT(cell.state_has_block(), "FATAL: cell@(%zu, %zu) with 1 block has cache",
+              cell_op::x(), cell_op::y());
 
     map.caches().erase(std::remove(map.caches().begin(),
                                    map.caches().end(), *m_cache));
@@ -114,18 +120,26 @@ void cached_block_pickup::visit(representation::arena_map& map) {
     map.static_cache_create();
   }
   m_block->accept(*this);
-  ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu)", m_robot_index,
-         m_block->id(), cache_id, cell_op::x(), cell_op::y());
+  ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
+         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y(),
+         m_cache->n_blocks());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
-  ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
+  /*
+   * Because map handling of cached block pickup happens first, m_cache in the
+   * main arena_map has already had its block count updated, so we can't refer
+   * to it here, and need to reference the one in the robot's occupany grid instead.
+   */
   int cache_id = m_cache->id();
-  representation::discrete_coord coord = m_cache->discrete_loc();
-  ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
-                                                    cell_op::y()),
-            "FATAL: Coordinates for cache/cell do not agree");
+  representation::perceived_cell2D& cell = map.access(cell_op::x(),
+                                                      cell_op::y());
+  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
 
+  /* -1 because it was already decremented by arena_map */
+  ER_ASSERT(m_cache->n_blocks() == cell.block_count() - 1,
+            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
+            m_cache->n_blocks(), cell.block_count() - 1);
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
    * underlying cell. If there are only 2 left, do the same thing but also
@@ -134,9 +148,9 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
    */
   if (m_cache->n_blocks() > 2) {
     m_cache->block_remove(m_block);
-    map.access(cell_op::x(), cell_op::y()).accept(*this);
+    cell.accept(*this);
   } else {
-    map.access(cell_op::x(), cell_op::y()).accept(*this);
+    cell.accept(*this);
     auto it = map.caches().begin();
     while (it != map.caches().end()) {
       if (it->first == m_cache) {
@@ -146,8 +160,9 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
       }
     } /* while() */
   }
-  ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu)",
-         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y());
+  ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
+         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y(),
+         m_cache->n_blocks());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {

@@ -40,6 +40,7 @@ NS_START(fordyca, events);
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<rcppsw::common::er_server>& server,
     representation::block* block, representation::cache* cache) :
+    cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
     er_client(server),
     m_block(block),
     m_cache(cache) {
@@ -56,7 +57,6 @@ void cache_block_drop::visit(representation::perceived_cell2D& cell) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::cell2D& cell) {
-  cell.entity(m_block);
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -65,13 +65,18 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(representation::arena_map&) {
+void cache_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
   int index = m_block->robot_index();
   m_block->accept(*this);
   m_cache->accept(*this);
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
   ER_NOM("arena_map: fb%d dropped block%d in cache%d (%zu blocks total)",
          index, m_block->id(), m_cache->id(), m_cache->n_blocks());
+} /* visit() */
+
+void cache_block_drop::visit(representation::perceived_arena_map& map) {
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {
@@ -85,6 +90,7 @@ void cache_block_drop::visit(representation::cache& cache) {
 
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
+  controller.map()->accept(*this);
   controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s dropped block%d in cache%d",

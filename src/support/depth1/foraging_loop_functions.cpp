@@ -76,8 +76,11 @@ bool foraging_loop_functions::handle_cached_block_pickup(
       events::cached_block_pickup pickup_op(rcppsw::common::g_server,
                                             &map()->caches()[cache],
                                             robot_id(robot));
-      controller.visitor::template visitable_any<T>::accept(pickup_op);
+      /*
+       * Map must be called before controller for proper cache block decrement!
+       */
       map()->accept(pickup_op);
+      controller.visitor::template visitable_any<T>::accept(pickup_op);
       return true;
     }
   }
@@ -100,8 +103,6 @@ bool foraging_loop_functions::handle_cache_block_drop(
                                        &map()->caches()[cache]);
 
     map()->accept(drop_op);
-
-    /* Actually drop the block */
     controller.visitor::template visitable_any<T>::accept(drop_op);
     return true;
     }
@@ -196,14 +197,6 @@ void foraging_loop_functions::pre_step_final(void) {
   depth0::foraging_loop_functions::pre_step_final();
   m_collector->csv_line_write(GetSpace().GetSimulationClock());
   m_collector->reset_on_timestep();
-
-  /*
-   * If the static cache has vanished because a robot took the 2nd to last
-   * block, re-create it.
-   */
-  if (!map()->caches().size()) {
-      map()->static_cache_create();
-  }
 } /* pre_step_final() */
 
 /*

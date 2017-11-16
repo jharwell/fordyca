@@ -41,6 +41,8 @@ void task_parser::parse(argos::TConfigurationNode& node) {
                           m_params->estimation_alpha);
   argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
   argos::GetNodeAttribute(task_node, "abort_offset", m_params->abort_offset);
+  argos::GetNodeAttribute(task_node, "proportionality_estimate",
+                          m_params->proportionality_estimate);
 } /* parse() */
 
 void task_parser::show(std::ostream& stream) {
@@ -48,6 +50,7 @@ void task_parser::show(std::ostream& stream) {
   stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
   stream << "reactivity=" << m_params->reactivity << std::endl;
   stream << "abort_offset=" << m_params->abort_offset << std::endl;
+  stream << "proportionality_estimate=" << m_params->proportionality_estimate << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

@@ -35,9 +35,14 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double generalist::calc_elapsed_time(double exec_time) const {
+double generalist::calc_elapsed_time(double start_time) const {
   return dynamic_cast<fsm::depth0::foraging_fsm*>(
-      polled_task::mechanism())->sensors()->tick() - exec_time;
+      polled_task::mechanism())->sensors()->tick() - start_time;
+} /* calc_elapsed_time() */
+
+double generalist::calc_start_time(void) const {
+  return dynamic_cast<fsm::depth0::foraging_fsm*>(
+      polled_task::mechanism())->sensors()->tick();
 } /* calc_elapsed_time() */
 
 /*******************************************************************************

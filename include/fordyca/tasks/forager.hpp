@@ -76,7 +76,8 @@ class forager : public task_allocation::polled_task, public foraging_task {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
 }
-  double calc_elapsed_time(double exec_time) const override;
+  double calc_elapsed_time(double start_time) const override;
+  double calc_start_time(void) const override;
 };
 
 NS_END(tasks, fordyca);
