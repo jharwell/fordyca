@@ -62,7 +62,6 @@ random_foraging_fsm::random_foraging_fsm(
   er_client::insmod("random_foraging_fsm",
          rcppsw::common::er_lvl::DIAG,
          rcppsw::common::er_lvl::NOM);
-  m_explore_fsm.change_parent(explore_for_block_fsm::ST_EXPLORE, &acquire_block);
 }
 
 /*******************************************************************************
@@ -93,13 +92,17 @@ HFSM_STATE_DEFINE(random_foraging_fsm, start, state_machine::event_data) {
 }
 HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data) {
   /*
-   * All signals propagated up from the explore FSM are ignored; we only care
-   * when the controller tells us we have actually picked up a block.
-  */
-  if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    ER_NOM("Block acquired");
-    internal_event(ST_TRANSPORT_TO_NEST);
+   * Wait in the finished state until the controller tells us we have dropped a
+   * block.
+   */
+  if (m_explore_fsm.task_finished()) {
+    if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+      m_explore_fsm.task_reset();
+      ER_NOM("Block acquired");
+      internal_event(ST_TRANSPORT_TO_NEST);
+    }
   }
+
   m_explore_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
 }
@@ -108,7 +111,7 @@ HFSM_STATE_DEFINE(random_foraging_fsm, acquire_block, state_machine::event_data)
  * Base Diagnostics
  ******************************************************************************/
 bool random_foraging_fsm::is_exploring_for_block(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running();
+  return current_state() == ST_ACQUIRE_BLOCK;
 } /* is_exploring_for_block() */
 
 bool random_foraging_fsm::is_avoiding_collision(void) const {
