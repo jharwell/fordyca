@@ -8,6 +8,7 @@ ExternalProject_Add(project_rcppsw
   SOURCE_DIR "$ENV{rcppsw}"
   BINARY_DIR "$ENV{rcppsw}/build"
   STEP_TARGETS build
+  INSTALL_COMMAND true
 )
 
 ExternalProject_Get_Property(project_rcppsw binary_dir)
@@ -20,6 +21,7 @@ ExternalProject_Add(project_rcsw
   SOURCE_DIR "$ENV{rcsw}"
   BINARY_DIR "$ENV{rcsw}/build"
   STEP_TARGETS build
+  INSTALL_COMMAND true
 )
 
 ExternalProject_Get_Property(project_rcsw binary_dir)
