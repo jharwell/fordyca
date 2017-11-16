@@ -66,14 +66,7 @@ class cache_found : public perceived_cell_op,
    */
   void visit(fsm::cell2D_fsm& fsm) override;
 
-  /**
-   * @brief Drop a carried block in the nest, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because dropping of blocks
-   * needs to be done in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
-  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(controller::depth1::foraging_controller&) override {}
   void visit(controller::depth0::foraging_controller&) override {}
 
   /**

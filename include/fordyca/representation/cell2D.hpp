@@ -76,6 +76,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
    */
   void reset(void) { m_fsm.init(); }
 
+  size_t block_count(void) const { return m_fsm.block_count(); }
+
   /**
    * @brief Set the entity associated with this cell.
    */

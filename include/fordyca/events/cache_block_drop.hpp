@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/common/er_client.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,14 +35,13 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class cell2D;
-class perceived_cell2D;
+class perceived_arena_map;
 class cache;
 class block;
 class arena_map;
 };
 
-namespace fsm { class cell2D_fsm; namespace depth1 { class block_to_cache_fsm; }}
+namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
 namespace controller { namespace depth1 { class foraging_controller; }}
 namespace tasks { class forager; }
 
@@ -50,14 +50,12 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cache_block_drop : public visitor::visitor,
+class cache_block_drop : public cell_op,
                          public rcppsw::common::er_client,
                          public visitor::visit_set<controller::depth1::foraging_controller,
                                                    fsm::depth1::block_to_cache_fsm,
                                                    tasks::forager,
-                                                   representation::cell2D,
-                                                   fsm::cell2D_fsm,
-                                                   representation::perceived_cell2D,
+                                                   representation::perceived_arena_map,
                                                    representation::block,
                                                    representation::cache,
                                                    representation::arena_map> {
@@ -89,6 +87,7 @@ class cache_block_drop : public visitor::visitor,
    * @param map The map to update (there is only ever one...)
    */
   void visit(representation::arena_map& map) override;
+  void visit(representation::perceived_arena_map& map) override;
 
   void visit(representation::block& block) override;
   void visit(representation::cache& cache) override;
