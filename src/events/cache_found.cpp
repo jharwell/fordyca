@@ -39,7 +39,7 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::common::er_server>& serve
     er_client(server),
     m_cache(cache) {
   er_client::insmod("cache_found",
-                    rcppsw::common::er_lvl::DIAG,
+                    rcppsw::common::er_lvl::VER,
                     rcppsw::common::er_lvl::NOM);
 }
 
@@ -58,19 +58,9 @@ void cache_found::visit(representation::cell2D& cell) {
 } /* visit() */
 
 void cache_found::visit(fsm::cell2D_fsm& fsm) {
-  if (fsm.state_has_cache()) {
-    return;
-  }
-  fsm.event_block_drop();
-  if (!fsm.state_has_cache()) {
+  for (size_t i = fsm.block_count(); i < m_cache->n_blocks(); ++i) {
     fsm.event_block_drop();
-  }
-} /* visit() */
-
-void cache_found::visit(controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
-  ER_NOM("depth1_foraging_controller: %s found cache%d",
-         controller.GetId().c_str(), m_cache->id());
+  } /* for(i..) */
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {

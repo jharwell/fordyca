@@ -75,6 +75,8 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
   bool state_has_cache(void) const { return decorator::decoratee().state_has_cache(); }
   bool state_is_empty(void) const { return decorator::decoratee().state_is_empty(); }
 
+  size_t block_count(void) const { return decorator::decoratee().block_count(); }
+
   /**
    * @brief Get the block current associated with this cell. NULL if no block
    * currently associated.
