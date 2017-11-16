@@ -14,16 +14,15 @@
   <framework>
     <system threads="0" />
     <experiment length="0"
-                ticks_per_second="10"
+                ticks_per_second="5"
                 random_seed="123" />
   </framework>
-
   <!-- *************** -->
   <!-- * Controllers * -->
   <!-- *************** -->
   <controllers>
 
-    <depth0_foraging_controller id="ffc"
+    <random_foraging_controller id="ffc"
                          library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -59,7 +58,7 @@
              nest="5, 2.5"
              />
       </params>
-    </depth0_foraging_controller>
+    </random_foraging_controller>
 
   </controllers>
 
@@ -67,7 +66,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="depth0_foraging_loop_functions">
+                  label="random_foraging_loop_functions">
     <metrics random_fname="random-stats.csv"
                  depth0_fname="depth0-stats.csv"
                  depth1_fname="depth1-stats.csv"
@@ -82,7 +81,7 @@
             dist_model="single_source"
             respawn="true"
             />
-    <caches create_static_cache="true"
+    <caches create_static_cache="false"
             create_dynamic_caches="false"
             static_cache_size="5"
             dimension="0.8"
@@ -127,7 +126,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="20" max_trials="100">
+      <entity quantity="5" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -158,13 +157,13 @@
     <qt-opengl>
       <camera>
         <placement idx="0"
-                   position="5,2.5,4"
+                   position="5,2.5,6"
                    look_at="5,2.5,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth0_foraging_qt_user_functions" />
+      <user_functions label="random_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
