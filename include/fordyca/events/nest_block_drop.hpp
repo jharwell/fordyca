@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +63,7 @@ NS_START(events);
  * ways.
  */
 class nest_block_drop : public visitor::visitor,
-                        public rcppsw::common::er_client,
+                        public rcppsw::er::client,
                         public visitor::visit_set<controller::depth0::foraging_controller,
                                                   controller::random_foraging_controller,
                                                   controller::depth1::foraging_controller,
@@ -76,9 +76,9 @@ class nest_block_drop : public visitor::visitor,
                                                   tasks::collector,
                                                   metrics::collectors::block_metrics_collector> {
  public:
-  nest_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
+  nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
              representation::block* block);
-  ~nest_block_drop(void) { er_client::rmmod(); }
+  ~nest_block_drop(void) { client::rmmod(); }
 
   /* foraging support */
   /**

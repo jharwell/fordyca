@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
@@ -51,7 +51,7 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cache_block_drop : public cell_op,
-                         public rcppsw::common::er_client,
+                         public rcppsw::er::client,
                          public visitor::visit_set<controller::depth1::foraging_controller,
                                                    fsm::depth1::block_to_cache_fsm,
                                                    tasks::forager,
@@ -60,9 +60,9 @@ class cache_block_drop : public cell_op,
                                                    representation::cache,
                                                    representation::arena_map> {
  public:
-  cache_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
+  cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                    representation::block* block, representation::cache* cache);
-  ~cache_block_drop(void) { er_client::rmmod(); }
+  ~cache_block_drop(void) { client::rmmod(); }
 
   /* depth1 foraging */
   /**

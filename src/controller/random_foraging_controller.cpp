@@ -27,7 +27,7 @@
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/base_foraging_sensors.hpp"
 
 /*******************************************************************************
@@ -51,7 +51,7 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   params::random_foraging_repository param_repo;
   param_repo.parse_all(node);
-  param_repo.show_all(er_client::server_handle()->log_stream());
+  param_repo.show_all(client::server_handle()->log_stream());
 
   m_fsm.reset(
       new fsm::random_foraging_fsm(static_cast<const struct params::fsm_params*>(

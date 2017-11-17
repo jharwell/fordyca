@@ -31,7 +31,7 @@ NS_START(fordyca, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 cell2D_fsm::cell2D_fsm(
-    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    const std::shared_ptr<rcppsw::er::server>& server) :
     state_machine::simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
     state_unknown(),
     state_empty(),
@@ -39,9 +39,9 @@ cell2D_fsm::cell2D_fsm(
     state_cache(),
     m_block_count(0) {
   /* if (ERROR == attmod("cell2D_fsm")) { */
-  /*   er_client::insmod("cell2D_fsm", */
-  /*                     rcppsw::common::er_lvl::NOM, */
-  /*                     rcppsw::common::er_lvl::NOM); */
+  /*   client::insmod("cell2D_fsm", */
+  /*                     rcppsw::er::er_lvl::NOM, */
+  /*                     rcppsw::er::er_lvl::NOM); */
   /* } */
 }
 

@@ -73,7 +73,7 @@ bool foraging_loop_functions::handle_cached_block_pickup(
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
-      events::cached_block_pickup pickup_op(rcppsw::common::g_server,
+      events::cached_block_pickup pickup_op(rcppsw::er::g_server,
                                             &map()->caches()[cache],
                                             robot_id(robot));
       /*
@@ -98,7 +98,7 @@ bool foraging_loop_functions::handle_cache_block_drop(
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
       /* Update arena map state due to a block nest drop */
-      events::cache_block_drop drop_op(rcppsw::common::g_server,
+      events::cache_block_drop drop_op(rcppsw::er::g_server,
                                        controller.block(),
                                        &map()->caches()[cache]);
 

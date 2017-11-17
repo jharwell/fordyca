@@ -27,7 +27,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include "fordyca/params/actuator_params.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,7 @@ actuator_manager::actuator_manager(
     argos::CCI_DifferentialSteeringActuator* const wheels,
     argos::CCI_LEDsActuator* const leds,
     argos::CCI_RangeAndBearingActuator* const raba) :
-    state_machine::simple_fsm(rcppsw::common::g_server, ST_MAX_STATES),
+    state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
     no_turn(),
     soft_turn(),
     hard_turn(),

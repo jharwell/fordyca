@@ -34,7 +34,7 @@ NS_START(fordyca, support, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(
-    std::shared_ptr<rcppsw::common::er_server> server,
+    std::shared_ptr<rcppsw::er::server> server,
     representation::occupancy_grid& grid,
     double cache_size,
     double resolution,

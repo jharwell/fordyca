@@ -61,7 +61,7 @@ class random_foraging_fsm : public base_foraging_fsm,
                             public visitor::visitable_any<random_foraging_fsm> {
  public:
   random_foraging_fsm(const struct params::fsm_params* params,
-                      std::shared_ptr<rcppsw::common::er_server> server,
+                      std::shared_ptr<rcppsw::er::server> server,
                       std::shared_ptr<controller::base_foraging_sensors> sensors,
                       std::shared_ptr<controller::actuator_manager> actuators);
 

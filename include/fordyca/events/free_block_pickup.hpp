@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,7 +68,7 @@ NS_START(events);
  * to it in different ways.
  */
 class free_block_pickup : public cell_op,
-                          public rcppsw::common::er_client,
+                          public rcppsw::er::client,
                           public visitor::visit_set<controller::random_foraging_controller,
                                                     controller::depth0::foraging_controller,
                                                     controller::depth1::foraging_controller,
@@ -82,9 +82,9 @@ class free_block_pickup : public cell_op,
                                                     tasks::generalist,
                                                     tasks::forager> {
  public:
-  free_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
+  free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                     representation::block* block, size_t robot_index);
-  ~free_block_pickup(void) { er_client::rmmod(); }
+  ~free_block_pickup(void) { client::rmmod(); }
 
   /* foraging support */
   /**
@@ -130,7 +130,7 @@ class free_block_pickup : public cell_op,
 
   size_t m_robot_index;
   representation::block* m_block;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<rcppsw::er::server> m_server;
 };
 
 NS_END(events, fordyca);

@@ -140,11 +140,11 @@ CATCH_TEST_CASE("block-move-test", "[arena_map]") {
     cell2D& old_cell = map.access(map.blocks()[i].discrete_loc().first,
                               map.blocks()[i].discrete_loc().second);
 
-    events::block_pickup op1(rcppsw::common::g_server, &map.blocks()[i], 0);
+    events::block_pickup op1(rcppsw::er::g_server, &map.blocks()[i], 0);
     map.accept(op1);
     CATCH_REQUIRE(old_cell.state_is_empty());
     CATCH_REQUIRE(map.blocks()[i].robot_index() != -1);
-    events::block_drop op2(rcppsw::common::g_server, &map.blocks()[i]);
+    events::block_drop op2(rcppsw::er::g_server, &map.blocks()[i]);
     map.accept(op2);
     cell2D& new_cell = map.access(map.blocks()[i].discrete_loc().first,
                                   map.blocks()[i].discrete_loc().second);

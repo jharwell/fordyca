@@ -40,13 +40,13 @@ using namespace fordyca;
  * Test Cases
  ******************************************************************************/
 CATCH_TEST_CASE("init-test", "[perceived_cell2D]") {
-  perceived_cell2D cell(rcppsw::common::g_server);
+  perceived_cell2D cell(rcppsw::er::g_server);
   CATCH_REQUIRE(!cell.state_is_known());
   CATCH_REQUIRE(cell.density() == 0.0);
 }
 
 CATCH_TEST_CASE("transition-test", "[perceived_cell2D]") {
-  perceived_cell2D cell(rcppsw::common::g_server);
+  perceived_cell2D cell(rcppsw::er::g_server);
   cell.rho(0.1);
   events::cell_empty op;
   cell.accept(op);
@@ -70,7 +70,7 @@ CATCH_TEST_CASE("transition-test", "[perceived_cell2D]") {
    * Verify that the same thing happens when a block is discovered.
    */
   block* b = new block(0.2);
-  events::block_found op2(rcppsw::common::g_server, b);
+  events::block_found op2(rcppsw::er::g_server, b);
   cell.accept(op2);
   CATCH_REQUIRE(cell.state_is_known());
   CATCH_REQUIRE(cell.state_has_block());
@@ -87,7 +87,7 @@ CATCH_TEST_CASE("transition-test", "[perceived_cell2D]") {
   list.push_back(b);
   list.push_back(b);
   cache* c = new cache(0.2, argos::CVector2(0.0, 0.0), list);
-  events::cache_found op3(rcppsw::common::g_server, c);
+  events::cache_found op3(rcppsw::er::g_server, c);
   cell.accept(op2);
   cell.accept(op3);
   CATCH_REQUIRE(cell.state_is_known());

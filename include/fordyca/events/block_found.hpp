@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/perceived_cell_op.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,11 +47,11 @@ NS_START(events);
  * processed by the \ref arena_map, and exist only in a robot's perception.
  */
 class block_found : public perceived_cell_op,
-                    public rcppsw::common::er_client {
+                    public rcppsw::er::client {
  public:
-  block_found(const std::shared_ptr<rcppsw::common::er_server>& server,
+  block_found(const std::shared_ptr<rcppsw::er::server>& server,
               const representation::block* block, size_t x, size_t y);
-  ~block_found(void) { er_client::rmmod(); }
+  ~block_found(void) { client::rmmod(); }
 
   /* depth0 foraging */
   void visit(representation::cell2D& cell) override;

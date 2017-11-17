@@ -31,7 +31,7 @@
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/common/base_params.hpp"
 #include "fordyca/params/base_parser.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/factory/sharing_factory.hpp"
 
 /*******************************************************************************

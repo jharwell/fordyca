@@ -40,7 +40,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(
     double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::base_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators,
                                    uint8_t max_states) :
@@ -53,8 +53,8 @@ base_explore_fsm::base_explore_fsm(
     m_state(),
     m_new_dir() {
   insmod("base_explore_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 HFSM_STATE_DEFINE(base_explore_fsm, new_direction, state_machine::event_data) {

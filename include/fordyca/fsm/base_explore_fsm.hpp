@@ -59,7 +59,7 @@ class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
   base_explore_fsm(double unsuccessful_dir_change_thresh,
-                   const std::shared_ptr<rcppsw::common::er_server>& server,
+                   const std::shared_ptr<rcppsw::er::server>& server,
                    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
                    const std::shared_ptr<controller::actuator_manager>& actuators,
                    uint8_t max_states);

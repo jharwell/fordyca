@@ -74,7 +74,7 @@ class acquire_block_fsm : public base_foraging_fsm,
  public:
   acquire_block_fsm(
       const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::common::er_server>& server,
+      const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
@@ -146,7 +146,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   const argos::CVector2 mc_nest_center;
   argos::CRandom::CRNG* m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<rcppsw::er::server> m_server;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
   depth0::vector_fsm m_vector_fsm;
   explore_for_block_fsm m_explore_fsm;

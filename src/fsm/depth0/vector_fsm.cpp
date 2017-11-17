@@ -44,7 +44,7 @@ double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(uint frequent_collision_thresh,
-                       std::shared_ptr<rcppsw::common::er_server> server,
+                       std::shared_ptr<rcppsw::er::server> server,
                        std::shared_ptr<controller::depth0::foraging_sensors> sensors,
                        std::shared_ptr<controller::actuator_manager> actuators) :
     polled_simple_fsm(server, ST_MAX_STATES),
@@ -72,8 +72,8 @@ vector_fsm::vector_fsm(uint frequent_collision_thresh,
               m_actuators->max_wheel_speed() * 0.1,
               m_actuators->max_wheel_speed() * 0.7) {
   insmod("vector_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

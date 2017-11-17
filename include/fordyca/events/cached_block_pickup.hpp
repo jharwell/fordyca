@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
@@ -49,7 +49,7 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cached_block_pickup : public cell_op,
-                            public rcppsw::common::er_client,
+                            public rcppsw::er::client,
                             public visitor::visit_set<controller::depth1::foraging_controller,
                                                       fsm::block_to_nest_fsm,
                                                       tasks::collector,
@@ -58,9 +58,9 @@ class cached_block_pickup : public cell_op,
                                                       representation::arena_map,
                                                       representation::perceived_arena_map> {
  public:
-  cached_block_pickup(const std::shared_ptr<rcppsw::common::er_server>& server,
+  cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                       representation::cache* cache, size_t robot_index);
-  ~cached_block_pickup(void) { er_client::rmmod(); }
+  ~cached_block_pickup(void) { client::rmmod(); }
 
   /* depth1 foraging */
   /**
@@ -101,7 +101,7 @@ class cached_block_pickup : public cell_op,
   size_t m_robot_index;
   representation::cache* m_cache;
   representation::block* m_block;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<rcppsw::er::server> m_server;
 };
 
 NS_END(events, fordyca);

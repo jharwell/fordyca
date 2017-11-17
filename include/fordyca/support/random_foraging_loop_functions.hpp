@@ -44,7 +44,7 @@ NS_START(fordyca, support);
  * Classes
  ******************************************************************************/
 class random_foraging_loop_functions : public argos::CLoopFunctions,
-                                       public rcppsw::common::er_client {
+                                       public rcppsw::er::client {
  public:
   random_foraging_loop_functions(void);
   virtual ~random_foraging_loop_functions(void) {}

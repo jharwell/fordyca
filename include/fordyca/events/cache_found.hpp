@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/perceived_cell_op.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,11 +40,11 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class cache_found : public perceived_cell_op,
-                    public rcppsw::common::er_client {
+                    public rcppsw::er::client {
  public:
-  cache_found(const std::shared_ptr<rcppsw::common::er_server>& server,
+  cache_found(const std::shared_ptr<rcppsw::er::server>& server,
               const representation::cache* cache, size_t x, size_t y);
-  ~cache_found(void) { er_client::rmmod(); }
+  ~cache_found(void) { client::rmmod(); }
 
   void visit(representation::cell2D& cell) override;
   void visit(representation::perceived_cell2D& cell) override;

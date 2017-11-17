@@ -40,18 +40,18 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     representation::cache* cache, size_t robot_index) :
     cell_op(cache->discrete_loc().first,
             cache->discrete_loc().second),
-    er_client(server),
+    client(server),
     m_robot_index(robot_index),
     m_cache(cache),
     m_block(nullptr),
     m_server(server) {
-  er_client::insmod("cached_block_pickup",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  client::insmod("cached_block_pickup",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
   ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
   m_block = m_cache->block_get();
   ER_ASSERT(m_block, "FATAL: No block in non-empty cache");

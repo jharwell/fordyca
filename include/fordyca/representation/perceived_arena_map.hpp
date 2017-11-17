@@ -27,7 +27,7 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 #include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
 
@@ -48,10 +48,10 @@ class line_of_sight;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class perceived_arena_map: public rcppsw::common::er_client,
+class perceived_arena_map: public rcppsw::er::client,
                            public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
-  perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
+  perceived_arena_map(const std::shared_ptr<rcppsw::er::server>& server,
                       const struct params::perceived_grid_params* params,
                       const std::string& robot_id);
 
@@ -92,8 +92,8 @@ class perceived_arena_map: public rcppsw::common::er_client,
   void update_density(void);
 
  private:
-  std::shared_ptr<rcppsw::common::er_server> m_server;
-  rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::common::er_server>&> m_grid;
+  std::shared_ptr<rcppsw::er::server> m_server;
+  rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;
 };
 
 NS_END(representation, fordyca);

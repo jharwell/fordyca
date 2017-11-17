@@ -27,7 +27,7 @@
 #include <vector>
 #include <utility>
 
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
@@ -41,12 +41,12 @@ namespace visitor = rcppsw::patterns::visitor;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cache_update_handler : public rcppsw::common::er_client,
+class cache_update_handler : public rcppsw::er::client,
                              public visitor::visitable_any<cache_update_handler> {
  public:
-  cache_update_handler(std::shared_ptr<rcppsw::common::er_server> server,
+  cache_update_handler(std::shared_ptr<rcppsw::er::server> server,
                        std::vector<representation::cache>& caches);
-  ~cache_update_handler(void) { er_client::rmmod(); }
+  ~cache_update_handler(void) { client::rmmod(); }
 
   representation::cache* map_to_cache(const representation::block* const block);
   void block_add(representation::cache* cache,

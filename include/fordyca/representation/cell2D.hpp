@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
@@ -47,7 +47,7 @@ namespace visitor = rcppsw::patterns::visitor;
  */
 class cell2D : public visitor::visitable_any<cell2D> {
  public:
-  explicit cell2D(const std::shared_ptr<rcppsw::common::er_server>& server);
+  explicit cell2D(const std::shared_ptr<rcppsw::er::server>& server);
 
   /* state inquiry */
 

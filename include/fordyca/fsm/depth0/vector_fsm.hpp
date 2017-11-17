@@ -49,7 +49,7 @@ NS_START(fsm, depth0);
 class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
   vector_fsm(uint frequent_collision_thresh,
-             std::shared_ptr<rcppsw::common::er_server> server,
+             std::shared_ptr<rcppsw::er::server> server,
              std::shared_ptr<controller::depth0::foraging_sensors> sensors,
              std::shared_ptr<controller::actuator_manager> actuators);
 
