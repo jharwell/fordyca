@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/ds/grid2D_ptr.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ class cell2D;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::common::er_server>&> occupancy_grid;
+typedef rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> occupancy_grid;
 
 NS_END(representation, fordyca);
 

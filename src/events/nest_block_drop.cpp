@@ -38,12 +38,12 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
+nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                                  representation::block* block) :
-    er_client(server), m_block(block) {
-  er_client::insmod("nest_block_drop",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+    client(server), m_block(block) {
+  client::insmod("nest_block_drop",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

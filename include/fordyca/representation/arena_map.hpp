@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <vector>
 
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
@@ -53,7 +53,7 @@ class cell2D;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map: public rcppsw::common::er_client,
+class arena_map: public rcppsw::er::client,
                  public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   arena_map(const struct params::arena_map_params* params);
@@ -154,7 +154,7 @@ class arena_map: public rcppsw::common::er_client,
   std::vector<block> m_blocks;
   std::vector<cache> m_caches;
   support::block_distributor m_block_distributor;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<rcppsw::er::server> m_server;
   occupancy_grid m_grid;
 };
 

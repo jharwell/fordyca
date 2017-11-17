@@ -48,10 +48,10 @@ namespace decorator = rcppsw::patterns::decorator;
  */
 class perceived_cell2D : public decorator::decorator<cell2D>,
                          public visitor::visitable_any<perceived_cell2D>,
-                         public rcppsw::common::er_client {
+                         public rcppsw::er::client {
  public:
   explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server);
+      const std::shared_ptr<rcppsw::er::server>& server);
 
   /**
    * @brief Set the relevance decay parameter for the cell.

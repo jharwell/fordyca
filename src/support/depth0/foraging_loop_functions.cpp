@@ -110,7 +110,7 @@ bool foraging_loop_functions::handle_free_block_pickup(argos::CFootBotEntity& ro
     /* Check whether the foot-bot is actually on a block */
     int block = robot_on_block(robot);
     if (-1 != block) {
-      events::free_block_pickup pickup_op(rcppsw::common::g_server,
+      events::free_block_pickup pickup_op(rcppsw::er::g_server,
                                           &map()->blocks()[block],
                                           robot_id(robot));
       controller.visitor::template visitable_any<T>::accept(pickup_op);
@@ -130,7 +130,7 @@ bool foraging_loop_functions::handle_nest_block_drop(argos::CFootBotEntity& robo
   if (controller.in_nest() && controller.is_transporting_to_nest()) {
 
     /* Update arena map state due to a block nest drop */
-    events::nest_block_drop drop_op(rcppsw::common::g_server,
+    events::nest_block_drop drop_op(rcppsw::er::g_server,
                                     controller.block());
 
     /* Get stats from carried block before it's dropped */

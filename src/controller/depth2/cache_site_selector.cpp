@@ -32,13 +32,13 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     argos::CVector2 nest_loc) :
-    er_client(server),
+    client(server),
     m_nest_loc(nest_loc) {
-  er_client::insmod("cache_site_selector",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  client::insmod("cache_site_selector",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

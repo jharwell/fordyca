@@ -27,7 +27,7 @@
 #include <list>
 #include <utility>
 
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -38,10 +38,10 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_selector: public rcppsw::common::er_client {
+class block_selector: public rcppsw::er::client {
  public:
   block_selector(
-      const std::shared_ptr<rcppsw::common::er_server>& server,
+      const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
   ~block_selector(void) { rmmod(); }

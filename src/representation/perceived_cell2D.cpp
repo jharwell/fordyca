@@ -38,15 +38,15 @@ const double perceived_cell2D::kEpsilon = 0.0001;
  * Constructors/Destructor
  ******************************************************************************/
 perceived_cell2D::perceived_cell2D(
-    const std::shared_ptr<rcppsw::common::er_server>& server) :
+    const std::shared_ptr<rcppsw::er::server>& server) :
     decorator(server),
-    er_client(server),
+    client(server),
     m_robot_id(),
     m_density() {
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
-           rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::VER);
+           rcppsw::er::er_lvl::DIAG,
+           rcppsw::er::er_lvl::VER);
   }
     }
 

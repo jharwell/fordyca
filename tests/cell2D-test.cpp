@@ -45,7 +45,7 @@ CATCH_TEST_CASE("init-test", "[cell2D]") {
 CATCH_TEST_CASE("transition-test", "[cell2D]") {
   cell2D cell;
   block b(0.2);
-  block_drop(rcppsw::common::g_server, &b);
+  block_drop(rcppsw::er::g_server, &b);
   cell.fsm().event_unknown();
   CATCH_REQUIRE(!cell.state_is_known());
   cell.fsm().event_empty();
@@ -61,7 +61,7 @@ CATCH_TEST_CASE("transition-test", "[cell2D]") {
 CATCH_TEST_CASE("cache-test", "[cell2D]") {
   cell2D cell;
   block b(0.2);
-  block_drop(rcppsw::common::g_server, &b);
+  block_drop(rcppsw::er::g_server, &b);
 
   cell.fsm().event_block_drop();
   cell.fsm().event_block_drop();

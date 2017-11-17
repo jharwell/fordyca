@@ -27,7 +27,7 @@
 #include <list>
 #include <utility>
 
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
@@ -43,10 +43,10 @@ NS_START(fordyca, controller, depth1);
  * @brief Selects from among existing caches for the best one to go get a block
  * from.
  */
-class existing_cache_selector: public rcppsw::common::er_client {
+class existing_cache_selector: public rcppsw::er::client {
  public:
   existing_cache_selector(
-      const std::shared_ptr<rcppsw::common::er_server>& server,
+      const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
   ~existing_cache_selector(void) { rmmod(); }

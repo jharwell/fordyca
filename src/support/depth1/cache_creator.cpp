@@ -34,17 +34,17 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_creator::cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
+cache_creator::cache_creator(std::shared_ptr<rcppsw::er::server> server,
                              representation::occupancy_grid& grid,
                              double cache_size, double resolution) :
-    er_client(server),
+    client(server),
     m_cache_size(cache_size),
     m_resolution(resolution),
     m_grid(grid),
     m_server(server) {
-  er_client::insmod("cache_creator",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  client::insmod("cache_creator",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
     }
 
 /*******************************************************************************

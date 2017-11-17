@@ -38,15 +38,15 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     representation::block* block, representation::cache* cache) :
     cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
-    er_client(server),
+    client(server),
     m_block(block),
     m_cache(cache) {
-  er_client::insmod("cache_block_drop",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  client::insmod("cache_block_drop",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

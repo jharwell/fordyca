@@ -33,12 +33,12 @@ NS_START(fordyca, support, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 cache_update_handler::cache_update_handler(
-    std::shared_ptr<rcppsw::common::er_server> server,
+    std::shared_ptr<rcppsw::er::server> server,
     std::vector<representation::cache>& caches) :
-    er_client(server), m_caches(caches) {
+    client(server), m_caches(caches) {
   insmod("cache_update_handler",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

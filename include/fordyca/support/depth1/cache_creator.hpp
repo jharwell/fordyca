@@ -31,7 +31,7 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/occupancy_grid.hpp"
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,9 +41,9 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cache_creator : public rcppsw::common::er_client {
+class cache_creator : public rcppsw::er::client {
  public:
-  cache_creator(std::shared_ptr<rcppsw::common::er_server> server,
+  cache_creator(std::shared_ptr<rcppsw::er::server> server,
                 representation::occupancy_grid& grid,
                 double cache_size, double resolution);
 
@@ -58,7 +58,7 @@ class cache_creator : public rcppsw::common::er_client {
 
  protected:
   representation::occupancy_grid& grid(void) const { return m_grid; }
-  rcppsw::common::er_server* server(void) const { return m_server.get(); }
+  rcppsw::er::server* server(void) const { return m_server.get(); }
   representation::cache create_single(std::list<representation::block*> blocks,
                                       const argos::CVector2& center);
 
@@ -66,7 +66,7 @@ class cache_creator : public rcppsw::common::er_client {
   double m_cache_size;
   double m_resolution;
   representation::occupancy_grid& m_grid;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
+  std::shared_ptr<rcppsw::er::server> m_server;
 };
 NS_END(support, fordyca, depth1);
 

@@ -36,7 +36,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 random_foraging_fsm::random_foraging_fsm(
     const struct params::fsm_params* params,
-    std::shared_ptr<rcppsw::common::er_server> server,
+    std::shared_ptr<rcppsw::er::server> server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
@@ -59,9 +59,9 @@ random_foraging_fsm::random_foraging_fsm(
                                   &entry_leaving_nest, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                   &entry_collision_avoidance, NULL)} {
-  er_client::insmod("random_foraging_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+  client::insmod("random_foraging_fsm",
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

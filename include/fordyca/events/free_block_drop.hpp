@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
@@ -42,13 +42,13 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 class free_block_drop : public cell_op,
-                        public rcppsw::common::er_client,
+                        public rcppsw::er::client,
                         public visitor::visit_set<representation::block> {
  public:
-  free_block_drop(const std::shared_ptr<rcppsw::common::er_server>& server,
+  free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   representation::block* block, size_t x, size_t y,
                   double resolution);
-  ~free_block_drop(void) { er_client::rmmod(); }
+  ~free_block_drop(void) { client::rmmod(); }
 
   /* foraging support */
   /**

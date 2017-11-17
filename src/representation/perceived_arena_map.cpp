@@ -33,7 +33,7 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     const struct params::perceived_grid_params* params,
     const std::string& robot_id) :
     m_server(server),
@@ -41,9 +41,9 @@ perceived_arena_map::perceived_arena_map(
            params->grid.upper.GetY(), m_server) {
   deferred_init(m_server);
   insmod("perceived_arena_map",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
-  server_handle()->dbglvl(rcppsw::common::er_lvl::NOM);
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
+  server_handle()->dbglvl(rcppsw::er::er_lvl::NOM);
   ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
          m_grid.resolution());
 

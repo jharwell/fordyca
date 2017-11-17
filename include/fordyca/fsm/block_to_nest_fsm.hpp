@@ -71,7 +71,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
  public:
   block_to_nest_fsm(
       const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::common::er_server>& server,
+      const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);

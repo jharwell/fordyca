@@ -27,7 +27,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
 #include "fordyca/params/sensor_params.hpp"

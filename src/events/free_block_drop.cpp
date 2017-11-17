@@ -36,15 +36,15 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 free_block_drop::free_block_drop(
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     representation::block* block, size_t x, size_t y, double resolution) :
     cell_op(x, y),
-    er_client(server),
+    client(server),
     m_resolution(resolution),
     m_block(block) {
-  er_client::insmod("free_block_drop",
-                    rcppsw::common::er_lvl::DIAG,
-                    rcppsw::common::er_lvl::NOM);
+  client::insmod("free_block_drop",
+                    rcppsw::er::er_lvl::DIAG,
+                    rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************

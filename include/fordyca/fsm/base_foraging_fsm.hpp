@@ -54,7 +54,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
-  base_foraging_fsm(std::shared_ptr<rcppsw::common::er_server> server,
+  base_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
                     std::shared_ptr<controller::base_foraging_sensors> sensors,
                     std::shared_ptr<controller::actuator_manager> actuators,
                     uint8_t max_states);

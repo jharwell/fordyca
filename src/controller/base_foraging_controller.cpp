@@ -32,7 +32,7 @@
 #include "fordyca/params/base_foraging_repository.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
-#include "rcppsw/common/er_server.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,22 +43,22 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void) :
-    er_client(),
+    client(),
     m_display_los(false),
     m_display_id(false),
     m_block(nullptr),
     m_actuators(),
     m_sensors(),
-    m_server(std::make_shared<rcppsw::common::er_server>()) {
+    m_server(std::make_shared<rcppsw::er::server>()) {
   /*
    * Initially, all robots use the RCPPSW er_server to log parameters.
    */
-  er_client::deferred_init(m_server);
+  client::deferred_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
-  er_client::insmod("controller",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+  client::insmod("controller",
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -73,13 +73,13 @@ bool base_foraging_controller::block_detected(void) const {
 } /* block_detected() */
 
 void base_foraging_controller::Init(argos::TConfigurationNode& node) {
-  er_client::server_handle()->change_logfile(std::string(std::string("controller-") +
+  client::server_handle()->change_logfile(std::string(std::string("controller-") +
                                                          GetId() +
                                               std::string(".txt")));
   ER_NOM("Initializing base foraging controller");
   params::base_foraging_repository param_repo;
   param_repo.parse_all(node);
-  param_repo.show_all(er_client::server_handle()->log_stream());
+  param_repo.show_all(client::server_handle()->log_stream());
 
 
   m_actuators.reset(new actuator_manager(

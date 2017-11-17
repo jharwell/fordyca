@@ -40,7 +40,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    std::shared_ptr<rcppsw::common::er_server> server,
+    std::shared_ptr<rcppsw::er::server> server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators,
     uint8_t max_states) :
@@ -54,9 +54,9 @@ base_foraging_fsm::base_foraging_fsm(
     m_rng(argos::CRandom::CreateRNG("argos")),
     m_sensors(sensors),
     m_actuators(actuators) {
-  /* er_client::insmod("base_foraging_fsm", */
-  /*                   rcppsw::common::er_lvl::DIAG, */
-  /*                   rcppsw::common::er_lvl::NOM); */
+  /* client::insmod("base_foraging_fsm", */
+  /*                   rcppsw::er::er_lvl::DIAG, */
+  /*                   rcppsw::er::er_lvl::NOM); */
 }
 
 /*******************************************************************************

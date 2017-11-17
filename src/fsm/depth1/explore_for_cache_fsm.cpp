@@ -40,7 +40,7 @@ NS_START(fordyca, fsm, depth1);
  ******************************************************************************/
 explore_for_cache_fsm::explore_for_cache_fsm(
     double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::common::er_server>& server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators) :
     base_explore_fsm(unsuccessful_dir_change_thresh, server, sensors,
@@ -63,8 +63,8 @@ explore_for_cache_fsm::explore_for_cache_fsm(
                                         &entry_new_direction, NULL),
             HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_cache_fsm",
-         rcppsw::common::er_lvl::DIAG,
-         rcppsw::common::er_lvl::NOM);
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, start) {

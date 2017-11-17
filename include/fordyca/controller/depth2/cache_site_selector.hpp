@@ -27,7 +27,7 @@
 #include <list>
 #include <utility>
 
-#include "rcppsw/common/er_client.hpp"
+#include "rcppsw/er/client.hpp"
 #include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
@@ -44,13 +44,13 @@ NS_START(fordyca, controller);
  * and the nest (ideally the halfway point), subject to constraints such as it
  * can't be too new other known caches.
  */
-class cache_site_selector: public rcppsw::common::er_client {
+class cache_site_selector: public rcppsw::er::client {
  public:
   cache_site_selector(
-      const std::shared_ptr<rcppsw::common::er_server>& server,
+      const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
-  ~cache_site_selector(void) { er_client::rmmod(); }
+  ~cache_site_selector(void) { client::rmmod(); }
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
