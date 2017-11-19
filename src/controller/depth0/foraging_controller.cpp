@@ -45,6 +45,10 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+bool foraging_controller::block_acquired(void) const {
+  return m_fsm->block_acquired();
+} /* block_acquired() */
+
 void foraging_controller::robot_loc(argos::CVector2 loc) {
   m_sensors->robot_loc(loc);
 }

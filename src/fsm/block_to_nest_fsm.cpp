@@ -50,8 +50,9 @@ block_to_nest_fsm::block_to_nest_fsm(
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     entry_wait_for_pickup(),
     m_sensors(sensors),
@@ -59,8 +60,10 @@ block_to_nest_fsm::block_to_nest_fsm(
     m_cache_fsm(params, server, sensors, actuators, map),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup, NULL,
+                                  &entry_wait_for_pickup, NULL),
         HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup, NULL,
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_pickup, NULL,
                                   &entry_wait_for_pickup, NULL),
         HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest, NULL,
                                     &entry_transport_to_nest, NULL),
@@ -88,21 +91,9 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
-  /*
-   * We may get a BLOCK_PICKUP signal even if we have not yet finished vectoring
-   * to our chosen block, if there are a bunch of blocks really close
-   * together; the simulation will signal us that we have picked one up as soon
-   * as it can. As such, as soon as we get this signal, reset the FSM and switch
-   * states.
-   */
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    if (!m_block_fsm.task_finished()) {
-      ER_WARN("WARNING: BLOCK_PICKUP received while still acquiring block--possibly spurious");
-    }
-    m_block_fsm.task_reset();
-    internal_event(ST_TRANSPORT_TO_NEST);
+HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {
+  if (m_block_fsm.task_finished()) {
+    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_block_fsm.task_execute();
   }
@@ -110,14 +101,22 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, acquire_free_block, state_machine::event_da
 }
 HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {
   if (m_cache_fsm.task_finished()) {
-    internal_event(ST_WAIT_FOR_PICKUP);
+    internal_event(ST_WAIT_FOR_CACHE_PICKUP);
   } else {
     m_cache_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_block_pickup, state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.task_reset();
+    internal_event(ST_TRANSPORT_TO_NEST);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_cache_pickup, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
@@ -126,7 +125,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_pickup, state_machine::event_data)
 }
 
 HFSM_ENTRY_DEFINE_ND(block_to_nest_fsm, entry_wait_for_pickup) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::BLACK);
+  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {
@@ -179,7 +178,11 @@ __pure bool block_to_nest_fsm::is_acquiring_cache(void) const {
  * General Member Functions
  ******************************************************************************/
 bool block_to_nest_fsm::cache_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_PICKUP;
+  return current_state() == ST_WAIT_FOR_CACHE_PICKUP;
+} /* cache_acquired() */
+
+bool block_to_nest_fsm::block_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
 } /* cache_acquired() */
 
 void block_to_nest_fsm::init(void) {

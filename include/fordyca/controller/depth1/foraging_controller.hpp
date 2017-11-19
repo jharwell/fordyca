@@ -76,8 +76,8 @@ class foraging_controller : public depth0::foraging_controller,
   bool is_transporting_to_cache(void) const override;
   std::string task_name(void) const override;
 
-  bool cache_detected(void) const;
   bool cache_acquired(void) const;
+  bool block_acquired(void) const;
 
   void process_los(const representation::line_of_sight* const los) override;
 

@@ -75,6 +75,7 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
   std::string task_name(void) const override { return "generalist"; };
 
   bool cache_acquired(void) const override { return false; }
+  bool block_acquired(void) const override;
 
   logical_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}

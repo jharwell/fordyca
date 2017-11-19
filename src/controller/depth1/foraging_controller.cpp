@@ -133,10 +133,6 @@ tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-bool foraging_controller::cache_detected(void) const {
-  return depth0::foraging_controller::sensors()->cache_detected();
-} /* cache_detected() */
-
 bool foraging_controller::cache_acquired(void) const {
   if (current_task()) {
     return current_task()->cache_acquired();
@@ -144,6 +140,14 @@ bool foraging_controller::cache_acquired(void) const {
     return false;
   }
 } /* cache_detected() */
+
+bool foraging_controller::block_acquired(void) const {
+  if (current_task()) {
+    return current_task()->block_acquired();
+  } else {
+    return false;
+  }
+} /* block_detected() */
 
 void foraging_controller::process_los(const representation::line_of_sight* const los) {
   depth0::foraging_controller::process_los(los);

@@ -153,8 +153,7 @@ bool foraging_loop_functions::handle_cache_block_drop(
     argos::CFootBotEntity& robot) {
   T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (controller.is_acquiring_cache() && controller.cache_detected() &&
-      controller.is_transporting_to_cache()) {
+  if (controller.cache_acquired() && controller.is_transporting_to_cache()) {
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {

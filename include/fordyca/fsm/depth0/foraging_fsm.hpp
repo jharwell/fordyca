@@ -87,6 +87,7 @@ class foraging_fsm : public base_foraging_fsm,
 
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
 
+
   /**
    * @brief Run the memory foraging task.
    */
@@ -110,6 +111,8 @@ class foraging_fsm : public base_foraging_fsm,
   /* depth0 metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+
+  bool block_acquired(void) const;
 
   /**
    * @brief Reset the FSM.

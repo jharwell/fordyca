@@ -54,6 +54,11 @@ bool forager::cache_acquired(void) const {
       polled_task::mechanism())->cache_acquired();
 } /* cache_acquired() */
 
+bool forager::block_acquired(void) const {
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(
+      polled_task::mechanism())->block_acquired();
+} /* cache_acquired() */
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/

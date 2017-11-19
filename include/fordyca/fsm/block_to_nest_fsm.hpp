@@ -124,6 +124,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   bool is_transporting_to_cache(void) const override { return false; };
 
   bool cache_acquired(void) const;
+  bool block_acquired(void) const;
 
   /**
    * @brief Reset the FSM
@@ -136,8 +137,9 @@ class block_to_nest_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a  free block */
+    ST_WAIT_FOR_BLOCK_PICKUP,
     ST_ACQUIRE_CACHED_BLOCK,  /* superstate for finding a cached block */
-    ST_WAIT_FOR_PICKUP,
+    ST_WAIT_FOR_CACHE_PICKUP,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_COLLISION_AVOIDANCE,
     ST_FINISHED,
@@ -154,10 +156,11 @@ class block_to_nest_fsm : public base_foraging_fsm,
 
   /* memory foraging states */
   HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE(block_to_nest_fsm, acquire_free_block,
+  HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_free_block);
+  HFSM_STATE_DECLARE(block_to_nest_fsm, wait_for_block_pickup,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_cached_block);
-  HFSM_STATE_DECLARE(block_to_nest_fsm, wait_for_pickup,
+  HFSM_STATE_DECLARE(block_to_nest_fsm, wait_for_cache_pickup,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
   HFSM_ENTRY_DECLARE_ND(block_to_nest_fsm, entry_wait_for_pickup);

@@ -97,8 +97,7 @@ HFSM_STATE_DEFINE(foraging_fsm, start, state_machine::event_data) {
    * block.
    */
   if (m_block_fsm.task_finished()) {
-    m_block_fsm.task_reset();
-    internal_event(ST_LEAVING_NEST);
+    internal_event(ST_FINISHED);
   }
 
   /*
@@ -108,7 +107,7 @@ HFSM_STATE_DEFINE(foraging_fsm, start, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_block_fsm.inject_event(data->signal(), data->type());
   } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      m_block_fsm.inject_event(data->signal(), data->type());
+    m_block_fsm.inject_event(data->signal(), data->type());
   }
   m_block_fsm.task_execute();
   return controller::foraging_signal::HANDLED;
@@ -157,6 +156,10 @@ void foraging_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
+
+bool foraging_fsm::block_acquired(void) const {
+  return m_block_fsm.block_acquired();
+} /* block_acquired() */
 
 
 NS_END(depth0, fsm, fordyca);
