@@ -38,7 +38,6 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constants
  ******************************************************************************/
 uint vector_fsm::kCOLLISION_RECOVERY_TIME = 20;
-double vector_fsm::kVECTOR_FSM_MIN_DIFF = 0.02;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -62,7 +61,7 @@ vector_fsm::vector_fsm(uint frequent_collision_thresh,
     m_collision_rec_count(0),
     m_sensors(sensors),
     m_actuators(actuators),
-    m_goal(),
+    m_goal_data(),
     m_ang_pid(5.0, 0, 0,
               1,
               -m_actuators->max_wheel_speed() * 0.5,
@@ -127,19 +126,20 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   double ang_speed = 0;
   double lin_speed = 0;
   if (data) {
-    m_goal = data->goal;
+    m_goal_data = *data;
   }
 
   if (m_sensors->calc_diffusion_vector(NULL)) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
-  if ((m_goal - m_sensors->robot_loc()).Length() <=
-      kVECTOR_FSM_MIN_DIFF) {
+  if ((m_goal_data.loc - m_sensors->robot_loc()).Length() <=
+      m_goal_data.tolerance) {
     m_ang_pid.reset();
     m_lin_pid.reset();
-    internal_event(ST_ARRIVED, rcppsw::make_unique<struct goal_data>(m_goal));
+    internal_event(ST_ARRIVED,
+                   rcppsw::make_unique<struct goal_data>(m_goal_data));
   }
-  argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal);
+  argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal_data.loc);
   argos::CVector2 heading = m_sensors->robot_heading();
   double angle_diff = heading.Angle().GetValue() -
                       robot_to_goal.Angle().GetValue();
@@ -147,8 +147,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   ang_speed += m_ang_pid.calculate(0, angle_diff);
   lin_speed = m_lin_pid.calculate(0, -1.0/std::fabs(angle_diff));
 
-  ER_VER("target: (%f, %f)@%f", m_goal.GetX(), m_goal.GetY(),
-         m_goal.Angle().GetValue());
+  ER_VER("target: (%f, %f)@%f", m_goal_data.loc.GetX(), m_goal_data.loc.GetY(),
+         m_goal_data.loc.Angle().GetValue());
   ER_VER("robot_to_target: vector=(%f, %f)@%f, len=%f",
          robot_to_goal.GetX(), robot_to_goal.GetY(),
          robot_to_goal.Angle().GetValue(), robot_to_goal.Length());
@@ -161,8 +161,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_VECTOR != last_state()) {
     ER_DIAG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
-            data->goal.GetX(), data->goal.GetY(),
-            kVECTOR_FSM_MIN_DIFF);
+            data->loc.GetX(), data->loc.GetY(), data->tolerance);
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -196,7 +195,8 @@ void vector_fsm::task_start(const rcppsw::task_allocation::taskable_argument* co
   ER_ASSERT(a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<struct goal_data>(a->vector()));
+                 rcppsw::make_unique<struct goal_data>(a->vector(),
+                                                       a->tolerance()));
 }
 
 void vector_fsm::init(void) {
