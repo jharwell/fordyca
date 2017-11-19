@@ -44,6 +44,11 @@ double collector::calc_start_time(void) const {
       polled_task::mechanism())->sensors()->tick();
 } /* calc_elapsed_time() */
 
+bool collector::cache_acquired(void) const {
+  return static_cast<fsm::block_to_nest_fsm*>(
+      polled_task::mechanism())->cache_acquired();
+} /* cache_acquired() */
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/

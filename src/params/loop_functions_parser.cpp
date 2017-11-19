@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/params/loop_functions_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/params/cache_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,6 +36,9 @@ NS_START(fordyca, params);
 void loop_functions_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct loop_functions_params);
   std::vector<std::string> res, res2;
+  cache_parser c;
+  c.parse(node);
+  m_params->cache_usage_penalty = c.get_results()->usage_penalty;
 
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
@@ -62,6 +66,7 @@ void loop_functions_parser::show(std::ostream& stream) {
   stream << "display_robot_id=" << m_params->display_robot_id << std::endl;
   stream << "display_block_id=" << m_params->display_block_id << std::endl;
   stream << "simulation_type=" << m_params->simulation_type << std:: endl;
+  stream << "cache_usage_penalty=" << m_params->cache_usage_penalty << std:: endl;
 } /* show() */
 
 NS_END(params, fordyca);

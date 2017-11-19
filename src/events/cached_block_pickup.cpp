@@ -30,6 +30,7 @@
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/fsm/depth0/foraging_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,9 +67,6 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 
 void cached_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
-  ER_NOM("cell2D: fb%zu block%d from cache%d @(%zu, %zu)",
-         m_robot_index, m_block->id(), m_cache->id(),
-         cell_op::x(), cell_op::y());
 } /* visit() */
 
 void cached_block_pickup::visit(representation::cache& cache) {
@@ -78,9 +76,6 @@ void cached_block_pickup::visit(representation::cache& cache) {
 
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
   cell.cell().accept(*this);
-  ER_NOM("perceived_cell2D: fb%zu block%d from cache%d @(%zu, %zu)",
-         m_robot_index, m_block->id(), m_cache->id(),
-         m_cache->discrete_loc().first, m_cache->discrete_loc().second);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {
@@ -115,6 +110,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 
     map.caches().erase(std::remove(map.caches().begin(),
                                    map.caches().end(), *m_cache));
+    m_cache = nullptr;
   }
   if (map.has_static_cache() && 0 == map.caches().size()) {
     map.static_cache_create();
@@ -122,47 +118,34 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
          m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y(),
-         m_cache->n_blocks());
+         (m_cache)?m_cache->n_blocks():1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
-  /*
-   * Because map handling of cached block pickup happens first, m_cache in the
-   * main arena_map has already had its block count updated, so we can't refer
-   * to it here, and need to reference the one in the robot's occupany grid instead.
-   */
-  int cache_id = m_cache->id();
   representation::perceived_cell2D& cell = map.access(cell_op::x(),
                                                       cell_op::y());
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
 
-  /* -1 because it was already decremented by arena_map */
-  ER_ASSERT(m_cache->n_blocks() == cell.block_count() - 1,
-            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
-            m_cache->n_blocks(), cell.block_count() - 1);
-  /*
-   * If there are more than 2 blocks in cache, just remove one, and update the
-   * underlying cell. If there are only 2 left, do the same thing but also
-   * remove the cache, as a cache with only one block is not a cache, it is just
-   * a block.
-   */
-  if (m_cache->n_blocks() > 2) {
-    m_cache->block_remove(m_block);
-    cell.accept(*this);
-  } else {
-    cell.accept(*this);
-    auto it = map.caches().begin();
-    while (it != map.caches().end()) {
-      if (it->first == m_cache) {
-        it = map.caches().erase(it);
-      } else {
-        ++it;
-      }
-    } /* while() */
+  if (nullptr != m_cache) {
+    /* -1 because it was already decremented by arena_map */
+    ER_ASSERT(m_cache->n_blocks() == cell.block_count() - 1,
+              "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
+              m_cache->n_blocks(), cell.block_count() - 1);
+    /*
+     * If there are more than 2 blocks in cache, just remove one, and update the
+     * underlying cell. If there are only 2 left, then the arena_map has already
+     * deleted the cache we are also referencing, so no need to do anything to
+     * our cache, only update the cell the cache used to be on.
+     */
+    if (m_cache->n_blocks() > 2) {
+      m_cache->block_remove(m_block);
+    }
   }
+  cell.accept(*this);
+
   ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
-         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y(),
-         m_cache->n_blocks());
+         m_robot_index, m_block->id(), (m_cache)?m_cache->id():-1, cell_op::x(), cell_op::y(),
+         (m_cache)?m_cache->n_blocks():1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {

@@ -39,12 +39,14 @@ struct cache_params : public rcppsw::common::base_params {
   cache_params(void) : create_static_cache(false),
                        create_dynamic_caches(false),
                        static_cache_size(0),
+                       usage_penalty(0),
                        dimension(0.0),
                        min_dist(0.0) {}
 
   bool create_static_cache;
   bool create_dynamic_caches;
   uint static_cache_size;
+  uint usage_penalty;
   double dimension;
   double min_dist;
 };

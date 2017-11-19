@@ -24,25 +24,33 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
+#include <list>
 #include "fordyca/support/depth0/foraging_loop_functions.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace metrics { namespace collectors { namespace robot_metrics {
+class depth1_collector;
+}}}
+
+NS_START(support);
+
 namespace depth0 { class foraging_loop_functions; }
+
 NS_START(depth1);
+
+class cache_usage_penalty;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 class foraging_loop_functions : public depth0::foraging_loop_functions {
  public:
-  foraging_loop_functions(void) : m_collector() {}
-  virtual ~foraging_loop_functions(void) {}
+  foraging_loop_functions(void);
+  virtual ~foraging_loop_functions(void);
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep() override;
@@ -53,8 +61,14 @@ class foraging_loop_functions : public depth0::foraging_loop_functions {
   template<typename T>
   bool handle_cache_block_drop(argos::CFootBotEntity& robot);
   template<typename T>
-  bool handle_cached_block_pickup(argos::CFootBotEntity& robot);
+  bool init_cache_usage_penalty(argos::CFootBotEntity& robot);
+  template<typename T>
+  bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot);
+  template<typename T>
+  void finish_cached_block_pickup(argos::CFootBotEntity& robot);
   int robot_on_cache(const argos::CFootBotEntity& robot);
+  template<typename T>
+  bool robot_serving_cache_penalty(argos::CFootBotEntity& robot);
 
  private:
   void pre_step_final(void) override;
@@ -64,7 +78,9 @@ class foraging_loop_functions : public depth0::foraging_loop_functions {
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
+  uint mc_cache_penalty;
   std::unique_ptr<metrics::collectors::robot_metrics::depth1_collector> m_collector;
+  std::list<cache_usage_penalty*> m_penalty_list;
 };
 
 NS_END(depth1, support, fordyca);

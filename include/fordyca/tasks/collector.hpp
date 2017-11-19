@@ -70,6 +70,8 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool is_transporting_to_cache(void) const override { return false; }
   std::string task_name(void) const override { return "collector"; };
 
+  bool cache_acquired(void) const override;
+
    void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);

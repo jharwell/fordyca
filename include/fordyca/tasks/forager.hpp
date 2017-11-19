@@ -70,6 +70,8 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool is_transporting_to_cache(void) const override;
   std::string task_name(void) const override { return "forager"; };
 
+  bool cache_acquired(void) const override;
+
   executable_task* partition(void) override { return nullptr; }
   double abort_prob(void) override { return 0.0; }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {

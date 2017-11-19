@@ -74,6 +74,8 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
   bool is_transporting_to_cache(void) const override { return false; }
   std::string task_name(void) const override { return "generalist"; };
 
+  bool cache_acquired(void) const override { return false; }
+
   logical_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
   double calc_elapsed_time(double start_time) const override;

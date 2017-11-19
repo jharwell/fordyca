@@ -62,6 +62,8 @@ class foraging_task : public metrics::collectible_metrics::robot_metrics::random
                                                             events::nest_block_drop> {
  public:
   foraging_task(void) {}
+
+  virtual bool cache_acquired(void) const = 0;
 };
 
 NS_END(tasks, fordyca);

@@ -27,20 +27,24 @@
 #include <string>
 
 #include "fordyca/controller/depth0/foraging_controller.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
-#include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/forager.hpp"
-#include "fordyca/tasks/generalist.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/task_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
-namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
+namespace rcppsw { namespace task_allocation { class polled_executive; }}
 
+NS_START(fordyca);
+namespace visitor = rcppsw::patterns::visitor;
+namespace tasks {
+class forager;
+class collector;
+class generalist;
+class foraging_task;
+}
+
+NS_START(controller, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -49,12 +53,7 @@ class foraging_controller : public depth0::foraging_controller,
                             public metrics::collectible_metrics::task_metrics::task_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
-  foraging_controller(void) :
-      depth0::foraging_controller(),
-      m_executive(),
-      m_forager(),
-      m_collector(),
-      m_generalist() {}
+  foraging_controller(void);
 
   tasks::foraging_task* current_task(void) const;
 
@@ -78,6 +77,8 @@ class foraging_controller : public depth0::foraging_controller,
   std::string task_name(void) const override;
 
   bool cache_detected(void) const;
+  bool cache_acquired(void) const;
+
   void process_los(const representation::line_of_sight* const los) override;
 
   /*
@@ -96,7 +97,7 @@ class foraging_controller : public depth0::foraging_controller,
   void ControlStep(void) override;
 
  private:
-  std::unique_ptr<task_allocation::polled_executive> m_executive;
+  std::unique_ptr<rcppsw::task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager> m_forager;
   std::unique_ptr<tasks::collector> m_collector;
   std::unique_ptr<tasks::generalist> m_generalist;

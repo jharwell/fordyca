@@ -32,6 +32,9 @@
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,6 +61,8 @@ random_foraging_loop_functions::random_foraging_loop_functions(void) :
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
 }
+
+random_foraging_loop_functions::~random_foraging_loop_functions(void) {}
 
 /*******************************************************************************
  * Member Functions

@@ -47,6 +47,7 @@ block_to_cache_fsm::block_to_cache_fsm(
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_sensors(sensors),
@@ -56,6 +57,7 @@ block_to_cache_fsm::block_to_cache_fsm(
     m_cache_fsm(params, server, sensors, actuators, map),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
+      HFSM_STATE_MAP_ENTRY_EX(&wait_for_pickup),
       HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                   &entry_collision_avoidance, NULL),
@@ -78,27 +80,25 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(block_to_cache_fsm, acquire_free_block, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+HFSM_STATE_DEFINE_ND(block_to_cache_fsm, acquire_free_block) {
 
-  /*
-   * We may get a BLOCK_PICKUP signal even if we have not yet finished vectoring
-   * to our chosen block, if there are a bunch of blocks really close
-   * together; the simulation will signal us that we have picked one up as soon
-   * as it can. As such, as soon as we get this signal, reset the FSM and switch
-   * states.
-   */
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    if (!m_block_fsm.task_finished()) {
-      ER_WARN("WARNING: BLOCK_PICKUP received while still acquiring block--possibly spurious");
-    }
-    m_block_fsm.task_reset();
+  if (m_block_fsm.task_finished()) {
     internal_event(ST_TRANSPORT_TO_CACHE);
   } else {
     m_block_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }
+
+HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_pickup, state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+
+    if (!m_block_fsm.task_finished()) {
+    internal_event(ST_TRANSPORT_TO_CACHE);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
 HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
@@ -176,6 +176,10 @@ void block_to_cache_fsm::init(void) {
   m_cache_fsm.task_reset();
   m_block_fsm.task_reset();
 } /* init() */
+
+bool block_to_cache_fsm::cache_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_PICKUP;
+} /* cache_acquired() */
 
 void block_to_cache_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
   const tasks::foraging_signal_argument* const a =

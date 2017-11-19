@@ -69,12 +69,12 @@
   <loop_functions library="build/lib/libfordyca"
                   label="depth1_foraging_loop_functions">
     <metrics random_fname="depth1-stats.csv"
-                 depth0_fname="depth0-stats.csv"
-                 depth1_fname="depth1-stats.csv"
-                 block_fname="block-stats.csv"
-                 distance_fname="distance-stats.csv"
-                 n_robots="20"
-                 />
+             depth0_fname="depth0-stats.csv"
+             depth1_fname="depth1-stats.csv"
+             block_fname="block-stats.csv"
+             distance_fname="distance-stats.csv"
+             n_robots="20"
+             />
     <grid resolution="0.2"
           size="10, 5, 2"/>
     <blocks n_blocks="20"
@@ -87,6 +87,7 @@
             static_cache_size="5"
             dimension="0.8"
             min_dist="0.6"
+            usage_penalty="100"
       />
     <nest size="0.5, 0.5" center="2, 2.5" />
     <visualization robot_id="true"

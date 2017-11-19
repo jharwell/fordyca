@@ -39,6 +39,7 @@ void cache_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
   argos::GetNodeAttribute(bnode, "min_dist", m_params->min_dist);
   argos::GetNodeAttribute(bnode, "static_cache_size", m_params->static_cache_size);
+  argos::GetNodeAttribute(bnode, "usage_penalty", m_params->usage_penalty);
   argos::GetNodeAttribute(bnode, "create_static_cache", m_params->create_static_cache);
   argos::GetNodeAttribute(bnode, "create_dynamic_caches", m_params->create_dynamic_caches);
 } /* parse() */
@@ -48,6 +49,7 @@ void cache_parser::show(std::ostream& stream) {
   stream << "dimension=" << m_params->dimension << std::endl;
   stream << "min_dist=" << m_params->min_dist << std::endl;
   stream << "static_cache_size=" << m_params->static_cache_size << std::endl;
+  stream << "usage_penalty=" << m_params->usage_penalty << std::endl;
   stream << "create_static_cache=" << m_params->create_static_cache << std::endl;
   stream << "create_dynamic_caches=" << m_params->create_dynamic_caches << std::endl;
 } /* show() */

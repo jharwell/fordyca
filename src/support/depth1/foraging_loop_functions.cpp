@@ -32,6 +32,11 @@
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
+#include "fordyca/support/depth1/cache_usage_penalty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,6 +44,14 @@
 NS_START(fordyca, support, depth1);
 
 namespace robot_collectors = metrics::collectors::robot_metrics;
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_loop_functions::foraging_loop_functions(void) :
+    mc_cache_penalty(), m_collector(), m_penalty_list() {}
+
+foraging_loop_functions::~foraging_loop_functions(void) {}
 
 /*******************************************************************************
  * Member Functions
@@ -52,6 +65,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
+  mc_cache_penalty = static_cast<const struct params::loop_functions_params*>(
+      repo.get_params("loop_functions"))->cache_usage_penalty;
   m_collector.reset(new robot_collectors::depth1_collector(
       static_cast<const struct params::metrics_params*>(
           repo.get_params("metrics"))->depth1_fname));
@@ -61,31 +76,63 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 }
 
 template<typename T>
-bool foraging_loop_functions::handle_cached_block_pickup(
+bool foraging_loop_functions::init_cache_usage_penalty(
     argos::CFootBotEntity& robot) {
 
   T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (controller.is_acquiring_cache() && controller.cache_detected() &&
-      !controller.is_transporting_to_cache()) {
+  if (controller.cache_acquired() && !controller.is_transporting_to_cache()) {
     ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
 
     /* Check whether the foot-bot is actually on a cache */
     int cache = robot_on_cache(robot);
     if (-1 != cache) {
-      events::cached_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &map()->caches()[cache],
-                                            robot_id(robot));
-      /*
-       * Map must be called before controller for proper cache block decrement!
-       */
-      map()->accept(pickup_op);
-      controller.visitor::template visitable_any<T>::accept(pickup_op);
+      m_penalty_list.push_back(new cache_usage_penalty(&controller,
+                                                       cache,
+                                                       mc_cache_penalty,
+                                                       GetSpace().GetSimulationClock()));
       return true;
     }
   }
   return false;
-} /* handle_cached_block_pickup() */
+} /* init_cache_usage_penalty() */
+
+template<typename T>
+bool foraging_loop_functions::cache_usage_penalty_satisfied(
+    argos::CFootBotEntity& robot) {
+
+  T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+
+  auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                         [&](const cache_usage_penalty* p) {
+                           return p->controller() == &controller;});
+  if (it != m_penalty_list.end()) {
+    return (*it)->penalty_satisfied(GetSpace().GetSimulationClock());
+  }
+
+  return false;
+} /* cache_usage_penalty_satisfied() */
+
+template<typename T>
+void foraging_loop_functions::finish_cached_block_pickup(
+    argos::CFootBotEntity& robot) {
+
+  T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+  cache_usage_penalty* p = m_penalty_list.front();
+  ER_ASSERT(p->controller() == &controller,
+            "FATAL: Out of order cache penalty handling");
+
+  events::cached_block_pickup pickup_op(rcppsw::er::g_server,
+                                        &map()->caches()[p->cache_id()],
+                                        robot_id(robot));
+  m_penalty_list.remove(p);
+
+  /*
+   * Map must be called before controller for proper cache block decrement!
+   */
+  map()->accept(pickup_op);
+  controller.visitor::template visitable_any<T>::accept(pickup_op);
+} /* finish_cached_block_pickup() */
 
 template<typename T>
 bool foraging_loop_functions::handle_cache_block_drop(
@@ -138,9 +185,26 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       handle_cache_block_drop<controller::depth1::foraging_controller>(robot);
     } else { /* The foot-bot has no block item */
       handle_free_block_pickup<controller::depth1::foraging_controller>(robot);
-      handle_cached_block_pickup<controller::depth1::foraging_controller>(robot);
+
+      if (robot_serving_cache_penalty<controller::depth1::foraging_controller>(robot)) {
+        if (cache_usage_penalty_satisfied<controller::depth1::foraging_controller>(robot)) {
+          finish_cached_block_pickup<controller::depth1::foraging_controller>(robot);
+        }
+      } else {
+        init_cache_usage_penalty<controller::depth1::foraging_controller>(robot);
+      }
     }
 } /* pre_step_iter() */
+
+template<typename T>
+bool foraging_loop_functions::robot_serving_cache_penalty(
+    argos::CFootBotEntity& robot) {
+  T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+  auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                         [&](const cache_usage_penalty* p) {
+                           return p->controller() == &controller;});
+  return it != m_penalty_list.end();
+} /* robot_serving_cache_penalty() */
 
 argos::CColor foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

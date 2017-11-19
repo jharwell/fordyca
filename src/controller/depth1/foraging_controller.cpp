@@ -36,11 +36,26 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/events/cache_found.hpp"
+#include "rcppsw/task_allocation/polled_executive.hpp"
+#include "fordyca/tasks/collector.hpp"
+#include "fordyca/tasks/forager.hpp"
+#include "fordyca/tasks/generalist.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace task_allocation = rcppsw::task_allocation;
 NS_START(fordyca, controller, depth1);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_controller::foraging_controller(void) :
+    depth0::foraging_controller(),
+    m_executive(),
+    m_forager(),
+    m_collector(),
+    m_generalist() {}
 
 /*******************************************************************************
  * Member Functions
@@ -120,6 +135,14 @@ tasks::foraging_task* foraging_controller::current_task(void) const {
 
 bool foraging_controller::cache_detected(void) const {
   return depth0::foraging_controller::sensors()->cache_detected();
+} /* cache_detected() */
+
+bool foraging_controller::cache_acquired(void) const {
+  if (current_task()) {
+    return current_task()->cache_acquired();
+  } else {
+    return false;
+  }
 } /* cache_detected() */
 
 void foraging_controller::process_los(const representation::line_of_sight* const los) {
