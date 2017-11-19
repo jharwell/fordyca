@@ -1,5 +1,5 @@
 /**
- * @file task_metrics.hpp
+ * @file cache_respawn_probability.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,32 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_
+#define INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include <cmath>
 
+#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics, task_metrics);
+NS_START(fordyca, expressions);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class task_metrics {
+class cache_respawn_probability: public rcppsw::math::expression<double>  {
  public:
-  task_metrics(void) {}
-  virtual ~task_metrics(void) {}
+  explicit cache_respawn_probability(double scale_factor) :
+      mc_scale_factor(scale_factor) {}
 
-  virtual std::string task_name(void) const = 0;
+  double calc(size_t n_foragers, size_t n_collectors) {
+    return set_result(1 - std::exp(mc_scale_factor * n_foragers/n_collectors));
+  }
+
+ private:
+  const double mc_scale_factor;
 };
 
-NS_END(task_metrics, collectible_metrics, metrics, fordyca);
+NS_END(expressions, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_TASK_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_ */

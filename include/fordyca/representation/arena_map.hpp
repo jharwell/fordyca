@@ -89,7 +89,7 @@ class arena_map: public rcppsw::er::client,
 
   void static_cache_create(void);
 
-  bool has_static_cache(void) const { return mc_cache_params.create_static_cache; }
+  bool has_static_cache(void) const { return mc_cache_params.create_static; }
 
   /**
    * @brief Get the # of blocks available in the arena.

@@ -1,5 +1,5 @@
 /**
- * @file metrics_params.hpp
+ * @file task_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,37 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/metrics/collectors/task_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
- * Structure Definitions
+ * Member Functions
  ******************************************************************************/
-struct metrics_params : public rcppsw::common::base_params {
-  metrics_params(void) : block_fname(), random_fname(), distance_fname(),
-                         depth0_fname(), depth1_fname(), task_fname(),
-                         n_robots() {}
+std::string task_collector::csv_header_build(const std::string& header) {
+  return base_metric_collector::csv_header_build(header) +
+      "n_collectors;n_foragers;n_generalists";
+} /* csv_header_build() */
 
-  std::string block_fname;
-  std::string random_fname;
-  std::string distance_fname;
-  std::string depth0_fname;
-  std::string depth1_fname;
-  std::string task_fname;
-  size_t n_robots;
-};
+void task_collector::reset(void) {
+  base_metric_collector::reset();
+  reset_on_timestep();
+} /* reset() */
 
-NS_END(params, fordyca);
+void task_collector::collect(
+    const collectible_metrics::task_metrics& metrics) {
+  m_stats.n_collectors += metrics.task_name() == "collector";
+  m_stats.n_foragers += metrics.task_name() == "forager";
+  m_stats.n_generalists += metrics.task_name() == "generalist";
+} /* collect() */
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */
+bool task_collector::csv_line_build(std::string& line) {
+  line = std::to_string(m_stats.n_collectors) + ";" +
+         std::to_string(m_stats.n_foragers) + ";" +
+         std::to_string(m_stats.n_generalists);
+  return true;
+} /* store_foraging_stats() */
+
+void task_collector::reset_on_timestep(void) {
+  m_stats = {0, 0, 0};
+} /* reset_on_timestep() */
+
+NS_END(collectors, metrics, fordyca);

@@ -30,7 +30,7 @@
 #include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics/task_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,7 +54,7 @@ NS_START(tasks);
 class foraging_task : public metrics::collectible_metrics::robot_metrics::random_metrics,
                       public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                       public metrics::collectible_metrics::robot_metrics::depth1_metrics,
-                      public metrics::collectible_metrics::task_metrics::task_metrics,
+                      public metrics::collectible_metrics::task_metrics,
                       public visitor::polymorphic_visitable<foraging_task,
                                                             events::cached_block_pickup,
                                                             events::cache_block_drop,

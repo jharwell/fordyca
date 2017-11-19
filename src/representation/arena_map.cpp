@@ -143,7 +143,7 @@ void arena_map::static_cache_create(void) {
       if (-1 == b.robot_index()) {
         blocks.push_back(&b);
       }
-      if (blocks.size() >= mc_cache_params.static_cache_size) {
+      if (blocks.size() >= mc_cache_params.static_size) {
         break;
       }
     } /* for(b..) */
@@ -158,7 +158,7 @@ void arena_map::distribute_blocks(bool first_time) {
     distribute_block(&m_blocks[i], first_time);
   } /* for(i..) */
 
-  if (first_time && mc_cache_params.create_static_cache) {
+  if (first_time && mc_cache_params.create_static) {
     static_cache_create();
   }
 

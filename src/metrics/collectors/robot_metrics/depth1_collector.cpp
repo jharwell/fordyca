@@ -34,7 +34,7 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  ******************************************************************************/
 std::string depth1_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "n_acuiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
+      "n_acquiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
 } /* csv_header_build() */
 
 void depth1_collector::reset(void) {

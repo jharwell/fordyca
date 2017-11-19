@@ -1,5 +1,5 @@
 /**
- * @file metrics_params.hpp
+ * @file task_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,37 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics, collectible_metrics);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct metrics_params : public rcppsw::common::base_params {
-  metrics_params(void) : block_fname(), random_fname(), distance_fname(),
-                         depth0_fname(), depth1_fname(), task_fname(),
-                         n_robots() {}
+class task_metrics {
+ public:
+  task_metrics(void) {}
+  virtual ~task_metrics(void) {}
 
-  std::string block_fname;
-  std::string random_fname;
-  std::string distance_fname;
-  std::string depth0_fname;
-  std::string depth1_fname;
-  std::string task_fname;
-  size_t n_robots;
+  virtual std::string task_name(void) const = 0;
 };
 
-NS_END(params, fordyca);
+NS_END(collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_ */

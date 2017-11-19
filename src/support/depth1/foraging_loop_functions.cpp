@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
 #include <limits>
+#include <random>
+
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/depth1/foraging_controller.hpp"
@@ -33,10 +35,12 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
+#include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 #include "fordyca/support/depth1/cache_usage_penalty.hpp"
+#include "fordyca/expressions/cache_respawn_probability.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +53,8 @@ namespace robot_collectors = metrics::collectors::robot_metrics;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_loop_functions::foraging_loop_functions(void) :
-    mc_cache_penalty(), m_collector(), m_penalty_list() {}
+    mc_cache_penalty(), mc_cache_respawn_scale_factor(), m_depth1_collector(),
+    m_task_collector(), m_penalty_list() {}
 
 foraging_loop_functions::~foraging_loop_functions(void) {}
 
@@ -66,11 +71,18 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   /* initialize stat collecting */
   mc_cache_penalty = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"))->cache_usage_penalty;
-  m_collector.reset(new robot_collectors::depth1_collector(
+      repo.get_params("loop_functions"))->cache.usage_penalty;
+  mc_cache_respawn_scale_factor = static_cast<const struct params::loop_functions_params*>(
+      repo.get_params("loop_functions"))->cache.static_respawn_scale_factor;
+
+  m_depth1_collector.reset(new robot_collectors::depth1_collector(
       static_cast<const struct params::metrics_params*>(
           repo.get_params("metrics"))->depth1_fname));
-  m_collector->reset();
+  m_depth1_collector->reset();
+  m_task_collector.reset(new metrics::collectors::task_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->task_fname));
+  m_task_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -131,7 +143,9 @@ void foraging_loop_functions::finish_cached_block_pickup(
    * Map must be called before controller for proper cache block decrement!
    */
   map()->accept(pickup_op);
+
   controller.visitor::template visitable_any<T>::accept(pickup_op);
+  floor()->SetChanged();
 } /* finish_cached_block_pickup() */
 
 template<typename T>
@@ -173,7 +187,8 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     random_collector()->collect(controller);
     distance_collector()->collect(controller);
     depth0_collector()->collect(controller);
-    m_collector->collect(controller);
+    m_depth1_collector->collect(controller);
+    m_task_collector->collect(controller);
 
     /* Send the robot its new line of sight */
     set_robot_pos<controller::depth1::foraging_controller>(robot);
@@ -249,18 +264,41 @@ void foraging_loop_functions::PreStep() {
 
 void foraging_loop_functions::Reset() {
   depth0::foraging_loop_functions::Reset();
-  m_collector->reset();
+  m_depth1_collector->reset();
+  m_task_collector->reset();
 }
 
 void foraging_loop_functions::Destroy() {
   depth0::foraging_loop_functions::Destroy();
-  m_collector->finalize();
+  m_depth1_collector->finalize();
+  m_task_collector->finalize();
 }
 
 void foraging_loop_functions::pre_step_final(void) {
   depth0::foraging_loop_functions::pre_step_final();
-  m_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_collector->reset_on_timestep();
+
+  /*
+   * The cache is recreated with a probability that depends on the relative
+   * ratio between the # foragers and the # collectors. If there are more
+   * foragers than collectors, then the cache will be recreated very quickly. If
+   * there are more collectors than foragers, then it will probably not be
+   * recreated immediately. And if there are no foragers, there is no chance
+   * that the cache could be recreated (trying to emulate depth2 behavior here).
+   */
+  if (map()->has_static_cache() && 0 == map()->caches().size()) {
+    int n_foragers = m_task_collector->n_foragers();
+    int n_collectors = m_task_collector->n_collectors();
+    expressions::cache_respawn_probability p(mc_cache_respawn_scale_factor);
+    if (p.calc(n_foragers, n_collectors) >=
+        static_cast<double>(rand()) / RAND_MAX) {
+      map()->static_cache_create();
+    }
+  }
+
+  m_depth1_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_depth1_collector->reset_on_timestep();
+  m_task_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_task_collector->reset_on_timestep();
 } /* pre_step_final() */
 
 /*

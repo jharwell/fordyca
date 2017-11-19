@@ -1,5 +1,5 @@
 /**
- * @file metrics_params.hpp
+ * @file task_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,37 +18,52 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/metrics/collectors/base_metric_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics);
+namespace collectible_metrics { class task_metrics; }
+
+NS_START(collectors);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct metrics_params : public rcppsw::common::base_params {
-  metrics_params(void) : block_fname(), random_fname(), distance_fname(),
-                         depth0_fname(), depth1_fname(), task_fname(),
-                         n_robots() {}
+class task_collector : public base_metric_collector {
+ public:
+  explicit task_collector(const std::string ofname) :
+      base_metric_collector(ofname), m_stats() {}
 
-  std::string block_fname;
-  std::string random_fname;
-  std::string distance_fname;
-  std::string depth0_fname;
-  std::string depth1_fname;
-  std::string task_fname;
-  size_t n_robots;
+  void reset(void) override;
+  void collect(const collectible_metrics::task_metrics& metrics);
+  void reset_on_timestep(void) override;
+
+  size_t n_collectors(void) const { return m_stats.n_collectors; }
+  size_t n_foragers(void) const { return m_stats.n_foragers; }
+  size_t n_generalists(void) const { return m_stats.n_generalists; }
+
+ private:
+  struct stats {
+    size_t n_collectors;
+    size_t n_foragers;
+    size_t n_generalists;
+  };
+
+  std::string csv_header_build(const std::string& header = "") override;
+  bool csv_line_build(std::string& line) override;
+
+  struct stats m_stats;
 };
 
-NS_END(params, fordyca);
+NS_END(collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_ */

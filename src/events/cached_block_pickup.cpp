@@ -105,15 +105,13 @@ void cached_block_pickup::visit(representation::arena_map& map) {
               cell_op::x(), cell_op::y());
   } else {
     cell.accept(*this);
-    ER_ASSERT(cell.state_has_block(), "FATAL: cell@(%zu, %zu) with 1 block has cache",
+    ER_ASSERT(cell.state_has_block(),
+              "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(), cell_op::y());
 
     map.caches().erase(std::remove(map.caches().begin(),
                                    map.caches().end(), *m_cache));
     m_cache = nullptr;
-  }
-  if (map.has_static_cache() && 0 == map.caches().size()) {
-    map.static_cache_create();
   }
   m_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",

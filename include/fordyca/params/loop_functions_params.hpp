@@ -27,6 +27,7 @@
 #include <string>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/cache_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +40,7 @@ NS_START(fordyca, params);
 struct loop_functions_params : public rcppsw::common::base_params {
   loop_functions_params(void) :
       nest_x(), nest_y(), display_robot_id(false), display_robot_los(false),
-      display_block_id(false), simulation_type(), cache_usage_penalty(0) {}
+      display_block_id(false), simulation_type(), cache() {}
 
   argos::CRange<double> nest_x;
   argos::CRange<double> nest_y;
@@ -47,7 +48,7 @@ struct loop_functions_params : public rcppsw::common::base_params {
   bool display_robot_los;
   bool display_block_id;
   std::string simulation_type;
-  uint cache_usage_penalty;
+  struct cache_params cache;
 };
 
 NS_END(params, fordyca);

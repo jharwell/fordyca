@@ -73,6 +73,7 @@
              depth1_fname="depth1-stats.csv"
              block_fname="block-stats.csv"
              distance_fname="distance-stats.csv"
+             task_fname="task-stats.csv"
              n_robots="20"
              />
     <grid resolution="0.2"
@@ -82,9 +83,10 @@
             dist_model="single_source"
             respawn="true"
             />
-    <caches create_static_cache="true"
-            create_dynamic_caches="false"
-            static_cache_size="5"
+    <caches create_static="true"
+            create_dynamic="false"
+            static_size="2"
+            static_respawn_scale_factor="0.05"
             dimension="0.8"
             min_dist="0.6"
             usage_penalty="100"
