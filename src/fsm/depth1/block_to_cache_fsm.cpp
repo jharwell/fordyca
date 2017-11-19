@@ -47,8 +47,9 @@ block_to_cache_fsm::block_to_cache_fsm(
     entry_collision_avoidance(),
     HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
+    HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     m_sensors(sensors),
     m_block_fsm(params, server,
@@ -57,8 +58,9 @@ block_to_cache_fsm::block_to_cache_fsm(
     m_cache_fsm(params, server, sensors, actuators, map),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
-      HFSM_STATE_MAP_ENTRY_EX(&wait_for_pickup),
+      HFSM_STATE_MAP_ENTRY_EX(&wait_for_block_pickup),
       HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
+      HFSM_STATE_MAP_ENTRY_EX(&wait_for_cache_drop),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                   &entry_collision_avoidance, NULL),
       HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
@@ -70,10 +72,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   } else if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      internal_event(ST_FINISHED);
-      return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+    if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
       internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
@@ -81,43 +80,37 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(block_to_cache_fsm, acquire_free_block) {
-
   if (m_block_fsm.task_finished()) {
-    internal_event(ST_TRANSPORT_TO_CACHE);
+    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_block_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_pickup, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+HFSM_STATE_DEFINE_ND(block_to_cache_fsm, transport_to_cache) {
 
-    if (!m_block_fsm.task_finished()) {
+  if (m_cache_fsm.task_finished()) {
+    m_cache_fsm.task_reset();
+    internal_event(ST_WAIT_FOR_CACHE_DROP);
+  } else {
+    m_cache_fsm.task_execute();
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_block_pickup, state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     internal_event(ST_TRANSPORT_TO_CACHE);
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_cache_fsm, transport_to_cache, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
-
-  /*
-   * We may get a BLOCK_DROP signal even if we have not yet finished vectoring
-   * to our chosen cache, because the signal can trigger as soon as we are on
-   * the cache, which might not be the center if the cache > 1 block wide. As
-   * such, as soon as we get this signal, reset the FSM and switch states.
-   */
-    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      if (!m_cache_fsm.task_finished()) {
-        ER_WARN("WARNING: BLOCK_DROP received while still acquiring cache");
-      }
-      m_cache_fsm.task_reset();
-      internal_event(ST_FINISHED);
-    } else {
-      m_cache_fsm.task_execute();
-    }
-    return controller::foraging_signal::HANDLED;
+HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_cache_drop, state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    internal_event(ST_FINISHED);
+  }
+  return controller::foraging_signal::HANDLED;
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {
@@ -165,7 +158,7 @@ __pure bool block_to_cache_fsm::is_acquiring_cache(void) const {
 } /* is_acquiring_cache */
 
 __pure bool block_to_cache_fsm::is_transporting_to_cache(void) const {
-  return current_state() == ST_TRANSPORT_TO_CACHE;
+  return current_state() == ST_TRANSPORT_TO_CACHE || cache_acquired();
 }
 
 /*******************************************************************************
@@ -178,8 +171,12 @@ void block_to_cache_fsm::init(void) {
 } /* init() */
 
 bool block_to_cache_fsm::cache_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_PICKUP;
+  return current_state() == ST_WAIT_FOR_CACHE_DROP;
 } /* cache_acquired() */
+
+bool block_to_cache_fsm::block_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+} /* block_acquired() */
 
 void block_to_cache_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
   const tasks::foraging_signal_argument* const a =

@@ -45,6 +45,11 @@ double generalist::calc_start_time(void) const {
       polled_task::mechanism())->sensors()->tick();
 } /* calc_elapsed_time() */
 
+bool generalist::block_acquired(void) const {
+  return static_cast<fsm::depth0::foraging_fsm*>(
+      polled_task::mechanism())->block_acquired();
+} /* cache_acquired() */
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/

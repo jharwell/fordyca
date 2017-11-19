@@ -71,13 +71,14 @@ class collector : public task_allocation::polled_task, public foraging_task {
   std::string task_name(void) const override { return "collector"; };
 
   bool cache_acquired(void) const override;
+  bool block_acquired(void) const override { return false; }
 
    void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
   }
   executable_task* partition(void) override { return nullptr; }
-  double abort_prob(void) override { return 0.0; }
+  double calc_abort_prob(void) override { return 0.0; }
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
 };

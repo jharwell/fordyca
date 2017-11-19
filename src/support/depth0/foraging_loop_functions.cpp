@@ -115,8 +115,7 @@ bool foraging_loop_functions::handle_free_block_pickup(argos::CFootBotEntity& ro
 
  T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-  if (!controller.in_nest() && controller.is_acquiring_block() &&
-      controller.block_detected()) {
+  if (controller.block_acquired()) {
     /* Check whether the foot-bot is actually on a block */
     int block = robot_on_block(robot);
     if (-1 != block) {

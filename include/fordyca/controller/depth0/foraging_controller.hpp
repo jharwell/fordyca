@@ -73,6 +73,8 @@ class foraging_controller : public base_foraging_controller,
   size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 
+  bool block_acquired(void) const;
+
   /**
    * @brief Set the current clock tick. In a real world, each robot would
    * maintain its own clock tick, and overall there would no doubt be
