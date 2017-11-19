@@ -25,16 +25,17 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/fsm/random_foraging_fsm.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
-
+#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+
+namespace fsm { class random_foraging_fsm; }
 
 NS_START(controller);
 
@@ -75,7 +76,7 @@ class random_foraging_controller : public base_foraging_controller,
    *
    * Since the FSM does all the work, this function just tells it run.
    */
-  void ControlStep(void) override { m_fsm->run(); }
+  void ControlStep(void) override;
 
   /*
    * @brief Reset controller to its state right after the Init().

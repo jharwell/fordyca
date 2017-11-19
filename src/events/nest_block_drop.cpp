@@ -29,6 +29,10 @@
 #include "fordyca/controller/depth0/foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/collector.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -29,6 +29,7 @@
 #include "fordyca/params/fsm_params.hpp"
 #include "rcppsw/er/server.hpp"
 #include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,6 +66,10 @@ void random_foraging_controller::Init(argos::TConfigurationNode& node) {
 void random_foraging_controller::Reset(void) {
   m_fsm->init();
 } /* Reset() */
+
+void random_foraging_controller::ControlStep(void) {
+  m_fsm->run();
+} /* ControlStep() */
 
 /*******************************************************************************
  * Base Diagnostics

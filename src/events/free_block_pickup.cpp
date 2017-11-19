@@ -30,6 +30,10 @@
 #include "fordyca/controller/depth0/foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/random_foraging_fsm.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/forager.hpp"
 
 /*******************************************************************************
  * Namespaces

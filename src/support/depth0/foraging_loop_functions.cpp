@@ -33,6 +33,10 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,6 +44,12 @@
 NS_START(fordyca, support, depth0);
 
 namespace robot_collectors = metrics::collectors::robot_metrics;
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_loop_functions::foraging_loop_functions(void): m_collector() {}
+foraging_loop_functions::~foraging_loop_functions(void) {}
 
 /*******************************************************************************
  * Member Functions

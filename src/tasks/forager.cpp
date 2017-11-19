@@ -49,6 +49,11 @@ double forager::calc_start_time(void) const {
       polled_task::mechanism())->sensors()->tick();
 } /* calc_elapsed_time() */
 
+bool forager::cache_acquired(void) const {
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(
+      polled_task::mechanism())->cache_acquired();
+} /* cache_acquired() */
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/

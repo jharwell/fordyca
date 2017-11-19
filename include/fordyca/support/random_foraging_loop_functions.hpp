@@ -30,15 +30,22 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace metrics { namespace collectors {
+class block_metrics_collector;
+namespace robot_metrics {
+class random_metrics_collector;
+class distance_metrics_collector;
+}
+}}
+
+NS_START(support);
 
 /*******************************************************************************
  * Classes
@@ -47,7 +54,7 @@ class random_foraging_loop_functions : public argos::CLoopFunctions,
                                        public rcppsw::er::client {
  public:
   random_foraging_loop_functions(void);
-  virtual ~random_foraging_loop_functions(void) {}
+  virtual ~random_foraging_loop_functions(void);
 
   void Init(argos::TConfigurationNode& node) override;
   void Reset() override;

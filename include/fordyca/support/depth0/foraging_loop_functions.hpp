@@ -27,12 +27,14 @@
 #include <string>
 #include <vector>
 #include "fordyca/support/random_foraging_loop_functions.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace metrics { namespace collectors { namespace robot_metrics {
+class depth0_collector;
+}}}
 namespace controller { namespace depth0 { class foraging_controller; }}
 NS_START(support, depth0);
 
@@ -41,8 +43,8 @@ NS_START(support, depth0);
  ******************************************************************************/
 class foraging_loop_functions : public random_foraging_loop_functions {
  public:
-  foraging_loop_functions() : m_collector() {}
-  virtual ~foraging_loop_functions(void) {}
+  foraging_loop_functions(void);
+  virtual ~foraging_loop_functions(void);
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep(void) override;
