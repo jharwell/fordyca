@@ -44,11 +44,14 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class vector_argument : public task_allocation::taskable_argument {
  public:
-  explicit vector_argument(const argos::CVector2& v) : m_vector(v) {}
+  vector_argument(double tolerance, const argos::CVector2& v) :
+      m_tolerance(tolerance), m_vector(v) {}
 
   const argos::CVector2& vector(void) const { return m_vector; }
+  double tolerance(void) const { return m_tolerance; }
 
  private:
+  double m_tolerance;
   argos::CVector2 m_vector;
 };
 

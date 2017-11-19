@@ -48,6 +48,18 @@ NS_START(fsm, depth0);
  ******************************************************************************/
 class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered having arrived at the specified block's location.
+   */
+  constexpr static double kBLOCK_ARRIVAL_TOL = 0.02;
+
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered having arrived at the specified cache's location.
+   */
+constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
+
   vector_fsm(uint frequent_collision_thresh,
              std::shared_ptr<rcppsw::er::server> server,
              std::shared_ptr<controller::depth0::foraging_sensors> sensors,
@@ -55,36 +67,13 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
 
   /* taskable overrides */
 
-  /**
-   * @brief Reset the vector-to-goal task to a state where it can be restarted.
-  */
   void task_reset(void) override { init(); }
-
-  /**
-   * @brief Determine if the robot is still on the way to the specified
-   * goal. Basically a way of checking if a robot is still in transit.
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
   bool task_running(void) const override {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
 
-  /**
-   * @brief (Re)start the FSM, with a new goal.
-   *
-   * @param arg The (X, Y) coordinates of the new goal to drive to.
-   */
   void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
-
-  /**
-   * @brief Determine if the robot has arrived at the specified goal within the
-   * specified tolerance yet.
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
   bool task_finished(void) const override { return current_state() == ST_ARRIVED; }
-
 
   /**
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
@@ -116,10 +105,12 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * to tell the FSM where to travel to next.
    */
   struct goal_data : public rcppsw::patterns::state_machine::event_data {
-    explicit goal_data(argos::CVector2 goal_) : goal(goal_) {}
-    goal_data(void) : goal() {}
+    goal_data(argos::CVector2 loc_, double tolerance_) :
+        tolerance(tolerance_), loc(loc_) {}
+    goal_data(void) : tolerance(), loc() {}
 
-    argos::CVector2 goal;
+    double tolerance;
+    argos::CVector2 loc;
   };
 
   struct fsm_state {
@@ -136,11 +127,6 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    */
   static uint kCOLLISION_RECOVERY_TIME;
 
-  /**
-   * @brief The tolerance within which a robot's location has to be in order to
-   * be considered having arrived at a specified target location.
-   */
-  static double kVECTOR_FSM_MIN_DIFF;
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 v);
@@ -182,15 +168,13 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
-  /* data members */
-
   argos::CRandom::CRNG* m_rng;
   struct fsm_state m_state;
   uint m_freq_collision_thresh;
   uint m_collision_rec_count;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager> m_actuators;
-  argos::CVector2 m_goal;
+  struct goal_data m_goal_data;
   rcppsw::control::pid_loop m_ang_pid;
   rcppsw::control::pid_loop m_lin_pid;
 };
