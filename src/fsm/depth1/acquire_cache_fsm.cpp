@@ -126,7 +126,7 @@ bool acquire_cache_fsm::is_acquiring_cache(void) const {
    *
    * TODO: Fix this so it is less hacky. See issue #152.
    */
-  return is_vectoring_to_cache() || is_exploring_for_cache() || task_finished();
+  return is_vectoring_to_cache() || is_exploring_for_cache();
 } /* is_acquring_cache() */
 
 /*******************************************************************************
@@ -140,9 +140,33 @@ void acquire_cache_fsm::init(void) {
 
 bool acquire_cache_fsm::acquire_known_cache(
     std::list<std::pair<const representation::cache*, double>> caches) {
-  if (!caches.size()) {
+
+  /*
+   * If we don't know of any caches, and we aren't currently running, we cannot
+   * acquire a known cache. However, if we don't know of any caches, but we are
+   * currently on our way to a cache (i.e. we "forgot" about it en-route, then
+   * we still might be able to acquire one, so don't give up just yet).
+   */
+  if (!caches.size() && !m_vector_fsm.task_running()) {
     return false;
   }
+
+  if (!m_vector_fsm.task_finished() && m_vector_fsm.task_running()) {
+    m_vector_fsm.task_execute();
+  }
+
+  if (m_vector_fsm.task_finished()) {
+    if (m_sensors->cache_detected()) {
+      return true;
+    }
+    ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");
+    return false;
+  }
+
+  /*
+   * If we get here, we must know of some caches, but not be currently vectoring
+   * toward any of them.
+   */
   if (!m_vector_fsm.task_running()) {
     controller::depth1::existing_cache_selector selector(m_server,
                                                          mc_nest_center);
@@ -157,15 +181,6 @@ bool acquire_cache_fsm::acquire_known_cache(
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
-  } else if (m_vector_fsm.task_finished()) {
-    if (m_sensors->cache_detected()) {
-      return true;
-    } else {
-      ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");
-      return false;
-    }
-  } else {
-    m_vector_fsm.task_execute();
   }
   return false;
 } /* acquire_known_cache() */
