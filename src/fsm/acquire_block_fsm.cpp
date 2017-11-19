@@ -85,7 +85,7 @@ HFSM_STATE_DEFINE_ND(acquire_block_fsm, acquire_block) {
 
 HFSM_EXIT_DEFINE(acquire_block_fsm, exit_acquire_block) {
   m_vector_fsm.task_reset();
-  m_explore_fsm.init();
+  m_explore_fsm.task_reset();
 }
 HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
   if (ST_FINISHED != last_state()) {
@@ -128,13 +128,36 @@ void acquire_block_fsm::init(void) {
 
 bool acquire_block_fsm::acquire_known_block(
     std::list<std::pair<const representation::block*, double>> blocks) {
-  if (!blocks.size()) {
+
+    /*
+   * If we don't know of any blocks, and we aren't currently running, we cannot
+   * acquire a known block. However, if we don't know of any blocks, but we are
+   * currently on our way to a block (i.e. we "forgot" about it en-route, then
+   * we still might be able to acquire one, so don't give up just yet).
+   */
+  if (!blocks.size() && !m_vector_fsm.task_running()) {
     return false;
   }
+
+  if (!m_vector_fsm.task_finished() && m_vector_fsm.task_running()) {
+    m_vector_fsm.task_execute();
+  }
+
+  if (m_vector_fsm.task_finished()) {
+    if (m_sensors->block_detected()) {
+      return true;
+    }
+    ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
+    return false;
+  }
+
+  /*
+   * If we get here, we must know of some blocks, but not be currently vectoring
+   * toward any of them.
+   */
   if (!m_vector_fsm.task_running()) {
     controller::depth0::block_selector selector(m_server, mc_nest_center);
-    auto best = selector.calc_best(blocks,
-                                   m_sensors->robot_loc());
+    auto best = selector.calc_best(blocks, m_sensors->robot_loc());
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
            best.first->id(),
            best.first->discrete_loc().first,
@@ -144,15 +167,6 @@ bool acquire_block_fsm::acquire_known_block(
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
-  } else if (m_vector_fsm.task_finished()) {
-    if (m_sensors->block_detected()) {
-      return true;
-    } else {
-      ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-      return false;
-    }
-  } else {
-    m_vector_fsm.task_execute();
   }
   return false;
 } /* acquire_known_block() */
