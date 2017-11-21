@@ -56,7 +56,7 @@ class cell2D;
 class arena_map: public rcppsw::er::client,
                  public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
-  arena_map(const struct params::arena_map_params* params);
+  explicit arena_map(const struct params::arena_map_params* params);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.

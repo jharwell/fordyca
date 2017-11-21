@@ -44,7 +44,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace task_allocation = rcppsw::task_allocation;
 NS_START(fordyca, controller, depth1);
 
 /*******************************************************************************
@@ -52,6 +51,7 @@ NS_START(fordyca, controller, depth1);
  ******************************************************************************/
 foraging_controller::foraging_controller(void) :
     depth0::foraging_controller(),
+    m_task_aborted(false),
     m_executive(),
     m_forager(),
     m_collector(),
@@ -68,7 +68,7 @@ void foraging_controller::ControlStep(void) {
    */
   process_los(depth0::foraging_controller::los());
   depth0::foraging_controller::map()->update_density();
-
+  m_task_aborted = false;
   m_executive->run();
 } /* ControlStep() */
 
@@ -124,10 +124,21 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_forager->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
-  m_executive.reset(new task_allocation::polled_executive(base_foraging_controller::server(),
-                                                          m_generalist.get()));
+  m_executive.reset(new task_allocation::polled_executive(
+      base_foraging_controller::server(),
+      m_generalist.get()));
+
+  m_executive->task_abort_cleanup(std::bind(
+      &foraging_controller::task_abort_cleanup,
+      this,
+      std::placeholders::_1));
+
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
+
+void foraging_controller::task_abort_cleanup(task_allocation::executable_task* const) {
+  m_task_aborted = true;
+} /* task_abort_cleanup() */
 
 tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());

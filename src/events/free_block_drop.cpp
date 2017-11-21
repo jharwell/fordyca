@@ -61,6 +61,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
+  block.reset();
   representation::discrete_coord d(cell_op::x(),cell_op::y());
   block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
   block.discrete_loc(d);

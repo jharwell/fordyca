@@ -29,6 +29,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/metrics_params.hpp"
@@ -181,6 +182,25 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     controller::depth1::foraging_controller& controller =
         dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
+
+    /*
+     * If a robot aborted its task and was carrying a block it needs to drop it,
+     * in addition to updating its own internal state, so that the block is not
+     * left dangling and unusable for the rest of the simulation.
+     */
+    if (controller.task_aborted() && controller.is_carrying_block()) {
+      representation::discrete_coord d =
+          representation::real_to_discrete_coord(controller.robot_loc(),
+                                                 map()->grid_resolution());
+      events::free_block_drop drop_op(rcppsw::er::g_server,
+                                      controller.block(),
+                                      d.first,
+                                      d.second,
+                                      map()->grid_resolution());
+      controller.block(nullptr);
+      map()->access(d.first, d.second).accept(drop_op);
+      floor()->SetChanged();
+    }
 
     /* get stats from this robot before its state changes */
     random_collector()->collect(controller);
