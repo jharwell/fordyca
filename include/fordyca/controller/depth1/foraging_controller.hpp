@@ -33,10 +33,15 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation { class polled_executive; }}
+namespace rcppsw { namespace task_allocation {
+class polled_executive;
+class executable_task;
+}}
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
+namespace task_allocation = rcppsw::task_allocation;
+
 namespace tasks {
 class forager;
 class collector;
@@ -81,6 +86,12 @@ class foraging_controller : public depth0::foraging_controller,
 
   void process_los(const representation::line_of_sight* const los) override;
 
+  /**
+   * @brief \c TRUE iff the robot aborted its current task, and only on the
+   * timestep in which the task was aborted.
+   */
+  bool task_aborted(void) const { return m_task_aborted; }
+
   /*
    * @brief Initialize the controller.
    *
@@ -97,7 +108,10 @@ class foraging_controller : public depth0::foraging_controller,
   void ControlStep(void) override;
 
  private:
-  std::unique_ptr<rcppsw::task_allocation::polled_executive> m_executive;
+  void task_abort_cleanup(task_allocation::executable_task* const);
+
+  bool m_task_aborted;
+  std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager> m_forager;
   std::unique_ptr<tasks::collector> m_collector;
   std::unique_ptr<tasks::generalist> m_generalist;

@@ -79,6 +79,7 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
 
   logical_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
+
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
 };
