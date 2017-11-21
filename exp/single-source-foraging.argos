@@ -49,8 +49,8 @@
                      delta="0.1" />
         </sensors>
         <actuators>
-          <wheels hard_turn_angle_threshold="90"
-                  soft_turn_angle_threshold="70"
+          <wheels hard_turn_angle_threshold="60"
+                  soft_turn_angle_threshold="30"
                   no_turn_angle_threshold="5"
                   max_speed="10" />
         </actuators>
