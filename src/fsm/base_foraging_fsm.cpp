@@ -102,11 +102,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, state_machine::event_dat
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_TRANSPORT_TO_NEST");
   }
-  static int i = 0;
-  if (++i > 100) {
-    m_actuators->stop_wheels();
-    return state_machine::event_signal::HANDLED;
-  }
+
   /*
    * We have arrived at the nest and it's time to head back out again. The
    * loop functions need to call the drop_block() function, as they have to
