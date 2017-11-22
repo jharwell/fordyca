@@ -117,15 +117,21 @@ bool base_foraging_sensors::block_detected(void) {
   int sum = 0;
 
   /*
-   * We are on a block if at least 3 of the 4 ground sensors say we are. Blocks
-   * are black, and the sensor returns 0.0 for black areas.
+   * We are on a block fif ALL 4 ground sensors say we are. We can usually get
+   * by with 3/4, but sometimes there are corner cases where a robot thinks that
+   * it has arrived at a block, and is waiting for the pickup signal from the
+   * simulation, but the simulation does not think that the robot is actually on
+   * the block (i.e. it is only partially overlapping, with the center of the
+   * robot being juusstttt outside the area of the block).
+   *
+   * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
   sum += readings[0].Value < 0.05;
   sum += readings[1].Value < 0.05;
   sum += readings[2].Value < 0.05;
   sum += readings[3].Value < 0.05;
 
-  return sum >= 3;
+  return 4 == sum;
 } /* block_detected() */
 
 NS_END(controller, fordyca);

@@ -44,9 +44,9 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class collector : public task_allocation::polled_task, public foraging_task {
  public:
-  collector(double alpha,
+  collector(const struct task_allocation::task_params* const params,
             std::unique_ptr<task_allocation::taskable>& mechanism) :
-      polled_task("collector", alpha, mechanism) {}
+      polled_task("collector", params, mechanism) {}
 
   /* event handling */
   void accept(events::cached_block_pickup &visitor) override;
@@ -77,8 +77,6 @@ class collector : public task_allocation::polled_task, public foraging_task {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
   }
-  executable_task* partition(void) override { return nullptr; }
-  double calc_abort_prob(void) override { return 0.0; }
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
 };

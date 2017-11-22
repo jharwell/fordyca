@@ -45,8 +45,9 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class forager : public task_allocation::polled_task, public foraging_task {
  public:
-  forager(double alpha, std::unique_ptr<task_allocation::taskable>& mechanism) :
-      polled_task("forager", alpha, mechanism) {}
+  forager(const struct task_allocation::task_params* params,
+          std::unique_ptr<task_allocation::taskable>& mechanism) :
+      polled_task("forager", params, mechanism) {}
 
   /* event handling */
   void accept(events::cache_block_drop &visitor) override;
@@ -73,8 +74,6 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;
 
-  executable_task* partition(void) override { return nullptr; }
-  double calc_abort_prob(void) override { return 0.0; }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);
