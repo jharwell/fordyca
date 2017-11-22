@@ -74,7 +74,6 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;
 
-  executable_task* partition(void) override { return nullptr; }
   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
     foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     task_allocation::polled_task::mechanism()->task_start(&a);

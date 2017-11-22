@@ -95,7 +95,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::actuators(),
           depth0::foraging_controller::map_ref());
   m_collector.reset(new tasks::collector(p, collector_fsm));
-  m_collector->set_atomic();
 
   std::unique_ptr<task_allocation::taskable> forager_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
@@ -105,7 +104,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::actuators(),
           depth0::foraging_controller::map_ref());
   m_forager.reset(new tasks::forager(p, forager_fsm));
-  m_forager->set_atomic();
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::foraging_fsm>(
@@ -119,6 +117,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_generalist->partition1(m_forager.get());
   m_generalist->partition2(m_collector.get());
   m_generalist->parent(m_generalist.get());
+  m_generalist->set_partitionable();
 
   m_forager->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
