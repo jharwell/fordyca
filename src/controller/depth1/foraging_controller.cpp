@@ -94,8 +94,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::foraging_controller::map_ref());
-  m_collector.reset(new tasks::collector(p->estimation_alpha,
-                                         collector_fsm));
+  m_collector.reset(new tasks::collector(p, collector_fsm));
   m_collector->set_atomic();
 
   std::unique_ptr<task_allocation::taskable> forager_fsm =
@@ -105,7 +104,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::foraging_controller::map_ref());
-  m_forager.reset(new tasks::forager(p->estimation_alpha, forager_fsm));
+  m_forager.reset(new tasks::forager(p, forager_fsm));
   m_forager->set_atomic();
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =

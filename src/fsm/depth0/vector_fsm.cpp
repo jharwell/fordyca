@@ -62,11 +62,11 @@ vector_fsm::vector_fsm(uint frequent_collision_thresh,
     m_sensors(sensors),
     m_actuators(actuators),
     m_goal_data(),
-    m_ang_pid(5.0, 0, 0,
+    m_ang_pid(4.0, 0.0, 0,
               1,
-              -m_actuators->max_wheel_speed() * 0.5,
-              m_actuators->max_wheel_speed() * 0.5),
-    m_lin_pid(3.0, 0, 0.02,
+              -m_actuators->max_wheel_speed() * 0.50,
+              m_actuators->max_wheel_speed() * 0.50),
+    m_lin_pid(3.0, 0, 0,
               1,
               m_actuators->max_wheel_speed() * 0.1,
               m_actuators->max_wheel_speed() * 0.7) {
@@ -141,23 +141,39 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   }
   argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal_data.loc);
   argos::CVector2 heading = m_sensors->robot_heading();
-  double angle_diff = heading.Angle().GetValue() -
-                      robot_to_goal.Angle().GetValue();
 
-  ang_speed += m_ang_pid.calculate(0, angle_diff);
+  /*
+   * Can't use the angle obtained from the  (heading - robot_to_goal) vector
+   * directly as input into the PID loop. Because of the use of the atan2()
+   * function, the angle will always be between [-pi, pi]. However, there can be
+   * discontinuous jumps from a small positive angle to a large negative angle
+   * and vice versa which play havoc with the PID loop's ability to compensate.
+   *
+   * So, compute the angle indirectly using sine and cosine in order to account
+   * for sign differences and ensure continuity between PID inputs across
+   * timesteps.
+   */
+  double angle_to_goal = std::atan2(
+      m_goal_data.loc.GetY() - m_sensors->robot_loc().GetY(),
+      m_goal_data.loc.GetX() - m_sensors->robot_loc().GetX());
+  double angle_diff = angle_to_goal - heading.Angle().GetValue();
+  angle_diff = atan2(std::sin(angle_diff), std::cos(angle_diff));
+
+  ang_speed = m_ang_pid.calculate(0, -angle_diff);
   lin_speed = m_lin_pid.calculate(0, -1.0/std::fabs(angle_diff));
 
   ER_VER("target: (%f, %f)@%f", m_goal_data.loc.GetX(), m_goal_data.loc.GetY(),
          m_goal_data.loc.Angle().GetValue());
-  ER_VER("robot_to_target: vector=(%f, %f)@%f, len=%f",
+  ER_VER("robot_to_target: vector=(%f, %f)@%f, len=%f\n",
          robot_to_goal.GetX(), robot_to_goal.GetY(),
          robot_to_goal.Angle().GetValue(), robot_to_goal.Length());
-  ER_VER("robot_heading=(%f, %f)@%f ang_speed=%f lin_speed=%f",
+  ER_VER("robot_heading=(%f, %f)@%f ang_speed=%f lin_speed=%f\n",
          heading.GetX(), heading.GetY(), heading.Angle().GetValue(),
          ang_speed, lin_speed);
   m_actuators->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }
+
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_VECTOR != last_state()) {
     ER_DIAG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
