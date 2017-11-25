@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
-#include <limits>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"

@@ -31,6 +31,7 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/forager.hpp"
@@ -137,7 +138,7 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 
 void free_block_pickup::visit(controller::depth0::stateful_foraging_controller& controller) {
   controller.map()->accept(*this);
-  controller.fsm()->accept(*this);
+  controller.current_task()->accept(*this);
   controller.block(m_block);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());

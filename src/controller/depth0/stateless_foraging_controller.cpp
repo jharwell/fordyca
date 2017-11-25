@@ -72,7 +72,7 @@ void stateless_foraging_controller::ControlStep(void) {
 } /* ControlStep() */
 
 /*******************************************************************************
- * Base Diagnostics
+ * Stateless Diagnostics
  ******************************************************************************/
 bool stateless_foraging_controller::is_exploring_for_block(void) const {
   return m_fsm->is_exploring_for_block();

@@ -28,11 +28,16 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 #include "rcppsw/er/server.hpp"
+#include "rcppsw/task_allocation/polled_executive.hpp"
+#include "fordyca/tasks/generalist.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
+#include "fordyca/params/depth1/task_repository.hpp"
+#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
@@ -43,10 +48,29 @@
 NS_START(fordyca, controller, depth0);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+stateful_foraging_controller::stateful_foraging_controller(void) :
+    base_foraging_controller(),
+    m_light_loc(),
+    m_map(),
+    m_sensors(),
+    m_executive(),
+    m_generalist() {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
+tasks::foraging_task* stateful_foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
+} /* current_task() */
+
 bool stateful_foraging_controller::block_acquired(void) const {
-  return m_fsm->block_acquired();
+  if (current_task()) {
+    return current_task()->block_acquired();
+  } else {
+    return false;
+  }
 } /* block_acquired() */
 
 void stateful_foraging_controller::robot_loc(argos::CVector2 loc) {
@@ -77,19 +101,15 @@ void stateful_foraging_controller::ControlStep(void) {
    */
   process_los(m_sensors->los());
   m_map->update_density();
-  if (m_fsm->task_finished()) {
-    m_fsm->task_reset();
-    m_fsm->task_start(nullptr);
-  } else {
-    m_fsm->task_execute();
-  }
+  m_executive->run();
 } /* ControlStep() */
 
 void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::depth0::stateful_foraging_repository param_repo;
+  params::depth1::task_repository task_repo;
 
   base_foraging_controller::Init(node);
-  ER_NOM("Initializing depth0_foraging controller");
+  ER_NOM("Initializing stateful_foraging controller");
   param_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
 
@@ -107,13 +127,25 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
-  m_fsm.reset(
-      new fsm::depth0::stateful_foraging_fsm(static_cast<const struct params::fsm_params*>(
-          param_repo.get_params("fsm")), server(), m_sensors,
-                                             base_foraging_controller::actuators(),
-                                             m_map));
+  const params::fsm_params * fsm_params = static_cast<const struct params::fsm_params*>(
+      param_repo.get_params("fsm"));
 
-  ER_NOM("depth0_foraging controller initialization finished");
+  const task_allocation::task_params* task_params =
+      static_cast<const task_allocation::task_params*>(
+          task_repo.get_params("task"));
+
+  std::unique_ptr<task_allocation::taskable> generalist_fsm =
+      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
+          fsm_params,
+          base_foraging_controller::server(),
+          depth0::stateful_foraging_controller::sensors_ref(),
+          base_foraging_controller::actuators(),
+          depth0::stateful_foraging_controller::map_ref());
+  m_generalist.reset(new tasks::generalist(task_params, generalist_fsm));
+  m_generalist->parent(m_generalist.get());
+  m_generalist->set_atomic();
+
+  ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
 void stateful_foraging_controller::process_los(const representation::line_of_sight* const los) {
@@ -131,18 +163,30 @@ void stateful_foraging_controller::process_los(const representation::line_of_sig
 } /* process_los() */
 
 /*******************************************************************************
- * Base Diagnostics
+ * Stateless Diagnostics
  ******************************************************************************/
 bool stateful_foraging_controller::is_exploring_for_block(void) const {
-  return m_fsm->is_exploring_for_block();
+  if (current_task()) {
+    return current_task()->is_exploring_for_block();
+  } else {
+    return false;
+  }
 } /* is_exploring */
 
 bool stateful_foraging_controller::is_avoiding_collision(void) const {
-  return m_fsm->is_avoiding_collision();
+  if (current_task()) {
+    return current_task()->is_avoiding_collision();
+  } else {
+    return false;
+  }
 } /* is_avoiding_collision() */
 
 bool stateful_foraging_controller::is_transporting_to_nest(void) const {
-  return m_fsm->is_transporting_to_nest();
+  if (current_task()) {
+    return current_task()->is_transporting_to_nest();
+  } else {
+    return false;
+  }
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
@@ -165,14 +209,22 @@ double stateful_foraging_controller::timestep_distance(void) const {
 } /* timestep_distance() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Stateful Diagnostics
  ******************************************************************************/
 bool stateful_foraging_controller::is_acquiring_block(void) const {
-  return m_fsm->is_acquiring_block();
+  if (current_task()) {
+    return current_task()->is_acquiring_block();
+  } else {
+    return false;
+  }
 } /* is_acquiring_block() */
 
 bool stateful_foraging_controller::is_vectoring_to_block(void) const {
-  return m_fsm->is_vectoring_to_block();
+  if (current_task()) {
+    return current_task()->is_vectoring_to_block();
+  } else {
+    return false;
+  }
 } /* is_vectoring_to_block() */
 
 using namespace argos;

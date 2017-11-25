@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
-#include <limits>
 #include <random>
 
 #include <argos3/core/simulator/simulator.h>
@@ -42,6 +41,7 @@
 #include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 #include "fordyca/support/depth1/cache_usage_penalty.hpp"
 #include "fordyca/expressions/cache_respawn_probability.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces

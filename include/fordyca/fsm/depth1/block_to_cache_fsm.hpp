@@ -24,9 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <utility>
-
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"

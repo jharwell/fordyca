@@ -28,6 +28,7 @@
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
