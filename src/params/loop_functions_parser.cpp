@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/params/loop_functions_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
-#include "fordyca/params/cache_parser.hpp"
+#include "fordyca/params/depth1/cache_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, params);
 void loop_functions_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct loop_functions_params);
   std::vector<std::string> res, res2;
-  cache_parser c;
+  depth1::cache_parser c;
   c.parse(node);
   m_params->cache = *c.get_results();
 

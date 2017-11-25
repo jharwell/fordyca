@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,7 +33,7 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class foraging_qt_user_functions : public depth0::foraging_qt_user_functions {
+class foraging_qt_user_functions : public depth0::stateful_foraging_qt_user_functions {
  public:
   foraging_qt_user_functions(void) {}
 

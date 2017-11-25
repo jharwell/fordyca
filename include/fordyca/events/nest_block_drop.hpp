@@ -35,15 +35,16 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-namespace depth0 { class foraging_fsm; }
+namespace depth0 { class stateless_foraging_fsm; class stateful_foraging_fsm; }
 namespace depth1 { class block_to_cache_fsm; }
-class random_foraging_fsm;
 class block_to_nest_fsm;
 }
 namespace controller {
-class random_foraging_controller;
-namespace depth0 {class foraging_controller; }
-namespace depth1 {class foraging_controller; }
+namespace depth0 {
+class stateless_foraging_controller;
+class stateful_foraging_controller;
+}
+namespace depth1 { class foraging_controller; }
 }
 
 namespace representation { class block; class arena_map; };
@@ -64,11 +65,11 @@ NS_START(events);
  */
 class nest_block_drop : public visitor::visitor,
                         public rcppsw::er::client,
-                        public visitor::visit_set<controller::depth0::foraging_controller,
-                                                  controller::random_foraging_controller,
+                        public visitor::visit_set<controller::depth0::stateful_foraging_controller,
+                                                  controller::depth0::stateless_foraging_controller,
                                                   controller::depth1::foraging_controller,
-                                                  fsm::depth0::foraging_fsm,
-                                                  fsm::random_foraging_fsm,
+                                                  fsm::depth0::stateless_foraging_fsm,
+                                                  fsm::depth0::stateful_foraging_fsm,
                                                   fsm::block_to_nest_fsm,
                                                   representation::block,
                                                   representation::arena_map,
@@ -91,13 +92,14 @@ class nest_block_drop : public visitor::visitor,
   void visit(representation::arena_map& map) override;
   void visit(metrics::collectors::block_metrics_collector& collector) override;
 
-  /* random foraging */
+  /* stateless foraging */
   /**
    * @brief Update a block with the knowledge that it has been dropped.
    *
    * @param block The block to update.
    */
   void visit(representation::block& block) override;
+  void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
 
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
@@ -106,15 +108,14 @@ class nest_block_drop : public visitor::visitor,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::random_foraging_controller& controller) override;
+  void visit(controller::depth0::stateless_foraging_controller& controller) override;
 
-  /* depth0 foraging */
-  void visit(controller::depth0::foraging_controller& controller) override;
-  void visit(fsm::depth0::foraging_fsm& fsm) override;
+  /* stateful foraging */
+  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(fsm::random_foraging_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::collector& task) override;
   void visit(tasks::generalist& task) override;

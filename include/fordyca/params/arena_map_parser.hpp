@@ -29,7 +29,7 @@
 #include "fordyca/params/base_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/cache_parser.hpp"
+#include "fordyca/params/depth1/cache_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +52,7 @@ class arena_map_parser: public base_parser {
   std::unique_ptr<struct arena_map_params> m_params;
   grid_parser m_grid_parser;
   block_parser m_block_parser;
-  cache_parser m_cache_parser;
+  depth1::cache_parser m_cache_parser;
 };
 
 NS_END(params, fordyca);

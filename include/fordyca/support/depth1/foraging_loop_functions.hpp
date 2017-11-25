@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include "fordyca/support/depth0/foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,18 +38,14 @@ namespace robot_metrics {
 class depth1_collector;
 }}}
 
-NS_START(support);
-
-namespace depth0 { class foraging_loop_functions; }
-
-NS_START(depth1);
+NS_START(support, depth1);
 
 class cache_usage_penalty;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class foraging_loop_functions : public depth0::foraging_loop_functions {
+class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
   foraging_loop_functions(void);
   virtual ~foraging_loop_functions(void);

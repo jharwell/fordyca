@@ -38,7 +38,7 @@
 #include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
 #include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/random_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 #include "fordyca/support/depth1/cache_usage_penalty.hpp"
 #include "fordyca/expressions/cache_respawn_probability.hpp"
@@ -63,7 +63,7 @@ foraging_loop_functions::~foraging_loop_functions(void) {}
  * Member Functions
  ******************************************************************************/
 void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
-  depth0::foraging_loop_functions::Init(node);
+  depth0::stateful_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth1_foraging loop functions");
   params::loop_function_repository repo;
@@ -203,7 +203,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     }
 
     /* get stats from this robot before its state changes */
-    random_collector()->collect(controller);
+    stateless_collector()->collect(controller);
     distance_collector()->collect(controller);
     depth0_collector()->collect(controller);
     m_depth1_collector->collect(controller);
@@ -282,19 +282,19 @@ void foraging_loop_functions::PreStep() {
 } /* PreStep() */
 
 void foraging_loop_functions::Reset() {
-  depth0::foraging_loop_functions::Reset();
+  depth0::stateful_foraging_loop_functions::Reset();
   m_depth1_collector->reset();
   m_task_collector->reset();
 }
 
 void foraging_loop_functions::Destroy() {
-  depth0::foraging_loop_functions::Destroy();
+  depth0::stateful_foraging_loop_functions::Destroy();
   m_depth1_collector->finalize();
   m_task_collector->finalize();
 }
 
 void foraging_loop_functions::pre_step_final(void) {
-  depth0::foraging_loop_functions::pre_step_final();
+  depth0::stateful_foraging_loop_functions::pre_step_final();
 
   /*
    * The cache is recreated with a probability that depends on the relative

@@ -26,11 +26,11 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/controller/random_foraging_controller.hpp"
-#include "fordyca/controller/depth0/foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
-#include "fordyca/fsm/random_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/forager.hpp"
@@ -85,7 +85,7 @@ void free_block_pickup::visit(representation::arena_map& map) {
 } /* visit() */
 
 /*******************************************************************************
- * Random Foraging
+ * Stateless Foraging
  ******************************************************************************/
 void free_block_pickup::visit(representation::block& block) {
   block.add_carry();
@@ -98,21 +98,21 @@ void free_block_pickup::visit(representation::block& block) {
          m_block->id(), m_robot_index);
 } /* visit() */
 
-void free_block_pickup::visit(controller::random_foraging_controller& controller) {
+void free_block_pickup::visit(controller::depth0::stateless_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
-  ER_NOM("random_foraging_controller: %s picked up block%d",
+  ER_NOM("stateless_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
-void free_block_pickup::visit(fsm::random_foraging_fsm& fsm) {
-  ER_NOM("random_foraging_fsm: register free_block_pickup event");
+void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
+  ER_NOM("stateless_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************
- * Depth0 Foraging
+ * Stateful Foraging
  ******************************************************************************/
 void free_block_pickup::visit(representation::perceived_cell2D& cell) {
   cell.cell().accept(*this);
@@ -129,17 +129,17 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
          cell_op::x(), cell_op::y());
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::foraging_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
   ER_NOM("depth0_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth0::foraging_controller& controller) {
+void free_block_pickup::visit(controller::depth0::stateful_foraging_controller& controller) {
   controller.map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
-  ER_NOM("depth0_foraging_controller: %s picked up block%d",
+  ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(), m_block->id());
 } /* visit() */
 
@@ -157,7 +157,7 @@ void free_block_pickup::visit(controller::depth1::foraging_controller& controlle
 } /* visit() */
 
 void free_block_pickup::visit(tasks::generalist& task) {
-  static_cast<fsm::depth0::foraging_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::forager& task) {

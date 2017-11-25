@@ -30,7 +30,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
-#include "fordyca/params/cache_params.hpp"
+#include "fordyca/params/depth1/cache_params.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/occupancy_grid.hpp"
 
@@ -149,7 +149,7 @@ class arena_map: public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
-  const struct params::cache_params mc_cache_params;
+  const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2 mc_nest_center;
   std::vector<block> m_blocks;
   std::vector<cache> m_caches;

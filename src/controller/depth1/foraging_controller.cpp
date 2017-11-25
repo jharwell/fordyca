@@ -28,8 +28,8 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 #include "rcppsw/task_allocation/task_params.hpp"
-#include "fordyca/params/task_repository.hpp"
-#include "fordyca/params/depth0_foraging_repository.hpp"
+#include "fordyca/params/depth1/task_repository.hpp"
+#include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
@@ -50,7 +50,7 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller::foraging_controller(void) :
-    depth0::foraging_controller(),
+    depth0::stateful_foraging_controller(),
     m_task_aborted(false),
     m_executive(),
     m_forager(),
@@ -66,17 +66,17 @@ void foraging_controller::ControlStep(void) {
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  process_los(depth0::foraging_controller::los());
-  depth0::foraging_controller::map()->update_density();
+  process_los(depth0::stateful_foraging_controller::los());
+  depth0::stateful_foraging_controller::map()->update_density();
   m_task_aborted = false;
   m_executive->run();
 } /* ControlStep() */
 
 void foraging_controller::Init(argos::TConfigurationNode& node) {
-  params::task_repository task_repo;
-  params::depth0_foraging_repository fsm_repo;
+  params::depth1::task_repository task_repo;
+  params::depth0::stateful_foraging_repository fsm_repo;
 
-  depth0::foraging_controller::Init(node);
+  depth0::stateful_foraging_controller::Init(node);
   task_repo.parse_all(node);
   task_repo.show_all(server_handle()->log_stream());
   fsm_repo.parse_all(node);
@@ -91,27 +91,27 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
-          depth0::foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map_ref());
   m_collector.reset(new tasks::collector(p, collector_fsm));
 
   std::unique_ptr<task_allocation::taskable> forager_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
-          depth0::foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map_ref());
   m_forager.reset(new tasks::forager(p, forager_fsm));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::foraging_fsm>(
+      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
-          depth0::foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map_ref());
   m_generalist.reset(new tasks::generalist(p, generalist_fsm));
 
   m_generalist->partition1(m_forager.get());
@@ -159,7 +159,7 @@ bool foraging_controller::block_acquired(void) const {
 } /* block_detected() */
 
 void foraging_controller::process_los(const representation::line_of_sight* const los) {
-  depth0::foraging_controller::process_los(los);
+  depth0::stateful_foraging_controller::process_los(los);
 
   for (auto cache : los->caches()) {
     if (!map()->access(cache->discrete_loc().first,
