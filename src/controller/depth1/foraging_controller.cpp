@@ -28,6 +28,8 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 #include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/polled_executive.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
@@ -36,10 +38,10 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
+#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -190,7 +192,7 @@ double foraging_controller::timestep_distance(void) const {
 } /* timestep_distance() */
 
 /*******************************************************************************
- * Base Diagnostics
+ * Stateless Diagnostics
  ******************************************************************************/
 bool foraging_controller::is_exploring_for_block(void) const {
   if (current_task()) {
@@ -217,7 +219,7 @@ bool foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Stateful Diagnostics
  ******************************************************************************/
 bool foraging_controller::is_acquiring_block(void) const {
   if (current_task()) {

@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/control_interface/ci_controller.h>
+#include <argos/core/utility/math/vector2.h>
+
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
@@ -35,12 +35,22 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+namespace rcppsw { namespace task_allocation {
+class polled_executive;
+class executable_task;
+}}
+
+NS_START(fordyca);
+namespace tasks { class generalist; class foraging_task; };
+namespace representation { class perceived_arena_map; }
+
+NS_START(controller);
 namespace visitor = rcppsw::patterns::visitor;
 namespace depth1 { class foraging_sensors; }
 
 NS_START(depth0);
 namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,12 +64,7 @@ class stateful_foraging_controller : public base_foraging_controller,
                                      public rmetrics::depth0_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
-  stateful_foraging_controller(void) :
-      base_foraging_controller(),
-      m_light_loc(),
-      m_map(),
-      m_fsm(),
-      m_sensors() {}
+  stateful_foraging_controller(void);
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;
@@ -75,6 +80,8 @@ class stateful_foraging_controller : public base_foraging_controller,
   double timestep_distance(void) const override;
 
   bool block_acquired(void) const;
+
+  tasks::foraging_task* current_task(void) const;
 
   /**
    * @brief Set the current clock tick. In a real world, each robot would
@@ -136,13 +143,13 @@ class stateful_foraging_controller : public base_foraging_controller,
 
   argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
-  fsm::depth0::stateful_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::shared_ptr<fsm::depth0::stateful_foraging_fsm>  m_fsm;
   std::shared_ptr<depth1::foraging_sensors>            m_sensors;
+  std::unique_ptr<task_allocation::polled_executive> m_executive;
+  std::unique_ptr<tasks::generalist> m_generalist;
 };
 
 NS_END(depth0, controller, fordyca);

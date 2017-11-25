@@ -24,6 +24,8 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
