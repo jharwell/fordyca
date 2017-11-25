@@ -34,7 +34,7 @@ NS_START(fordyca, params);
 void metrics_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct metrics_params);
   argos::TConfigurationNode lnode = argos::GetNode(node, "metrics");
-  argos::GetNodeAttribute(lnode, "random_fname", m_params->random_fname);
+  argos::GetNodeAttribute(lnode, "stateless_fname", m_params->stateless_fname);
   argos::GetNodeAttribute(lnode, "distance_fname", m_params->distance_fname);
   argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
   argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
@@ -45,7 +45,7 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
 
 void metrics_parser::show(std::ostream& stream) {
   stream << "====================\nMetrics params\n====================\n";
-  stream << "random_fname=" << m_params->random_fname << std::endl;
+  stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
   stream << "distance_fname=" << m_params->distance_fname << std::endl;
   stream << "depth0_fname=" << m_params->depth0_fname << std::endl;
   stream << "depth1_fname=" << m_params->depth1_fname << std::endl;

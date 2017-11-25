@@ -31,9 +31,9 @@
 
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/depth0/vector_fsm.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 /*******************************************************************************
@@ -64,11 +64,11 @@ NS_START(fsm);
  * arena.
  *
  * Each robot executing this FSM will look for a block (either a known block or
- * via random exploration). Once an existing block has been acquired, it signals
+ * via stateless exploration). Once an existing block has been acquired, it signals
  * that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::stateless_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
@@ -148,7 +148,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::er::server> m_server;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
-  depth0::vector_fsm m_vector_fsm;
+  vector_fsm m_vector_fsm;
   explore_for_block_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

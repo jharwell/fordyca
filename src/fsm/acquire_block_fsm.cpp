@@ -163,7 +163,7 @@ bool acquire_block_fsm::acquire_known_block(
            best.first->discrete_loc().first,
            best.first->discrete_loc().second,
            best.second);
-    tasks::vector_argument v(depth0::vector_fsm::kBLOCK_ARRIVAL_TOL,
+    tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
                              best.first->real_loc());
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();

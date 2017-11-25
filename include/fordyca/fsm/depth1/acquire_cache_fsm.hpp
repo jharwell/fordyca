@@ -31,9 +31,9 @@
 
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/depth0/vector_fsm.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
@@ -64,7 +64,7 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::stateless_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                           public rcppsw::task_allocation::taskable {
@@ -153,7 +153,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   std::shared_ptr<rcppsw::er::server> m_server;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
 
-  depth0::vector_fsm m_vector_fsm;
+  vector_fsm m_vector_fsm;
   explore_for_cache_fsm m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

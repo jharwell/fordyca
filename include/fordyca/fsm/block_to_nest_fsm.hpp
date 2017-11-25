@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/fsm/depth0/vector_fsm.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/random_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
@@ -63,7 +63,7 @@ NS_START(fsm);
  * the nest.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::robot_metrics::random_metrics,
+                          public metrics::collectible_metrics::robot_metrics::stateless_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth0_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                           public task_allocation::taskable,

@@ -26,7 +26,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/repository.hpp"
+#include "fordyca/params/base_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class loop_function_repository: public repository {
+class loop_function_repository: public base_repository {
  public:
   loop_function_repository(void);
 };

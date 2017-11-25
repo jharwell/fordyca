@@ -67,7 +67,7 @@ class cache_found : public perceived_cell_op,
   void visit(fsm::cell2D_fsm& fsm) override;
 
   void visit(controller::depth1::foraging_controller&) override {}
-  void visit(controller::depth0::foraging_controller&) override {}
+  void visit(controller::depth0::stateful_foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

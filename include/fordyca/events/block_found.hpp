@@ -53,10 +53,11 @@ class block_found : public perceived_cell_op,
               const representation::block* block, size_t x, size_t y);
   ~block_found(void) { client::rmmod(); }
 
-  /* depth0 foraging */
+  /* stateful foraging */
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
+
   /**
    * @brief Drop a carried block in the nest, updating state as appropriate.
    *
@@ -64,7 +65,7 @@ class block_found : public perceived_cell_op,
    * needs to be done in the loop functions so the area can correctly be drawn
    * each timestep.
    */
-  void visit(controller::depth0::foraging_controller& controller) override;
+  void visit(controller::depth0::stateful_foraging_controller& controller) override;
 
   /**
    * @brief Update the arena_map on a block drop by distributing the block in a
