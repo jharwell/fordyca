@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,25 +36,32 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 std::list<const representation::block*> line_of_sight::blocks(void) const {
   std::list<const representation::block*> blocks;
-  for (auto i = m_view.origin();
-       i < m_view.origin() + m_view.num_elements(); ++i) {
-    if ((*i)->state_has_block()) {
-      blocks.push_back((*i)->block());
-      assert((*i)->block());
-    }
+
+  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
+    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
+      representation::cell2D* cell = m_view[i][j];
+      if (cell->state_has_block()) {
+        assert(dynamic_cast<const representation::block*>(cell->block()));
+        blocks.push_back(cell->block());
+      }
+    } /* for(j..) */
   } /* for(i..) */
+
   return blocks;
 } /* blocks() */
 
 std::list<const representation::cache*> line_of_sight::caches(void) const {
   std::list<const representation::cache*> caches;
-  for (auto i = m_view.origin();
-       i < m_view.origin() + m_view.num_elements(); ++i) {
-    if ((*i)->state_has_cache()) {
-      assert((*i)->cache());
-      caches.push_back((*i)->cache());
-    }
+  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
+    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
+      representation::cell2D* cell = m_view[i][j];
+      if (cell->state_has_cache()) {
+        assert(dynamic_cast<const representation::cache*>(cell->cache()));
+        caches.push_back(cell->cache());
+      }
+    } /* for(j..) */
   } /* for(i..) */
+
   return caches;
 } /* caches() */
 

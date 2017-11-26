@@ -61,10 +61,13 @@ cache_block_drop::cache_block_drop(
  * Depth1 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(representation::perceived_cell2D& cell) {
+  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not contain a cache");
   cell.cell().accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::cell2D& cell) {
+  ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
+            "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
             "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",

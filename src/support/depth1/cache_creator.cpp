@@ -58,8 +58,8 @@ representation::cache cache_creator::create_single(
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  representation::discrete_coord d(static_cast<size_t>(center.GetX()/ m_resolution),
-                                   static_cast<size_t>(center.GetY()/ m_resolution));
+  representation::discrete_coord d = representation::real_to_discrete_coord(center,
+                                                                            m_resolution);
   representation::cell2D& cell = m_grid.access(d.first, d.second);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
@@ -80,8 +80,8 @@ representation::cache cache_creator::create_single(
     events::free_block_drop op(m_server, block, d.first, d.second, m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
-  ER_NOM("Create cache at (%f, %f) with  %zu blocks",
-         center.GetX(), center.GetY(), blocks.size());
+  ER_NOM("Create cache at (%f, %f) -> (%zu, %zu) with  %zu blocks",
+         center.GetX(), center.GetY(), d.first, d.second, blocks.size());
 
   representation::cache c(m_cache_size, center, blocks);
   c.discrete_loc(representation::real_to_discrete_coord(center, m_resolution));

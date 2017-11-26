@@ -33,7 +33,6 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
@@ -209,7 +208,6 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     m_depth1_collector->collect(controller);
     m_task_collector->collect(controller);
 
-    /* Send the robot its new line of sight */
     set_robot_pos<controller::depth1::foraging_controller>(robot);
     set_robot_los<controller::depth1::foraging_controller>(robot);
     set_robot_tick<controller::depth1::foraging_controller>(robot);

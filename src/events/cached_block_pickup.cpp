@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
@@ -69,6 +70,8 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::cell2D& cell) {
+  ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
+            "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -78,6 +81,7 @@ void cached_block_pickup::visit(representation::cache& cache) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
+  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
   cell.cell().accept(*this);
 } /* visit() */
 
@@ -126,8 +130,6 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   representation::perceived_cell2D& cell = map.access(cell_op::x(),
                                                       cell_op::y());
-  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
-
   if (nullptr != m_cache) {
     /* -1 because it was already decremented by arena_map */
     ER_ASSERT(m_cache->n_blocks() == cell.block_count() - 1,
@@ -143,7 +145,18 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
       m_cache->block_remove(m_block);
     }
   }
-  cell.accept(*this);
+
+  /*
+   * If the cell does not contain a cache, then the robot has managed to drive
+   * into the cache without the cell that actually contains the blocks/cache
+   * ending up in its LOS, and so it thinks it is empty, which will trigger an
+   * assert later. This *should* never happen (see fixed issue #152), but if it
+   * does, we don't want to assert. Instead, because the cell will be in an
+   * empty state, we just don't do anything.
+   */
+  if (cell.state_has_cache()) {
+    cell.accept(*this);
+  }
 
   ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
          m_robot_index, m_block->id(), (m_cache)?m_cache->id():-1, cell_op::x(), cell_op::y(),
