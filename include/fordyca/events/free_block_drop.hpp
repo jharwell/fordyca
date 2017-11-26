@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
@@ -34,7 +35,6 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class block; }
 
 NS_START(events);
 
@@ -43,7 +43,7 @@ NS_START(events);
  ******************************************************************************/
 class free_block_drop : public cell_op,
                         public rcppsw::er::client,
-                        public visitor::visit_set<representation::block> {
+                        public block_drop_event {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   representation::block* block, size_t x, size_t y,
@@ -56,7 +56,10 @@ class free_block_drop : public cell_op,
    *
    * @param cell The cell to update.
    */
-  void visit(class representation::cell2D& cell) override;
+  void visit(representation::cell2D& cell) override;
+
+  void visit(controller::depth1::foraging_controller&) override {}
+  void visit(representation::arena_map&) override {}
 
   /**
    * @brief Update the FSM associated with a cell on a block drop.
@@ -71,7 +74,6 @@ class free_block_drop : public cell_op,
    * @param block The block to update.
    */
   void visit(representation::block& block) override;
-
   void visit(representation::perceived_cell2D&) override {}
 
   /**
