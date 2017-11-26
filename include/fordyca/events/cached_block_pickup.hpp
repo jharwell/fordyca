@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/events/block_pickup_event.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,14 +34,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class perceived_arena_map;
-class cache;
-class block;
-class arena_map;
-}
-namespace fsm { class block_to_nest_fsm; }
-namespace controller { namespace depth1 {class foraging_controller; }}
+namespace representation { class cache; }
 namespace tasks { class collector; }
 
 NS_START(events);
@@ -50,13 +44,9 @@ NS_START(events);
  ******************************************************************************/
 class cached_block_pickup : public cell_op,
                             public rcppsw::er::client,
-                            public visitor::visit_set<controller::depth1::foraging_controller,
-                                                      fsm::block_to_nest_fsm,
-                                                      tasks::collector,
-                                                      representation::block,
-                                                      representation::cache,
-                                                      representation::arena_map,
-                                                      representation::perceived_arena_map> {
+                            public block_pickup_event,
+                            public visitor::visit_set<tasks::collector,
+                                                      representation::cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                       representation::cache* cache, size_t robot_index);

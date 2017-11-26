@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/events/block_drop_event.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,11 +44,8 @@ namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-namespace depth1 { class foraging_controller; }
-}
+}}
 
-namespace representation { class block; class arena_map; };
 namespace metrics { namespace collectors { class block_metrics_collector; }}
 namespace tasks { class generalist; class collector; }
 
@@ -64,15 +62,13 @@ NS_START(events);
  * ways.
  */
 class nest_block_drop : public visitor::visitor,
+                        public block_drop_event,
                         public rcppsw::er::client,
                         public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                                   controller::depth0::stateless_foraging_controller,
-                                                  controller::depth1::foraging_controller,
                                                   fsm::depth0::stateless_foraging_fsm,
                                                   fsm::depth0::stateful_foraging_fsm,
                                                   fsm::block_to_nest_fsm,
-                                                  representation::block,
-                                                  representation::arena_map,
                                                   tasks::generalist,
                                                   tasks::collector,
                                                   metrics::collectors::block_metrics_collector> {

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
@@ -34,15 +35,8 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class perceived_arena_map;
-class cache;
-class block;
-class arena_map;
-};
-
+namespace representation { class perceived_arena_map; class cache; }
 namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
-namespace controller { namespace depth1 { class foraging_controller; }}
 namespace tasks { class forager; }
 
 NS_START(events);
@@ -52,13 +46,11 @@ NS_START(events);
  ******************************************************************************/
 class cache_block_drop : public cell_op,
                          public rcppsw::er::client,
-                         public visitor::visit_set<controller::depth1::foraging_controller,
-                                                   fsm::depth1::block_to_cache_fsm,
+                         public block_drop_event,
+                         public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
                                                    tasks::forager,
                                                    representation::perceived_arena_map,
-                                                   representation::block,
-                                                   representation::cache,
-                                                   representation::arena_map> {
+                                                   representation::cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                    representation::block* block, representation::cache* cache,

@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/events/cell_op.hpp"
+#include "fordyca/events/block_pickup_event.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,19 +38,12 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm {
 namespace depth0 { class stateless_foraging_fsm; class stateful_foraging_fsm; }
 namespace depth1 { class block_to_cache_fsm; }
-class block_to_nest_fsm;
 }
 namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
 }
-namespace depth1 {class foraging_controller; }
-}
-namespace representation {
-class perceived_arena_map;
-class block;
-class arena_map;
 }
 
 namespace tasks { class generalist; class forager; }
@@ -70,16 +64,12 @@ NS_START(events);
  */
 class free_block_pickup : public cell_op,
                           public rcppsw::er::client,
+                          public block_pickup_event,
                           public visitor::visit_set<controller::depth0::stateless_foraging_controller,
                                                     controller::depth0::stateful_foraging_controller,
-                                                    controller::depth1::foraging_controller,
                                                     fsm::depth0::stateless_foraging_fsm,
                                                     fsm::depth0::stateful_foraging_fsm,
                                                     fsm::depth1::block_to_cache_fsm,
-                                                    fsm::block_to_nest_fsm,
-                                                    representation::block,
-                                                    representation::arena_map,
-                                                    representation::perceived_arena_map,
                                                     tasks::generalist,
                                                     tasks::forager> {
  public:
