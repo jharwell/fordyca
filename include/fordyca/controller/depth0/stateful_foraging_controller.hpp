@@ -29,8 +29,8 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,8 +60,8 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class stateful_foraging_controller : public base_foraging_controller,
                                      public rmetrics::stateless_metrics,
+                                     public rmetrics::stateful_metrics,
                                      public rmetrics::distance_metrics,
-                                     public rmetrics::depth0_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);

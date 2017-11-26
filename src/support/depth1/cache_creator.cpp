@@ -55,6 +55,18 @@ representation::cache cache_creator::create_single(
     const argos::CVector2& center) {
 
   /*
+   * The cell that will be the location of the new cache may already contain a
+   * block. If so, it should be added to the list of blocks for the cache.
+   */
+  representation::discrete_coord d(static_cast<size_t>(center.GetX()/ m_resolution),
+                                   static_cast<size_t>(center.GetY()/ m_resolution));
+  representation::cell2D& cell = m_grid.access(d.first, d.second);
+  if (cell.state_has_block()) {
+    ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
+    blocks.push_back(cell.block());
+  }
+
+  /*
    * The cells for all blocks that will comprise the cache should be emptied,
    * and all blocks be deposited in a single cell.
    */
@@ -65,10 +77,7 @@ representation::cache cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block,
-                               static_cast<size_t>(center.GetX()/ m_resolution),
-                               static_cast<size_t>(center.GetY()/ m_resolution),
-                               m_resolution);
+    events::free_block_drop op(m_server, block, d.first, d.second, m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) with  %zu blocks",

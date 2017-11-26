@@ -25,11 +25,11 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/ds/grid2D_ptr.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, representation);
 class cell2D;
 

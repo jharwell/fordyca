@@ -25,6 +25,7 @@
 #include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,11 +52,23 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) 
 
   if (controller.display_los()) {
     const representation::line_of_sight* los = controller.los();
-    DrawCircle(argos::CVector3(0, 0, 0),
-               argos::CQuaternion(),
-               (los->sizex()/2.0)*0.2,
-               argos::CColor::RED,
-               false);
+    const double resolution = 0.2;
+    std::vector<argos::CVector2> points;
+    points.emplace_back(-resolution * los->sizex()/2,
+                        -resolution * los->sizey()/2);
+    points.emplace_back(-resolution * los->sizex()/2,
+                        resolution * los->sizey()/2);
+    points.emplace_back(resolution * los->sizex()/2,
+                        resolution * los->sizey()/2);
+    points.emplace_back(resolution * los->sizex()/2,
+                        -resolution * los->sizey()/2);
+
+    /* draw slightly above the ground so that it renders better */
+    DrawPolygon(argos::CVector3(0, 0, 0.05),
+                argos::CQuaternion(),
+                points,
+                argos::CColor::RED,
+                false);
   }
 }
 

@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces

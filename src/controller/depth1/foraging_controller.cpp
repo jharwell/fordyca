@@ -29,6 +29,7 @@
 
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
+#include "rcppsw/er/server.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
@@ -42,6 +43,7 @@
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces

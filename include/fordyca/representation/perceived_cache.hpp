@@ -1,5 +1,5 @@
 /**
- * @file block_utility.hpp
+ * @file perceived_cache.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,26 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
+#include <utility>
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, representation);
+class cache;
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @brief Calculates the utility associated with a known block, as part of a
- * robot's decision on whether or not to go and attempt to pick it up.
- *
- * Depends on:
- *
- * - Distance of block to nest (Further is better).
- * - Distance of block to robot's current position (closer is better).
- * - Pheromone density associated with the block information (higher is better).
- */
-class block_utility: public rcppsw::math::expression<double>  {
- public:
-  block_utility(const argos::CVector2& block_loc,
-                const argos::CVector2& nest_loc) :
-      mc_block_loc(block_loc),
-      mc_nest_loc(nest_loc) {}
+typedef std::pair<const cache*, double> perceived_cache;
 
-  double calc(const argos::CVector2& rloc, double density);
+NS_END(representation, fordyca);
 
- private:
-  const argos::CVector2 mc_block_loc;
-  const argos::CVector2 mc_nest_loc;
-};
-
-NS_END(expressions, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_CACHE_HPP_ */

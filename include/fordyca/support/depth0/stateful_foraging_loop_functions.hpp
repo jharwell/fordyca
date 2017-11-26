@@ -31,10 +31,12 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace metrics { namespace collectors { namespace robot_metrics {
-class depth0_collector;
+class stateful_metrics_collector;
 }}}
 namespace controller { namespace depth0 { class foraging_controller; }}
 NS_START(support, depth0);
+
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Classes
@@ -59,7 +61,7 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   template<typename t>
   void set_robot_tick(argos::CFootBotEntity& robot);
 
-  metrics::collectors::robot_metrics::depth0_collector* depth0_collector(void) const;
+  robot_collectors::stateful_metrics_collector* stateful_collector(void) const;
   void pre_step_final(void) override;
 
  private:
@@ -69,7 +71,7 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   stateful_foraging_loop_functions(const stateful_foraging_loop_functions& s) = delete;
   stateful_foraging_loop_functions& operator=(const stateful_foraging_loop_functions& s) = delete;
 
-  std::unique_ptr<metrics::collectors::robot_metrics::depth0_collector> m_collector;
+  std::unique_ptr<robot_collectors::stateful_metrics_collector> m_collector;
 };
 
 NS_END(depth0, support, fordyca);

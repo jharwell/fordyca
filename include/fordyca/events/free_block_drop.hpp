@@ -45,7 +45,6 @@ class free_block_drop : public cell_op,
                         public rcppsw::er::client,
                         public visitor::visit_set<representation::block> {
  public:
-
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   representation::block* block, size_t x, size_t y,
                   double resolution);

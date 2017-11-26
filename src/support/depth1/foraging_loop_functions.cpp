@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
 #include <random>
-
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -34,10 +35,10 @@
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
 #include "fordyca/metrics/collectors/task_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth1_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 #include "fordyca/support/depth1/cache_usage_penalty.hpp"
 #include "fordyca/expressions/cache_respawn_probability.hpp"
@@ -47,8 +48,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-
-namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -76,7 +75,7 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   mc_cache_respawn_scale_factor = static_cast<const struct params::loop_functions_params*>(
       repo.get_params("loop_functions"))->cache.static_respawn_scale_factor;
 
-  m_depth1_collector.reset(new robot_collectors::depth1_collector(
+  m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
       static_cast<const struct params::metrics_params*>(
           repo.get_params("metrics"))->depth1_fname));
   m_depth1_collector->reset();
@@ -161,7 +160,8 @@ bool foraging_loop_functions::handle_cache_block_drop(
       /* Update arena map state due to a block nest drop */
       events::cache_block_drop drop_op(rcppsw::er::g_server,
                                        controller.block(),
-                                       &map()->caches()[cache]);
+                                       &map()->caches()[cache],
+                                       map()->grid_resolution());
 
     map()->accept(drop_op);
     controller.visitor::template visitable_any<T>::accept(drop_op);
@@ -204,8 +204,8 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
     /* get stats from this robot before its state changes */
     stateless_collector()->collect(controller);
+    stateful_collector()->collect(controller);
     distance_collector()->collect(controller);
-    depth0_collector()->collect(controller);
     m_depth1_collector->collect(controller);
     m_task_collector->collect(controller);
 
@@ -311,7 +311,18 @@ void foraging_loop_functions::pre_step_final(void) {
     if (p.calc(n_foragers, n_collectors) >=
         static_cast<double>(rand()) / RAND_MAX) {
       map()->static_cache_create();
+      representation::cell2D& cell = map()->access(map()->caches()[0].discrete_loc().first,
+                                                   map()->caches()[0].discrete_loc().second);
+      ER_ASSERT(map()->caches()[0].n_blocks() == cell.block_count(),
+                "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+                map()->caches()[0].n_blocks(), cell.block_count());
+      floor()->SetChanged();
     }
+  }
+
+  if (map()->cache_removed()) {
+    floor()->SetChanged();
+    map()->cache_removed(false);
   }
 
   m_depth1_collector->csv_line_write(GetSpace().GetSimulationClock());

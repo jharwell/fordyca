@@ -1,5 +1,5 @@
 /**
- * @file block_utility.hpp
+ * @file cache_respawn_probability.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/expressions/cache_respawn_probability.hpp"
+#include <cmath>
 
 /*******************************************************************************
  * Namespaces
@@ -34,32 +30,16 @@
 NS_START(fordyca, expressions);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @brief Calculates the utility associated with a known block, as part of a
- * robot's decision on whether or not to go and attempt to pick it up.
- *
- * Depends on:
- *
- * - Distance of block to nest (Further is better).
- * - Distance of block to robot's current position (closer is better).
- * - Pheromone density associated with the block information (higher is better).
- */
-class block_utility: public rcppsw::math::expression<double>  {
- public:
-  block_utility(const argos::CVector2& block_loc,
-                const argos::CVector2& nest_loc) :
-      mc_block_loc(block_loc),
-      mc_nest_loc(nest_loc) {}
-
-  double calc(const argos::CVector2& rloc, double density);
-
- private:
-  const argos::CVector2 mc_block_loc;
-  const argos::CVector2 mc_nest_loc;
-};
+double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {
+    double tmp;
+    if (0 == n_collectors) {
+      tmp = mc_scale_factor * n_foragers;
+    } else {
+      tmp = mc_scale_factor * n_foragers/n_collectors;
+    }
+    return set_result(1 - std::exp(-tmp));
+  } /* calc() */
 
 NS_END(expressions, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */

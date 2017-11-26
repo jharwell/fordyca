@@ -84,6 +84,8 @@ void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
 void cached_block_pickup::visit(representation::arena_map& map) {
   ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
   int cache_id = m_cache->id();
+  ER_ASSERT(-1 != cache_id, "FATAL: Cache ID undefined on block pickup");
+
   representation::discrete_coord coord = m_cache->discrete_loc();
   ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
                                                     cell_op::y()),
@@ -92,7 +94,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 
   representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
-            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
+            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
             m_cache->n_blocks(), cell.block_count());
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
@@ -111,9 +113,8 @@ void cached_block_pickup::visit(representation::arena_map& map) {
     ER_ASSERT(cell.state_has_block(),
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(), cell_op::y());
-
-    map.caches().erase(std::remove(map.caches().begin(),
-                                   map.caches().end(), *m_cache));
+    map.cache_remove(*m_cache);
+    map.cache_removed(true);
     m_cache = nullptr;
   }
   m_block->accept(*this);

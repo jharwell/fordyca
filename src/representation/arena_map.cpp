@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
+#include "rcppsw/er/server.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena_map_params.hpp"
@@ -36,6 +37,7 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena_map_params* params) :
+    m_cache_removed(false),
     mc_cache_params(params->cache),
     mc_nest_center(params->nest_center),
     m_blocks(params->block.n_blocks,
@@ -177,5 +179,10 @@ void arena_map::distribute_blocks(bool first_time) {
     } /* for(j..) */
   } /* for(i..) */
 } /* distribute_blocks() */
+
+void arena_map::cache_remove(cache& victim) {
+  m_caches.erase(std::remove(m_caches.begin(),
+                             m_caches.end(), victim));
+} /* cache_remove() */
 
 NS_END(representation, fordyca);

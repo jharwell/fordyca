@@ -1,5 +1,5 @@
 /**
- * @file depth0_collector.cpp
+ * @file stateful_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,29 +32,29 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string depth0_collector::csv_header_build(const std::string& header) {
+std::string stateful_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_block;n_vectoring_to_block";
 } /* csv_header_build() */
 
-void depth0_collector::reset(void) {
+void stateful_metrics_collector::reset(void) {
   base_metric_collector::reset();
   reset_on_timestep();
 } /* reset() */
 
-void depth0_collector::collect(
-    const collectible_metrics::robot_metrics::depth0_metrics& metrics) {
+void stateful_metrics_collector::collect(
+    const collectible_metrics::robot_metrics::stateful_metrics& metrics) {
   m_stats.n_acquiring_block += metrics.is_acquiring_block();
   m_stats.n_vectoring_to_block += metrics.is_vectoring_to_block();
 } /* collect() */
 
-bool depth0_collector::csv_line_build(std::string& line) {
+bool stateful_metrics_collector::csv_line_build(std::string& line) {
   line = std::to_string(m_stats.n_acquiring_block) + ";" +
          std::to_string(m_stats.n_vectoring_to_block);
   return true;
 } /* store_foraging_stats() */
 
-void depth0_collector::reset_on_timestep(void) {
+void stateful_metrics_collector::reset_on_timestep(void) {
   m_stats = {0, 0};
 } /* reset_on_timestep() */
 

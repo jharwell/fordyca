@@ -24,6 +24,7 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces

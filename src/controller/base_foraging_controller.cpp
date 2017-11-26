@@ -29,7 +29,7 @@
 
 #include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/params/base_repository.hpp"
+#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "rcppsw/er/server.hpp"
@@ -77,7 +77,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
                                                          GetId() +
                                               std::string(".txt")));
   ER_NOM("Initializing base foraging controller");
-  params::base_repository param_repo;
+  params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
   param_repo.show_all(client::server_handle()->log_stream());
 

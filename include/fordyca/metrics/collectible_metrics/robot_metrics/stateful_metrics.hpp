@@ -1,5 +1,5 @@
 /**
- * @file block_utility.hpp
+ * @file stateful_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_STATEFUL_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_STATEFUL_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/**
- * @brief Calculates the utility associated with a known block, as part of a
- * robot's decision on whether or not to go and attempt to pick it up.
- *
- * Depends on:
- *
- * - Distance of block to nest (Further is better).
- * - Distance of block to robot's current position (closer is better).
- * - Pheromone density associated with the block information (higher is better).
- */
-class block_utility: public rcppsw::math::expression<double>  {
+class stateful_metrics : public base_collectible_metrics {
  public:
-  block_utility(const argos::CVector2& block_loc,
-                const argos::CVector2& nest_loc) :
-      mc_block_loc(block_loc),
-      mc_nest_loc(nest_loc) {}
+  stateful_metrics(void) {}
+  virtual ~stateful_metrics(void) {}
 
-  double calc(const argos::CVector2& rloc, double density);
-
- private:
-  const argos::CVector2 mc_block_loc;
-  const argos::CVector2 mc_nest_loc;
+  virtual bool is_acquiring_block(void) const = 0;
+  virtual bool is_vectoring_to_block(void) const = 0;
 };
 
-NS_END(expressions, fordyca);
+NS_END(robot_metrics, collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_STATEFUL_METRICS_HPP_ */
