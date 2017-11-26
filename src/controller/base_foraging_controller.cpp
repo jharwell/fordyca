@@ -26,6 +26,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+#include <fstream>
 
 #include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"

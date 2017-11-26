@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include <fstream>
+
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/sensor_params.hpp"

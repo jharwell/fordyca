@@ -24,9 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/actuator_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +37,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class actuator_parser : public base_parser {
+class actuator_parser : public rcppsw::common::xml_param_parser {
  public:
   actuator_parser(void) : m_params() {}
 

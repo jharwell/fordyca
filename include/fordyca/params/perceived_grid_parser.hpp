@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class perceived_grid_parser: public base_parser {
+class perceived_grid_parser: public rcppsw::common::xml_param_parser {
  public:
   perceived_grid_parser(void): m_params(), m_grid_parser() {}
 

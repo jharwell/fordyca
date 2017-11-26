@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/base_repository.hpp"
+#include "rcppsw/common/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class task_repository: public base_repository {
+class task_repository: public rcppsw::common::xml_param_repository {
  public:
   task_repository(void);
 };

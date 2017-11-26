@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +38,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class grid_parser: public base_parser {
+class grid_parser: public rcppsw::common::xml_param_parser {
  public:
   grid_parser(void): m_params() {}
 

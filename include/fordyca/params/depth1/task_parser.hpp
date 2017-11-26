@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +39,7 @@ namespace task_allocation = rcppsw::task_allocation;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class task_parser: public base_parser {
+class task_parser: public rcppsw::common::xml_param_parser {
  public:
   task_parser(void) : m_params() {}
 

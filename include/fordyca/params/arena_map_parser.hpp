@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/arena_map_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/depth1/cache_parser.hpp"
@@ -39,7 +41,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class arena_map_parser: public base_parser {
+class arena_map_parser: public rcppsw::common::xml_param_parser {
  public:
   arena_map_parser(void): m_params(), m_grid_parser(), m_block_parser(),
                           m_cache_parser() {}
