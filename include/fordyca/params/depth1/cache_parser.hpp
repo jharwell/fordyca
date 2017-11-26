@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/depth1/cache_params.hpp"
-#include "fordyca/params/base_parser.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +38,7 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class cache_parser: public base_parser {
+class cache_parser: public rcppsw::common::xml_param_parser {
  public:
   cache_parser(void): m_params() {}
 

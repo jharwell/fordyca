@@ -96,7 +96,8 @@ class perceived_arena_map: public rcppsw::er::client,
 
  private:
   std::shared_ptr<rcppsw::er::server> m_server;
-  rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;
+  rcppsw::ds::grid2D_ptr<perceived_cell2D,
+                         std::shared_ptr<rcppsw::er::server>&> m_grid;
 };
 
 NS_END(representation, fordyca);

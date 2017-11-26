@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/base_repository.hpp"
+#include "rcppsw/common/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class stateful_foraging_repository: public base_repository {
+class stateful_foraging_repository: public rcppsw::common::xml_param_repository {
  public:
   stateful_foraging_repository(void);
 };
