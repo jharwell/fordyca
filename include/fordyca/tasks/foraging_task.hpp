@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
@@ -51,7 +51,7 @@ NS_START(tasks);
  * Structure Definitions
  ******************************************************************************/
 class foraging_task : public metrics::collectible_metrics::robot_metrics::stateless_metrics,
-                      public metrics::collectible_metrics::robot_metrics::depth0_metrics,
+                      public metrics::collectible_metrics::robot_metrics::stateful_metrics,
                       public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                       public metrics::collectible_metrics::task_metrics,
                       public visitor::polymorphic_visitable<foraging_task,

@@ -36,7 +36,7 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode lnode = argos::GetNode(node, "metrics");
   argos::GetNodeAttribute(lnode, "stateless_fname", m_params->stateless_fname);
   argos::GetNodeAttribute(lnode, "distance_fname", m_params->distance_fname);
-  argos::GetNodeAttribute(lnode, "depth0_fname", m_params->depth0_fname);
+  argos::GetNodeAttribute(lnode, "stateful_fname", m_params->stateful_fname);
   argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
   argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
   argos::GetNodeAttribute(lnode, "task_fname", m_params->task_fname);
@@ -46,8 +46,8 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
 void metrics_parser::show(std::ostream& stream) {
   stream << "====================\nMetrics params\n====================\n";
   stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
+  stream << "stateful_fname=" << m_params->stateful_fname << std::endl;
   stream << "distance_fname=" << m_params->distance_fname << std::endl;
-  stream << "depth0_fname=" << m_params->depth0_fname << std::endl;
   stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
   stream << "block_fname=" << m_params->block_fname << std::endl;
   stream << "task_fname=" << m_params->task_fname << std::endl;

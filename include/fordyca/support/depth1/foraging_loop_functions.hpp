@@ -35,12 +35,13 @@ NS_START(fordyca);
 namespace metrics { namespace collectors {
 class task_collector;
 namespace robot_metrics {
-class depth1_collector;
+class depth1_metrics_collector;
 }}}
 
 NS_START(support, depth1);
 
 class cache_usage_penalty;
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Classes
@@ -77,8 +78,8 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
   uint mc_cache_penalty;
-  uint mc_cache_respawn_scale_factor;
-  std::unique_ptr<metrics::collectors::robot_metrics::depth1_collector> m_depth1_collector;
+  double mc_cache_respawn_scale_factor;
+  std::unique_ptr<robot_collectors::depth1_metrics_collector> m_depth1_collector;
   std::unique_ptr<metrics::collectors::task_collector> m_task_collector;
   std::list<cache_usage_penalty*> m_penalty_list;
 };

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
@@ -43,11 +44,14 @@ NS_START(fordyca, events);
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<rcppsw::er::server>& server,
-    representation::block* block, representation::cache* cache) :
+    representation::block* block, representation::cache* cache,
+    double resolution) :
     cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
     client(server),
+    m_resolution(resolution),
     m_block(block),
-    m_cache(cache) {
+    m_cache(cache),
+    m_server(server) {
   client::insmod("cache_block_drop",
                     rcppsw::er::er_lvl::DIAG,
                     rcppsw::er::er_lvl::NOM);
@@ -57,11 +61,17 @@ cache_block_drop::cache_block_drop(
  * Depth1 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(representation::perceived_cell2D& cell) {
+  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not contain a cache");
   cell.cell().accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::cell2D& cell) {
+  ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
+            "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
+  ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
+            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+            m_cache->n_blocks(), cell.block_count());
 } /* visit() */
 
 void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
@@ -84,7 +94,9 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {
-  block.robot_index(-1);
+  events::free_block_drop e(m_server, &block, cell_op::x(), cell_op::y(),
+                            m_resolution);
+  block.accept(e);
 } /* visit() */
 
 void cache_block_drop::visit(representation::cache& cache) {

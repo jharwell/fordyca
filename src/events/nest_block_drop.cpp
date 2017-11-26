@@ -56,8 +56,8 @@ nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::er::server>& serv
  ******************************************************************************/
 void nest_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
-  map.distribute_block(m_block, false);
   int index = m_block->robot_index();
+  map.distribute_block(m_block, false);
   m_block->accept(*this);
   ER_NOM("fb%d dropped block%d in nest", index, m_block->id());
 } /* visit() */

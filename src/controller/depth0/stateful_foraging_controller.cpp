@@ -41,6 +41,7 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -111,7 +112,9 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   base_foraging_controller::Init(node);
   ER_NOM("Initializing stateful_foraging controller");
   param_repo.parse_all(node);
+  task_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
+  task_repo.show_all(server_handle()->log_stream());
 
   m_map.reset(new representation::perceived_arena_map(
       server(),
@@ -144,6 +147,10 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   m_generalist.reset(new tasks::generalist(task_params, generalist_fsm));
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
+
+  m_executive.reset(new task_allocation::polled_executive(
+      base_foraging_controller::server(),
+      m_generalist.get()));
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */

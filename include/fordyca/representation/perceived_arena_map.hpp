@@ -27,13 +27,16 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/representation/perceived_block.hpp"
+#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace rcppsw { namespace er { class server; }}
+
 NS_START(fordyca);
 namespace params { struct perceived_grid_params; }
 NS_START(representation);

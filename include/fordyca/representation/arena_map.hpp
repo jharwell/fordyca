@@ -67,6 +67,10 @@ class arena_map: public rcppsw::er::client,
   std::vector<block>& blocks(void) { return m_blocks; }
 
   std::vector<cache>& caches(void) { return m_caches; }
+  void cache_remove(cache& victim);
+  void cache_removed(bool b) { m_cache_removed = b; }
+  bool cache_removed(void) const { return m_cache_removed; }
+
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
 
   /**
@@ -149,6 +153,7 @@ class arena_map: public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
+  bool m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2 mc_nest_center;
   std::vector<block> m_blocks;

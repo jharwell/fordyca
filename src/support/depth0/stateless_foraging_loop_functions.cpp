@@ -21,9 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
+
+#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"

@@ -1,5 +1,5 @@
 /**
- * @file depth0_collector.hpp
+ * @file perceived_block.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,27 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_BLOCK_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_BLOCK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include <utility>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-namespace collectible_metrics { namespace robot_metrics { class depth0_metrics; } }
+NS_START(fordyca, representation);
 
-NS_START(collectors, robot_metrics);
+class block;
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-class depth0_collector : public base_metric_collector {
- public:
-  explicit depth0_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+typedef std::pair<const block*, double> perceived_block;
 
-  void reset(void) override;
-  void collect(const collectible_metrics::robot_metrics::depth0_metrics& metrics);
-  void reset_on_timestep(void) override;
+NS_END(representation, fordyca);
 
- private:
-  struct stats {
-    size_t n_acquiring_block;
-    size_t n_vectoring_to_block;
-  };
-
-  std::string csv_header_build(const std::string& header = "") override;
-  bool csv_line_build(std::string& line) override;
-
-  struct stats m_stats;
-};
-
-NS_END(robot_metrics, collectors, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH0_DEPTH0_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_BLOCK_HPP_ */

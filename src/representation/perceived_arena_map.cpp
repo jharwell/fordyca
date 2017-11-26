@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,6 +53,7 @@ perceived_arena_map::perceived_arena_map(
       perceived_cell2D& cell = m_grid.access(i, j);
       cell.rho(params->pheromone_rho);
       cell.robot_id(robot_id);
+      cell.cell().loc(discrete_coord(i, j));
     } /* for(j..) */
   } /* for(i..) */
 }

@@ -24,6 +24,8 @@
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -32,9 +34,9 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth0_collector.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
 
 /*******************************************************************************
@@ -62,9 +64,9 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  m_collector.reset(new robot_collectors::depth0_collector(
+  m_collector.reset(new robot_collectors::stateful_metrics_collector(
       static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->depth0_fname));
+          repo.get_params("metrics"))->stateful_fname));
   m_collector->reset();
 
   /* configure robots */
@@ -224,7 +226,7 @@ void stateful_foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& rob
   controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
 } /* set_robot_tic() */
 
-robot_collectors::depth0_collector* stateful_foraging_loop_functions::depth0_collector(void) const {
+robot_collectors::stateful_metrics_collector* stateful_foraging_loop_functions::stateful_collector(void) const {
   return m_collector.get();
 } /* depth0_collector() */
 

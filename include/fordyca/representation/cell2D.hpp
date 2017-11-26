@@ -25,17 +25,19 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;
+class cache;
+class block;
+class cell_entity;
 
 /*******************************************************************************
  * Class Definitions
@@ -91,9 +93,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const representation::block* block(void) const {
-    return static_cast<representation::block*>(m_entity);
-  }
+  const representation::block* block(void) const;
+  representation::block* block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -101,9 +102,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const representation::cache* cache(void) const {
-    return static_cast<representation::cache*>(m_entity);
-  }
+  const representation::cache* cache(void) const;
 
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 

@@ -1,5 +1,5 @@
 /**
- * @file depth1_collector.hpp
+ * @file depth1_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,9 +38,9 @@ NS_START(collectors, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth1_collector : public base_metric_collector {
+class depth1_metrics_collector : public base_metric_collector {
  public:
-  explicit depth1_collector(const std::string ofname) :
+  explicit depth1_metrics_collector(const std::string ofname) :
       base_metric_collector(ofname), m_stats() {}
 
   void reset(void) override;
@@ -63,4 +63,4 @@ class depth1_collector : public base_metric_collector {
 
 NS_END(robot_metrics, collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_DEPTH1_METRICS_COLLECTOR_HPP_ */

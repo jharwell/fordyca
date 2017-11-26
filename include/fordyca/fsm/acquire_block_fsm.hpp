@@ -34,7 +34,7 @@
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,7 +69,7 @@ NS_START(fsm);
  */
 class acquire_block_fsm : public base_foraging_fsm,
                           public metrics::collectible_metrics::robot_metrics::stateless_metrics,
-                          public metrics::collectible_metrics::robot_metrics::depth0_metrics,
+                          public metrics::collectible_metrics::robot_metrics::stateful_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(

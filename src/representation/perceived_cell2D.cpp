@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
 #include "fordyca/events/cell_unknown.hpp"
 
 /*******************************************************************************

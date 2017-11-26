@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -68,7 +68,7 @@ namespace rmetrics = metrics::collectible_metrics::robot_metrics;
  */
 class stateful_foraging_fsm : public base_foraging_fsm,
                      public rmetrics::stateless_metrics,
-                     public rmetrics::depth0_metrics,
+                     public rmetrics::stateful_metrics,
                      public task_allocation::taskable,
                      public visitor::visitable_any<depth0::stateful_foraging_fsm> {
  public:

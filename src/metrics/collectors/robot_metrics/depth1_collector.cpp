@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/robot_metrics/depth1_collector.hpp"
+#include "fordyca/metrics/collectors/robot_metrics/depth1_metrics_collector.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
 /*******************************************************************************
@@ -32,17 +32,17 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string depth1_collector::csv_header_build(const std::string& header) {
+std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
 } /* csv_header_build() */
 
-void depth1_collector::reset(void) {
+void depth1_metrics_collector::reset(void) {
   base_metric_collector::reset();
   reset_on_timestep();
 } /* reset() */
 
-void depth1_collector::collect(
+void depth1_metrics_collector::collect(
     const collectible_metrics::robot_metrics::depth1_metrics& metrics) {
   m_stats.n_exploring_for_cache += metrics.is_exploring_for_cache();
   m_stats.n_acquiring_cache += metrics.is_acquiring_cache();
@@ -50,7 +50,7 @@ void depth1_collector::collect(
   m_stats.n_transporting_to_cache += metrics.is_transporting_to_cache();
 } /* collect() */
 
-bool depth1_collector::csv_line_build(std::string& line) {
+bool depth1_metrics_collector::csv_line_build(std::string& line) {
   line = std::to_string(m_stats.n_acquiring_cache) + ";" +
          std::to_string(m_stats.n_vectoring_to_cache) + ";" +
          std::to_string(m_stats.n_exploring_for_cache) + ";" +
@@ -58,7 +58,7 @@ bool depth1_collector::csv_line_build(std::string& line) {
   return true;
 } /* store_foraging_stats() */
 
-void depth1_collector::reset_on_timestep(void) {
+void depth1_metrics_collector::reset_on_timestep(void) {
   m_stats = {0, 0, 0, 0};
 } /* reset_on_timestep() */
 

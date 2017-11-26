@@ -61,7 +61,8 @@ class cache_block_drop : public cell_op,
                                                    representation::arena_map> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   representation::block* block, representation::cache* cache);
+                   representation::block* block, representation::cache* cache,
+                   double resolution);
   ~cache_block_drop(void) { client::rmmod(); }
 
   /* depth1 foraging */
@@ -99,8 +100,11 @@ class cache_block_drop : public cell_op,
  private:
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;
+
+  double m_resolution;
   representation::block* m_block;
   representation::cache* m_cache;
+  std::shared_ptr<rcppsw::er::server> m_server;
 };
 
 NS_END(events, fordyca);

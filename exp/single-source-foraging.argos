@@ -42,7 +42,7 @@
               />
         <task estimation_alpha="0.8"
               reactivity="-0.5"
-              proportionality_estimate="0.01"
+              proportionality_estimate="0.001"
               abort_offset="-2"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
@@ -56,7 +56,7 @@
         </actuators>
         <fsm unsuccessful_explore_dir_change="1000"
              frequent_collision_thresh="100"
-             nest="5, 2.5"
+             nest="2.0, 2.5"
              />
       </params>
     </depth1_foraging_controller>
@@ -68,8 +68,8 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="depth1_foraging_loop_functions">
-    <metrics random_fname="depth1-stats.csv"
-             depth0_fname="depth0-stats.csv"
+    <metrics stateless_fname="stateless-stats.csv"
+             stateful_fname="stateful-stats.csv"
              depth1_fname="depth1-stats.csv"
              block_fname="block-stats.csv"
              distance_fname="distance-stats.csv"

@@ -31,7 +31,7 @@
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth0_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
 
 /*******************************************************************************
@@ -64,7 +64,7 @@ NS_START(fsm);
  */
 class block_to_nest_fsm : public base_foraging_fsm,
                           public metrics::collectible_metrics::robot_metrics::stateless_metrics,
-                          public metrics::collectible_metrics::robot_metrics::depth0_metrics,
+                          public metrics::collectible_metrics::robot_metrics::stateful_metrics,
                           public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                           public task_allocation::taskable,
                           public visitor::visitable_any<block_to_nest_fsm> {
