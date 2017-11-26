@@ -36,25 +36,23 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class foraging_signal
+ *
  * @brief Signals that sub-states can return in order to notify their super
- * states that a conditiot that they do not know how to handle has arised.
+ * states that a condition that they do not know how to handle has arisen.
  */
 class foraging_signal : public state_machine::event_signal {
  public:
   enum type {
     /**
-     * A block has been located (i.e. appeared within a robot's LOS)
+     * The signal sent to FSMs during nominal operation.
      */
-    BLOCK_LOCATED = state_machine::event_signal::EXTERNAL_SIGNALS,
-    FSM_RUN,              /// The signal sent to FSMs during nominal operation
-    BLOCK_PICKUP,         /// A robot has picked up a block
-    BLOCK_DROP,           /// A robot has dropped a block in {cache, nest, arena}
-    CACHE_LOCATED,        /// A robot has located a cache
-    ARRIVED_AT_TARGET,    /// A robot has arrived at its target via vectoring
-    ARRIVED_IN_NEST,      /// A robot has arrived in the nest
-    LEFT_NEST,            /// A robot has left the nest
-    ACQUIRE_FREE_BLOCK,   /// Direct a robot to acquire a free block in the arena
-    ACQUIRE_CACHED_BLOCK,  /// Directa a robot to acquire a block from a cache.
+    FSM_RUN  = state_machine::event_signal::EXTERNAL_SIGNALS,
+    BLOCK_PICKUP,          /// A robot has picked up a block
+    BLOCK_DROP,            /// A robot has dropped a block in {cache, nest, arena}
+    LEFT_NEST,             /// A robot has left the nest
+    ACQUIRE_FREE_BLOCK,    /// Direct a robot to acquire a free block in the arena
+    ACQUIRE_CACHED_BLOCK,  /// Direct a robot to acquire a block from a cache.
     COLLISION_IMMINENT
   };
 };

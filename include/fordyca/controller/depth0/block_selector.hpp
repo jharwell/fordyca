@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <utility>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/block.hpp"
@@ -38,6 +37,12 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_selector
+ *
+ * @brief Select the best block that a robot knows about, for use in acquiring a
+ * block as part of a higher level FSM.
+ */
 class block_selector: public rcppsw::er::client {
  public:
   block_selector(

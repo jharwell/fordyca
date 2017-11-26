@@ -35,6 +35,12 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/*
+ * @class foraging_sensors
+ *
+ * @brief The sensors used by depth0 (\ref stateless_foraging_controller,
+ * \ref stateful_foraging_controller) controllers.
+ */
 class foraging_sensors : public base_foraging_sensors {
  public:
   foraging_sensors(
@@ -50,10 +56,12 @@ class foraging_sensors : public base_foraging_sensors {
   const representation::line_of_sight* los(void) const { return m_los.get(); }
 
   /**
-   * @brief This is a hack to make it easy for me to run simulations, as I can
-   * computer the line of sight for a robot within the loop functions, and just
-   * pass it in here. In real robots this routine would be MUCH messier and
-   * harder to work with.
+   * @brief Set the robots LOS for the next timestep.
+   *
+   * This is a hack to make it easy for me to run simulations, as I can computer
+   * the line of sight for a robot within the loop functions, and just pass it
+   * in here. In real robots this routine would be MUCH messier and harder to
+   * work with.
    *
    * @param los The new los
    */
@@ -75,7 +83,7 @@ class foraging_sensors : public base_foraging_sensors {
   foraging_sensors(const foraging_sensors& fsm) = delete;
   foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 
-  uint                                        m_tick;
+  uint                                          m_tick;
   std::unique_ptr<representation::line_of_sight> m_los;
 };
 

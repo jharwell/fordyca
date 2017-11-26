@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <utility>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/cache.hpp"
@@ -40,6 +39,7 @@ NS_START(fordyca, controller, depth1);
  ******************************************************************************/
 /**
  * @class existing_cache_selector
+ *
  * @brief Selects from among existing caches for the best one to go get a block
  * from.
  */
@@ -56,7 +56,8 @@ class existing_cache_selector: public rcppsw::er::client {
    * not faded into an unknown state), compute which is the "best", for use in
    * deciding which cache to go to and attempt to pickup from.
    *
-   * @return A pointer to the "best" existing cache, along with its utility value.
+   * @return A pointer to the "best" existing cache, along with its utility
+   * value.
    */
   representation::perceived_cache calc_best(
       const std::list<representation::perceived_cache> existing_caches,
