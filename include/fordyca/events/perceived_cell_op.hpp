@@ -38,15 +38,19 @@ namespace depth0 { class stateful_foraging_controller; }
 namespace depth1 {class foraging_controller; }
 }
 
-namespace representation {
-class perceived_arena_map;
-} /* namespace representation */
+namespace representation { class perceived_arena_map; }
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class perceived_cell_op
+ *
+ * @brief Non-abstract interface defining the minimum visit set for al events
+ * that involve robot perception.
+ */
 class perceived_cell_op : public cell_op,
                           public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                                     controller::depth1::foraging_controller,

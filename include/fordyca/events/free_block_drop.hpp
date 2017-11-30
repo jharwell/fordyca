@@ -41,6 +41,17 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class free_block_drop
+ *
+ * @brief Created whenever a block is dropped somewhere in the arena that is not
+ * a cache or the nest.
+ *
+ * This can happen when:
+ *
+ * - The loop functions are doing block distribution.
+ * - The robot aborts its task, and is carrying a block.
+ */
 class free_block_drop : public cell_op,
                         public rcppsw::er::client,
                         public block_drop_event {
@@ -50,31 +61,17 @@ class free_block_drop : public cell_op,
                   double resolution);
   ~free_block_drop(void) { client::rmmod(); }
 
-  /* foraging support */
-  /**
-   * @brief Update a cell on a block drop.
-   *
-   * @param cell The cell to update.
-   */
+  /* stateless foraging */
   void visit(representation::cell2D& cell) override;
-
-  void visit(controller::depth1::foraging_controller&) override {}
+  void visit(representation::block& block) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map&) override {}
 
-  /**
-   * @brief Update the FSM associated with a cell on a block drop.
-   *
-   * @param fsm The FSM associated with the cell to update.
-   */
-  void visit(fsm::cell2D_fsm& fsm) override;
-
-  /**
-   * @brief Update a block with the knowledge that it has been dropped.
-   *
-   * @param block The block to update.
-   */
-  void visit(representation::block& block) override;
+  /* stateful foraging */
   void visit(representation::perceived_cell2D&) override {}
+
+  /* depth1 foraging */
+  void visit(controller::depth1::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

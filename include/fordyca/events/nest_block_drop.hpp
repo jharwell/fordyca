@@ -57,9 +57,7 @@ NS_START(events);
 /**
  * @class nest_block_drop
  *
- * @brief Fired whenever a robot drops a block in the nest. Processed by both
- * \ref arena_map and the robots, as they each need to react to it in different
- * ways.
+ * @brief Fired whenever a robot drops a block in the nest.
  */
 class nest_block_drop : public visitor::visitor,
                         public block_drop_event,
@@ -77,34 +75,13 @@ class nest_block_drop : public visitor::visitor,
              representation::block* block);
   ~nest_block_drop(void) { client::rmmod(); }
 
-  /* foraging support */
-  /**
-   * @brief Update the arena_map on a block drop by distributing the block in a
-   * new location and updating the block so that it no longer thinks it is
-   * carried by a robot.
-   *
-   * @param map The map to update
-   */
+  /* stateless foraging */
   void visit(representation::arena_map& map) override;
   void visit(metrics::collectors::block_metrics_collector& collector) override;
-
-  /* stateless foraging */
-  /**
-   * @brief Update a block with the knowledge that it has been dropped.
-   *
-   * @param block The block to update.
-   */
   void visit(representation::block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
-
-  /**
-   * @brief Drop a carried block in the nest, updating state as appropriate.
-   *
-   * This needs to be here, rather than in the FSM, because dropping of blocks
-   * needs to be done in the loop functions so the area can correctly be drawn
-   * each timestep.
-   */
   void visit(controller::depth0::stateless_foraging_controller& controller) override;
+
 
   /* stateful foraging */
   void visit(controller::depth0::stateful_foraging_controller& controller) override;

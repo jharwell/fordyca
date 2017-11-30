@@ -1,5 +1,5 @@
 /**
- * @file cell_empty.cpp
+ * @file existing_cache_utility.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,40 +21,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/expressions/existing_cache_utility.hpp"
+#include <cmath>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, expressions);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+existing_cache_utility::existing_cache_utility(const argos::CVector2& cache_loc,
+                                                 const argos::CVector2& nest_loc) :
+    mc_cache_loc(cache_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_empty::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
-} /* visit() */
+double existing_cache_utility::calc(const argos::CVector2& rloc,
+                                    double density, size_t n_blocks) {
+  return set_result((std::exp(-density) * n_blocks) /
+                    ((mc_cache_loc - rloc).Length() *
+                     (mc_cache_loc - mc_nest_loc).Length()));
+} /* calc() */
 
-void cell_empty::visit(representation::cell2D& cell) {
-  cell.entity(nullptr);
-  cell.fsm().accept(*this);
-} /* visit() */
-
-void cell_empty::visit(fsm::cell2D_fsm& fsm) {
-  fsm.event_empty();
-} /* visit() */
-
-void cell_empty::visit(representation::arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-void cell_empty::visit(representation::perceived_arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-NS_END(events, fordyca);
+NS_END(expressions, fordyca);

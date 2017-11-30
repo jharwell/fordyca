@@ -39,6 +39,13 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/*
+ * @class cache_found
+ *
+ * @brief Created whenever a NEW cache (i.e. one that is not currently known to
+ * a robot, but possibly one that it has seen before and whose relevance had
+ * expired) is discovered by the robot via it appearing in the robot's LOS.
+ */
 class cache_found : public perceived_cell_op,
                     public rcppsw::er::client {
  public:
@@ -46,31 +53,18 @@ class cache_found : public perceived_cell_op,
               const representation::cache* cache, size_t x, size_t y);
   ~cache_found(void) { client::rmmod(); }
 
+  /* stateful foraging */
   void visit(representation::cell2D& cell) override;
   void visit(representation::perceived_cell2D& cell) override;
 
   /* depth1 foraging */
-  /**
-   * @brief Update the arena_map on a block drop by distributing the block in a
-   * new location and updating the block so that it no longer thinks it is
-   * carried by a robot.
-   *
-   * @param map The map to update (there is only ever one...)
-   */
   void visit(representation::perceived_arena_map& map) override;
-
-    /**
-   * @brief Update the FSM associated with a cell on a block drop.
-   *
-   * @param fsm The FSM associated with the cell to update.
-   */
   void visit(fsm::cell2D_fsm& fsm) override;
-
   void visit(controller::depth1::foraging_controller&) override {}
   void visit(controller::depth0::stateful_foraging_controller&) override {}
 
   /**
-   * @brief Get the handle on the block that has been dropped.
+   * @brief Get the handle on the cache that has been found.
    */
   const representation::cache* cache(void) const { return m_cache; }
 

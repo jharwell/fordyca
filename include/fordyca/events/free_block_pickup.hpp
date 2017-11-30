@@ -43,8 +43,7 @@ namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-}
+}}
 
 namespace tasks { class generalist; class forager; }
 
@@ -58,9 +57,6 @@ NS_START(events);
  *
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
- *
- * This event is processed by both robots and \ref arena_map, as they both react
- * to it in different ways.
  */
 class free_block_pickup : public cell_op,
                           public rcppsw::er::client,
@@ -77,32 +73,15 @@ class free_block_pickup : public cell_op,
                     representation::block* block, size_t robot_index);
   ~free_block_pickup(void) { client::rmmod(); }
 
-  /* foraging support */
-  /**
-   * @brief Update the arena_map with the block pickup event by making the block
-   * seem to disappear by moving it out of sight.
-   *
-   * @param map The arena_map.
-   */
+  /* stateless foraging */
   void visit(representation::arena_map& map) override;
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-
-  /* stateless foraging */
-  /**
-   * @brief Update a block with the knowledge that it is now carried by a robot.
-   */
   void visit(representation::block& block) override;
   void visit(controller::depth0::stateless_foraging_controller& controller) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
 
   /* stateful foraging */
-  /**
-   * @brief Handle the event of a robot picking up a block, making updates to
-   * the arena map as necessary.
-   *
-   * @param map The robot's arena map.
-   */
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::perceived_cell2D& cell) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;

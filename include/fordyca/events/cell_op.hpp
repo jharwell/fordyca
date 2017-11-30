@@ -40,6 +40,15 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cell_op
+ *
+ * @brief Non-abstract interface specifying the minimum set of classes that all
+ * events that operate on cells within an occupany grid need to visit.
+ *
+ * Also provided are the (x, y) coordinates of the cell to which the event is
+ * directed. Not all derived events may need them, but they are there.
+ */
 class cell_op : public visitor::visitor,
                 public visitor::visit_set<representation::cell2D,
                                           representation::perceived_cell2D,

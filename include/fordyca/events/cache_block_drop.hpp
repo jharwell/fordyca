@@ -44,6 +44,14 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_block_drop
+ *
+ * @brief Created whenever a robot drops a block in a cache.
+ *
+ * The cache usuage penalty, if there is one, is not assessed during the event,
+ * but at a higher level.
+ */
 class cache_block_drop : public cell_op,
                          public rcppsw::er::client,
                          public block_drop_event,
@@ -58,30 +66,10 @@ class cache_block_drop : public cell_op,
   ~cache_block_drop(void) { client::rmmod(); }
 
   /* depth1 foraging */
-  /**
-   * @brief Update a cell on a block drop.
-   *
-   * @param cell The cell to update.
-   */
   void visit(class representation::cell2D& cell) override;
-
-  /**
-   * @brief Update the FSM associated with a cell on a block drop.
-   *
-   * @param fsm The FSM associated with the cell to update.
-   */
   void visit(fsm::cell2D_fsm& fsm) override;
-
-  /**
-   * @brief Update the arena_map on a block drop by distributing the block in a
-   * new location and updating the block so that it no longer thinks it is
-   * carried by a robot.
-   *
-   * @param map The map to update (there is only ever one...)
-   */
   void visit(representation::arena_map& map) override;
   void visit(representation::perceived_arena_map& map) override;
-
   void visit(representation::block& block) override;
   void visit(representation::cache& cache) override;
   void visit(class representation::perceived_cell2D& cell) override;

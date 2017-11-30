@@ -30,6 +30,12 @@
 NS_START(fordyca, expressions);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cache_respawn_probability::cache_respawn_probability(double scale_factor) :
+    mc_scale_factor(scale_factor) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {
