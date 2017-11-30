@@ -39,11 +39,22 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
+/**
+ * @class base_foraging_loop_functions
+ *
+ * @brief The base loop functions in FORDYCA that all other loop functions
+ * inherit from.
+ *
+ * This class is not a functional set of loop functions, but it provides
+ * functions needed across multiple derived classes, but functionality that
+ * could not just be free functions because they require access to members in
+ * the \ref argos::CLoopFunctions class.
+ */
 class base_foraging_loop_functions : public argos::CLoopFunctions {
  public:
   base_foraging_loop_functions(void) :
@@ -97,6 +108,9 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
     return false;
   }
 
+ protected:
+  argos::CFloorEntity* floor(void) const { return m_floor; }
+
  private:
   base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
   base_foraging_loop_functions& operator=(const base_foraging_loop_functions& s) = delete;
@@ -104,6 +118,6 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   argos::CFloorEntity*                                           m_floor;
 };
 
-NS_END(depth0, support, fordyca);
+NS_END(support, fordyca);
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_BASE_FORAGING_LOOP_FUNCTIONS_HPP_ */

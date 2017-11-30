@@ -30,6 +30,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,6 +59,11 @@ bool forager::block_acquired(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(
       polled_task::mechanism())->block_acquired();
 } /* cache_acquired() */
+
+void forager::task_start(const task_allocation::taskable_argument* const) {
+  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+  task_allocation::polled_task::mechanism()->task_start(&a);
+} /* task_start() */
 
 /*******************************************************************************
  * Event Handling

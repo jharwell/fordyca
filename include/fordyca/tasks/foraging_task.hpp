@@ -50,6 +50,11 @@ NS_START(tasks);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @class foraging_task
+ *
+ * @brief Interface specified the visit set for all foraging tasks in FORDYCA.
+ */
 class foraging_task : public metrics::collectible_metrics::robot_metrics::stateless_metrics,
                       public metrics::collectible_metrics::robot_metrics::stateful_metrics,
                       public metrics::collectible_metrics::robot_metrics::depth1_metrics,
@@ -62,7 +67,16 @@ class foraging_task : public metrics::collectible_metrics::robot_metrics::statel
  public:
   foraging_task(void) {}
 
+  /**
+   * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the
+   * block pickup/block drop signal from the arena.
+   */
   virtual bool cache_acquired(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot has acquired a block and is waiting for the
+   * block pickup signal from the arena.
+   */
   virtual bool block_acquired(void) const = 0;
 };
 

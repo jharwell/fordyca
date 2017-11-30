@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/tasks/argument.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -39,8 +38,10 @@ namespace task_allocation = rcppsw::task_allocation;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @brief Class representing the second half of the generalist task in depth 1
- * allocation.
+ * @class collector
+ *
+ * @brief Task in which robots locate a cache and bring a block from it to the
+ * nest.
  */
 class collector : public task_allocation::polled_task, public foraging_task {
  public:
@@ -73,10 +74,7 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }
 
-   void task_start(__unused const task_allocation::taskable_argument* const arg) override {
-    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
-    task_allocation::polled_task::mechanism()->task_start(&a);
-  }
+  void task_start(const task_allocation::taskable_argument* const) override;
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
 };

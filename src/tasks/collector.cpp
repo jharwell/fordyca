@@ -26,6 +26,7 @@
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,6 +49,11 @@ bool collector::cache_acquired(void) const {
   return static_cast<fsm::block_to_nest_fsm*>(
       polled_task::mechanism())->cache_acquired();
 } /* cache_acquired() */
+
+void collector::task_start(const task_allocation::taskable_argument* const) {
+  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
+  task_allocation::polled_task::mechanism()->task_start(&a);
+} /* task_start() */
 
 /*******************************************************************************
  * Event Handling

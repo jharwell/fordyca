@@ -50,7 +50,6 @@ stateless_foraging_loop_functions::stateless_foraging_loop_functions(void) :
     client(rcppsw::er::g_server),
     m_nest_x(),
     m_nest_y(),
-    m_floor(NULL),
     m_sim_type(),
     m_stateless_collector(),
     m_distance_collector(),
@@ -71,8 +70,6 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
   rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);
   ER_NOM("Initializing stateless foraging loop functions");
-
-  m_floor = &GetSpace().GetFloorEntity();
 
   params::loop_function_repository repo;
 
@@ -170,26 +167,9 @@ void stateless_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
     m_stateless_collector->collect(controller);
     m_distance_collector->collect(controller);
 
-    if (controller.is_carrying_block()) {
-      if (controller.in_nest()) {
-        /*
-         * Get stats from carried block before it's dropped and its state
-         * changes.
-         */
-        m_block_collector->collect(*controller.block());
-
-        /* Update arena map state due to a block nest drop */
-        events::nest_block_drop drop_op(rcppsw::er::g_server,
-                                        controller.block());
-        m_map->accept(drop_op);
-
-        /* Actually drop the block */
-        controller.accept(drop_op);
-
-        /* The floor texture must be updated */
-        m_floor->SetChanged();
-      }
-    } else { /* The foot-bot has no block item */
+    if(!handle_nest_block_drop<controller::depth0::stateless_foraging_controller>(robot,
+                                                                                  *m_map,
+                                                                                  *m_block_collector)) {
       if (!controller.in_nest() && controller.is_exploring_for_block() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
@@ -202,7 +182,7 @@ void stateless_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
           m_map->accept(pickup_op);
 
           /* The floor texture must be updated */
-          m_floor->SetChanged();
+          floor()->SetChanged();
         }
       }
     }

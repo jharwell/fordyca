@@ -38,6 +38,13 @@ NS_START(support, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_usage_penalty
+ *
+ * @brief Handles subjecting a controller to a penalty when picking up
+ * from/dropping in a cache via a specified timeout in which robots will sit
+ * still.
+ */
 class cache_usage_penalty {
  public:
   cache_usage_penalty(const controller::depth1::foraging_controller* const controller,
@@ -50,12 +57,16 @@ class cache_usage_penalty {
 
   uint cache_id(void) const { return m_cache_id; }
   const controller::depth1::foraging_controller* controller(void) const { return m_controller; }
+
+  /**
+   * @brief If \c TRUE, then the robot has satisfied the cache penalty.
+   */
   bool penalty_satisfied(uint current_time) { return current_time - m_start_time >= m_penalty; }
 
  private:
-  uint m_cache_id;
-  uint m_penalty;
-  uint m_start_time;
+  uint                                                m_cache_id;
+  uint                                                m_penalty;
+  uint                                                m_start_time;
   const controller::depth1::foraging_controller*const m_controller;
 };
 

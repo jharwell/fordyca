@@ -53,7 +53,8 @@ NS_START(support, depth0);
  *
  * @brief Contains the simulation support functions for stateless foraging:
  *
- * - Sending robots block pickup/block drop signals if they are waiting for them.
+ * - Sending robots block pickup/block drop signals if they are waiting for
+ *   them.
  * - Handling block distribution.
  */
 class stateless_foraging_loop_functions : public base_foraging_loop_functions,
@@ -71,7 +72,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
 
  protected:
   representation::arena_map* map(void) const { return m_map.get(); }
-  argos::CFloorEntity* floor(void) const { return m_floor; }
 
   metrics::collectors::block_metrics_collector* block_collector(void) const;
   robot_collectors::distance_metrics_collector* distance_collector(void) const;
@@ -89,7 +89,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
 
   argos::CRange<double>                                          m_nest_x;
   argos::CRange<double>                                          m_nest_y;
-  argos::CFloorEntity*                                           m_floor;
   std::string                                                    m_sim_type;
   std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;
   std::unique_ptr<robot_collectors::distance_metrics_collector>  m_distance_collector;
