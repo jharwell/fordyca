@@ -34,6 +34,13 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class static_cache_creator
+ *
+ * @brief Creates a static cache in the arena by taking a specified number of
+ * free blocks and grouping them together into a cache at the specified
+ * location.
+ */
 class static_cache_creator : public cache_creator {
  public:
   static_cache_creator(std::shared_ptr<rcppsw::er::server> server,
@@ -41,12 +48,6 @@ class static_cache_creator : public cache_creator {
                        const argos::CVector2& center,
                        double cache_size, double resolution);
 
-  /**
-   * @brief Scan the entire list of blocks currently in the arena, and create
-   * caches from all blocks that are close enough together.
-   *
-   * @return The list of current caches.
-   */
   std::vector<representation::cache> create_all(
     std::vector<representation::block*>& blocks) override;
 

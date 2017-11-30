@@ -54,6 +54,14 @@ int robot_on_cache(const argos::CFootBotEntity& robot, representation::arena_map
  */
 int robot_id(const argos::CFootBotEntity& robot);
 
+/**
+ * @brief Set the position of the robot in the arena.
+ *
+ * This is a hack that makes getting my research up and running easier.
+ *
+ * @todo This should eventually be replaced by a calculation of robot's position
+ * by the robot.
+ */
 template<typename T>
 void set_robot_pos(argos::CFootBotEntity& robot) {
   argos::CVector2 pos;
@@ -64,6 +72,14 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
   controller.robot_loc(pos);
 }
 
+/**
+ * @brief Set the LOS of a robot in the arena.
+ *
+ * This is a hack that makes getting my research up and running easier.
+ *
+ * @todo This should eventually be replaced by a calculation of a robot's LOS by
+ * the robot, probably using on-board cameras.
+ */
 template<typename T>
 void set_robot_los(argos::CFootBotEntity& robot,
                    representation::arena_map& map) {

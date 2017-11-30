@@ -41,6 +41,14 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_creator
+ *
+ * @brief Base class for creating static/dynamic caches in the arena.
+ *
+ * Used by the arena to actually create caches, and by robots to create
+ * "virtual" caches in their on-board representation of the arena.
+ */
 class cache_creator : public rcppsw::er::client {
  public:
   cache_creator(std::shared_ptr<rcppsw::er::server> server,
@@ -48,8 +56,8 @@ class cache_creator : public rcppsw::er::client {
                 double cache_size, double resolution);
 
   /**
-   * @brief Scan the entire vector of blocks currently in the arena, and create
-   * caches from some/all blocks.
+   * @brief Create caches from all blocks in the provided list that are close
+   * enough together.
    *
    * @return A vector of created caches.
    */
@@ -63,9 +71,9 @@ class cache_creator : public rcppsw::er::client {
                                       const argos::CVector2& center);
 
  private:
-  double m_cache_size;
-  double m_resolution;
-  representation::occupancy_grid& m_grid;
+  double                              m_cache_size;
+  double                              m_resolution;
+  representation::occupancy_grid&     m_grid;
   std::shared_ptr<rcppsw::er::server> m_server;
 };
 NS_END(support, fordyca, depth1);

@@ -27,7 +27,6 @@
 #include <string>
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/tasks/argument.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -40,8 +39,10 @@ namespace task_allocation = rcppsw::task_allocation;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @brief Class representing the first half of the generalist task in depth 1
- * allocation.
+ * @class forager
+ *
+ * @brief Task in which robots locate a free block and bring it to a known
+ * cache.
  */
 class forager : public task_allocation::polled_task, public foraging_task {
  public:
@@ -74,10 +75,7 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;
 
-  void task_start(__unused const task_allocation::taskable_argument* const arg) override {
-    foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
-    task_allocation::polled_task::mechanism()->task_start(&a);
-}
+  void task_start(const task_allocation::taskable_argument* const) override;
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
 };

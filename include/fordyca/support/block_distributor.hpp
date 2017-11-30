@@ -43,6 +43,13 @@ NS_START(support);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_distributor
+ *
+ * @brief Distributes all blocks as directed on simulation start, and then
+ * re-dstributes individual blocks every time they are dropped in the nest
+ * (unless respawn is not enabled).
+ */
 class block_distributor {
  public:
   block_distributor(argos::CRange<double> arena_x,

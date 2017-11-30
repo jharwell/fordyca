@@ -40,15 +40,25 @@ class task_collector;
 namespace robot_metrics {
 class depth1_metrics_collector;
 }}}
+namespace robot_collectors = metrics::collectors::robot_metrics;
 
 NS_START(support, depth1);
 
 class cache_usage_penalty;
-namespace robot_collectors = metrics::collectors::robot_metrics;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
+/**
+ * @class foraging_loop_functions
+ *
+ * @brief The loop functions for depth 1 foraging.
+ *
+ * Handles:
+ *
+ * - Robots picking up from/dropping in a cache
+ * - Subjecting robots using caches to a penalty (only on pickup).
+ */
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
   foraging_loop_functions(void);
@@ -60,10 +70,14 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void Reset(void) override;
 
  protected:
+  /**
+   * @brief Check if a robot has acquired a cache, and is trying to pickup from
+   * a cache, then creates a \ref cache_usage_penalty object and associates it
+   * with the robot.
+   */
   template<typename T>
   bool init_cache_usage_penalty(
       argos::CFootBotEntity& robot) {
-
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.cache_acquired() && !controller.is_transporting_to_cache()) {
@@ -80,8 +94,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
       }
     }
     return false;
-  } /* init_cache_usage_penalty() */
+  }
 
+  /**
+   * @brief Determine if a robot has satisfied the \ref cache_usage_penalty yet.
+   */
   template<typename T>
   bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot) {
 
@@ -95,8 +112,13 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     }
 
     return false;
-  } /* cache_usage_penalty_satisfied() */
+  }
 
+  /**
+   * @brief Called after a robot has satisfied the cache usage penalty, and
+   * actually performs the handshaking between the cache, the arena, and the
+   * robot for block pickup.
+   */
   template<typename T>
   void finish_cached_block_pickup(argos::CFootBotEntity& robot) {
 
@@ -119,6 +141,10 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     floor()->SetChanged();
   }
 
+  /**
+   * @brief If \c TRUE, then the specified robot is currently serving a cache
+   * penalty.
+   */
   template<typename T>
   bool robot_serving_cache_penalty(
       argos::CFootBotEntity& robot) {
@@ -129,6 +155,10 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     return it != m_penalty_list.end();
   }
 
+  /**
+   * @brief Handles handshaking between cache, robot, and arena if the robot is
+   * has acquired a cache and is looking to drop an object in it.
+   */
   template<typename T>
   bool handle_cache_block_drop(argos::CFootBotEntity& robot) {
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());

@@ -38,11 +38,14 @@ namespace task_allocation = rcppsw::task_allocation;
  * Structure Definitions
  ******************************************************************************/
 /**
+ * @class generalist
+ *
  * @brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
  *
  * It is decomposable into two subtasks that result in the same net change to
- * the arena state when run in sequence (possibly by two different robots).
+ * the arena state when run in sequence (possibly by two different robots):
+ * \ref collector and \ref forager.
  */
 class generalist : public task_allocation::partitionable_polled_task<task_allocation::polled_task,
                                                                      task_allocation::polled_task>,
@@ -78,7 +81,7 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
   bool block_acquired(void) const override;
 
   logical_task* partition(void) override { return partitionable_task::partition(); }
-  void task_start(__unused const task_allocation::taskable_argument* const arg) override {}
+  void task_start(const task_allocation::taskable_argument* const) override {}
 
   double calc_elapsed_time(double start_time) const override;
   double calc_start_time(void) const override;
