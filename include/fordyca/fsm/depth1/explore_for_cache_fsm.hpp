@@ -36,7 +36,6 @@ NS_START(fordyca);
 
 namespace controller { namespace depth1 {class foraging_sensors; }}
 
-
 NS_START(fsm, depth1);
 
 /*******************************************************************************
@@ -46,8 +45,8 @@ NS_START(fsm, depth1);
  * @class explore_for_cache_fsm
  *
  * @brief The base FSM for an exploration subtask. Each robot executing this FSM
- * will roam around randomly until it finds a cache, and then signal a higher
- * level FSM that it has done so.
+ * will roam around randomly until it finds a cache, and then signal that its
+ * task is finished once it has done so.
  */
 class explore_for_cache_fsm : public base_explore_fsm {
  public:
@@ -102,11 +101,10 @@ class explore_for_cache_fsm : public base_explore_fsm {
 
   /**
    * @brief The main state for the explore FSM. Robots in this state maintain
-   * their heading, looking for SOMETHING of interest, until they find it or
-   * exceed the direction change threshold.
+   * their heading, looking for a cache, until they find it or exceed the
+   * direction change threshold.
    */
   HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, explore);
-
   HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, finished);
 
   /**

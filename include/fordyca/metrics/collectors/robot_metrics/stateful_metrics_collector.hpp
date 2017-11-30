@@ -31,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { namespace robot_metrics { class stateful_metrics; } }
 
 NS_START(collectors, robot_metrics);
@@ -38,6 +39,13 @@ NS_START(collectors, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class stateful_metrics_collector
+ *
+ * @brief Collector for \ref stateful_metrics.
+ *
+ * Metrics are written out every timestep.
+ */
 class stateful_metrics_collector : public base_metric_collector {
  public:
   explicit stateful_metrics_collector(const std::string ofname) :

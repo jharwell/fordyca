@@ -36,11 +36,19 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class task_metrics
+ *
+ * @brief Interface defining metrics that can be collected on running tasks.
+ */
 class task_metrics {
  public:
   task_metrics(void) {}
   virtual ~task_metrics(void) {}
 
+  /**
+   * @brief Get the name of the name that is currently being executed
+   */
   virtual std::string task_name(void) const = 0;
 };
 

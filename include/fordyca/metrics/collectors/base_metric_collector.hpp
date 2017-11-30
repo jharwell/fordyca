@@ -40,27 +40,77 @@ NS_START(collectors);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class base_metric_collector
+ *
+ * @brief Base class that uses the template design pattern to hooks
+ * for derived classes so that the process of writing out metrics is centralized
+ * in one place (here).
+ *
+ * Metrics are written out in .csv format.
+ */
 class base_metric_collector {
  public:
   explicit base_metric_collector(const std::string ofname) :
       m_ofname(ofname), m_ofile() {}
   virtual ~base_metric_collector(void) {}
 
+  /**
+   * @brief Reset the metrics completely, as if none have yet been collected.
+   *
+   * Should be called only on collection start/reset.
+   */
   virtual void reset(void);
+
+  /**
+   * @brief Reset some metrics (possibly).
+   *
+   * Can be called every timestep. By default it does nothing.
+   */
   virtual void reset_on_timestep(void) {}
 
+  /**
+   * @brief Write out the gathered metrics.
+   *
+   * @param timestep The current timestep.
+   */
   void csv_line_write(uint timestep);
+
+  /**
+   * @brief Finalize metrics and flush files.
+   */
   void finalize(void) { m_ofile.close(); }
 
  protected:
+  /**
+   * @brief Build the header line for a particular collector.
+   *
+   * The default one only contains a single column: the current timestep.
+   *
+   * @param header The current header.
+   *
+   * @return The built header.
+   */
   virtual std::string csv_header_build(const std::string& header = "");
+
+  /**
+   * @brief Build the next line of metrics
+   *
+   * @param line The current line, to be filled.
+   *
+   * @return \c TRUE if the metrics should be written out, or \c FALSE if
+   * not. This allows metrics to be gathered across multiple timesteps, but only
+   * written out once an interesting event has occurred.
+   */
   virtual bool csv_line_build(std::string& line) = 0;
 
+  /**
+   * @brief Write out the default header, when only contains "clock;"
+   */
   void csv_header_write(void);
-  std::ofstream& ofile(void) { return m_ofile; }
 
  private:
-  std::string m_ofname;
+  std::string   m_ofname;
   std::ofstream m_ofile;
 };
 

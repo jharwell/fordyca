@@ -32,9 +32,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -42,9 +40,9 @@ NS_START(fsm);
 /**
  * @class explore_for_block_fsm
  *
- * @brief The base FSM for an exploration subtask. Each robot executing this FSM will
- * roam around randomly until it finds a block (or a cache), and then signal a
- * higher level FSM that it has done so.
+ * @brief Robots executing this task will roam around randomly looking for a
+ * free block. Once they have found one, the FSM will signal that its task is
+ * complete.
  */
 class explore_for_block_fsm : public base_explore_fsm {
  public:
@@ -107,9 +105,14 @@ class explore_for_block_fsm : public base_explore_fsm {
   HFSM_STATE_DECLARE_ND(explore_for_block_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM. Note that the order of the states
-   * in the map MUST match the order of the states in \enum fsm_states, or
-   * things will not work correctly.
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   *
+   * Note also that all robots will share the SAME state map in memory, so you
+   * cannot change the parent of any statein this FSM for only SOME other
+   * objects. But that should not be necessary, as it is taskable.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];

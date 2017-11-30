@@ -31,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { class task_metrics; }
 
 NS_START(collectors);
@@ -38,6 +39,13 @@ NS_START(collectors);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class task_collector
+ *
+ * @brief Collector for \ref task_metrics.
+ *
+ * Metrics are written out every timestep.
+ */
 class task_collector : public base_metric_collector {
  public:
   explicit task_collector(const std::string ofname) :

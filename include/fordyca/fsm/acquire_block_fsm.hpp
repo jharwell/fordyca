@@ -42,30 +42,27 @@
 NS_START(fordyca);
 
 namespace params { struct fsm_params; }
+namespace representation { class perceived_arena_map; class block; }
 
 namespace controller {
 namespace depth0 { class foraging_sensors; }
 class actuator_manager;
-} /* namespace controller */
-
-namespace representation {
-class perceived_arena_map;
-class block;
-} /* namespace representation */
+}
 
 NS_START(fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
+ * @class acquire_block_fsm
+ *
  * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.
  *
  * Each robot executing this FSM will look for a block (either a known block or
- * via stateless exploration). Once an existing block has been acquired, it signals
- * that it has completed its task.
+ * via stateless exploration). Once an existing block has been acquired, it
+ * signals that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
                           public metrics::collectible_metrics::robot_metrics::stateless_metrics,
@@ -104,7 +101,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START,
     ST_ACQUIRE_BLOCK, /* superstate for finding a free block */
-    ST_FINISHED,
+    ST_FINISHED,      /* A block has been acquired; wait to be reset */
     ST_MAX_STATES
   };
 
@@ -124,12 +121,6 @@ class acquire_block_fsm : public base_foraging_fsm,
   bool acquire_known_block(
       std::list<std::pair<const representation::block*, double>> blocks);
 
-  /*
-   * States for locate_block FSM. Note that the states for the vector_fsm
-   * sub-fsm cannot be part of the locate_block hfsm, because that sub-fsm is
-   * initiated from multiple states, and hfsm states can only have ONE parent
-   * state.
-   **/
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, finished);
@@ -143,13 +134,13 @@ class acquire_block_fsm : public base_foraging_fsm,
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
-  const argos::CVector2 mc_nest_center;
-  argos::CRandom::CRNG* m_rng;
+  const argos::CVector2                                      mc_nest_center;
+  argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
-  std::shared_ptr<rcppsw::er::server> m_server;
-  std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
-  vector_fsm m_vector_fsm;
-  explore_for_block_fsm m_explore_fsm;
+  std::shared_ptr<rcppsw::er::server>                        m_server;
+  std::shared_ptr<controller::depth0::foraging_sensors>      m_sensors;
+  vector_fsm                                                 m_vector_fsm;
+  explore_for_block_fsm                                      m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

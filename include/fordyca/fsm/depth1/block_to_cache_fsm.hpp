@@ -39,17 +39,14 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace task_allocation = rcppsw::task_allocation;
+namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
-
+namespace representation { class perceived_arena_map; class block; }
 namespace controller {
 namespace depth1{ class foraging_sensors; };
 class actuator_manager;
-} /* namespace controller */
-
-namespace representation { class perceived_arena_map; class block; }
-
-namespace task_allocation = rcppsw::task_allocation;
-namespace visitor = rcppsw::patterns::visitor;
+}
 
 NS_START(fsm, depth1);
 
@@ -59,9 +56,10 @@ NS_START(fsm, depth1);
 /**
  * @brief The FSM for the block-to-cache subtask.
  *
- * Each robot executing this FSM will locate for a block (either a known block
+ * Each robot executing this FSM will locate a free block (either a known block
  * or via random exploration), pickup the block and bring it to the best cache
- * it knows about.
+ * it knows about. Once it has done that it will signal that its task is
+ * complete.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
                            public metrics::collectible_metrics::robot_metrics::stateless_metrics,
@@ -146,10 +144,9 @@ class block_to_cache_fsm : public base_foraging_fsm,
   block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
   block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
 
-  /* data members */
-  std::shared_ptr<controller::depth1::foraging_sensors>  m_sensors;
-  acquire_block_fsm m_block_fsm;
-  acquire_cache_fsm m_cache_fsm;
+  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
+  acquire_block_fsm                                     m_block_fsm;
+  acquire_cache_fsm                                     m_cache_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

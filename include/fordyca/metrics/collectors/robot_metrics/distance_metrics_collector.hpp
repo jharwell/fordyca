@@ -34,14 +34,22 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { namespace robot_metrics { class distance_metrics; } }
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors, robot_metrics);
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class distance_metrics_collector
+ *
+ * @brief Collector for \ref distance_metrics.
+ *
+ * Metrics are written out every timestep.
+ */
 class distance_metrics_collector : public base_metric_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
@@ -61,7 +69,7 @@ class distance_metrics_collector : public base_metric_collector,
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
 
-  size_t m_n_robots;
+  size_t                          m_n_robots;
   std::vector<struct robot_stats> m_stats;
 };
 

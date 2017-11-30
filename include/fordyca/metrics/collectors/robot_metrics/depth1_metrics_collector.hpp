@@ -31,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { namespace robot_metrics { class depth1_metrics; } }
 
 NS_START(collectors, robot_metrics);
@@ -38,6 +39,13 @@ NS_START(collectors, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class depth1_metrics_collector
+ *
+ * @brief Collector for \ref depth1_metrics.
+ *
+ * Metrics are written out every timestep.
+ */
 class depth1_metrics_collector : public base_metric_collector {
  public:
   explicit depth1_metrics_collector(const std::string ofname) :

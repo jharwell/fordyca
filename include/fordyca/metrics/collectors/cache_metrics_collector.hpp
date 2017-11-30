@@ -32,15 +32,23 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { class cache_metrics; }
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors);
-
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_metrics_collector
+ *
+ * @brief Collect for \ref cache_metrics.
+ *
+ * Metrics are not output every timestep, but only on timesteps in which a
+ * cache-related event occurs (pickup from/drop in).
+ */
 class cache_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<cache_metrics_collector> {
  public:
@@ -60,7 +68,7 @@ class cache_metrics_collector : public base_metric_collector,
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
 
-  bool m_new_data;
+  bool         m_new_data;
   struct stats m_stats;
 };
 

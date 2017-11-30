@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -33,14 +34,42 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class depth1_metrics
+ *
+ * @brief Interface defining what metrics that should be collected from robots
+ * executing the \ref depth1::foraging_controller, or any controller derived
+ * from that one.
+ */
 class depth1_metrics : public base_collectible_metrics {
  public:
   depth1_metrics(void) {}
   virtual ~depth1_metrics(void) {}
 
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref explore_for_cache_fsm.
+   */
   virtual bool is_exploring_for_cache(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref vector_fsm and traveling toward a known cache.
+   */
   virtual bool is_vectoring_to_cache(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref acquire_cache_fsm, and is acquiring a cache either through exploring
+   * or by vectoring to a known one.
+   */
   virtual bool is_acquiring_cache(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref block_to_cach_fsm, and is transporting an acquired block to its cache
+   * of choice.
+   */
   virtual bool is_transporting_to_cache(void) const = 0;
 };
 

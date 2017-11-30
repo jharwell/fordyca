@@ -32,15 +32,22 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+
 namespace collectible_metrics { class block_metrics; }
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors);
-
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_metrics_collector
+ *
+ * @brief Collector for \ref block_metrics.
+ *
+ * Metrics are not written out until at least 1 block has been collected.
+ */
 class block_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<block_metrics_collector> {
  public:
