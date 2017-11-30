@@ -34,13 +34,32 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_metrics
+ *
+ * @brief Interface defining collectible metrics on static/dynamic caches in the
+ * arena.
+ */
 class cache_metrics : public base_collectible_metrics {
  public:
   cache_metrics(void) {}
   virtual ~cache_metrics(void) {}
 
+  /**
+   * @brif Get the # of blocks in the cache
+   */
   virtual size_t n_blocks(void) const = 0;
+
+  /**
+   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
+   * that have been picked up from the cache.
+   */
   virtual size_t n_block_pickups(void) const = 0;
+
+  /**
+   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
+   * that have been picked dropped in the cache
+   */
   virtual size_t n_block_drops(void) const = 0;
 };
 

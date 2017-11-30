@@ -64,12 +64,19 @@ class cache : public cell_entity,
   void inc_block_pickups(void) { ++m_n_block_pickups; }
   void inc_block_drops(void) { ++m_n_block_drops; }
 
+  /**
+   * @brief \c TRUE iff the cache contains the specified block.
+   *
+   * @param block
+   *
+   * @return
+   */
   __pure bool contains_block(const block* const block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
   }
-  __pure bool block_within_boundaries(const block* const block) const {
-    return (cell_entity::real_loc() - block->real_loc()).Length() <= cell_entity::xsize();
-  }
+  /**
+   * @brief Get a list of the blocks currently in the cache.
+   */
   std::list<block*>& blocks(void) { return m_blocks; }
 
   void block_add(block* block) { m_blocks.push_back(block);  }
@@ -82,16 +89,11 @@ class cache : public cell_entity,
   }
 
  private:
-  static int m_next_id;
-  size_t m_n_block_pickups;
-  size_t m_n_block_drops;
+  static int        m_next_id;
+  size_t            m_n_block_pickups;
+  size_t            m_n_block_drops;
   std::list<block*> m_blocks;
 };
-
-/*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-typedef std::pair<const cache*, double> perceived_cache;
 
 NS_END(representation, fordyca);
 

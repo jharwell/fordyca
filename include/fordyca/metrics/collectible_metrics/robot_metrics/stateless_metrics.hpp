@@ -34,13 +34,33 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class stateless_metrics
+ *
+ * @brief Interface defining what metrics should be collected from any robot
+ * executing the \ref stateless_foraging_controller, or any controller logically
+ * (not necessarily in the C++ sense) derived from that controller.
+ */
 class stateless_metrics : public base_collectible_metrics {
  public:
   stateless_metrics(void) {}
   virtual ~stateless_metrics(void) {}
 
+  /**
+   * @brief If \c TRUE, then a robot is currently executing the
+   * \ref explore_for_block_fsm.
+   */
   virtual bool is_exploring_for_block(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
+   */
   virtual bool is_avoiding_collision(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot has acquired a block and is currently
+   * taking it back to the nest.
+   */
   virtual bool is_transporting_to_nest(void) const = 0;
 };
 

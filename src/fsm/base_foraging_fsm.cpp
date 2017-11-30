@@ -69,8 +69,6 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
             "FATAL: ST_LEAVING_NEST should never pickup blocks...");
   ER_ASSERT(controller::foraging_signal::BLOCK_DROP != data->signal(),
             "FATAL: ST_LEAVING_NEST should never drop blocks...");
-  ER_ASSERT(controller::foraging_signal::BLOCK_LOCATED != data->signal(),
-            "FATAL: ST_LEAVING_NEST should never locate blocks...");
 
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
@@ -96,8 +94,6 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, state_machine::event_dat
             "FATAL: ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
             "FATAL: ST_TRANSPORT_TO_NEST should never pickup blocks...");
-  ER_ASSERT(controller::foraging_signal::BLOCK_LOCATED != data->signal(),
-            "FATAL: ST_TRANSPORT_TO_NEST should never locate blocks...");
 
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_TRANSPORT_TO_NEST");

@@ -42,6 +42,14 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/*
+ * @class cached_block_pickup
+ *
+ * @brief Created whenever a robot picks up a block from a cache.
+ *
+ * The cache usage penalty, if there is one, is assessed prior to this event
+ * being created.
+ */
 class cached_block_pickup : public cell_op,
                             public rcppsw::er::client,
                             public block_pickup_event,
@@ -53,34 +61,14 @@ class cached_block_pickup : public cell_op,
   ~cached_block_pickup(void) { client::rmmod(); }
 
   /* depth1 foraging */
-  /**
-   * @brief Update the arena_map with the block pickup event by making the block
-   * seem to disappear by moving it out of sight.
-   *
-   * @param map The arena_map.
-   */
   void visit(representation::arena_map& map) override;
-
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
-
-  /**
-   * @brief Handle the event of a robot picking up a block, making updates to
-   * the arena map as necessary.
-   *
-   * @param map The robot's arena map.
-   */
   void visit(representation::perceived_arena_map& map) override;
-
-  /**
-   * @brief Update a block with the knowledge that it is now carried by a robot.
-   */
   void visit(representation::block& block) override;
-  void visit(representation::cache& block) override;
-
+  void visit(representation::cache& cache) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
-
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(tasks::collector& task) override;
 

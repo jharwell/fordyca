@@ -39,25 +39,26 @@ NS_START(events);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cell_unknown
+ *
+ * @brief Created whenever a cell within an occupancy grid needs to go into an
+ * unknown state.
+ *
+ * This happens in two cases:
+ *
+ * 1. After its relevance expires.
+ * 2. Before the robot sees it for the first time (ala Fog of War).
+ */
 class cell_unknown : public cell_op {
  public:
   cell_unknown(size_t x, size_t y) : cell_op(x, y) {}
 
-  /**
-   * @brief Update a cell with the knowledge that it is now unknown.
-   *
-   * @param cell The cell to update.
-   */
-  void visit(representation::cell2D& cell) override;
-
+  /* stateless foraging */
   void visit(representation::perceived_cell2D& cell) override;
 
-  /**
-   * @brief Update the FSM associated with a cell with the knowledge that it is
-   * now unknown.
-   *
-   * @param cell The FSM associated with the cell to update.
-   */
+  /* stateful foraging */
+  void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& cell) override;
 };
 

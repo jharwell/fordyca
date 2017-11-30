@@ -36,16 +36,25 @@
 NS_START(fordyca);
 
 namespace controller {
-namespace depth0 { class foraging_sensors; }
-class actuator_manager;
-} /* namespace controller */
-
+namespace depth0 { class foraging_sensors; } class actuator_manager; }
 namespace state_machine = rcppsw::patterns::state_machine;
+
 NS_START(fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class vector_fsm
+ *
+ * @brief An FSM used to send a robot to a particular ABSOLUTE location in the
+ * arena (a block or cache location)
+ *
+ * Arrival tolerance can be specified differently for blocks and caches, which
+ * is necessary to avoid false positives in the cache of blocks, and also to
+ * avoid multiple robots all trying to drive to the center of the cache to
+ * "arrive" at it.
+ */
 class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
  public:
   /**
@@ -66,7 +75,6 @@ constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
              std::shared_ptr<controller::actuator_manager> actuators);
 
   /* taskable overrides */
-
   void task_reset(void) override { init(); }
   bool task_running(void) const override {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
@@ -83,8 +91,7 @@ constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
 
 
   bool is_avoiding_collision(void) const {
-    return ST_COLLISION_AVOIDANCE == current_state() ||
-        ST_COLLISION_AVOIDANCE == current_state();
+    return ST_COLLISION_AVOIDANCE == current_state();
   }
 
  protected:
@@ -168,15 +175,15 @@ constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
-  argos::CRandom::CRNG* m_rng;
-  struct fsm_state m_state;
-  uint m_freq_collision_thresh;
-  uint m_collision_rec_count;
+  argos::CRandom::CRNG*                                 m_rng;
+  struct fsm_state                                      m_state;
+  uint                                                  m_freq_collision_thresh;
+  uint                                                  m_collision_rec_count;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
-  std::shared_ptr<controller::actuator_manager> m_actuators;
-  struct goal_data m_goal_data;
-  rcppsw::control::pid_loop m_ang_pid;
-  rcppsw::control::pid_loop m_lin_pid;
+  std::shared_ptr<controller::actuator_manager>         m_actuators;
+  struct goal_data                                      m_goal_data;
+  rcppsw::control::pid_loop                             m_ang_pid;
+  rcppsw::control::pid_loop                             m_lin_pid;
 };
 
 NS_END(fsm, fordyca);

@@ -34,6 +34,11 @@ NS_START(fordyca, controller, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class foraging_sensors
+ *
+ * @brief The sensors used by the depth1 foraging controller
+ */
 class foraging_sensors: public depth0::foraging_sensors {
  public:
   foraging_sensors(
@@ -44,7 +49,7 @@ class foraging_sensors: public depth0::foraging_sensors {
       argos::CCI_FootBotMotorGroundSensor* const ground);
 
   /**
-   * @brief If TRUE, a block has *possibly* been detected.
+   * @brief If \c TRUE, a cache has *possibly* been detected.
    *
    * Only possibly, because there are some false positives, such as the first
    * timestep, before ARGoS has finished initializing things.

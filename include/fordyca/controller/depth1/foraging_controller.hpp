@@ -53,6 +53,13 @@ NS_START(controller, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class foraging_controller
+ *
+ * @brief A foraging controller that switches between \ref generalist,
+ * \ref forager, and \ref collector tasks, according to dynamic changes in the
+ * environment and/or execution times of the tasks.
+ */
 class foraging_controller : public depth0::stateful_foraging_controller,
                             public metrics::collectible_metrics::robot_metrics::depth1_metrics,
                             public metrics::collectible_metrics::task_metrics,
@@ -60,17 +67,21 @@ class foraging_controller : public depth0::stateful_foraging_controller,
  public:
   foraging_controller(void);
 
+  /* CCI_Controller overrides */
+  void Init(argos::TConfigurationNode& t_node) override;
+  void ControlStep(void) override;
+
   tasks::foraging_task* current_task(void) const;
 
   /* distance metrics */
   double timestep_distance(void) const override;
 
-  /* base metrics */
+  /* stateless metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 metrics */
+  /* stateful metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
@@ -81,9 +92,29 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool is_transporting_to_cache(void) const override;
   std::string task_name(void) const override;
 
+  /**
+   * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has
+   * arrived to one via some mechanism.
+   *
+   * This state corresponds to one of the FSMs within the controller waiting for
+   * a signal from the simulation that in order to move to the next stage of its
+   * task.
+   */
   bool cache_acquired(void) const;
+
+  /**
+   * @brief If \c TRUE, then a robot has acquired a block, meaning that it has
+   * arrived to one via some mechanism.
+   *
+   * This state corresponds to one of the FSMs within the controller waiting for
+   * a signal from the simulation that in order to move to the next stage of its
+   * task.
+   */
   bool block_acquired(void) const;
 
+  /**
+   * @brief Process the LOS for the current timestep (blocks and caches)
+   */
   void process_los(const representation::line_of_sight* const los) override;
 
   /**
@@ -92,29 +123,15 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool task_aborted(void) const { return m_task_aborted; }
 
-  /*
-   * @brief Initialize the controller.
-   *
-   * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><foraging_controller> section.
-   */
-  void Init(argos::TConfigurationNode& t_node) override;
-
-  /*
-   * @brief Called once every time step; length set in the XML file.
-   *
-   * Since the FSM does most of the work, this function just tells it run.
-   */
-  void ControlStep(void) override;
 
  private:
   void task_abort_cleanup(task_allocation::executable_task* const);
 
-  bool m_task_aborted;
+  bool                                               m_task_aborted;
   std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::forager> m_forager;
-  std::unique_ptr<tasks::collector> m_collector;
-  std::unique_ptr<tasks::generalist> m_generalist;
+  std::unique_ptr<tasks::forager>                    m_forager;
+  std::unique_ptr<tasks::collector>                  m_collector;
+  std::unique_ptr<tasks::generalist>                 m_generalist;
 };
 
 NS_END(depth1, controller, fordyca);

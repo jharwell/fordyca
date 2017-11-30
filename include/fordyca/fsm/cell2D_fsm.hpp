@@ -40,8 +40,14 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Per-cell (2D square on arena map) state machine containing the current
- * state of the cell (empty, has a block, or unknown).
+ * @class cell2D_fsm
+ *
+ * @brief Per-cell FSM containing the current state of the cell (empty, has a
+ * block, has a cache, or unknown).
+ *
+ * Though this class processes events, it does not do so via the visitor
+ * pattern as it is so simple that using the visitor pattern would be overkill
+ * here.
  */
 class cell2D_fsm : public state_machine::simple_fsm,
                    public visitor::visitable_any<cell2D_fsm> {
@@ -57,6 +63,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   explicit cell2D_fsm(
       const std::shared_ptr<rcppsw::er::server>& server);
   virtual ~cell2D_fsm(void) {}
+
   bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
   bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }

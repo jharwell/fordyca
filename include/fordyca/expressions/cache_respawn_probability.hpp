@@ -35,11 +35,26 @@ NS_START(fordyca, expressions);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_respawn_probability
+ *
+ * @brief Calculate the probability that loop functions should respawn a static
+ * cache after it has been emptied (turned into a single block that is).
+ *
+ * Depends on:
+ *
+ * - A scaling factor > 0 that influences the probability distribution shape.
+ */
 class cache_respawn_probability: public rcppsw::math::expression<double>  {
  public:
-  explicit cache_respawn_probability(double scale_factor) :
-      mc_scale_factor(scale_factor) {}
+  explicit cache_respawn_probability(double scale_factor);
 
+  /**
+   * @brief Calculate the probability of respawn
+   *
+   * @param n_foragers # robots currently executing Forager task.
+   * @param n_collectors # robots currently executing Collector task.
+   */
   double calc(size_t n_foragers, size_t n_collectors);
 
  private:

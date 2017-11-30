@@ -34,6 +34,11 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class base_collectible_metrics
+ *
+ * @brief Base class for all collectible metrics in FORDYCA.
+ */
 class base_collectible_metrics {
  public:
   virtual ~base_collectible_metrics(void) {}

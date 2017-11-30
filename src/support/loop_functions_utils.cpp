@@ -1,5 +1,5 @@
 /**
- * @file cell_empty.cpp
+ * @file loop_functions_utils.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,40 +21,34 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, support, utils);
 
 /*******************************************************************************
- * Member Functions
+ * Functions
  ******************************************************************************/
-void cell_empty::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
-} /* visit() */
+int robot_on_block(const argos::CFootBotEntity& robot,
+                   representation::arena_map& map) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  return map.robot_on_block(pos);
+} /* robot_on_block() */
 
-void cell_empty::visit(representation::cell2D& cell) {
-  cell.entity(nullptr);
-  cell.fsm().accept(*this);
-} /* visit() */
+int robot_id(const argos::CFootBotEntity& robot) {
+  /* +2 because the ID string starts with 'fb' */
+  return std::atoi(robot.GetId().c_str()+2);
+} /* robot_id() */
 
-void cell_empty::visit(fsm::cell2D_fsm& fsm) {
-  fsm.event_empty();
-} /* visit() */
+int robot_on_cache(const argos::CFootBotEntity& robot, representation::arena_map& map) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  return map.robot_on_cache(pos);
+}
 
-void cell_empty::visit(representation::arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-void cell_empty::visit(representation::perceived_arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
-
-NS_END(events, fordyca);
+NS_END(utils, support, fordyca);

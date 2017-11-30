@@ -35,11 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
-} /* namespace controller */
-
+namespace controller { class base_foraging_sensors; class actuator_manager; }
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -51,9 +47,10 @@ NS_START(fsm);
 /**
  * @class base_explore_fsm
  *
- * @brief The base FSM for an exploration subtask. Each robot executing this FSM will
- * roam around randomly until it finds a block (or a cache), and then signal a
- * higher level FSM that it has done so.
+ * @brief The base FSM for an exploration subtask. Does not actually contain an
+ * FSM per-se, but just some pieces common to all exploration FSMs.
+ *
+ * This class cannot be instantiated on its own.
  */
 class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
@@ -65,7 +62,7 @@ class base_explore_fsm : public base_foraging_fsm,
                    uint8_t max_states);
 
   /* taskable overrides */
-  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
+  void task_start(const rcppsw::task_allocation::taskable_argument* const) override {}
 
   /**
    * @brief Reset the FSM
@@ -137,11 +134,11 @@ class base_explore_fsm : public base_foraging_fsm,
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
 
-  const double mc_dir_change_thresh;
+  const double          mc_dir_change_thresh;
 
   argos::CRandom::CRNG* m_rng;
-  struct fsm_state m_state;
-  argos::CRadians m_new_dir;
+  struct fsm_state      m_state;
+  argos::CRadians       m_new_dir;
 };
 
 NS_END(fsm, fordyca);

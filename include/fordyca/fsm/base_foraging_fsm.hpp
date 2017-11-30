@@ -34,13 +34,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
-} /* namespace controller */
+namespace controller { class base_foraging_sensors; class actuator_manager; }
+namespace state_machine = rcppsw::patterns::state_machine;
 
 NS_START(fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,9 +45,10 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /**
  * @class base_foraging_fsm
  *
- * @brief A collection of base states/common functionality that state machines
- * can use if they choose. This class cannot be instantiated on its own/has no
- * actual working state machine.
+ * @brief A collection of base states/common functionality that foraging FSMs
+ * can use if they choose.
+ *
+ * This class cannot be instantiated on its own.
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
@@ -73,7 +71,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    *
    * @param vector The input vector
    *
-   * @return The same vector, but with a new angle
+   * @return The same vector, but with a new angle.
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
   controller::actuator_manager*  actuators(void) const { return m_actuators.get(); }
@@ -112,8 +110,8 @@ class base_foraging_fsm : public state_machine::hfsm {
    * direction as the average location of the detected obstacle and moving in
    * that direction.
    *
-   * After completing avoidance, robots will return automatically to whatever
-   * state they were in prior to this one.
+   * After completing avoidance, robots will return to whatever state they were
+   * in prior to this one.
    */
   HFSM_STATE_DECLARE_ND(base_foraging_fsm, collision_avoidance);
 
@@ -138,9 +136,9 @@ class base_foraging_fsm : public state_machine::hfsm {
   base_foraging_fsm(const base_foraging_fsm& fsm) = delete;
   base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;
 
-  argos::CRandom::CRNG* m_rng;
+  argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;
-  std::shared_ptr<controller::actuator_manager> m_actuators;
+  std::shared_ptr<controller::actuator_manager>      m_actuators;
 };
 
 NS_END(fsm, fordyca);

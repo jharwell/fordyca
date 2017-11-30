@@ -33,17 +33,11 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-
-namespace params {
-struct fsm_params;
-} /* namespace params */
-
-namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
-} /* namespace controller */
+namespace params { struct fsm_params; }
+namespace controller { class base_foraging_sensors; class actuator_manager;}
 
 NS_START(fsm, depth0);
 
@@ -55,11 +49,11 @@ NS_START(fsm, depth0);
  *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
- * block back to the nest and repeat.
+ * block back to the nest, and fdrops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                            public metrics::collectible_metrics::robot_metrics::stateless_metrics,
-                            public visitor::visitable_any<stateless_foraging_fsm> {
+                               public metrics::collectible_metrics::robot_metrics::stateless_metrics,
+                               public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const struct params::fsm_params* params,
                       std::shared_ptr<rcppsw::er::server> server,
@@ -103,7 +97,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
 
-  /* random foraging fsm states */
+  /* stateless fsm states */
   HFSM_STATE_DECLARE(stateless_foraging_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, acquire_block,
                      state_machine::event_data);

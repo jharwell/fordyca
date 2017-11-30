@@ -54,13 +54,15 @@ NS_START(fsm);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
- * @brief The FSM for an unpartitioned foraging task.
+ * @class block_to_nest_fsm
  *
- * Each robot executing this FSM will locate for a block (either a known block
- * or via random exploration), pickup the block and bring it all the way back to
- * the nest.
+ * @brief Each robot executing this FSM will locate for a block (either a known
+ * block or via random exploration), pickup the block and bring it all the way
+ * back to the nest.
+ *
+ * It can be directed to acquire a block either from a cache or to find a free
+ * one.
  */
 class block_to_nest_fsm : public base_foraging_fsm,
                           public metrics::collectible_metrics::robot_metrics::stateless_metrics,
@@ -77,24 +79,8 @@ class block_to_nest_fsm : public base_foraging_fsm,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
   /* taskable overrides */
-
-  /**
-   * @brief Run the next step of the FSM during task execution.
-   */
   void task_execute(void) override;
-
-  /**
-   * @brief Start/restart the FSM. It can be told to retrieve a block from a
-   * cache or to look for a free block, via the argument.
-   */
   void task_start(const task_allocation::taskable_argument * arg) override;
-
-  /**
-   * @brief Determine if a block has been brought to the nest, and the robot has
-   * subsequently left the nest, ready for its next task.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }
@@ -123,7 +109,17 @@ class block_to_nest_fsm : public base_foraging_fsm,
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override { return false; };
 
+  /**
+   * @brief If \c TRUE, the robot has acquired (i.e. is sitting on top of) a
+   * cache, and is waiting for the simulation to send it the block pickup
+   * signal.
+   */
   bool cache_acquired(void) const;
+
+  /* @brief If \c TRUE, the robot has acquired (i.e. is sitting on top of) a
+   * block, and is waiting for the simulation to send it the block pickup
+   * signal.
+   */
   bool block_acquired(void) const;
 
   /**
@@ -137,8 +133,19 @@ class block_to_nest_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START,
     ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a  free block */
+    /**
+     * @brief State robots wait in after acquiring a block for the simulation to
+     * send them the block pickup signal. Having this extra state solves a lot
+     * of handshaking/off by one issues regarding the timing of doing so.
+     */
     ST_WAIT_FOR_BLOCK_PICKUP,
     ST_ACQUIRE_CACHED_BLOCK,  /* superstate for finding a cached block */
+
+    /**
+     * @brief State robots wait in after acquiring a cache for the simulation to
+     * send them the block pickup signal. Having this extra state solves a lot
+     * of handshaking/off by one issues regarding the timing of doing so.
+     */
     ST_WAIT_FOR_CACHE_PICKUP,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_COLLISION_AVOIDANCE,
@@ -172,10 +179,9 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm(const block_to_nest_fsm& fsm) = delete;
   block_to_nest_fsm& operator=(const block_to_nest_fsm& fsm) = delete;
 
-  /* data members */
-  std::shared_ptr<controller::depth1::foraging_sensors>  m_sensors;
-  acquire_block_fsm m_block_fsm;
-  depth1::acquire_cache_fsm m_cache_fsm;
+  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
+  acquire_block_fsm                                     m_block_fsm;
+  depth1::acquire_cache_fsm                             m_cache_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

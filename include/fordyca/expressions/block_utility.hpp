@@ -37,6 +37,8 @@ NS_START(fordyca, expressions);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class block_utilityppp
+ *
  * @brief Calculates the utility associated with a known block, as part of a
  * robot's decision on whether or not to go and attempt to pick it up.
  *
@@ -49,9 +51,7 @@ NS_START(fordyca, expressions);
 class block_utility: public rcppsw::math::expression<double>  {
  public:
   block_utility(const argos::CVector2& block_loc,
-                const argos::CVector2& nest_loc) :
-      mc_block_loc(block_loc),
-      mc_nest_loc(nest_loc) {}
+                const argos::CVector2& nest_loc);
 
   double calc(const argos::CVector2& rloc, double density);
 

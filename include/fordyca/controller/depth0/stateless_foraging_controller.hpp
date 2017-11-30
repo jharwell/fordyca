@@ -35,7 +35,6 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-
 namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
@@ -57,7 +56,12 @@ class stateless_foraging_controller : public base_foraging_controller,
  public:
   stateless_foraging_controller(void);
 
-  /* base metrics */
+  /* CCI_Controller overrides */
+  void Init(argos::TConfigurationNode& t_node) override;
+  void ControlStep(void) override;
+  void Reset(void) override;
+
+  /* stateless metrics */
   bool is_exploring_for_block(void) const override;
   bool is_transporting_to_nest(void) const override;
   bool is_avoiding_collision(void) const override;
@@ -65,25 +69,6 @@ class stateless_foraging_controller : public base_foraging_controller,
   /* distance metrics */
   size_t entity_id(void) const override;
   double timestep_distance(void) const override;
-
-  /*
-   * @brief Initialize the controller.
-   *   * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><stateless_foraging_controller_controller> section.
-   */
-  void Init(argos::TConfigurationNode& t_node) override;
-
-  /*
-   * @brief Called once every time step; length set in the XML file.
-   *
-   * Since the FSM does all the work, this function just tells it run.
-   */
-  void ControlStep(void) override;
-
-  /*
-   * @brief Reset controller to its state right after the Init().
-   */
-  void Reset(void) override;
 
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 

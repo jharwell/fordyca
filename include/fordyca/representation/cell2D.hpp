@@ -43,6 +43,8 @@ class cell_entity;
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class cell2D
+ *
  * @brief Base representation of a cell on a 2D grid. This class represents
  * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
  * state is).
@@ -110,8 +112,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
   cell2D(const cell2D& other) = delete;
   cell2D& operator=(const cell2D& other) = delete;
 
-  cell_entity* m_entity;
-  discrete_coord m_loc;
+  cell_entity*    m_entity;
+  discrete_coord  m_loc;
   fsm::cell2D_fsm m_fsm;
 };
 

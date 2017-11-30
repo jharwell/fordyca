@@ -43,13 +43,11 @@
 NS_START(fordyca);
 
 namespace params { struct fsm_params; }
-
+namespace representation { class perceived_arena_map; class cache; }
 namespace controller {
 namespace depth1 {class foraging_sensors; }
 class actuator_manager;
-} /* namespace controller */
-
-namespace representation { class perceived_arena_map; class cache; }
+}
 
 NS_START(fsm, depth1);
 
@@ -57,7 +55,9 @@ NS_START(fsm, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- *@brief The FSM for an acquiring a block from a cache in the arena.
+ * @class acquire_cache_fsm
+ *
+ * @brief The FSM for an acquiring a block from a cache in the arena.
  *
  * Each robot executing this FSM will look for a cache (either a known cache or
  * via random exploration). Once a block has been acquired from an existing
@@ -147,14 +147,13 @@ class acquire_cache_fsm : public base_foraging_fsm,
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
   acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
 
-  const argos::CVector2 mc_nest_center;
-  argos::CRandom::CRNG* m_rng;
+  const argos::CVector2                                      mc_nest_center;
+  argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
-  std::shared_ptr<rcppsw::er::server> m_server;
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
-
-  vector_fsm m_vector_fsm;
-  explore_for_cache_fsm m_explore_fsm;
+  std::shared_ptr<rcppsw::er::server>                        m_server;
+  std::shared_ptr<controller::depth1::foraging_sensors>      m_sensors;
+  vector_fsm                                                 m_vector_fsm;
+  explore_for_cache_fsm                                      m_explore_fsm;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

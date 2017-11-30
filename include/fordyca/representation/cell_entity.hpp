@@ -39,6 +39,8 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class cell_entity
+ *
  * @brief A base class from which objects that are able to occupy a cell within
  * a 2D grid derive.
  */
@@ -53,6 +55,7 @@ class cell_entity {
       m_x_dim(other.m_x_dim), m_y_dim(other.m_y_dim),
       m_color(other.m_color), m_real_loc(other.m_real_loc),
       m_discrete_loc(other.m_discrete_loc) {}
+
   cell_entity& operator=(const cell_entity& other) {
     this->m_id = other.m_id;
     this->m_display_id = other.m_display_id;
@@ -127,13 +130,13 @@ class cell_entity {
   int id(void) const { return m_id; }
 
  private:
-  int m_id;
-  bool m_display_id;
-  double m_x_dim;
-  double m_y_dim;
-  argos::CColor m_color;
+  int             m_id;
+  bool            m_display_id;
+  double          m_x_dim;
+  double          m_y_dim;
+  argos::CColor   m_color;
   argos::CVector2 m_real_loc;
-  discrete_coord m_discrete_loc;
+  discrete_coord  m_discrete_loc;
 };
 
 /*******************************************************************************

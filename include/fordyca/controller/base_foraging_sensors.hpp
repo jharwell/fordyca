@@ -45,6 +45,12 @@ NS_START(controller);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class base_foraging_sensors
+ *
+ * @brief The base sensor class for all sensors used by the different foraging
+ * controllers. Contains common functionality to all sensors.
+ */
 class base_foraging_sensors {
  public:
   base_foraging_sensors(
@@ -55,7 +61,7 @@ class base_foraging_sensors {
       argos::CCI_FootBotMotorGroundSensor* const ground);
 
   /**
-   * @brief If TRUE, a block has *possibly* been detected.
+   * @brief If \c TRUE, a block has *possibly* been detected.
    *
    * Only possibly, because there are some false positives, such as the first
    * timestep, before ARGoS has finished initializing things.
@@ -63,8 +69,8 @@ class base_foraging_sensors {
   bool block_detected(void);
 
   /**
-   * @brief If TRUE, the robot is currently in the nest, as reported by 3/4 of
-   * its ground sensors.
+   * @brief If \c TRUE, the robot is currently in the nest, as reported by 3/4
+   * of its ground sensors.
    */
   bool in_nest(void);
 
@@ -126,15 +132,14 @@ class base_foraging_sensors {
   base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
   base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
 
-  /** The current timestep  */
   const double                                mc_diffusion_delta;
   argos::CVector2                             m_robot_loc;
   argos::CVector2                             m_prev_robot_loc;
   const argos::CRange<argos::CRadians>        mc_go_straight_angle_range;
-  argos::CCI_RangeAndBearingSensor*           m_rabs; /* range and bearing sensor */
-  argos::CCI_FootBotProximitySensor*          m_proximity; /* proximity sensor */
-  argos::CCI_FootBotLightSensor*              m_light; /* light sensor */
-  argos::CCI_FootBotMotorGroundSensor*        m_ground; /* motor ground sensor */
+  argos::CCI_RangeAndBearingSensor*           m_rabs;
+  argos::CCI_FootBotProximitySensor*          m_proximity;
+  argos::CCI_FootBotLightSensor*              m_light;
+  argos::CCI_FootBotMotorGroundSensor*        m_ground;
 };
 
 NS_END(controller, fordyca);

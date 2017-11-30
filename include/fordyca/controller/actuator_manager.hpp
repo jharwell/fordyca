@@ -115,6 +115,14 @@ class actuator_manager: public state_machine::simple_fsm {
   void set_wheel_speeds(double lin_speed, double ang_speed);
 
  private:
+  /**
+   * @brief Set the wheel speeds according to the heading.
+   *
+   * @param speed1 Speed of one wheel.
+   * @param speed2 Speed of the other wheel.
+   * @param heading Robot heading, which is used to determine which speed to
+   * apply to which wheel, so that the proper turn direction is executed.
+   */
   void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
   actuator_manager(const actuator_manager& fsm) = delete;
   actuator_manager& operator=(const actuator_manager& fsm) = delete;
@@ -124,7 +132,7 @@ class actuator_manager: public state_machine::simple_fsm {
    */
   enum fsm_states {
     ST_NO_TURN,     /// Go straight
-    ST_SOFT_TURN,   /// Both wheels are turning forwards, but at different speeds
+    ST_SOFT_TURN,   /// Both wheels rotating forward at slightly different speeds
     ST_HARD_TURN,   /// Wheels are turning with opposite & max speeds
     ST_MAX_STATES
   };

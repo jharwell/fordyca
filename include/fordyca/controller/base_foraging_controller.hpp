@@ -42,16 +42,33 @@ class base_foraging_sensors;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class base_foraging_controller
+ *
+ * @brief The base controller foraging class that all FORDYCA controllers derive
+ * from. It holds all functionality common to all controllers, as well that some
+ * that is stubbed out here, but overridden in derived classes which allows this
+ * class to be used as the robot controller handle when rendering QT graphics
+ * overlays.
+ */
 class base_foraging_controller : public argos::CCI_Controller,
                                  public rcppsw::er::client {
  public:
   base_foraging_controller(void);
   virtual ~base_foraging_controller(void) {}
 
+  /* CCI_Controller overrides */
+  void Init(argos::TConfigurationNode& node) override;
+  void Reset(void) override;
+
+  /**
+   * @brief Set whether or not a robot is supposed to display it's LOS as a
+   * square of the appropriate size during simulation.
+   */
   void display_los(bool display_los) { m_display_los = display_los; }
 
   /**
-   * @brief If TRUE, then the robot should display its approxibate LOS as a
+   * @brief If \c TRUE, then the robot should display its approximate LOS as a
    * circle on the ground during simulation.
    */
   bool display_los(void) const { return m_display_los; }
@@ -63,16 +80,24 @@ class base_foraging_controller : public argos::CCI_Controller,
   void display_id(bool display_id) { m_display_id = display_id; }
 
   /**
-   * @brief Return whether or not a robot is supposed to display it's ID above
-   * its head during simulation.
+   * @brief If \c TRUE, then the robot should display its ID above its head
+   * during simulation.
    */
   bool display_id(void) const { return m_display_id; }
 
   /**
-   * @brief If TRUE, the robot is currently at least most of the way in the nest.
+   * @brief If \c TRUE, the robot is currently at least most of the way in the
+   * nest, as reported by the sensors.
    */
   bool in_nest(void) const;
 
+  /**
+   * @brief Get the current LOS for the robot.
+   *
+   * By default this returns nullptr. It is only here so that it this class can
+   * be used as the robot controller handle when rendering QT graphics
+   * overlays.
+   */
   virtual const representation::line_of_sight* los(void) const { return nullptr; }
 
   /**
@@ -85,25 +110,23 @@ class base_foraging_controller : public argos::CCI_Controller,
    * currently carrying a block.
    */
   representation::block* block(void) const { return m_block; }
+
+  /**
+   * @brief Set the block that the robot is carrying.
+   */
   void block(representation::block* block) { m_block = block; }
 
   /**
-   * @brief If TRUE, then the robot thinks that it is on top of a block. Note
-   * that this may be a false positive...
+   * @brief If \c TRUE, then the robot thinks that it is on top of a block.
+   *
+   * On rare occasions this may be a false positive, which is why it is also
+   * checked in the loop functions before passing any events to the
+   * controller. One such occasion that is known to occur is the first timestep,
+   * because the sensors have not yet finished initializing, and will return the
+   * values that are incidentally the same as those that correspond to a block
+   * being found.
    */
   bool block_detected(void) const;
-
-  void Init(argos::TConfigurationNode& node) override;
-
-  /*
-   * @brief Reset controller to its state right after the Init().
-   */
-  void Reset(void) override;
-
-  /*
-   * @brief Cleanup whatever was done by Init().
-   */
-  void Destroy(void) override {}
 
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
@@ -114,15 +137,10 @@ class base_foraging_controller : public argos::CCI_Controller,
   base_foraging_controller(const base_foraging_controller& other) = delete;
   base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
 
-  bool m_display_los;
-  bool m_display_id;
-
-  /**
-   * The current block that the robot is carrying, or NULL if the robot is not
-   * currently carrying a block.
-   */
-  representation::block*                        m_block;
-  std::shared_ptr<actuator_manager>             m_actuators;
+  bool                                   m_display_los;
+  bool                                   m_display_id;
+  representation::block*                 m_block;
+  std::shared_ptr<actuator_manager>      m_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::er::server>    m_server;
 };

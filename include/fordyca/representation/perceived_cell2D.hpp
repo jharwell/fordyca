@@ -42,9 +42,10 @@ namespace decorator = rcppsw::patterns::decorator;
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Per-robot representation of a cell on the 2D grid. The fsm er_server
- * is disabled, so you can't use any of the standard event reporting macros
- * without modifying \ref grid2D.
+ * @class perceived_cell2D
+ *
+ * @brief Per-robot representation of a cell on the 2D grid, as it appears to a
+ * robot, in which the knowledge of the cell's state decays over time.
  */
 class perceived_cell2D : public decorator::decorator<cell2D>,
                          public visitor::visitable_any<perceived_cell2D>,
@@ -113,9 +114,9 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    * The tolerance to zero which the pheromone density has to reach before the
    * cell will transition back to an unknown state.
    */
-  static const double kEpsilon;
+  static const double              kEpsilon;
 
-  std::string m_robot_id;  /// For debugging purposes only
+  std::string                      m_robot_id;
   rcppsw::swarm::pheromone_density m_density;
 };
 

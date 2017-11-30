@@ -34,12 +34,29 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class stateful_metrics
+ *
+ * @brief Interface defining what metrics should be collected from all robots
+ * executing the \ref stateful_foraging_controller, or any controller derived
+ * from that controller.
+ */
 class stateful_metrics : public base_collectible_metrics {
  public:
   stateful_metrics(void) {}
   virtual ~stateful_metrics(void) {}
 
+  /**
+   * @brief If \c TRUE, then a robot is currently acquiring a block (either via
+   * exploring or via vectoring), and is executing the \ref explore_for_block_fsm/
+   * \ref acquire_block_fsm.
+   */
   virtual bool is_acquiring_block(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot is currently acquiring a block via
+   * vectoring and is executing the \ref vector_fsm/ \ref acquire_block_fsm.
+   */
   virtual bool is_vectoring_to_block(void) const = 0;
 };
 

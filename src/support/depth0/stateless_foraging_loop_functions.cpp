@@ -43,9 +43,6 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 
-namespace collectors = metrics::collectors;
-namespace robot_collectors = metrics::collectors::robot_metrics;
-
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
@@ -196,11 +193,11 @@ void stateless_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
       if (!controller.in_nest() && controller.is_exploring_for_block() &&
           controller.block_detected()) {
         /* Check whether the foot-bot is actually on a block */
-        int block = robot_on_block(robot);
+        int block = utils::robot_on_block(robot, *map());
         if (-1 != block) {
           events::free_block_pickup pickup_op(rcppsw::er::g_server,
                                               &m_map->blocks()[block],
-                                              robot_id(robot));
+                                              utils::robot_id(robot));
           controller.accept(pickup_op);
           m_map->accept(pickup_op);
 
@@ -230,18 +227,6 @@ void stateless_foraging_loop_functions::PreStep() {
   } /* for(it..) */
   pre_step_final();
 } /* PreStep() */
-
-int stateless_foraging_loop_functions::robot_id(const argos::CFootBotEntity& robot) {
-  /* +2 because the ID string starts with 'fb' */
-  return std::atoi(robot.GetId().c_str()+2);
-} /* robot_id() */
-
-int stateless_foraging_loop_functions::robot_on_block(const argos::CFootBotEntity& robot) {
-  argos::CVector2 pos;
-  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-  return m_map->robot_on_block(pos);
-} /* robot_on_block() */
 
 __pure bool stateless_foraging_loop_functions::IsExperimentFinished(void) {
   /*

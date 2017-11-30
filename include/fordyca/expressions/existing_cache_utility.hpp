@@ -37,6 +37,8 @@ NS_START(fordyca, expressions);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class existing_cache_utility
+ *
  * @brief Calculates the utility associated with an existing cache that the
  * robot knows about.
  *
@@ -51,14 +53,9 @@ NS_START(fordyca, expressions);
 class existing_cache_utility: public rcppsw::math::expression<double> {
  public:
   existing_cache_utility(const argos::CVector2& cache_loc,
-                         const argos::CVector2& nest_loc) :
-      mc_cache_loc(cache_loc), mc_nest_loc(nest_loc) {}
+                         const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc, double density, size_t n_blocks) {
-    return set_result((std::exp(-density) * n_blocks) /
-                      ((mc_cache_loc - rloc).Length() *
-                       (mc_cache_loc - mc_nest_loc).Length()));
-  }
+  double calc(const argos::CVector2& rloc, double density, size_t n_blocks);
 
  private:
   const argos::CVector2 mc_cache_loc;

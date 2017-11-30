@@ -35,13 +35,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class block;
-} /* namespace representation */
-
-namespace params {
-struct block_params;
-} /* namespace params */
+namespace representation { class block; }
+namespace params { struct block_params; }
 
 NS_START(support);
 
@@ -85,10 +80,11 @@ class block_distributor {
   argos::CVector2 dist_random(const representation::block& block);
 
   /**
-   * @brief Distribute a block within a small range about 75% of the way between
+   * @brief Distribute a block within a small range about 90% of the way between
    * the nest and the far wall. Assumes a horizontally rectangular arena.
    */
   argos::CVector2 dist_single_src(const representation::block& block);
+
   argos::CVector2 dist_in_range(argos::CRange<double> x_range,
                                 argos::CRange<double> y_range);
   argos::CVector2 dist_outside_range(double dimension,
@@ -98,8 +94,8 @@ class block_distributor {
   block_distributor(const block_distributor& s) = delete;
   block_distributor& operator=(const block_distributor& s) = delete;
 
-  std::string m_dist_model;
-  bool m_respawn;
+  std::string           m_dist_model;
+  bool                  m_respawn;
   argos::CRange<double> m_arena_x;
   argos::CRange<double> m_arena_y;
   argos::CRange<double> m_nest_x;

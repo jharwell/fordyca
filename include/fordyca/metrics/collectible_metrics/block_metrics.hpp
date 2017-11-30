@@ -34,6 +34,11 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_metrics
+ *
+ * @brief Interface defining collectible metrics on a block.
+ */
 class block_metrics : public base_collectible_metrics {
  public:
   block_metrics(void) {}

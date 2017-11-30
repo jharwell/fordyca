@@ -40,13 +40,15 @@ namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca);
 namespace params { struct perceived_grid_params; }
 NS_START(representation);
+class line_of_sight;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class line_of_sight;
 
 /**
+ * @class perceived_arena_map
+ *
  * @brief The arena map stores a logical representation of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
@@ -95,7 +97,7 @@ class perceived_arena_map: public rcppsw::er::client,
   void update_density(void);
 
  private:
-  std::shared_ptr<rcppsw::er::server> m_server;
+  std::shared_ptr<rcppsw::er::server>                          m_server;
   rcppsw::ds::grid2D_ptr<perceived_cell2D,
                          std::shared_ptr<rcppsw::er::server>&> m_grid;
 };

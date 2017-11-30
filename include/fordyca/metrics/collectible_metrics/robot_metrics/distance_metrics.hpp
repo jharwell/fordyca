@@ -34,12 +34,29 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class distance_metrics
+ *
+ * @brief Interface defining what metrics regarding distance traveled should be
+ * collected from all robots.
+ */
 class distance_metrics : public base_collectible_metrics {
  public:
   distance_metrics(void) {}
   virtual ~distance_metrics(void) {}
 
+  /**
+   * @brief Get the distance that a robot has traveled in a single timestep.
+   *
+   * This will be called every timestep by the \ref distance_metrics_collector
+   * on all robots.
+   */
   virtual double timestep_distance(void) const = 0;
+
+  /**
+   * @brief Get the ID of a robot, for use in associating gathered metrics with
+   * a specific robot.
+   */
   virtual size_t entity_id(void) const = 0;
 };
 

@@ -34,6 +34,8 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
+
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
@@ -84,7 +86,8 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
             repo.get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);
-    set_robot_los<controller::depth0::stateful_foraging_controller>(robot);
+    utils::set_robot_los<controller::depth0::stateful_foraging_controller>(robot,
+                                                                           *map());
   } /* for(it..) */
   ER_NOM("stateful_foraging loop functions initialization finished");
 }
@@ -100,63 +103,20 @@ void stateful_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robo
     m_collector->collect(controller);
 
     /* Send the robot its new line of sight */
-    set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-    set_robot_los<controller::depth0::stateful_foraging_controller>(robot);
+    utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
+    utils::set_robot_los<controller::depth0::stateful_foraging_controller>(robot,
+                                                                           *map());
     set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
     if (controller.is_carrying_block()) {
-      handle_nest_block_drop<controller::depth0::stateful_foraging_controller>(robot);
+      handle_nest_block_drop<controller::depth0::stateful_foraging_controller>(robot,
+                                                                               *map(),
+                                                                               *block_collector());
     } else { /* The foot-bot has no block item */
-      handle_free_block_pickup<controller::depth0::stateful_foraging_controller>(robot);
+      handle_free_block_pickup<controller::depth0::stateful_foraging_controller>(robot,
+                                                                                 *map());
     }
 } /* pre_step_iter() */
-
-template<typename T>
-bool stateful_foraging_loop_functions::handle_free_block_pickup(argos::CFootBotEntity& robot) {
-
- T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
-  if (controller.block_acquired()) {
-    /* Check whether the foot-bot is actually on a block */
-    int block = robot_on_block(robot);
-    if (-1 != block) {
-      events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                          &map()->blocks()[block],
-                                          robot_id(robot));
-      controller.visitor::template visitable_any<T>::accept(pickup_op);
-      map()->accept(pickup_op);
-
-      /* The floor texture must be updated */
-      floor()->SetChanged();
-      return true;
-    }
-  }
-  return false;
-} /* handle_free_block_pickup() */
-
-template <typename T>
-bool stateful_foraging_loop_functions::handle_nest_block_drop(argos::CFootBotEntity& robot) {
-  T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-  if (controller.in_nest() && controller.is_transporting_to_nest()) {
-
-    /* Update arena map state due to a block nest drop */
-    events::nest_block_drop drop_op(rcppsw::er::g_server,
-                                    controller.block());
-
-    /* Get stats from carried block before it's dropped */
-    stateless_foraging_loop_functions::block_collector()->accept(drop_op);
-
-    map()->accept(drop_op);
-
-    /* Actually drop the block */
-    controller.visitor::template visitable_any<T>::accept(drop_op);
-
-    /* The floor texture must be updated */
-    floor()->SetChanged();
-    return true;
-  }
-  return false;
-} /* handle_nest_block_drop() */
 
 argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -204,37 +164,9 @@ void stateful_foraging_loop_functions::PreStep() {
   pre_step_final();
 } /* PreStep() */
 
-template<typename T>
-void stateful_foraging_loop_functions::set_robot_los(argos::CFootBotEntity& robot) {
-  argos::CVector2 pos;
-  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-
-  representation::discrete_coord robot_loc =
-      representation::real_to_discrete_coord(pos, map()->grid_resolution());
-  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-  std::unique_ptr<representation::line_of_sight> new_los =
-      rcppsw::make_unique<representation::line_of_sight>(
-          map()->subgrid(robot_loc.first, robot_loc.second, 1),
-          robot_loc);
-  controller.los(new_los);
-} /* set_robot_los() */
-
-template<typename T>
-void stateful_foraging_loop_functions::set_robot_tick(argos::CFootBotEntity& robot) {
-  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-  controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
-} /* set_robot_tic() */
-
 robot_collectors::stateful_metrics_collector* stateful_foraging_loop_functions::stateful_collector(void) const {
   return m_collector.get();
 } /* depth0_collector() */
-
-
-template void stateful_foraging_loop_functions::set_robot_los<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
-template void stateful_foraging_loop_functions::set_robot_tick<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
-template bool stateful_foraging_loop_functions::handle_nest_block_drop<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
-template bool stateful_foraging_loop_functions::handle_free_block_pickup<controller::depth1::foraging_controller>(argos::CFootBotEntity&);
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions, "stateful_foraging_loop_functions");

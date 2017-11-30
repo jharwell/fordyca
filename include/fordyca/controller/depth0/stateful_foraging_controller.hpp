@@ -56,7 +56,15 @@ namespace task_allocation = rcppsw::task_allocation;
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief  A controller is simply an implementation of the CCI_Controller class.
+ * @class stateful_foraging_controller
+ *
+ * @brief A foraging controller that remembers what it has seen for a period of
+ * time (knowledge decays according to an exponential model, @see
+ * pheromone_density).
+ *
+ * Robots using this controller execute the \ref generalist task, in which a
+ * block is acquired (either via randomized exploring or by vectoring to a known
+ * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public base_foraging_controller,
                                      public rmetrics::stateless_metrics,
@@ -66,12 +74,16 @@ class stateful_foraging_controller : public base_foraging_controller,
  public:
   stateful_foraging_controller(void);
 
-  /* base metrics */
+  /* CCI_Controller overrides */
+  void Init(argos::TConfigurationNode& t_node) override;
+  void ControlStep(void) override;
+
+  /* stateless metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 metrics */
+  /* stateful metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
@@ -81,44 +93,35 @@ class stateful_foraging_controller : public base_foraging_controller,
 
   bool block_acquired(void) const;
 
+  /**
+   * @brief Get the current task the controller is executing. For this
+   * controller, that is always the \ref generalist task.
+   */
   tasks::foraging_task* current_task(void) const;
 
   /**
-   * @brief Set the current clock tick. In a real world, each robot would
-   * maintain its own clock tick, and overall there would no doubt be
-   * considerable skew; this is a simulation hack that makes things much
-   * nicer/easier to deal with.
+   * @brief Set the current clock tick.
+   *
+   * In a real world, each robot would maintain its own clock tick, and overall
+   * there would no doubt be considerable skew; this is a simulation hack that
+   * makes things much nicer/easier to deal with.
    */
   void tick(uint tick);
 
-  /*
-   * @brief Initialize the controller.
-   *
-   * @param t_node Points to the <parameters> section in the XML file in the
-   *               <controllers><stateful_foraging_controller_controller> section.
-   */
-  void Init(argos::TConfigurationNode& t_node) override;
-
-  /*
-   * @brief Called once every time step; length set in the XML file.
-   *
-   * Since the FSM does most of the work, this function just tells it run.
-   */
-  void ControlStep(void) override;
-
   /**
-   * @brief Set the robot's current line of sight (LOS). This sort of a hack,
-   * but is much easier than actually computing it, and helps me get on with teh
-   * actual reserach I'm interested in.
+   * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
+  /**
+   * @brief Process the LOS for a given timestep.
+   *
+   * Only handles blocks within a LOS; caches are ignored.
+   */
   virtual void process_los(const representation::line_of_sight* const los);
 
   /**
    * @brief Get the current LOS for the robot.
-   *
-   * @return The current LOS.
    */
   const representation::line_of_sight* los(void) const override;
 
@@ -136,11 +139,10 @@ class stateful_foraging_controller : public base_foraging_controller,
    * This is a hack, as real world robot's would have to do their own
    * localization. This is far superior to that, in terms of ease of
    * programming. Plus it helps me focus in on my actual research. Ideally,
-   * robot's would calculate this from sensor values, rather than it being set
-   * by the loop functions.
+   * robots would calculate this from sensor values, rather than it being set by
+   * the loop functions.
    */
   void robot_loc(argos::CVector2 loc);
-
   argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
 
@@ -148,8 +150,8 @@ class stateful_foraging_controller : public base_foraging_controller,
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::shared_ptr<depth1::foraging_sensors>            m_sensors;
-  std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::generalist> m_generalist;
+  std::unique_ptr<task_allocation::polled_executive>   m_executive;
+  std::unique_ptr<tasks::generalist>                   m_generalist;
 };
 
 NS_END(depth0, controller, fordyca);
