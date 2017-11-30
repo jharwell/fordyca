@@ -26,6 +26,9 @@
  ******************************************************************************/
 #include <list>
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
+#include "fordyca/support/depth1/cache_usage_penalty.hpp"
+#include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,16 +61,95 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
 
  protected:
   template<typename T>
-  bool handle_cache_block_drop(argos::CFootBotEntity& robot);
+  bool init_cache_usage_penalty(
+      argos::CFootBotEntity& robot) {
+
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+
+    if (controller.cache_acquired() && !controller.is_transporting_to_cache()) {
+      ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
+
+      /* Check whether the foot-bot is actually on a cache */
+      int cache = utils::robot_on_cache(robot, *map());
+      if (-1 != cache) {
+        m_penalty_list.push_back(new cache_usage_penalty(&controller,
+                                                         cache,
+                                                         mc_cache_penalty,
+                                                         GetSpace().GetSimulationClock()));
+        return true;
+      }
+    }
+    return false;
+  } /* init_cache_usage_penalty() */
+
   template<typename T>
-  bool init_cache_usage_penalty(argos::CFootBotEntity& robot);
+  bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot) {
+
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+
+    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                           [&](const cache_usage_penalty* p) {
+                             return p->controller() == &controller;});
+    if (it != m_penalty_list.end()) {
+      return (*it)->penalty_satisfied(GetSpace().GetSimulationClock());
+    }
+
+    return false;
+  } /* cache_usage_penalty_satisfied() */
+
   template<typename T>
-  bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot);
+  void finish_cached_block_pickup(argos::CFootBotEntity& robot) {
+
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    cache_usage_penalty* p = m_penalty_list.front();
+    ER_ASSERT(p->controller() == &controller,
+              "FATAL: Out of order cache penalty handling");
+
+    events::cached_block_pickup pickup_op(rcppsw::er::g_server,
+                                          &map()->caches()[p->cache_id()],
+                                          utils::robot_id(robot));
+    m_penalty_list.remove(p);
+
+    /*
+     * Map must be called before controller for proper cache block decrement!
+     */
+    map()->accept(pickup_op);
+
+    controller.visitor::template visitable_any<T>::accept(pickup_op);
+    floor()->SetChanged();
+  }
+
   template<typename T>
-  void finish_cached_block_pickup(argos::CFootBotEntity& robot);
-  int robot_on_cache(const argos::CFootBotEntity& robot);
+  bool robot_serving_cache_penalty(
+      argos::CFootBotEntity& robot) {
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                           [&](const cache_usage_penalty* p) {
+                             return p->controller() == &controller;});
+    return it != m_penalty_list.end();
+  }
+
   template<typename T>
-  bool robot_serving_cache_penalty(argos::CFootBotEntity& robot);
+  bool handle_cache_block_drop(argos::CFootBotEntity& robot) {
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+
+    if (controller.cache_acquired() && controller.is_transporting_to_cache()) {
+      /* Check whether the foot-bot is actually on a cache */
+      int cache = utils::robot_on_cache(robot, *map());
+      if (-1 != cache) {
+        /* Update arena map state due to a block nest drop */
+        events::cache_block_drop drop_op(rcppsw::er::g_server,
+                                         controller.block(),
+                                         &map()->caches()[cache],
+                                         map()->grid_resolution());
+
+        map()->accept(drop_op);
+        controller.visitor::template visitable_any<T>::accept(drop_op);
+        return true;
+      }
+    }
+    return false;
+  }
 
  private:
   void pre_step_final(void) override;
@@ -77,11 +159,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   foraging_loop_functions(const foraging_loop_functions& s) = delete;
   foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
-  uint mc_cache_penalty;
-  double mc_cache_respawn_scale_factor;
+  uint                                                        mc_cache_penalty;
+  double                                                      mc_cache_respawn_scale_factor;
   std::unique_ptr<robot_collectors::depth1_metrics_collector> m_depth1_collector;
-  std::unique_ptr<metrics::collectors::task_collector> m_task_collector;
-  std::list<cache_usage_penalty*> m_penalty_list;
+  std::unique_ptr<metrics::collectors::task_collector>        m_task_collector;
+  std::list<cache_usage_penalty*>                             m_penalty_list;
 };
 
 NS_END(depth1, support, fordyca);

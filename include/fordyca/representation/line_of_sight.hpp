@@ -48,10 +48,9 @@ class cell2D;
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
  *
- * The LOS for a robot is always square. Furthermore, it is always a multiple of
- * 4, as the smallest LOS is a 2x2 grid, the next smallest a 4x4, etc., UNLESS
- * the robot is near the edge of the arena, and a square grid would result in
- * out-of-bounds array accesses. In that case, a truncated LOS is created.
+ * The LOS for a robot is always square' UNLESS the robot is near the edge of
+ * the arena, and a square grid would result in out-of-bounds array accesses. In
+ * that case, a truncated LOS is created.
  *
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
@@ -117,7 +116,7 @@ class line_of_sight {
   const discrete_coord& center(void) const { return m_center; }
 
  private:
-  discrete_coord m_center;
+  discrete_coord                 m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
 };
 

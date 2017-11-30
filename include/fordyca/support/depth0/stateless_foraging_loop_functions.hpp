@@ -25,12 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <argos3/core/simulator/loop_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/arena_map.hpp"
+#include "fordyca/support/base_foraging_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,16 +39,25 @@ class block_metrics_collector;
 namespace robot_metrics {
 class stateless_metrics_collector;
 class distance_metrics_collector;
-}
-}}
+}}}
+namespace collectors = metrics::collectors;
+namespace robot_collectors = collectors::robot_metrics;
 
 NS_START(support, depth0);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class stateless_foraging_loop_functions : public argos::CLoopFunctions,
-                                       public rcppsw::er::client {
+/**
+ * @class statless_foraging_loop_functions
+ *
+ * @brief Contains the simulation support functions for stateless foraging:
+ *
+ * - Sending robots block pickup/block drop signals if they are waiting for them.
+ * - Handling block distribution.
+ */
+class stateless_foraging_loop_functions : public base_foraging_loop_functions,
+                                          public rcppsw::er::client {
  public:
   stateless_foraging_loop_functions(void);
   virtual ~stateless_foraging_loop_functions(void);
@@ -64,35 +70,12 @@ class stateless_foraging_loop_functions : public argos::CLoopFunctions,
   void PostExperiment(void) override;
 
  protected:
-  template<typename T>
-  void set_robot_pos(argos::CFootBotEntity& robot) {
-    argos::CVector2 pos;
-    pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-            const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-
-    T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-    controller.robot_loc(pos);
-  } /* set_robot_los() */
-
-  /**
-   * @brief Check if a robot is on top of a block. If, so return the block index.
-   *
-   * @param robot The robot to check
-   *
-   * @return The block index, or -1 if the robot is not on top of a block.
-   */
-  int robot_on_block(const argos::CFootBotEntity& robot);
-
-  /**
-   * @brief Get the ID of the robot as an integer.
-   */
-  int robot_id(const argos::CFootBotEntity& robot);
   representation::arena_map* map(void) const { return m_map.get(); }
   argos::CFloorEntity* floor(void) const { return m_floor; }
 
   metrics::collectors::block_metrics_collector* block_collector(void) const;
-  metrics::collectors::robot_metrics::distance_metrics_collector* distance_collector(void) const;
-  metrics::collectors::robot_metrics::stateless_metrics_collector* stateless_collector(void) const;
+  robot_collectors::distance_metrics_collector* distance_collector(void) const;
+  robot_collectors::stateless_metrics_collector* stateless_collector(void) const;
 
   const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
@@ -104,14 +87,14 @@ class stateless_foraging_loop_functions : public argos::CLoopFunctions,
   stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;
   stateless_foraging_loop_functions& operator=(const stateless_foraging_loop_functions& s) = delete;
 
-  argos::CRange<double> m_nest_x;
-  argos::CRange<double> m_nest_y;
-  argos::CFloorEntity* m_floor;
-  std::string m_sim_type;
-  std::unique_ptr<metrics::collectors::robot_metrics::stateless_metrics_collector> m_stateless_collector;
-  std::unique_ptr<metrics::collectors::robot_metrics::distance_metrics_collector> m_distance_collector;
-  std::unique_ptr<metrics::collectors::block_metrics_collector> m_block_collector;
-  std::unique_ptr<representation::arena_map> m_map;
+  argos::CRange<double>                                          m_nest_x;
+  argos::CRange<double>                                          m_nest_y;
+  argos::CFloorEntity*                                           m_floor;
+  std::string                                                    m_sim_type;
+  std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;
+  std::unique_ptr<robot_collectors::distance_metrics_collector>  m_distance_collector;
+  std::unique_ptr<collectors::block_metrics_collector>           m_block_collector;
+  std::unique_ptr<representation::arena_map>                     m_map;
 };
 
 NS_END(depth0, support, fordyca);

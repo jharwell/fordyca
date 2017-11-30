@@ -38,6 +38,8 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class block
+ *
  * @brief A representation of a block within the arena map. Blocks do not have
  * state (other than if they are currently being carried by a robot). Blocks
  * have both real (where they actually live in the world) and discretized
@@ -78,12 +80,8 @@ class block : public cell_entity,
   int robot_index(void) const { return m_robot_index; }
   void robot_index(int robot_index) { m_robot_index = robot_index; }
 
-  bool operator==(const block &other) const {
-    return this->id() == other.id();
-  }
-
  private:
-  int m_robot_index;
+  int    m_robot_index;
   size_t m_carries;
 };
 

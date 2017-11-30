@@ -49,6 +49,8 @@ class cell2D;
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class arena_map
+ *
  * @brief The arena map stores a logical representation of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
@@ -66,8 +68,18 @@ class arena_map: public rcppsw::er::client,
    */
   std::vector<block>& blocks(void) { return m_blocks; }
 
+  /**
+   * @brief Get the list of all the caches currently present in the arena.
+   */
   std::vector<cache>& caches(void) { return m_caches; }
+
+  /**
+   * @brief Remove a cache from the list of caches.
+   *
+   * @param victim The cache to remove.
+   */
   void cache_remove(cache& victim);
+
   void cache_removed(bool b) { m_cache_removed = b; }
   bool cache_removed(void) const { return m_cache_removed; }
 
@@ -153,14 +165,14 @@ class arena_map: public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
-  bool m_cache_removed;
+  bool                                      m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
-  const argos::CVector2 mc_nest_center;
-  std::vector<block> m_blocks;
-  std::vector<cache> m_caches;
-  support::block_distributor m_block_distributor;
-  std::shared_ptr<rcppsw::er::server> m_server;
-  occupancy_grid m_grid;
+  const argos::CVector2                     mc_nest_center;
+  std::vector<block>                        m_blocks;
+  std::vector<cache>                        m_caches;
+  support::block_distributor                m_block_distributor;
+  std::shared_ptr<rcppsw::er::server>       m_server;
+  occupancy_grid                            m_grid;
 };
 
 NS_END(representation, fordyca);

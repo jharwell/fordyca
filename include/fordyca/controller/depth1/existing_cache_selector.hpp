@@ -28,6 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

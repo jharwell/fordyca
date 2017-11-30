@@ -30,17 +30,28 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+
+namespace robot_collectors = metrics::collectors::robot_metrics;
 namespace metrics { namespace collectors { namespace robot_metrics {
 class stateful_metrics_collector;
 }}}
 namespace controller { namespace depth0 { class foraging_controller; }}
-NS_START(support, depth0);
 
-namespace robot_collectors = metrics::collectors::robot_metrics;
+NS_START(support, depth0);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
+/**
+ * @class stateful_foraging_loop_functions
+ *
+ * @brief Contains the simulation support functions for stateful foraging, such
+ * as:
+ *
+ * - Sending robots their LOS each timestep
+ * - Sending robots their position each timestep.
+ * - Sending robot the current simulation tick each timestep.
+ */
 class stateful_foraging_loop_functions : public stateless_foraging_loop_functions {
  public:
   stateful_foraging_loop_functions(void);
@@ -52,22 +63,18 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   void Reset(void) override;
 
  protected:
-  template<typename T>
-  bool handle_nest_block_drop(argos::CFootBotEntity& robot);
-  template<typename T>
-  bool handle_free_block_pickup(argos::CFootBotEntity& robot);
-  template<typename T>
-  void set_robot_los(argos::CFootBotEntity& robot);
-  template<typename t>
-  void set_robot_tick(argos::CFootBotEntity& robot);
-
   robot_collectors::stateful_metrics_collector* stateful_collector(void) const;
   void pre_step_final(void) override;
+
+  template<typename T>
+  void set_robot_tick(argos::CFootBotEntity& robot) {
+    T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+    controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
+  }
 
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-
   stateful_foraging_loop_functions(const stateful_foraging_loop_functions& s) = delete;
   stateful_foraging_loop_functions& operator=(const stateful_foraging_loop_functions& s) = delete;
 

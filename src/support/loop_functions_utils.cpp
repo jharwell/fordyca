@@ -1,5 +1,5 @@
 /**
- * @file block_utility.hpp
+ * @file loop_functions_utils.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, support, utils);
 
 /*******************************************************************************
- * Class Definitions
+ * Functions
  ******************************************************************************/
-/**
- * @class block_utilityppp
- *
- * @brief Calculates the utility associated with a known block, as part of a
- * robot's decision on whether or not to go and attempt to pick it up.
- *
- * Depends on:
- *
- * - Distance of block to nest (Further is better).
- * - Distance of block to robot's current position (closer is better).
- * - Pheromone density associated with the block information (higher is better).
- */
-class block_utility: public rcppsw::math::expression<double>  {
- public:
-  block_utility(const argos::CVector2& block_loc,
-                const argos::CVector2& nest_loc);
+int robot_on_block(const argos::CFootBotEntity& robot,
+                   representation::arena_map& map) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  return map.robot_on_block(pos);
+} /* robot_on_block() */
 
-  double calc(const argos::CVector2& rloc, double density);
+int robot_id(const argos::CFootBotEntity& robot) {
+  /* +2 because the ID string starts with 'fb' */
+  return std::atoi(robot.GetId().c_str()+2);
+} /* robot_id() */
 
- private:
-  const argos::CVector2 mc_block_loc;
-  const argos::CVector2 mc_nest_loc;
-};
+int robot_on_cache(const argos::CFootBotEntity& robot, representation::arena_map& map) {
+  argos::CVector2 pos;
+  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  return map.robot_on_cache(pos);
+}
 
-NS_END(expressions, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */
+NS_END(utils, support, fordyca);
