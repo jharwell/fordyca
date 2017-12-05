@@ -28,11 +28,11 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <fstream>
 
-#include "rcppsw/task_allocation/task_params.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "rcppsw/er/server.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
+#include "fordyca/params/depth1/task_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
@@ -88,8 +88,8 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   fsm_repo.show_all(server_handle()->log_stream());
 
   ER_NOM("Initializing depth1 controller");
-  const task_allocation::partitionable_task_params* p =
-      static_cast<const task_allocation::partitionable_task_params*>(
+  const params::depth1::task_params* p =
+      static_cast<const params::depth1::task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
@@ -99,7 +99,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_collector.reset(new tasks::collector(p, collector_fsm));
+  m_collector.reset(new tasks::collector(&p->tasks, collector_fsm));
 
   std::unique_ptr<task_allocation::taskable> forager_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
@@ -108,7 +108,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_forager.reset(new tasks::forager(p, forager_fsm));
+  m_forager.reset(new tasks::forager(&p->tasks, forager_fsm));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
@@ -117,7 +117,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist.reset(new tasks::generalist(p, generalist_fsm));
+  m_generalist.reset(new tasks::generalist(&p->tasks, generalist_fsm));
 
   m_generalist->partition1(m_forager.get());
   m_generalist->partition2(m_collector.get());
@@ -136,6 +136,11 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
       this,
       std::placeholders::_1));
 
+  if (p->init_random_estimates) {
+    m_generalist->init_random(10000, 2000);
+    m_forager->init_random(1000, 2000);
+    m_collector->init_random(1000, 2000);
+  }
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 
