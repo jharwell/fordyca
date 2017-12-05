@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/forager.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
@@ -38,17 +39,21 @@
 NS_START(fordyca, tasks);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+forager::forager(const struct task_allocation::task_params* params,
+        std::unique_ptr<task_allocation::taskable>& mechanism) :
+    polled_task("forager", params, mechanism),
+    m_was_transporting(false),
+    m_abort_prob(params->abort_reactivity, params->abort_offset) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double forager::calc_elapsed_time(double start_time) const {
-  return dynamic_cast<fsm::depth1::block_to_cache_fsm*>(
-      polled_task::mechanism())->sensors()->tick() - start_time;
-} /* elapsed_time() */
-
-double forager::calc_start_time(void) const {
+double forager::current_time(void) const {
   return dynamic_cast<fsm::depth1::block_to_cache_fsm*>(
       polled_task::mechanism())->sensors()->tick();
-} /* calc_elapsed_time() */
+} /* current_time() */
 
 bool forager::cache_acquired(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(
@@ -64,6 +69,28 @@ void forager::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
+
+double forager::calc_abort_prob(void) {
+  if (is_transporting_to_cache()) {
+    return m_abort_prob.calc(executable_task::interface_time(),
+                             executable_task::interface_estimate());
+  }
+  return 0.0;
+} /* calc_abort_prob() */
+
+double forager::calc_interface_time(double start_time) {
+  if (is_transporting_to_cache() && !m_was_transporting) {
+    reset_interface_time();
+    m_was_transporting = true;
+    return 0.0;
+  }
+
+  if (!is_transporting_to_cache()) {
+    m_was_transporting = false;
+    return 0.0;
+  }
+  return current_time() - start_time;
+} /* calc_interface_time() */
 
 /*******************************************************************************
  * Event Handling
