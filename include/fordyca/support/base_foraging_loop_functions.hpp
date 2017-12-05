@@ -57,8 +57,9 @@ NS_START(fordyca, support);
  */
 class base_foraging_loop_functions : public argos::CLoopFunctions {
  public:
-  base_foraging_loop_functions(void) :
-      m_floor(&GetSpace().GetFloorEntity()) {}
+  base_foraging_loop_functions(void) : m_floor(nullptr) {}
+
+  void Init(argos::TConfigurationNode&) override { m_floor = &GetSpace().GetFloorEntity(); }
 
   template<typename T>
   bool handle_free_block_pickup(argos::CFootBotEntity& robot,

@@ -48,7 +48,7 @@ class task_parser: public rcppsw::common::xml_param_parser {
   void show(std::ostream& stream) override;
 
  private:
-  std::unique_ptr<struct task_allocation::task_params> m_params;
+  std::unique_ptr<struct task_allocation::partitionable_task_params> m_params;
 };
 
 NS_END(params, fordyca, depth1);

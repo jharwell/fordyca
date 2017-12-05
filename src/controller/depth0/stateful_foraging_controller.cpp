@@ -30,6 +30,7 @@
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/perceived_grid_params.hpp"
@@ -134,8 +135,8 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   const params::fsm_params * fsm_params = static_cast<const struct params::fsm_params*>(
       param_repo.get_params("fsm"));
 
-  const task_allocation::task_params* task_params =
-      static_cast<const task_allocation::task_params*>(
+  const task_allocation::partitionable_task_params* task_params =
+      static_cast<const task_allocation::partitionable_task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =

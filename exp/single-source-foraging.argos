@@ -41,9 +41,13 @@
               size="10, 5, 2"
               />
         <task estimation_alpha="0.8"
-              reactivity="-0.5"
+              abort_reactivity="8"
+              abort_offset="4"
+              partition_reactivity="0.5"
+              partition_offset="2"
               proportionality_estimate="0.001"
-              abort_offset="-2"/>
+              subtask_selection_method="random"
+              partition_method="pini2011"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />

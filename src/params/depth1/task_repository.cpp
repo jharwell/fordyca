@@ -33,8 +33,7 @@ NS_START(fordyca, params, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 task_repository::task_repository(void) {
-  factory().register_type<task_parser>("task");
-  parsers()["task"] = factory().create("task").get();
+  register_parser<task_parser>("task");
 }
 
 NS_END(depth1, params, fordyca);

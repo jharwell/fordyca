@@ -36,14 +36,10 @@ NS_START(fordyca, params, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_repository::stateful_foraging_repository(void) {
-  factory().register_type<actuator_parser>("actuators");
-  factory().register_type<sensor_parser> ("sensors");
-  factory().register_type<fsm_parser>("fsm");
-  factory().register_type<perceived_grid_parser>("perceived_grid");
-  parsers()["actuators"]        = factory().create("actuators").get();
-  parsers()["sensors"]          = factory().create("sensors").get();
-  parsers()["fsm"]              = factory().create("fsm").get();
-  parsers()["perceived_grid"] = factory().create("perceived_grid").get();
+  register_parser<actuator_parser>("actuators");
+  register_parser<sensor_parser>("sensors");
+  register_parser<fsm_parser>("fsm");
+  register_parser<perceived_grid_parser>("perceived_grid");
 }
 
 NS_END(depth0, params, fordyca);

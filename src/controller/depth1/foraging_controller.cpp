@@ -88,8 +88,8 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   fsm_repo.show_all(server_handle()->log_stream());
 
   ER_NOM("Initializing depth1 controller");
-  const task_allocation::task_params* p =
-      static_cast<const task_allocation::task_params*>(
+  const task_allocation::partitionable_task_params* p =
+      static_cast<const task_allocation::partitionable_task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =

@@ -35,12 +35,9 @@ NS_START(fordyca, params);
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) {
-  factory().register_type<arena_map_parser>("arena_map");
-  factory().register_type<metrics_parser>("metrics");
-  factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["arena_map"]        = factory().create("arena_map").get();
-  parsers()["metrics"]          = factory().create("metrics").get();
-  parsers()["loop_functions"]   = factory().create("loop_functions").get();
+  register_parser<arena_map_parser>("arena_map");
+  register_parser<metrics_parser>("metrics");
+  register_parser<loop_functions_parser>("loop_functions");
 }
 
 NS_END(params, fordyca);
