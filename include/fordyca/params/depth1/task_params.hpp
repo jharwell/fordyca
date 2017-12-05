@@ -1,5 +1,5 @@
 /**
- * @file task_parser.hpp
+ * @file task_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,40 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
 
-struct task_params;
-
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
-class task_parser: public rcppsw::common::xml_param_parser {
- public:
-  task_parser(void) : m_params() {}
-
-  void parse(argos::TConfigurationNode& node) override;
-  const struct task_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct task_params> m_params;
+struct task_params : public rcppsw::common::base_params {
+  task_params(void) : tasks(), init_random_estimates(false) {}
+  struct rcppsw::task_allocation::partitionable_task_params tasks;
+  bool init_random_estimates;
 };
 
-NS_END(params, fordyca, depth1);
+NS_END(depth1, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARAMS_HPP_ */

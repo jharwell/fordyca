@@ -45,6 +45,7 @@
               abort_offset="4"
               partition_reactivity="0.5"
               partition_offset="2"
+              init_random_estimates="true"
               proportionality_estimate="0.001"
               subtask_selection_method="random"
               partition_method="pini2011"/>
