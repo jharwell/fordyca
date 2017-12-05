@@ -22,10 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/generalist.hpp"
+
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,17 +35,20 @@
 NS_START(fordyca, tasks);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+generalist::generalist(const struct task_allocation::partitionable_task_params * const params,
+                       std::unique_ptr<task_allocation::taskable>& mechanism) :
+    partitionable_polled_task(rcppsw::er::g_server,
+                              "generalist", params, mechanism) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double generalist::calc_elapsed_time(double start_time) const {
-  return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
-      polled_task::mechanism())->sensors()->tick() - start_time;
-} /* calc_elapsed_time() */
-
-double generalist::calc_start_time(void) const {
+double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
       polled_task::mechanism())->sensors()->tick();
-} /* calc_elapsed_time() */
+} /* current_time() */
 
 bool generalist::block_acquired(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(

@@ -66,6 +66,8 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) {}
  * Member Functions
  ******************************************************************************/
 void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+  base_foraging_loop_functions::Init(node);
+
   rcppsw::er::g_server->change_logfile("loop-functions.txt");
   rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
   rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);

@@ -28,6 +28,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/task_allocation/abort_probability.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,8 +48,7 @@ namespace task_allocation = rcppsw::task_allocation;
 class forager : public task_allocation::polled_task, public foraging_task {
  public:
   forager(const struct task_allocation::task_params* params,
-          std::unique_ptr<task_allocation::taskable>& mechanism) :
-      polled_task("forager", params, mechanism) {}
+          std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
   void accept(events::cache_block_drop &visitor) override;
@@ -76,8 +76,13 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool block_acquired(void) const override;
 
   void task_start(const task_allocation::taskable_argument* const) override;
-  double calc_elapsed_time(double start_time) const override;
-  double calc_start_time(void) const override;
+  double current_time(void) const override;
+  double calc_abort_prob(void) override;
+  double calc_interface_time(double start_time) override;
+
+ private:
+  bool m_was_transporting;
+  task_allocation::abort_probability m_abort_prob;
 };
 
 NS_END(tasks, fordyca);

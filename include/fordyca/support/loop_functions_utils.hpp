@@ -92,7 +92,7 @@ void set_robot_los(argos::CFootBotEntity& robot,
   T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
-          map.subgrid(robot_loc.first, robot_loc.second, 1),
+          map.subgrid(robot_loc.first, robot_loc.second, 2),
           robot_loc);
   controller.los(new_los);
 }

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
+
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -47,13 +48,11 @@ namespace task_allocation = rcppsw::task_allocation;
  * the arena state when run in sequence (possibly by two different robots):
  * \ref collector and \ref forager.
  */
-class generalist : public task_allocation::partitionable_polled_task<task_allocation::polled_task,
-                                                                     task_allocation::polled_task>,
+class generalist : public task_allocation::partitionable_polled_task,
                    public foraging_task {
  public:
-  generalist(const struct task_allocation::task_params * const params,
-             std::unique_ptr<task_allocation::taskable>& mechanism) :
-      partitionable_polled_task("generalist", params, mechanism) {}
+  generalist(const struct task_allocation::partitionable_task_params * const params,
+             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
   void accept(events::free_block_pickup &visitor) override;
@@ -80,11 +79,12 @@ class generalist : public task_allocation::partitionable_polled_task<task_alloca
   bool cache_acquired(void) const override { return false; }
   bool block_acquired(void) const override;
 
-  logical_task* partition(void) override { return partitionable_task::partition(); }
+  executable_task* partition(void) override { return partitionable_task::partition(); }
   void task_start(const task_allocation::taskable_argument* const) override {}
 
-  double calc_elapsed_time(double start_time) const override;
-  double calc_start_time(void) const override;
+  double current_time(void) const override;
+  double calc_abort_prob(void) override { return 0.0; }
+  double calc_interface_time(double) override { return 0.0; }
 };
 
 NS_END(tasks, fordyca);

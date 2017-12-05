@@ -35,22 +35,32 @@ NS_START(fordyca, params, depth1);
 void task_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode task_node = argos::GetNode(node, "task");
 
-  m_params.reset(new task_allocation::task_params);
+  m_params.reset(new task_allocation::partitionable_task_params);
 
   argos::GetNodeAttribute(task_node, "estimation_alpha",
                           m_params->estimation_alpha);
-  argos::GetNodeAttribute(task_node, "reactivity", m_params->reactivity);
+  argos::GetNodeAttribute(task_node, "abort_reactivity", m_params->abort_reactivity);
   argos::GetNodeAttribute(task_node, "abort_offset", m_params->abort_offset);
+  argos::GetNodeAttribute(task_node, "partition_reactivity", m_params->partition_reactivity);
+  argos::GetNodeAttribute(task_node, "partition_offset", m_params->partition_offset);
   argos::GetNodeAttribute(task_node, "proportionality_estimate",
                           m_params->proportionality_estimate);
+  argos::GetNodeAttribute(task_node, "subtask_selection_method",
+                          m_params->subtask_selection_method);
+  argos::GetNodeAttribute(task_node, "partition_method",
+                          m_params->partition_method);
 } /* parse() */
 
 void task_parser::show(std::ostream& stream) {
   stream << "====================\nTASK params\n====================\n";
   stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
-  stream << "reactivity=" << m_params->reactivity << std::endl;
+  stream << "abort_reactivity=" << m_params->abort_reactivity << std::endl;
   stream << "abort_offset=" << m_params->abort_offset << std::endl;
+  stream << "partition_reactivity=" << m_params->partition_reactivity << std::endl;
+  stream << "partition_offset=" << m_params->partition_offset << std::endl;
   stream << "proportionality_estimate=" << m_params->proportionality_estimate << std::endl;
+  stream << "subtask_selection_method=" << m_params->subtask_selection_method << std::endl;
+  stream << "partition_method=" << m_params->partition_method << std::endl;
 } /* show() */
 
 NS_END(depth1, params, fordyca);
