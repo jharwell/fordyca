@@ -36,14 +36,16 @@ int cache::m_next_id = 0;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache::cache(double dimension,
+cache::cache(double dimension, double resolution,
              argos::CVector2 center,
-             std::vector<block*> blocks) :
+             std::vector<block*>& blocks) :
     cell_entity(dimension, dimension, argos::CColor::BLUE),
+    m_resolution(resolution),
     m_n_block_pickups(),
     m_n_block_drops(),
     m_blocks(blocks) {
-  real_loc(center);
+  this->real_loc(center);
+  this->discrete_loc(representation::real_to_discrete_coord(center,resolution));
   id(m_next_id++);
     }
 
@@ -53,5 +55,12 @@ cache::cache(double dimension,
 void cache::block_remove(block* block) {
   m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
 } /* block_remove() */
+
+std::unique_ptr<prototype::clonable> cache::clone(void) const {
+  return rcppsw::make_unique<cache>(cell_entity::xsize(),
+                                    m_resolution,
+                                    real_loc(),
+                                    const_cast<std::vector<block*>&>(m_blocks));
+} /* clone() */
 
 NS_END(fordyca, representation);

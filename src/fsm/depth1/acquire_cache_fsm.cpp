@@ -119,13 +119,6 @@ bool acquire_cache_fsm::is_vectoring_to_cache(void) const {
 } /* is_vectoring_to_cache() */
 
 bool acquire_cache_fsm::is_acquiring_cache(void) const {
-  /*
-   * task_finished() covers the case where you arrive at a cache with the
-   * exploration FSM, so that you do not missing the one-time signal from the
-   * simulation saying that a block has been picked up.
-   *
-   * TODO: Fix this so it is less hacky. See issue #152.
-   */
   return is_vectoring_to_cache() || is_exploring_for_cache();
 } /* is_acquring_cache() */
 
@@ -139,7 +132,7 @@ void acquire_cache_fsm::init(void) {
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
-    std::list<std::pair<const representation::cache*, double>> caches) {
+    std::list<representation::perceived_cache> caches) {
 
   /*
    * If we don't know of any caches, and we aren't currently running, we cannot
@@ -193,7 +186,7 @@ bool acquire_cache_fsm::acquire_any_cache(void) {
    * exploration we find one through our LOS, then stop exploring and go vector
    * to it.
    */
-  if (!acquire_known_cache(m_map->caches())) {
+  if (!acquire_known_cache(m_map->perceived_caches())) {
     if (m_vector_fsm.task_running()) {
       return false;
     }

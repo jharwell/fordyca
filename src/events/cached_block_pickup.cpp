@@ -51,15 +51,15 @@ cached_block_pickup::cached_block_pickup(
             cache->discrete_loc().second),
     client(server),
     m_robot_index(robot_index),
-    m_cache(cache),
+    m_real_cache(cache),
     m_pickup_block(nullptr),
     m_orphan_block(nullptr),
     m_server(server) {
   client::insmod("cached_block_pickup",
                     rcppsw::er::er_lvl::DIAG,
                     rcppsw::er::er_lvl::NOM);
-  ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
-  m_pickup_block = m_cache->block_get();
+  ER_ASSERT(m_real_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
+  m_pickup_block = m_real_cache->block_get();
   ER_ASSERT(m_pickup_block, "FATAL: No block in non-empty cache");
     }
 
@@ -75,7 +75,7 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
             "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
   if (!cell.fsm().state_has_cache()) {
-      cell.entity(nullptr);
+      cell.entity(m_orphan_block);
   }
 } /* visit() */
 
@@ -90,76 +90,65 @@ void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {
-  ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
-  int cache_id = m_cache->id();
+  ER_ASSERT(m_real_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
+  int cache_id = m_real_cache->id();
   ER_ASSERT(-1 != cache_id, "FATAL: Cache ID undefined on block pickup");
 
-  representation::discrete_coord coord = m_cache->discrete_loc();
+  representation::discrete_coord coord = m_real_cache->discrete_loc();
   ER_ASSERT(coord == representation::discrete_coord(cell_op::x(),
                                                     cell_op::y()),
             "FATAL: Coordinates for cache%d (%zu, %zu)/cell(%zu, %zu) do not agree",
             cache_id, coord.first, coord.second, cell_op::y(), cell_op::y());
 
   representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
-  ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
+  ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
             "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-            m_cache->n_blocks(), cell.block_count());
+            m_real_cache->n_blocks(), cell.block_count());
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
    * underlying cell. If there are only 2 left, do the same thing but also
    * remove the cache, as a cache with only one block is not a cache, it is just
    * a block.
    */
-  for (auto block : m_cache->blocks()) {
-    printf("pickup before id:%d\n", block->id());
-  }
-  if (m_cache->n_blocks() > 2) {
-    m_cache->block_remove(m_pickup_block);
+  if (m_real_cache->n_blocks() > 2) {
+    m_real_cache->block_remove(m_pickup_block);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(), cell_op::y());
   } else {
+    m_real_cache->block_remove(m_pickup_block);
+    m_orphan_block = m_real_cache->block_get();
     cell.accept(*this);
-    m_cache->block_remove(m_pickup_block);
-    m_orphan_block = m_cache->block_get();
-    cell.entity(m_orphan_block);
     ER_ASSERT(cell.state_has_block(),
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(), cell_op::y());
-    map.cache_remove(*m_cache);
+    map.cache_remove(*m_real_cache);
     map.cache_removed(true);
-    m_cache = nullptr;
-  }
-  if (m_cache) {
-    for (auto block : m_cache->blocks()) {
-      printf("pickup after id:%d\n", block->id());
-    }
-
+    m_real_cache = nullptr;
   }
   m_pickup_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
          m_robot_index, m_pickup_block->id(), cache_id, cell_op::x(), cell_op::y(),
-         (m_cache)?m_cache->n_blocks():1);
+         (m_real_cache)?m_real_cache->n_blocks():1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   representation::perceived_cell2D& cell = map.access(cell_op::x(),
                                                       cell_op::y());
-  if (nullptr != m_cache) {
-    /* -1 because it was already decremented by arena_map */
-    ER_ASSERT(m_cache->n_blocks() == cell.block_count() - 1,
-              "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
-              m_cache->n_blocks(), cell.block_count() - 1);
-    /*
-     * If there are more than 2 blocks in cache, just remove one, and update the
-     * underlying cell. If there are only 2 left, then the arena_map has already
-     * deleted the cache we are also referencing, so no need to do anything to
-     * our cache, only update the cell the cache used to be on.
-     */
-    ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: non-NULL cache with < 2 blocks");
-  } else {
-    cell.decoratee().entity(m_orphan_block);
+  ER_ASSERT(cell.state_has_cache(), "FATAL: Cell does not contain cache");
+  ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
+            "FATAL: perceived cache/cell disagree on # of blocks: cache=%zu/cell/%zu",
+            cell.cache()->n_blocks(), cell.block_count());
+  representation::cache * pcache = const_cast<representation::cache*>(cell.cache());
+
+  ER_ASSERT(pcache->contains_block(m_pickup_block),
+            "FATAL: perceived cache does not contain ref to block to be picked up");
+
+  pcache->block_remove(m_pickup_block);
+  if (1 == pcache->n_blocks()) {
+    map.cache_remove(*pcache);
+    pcache = nullptr;
   }
 
   /*
@@ -174,9 +163,18 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
     cell.accept(*this);
   }
 
+  if (pcache) {
+    ER_ASSERT(cell.state_has_cache(),
+              "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
+              cell_op::x(), cell_op::y());
+  } else {
+    ER_ASSERT(cell.state_has_block(),
+              "FATAL: cell@(%zu, %zu) with 1 block has cache",
+              cell_op::x(), cell_op::y());
+  }
   ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
-         m_robot_index, m_pickup_block->id(), (m_cache)?m_cache->id():-1, cell_op::x(), cell_op::y(),
-         (m_cache)?m_cache->n_blocks():1);
+         m_robot_index, m_pickup_block->id(), (pcache)?pcache->id():-1, cell_op::x(), cell_op::y(),
+         (pcache)?pcache->n_blocks():1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {

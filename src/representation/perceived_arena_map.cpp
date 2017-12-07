@@ -22,8 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
+
 #include "rcppsw/er/server.hpp"
+#include "fordyca/params/perceived_grid_params.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,12 +41,12 @@ perceived_arena_map::perceived_arena_map(
     const std::string& robot_id) :
     m_server(server),
     m_grid(params->grid.resolution, params->grid.upper.GetX(),
-           params->grid.upper.GetY(), m_server) {
+           params->grid.upper.GetY(), m_server),
+    m_caches() {
   deferred_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
-  server_handle()->dbglvl(rcppsw::er::er_lvl::NOM);
   ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
          m_grid.resolution());
 
@@ -74,17 +76,16 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-std::list<perceived_cache> perceived_arena_map::caches(void) const {
-  std::list<perceived_cache> caches;
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      if (m_grid.access(i, j).state_has_cache()) {
-        caches.push_back(perceived_cache(m_grid.access(i, j).cache(),
-                                         m_grid.access(i, j).density()));
-      }
-    } /* for(j..) */
-  } /* for(i..) */
-  return caches;
+std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
+  std::list<perceived_cache> pcaches;
+  for (auto& c : m_caches) {
+    representation::perceived_cache p(&c,
+                                      m_grid.access(c.discrete_loc().first,
+                                                    c.discrete_loc().second).density());
+    pcaches.push_back(p);
+  } /* for(c..) */
+
+  return pcaches;
 } /* caches() */
 
 void perceived_arena_map::update_density(void) {
@@ -94,5 +95,14 @@ void perceived_arena_map::update_density(void) {
     } /* for(j..) */
   } /* for(i..) */
 } /* update_density() */
+
+void perceived_arena_map::cache_add(representation::cache& cache) {
+  m_caches.push_back(cache);
+} /* cache_add() */
+
+void perceived_arena_map::cache_remove(representation::cache& victim) {
+  m_caches.erase(std::remove(m_caches.begin(),
+                             m_caches.end(), victim));
+} /* cache_remove() */
 
 NS_END(representation, fordyca);

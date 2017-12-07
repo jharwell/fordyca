@@ -181,10 +181,25 @@ void foraging_controller::process_los(const representation::line_of_sight* const
       ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(),
              cache->discrete_loc().first, cache->discrete_loc().second);
     }
-    events::cache_found op(base_foraging_controller::server(), cache,
+    /*
+     * The cache we get a handle to is owned by the simulation, and we don't
+     * want to just pass that into the robot's arena_map, as keeping them in
+     * sync is not possible in all situations.
+     *
+     * For example if a block executing the collector task picks up a block and
+     * tries to compute the best cache to bring it to, only to have one or more
+     * of its cache references be invalid due to other robots causing caches to
+     * be created/destroyed.
+     *
+     * Cloning is definitely necessary here.
+     */
+    std::unique_ptr<prototype::clonable> clone = cache->clone();
+    events::cache_found op(base_foraging_controller::server(),
+                           dynamic_cast<representation::cache*>(clone.get()),
                            cache->discrete_loc().first,
                            cache->discrete_loc().second);
     map()->accept(op);
+    clone.reset(); /* get rid of clone--it is now safety copied */
   } /* for(cache..) */
 } /* process_los() */
 

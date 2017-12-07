@@ -50,8 +50,11 @@ class line_of_sight;
  * @class perceived_arena_map
  *
  * @brief The arena map stores a logical representation of the state of the
- * arena. Basically, it combines a 2D grid with sets of objects that populate
- * the grid and move around as the state of the arena changes.
+ * arena, from the perspective of the robot.
+ *
+ * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
+ * where they actually live (clone not referenc), which decouples/simplifies a
+ * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
 class perceived_arena_map: public rcppsw::er::client,
                            public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
@@ -76,7 +79,11 @@ class perceived_arena_map: public rcppsw::er::client,
    * @return The list of perceived caches (really a list of std::pair<cache,
    * double>).
    */
-  std::list<perceived_cache> caches(void) const;
+  std::vector<representation::cache>& caches(void) { return m_caches; }
+  std::list<representation::perceived_cache> perceived_caches(void) const;
+
+  void cache_add(representation::cache& cache);
+  void cache_remove(representation::cache& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -101,6 +108,13 @@ class perceived_arena_map: public rcppsw::er::client,
   std::shared_ptr<rcppsw::er::server>                          m_server;
   rcppsw::ds::grid2D_ptr<perceived_cell2D,
                          std::shared_ptr<rcppsw::er::server>&> m_grid;
+
+  /**
+   * @brief The caches that the robot currently knows about. Their relevance is
+   * not stored with the cache, because that is a properly of the cell the cache
+   * resides in, and not the cache itself.
+   */
+  std::vector<representation::cache> m_caches;
 };
 
 NS_END(representation, fordyca);

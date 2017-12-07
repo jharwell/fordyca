@@ -77,8 +77,17 @@ class cached_block_pickup : public cell_op,
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   size_t m_robot_index;
-  representation::cache* m_cache;
+  representation::cache* m_real_cache;
+
+  /**
+   * @brief The block that will be picked up by the robot.
+   */
   representation::block* m_pickup_block;
+
+  /**
+   * @brief The block that is left over when a cache devolves into a single
+   * block, that needs to be sent to the cell that the cache used to live on.
+   */
   representation::block* m_orphan_block;
   std::shared_ptr<rcppsw::er::server> m_server;
 };

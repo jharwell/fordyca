@@ -29,6 +29,7 @@
 #include <algorithm>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
@@ -36,6 +37,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace prototype = rcppsw::patterns::prototype;
+
 NS_START(fordyca, representation);
 
 /*******************************************************************************
@@ -49,13 +52,18 @@ NS_START(fordyca, representation);
  * enclosing class. Caches have both real (where they actually live in the
  * world) and discretized locations (where they are mapped to within the arena
  * map).
+ *
+ * @todo Caches do not change their location for their lifetime, although this
+ * is not currently enforced by the class.
  */
 class cache : public cell_entity,
               public metrics::collectible_metrics::cache_metrics,
               public rcppsw::patterns::visitor::visitable_any<cache>,
-              public rcppsw::patterns::protype::clonable {
+              public prototype::clonable {
  public:
-  cache(double dimension, argos::CVector2 center, std::vector<block*> blocks);
+  cache(double dimension, double resolution,
+        argos::CVector2 center,
+        std::vector<block*>& blocks);
 
   /* metrics */
   size_t n_blocks(void) const override { return m_blocks.size(); }
@@ -65,7 +73,8 @@ class cache : public cell_entity,
   void inc_block_pickups(void) { ++m_n_block_pickups; }
   void inc_block_drops(void) { ++m_n_block_drops; }
 
-  std::unique_ptr<
+  std::unique_ptr<prototype::clonable> clone(void) const override;
+
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    *
@@ -92,6 +101,7 @@ class cache : public cell_entity,
 
  private:
   static int        m_next_id;
+  double            m_resolution;
   size_t            m_n_block_pickups;
   size_t            m_n_block_drops;
   std::vector<block*> m_blocks;

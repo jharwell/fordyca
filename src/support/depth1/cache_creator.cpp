@@ -74,7 +74,6 @@ representation::cache cache_creator::create_single(
     events::cell_empty op(block->discrete_loc().first,
                           block->discrete_loc().second);
     m_grid.access(op.x(), op.y()).accept(op);
-    printf("cache create: block id:%d (%zu, %zu)\n",block->id(),op.x(), op.y());
   } /* for(block..) */
 
   for (auto block : blocks) {
@@ -84,9 +83,10 @@ representation::cache cache_creator::create_single(
   ER_NOM("Create cache at (%f, %f) -> (%zu, %zu) with  %zu blocks",
          center.GetX(), center.GetY(), d.first, d.second, blocks.size());
 
-  representation::cache c(m_cache_size, center,
-                          std::vector<representation::block*>(blocks.begin(),
-                                                              blocks.end()));
+  std::vector<representation::block*> blocks_list(blocks.begin(),
+                                                  blocks.end());
+  representation::cache c(m_cache_size, m_grid.resolution(),
+                          center, blocks_list);
   c.discrete_loc(representation::real_to_discrete_coord(center, m_resolution));
   return c;
 } /* create_single() */
