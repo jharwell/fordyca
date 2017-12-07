@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
+#include <list>
 #include <argos/core/utility/math/vector2.h>
 
 #include "fordyca/representation/real_coord.hpp"
@@ -63,6 +63,8 @@ class cache_creator : public rcppsw::er::client {
    */
   virtual std::vector<representation::cache> create_all(
       std::vector<representation::block*>& blocks) = 0;
+
+  void update_host_cells(std::vector<representation::cache>& caches);
 
  protected:
   representation::occupancy_grid& grid(void) const { return m_grid; }

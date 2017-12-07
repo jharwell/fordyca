@@ -100,7 +100,14 @@ void cache_block_drop::visit(representation::block& block) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::cache& cache) {
+  for (auto block : m_cache->blocks()) {
+    printf("drop before Block id:%d\n", block->id());
+  }
+
   cache.block_add(m_block);
+  for (auto block : m_cache->blocks()) {
+    printf("drop after Block id:%d\n", block->id());
+  }
   cache.inc_block_drops();
 } /* visit() */
 

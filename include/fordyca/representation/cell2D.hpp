@@ -104,7 +104,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const representation::cache* cache(void) const;
+  representation::cache* cache(void) const;
 
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 

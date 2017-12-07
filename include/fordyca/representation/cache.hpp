@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
+#include <vector>
 #include <utility>
 #include <algorithm>
 
@@ -52,9 +52,10 @@ NS_START(fordyca, representation);
  */
 class cache : public cell_entity,
               public metrics::collectible_metrics::cache_metrics,
-              public rcppsw::patterns::visitor::visitable_any<cache> {
+              public rcppsw::patterns::visitor::visitable_any<cache>,
+              public rcppsw::patterns::protype::clonable {
  public:
-  cache(double dimension, argos::CVector2 center, std::list<block*> blocks);
+  cache(double dimension, argos::CVector2 center, std::vector<block*> blocks);
 
   /* metrics */
   size_t n_blocks(void) const override { return m_blocks.size(); }
@@ -64,6 +65,7 @@ class cache : public cell_entity,
   void inc_block_pickups(void) { ++m_n_block_pickups; }
   void inc_block_drops(void) { ++m_n_block_drops; }
 
+  std::unique_ptr<
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    *
@@ -77,10 +79,10 @@ class cache : public cell_entity,
   /**
    * @brief Get a list of the blocks currently in the cache.
    */
-  std::list<block*>& blocks(void) { return m_blocks; }
+  std::vector<block*>& blocks(void) { return m_blocks; }
 
   void block_add(block* block) { m_blocks.push_back(block);  }
-  void block_remove(block* block) { m_blocks.remove(block); }
+  void block_remove(block* block);
   block* block_get(void) { return m_blocks.front(); }
 
   __pure bool operator==(const cache &other) const {
@@ -92,7 +94,7 @@ class cache : public cell_entity,
   static int        m_next_id;
   size_t            m_n_block_pickups;
   size_t            m_n_block_drops;
-  std::list<block*> m_blocks;
+  std::vector<block*> m_blocks;
 };
 
 NS_END(representation, fordyca);

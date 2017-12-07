@@ -89,7 +89,8 @@ class perceived_arena_map: public rcppsw::er::client,
    * @return The cell.
    */
   perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  const perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i, j); }
+  perceived_cell2D& access(const discrete_coord& c) { return access(c.first, c.second); }
+  const perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i,j); }
 
   /**
    * @brief Update the density of all cells in the perceived arena.

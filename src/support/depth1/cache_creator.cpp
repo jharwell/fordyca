@@ -74,6 +74,7 @@ representation::cache cache_creator::create_single(
     events::cell_empty op(block->discrete_loc().first,
                           block->discrete_loc().second);
     m_grid.access(op.x(), op.y()).accept(op);
+    printf("cache create: block id:%d (%zu, %zu)\n",block->id(),op.x(), op.y());
   } /* for(block..) */
 
   for (auto block : blocks) {
@@ -83,9 +84,18 @@ representation::cache cache_creator::create_single(
   ER_NOM("Create cache at (%f, %f) -> (%zu, %zu) with  %zu blocks",
          center.GetX(), center.GetY(), d.first, d.second, blocks.size());
 
-  representation::cache c(m_cache_size, center, blocks);
+  representation::cache c(m_cache_size, center,
+                          std::vector<representation::block*>(blocks.begin(),
+                                                              blocks.end()));
   c.discrete_loc(representation::real_to_discrete_coord(center, m_resolution));
   return c;
 } /* create_single() */
+
+void cache_creator::update_host_cells(std::vector<representation::cache>& caches) {
+  for (auto& cache : caches) {
+    m_grid.access(cache.discrete_loc().first,
+                  cache.discrete_loc().second).entity(&cache);
+  } /* for(cache..) */
+} /* update_host_cells() */
 
 NS_END(depth1, support, fordyca);

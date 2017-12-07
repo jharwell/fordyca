@@ -86,6 +86,8 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
       /* Check whether the foot-bot is actually on a cache */
       int cache = utils::robot_on_cache(robot, *map());
       if (-1 != cache) {
+        ER_NOM("fb%d incurring cache usage penalty: start=%zu, duration=%zu",
+               utils::robot_id(robot), GetSpace().GetSimulationClock(), mc_cache_penalty);
         m_penalty_list.push_back(new cache_usage_penalty(&controller,
                                                          cache,
                                                          mc_cache_penalty,

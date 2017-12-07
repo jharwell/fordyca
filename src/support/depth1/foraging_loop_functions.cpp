@@ -103,7 +103,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
                                       d.second,
                                       map()->grid_resolution());
       controller.block(nullptr);
-      map()->access(d.first, d.second).accept(drop_op);
+      map()->accept(drop_op);
       floor()->SetChanged();
     }
 
@@ -209,8 +209,7 @@ void foraging_loop_functions::pre_step_final(void) {
     if (p.calc(n_foragers, n_collectors) >=
         static_cast<double>(rand()) / RAND_MAX) {
       map()->static_cache_create();
-      representation::cell2D& cell = map()->access(map()->caches()[0].discrete_loc().first,
-                                                   map()->caches()[0].discrete_loc().second);
+      representation::cell2D& cell = map()->access(map()->caches()[0].discrete_loc());
       ER_ASSERT(map()->caches()[0].n_blocks() == cell.block_count(),
                 "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
                 map()->caches()[0].n_blocks(), cell.block_count());

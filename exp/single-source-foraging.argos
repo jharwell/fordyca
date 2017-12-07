@@ -135,7 +135,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="100">
+      <entity quantity="10" max_trials="100">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

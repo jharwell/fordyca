@@ -38,7 +38,7 @@ int cache::m_next_id = 0;
  ******************************************************************************/
 cache::cache(double dimension,
              argos::CVector2 center,
-             std::list<block*> blocks) :
+             std::vector<block*> blocks) :
     cell_entity(dimension, dimension, argos::CColor::BLUE),
     m_n_block_pickups(),
     m_n_block_drops(),
@@ -46,5 +46,12 @@ cache::cache(double dimension,
   real_loc(center);
   id(m_next_id++);
     }
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cache::block_remove(block* block) {
+  m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
+} /* block_remove() */
 
 NS_END(fordyca, representation);

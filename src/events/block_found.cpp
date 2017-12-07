@@ -50,15 +50,30 @@ block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
  ******************************************************************************/
 void block_found::visit(representation::cell2D& cell) {
   cell.entity(const_cast<representation::block*>(m_block));
-  ER_ASSERT(!cell.fsm().state_has_cache(),
-            "FATAL: block found on cell that has a cache");
+
+  /*
+   * We do not assert that the cell we found a block in does not have a cache,
+   * because it is possible that we got into this function on the timestep that
+   * another robot picked up the last block from a cache we are also on/in, and
+   * the cell containing the cache in the actual arena is now just a block.
+   *
+   * We just update our view of the world to reflect the new information.
+   */
   if (!cell.fsm().state_has_block()) {
     cell.fsm().accept(*this);
   }
 } /* visit() */
 
 void block_found::visit(fsm::cell2D_fsm& fsm) {
-  fsm.event_block_drop();
+  if (fsm.state_has_cache()) {
+    for (size_t i = fsm.block_count(); i > 1; --i) {
+      fsm.event_block_pickup();
+    } /* for(i..) */
+  } else {
+    fsm.event_block_drop();
+  }
+  ER_ASSERT(fsm.state_has_block(),
+            "FATAL: Perceived cell does not contain block after block found event");
 } /* visit() */
 
 void block_found::visit(representation::perceived_cell2D& cell) {

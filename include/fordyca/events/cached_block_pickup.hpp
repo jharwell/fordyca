@@ -78,7 +78,8 @@ class cached_block_pickup : public cell_op,
 
   size_t m_robot_index;
   representation::cache* m_cache;
-  representation::block* m_block;
+  representation::block* m_pickup_block;
+  representation::block* m_orphan_block;
   std::shared_ptr<rcppsw::er::server> m_server;
 };
 
