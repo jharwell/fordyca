@@ -35,7 +35,8 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         const representation::cache* cache, size_t x, size_t y) :
+                         representation::cache* const cache,
+                         size_t x, size_t y) :
     perceived_cell_op(x, y),
     client(server),
     m_cache(cache) {
@@ -43,6 +44,8 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
                  rcppsw::er::er_lvl::VER,
                  rcppsw::er::er_lvl::NOM);
 }
+
+cache_found::~cache_found(void) { client::rmmod(); }
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -54,7 +57,7 @@ void cache_found::visit(representation::perceived_cell2D& cell) {
 } /* visit() */
 
 void cache_found::visit(representation::cell2D& cell) {
-  cell.entity(const_cast<representation::cache*>(m_cache));
+  cell.entity(m_cache);
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -71,12 +74,14 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
     fsm.event_block_drop();
   } /* for(i..) */
 
-  for (size_t i = m_cache->n_blocks(); i > fsm.block_count(); --i) {
+  for (size_t i = fsm.block_count(); i > m_cache->n_blocks(); --i) {
     fsm.event_block_pickup();
   } /* for(i..) */
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {
+  map.caches().push_back(*m_cache);
+  m_cache = &map.caches().back();
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 

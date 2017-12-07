@@ -33,6 +33,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
+#include "fordyca/representation/perceived_cache.hpp"
+
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
@@ -125,8 +127,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * If the robot's knowledge of the chosen cache's existence expires during the
    * pursuit of said cache, that is ignored.
    */
-  bool acquire_known_cache(
-      std::list<std::pair<const representation::cache*, double>> caches);
+  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
 
   /*
    * States for locate_block FSM. Note that the states for the vector_fsm

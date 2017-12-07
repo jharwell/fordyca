@@ -45,6 +45,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
