@@ -65,7 +65,7 @@ class free_block_drop : public cell_op,
   void visit(representation::cell2D& cell) override;
   void visit(representation::block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map&) override {}
+  void visit(representation::arena_map&) override;
 
   /* stateful foraging */
   void visit(representation::perceived_cell2D&) override {}
@@ -84,6 +84,7 @@ class free_block_drop : public cell_op,
 
   double m_resolution;
   representation::block* m_block;
+  std::shared_ptr<rcppsw::er::server> m_server;
 };
 
 NS_END(events, fordyca);

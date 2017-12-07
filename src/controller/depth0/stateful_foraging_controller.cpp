@@ -37,6 +37,7 @@
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
+#include "fordyca/params/depth1/task_params.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -135,8 +136,8 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   const params::fsm_params * fsm_params = static_cast<const struct params::fsm_params*>(
       param_repo.get_params("fsm"));
 
-  const task_allocation::partitionable_task_params* task_params =
-      static_cast<const task_allocation::partitionable_task_params*>(
+  const params::depth1::task_params* task_params =
+      static_cast<const params::depth1::task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
@@ -146,7 +147,7 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist.reset(new tasks::generalist(task_params, generalist_fsm));
+  m_generalist.reset(new tasks::generalist(&task_params->tasks, generalist_fsm));
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
 
@@ -159,8 +160,7 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
 void stateful_foraging_controller::process_los(const representation::line_of_sight* const los) {
   for (auto block : los->blocks()) {
-    if (!m_map->access(block->discrete_loc().first,
-                       block->discrete_loc().second).state_has_block()) {
+    if (!m_map->access(block->discrete_loc()).state_has_block()) {
       events::block_found op(base_foraging_controller::server(), block,
                              block->discrete_loc().first,
                              block->discrete_loc().second);

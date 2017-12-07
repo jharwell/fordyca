@@ -40,8 +40,8 @@ cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
     client(server),
     m_cache(cache) {
   client::insmod("cache_found",
-                    rcppsw::er::er_lvl::VER,
-                    rcppsw::er::er_lvl::NOM);
+                 rcppsw::er::er_lvl::VER,
+                 rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -59,8 +59,20 @@ void cache_found::visit(representation::cell2D& cell) {
 } /* visit() */
 
 void cache_found::visit(fsm::cell2D_fsm& fsm) {
+  /*
+   * If there are more blocks in the cache than currently exist in the cell,
+   * then other robots have dropped blocks in cache since the last time we saw
+   * it. If there are fewer blocks in the cache than currently exist in the
+   * cell, then other robots have picked up blocks from the cache since the last
+   * time we saw it. In either case, synchronize the cell with the cache,
+   * because the cache reflects the reality that robots have just seen.
+   */
   for (size_t i = fsm.block_count(); i < m_cache->n_blocks(); ++i) {
     fsm.event_block_drop();
+  } /* for(i..) */
+
+  for (size_t i = m_cache->n_blocks(); i > fsm.block_count(); --i) {
+    fsm.event_block_pickup();
   } /* for(i..) */
 } /* visit() */
 

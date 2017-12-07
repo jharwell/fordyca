@@ -50,7 +50,7 @@ representation::block* cell2D::block(void) {
   return const_cast<representation::block*>(static_cast<representation::block*>(m_entity));
 } /* block() */
 
-const representation::cache* cell2D::cache(void) const {
+representation::cache* cell2D::cache(void) const {
   return static_cast<representation::cache*>(m_entity);
 } /* cache() */
 

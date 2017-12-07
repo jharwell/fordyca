@@ -172,15 +172,19 @@ void foraging_controller::process_los(const representation::line_of_sight* const
   depth0::stateful_foraging_controller::process_los(los);
 
   for (auto cache : los->caches()) {
-    if (!map()->access(cache->discrete_loc().first,
-                       cache->discrete_loc().second).state_has_cache()) {
-      events::cache_found op(base_foraging_controller::server(), cache,
-                             cache->discrete_loc().first,
-                             cache->discrete_loc().second);
-      map()->accept(op);
+    /*
+     * The state of a cache can change between when the robot saw it last
+     * (i.e. different # of blocks in it), and so you need to always process
+     * caches in the LOS, even if you already know about them.
+     */
+    if (!map()->access(cache->discrete_loc()).state_has_cache()) {
       ER_NOM("Discovered cache%d at (%zu, %zu)", cache->id(),
              cache->discrete_loc().first, cache->discrete_loc().second);
     }
+    events::cache_found op(base_foraging_controller::server(), cache,
+                           cache->discrete_loc().first,
+                           cache->discrete_loc().second);
+    map()->accept(op);
   } /* for(cache..) */
 } /* process_los() */
 

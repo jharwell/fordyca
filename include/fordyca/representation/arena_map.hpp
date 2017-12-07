@@ -84,6 +84,7 @@ class arena_map: public rcppsw::er::client,
   bool cache_removed(void) const { return m_cache_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  cell2D& access(const discrete_coord& coord) { return access(coord.first, coord.second); }
 
   /**
    * @brief Distribute all blocks in the arena.

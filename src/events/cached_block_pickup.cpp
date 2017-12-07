@@ -52,14 +52,15 @@ cached_block_pickup::cached_block_pickup(
     client(server),
     m_robot_index(robot_index),
     m_cache(cache),
-    m_block(nullptr),
+    m_pickup_block(nullptr),
+    m_orphan_block(nullptr),
     m_server(server) {
   client::insmod("cached_block_pickup",
                     rcppsw::er::er_lvl::DIAG,
                     rcppsw::er::er_lvl::NOM);
   ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
-  m_block = m_cache->block_get();
-  ER_ASSERT(m_block, "FATAL: No block in non-empty cache");
+  m_pickup_block = m_cache->block_get();
+  ER_ASSERT(m_pickup_block, "FATAL: No block in non-empty cache");
     }
 
 /*******************************************************************************
@@ -73,10 +74,13 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
+  if (!cell.fsm().state_has_cache()) {
+      cell.entity(nullptr);
+  }
 } /* visit() */
 
 void cached_block_pickup::visit(representation::cache& cache) {
-  cache.block_remove(m_block);
+  cache.block_remove(m_pickup_block);
   cache.inc_block_pickups();
 } /* visit() */
 
@@ -106,14 +110,20 @@ void cached_block_pickup::visit(representation::arena_map& map) {
    * remove the cache, as a cache with only one block is not a cache, it is just
    * a block.
    */
+  for (auto block : m_cache->blocks()) {
+    printf("pickup before id:%d\n", block->id());
+  }
   if (m_cache->n_blocks() > 2) {
-    m_cache->block_remove(m_block);
+    m_cache->block_remove(m_pickup_block);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(), cell_op::y());
   } else {
     cell.accept(*this);
+    m_cache->block_remove(m_pickup_block);
+    m_orphan_block = m_cache->block_get();
+    cell.entity(m_orphan_block);
     ER_ASSERT(cell.state_has_block(),
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(), cell_op::y());
@@ -121,9 +131,15 @@ void cached_block_pickup::visit(representation::arena_map& map) {
     map.cache_removed(true);
     m_cache = nullptr;
   }
-  m_block->accept(*this);
+  if (m_cache) {
+    for (auto block : m_cache->blocks()) {
+      printf("pickup after id:%d\n", block->id());
+    }
+
+  }
+  m_pickup_block->accept(*this);
   ER_NOM("arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
-         m_robot_index, m_block->id(), cache_id, cell_op::x(), cell_op::y(),
+         m_robot_index, m_pickup_block->id(), cache_id, cell_op::x(), cell_op::y(),
          (m_cache)?m_cache->n_blocks():1);
 } /* visit() */
 
@@ -141,9 +157,9 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
      * deleted the cache we are also referencing, so no need to do anything to
      * our cache, only update the cell the cache used to be on.
      */
-    if (m_cache->n_blocks() > 2) {
-      m_cache->block_remove(m_block);
-    }
+    ER_ASSERT(m_cache->n_blocks() >= 2, "FATAL: non-NULL cache with < 2 blocks");
+  } else {
+    cell.decoratee().entity(m_orphan_block);
   }
 
   /*
@@ -159,7 +175,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   }
 
   ER_NOM("perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
-         m_robot_index, m_block->id(), (m_cache)?m_cache->id():-1, cell_op::x(), cell_op::y(),
+         m_robot_index, m_pickup_block->id(), (m_cache)?m_cache->id():-1, cell_op::x(), cell_op::y(),
          (m_cache)?m_cache->n_blocks():1);
 } /* visit() */
 
@@ -175,11 +191,11 @@ void cached_block_pickup::visit(representation::block& block) {
 
 void cached_block_pickup::visit(controller::depth1::foraging_controller& controller) {
   controller.map()->accept(*this);
-  controller.block(m_block);
+  controller.block(m_pickup_block);
   controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
-         controller.GetId().c_str(), m_block->id());
+         controller.GetId().c_str(), m_pickup_block->id());
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::collector& task) {

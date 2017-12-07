@@ -141,8 +141,10 @@ void arena_map::static_cache_create(void) {
      * Only blocks that are not currently carried by a robot are eligible for
      * being used to re-create the static cache.
      */
-    for (auto&& b : m_blocks) {
-      if (-1 == b.robot_index()) {
+    for (auto& b : m_blocks) {
+      if (-1 == b.robot_index() &&
+          b.discrete_loc() != real_to_discrete_coord(argos::CVector2(x, y),
+                                                     m_grid.resolution())) {
         blocks.push_back(&b);
       }
       if (blocks.size() >= mc_cache_params.static_size) {
@@ -151,8 +153,7 @@ void arena_map::static_cache_create(void) {
     } /* for(b..) */
 
     m_caches = c.create_all(blocks);
-    m_grid.access(m_caches[0].discrete_loc().first,
-                  m_caches[0].discrete_loc().second).entity(&m_caches[0]);
+    c.update_host_cells(m_caches);
 } /* static_cache_create() */
 
 void arena_map::distribute_blocks(bool first_time) {

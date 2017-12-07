@@ -67,6 +67,7 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 
 void free_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
+  cell.entity(nullptr);
   ER_NOM("cell2D: fb%zu block%d from (%zu, %zu)",
          m_robot_index, m_block->id(), m_block->discrete_loc().first,
          m_block->discrete_loc().second);

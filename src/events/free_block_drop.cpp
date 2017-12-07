@@ -24,6 +24,8 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include <argos/core/utility/math/vector2.h>
 
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
@@ -41,7 +43,8 @@ free_block_drop::free_block_drop(
     cell_op(x, y),
     client(server),
     m_resolution(resolution),
-    m_block(block) {
+    m_block(block),
+    m_server(server) {
   client::insmod("free_block_drop",
                     rcppsw::er::er_lvl::DIAG,
                     rcppsw::er::er_lvl::NOM);
@@ -65,6 +68,16 @@ void free_block_drop::visit(representation::block& block) {
   representation::discrete_coord d(cell_op::x(),cell_op::y());
   block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
   block.discrete_loc(d);
+} /* visit() */
+
+void free_block_drop::visit(representation::arena_map& map) {
+  representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+  if (cell.state_has_cache()) {
+    cache_block_drop op(m_server, m_block, cell.cache(), m_resolution);
+    map.accept(op);
+  } else {
+    cell.accept(*this);
+  }
 } /* visit() */
 
 NS_END(events, fordyca);
