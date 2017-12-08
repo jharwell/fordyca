@@ -81,6 +81,10 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* Capture parsed parameters in logfile */
   repo.show_all(rcppsw::er::g_server->log_stream());
 
+  /* setup logging timestamp calculator */
+  rcppsw::er::g_server->log_ts_calculator(std::bind(&stateless_foraging_loop_functions::log_timestamp_calc,
+                                                    this));
+
   const struct params::loop_functions_params * l_params =
       static_cast<const struct params::loop_functions_params*>(
       repo.get_params("loop_functions"));
@@ -240,6 +244,10 @@ robot_collectors::distance_metrics_collector* stateless_foraging_loop_functions:
 robot_collectors::stateless_metrics_collector* stateless_foraging_loop_functions::stateless_collector(void) const {
   return m_stateless_collector.get();
 } /* stateless_collector() */
+
+std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {
+  return "[t=" + std::to_string(GetSpace().GetSimulationClock()) + "] ";
+} /* log_timestamp_calc() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions, "stateless_foraging_loop_functions")

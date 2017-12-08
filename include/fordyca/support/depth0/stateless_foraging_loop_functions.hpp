@@ -80,6 +80,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
   virtual void pre_step_final(void);
+  std::string log_timestamp_calc(void);
 
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
