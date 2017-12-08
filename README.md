@@ -1,150 +1,201 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-This is mainly just a collection of things I don't want to forget at the moment.
+This is the main entry point for getting started on the project.
 
-## Labelling Issues
+## Basic Setup
 
-- Critical is for things that are main features/super important, or are
-  segmentation-fault level bugs.
+Before starting, make sure you have ARGoS installed, and can run the simple
+foraging example given on the website.
 
-- Major is for stuff that is supports main project features.
+These steps are for Linux, and while it may work on OSX, I have not tried it. It
+definitely will not work on windows. You will need a recent version of the
+following programs:
 
-- Normal is for things that I will need eventually, but could be done now or at
-  some point in the near-ish future.
+- cmake
+- make
+- g++
+- cppcheck (optional; for additional static analysis)
+- clang++ (optional; for additional syntax checking/static analysis )
+- icpc (optional; for additional syntax checking)
 
-- Minor is for things that would be nice to have (think enhancements), but that
-  I can live with without too much headache at the moment.
+1. After cloning this repo, you will also need to clone the following repos:
 
-- Feature is for pretty much everything that isn't "create an experimental
-  scenario".
+  - [https://github.com/jharwell/rcppsw](rcppsw)
+  - [https://github.com/jharwell/rcsw](rcsw)
 
-- Enhancements are pretty self-explanatory.
+  Before you can build anything, you will need to define some environment
+  variables:
 
-Also, branches should be named after their issue number, which is probably not the
-same as their number within their category (i.e. the 4th bug is probably the
-17th global issue).
+  - `rcsw` - Set to the path to wherever you cloned the `rcsw` repo.
 
-## Parameters
+  - `rcppsw` - Set to the path to wherever you cloned the `rcppsw` repo.
 
-I have extended the base `.argos` file with a set of new parameters, documented
-below. Unless otherwise stated, all parameters must be present in the XML file.
+2. Verify you can build `rcsw`, `rcppsw`, and `fordyca` (in that order), by
+   doing:
 
-### Controller
+        cd /path/to/repo
+        mkdir build && cd build
+        cmake ..
+        make
 
-The following XML tags are defined:
+## Relevant Papers
 
-- grid: Parameters pertaining to a robots discretization of the continuous world
-  into a grid.
-- sensors: Parameters for robot sensors.
-- actuators: Parameters for robot actuators.
-- fsm: Parameters for state machine controlling a robot's actions.
+## Style Guide
 
-#### `grid`
-- `cell_decay_delta`: How fast the relevance of information about a particular
-                      cell within a robot's 2D map of the world loses
-                      relevance. Each timestep, the relevance value of the cell
-                      is decremented by this value, starting the timestep after
-                      the robot obtains information about the actual state of
-                      the cell by driving over/near it.
+Generally speaking, I follow the "do as the standard library does" mantra for
+this project. In particular:
 
-- `resolution`: The size of the cells the arena is broken up (discretized)
-                into. Should probably be the same as whatever the block size is,
-                to make things easy.
+- All source files have the `.cpp` extension, and all header files have the
+  `.hpp` extension.
 
-#### `sensors`
-- `diffusion`:
+- All file, class, variable, and namespace names are `specified_like_this`, NOT
+  `specifiedLikeThis` or `SpecifiedLikeThis`.
 
-  - `go_straight_angle_range`: The angle range to the left/right of center (90
-                               degrees on a unit circle) in which obstacles are
-                               not ignored (outside of this range they are
-                               ignored, assuming the robot will be able to drive
-                               by them). Takes a pair like so: `-5:5` (for a 10
-                               degree window).
+- Exactly one class definition per .cpp/.hpp file, unless there is a very good
+  reason.
 
-  - `delta`: The longest distance away from the robot obstacles will be
-             considered.
+- The namespace hierarchy exactly corresponds to the directory hierarchy that
+  the source/header files for classes can be found in.
 
-#### `actuators`
-- `wheels`
+- All classes have a doxygen brief, as do all non-getter/non-setter member
+  functions. Tricky/nuanced issues with member variables should be documented,
+  though in general the class name + member variable name + type should be
+  enough documentation. If its not, chances are you are doing it wrong.
 
-  - `hard_turn_angle_threshold`: If actuators are told to change to a heading
-                                 within a difference greater than the one
-                                 specified by this parameter to the current
-                                 heading, then a hard turn is executed (turn in
-                                 place/opposite wheel speeds).
+  This may seem like overkill, but I have learned over the years that `If it is
+  hard to document, it is probably wrong, and if it is hard to test, it is
+  almost assuredly wrong`. Forcing documenting all major parts of the code helps
+  a lot with the first part.
 
-  - `soft_turn_angle_threshold`: If actuators are told to change to a heading
-                                 within a difference greater than the one
-                                 specified by this parameter to the current
-                                 heading, but less than
-                                 `hard_turn_angle_threshold`, then a soft turn
-                                 is executed (keep moving forward and turn
-                                 gradually).
+- Code should pass the google C++ linter, ignoring the following items. For
+  everything else, the linter warnings should be addressed.
 
-  - `no_turn_angle_threshold`: If actuators are told to change to a heading
-                               within a difference less than the one specified
-                               by this parameter to the current heading, the
-                               heading change is ignored.
+ - Use of non-const references--I do this all the time.
 
-#### `fsm`
-- `unsuccessful_explore_dir_change`: If a robot is unsuccessful in finding what
-                                     it is looking for in the # timesteps
-                                     specified by this parameter, then it will
-                                     randomly change direction.
+ - Line length <= 80 ONLY for: member variable decls, function decls, inheritance
+   lists, and function definitions. Sometimes the names of
+   variables/namespaces/templates make this impossible to do without obfuscating
+   the code.
 
-### Loop Functions
+## Development Guide
 
-The following XML tags are defined:
+### Directory layout
 
-- logging: Parameters relative to logging simulation results.
-- grid: Parameters relating to discretization of the arena.
-- blocks: Parameters relating to blocks/block distribution
-- nest: Parameters relating to the nest.
-- visualization: Parameters for simulation visualizations, for help in
-                 debugging.
+- `src/` - All `.cpp` files live under here.
 
-#### `logging`
-- `sim_stats`: The filename that foraging statistics will be written to.
+- `include/` - All `.hpp` files live under here.
 
-#### `grid`
-- `resolution`: The resolution that the arena will be represented at, in terms
-                of the size of grid cells. Must be the same as the value passed
-                to the robot controllers.
+- `tests` - All test code lives under here.
 
-#### `blocks`
-- `n_blocks`: # of blocks present in the arena.
+- `docs/` - All documentation besides this README lives under me.
 
-- `dimension`: Since blocks are square, this the size of one side of the square.
+- `exp/` - This is the directory where the ARGoS simulation input files live.
 
-- `dist_model`: The distribution model for the blocks. When blocks are
-                distributed to a new location in the arena and made available
-                for robots to pickup (either initially or after a block is
-                deposited in the nest), they are placed in the arena in one of
-                the following ways:
+- `VERSION` - A file in the root root that holds the current/next versions of
+  the code. Versions are numbered as `major.minor.patch+xxx`. `major`
+  corresponds to releases/milestones in the code, and is only updated when
+  `devel` is merged to `master`. `minor` corresponds to the addition of new
+  features; each time a feature branch is merged into `devel`, the minor version
+  should be incremented. `patch` corresponds to fixing bugs, so everytime a
+  bugfix branch is merged into `devel`, this number should be incremented. The
+  `+xxx` is for how many commits there have been since the last major release,
+  and is calculated upon merging `devel` into `master`.
 
-    - `random`: Placed in a random location in the arena.
+### Labelling Issues
 
-    - `single_source` - Placed within a small arena opposite about 75% of the
-                        way from the nest to the other side of the arena
-                        (assumed horizontal, rectangular arena).
+All issues that are entered into github should have a `Priority`, a `Status`,
+and a `Type` associated with them. Well usually. Sometimes it doesn't make
+sense (Question for example) to have all three.
 
-#### `nest`
-- `size`: The size of the nest. Must be specified in a tuple like so:
-  `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
+Priorities:
 
-- `center`: Location for center of the nest (nest is a square).
-            Must be specified in a tuple like so:
-  `1.5, 1.5`. Note the space--parsing does not work if it is omitted.
+- `Critical` - Things that are main features/super important, or are
+  segmentation-fault level bugs, as in "this must be fixed/addressed now before
+  we can move forward".
 
-#### `visualization`
-- `robot_id`: Set to `true` or `false`. If true, robot id is displayed above
-              each robot during simulation.
+- `Major` - Things that support/are main project features, but are not blocking
+  other tasks.
 
-- `robot_los`: Set to `true` or `false`. If true, each robot's approximate line
-               of sight is displayed as a red circle during simulation.
+- `Minor` - Things that would be nice to have (think enhancements), but that are
+  not required at the moment, but will be needed at some point in the near-ish
+  future.
 
-- `block_id`: Set to `true` or `false`. If true, each block's id displayed above
-              it during simulation.
+- `Low` - Things that are not blocking any other tasks, can be implemented
+  anytime without compromising the project in any way. A "wishlist" of things
+  that would be nice to add, as it were.
 
-Explicitly setting visualization parameters is not required--they will be
-treated as false if they are not.
+Statuses:
+
+- `Available` - The task is available to be worked on.
+
+- `Blocked` - The task is blocked waiting for the completion of another task.
+
+- `Completed` - The task has been completed. All tasks should be in this state
+  before the issue is closed.
+
+- `Future` - It is not possible to work on the task at the moment, because too
+  much development needs to happen to make it accessible, or that it is
+  something worth considering adding in the future, when the project is more
+  mature.
+
+- `In Progress` - The task is currently being worked on.
+
+- `Review Needed` - The task has been completed, but needs to be reviewed (this
+  should be tied to a pull request) before it can be moved to the completed
+  state.
+
+Types:
+
+- `Bugfix` - This is a task to address a bug in the code.
+
+- `Docs` - This is a task related to creating/updating documentation.
+
+- `Enhancement` - This is a task that extends the functionality of an existing
+  part of the code, but not so far that it is considered a new feature.
+
+- `Feature` - This is a task that adds new functionality to the code.
+
+- `Question` - This is not a task per-se, but a question whose resolution will
+  lead to the creation of enhancements/features/refactors.
+
+- `Refactor` - This is a task to refactor the code, not changing functionality
+  but modifying the interface, changing data structures, etc. This should be
+  accompanied by unit tests if applicable.
+
+- `Task` - This is a task that relates to "chore" work for the project. Renaming
+  files, moving things around, mucking about with the build process are all good
+  examples of things that should get a `Task` label.
+
+### Branches
+
+- All branches should have a corresponding issue on github, and the issue should
+  be named the same thing as the branch. This may seem pedantic, but when you have
+  hundreds or thousands of issues and branches, any little thing you can do to
+  increase the self-documenting nature of the development process is worth
+  doing.
+
+### General Workflow
+
+1. Find an issue on github to work on.
+
+2. Mark said is as `Status: In Progress` so no one else starts working on it
+   too.
+
+3. Branch off of the devel branch with a branch with the same name as the issue.
+
+4. Work on the issue/task, committing as needed. You should push your changes
+   regularly, so people can see that the issue is being actively worked on. Your
+   commit messages don't have to be an essay, but they should all reference the
+   issue # of the task so that in-progress commits show up in github, and
+   describe what was done and why in reasonable detail. Don't do things like "in
+   progress", or "misc updates", or if you do such things, rebase/collapse your
+   history into a single detailed commit when you are done. Be sure you know
+   what you are doing if you go this route...
+
+5. Finish the task, updating the `VERSION` file appropriately if needed, and
+   change status to `Status: Needs Review` and open a pull request.
+
+6. Once the task has been reviewed and given the green light, merge it into
+   devel, and marked the issue as `Status: Completed`. Don't close the issue.
+
+7. Repeat as necessary.
