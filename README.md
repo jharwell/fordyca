@@ -70,12 +70,12 @@ this project. In particular:
 - Code should pass the google C++ linter, ignoring the following items. For
   everything else, the linter warnings should be addressed.
 
- - Use of non-const references--I do this all the time.
+  - Use of non-const references--I do this all the time.
 
- - Line length <= 80 ONLY for: member variable decls, function decls, inheritance
-   lists, and function definitions. Sometimes the names of
-   variables/namespaces/templates make this impossible to do without obfuscating
-   the code.
+  - Line length >= 80 ONLY for: member variable decls, function decls, inheritance
+    lists, and function definitions. Sometimes the names of
+    variables/namespaces/templates make this impossible to do without obfuscating
+    the code.
 
 ## Development Guide
 
@@ -178,8 +178,8 @@ Types:
 
 1. Find an issue on github to work on.
 
-2. Mark said is as `Status: In Progress` so no one else starts working on it
-   too.
+2. Mark said task as `Status: In Progress` so no one else starts working on it
+   too, and assign it to yourself if it is not already assigned to you.
 
 3. Branch off of the devel branch with a branch with the same name as the issue.
 
