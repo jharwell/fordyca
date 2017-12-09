@@ -20,8 +20,8 @@ following programs:
 
 1. After cloning this repo, you will also need to clone the following repos:
 
-  - [https://github.com/jharwell/rcppsw](rcppsw)
-  - [https://github.com/jharwell/rcsw](rcsw)
+  - [https://github.com/jharwell/rcppsw]("rcppsw")
+  - [https://github.com/jharwell/rcsw]("rcsw")
 
   Before you can build anything, you will need to define some environment
   variables:
@@ -168,11 +168,14 @@ Types:
 
 ### Branches
 
-- All branches should have a corresponding issue on github, and the issue should
-  be named the same thing as the branch. This may seem pedantic, but when you have
-  hundreds or thousands of issues and branches, any little thing you can do to
-  increase the self-documenting nature of the development process is worth
-  doing.
+All branches should have a corresponding issue on github, and the issue should
+be named the same thing as the branch. This may seem pedantic, but when you have
+hundreds or thousands of issues and branches, any little thing you can do to
+increase the self-documenting nature of the development process is worth doing.
+
+For more details, see [Git usage guidlines](docs/f17-git-usage.pdf). It's from
+3081, and is focused on git usage from a course perspective, but there is still
+a lot of good stuf in it.
 
 ### General Workflow
 

@@ -48,7 +48,8 @@ compile_commands.json
 
 # Build process
 build
-docs
+docs/html
+docs/latex
 
 # Runtime
 *.txt
