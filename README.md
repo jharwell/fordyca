@@ -20,8 +20,8 @@ following programs:
 
 1. After cloning this repo, you will also need to clone the following repos:
 
-  - [https://github.com/jharwell/rcppsw]
-  - [https://github.com/jharwell/rcsw]
+  - https://github.com/jharwell/rcppsw
+  - https://github.com/jharwell/rcsw
 
   Before you can build anything, you will need to define some environment
   variables:
