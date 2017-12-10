@@ -42,7 +42,7 @@ std::list<const representation::block*> line_of_sight::blocks(void) const {
       representation::cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_block()) {
-        assert(dynamic_cast<const representation::block*>(cell->block()));
+        assert(dynamic_cast<const representation::block*>(cell->entity()));
         blocks.push_back(cell->block());
       }
     } /* for(j..) */
@@ -58,7 +58,7 @@ std::list<const representation::cache*> line_of_sight::caches(void) const {
       representation::cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_cache()) {
-        assert(dynamic_cast<const representation::cache*>(cell->cache()));
+        assert(dynamic_cast<const representation::cache*>(cell->entity()));
         caches.push_back(cell->cache());
       }
     } /* for(j..) */

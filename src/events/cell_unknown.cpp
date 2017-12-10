@@ -37,6 +37,7 @@ NS_START(fordyca, events);
 void cell_unknown::visit(representation::perceived_cell2D& cell) {
   cell.cell().accept(*this);
 } /* visit() */
+
 void cell_unknown::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
