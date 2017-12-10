@@ -78,13 +78,13 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
 
 std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
   std::list<perceived_cache> pcaches;
+
   for (auto& c : m_caches) {
     representation::perceived_cache p(&c,
                                       m_grid.access(c.discrete_loc().first,
                                                     c.discrete_loc().second).density());
     pcaches.push_back(p);
   } /* for(c..) */
-
   return pcaches;
 } /* caches() */
 
@@ -97,7 +97,16 @@ void perceived_arena_map::update_density(void) {
 } /* update_density() */
 
 void perceived_arena_map::cache_add(representation::cache& cache) {
-  m_caches.push_back(cache);
+  /*
+   * If the cache is already in our list of caches we know about it needs to be
+   * removed, because the new version we just got from our LOS is more up to
+   * date.
+   */
+  auto it = std::find(m_caches.begin(), m_caches.end(), cache);
+  if (m_caches.end() != it) {
+    cache_remove(*it);
+  }
+    m_caches.push_back(cache);
 } /* cache_add() */
 
 void perceived_arena_map::cache_remove(representation::cache& victim) {

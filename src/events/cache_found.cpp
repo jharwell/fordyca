@@ -80,7 +80,7 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {
-  map.caches().push_back(*m_cache);
+  map.cache_add(*m_cache);
   m_cache = &map.caches().back();
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */

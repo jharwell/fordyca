@@ -102,7 +102,7 @@ class arena_map: public rcppsw::er::client,
    * @param block The block to distribute.
    * @param first_time Is this the first time distributing this block?
    */
-  void distribute_block(block* const block, bool first_time);
+  void distribute_block(block* const block, bool first_time = false);
 
   void static_cache_create(void);
 

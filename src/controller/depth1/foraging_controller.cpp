@@ -193,11 +193,11 @@ void foraging_controller::process_los(const representation::line_of_sight* const
      *
      * Cloning is definitely necessary here.
      */
-    std::unique_ptr<prototype::clonable> clone = cache->clone();
+    std::unique_ptr<representation::cache> clone = cache->clone();
     events::cache_found op(base_foraging_controller::server(),
-                           dynamic_cast<representation::cache*>(clone.get()),
-                           cache->discrete_loc().first,
-                           cache->discrete_loc().second);
+                           clone.get(),
+                           clone->discrete_loc().first,
+                           clone->discrete_loc().second);
     map()->accept(op);
     clone.reset(); /* get rid of clone--it is now safety copied */
   } /* for(cache..) */

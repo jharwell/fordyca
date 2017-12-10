@@ -67,7 +67,7 @@ void perceived_cell2D::update_density(void) {
     }
     events::cell_unknown op(decorator::decoratee().loc().first,
                             decorator::decoratee().loc().second);
-    decorator::decoratee().accept(op);
+    decoratee().accept(op);
   }
 } /* update_density() */
 

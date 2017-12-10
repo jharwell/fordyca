@@ -85,7 +85,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(representation::cell_entity* entity) { m_entity = entity; }
+  void entity(cell_entity* entity) { m_entity = entity; }
+  const cell_entity* entity(void) const { return m_entity; }
   void loc(discrete_coord loc) { m_loc = loc; }
   discrete_coord loc(void) const { return m_loc; }
 
