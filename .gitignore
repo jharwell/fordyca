@@ -55,3 +55,4 @@ docs/latex
 *.txt
 .gdb_history
 *.csv
+output

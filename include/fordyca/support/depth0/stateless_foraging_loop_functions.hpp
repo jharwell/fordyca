@@ -40,7 +40,7 @@ namespace robot_metrics {
 class stateless_metrics_collector;
 class distance_metrics_collector;
 }}}
-namespace params { class loop_function_repository; }
+namespace params { struct output_params; class loop_function_repository; }
 
 namespace collectors = metrics::collectors;
 namespace robot_collectors = collectors::robot_metrics;
@@ -83,10 +83,12 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
   virtual void pre_step_final(void);
   std::string log_timestamp_calc(void);
+  const std::string& metrics_path(void) const { return m_metrics_path; }
 
  private:
-  void metric_collecting_init(params::loop_function_repository& repo);
   void arena_map_init(params::loop_function_repository& repo);
+  void output_init(const struct params::output_params* p_output);
+  void metric_collecting_init(const struct params::output_params* p_output);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;
@@ -95,6 +97,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   argos::CRange<double>                                          m_nest_x;
   argos::CRange<double>                                          m_nest_y;
   std::string                                                    m_sim_type;
+  std::string                                                    m_output_root;
+  std::string                                                    m_metrics_path;
   std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;
   std::unique_ptr<robot_collectors::distance_metrics_collector>  m_distance_collector;
   std::unique_ptr<collectors::block_metrics_collector>           m_block_collector;

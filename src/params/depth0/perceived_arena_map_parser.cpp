@@ -1,5 +1,5 @@
 /**
- * @file perceived_grid_parser.hpp
+ * @file perceived_arena_map_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,40 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-class perceived_grid_parser: public rcppsw::common::xml_param_parser {
- public:
-  perceived_grid_parser(void): m_params(), m_grid_parser() {}
+void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct perceived_arena_map_params);
+  argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct perceived_grid_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
+  m_grid_parser.parse(argos::GetNode(pnode, "grid"));
+  m_params->grid = *m_grid_parser.get_results();
+  m_params->pheromone_rho = std::atof(
+      pnode.GetAttribute("pheromone_rho").c_str());
+} /* parse() */
 
- private:
-  std::unique_ptr<struct perceived_grid_params> m_params;
-  grid_parser m_grid_parser;
-};
+void perceived_arena_map_parser::show(std::ostream& stream) {
+  stream << "====================\nPerceived arena_map params\n====================\n";
+  m_grid_parser.show(stream);
+  stream << "pheromone_rho=" << m_params->pheromone_rho << std::endl;
+} /* show() */
 
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_ */
+NS_END(depth0, params, fordyca);

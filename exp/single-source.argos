@@ -36,10 +36,17 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <grid pheromone_rho="0.001"
-              resolution="0.2"
-              size="10, 5, 2"
-              />
+    <output>
+      <robot
+           output_root="output"
+           output_dir="__current_date__"
+           />
+      </output>
+        <perceived_arena_map>
+              <grid resolution="0.2"
+                    size="10, 5, 2"
+                    />
+        </perceived_arena_map>
         <task estimation_alpha="0.8"
               abort_reactivity="8"
               abort_offset="4"
@@ -72,32 +79,40 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="depth1_foraging_loop_functions">
-    <metrics root_dir="metrics"
-             output_dir="__current_date__"
-             stateless_fname="stateless-stats.csv"
-             stateful_fname="stateful-stats.csv"
-             depth1_fname="depth1-stats.csv"
-             block_fname="block-stats.csv"
-             distance_fname="distance-stats.csv"
-             task_fname="task-stats.csv"
-             n_robots="20"
-             />
-    <grid resolution="0.2"
-          size="10, 5, 2"/>
-    <blocks n_blocks="20"
-            dimension="0.2"
-            dist_model="single_source"
-            respawn="true"
-            />
-    <caches create_static="true"
-            create_dynamic="false"
-            static_size="2"
-            static_respawn_scale_factor="0.05"
-            dimension="0.8"
-            min_dist="0.6"
-            usage_penalty="100"
-      />
-    <nest size="0.5, 0.5" center="2, 2.5" />
+    <output>
+      <sim sim_log_fname="sim.log"
+           output_root="output"
+           output_dir="__current_date__"
+           />
+        <metrics
+          output_dir="metrics"
+          stateless_fname="stateless-stats.csv"
+          stateful_fname="stateful-stats.csv"
+          depth1_fname="depth1-stats.csv"
+          block_fname="block-stats.csv"
+          distance_fname="distance-stats.csv"
+          task_fname="task-stats.csv"
+          n_robots="20"
+          />
+    </output>
+    <arena_map>
+      <grid resolution="0.2"
+            size="10, 5, 2"/>
+      <blocks n_blocks="20"
+              dimension="0.2"
+              dist_model="single_source"
+              respawn="true"
+              />
+      <caches create_static="true"
+              create_dynamic="false"
+              static_size="2"
+              static_respawn_scale_factor="0.05"
+              dimension="0.8"
+              min_dist="0.6"
+              usage_penalty="100"
+              />
+      <nest size="0.5, 0.5" center="2, 2.5" />
+    </arena_map>
     <visualization robot_id="true"
                    robot_los="true"
                    block_id="true"
@@ -163,18 +178,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

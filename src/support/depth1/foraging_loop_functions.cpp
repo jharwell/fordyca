@@ -30,7 +30,7 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/params/output_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
@@ -65,19 +65,20 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   repo.parse_all(node);
 
+  mc_cache_penalty = static_cast<const struct params::arena_map_params*>(
+      repo.get_params("arena_map"))->cache.usage_penalty;
+  mc_cache_respawn_scale_factor = static_cast<const struct params::arena_map_params*>(
+      repo.get_params("arena_map"))->cache.static_respawn_scale_factor;
+
   /* initialize stat collecting */
-  mc_cache_penalty = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"))->cache.usage_penalty;
-  mc_cache_respawn_scale_factor = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"))->cache.static_respawn_scale_factor;
+    const params::output_params* p_output = static_cast<const struct params::output_params*>(
+      repo.get_params("output"));
 
   m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->depth1_fname));
+      metrics_path() + "/" + p_output->metrics.depth1_fname));
   m_depth1_collector->reset();
   m_task_collector.reset(new metrics::collectors::task_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->task_fname));
+      metrics_path() + "/" + p_output->metrics.task_fname));
   m_task_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");

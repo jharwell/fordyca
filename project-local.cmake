@@ -58,6 +58,7 @@ add_dependencies(${target} project_rcppsw-build project_rcsw-build)
 target_link_libraries(${target}
   rcppsw
   rcsw
+  stdc++fs
   argos3core_simulator
   argos3plugin_simulator_footbot
   argos3plugin_simulator_genericrobot
