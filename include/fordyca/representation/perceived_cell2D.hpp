@@ -71,22 +71,17 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    */
   double density(void) const { return m_density.last_result(); }
 
-  bool state_is_known(void) const { return decorator::decoratee().state_is_known(); }
-  bool state_has_block(void) const { return decorator::decoratee().state_has_block(); }
-  bool state_has_cache(void) const { return decorator::decoratee().state_has_cache(); }
-  bool state_is_empty(void) const { return decorator::decoratee().state_is_empty(); }
 
-  size_t block_count(void) const { return decorator::decoratee().block_count(); }
+  bool state_is_known(void) const { return decoratee().state_is_known(); }
+  bool state_has_block(void) const { return decoratee().state_has_block(); }
+  bool state_has_cache(void) const { return decoratee().state_has_cache(); }
+  bool state_is_empty(void) const { return decoratee().state_is_empty(); }
 
-  /**
-   * @brief Get the block current associated with this cell. NULL if no block
-   * currently associated.
-   *
-   * @return The associated block.
-   */
-  const representation::block* block(void) const { return decorator::decoratee().block(); }
+  size_t block_count(void) const { return decoratee().block_count(); }
 
-  const representation::cache* cache(void) const { return decorator::decoratee().cache(); }
+  const representation::block* block(void) const { return decoratee().block(); }
+  const representation::cache* cache(void) const { return decoratee().cache(); }
+  const representation::cell_entity* entity(void) const { return decoratee().entity(); }
 
   /**
    * @brief Update the information relevance/pheromone density associated with
@@ -96,7 +91,8 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    * cell transitions back to an unknown state, as the robot can no longer trust
    * its information.
    */
-  void update_density(void);
+  void density_update(void);
+  void density_reset(void) { m_density.reset(); }
 
   /**
    * @brief Add the specified amount to the pheromone density for this cell.
@@ -104,8 +100,6 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    * @param amount The amount of pheromone to add.
    */
   void add_pheromone(double amount) { m_density.add_pheromone(amount); }
-
-  cell2D& cell(void) { return decorator::decoratee(); }
 
   double epsilon(void) const { return kEpsilon; }
 

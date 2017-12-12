@@ -63,7 +63,7 @@ class block_metrics_collector : public base_metric_collector,
   struct block_metrics {
     size_t total_collected; /* aggregate across blocks, not reset each timestep*/
     size_t total_carries; /* aggregate across blocks, not reset each timstep */
-    size_t block_carries; /* for one block, reset each timestep */
+    size_t block_carries; /* carries for most recently collected block */
   };
 
   std::string csv_header_build(const std::string& header = "") override;

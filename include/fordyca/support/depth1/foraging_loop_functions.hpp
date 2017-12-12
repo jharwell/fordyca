@@ -169,12 +169,12 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
       /* Check whether the foot-bot is actually on a cache */
       int cache = utils::robot_on_cache(robot, *map());
       if (-1 != cache) {
-        /* Update arena map state due to a block nest drop */
         events::cache_block_drop drop_op(rcppsw::er::g_server,
                                          controller.block(),
                                          &map()->caches()[cache],
                                          map()->grid_resolution());
 
+        /* Update arena map state due to a block nest drop */
         map()->accept(drop_op);
         controller.visitor::template visitable_any<T>::accept(drop_op);
         return true;

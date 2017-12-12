@@ -32,10 +32,9 @@ NS_START(fordyca, representation);
 /***********************e*******************************************************
  * Member Functions
  ******************************************************************************/
-void block::reset(void) {
-  m_carries = 0;
+void block::reset_index(void) {
   m_robot_index = -1;
-} /* reset() */
+} /* reset_index() */
 
 void block::move_out_of_sight(void) {
   real_loc(argos::CVector2(100.0, 100.0));

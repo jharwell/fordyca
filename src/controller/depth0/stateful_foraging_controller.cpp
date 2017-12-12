@@ -161,6 +161,18 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
 void stateful_foraging_controller::process_los(const representation::line_of_sight* const los) {
   for (auto block : los->blocks()) {
+    /*
+     * Right now, if a robot already knows about a block it does not take into
+     * account seeing it again in a subsequent timestep. This is mostly OK, I
+     * think, because blocks cannot change state in between observations (caches
+     * can, which is why cache_found events must always be processed).
+     *
+     * This does result in cells containing blocks to only have pheromone
+     * densities [0, 1], while caches can be much higher. Since we always do
+     * apples to apples comparisons, this is not an issue. However, it does mean
+     * that the pheromone decay rates for blocks/caches need to be different in
+     * order to be realistic.
+     */
     if (!m_map->access(block->discrete_loc()).state_has_block()) {
       events::block_found op(base_foraging_controller::server(), block,
                              block->discrete_loc().first,

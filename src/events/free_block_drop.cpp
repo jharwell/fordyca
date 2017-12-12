@@ -28,6 +28,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
-  block.reset();
+  block.reset_index();
   representation::discrete_coord d(cell_op::x(),cell_op::y());
   block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
   block.discrete_loc(d);

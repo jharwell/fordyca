@@ -70,7 +70,7 @@ void nest_block_drop::visit(metrics::collectors::block_metrics_collector& collec
  * Stateless Foraging
  ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
-  block.reset();
+  block.reset_index();
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::stateless_foraging_controller& controller) {
