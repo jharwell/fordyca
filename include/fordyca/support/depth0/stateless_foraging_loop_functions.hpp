@@ -40,6 +40,8 @@ namespace robot_metrics {
 class stateless_metrics_collector;
 class distance_metrics_collector;
 }}}
+namespace params { class loop_function_repository; }
+
 namespace collectors = metrics::collectors;
 namespace robot_collectors = collectors::robot_metrics;
 
@@ -83,6 +85,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   std::string log_timestamp_calc(void);
 
  private:
+  void metric_collecting_init(params::loop_function_repository& repo);
+  void arena_map_init(params::loop_function_repository& repo);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;

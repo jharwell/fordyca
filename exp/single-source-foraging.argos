@@ -72,7 +72,9 @@
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
                   label="depth1_foraging_loop_functions">
-    <metrics stateless_fname="stateless-stats.csv"
+    <metrics root_dir="metrics"
+             output_dir="__current_date__"
+             stateless_fname="stateless-stats.csv"
              stateful_fname="stateful-stats.csv"
              depth1_fname="depth1-stats.csv"
              block_fname="block-stats.csv"
