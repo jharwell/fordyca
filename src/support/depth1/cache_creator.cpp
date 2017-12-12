@@ -63,7 +63,15 @@ representation::cache cache_creator::create_single(
   representation::cell2D& cell = m_grid.access(d.first, d.second);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
-    blocks.push_back(cell.block());
+
+    /*
+     * We use insert() instead of push_back() here so that it there was a
+     * leftover block on the cell where a cache used to be that is also where
+     * this cache is being created, it becomes the "front" of the cache, and
+     * will be the first block picked up by a robot from the new cache. This
+     * helps to ensure fairness/better statistics for the simulations.
+     */
+    blocks.insert(blocks.begin(), cell.block());
   }
 
   /*

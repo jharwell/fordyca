@@ -102,6 +102,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
                                       d.first,
                                       d.second,
                                       map()->grid_resolution());
+
       controller.block(nullptr);
       map()->accept(drop_op);
       floor()->SetChanged();

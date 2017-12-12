@@ -183,8 +183,8 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {
-  block.add_carry();
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
+  block.add_carry();
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */

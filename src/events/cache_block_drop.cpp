@@ -33,6 +33,7 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/forager.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,7 +63,7 @@ cache_block_drop::cache_block_drop(
  ******************************************************************************/
 void cache_block_drop::visit(representation::perceived_cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not contain a cache");
-  cell.cell().accept(*this);
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::cell2D& cell) {

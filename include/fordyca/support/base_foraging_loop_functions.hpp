@@ -94,7 +94,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
       events::nest_block_drop drop_op(rcppsw::er::g_server,
                                       controller.block());
 
-      /* Get stats from carried block before it's dropped */
+      /* update block carries */
       block_collector.accept(drop_op);
 
       map.accept(drop_op);
