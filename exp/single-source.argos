@@ -12,7 +12,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
+    <system threads="3" />
     <experiment length="0"
                 ticks_per_second="5"
                 random_seed="123" />

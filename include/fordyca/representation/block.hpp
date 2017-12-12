@@ -67,9 +67,10 @@ class block : public cell_entity,
   /**
    * @brief Reset the state of the block (i.e. not carried by a robot anymore).
    */
-  void reset_index(void);
+  void reset_index(void) { m_robot_index = -1; }
 
   void move_out_of_sight(void);
+  void reset_carries(void) { m_carries = 0; }
 
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
