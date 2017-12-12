@@ -51,9 +51,12 @@ cache_found::~cache_found(void) { client::rmmod(); }
  * Depth1 Foraging
  ******************************************************************************/
 void cache_found::visit(representation::perceived_cell2D& cell) {
-  cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
+  if (!cell.state_has_cache()) {
+    cell.add_pheromone(1.0);
+  }
+
+  cell.density_update();
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void cache_found::visit(representation::cell2D& cell) {

@@ -74,7 +74,7 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
-  if (!cell.fsm().state_has_cache()) {
+  if (!cell.state_has_cache()) {
       cell.entity(m_orphan_block);
   }
 } /* visit() */
@@ -86,7 +86,12 @@ void cached_block_pickup::visit(representation::cache& cache) {
 
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
-  cell.cell().accept(*this);
+  cell.decoratee().accept(*this);
+  if (!cell.state_has_cache()) {
+    cell.density_reset();
+    cell.add_pheromone(1.0);
+    cell.density_update();
+  }
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {

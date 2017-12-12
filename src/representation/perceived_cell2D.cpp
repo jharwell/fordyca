@@ -48,20 +48,19 @@ perceived_cell2D::perceived_cell2D(
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
            rcppsw::er::er_lvl::DIAG,
-           rcppsw::er::er_lvl::VER);
+           rcppsw::er::er_lvl::NOM);
   }
     }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_cell2D::update_density(void) {
-  m_density.calc();
-  if (m_density.last_result() < kEpsilon) {
-    if (decorator::decoratee().state_has_block()) {
+void perceived_cell2D::density_update(void) {
+  if (m_density.calc() < kEpsilon) {
+    if (decoratee().state_has_block()) {
       ER_VER("Relevance of block%d is within %f of 0 for %s", block()->id(),
              kEpsilon, m_robot_id.c_str());
-    } else if (decorator::decoratee().state_has_cache()) {
+    } else if (decoratee().state_has_cache()) {
       ER_VER("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
              kEpsilon, m_robot_id.c_str());
     }
@@ -69,6 +68,6 @@ void perceived_cell2D::update_density(void) {
                             decorator::decoratee().loc().second);
     decoratee().accept(op);
   }
-} /* update_density() */
+} /* density_update() */
 
 NS_END(representation, fordyca);
