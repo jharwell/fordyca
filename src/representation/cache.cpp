@@ -56,11 +56,15 @@ void cache::block_remove(block* block) {
   m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
 } /* block_remove() */
 
-std::unique_ptr<prototype::clonable> cache::clone(void) const {
+std::unique_ptr<cache> cache::clone(void) const {
   return rcppsw::make_unique<cache>(cell_entity::xsize(),
                                     m_resolution,
                                     real_loc(),
                                     const_cast<std::vector<block*>&>(m_blocks));
 } /* clone() */
+
+__pure bool cache::operator==(const cache &other) const {
+  return cell_entity::discrete_loc() == other.cell_entity::discrete_loc();
+}
 
 NS_END(fordyca, representation);

@@ -56,6 +56,7 @@ link_directories(/usr/lib/argos3)
 add_library(${target} SHARED ${${target}_SRC})
 add_dependencies(${target} project_rcppsw-build project_rcsw-build)
 target_link_libraries(${target}
+  asan
   rcppsw
   rcsw
   argos3core_simulator
