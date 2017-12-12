@@ -34,18 +34,22 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void arena_map_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct arena_map_params);
-  m_grid_parser.parse(node);
-  m_block_parser.parse(node);
-  m_cache_parser.parse(node);
+  argos::TConfigurationNode anode = argos::GetNode(node, "arena_map");
+
+  m_grid_parser.parse(argos::GetNode(anode, "grid"));
   m_params->grid = *m_grid_parser.get_results();
+
+  m_block_parser.parse(argos::GetNode(anode, "blocks"));
   m_params->block = *m_block_parser.get_results();
+
+  m_cache_parser.parse(argos::GetNode(anode, "caches"));
   m_params->cache = *m_cache_parser.get_results();
 
   std::vector<std::string> res, res2;
   rcppsw::utils::line_parser parser(' ');
 
-  res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
-  res2 = parser.parse(node.FirstChildElement("nest")->GetAttribute("size"));
+  res = parser.parse(argos::GetNode(anode, "nest").GetAttribute("center"));
+  res2 = parser.parse(argos::GetNode(anode, "nest").GetAttribute("size"));
 
   m_params->nest_center = argos::CVector2(std::atof(res[0].c_str()),
                                           std::atof(res[1].c_str()));

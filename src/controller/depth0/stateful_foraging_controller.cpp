@@ -33,7 +33,7 @@
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
@@ -122,8 +122,8 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_map.reset(new representation::perceived_arena_map(
       server(),
-      static_cast<const struct params::perceived_grid_params*>(
-          param_repo.get_params("perceived_grid")),
+      static_cast<const struct params::depth0::perceived_arena_map_params*>(
+          param_repo.get_params("perceived_arena_map")),
       GetId()));
 
   m_sensors.reset(new depth1::foraging_sensors(

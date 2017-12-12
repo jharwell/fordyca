@@ -24,7 +24,7 @@
 #include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "rcppsw/er/server.hpp"
@@ -32,7 +32,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/params/output_params.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
@@ -44,6 +44,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+namespace fs = std::experimental::filesystem;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -53,6 +54,8 @@ stateless_foraging_loop_functions::stateless_foraging_loop_functions(void) :
     m_nest_x(),
     m_nest_y(),
     m_sim_type(),
+    m_output_root(),
+    m_metrics_path(),
     m_stateless_collector(),
     m_distance_collector(),
     m_block_collector(),
@@ -70,7 +73,6 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) {}
 void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   base_foraging_loop_functions::Init(node);
 
-  rcppsw::er::g_server->change_logfile("loop-functions.txt");
   rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
   rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);
   ER_NOM("Initializing stateless foraging loop functions");
@@ -78,6 +80,15 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* parse all environment parameters and capture in logfile */
   params::loop_function_repository repo;
   repo.parse_all(node);
+
+  const params::output_params* p_output = static_cast<const struct params::output_params*>(
+      repo.get_params("output"));
+  const params::arena_map_params* p_arena = static_cast<const struct params::arena_map_params*>(
+      repo.get_params("arena_map"));
+
+  output_init(p_output);
+
+  rcppsw::er::g_server->change_logfile(m_output_root + "/" + p_output->sim_log_fname);
   repo.show_all(rcppsw::er::g_server->log_stream());
 
   /* setup logging timestamp calculator */
@@ -88,15 +99,15 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   const struct params::loop_functions_params * l_params =
       static_cast<const struct params::loop_functions_params*>(
       repo.get_params("loop_functions"));
-  m_nest_x = l_params->nest_x;
-  m_nest_y = l_params->nest_y;
+  m_nest_x = p_arena->nest_x;
+  m_nest_y = p_arena->nest_y;
   m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
 
   /* initialize metric collecting */
-  metric_collecting_init(repo);
+  metric_collecting_init(p_output);
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -195,33 +206,26 @@ void stateless_foraging_loop_functions::PreStep() {
 } /* PreStep() */
 
 void stateless_foraging_loop_functions::metric_collecting_init(
-    params::loop_function_repository& repo) {
+    const struct params::output_params* p_output) {
+
+  m_metrics_path = m_output_root  + "/" + p_output->metrics.output_dir;
+  if (fs::exists(m_metrics_path)) {
+    fs::remove_all(m_metrics_path);
+  }
+  fs::create_directories(m_metrics_path);
 
   m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->stateless_fname));
+      m_metrics_path + "/" + p_output->metrics.stateless_fname));
   m_block_collector.reset(new collectors::block_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->block_fname));
-  const struct params::metrics_params* diag_p =
-      static_cast<const struct params::metrics_params*>(repo.get_params("metrics"));
+      m_metrics_path + "/" + p_output->metrics.block_fname));
 
   m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
-      diag_p->distance_fname, diag_p->n_robots));
+      m_metrics_path + "/" + p_output->metrics.distance_fname,
+      p_output->metrics.n_robots));
+
   m_stateless_collector->reset();
   m_distance_collector->reset();
   m_block_collector->reset();
-
-  std::string path = diag_p->root_dir + "/" + diag_p->output_dir;
-  if (boost::filesystem::exists(path)) {
-    boost::filesystem::remove(path);
-  }
-  if ("__current_date__" == diag_p->output_dir) {
-    path = diag_p->root_dir + "/" +
-           boost::posix_time::to_iso_extended_string(
-               boost::posix_time::second_clock::local_time());
-    }
-  boost::filesystem::create_directories(path);
 } /* metric_collecting_init() */
 
 void stateless_foraging_loop_functions::arena_map_init(
@@ -239,6 +243,19 @@ void stateless_foraging_loop_functions::arena_map_init(
     m_map->blocks()[i].display_id(l_params->display_block_id);
   } /* for(i..) */
 } /* arena_map_init() */
+
+void stateless_foraging_loop_functions::output_init(const struct params::output_params* params) {
+  if ("__current_date__" == params->output_dir) {
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    m_output_root = params->output_root + "/" + std::to_string(now.date().year()) + "-" +
+                    std::to_string(now.date().month()) + "-" +
+                    std::to_string(now.date().day()) + ":" +
+                    std::to_string(now.time_of_day().hours()) + "-" +
+                    std::to_string(now.time_of_day().minutes());
+  } else {
+    m_output_root = params->output_root + "/" + params->output_dir;
+  }
+} /* output_init() */
 
 __pure bool stateless_foraging_loop_functions::IsExperimentFinished(void) {
   /*

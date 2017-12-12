@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file output_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,28 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
+#include <string>
+#include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/metrics_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>("output");
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-}
+struct output_params : public rcppsw::common::base_params {
+  output_params(void) : output_root(), output_dir(), sim_log_fname(),
+                        metrics() {}
 
-NS_END(depth0, params, fordyca);
+  std::string output_root;
+  std::string output_dir;
+  std::string sim_log_fname;
+  struct metrics_params metrics;
+};
+
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_ */

@@ -32,7 +32,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/params/output_params.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 
@@ -66,9 +66,10 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
+    const params::output_params* p_output = static_cast<const struct params::output_params*>(
+      repo.get_params("output"));
   m_collector.reset(new robot_collectors::stateful_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->stateful_fname));
+      metrics_path() + "/" + p_output->metrics.stateful_fname));
   m_collector->reset();
 
   /* configure robots */

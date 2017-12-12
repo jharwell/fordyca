@@ -44,8 +44,8 @@ struct arena_map_params : public rcppsw::common::base_params {
 
   struct grid_params grid;
   struct block_params block;
-
   struct depth1::cache_params cache;
+
   argos::CVector2 nest_center;
   argos::CRange<double> nest_x;
   argos::CRange<double> nest_y;

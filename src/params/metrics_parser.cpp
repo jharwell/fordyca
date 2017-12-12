@@ -33,32 +33,32 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void metrics_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct metrics_params);
-  argos::TConfigurationNode lnode = argos::GetNode(node, "metrics");
 
-  argos::GetNodeAttribute(lnode, "root_dir", m_params->root_dir);
-  argos::GetNodeAttribute(lnode, "output_dir", m_params->output_dir);
+  std::cout <<node.Value() << std::endl;
+  argos::GetNodeAttribute(node, "output_dir", m_params->output_dir);
 
-  argos::GetNodeAttribute(lnode, "stateless_fname", m_params->stateless_fname);
-  argos::GetNodeAttribute(lnode, "distance_fname", m_params->distance_fname);
-  argos::GetNodeAttribute(lnode, "stateful_fname", m_params->stateful_fname);
-  argos::GetNodeAttribute(lnode, "depth1_fname", m_params->depth1_fname);
-  argos::GetNodeAttribute(lnode, "block_fname", m_params->block_fname);
-  argos::GetNodeAttribute(lnode, "task_fname", m_params->task_fname);
-  argos::GetNodeAttribute(lnode, "n_robots", m_params->n_robots);
+  argos::GetNodeAttribute(node, "stateless_fname", m_params->stateless_fname);
+  argos::GetNodeAttribute(node, "distance_fname", m_params->distance_fname);
+  argos::GetNodeAttribute(node, "stateful_fname", m_params->stateful_fname);
+  argos::GetNodeAttribute(node, "depth1_fname", m_params->depth1_fname);
+  argos::GetNodeAttribute(node, "block_fname", m_params->block_fname);
+  argos::GetNodeAttribute(node, "task_fname", m_params->task_fname);
+  argos::GetNodeAttribute(node, "n_robots", m_params->n_robots);
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) {
   stream << "====================\nMetrics params\n====================\n";
-  stream << "root_dir=" << m_params->root_dir << std::endl;
-  stream << "output_dir=" << m_params->output_dir << std::endl;
+  if (m_params) {
+    stream << "output_dir=" << m_params->output_dir << std::endl;
 
-  stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
-  stream << "stateful_fname=" << m_params->stateful_fname << std::endl;
-  stream << "distance_fname=" << m_params->distance_fname << std::endl;
-  stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
-  stream << "block_fname=" << m_params->block_fname << std::endl;
-  stream << "task_fname=" << m_params->task_fname << std::endl;
-  stream << "n_robots=" << m_params->n_robots << std::endl;
+    stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
+    stream << "stateful_fname=" << m_params->stateful_fname << std::endl;
+    stream << "distance_fname=" << m_params->distance_fname << std::endl;
+    stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
+    stream << "block_fname=" << m_params->block_fname << std::endl;
+    stream << "task_fname=" << m_params->task_fname << std::endl;
+    stream << "n_robots=" << m_params->n_robots << std::endl;
+  }
 } /* show() */
 
 NS_END(params, fordyca);

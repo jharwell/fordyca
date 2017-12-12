@@ -1,5 +1,5 @@
 /**
- * @file perceived_grid_params.hpp
+ * @file perceived_arena_map_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,18 +30,18 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct perceived_grid_params : public rcppsw::common::base_params {
-  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
+struct perceived_arena_map_params : public rcppsw::common::base_params {
+  perceived_arena_map_params(void) : grid(), pheromone_rho(0.0) {}
 
   struct grid_params grid;
   double pheromone_rho;
 };
 
-NS_END(params, fordyca);
+NS_END(depth0, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_ */

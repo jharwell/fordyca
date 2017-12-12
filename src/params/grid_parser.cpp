@@ -37,10 +37,9 @@ void grid_parser::parse(argos::TConfigurationNode& node) {
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(argos::GetNode(node, "grid").GetAttribute("size"));
+  res = parser.parse(node.GetAttribute("size"));
 
-  m_params->resolution = std::atof(
-      argos::GetNode(node, "grid").GetAttribute("resolution").c_str());
+  m_params->resolution = std::atof(node.GetAttribute("resolution").c_str());
   m_params->lower.Set(0, 0);
   m_params->upper.Set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
 } /* parse() */

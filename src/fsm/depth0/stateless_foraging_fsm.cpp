@@ -36,7 +36,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
     const struct params::fsm_params* params,
-    std::shared_ptr<rcppsw::er::server> server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators) :
     base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),

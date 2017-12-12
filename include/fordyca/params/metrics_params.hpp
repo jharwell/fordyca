@@ -36,12 +36,11 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct metrics_params : public rcppsw::common::base_params {
-  metrics_params(void) : root_dir(), output_dir(), block_fname(),
+  metrics_params(void) : output_dir(), block_fname(),
                          stateless_fname(), stateful_fname(),
                          distance_fname(), depth1_fname(), task_fname(),
                          n_robots() {}
 
-  std::string root_dir;
   std::string output_dir;
   std::string block_fname;
   std::string stateless_fname;

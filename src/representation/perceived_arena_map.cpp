@@ -24,7 +24,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const struct params::perceived_grid_params* params,
+    const struct params::depth0::perceived_arena_map_params* params,
     const std::string& robot_id) :
     m_server(server),
     m_grid(params->grid.resolution, params->grid.upper.GetX(),
