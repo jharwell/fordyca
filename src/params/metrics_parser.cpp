@@ -34,6 +34,10 @@ NS_START(fordyca, params);
 void metrics_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct metrics_params);
   argos::TConfigurationNode lnode = argos::GetNode(node, "metrics");
+
+  argos::GetNodeAttribute(lnode, "root_dir", m_params->root_dir);
+  argos::GetNodeAttribute(lnode, "output_dir", m_params->output_dir);
+
   argos::GetNodeAttribute(lnode, "stateless_fname", m_params->stateless_fname);
   argos::GetNodeAttribute(lnode, "distance_fname", m_params->distance_fname);
   argos::GetNodeAttribute(lnode, "stateful_fname", m_params->stateful_fname);
@@ -45,6 +49,9 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
 
 void metrics_parser::show(std::ostream& stream) {
   stream << "====================\nMetrics params\n====================\n";
+  stream << "root_dir=" << m_params->root_dir << std::endl;
+  stream << "output_dir=" << m_params->output_dir << std::endl;
+
   stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
   stream << "stateful_fname=" << m_params->stateful_fname << std::endl;
   stream << "distance_fname=" << m_params->distance_fname << std::endl;

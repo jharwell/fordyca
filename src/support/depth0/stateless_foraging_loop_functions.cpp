@@ -24,6 +24,8 @@
 #include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include <boost/filesystem.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "rcppsw/er/server.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
@@ -73,17 +75,15 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);
   ER_NOM("Initializing stateless foraging loop functions");
 
+  /* parse all environment parameters and capture in logfile */
   params::loop_function_repository repo;
-
-  /* parse all environment parameters */
   repo.parse_all(node);
-
-  /* Capture parsed parameters in logfile */
   repo.show_all(rcppsw::er::g_server->log_stream());
 
   /* setup logging timestamp calculator */
-  rcppsw::er::g_server->log_ts_calculator(std::bind(&stateless_foraging_loop_functions::log_timestamp_calc,
-                                                    this));
+  rcppsw::er::g_server->log_ts_calculator(std::bind(
+      &stateless_foraging_loop_functions::log_timestamp_calc,
+      this));
 
   const struct params::loop_functions_params * l_params =
       static_cast<const struct params::loop_functions_params*>(
@@ -93,30 +93,10 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
-  const struct params::arena_map_params * arena_params =
-      static_cast<const struct params::arena_map_params*>(
-          repo.get_params("arena_map"));
-  m_map.reset(new representation::arena_map(arena_params));
-  m_map->distribute_blocks(true);
-  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
-    m_map->blocks()[i].display_id(l_params->display_block_id);
-  } /* for(i..) */
+  arena_map_init(repo);
 
-  /* initialize stat collecting */
-  m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->stateless_fname));
-  m_block_collector.reset(new collectors::block_metrics_collector(
-      static_cast<const struct params::metrics_params*>(
-          repo.get_params("metrics"))->block_fname));
-  const struct params::metrics_params* diag_p =
-      static_cast<const struct params::metrics_params*>(repo.get_params("metrics"));
-
-  m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
-      diag_p->distance_fname, diag_p->n_robots));
-  m_stateless_collector->reset();
-  m_distance_collector->reset();
-  m_block_collector->reset();
+  /* initialize metric collecting */
+  metric_collecting_init(repo);
 
   /* configure robots */
   argos::CSpace::TMapPerType& footbots = GetSpace().GetEntitiesByType("foot-bot");
@@ -213,6 +193,52 @@ void stateless_foraging_loop_functions::PreStep() {
   } /* for(it..) */
   pre_step_final();
 } /* PreStep() */
+
+void stateless_foraging_loop_functions::metric_collecting_init(
+    params::loop_function_repository& repo) {
+
+  m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->stateless_fname));
+  m_block_collector.reset(new collectors::block_metrics_collector(
+      static_cast<const struct params::metrics_params*>(
+          repo.get_params("metrics"))->block_fname));
+  const struct params::metrics_params* diag_p =
+      static_cast<const struct params::metrics_params*>(repo.get_params("metrics"));
+
+  m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
+      diag_p->distance_fname, diag_p->n_robots));
+  m_stateless_collector->reset();
+  m_distance_collector->reset();
+  m_block_collector->reset();
+
+  std::string path = diag_p->root_dir + "/" + diag_p->output_dir;
+  if (boost::filesystem::exists(path)) {
+    boost::filesystem::remove(path);
+  }
+  if ("__current_date__" == diag_p->output_dir) {
+    path = diag_p->root_dir + "/" +
+           boost::posix_time::to_iso_extended_string(
+               boost::posix_time::second_clock::local_time());
+    }
+  boost::filesystem::create_directories(path);
+} /* metric_collecting_init() */
+
+void stateless_foraging_loop_functions::arena_map_init(
+    params::loop_function_repository& repo) {
+  const struct params::arena_map_params * arena_params =
+      static_cast<const struct params::arena_map_params*>(
+          repo.get_params("arena_map"));
+  const struct params::loop_functions_params * l_params =
+      static_cast<const struct params::loop_functions_params*>(
+          repo.get_params("loop_functions"));
+
+  m_map.reset(new representation::arena_map(arena_params));
+  m_map->distribute_blocks(true);
+  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
+    m_map->blocks()[i].display_id(l_params->display_block_id);
+  } /* for(i..) */
+} /* arena_map_init() */
 
 __pure bool stateless_foraging_loop_functions::IsExperimentFinished(void) {
   /*
