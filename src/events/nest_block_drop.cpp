@@ -71,6 +71,7 @@ void nest_block_drop::visit(metrics::collectors::block_metrics_collector& collec
  ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
   block.reset_index();
+  block.reset_carries();
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::stateless_foraging_controller& controller) {
