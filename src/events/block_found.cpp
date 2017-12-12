@@ -77,9 +77,21 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void block_found::visit(representation::perceived_cell2D& cell) {
+  /*
+   * It is possible that this block found event was generated because we were
+   * in/on a cache that someone else picked up the last block from, and the
+   * remaining orphan block has now entered our LOS. In that case, the cell will
+   * still be in the HAS_CACHE state until the event is propagated all the way
+   * through, and we can use that to reset the pheromone density for the cell,
+   * which may be very high (a well known cache). It should be reset to 1.0 for
+   * a newly discovered block.
+   */
+  if (cell.state_has_cache()) {
+    cell.density_reset();
+  }
   cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
+  cell.density_update();
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {

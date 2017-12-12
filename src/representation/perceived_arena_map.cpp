@@ -55,7 +55,7 @@ perceived_arena_map::perceived_arena_map(
       perceived_cell2D& cell = m_grid.access(i, j);
       cell.rho(params->pheromone_rho);
       cell.robot_id(robot_id);
-      cell.cell().loc(discrete_coord(i, j));
+      cell.decoratee().loc(discrete_coord(i, j));
     } /* for(j..) */
   } /* for(i..) */
 }
@@ -91,7 +91,7 @@ std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
 void perceived_arena_map::update_density(void) {
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      m_grid.access(i, j).update_density();
+      m_grid.access(i, j).density_update();
     } /* for(j..) */
   } /* for(i..) */
 } /* update_density() */
