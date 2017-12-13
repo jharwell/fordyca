@@ -93,8 +93,13 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
      * If a robot aborted its task and was carrying a block it needs to drop it,
      * in addition to updating its own internal state, so that the block is not
      * left dangling and unusable for the rest of the simulation.
+     *
+     * Also, if the robot happens to abort its task while serving the cache
+     * penalty, then it needs to be removed from the penalty list to keep things
+     * consistent and avoid assertion failures later.
      */
-    if (controller.task_aborted() && controller.is_carrying_block()) {
+    if (controller.task_aborted()) {
+      if (controller.is_carrying_block()) {
       representation::discrete_coord d =
           representation::real_to_discrete_coord(controller.robot_loc(),
                                                  map()->grid_resolution());
@@ -107,6 +112,15 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       controller.block(nullptr);
       map()->accept(drop_op);
       floor()->SetChanged();
+      }
+      auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                             [&](const cache_usage_penalty* p) {
+                               return p->controller() == &controller;});
+      if (it != m_penalty_list.end()) {
+        m_penalty_list.remove(*it);
+      }
+      ER_ASSERT(!robot_serving_cache_penalty<controller::depth1::foraging_controller>(robot),
+                "FATAL: Multiple instances of same controller serving cache penalty");
     }
 
     /* get stats from this robot before its state changes */
@@ -120,12 +134,20 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     utils::set_robot_los<controller::depth1::foraging_controller>(robot,
                                                                   *map());
     set_robot_tick<controller::depth1::foraging_controller>(robot);
-
+    if (controller.task_aborted()) {
+      return;
+    }
     if (controller.is_carrying_block()) {
       handle_nest_block_drop<controller::depth1::foraging_controller>(robot,
                                                                       *map(),
                                                                       *block_collector());
-      handle_cache_block_drop<controller::depth1::foraging_controller>(robot);
+      if (robot_serving_cache_penalty<controller::depth1::foraging_controller>(robot)) {
+        if (cache_usage_penalty_satisfied<controller::depth1::foraging_controller>(robot)) {
+          handle_cache_block_drop<controller::depth1::foraging_controller>(robot);
+        }
+      } else {
+        init_cache_usage_penalty<controller::depth1::foraging_controller>(robot);
+      }
     } else { /* The foot-bot has no block item */
       handle_free_block_pickup<controller::depth1::foraging_controller>(robot,
                                                                         *map());

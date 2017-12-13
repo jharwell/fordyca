@@ -109,7 +109,7 @@
               static_respawn_scale_factor="0.05"
               dimension="0.8"
               min_dist="0.6"
-              usage_penalty="100"
+              usage_penalty="10"
               />
       <nest size="0.5, 0.5" center="2, 2.5" />
     </arena_map>
