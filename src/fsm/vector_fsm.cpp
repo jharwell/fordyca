@@ -126,7 +126,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   double ang_speed = 0;
   double lin_speed = 0;
   if (data) {
-    m_goal_data = *data;
+      m_goal_data = *data;
+      ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
   if (m_sensors->calc_diffusion_vector(NULL)) {
