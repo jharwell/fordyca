@@ -67,7 +67,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at the specified cache's location.
    */
-constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
+  constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
   vector_fsm(uint frequent_collision_thresh,
              std::shared_ptr<rcppsw::er::server> server,
@@ -132,8 +132,7 @@ constexpr static double kCACHE_ARRIVAL_TOL = 0.2;
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  static uint kCOLLISION_RECOVERY_TIME;
-
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 20;
 
   /* member functions */
   argos::CVector2 randomize_vector_angle(argos::CVector2 v);

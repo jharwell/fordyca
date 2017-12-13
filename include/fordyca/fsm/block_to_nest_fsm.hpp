@@ -154,7 +154,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   };
 
  private:
-  static const uint kPICKUP_TIMEOUT;
+  constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
