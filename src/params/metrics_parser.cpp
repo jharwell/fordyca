@@ -34,7 +34,6 @@ NS_START(fordyca, params);
 void metrics_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct metrics_params);
 
-  std::cout <<node.Value() << std::endl;
   argos::GetNodeAttribute(node, "output_dir", m_params->output_dir);
 
   argos::GetNodeAttribute(node, "stateless_fname", m_params->stateless_fname);

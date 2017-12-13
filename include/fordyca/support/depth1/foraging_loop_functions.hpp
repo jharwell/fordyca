@@ -80,7 +80,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
       argos::CFootBotEntity& robot) {
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-    if (controller.cache_acquired() && !controller.is_transporting_to_cache()) {
+    if (controller.cache_acquired()) {
       ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
 
       /* Check whether the foot-bot is actually on a cache */
@@ -103,7 +103,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot) {
-
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
@@ -123,22 +122,23 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   void finish_cached_block_pickup(argos::CFootBotEntity& robot) {
-
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     cache_usage_penalty* p = m_penalty_list.front();
     ER_ASSERT(p->controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-
+    ER_ASSERT(controller.cache_acquired(),
+              "FATAL: Controller not waiting for cached block pickup");
     events::cached_block_pickup pickup_op(rcppsw::er::g_server,
                                           &map()->caches()[p->cache_id()],
                                           utils::robot_id(robot));
     m_penalty_list.remove(p);
+    ER_ASSERT(!robot_serving_cache_penalty<T>(robot),
+              "FATAL: Multiple instances of same controller serving cache penalty");
 
     /*
      * Map must be called before controller for proper cache block decrement!
      */
     map()->accept(pickup_op);
-
     controller.visitor::template visitable_any<T>::accept(pickup_op);
     floor()->SetChanged();
   }
@@ -165,20 +165,28 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   bool handle_cache_block_drop(argos::CFootBotEntity& robot) {
     T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-    if (controller.cache_acquired() && controller.is_transporting_to_cache()) {
-      /* Check whether the foot-bot is actually on a cache */
-      int cache = utils::robot_on_cache(robot, *map());
-      if (-1 != cache) {
-        events::cache_block_drop drop_op(rcppsw::er::g_server,
-                                         controller.block(),
-                                         &map()->caches()[cache],
-                                         map()->grid_resolution());
+    /* Check whether the foot-bot is actually on a cache */
+    int cache = utils::robot_on_cache(robot, *map());
+    if (-1 != cache) {
+      cache_usage_penalty* p = m_penalty_list.front();
+      ER_ASSERT(p->controller() == &controller,
+                "FATAL: Out of order cache penalty handling");
+      ER_ASSERT(controller.cache_acquired(),
+                "FATAL: Controller not waiting for cache block drop");
 
-        /* Update arena map state due to a block nest drop */
-        map()->accept(drop_op);
-        controller.visitor::template visitable_any<T>::accept(drop_op);
-        return true;
-      }
+      m_penalty_list.remove(p);
+      ER_ASSERT(!robot_serving_cache_penalty<T>(robot),
+                "FATAL: Multiple instances of same controller serving cache penalty");
+
+      events::cache_block_drop drop_op(rcppsw::er::g_server,
+                                       controller.block(),
+                                       &map()->caches()[cache],
+                                       map()->grid_resolution());
+
+      /* Update arena map state due to a cache drop */
+      map()->accept(drop_op);
+      controller.visitor::template visitable_any<T>::accept(drop_op);
+      return true;
     }
     return false;
   }
