@@ -35,11 +35,6 @@ NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
- * Constants
- ******************************************************************************/
-uint vector_fsm::kCOLLISION_RECOVERY_TIME = 20;
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(uint frequent_collision_thresh,

@@ -33,11 +33,6 @@ NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
- * Constants
- ******************************************************************************/
-const uint block_to_nest_fsm::kPICKUP_TIMEOUT = 100;
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 block_to_nest_fsm::block_to_nest_fsm(
@@ -208,7 +203,7 @@ bool block_to_nest_fsm::cache_acquired(void) const {
 
 bool block_to_nest_fsm::block_acquired(void) const {
   return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-} /* cache_acquired() */
+} /* block_acquired() */
 
 void block_to_nest_fsm::init(void) {
   base_foraging_fsm::init();
