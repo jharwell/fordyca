@@ -113,9 +113,14 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       map()->accept(drop_op);
       floor()->SetChanged();
       }
-       std::remove_if(m_penalty_list.begin(), m_penalty_list.end(),
-                      [&](const cache_usage_penalty* p) {
-                        return p->controller() == &controller;});
+      auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+                             [&](const cache_usage_penalty* p) {
+                               return p->controller() == &controller;});
+      if (it != m_penalty_list.end()) {
+        m_penalty_list.remove(*it);
+      }
+      ER_ASSERT(!robot_serving_cache_penalty<controller::depth1::foraging_controller>(robot),
+                "FATAL: Multiple instances of same controller serving cache penalty");
     }
 
     /* get stats from this robot before its state changes */

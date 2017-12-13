@@ -1,7 +1,7 @@
 #!/opt/data/local/bin/fish
 
 set -g scenarios "single-source"
-set -g controllers "depth1"
+set -g controllers "stateless" "stateful" "depth1"
 set -g timesteps 100000
 
 for s in $scenarios
