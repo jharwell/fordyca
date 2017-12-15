@@ -48,8 +48,8 @@ NS_START(collectors, robot_metrics);
  */
 class stateful_metrics_collector : public base_metric_collector {
  public:
-  explicit stateful_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  stateful_metrics_collector(const std::string ofname, bool collect_cum) :
+      base_metric_collector(ofname, collect_cum), m_stats() {}
 
   void reset(void) override;
   void collect(const collectible_metrics::robot_metrics::stateful_metrics& metrics);
@@ -59,6 +59,9 @@ class stateful_metrics_collector : public base_metric_collector {
   struct stats {
     size_t n_acquiring_block;
     size_t n_vectoring_to_block;
+
+    size_t n_cum_acquiring_block;
+    size_t n_cum_vectoring_to_block;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

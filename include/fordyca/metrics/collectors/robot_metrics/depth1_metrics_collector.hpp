@@ -48,8 +48,8 @@ NS_START(collectors, robot_metrics);
  */
 class depth1_metrics_collector : public base_metric_collector {
  public:
-  explicit depth1_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  depth1_metrics_collector(const std::string ofname, bool collect_cum) :
+      base_metric_collector(ofname, collect_cum), m_stats() {}
 
   void reset(void) override;
   void collect(const collectible_metrics::robot_metrics::depth1_metrics& metrics);
@@ -61,6 +61,11 @@ class depth1_metrics_collector : public base_metric_collector {
     size_t n_vectoring_to_cache;
     size_t n_acquiring_cache;
     size_t n_transporting_to_cache;
+
+    size_t n_cum_exploring_for_cache;
+    size_t n_cum_vectoring_to_cache;
+    size_t n_cum_acquiring_cache;
+    size_t n_cum_transporting_to_cache;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

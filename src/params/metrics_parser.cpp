@@ -43,6 +43,7 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "block_fname", m_params->block_fname);
   argos::GetNodeAttribute(node, "task_fname", m_params->task_fname);
   argos::GetNodeAttribute(node, "n_robots", m_params->n_robots);
+  argos::GetNodeAttribute(node, "collect_cum", m_params->collect_cum);
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) {
@@ -57,6 +58,7 @@ void metrics_parser::show(std::ostream& stream) {
     stream << "block_fname=" << m_params->block_fname << std::endl;
     stream << "task_fname=" << m_params->task_fname << std::endl;
     stream << "n_robots=" << m_params->n_robots << std::endl;
+    stream << "collect_cum=" << m_params->collect_cum << std::endl;
   }
 } /* show() */
 
