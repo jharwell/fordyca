@@ -35,7 +35,7 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
 std::string distance_metrics_collector::csv_header_build(const std::string& header) {
   std::string line = "";
   for (size_t i = 0; i < m_n_robots; ++i) {
-    line += "robot" + std::to_string(i) + ";";
+    line += "robot" + std::to_string(i) + separator();
   } /* for(i..) */
 
   return base_metric_collector::csv_header_build(header) + line;
@@ -51,7 +51,7 @@ void distance_metrics_collector::reset(void) {
 
 bool distance_metrics_collector::csv_line_build(std::string& line) {
   for (auto s : m_stats) {
-    line += std::to_string(s.total_distance) + ";";
+    line += std::to_string(s.total_distance) + separator();
   } /* for(s..) */
   return true;
 } /* csv_line_build() */

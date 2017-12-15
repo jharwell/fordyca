@@ -34,7 +34,10 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  ******************************************************************************/
 std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "n_acquiring_cache;n_vectoring_to_cache;n_exploring_for_cache;n_transporting_to_cache";
+      "n_acquiring_cache" + separator() +
+      "n_vectoring_to_cache" + separator() +
+      "n_exploring_for_cache" + separator() +
+      "n_transporting_to_cache" + separator();
 } /* csv_header_build() */
 
 void depth1_metrics_collector::reset(void) {
@@ -51,10 +54,10 @@ void depth1_metrics_collector::collect(
 } /* collect() */
 
 bool depth1_metrics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_acquiring_cache) + ";" +
-         std::to_string(m_stats.n_vectoring_to_cache) + ";" +
-         std::to_string(m_stats.n_exploring_for_cache) + ";" +
-         std::to_string(m_stats.n_transporting_to_cache);
+  line = std::to_string(m_stats.n_acquiring_cache) + separator() +
+         std::to_string(m_stats.n_vectoring_to_cache) + separator() +
+         std::to_string(m_stats.n_exploring_for_cache) + separator() +
+         std::to_string(m_stats.n_transporting_to_cache) + separator();
   return true;
 } /* store_foraging_stats() */
 

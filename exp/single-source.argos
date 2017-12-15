@@ -178,18 +178,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth1_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

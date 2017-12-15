@@ -34,7 +34,9 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  ******************************************************************************/
 std::string stateless_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "n_exploring_for_block;n_avoiding_collision;n_transporting_to_nest";
+      "n_exploring_for_block"  + separator() +
+      "n_avoiding_collision" + separator() +
+      "n_transporting_to_nest" + separator();
 } /* csv_header_build() */
 
 void stateless_metrics_collector::reset(void) {
@@ -50,9 +52,9 @@ void stateless_metrics_collector::collect(
 } /* collect() */
 
 bool stateless_metrics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_exploring_for_block) + ";" +
-         std::to_string(m_stats.n_avoiding_collision) + ";" +
-         std::to_string(m_stats.n_transporting_to_nest);
+  line = std::to_string(m_stats.n_exploring_for_block) + separator() +
+         std::to_string(m_stats.n_avoiding_collision) + separator() +
+         std::to_string(m_stats.n_transporting_to_nest) + separator();
   return true;
 } /* store_foraging_stats() */
 
