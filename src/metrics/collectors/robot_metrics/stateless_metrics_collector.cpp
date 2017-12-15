@@ -33,10 +33,20 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  * Member Functions
  ******************************************************************************/
 std::string stateless_metrics_collector::csv_header_build(const std::string& header) {
-  return base_metric_collector::csv_header_build(header) +
+  if (collect_cum()) {
+    return base_metric_collector::csv_header_build(header) +
+        "n_exploring_for_block"  + separator() +
+        "n_cum_exploring_for_block"  + separator() +
+        "n_avoiding_collision" + separator() +
+        "n_cum_avoiding_collision" + separator() +
+        "n_transporting_to_nest" + separator() +
+        "n_cum_transporting_to_nest" + separator();
+  } else {
+      return base_metric_collector::csv_header_build(header) +
       "n_exploring_for_block"  + separator() +
       "n_avoiding_collision" + separator() +
       "n_transporting_to_nest" + separator();
+  }
 } /* csv_header_build() */
 
 void stateless_metrics_collector::reset(void) {
@@ -49,17 +59,34 @@ void stateless_metrics_collector::collect(
   m_stats.n_exploring_for_block += metrics.is_exploring_for_block();
   m_stats.n_transporting_to_nest += metrics.is_transporting_to_nest();
   m_stats.n_avoiding_collision += metrics.is_avoiding_collision();
+
+  if (collect_cum()) {
+    m_stats.n_cum_exploring_for_block += metrics.is_exploring_for_block();
+    m_stats.n_cum_transporting_to_nest += metrics.is_transporting_to_nest();
+    m_stats.n_cum_avoiding_collision += metrics.is_avoiding_collision();
+  }
 } /* collect() */
 
 bool stateless_metrics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_exploring_for_block) + separator() +
-         std::to_string(m_stats.n_avoiding_collision) + separator() +
-         std::to_string(m_stats.n_transporting_to_nest) + separator();
+  if (collect_cum()) {
+    line = std::to_string(m_stats.n_exploring_for_block) + separator() +
+           std::to_string(m_stats.n_cum_exploring_for_block) + separator() +
+           std::to_string(m_stats.n_avoiding_collision) + separator() +
+           std::to_string(m_stats.n_cum_avoiding_collision) + separator() +
+           std::to_string(m_stats.n_transporting_to_nest) + separator() +
+           std::to_string(m_stats.n_cum_transporting_to_nest) + separator();
+  } else {
+    line = std::to_string(m_stats.n_exploring_for_block) + separator() +
+           std::to_string(m_stats.n_avoiding_collision) + separator() +
+           std::to_string(m_stats.n_transporting_to_nest) + separator();
+    }
   return true;
 } /* store_foraging_stats() */
 
 void stateless_metrics_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0};
+  m_stats.n_avoiding_collision = 0;
+  m_stats.n_exploring_for_block = 0;
+  m_stats.n_transporting_to_nest = 0;
 } /* reset_on_timestep() */
 
 NS_END(robot_metrics, collectors, metrics, fordyca);

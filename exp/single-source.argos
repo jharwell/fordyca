@@ -93,6 +93,7 @@
           distance_fname="distance-stats.csv"
           task_fname="task-stats.csv"
           n_robots="20"
+          collect_cum="true"
           />
     </output>
     <arena_map>

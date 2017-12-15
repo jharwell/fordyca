@@ -69,7 +69,8 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
     const params::output_params* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
   m_collector.reset(new robot_collectors::stateful_metrics_collector(
-      metrics_path() + "/" + p_output->metrics.stateful_fname));
+      metrics_path() + "/" + p_output->metrics.stateful_fname,
+      p_output->metrics.collect_cum));
   m_collector->reset();
 
   /* configure robots */

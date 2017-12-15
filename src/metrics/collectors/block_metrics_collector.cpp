@@ -33,10 +33,16 @@ NS_START(fordyca, metrics, collectors);
  * Member Functions
  ******************************************************************************/
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
-  return base_metric_collector::csv_header_build(header) +
-      "block_carries" + separator() +
-      "total_collected_blocks" + separator() +
-      "avg_carries" + separator();
+  if (collect_cum()) {
+    return base_metric_collector::csv_header_build(header) +
+        "block_carries" + separator() +
+        "avg_carries" + separator() +
+        "cum_collected" + separator();
+  } else {
+    return base_metric_collector::csv_header_build(header);
+        "block_carries" + separator() +
+        "avg_carries" + separator();
+  }
 } /* csv_header_build() */
 
 void block_metrics_collector::reset(void) {
@@ -47,11 +53,16 @@ void block_metrics_collector::reset(void) {
 bool block_metrics_collector::csv_line_build(std::string& line) {
   double avg_carries = 0;
   if (m_metrics.block_carries > 0) {
-    avg_carries = static_cast<double>(m_metrics.total_carries)/
-                                      m_metrics.total_collected;
-    line = std::to_string(m_metrics.block_carries) + separator() +
-           std::to_string(m_metrics.total_collected) + separator() +
-           std::to_string(avg_carries) + separator();
+    avg_carries = static_cast<double>(m_metrics.cum_carries)/
+                                      m_metrics.cum_collected;
+    if (collect_cum()) {
+      line = std::to_string(m_metrics.block_carries) + separator() +
+             std::to_string(avg_carries) + separator() +
+             std::to_string(m_metrics.cum_collected) + separator();
+    } else {
+      line = std::to_string(m_metrics.block_carries) + separator() +
+             std::to_string(avg_carries) + separator();
+    }
     m_metrics.block_carries = 0;
     return true;
   }
@@ -61,8 +72,10 @@ bool block_metrics_collector::csv_line_build(std::string& line) {
 void block_metrics_collector::collect(
     const collectible_metrics::block_metrics& metrics) {
   m_metrics.block_carries = metrics.n_carries();
-  ++m_metrics.total_collected;
-  m_metrics.total_carries += metrics.n_carries();
+  if (collect_cum()) {
+    m_metrics.cum_carries += metrics.n_carries();
+    ++m_metrics.cum_collected;
+  }
 } /* collect() */
 
 NS_END(collectors, metrics, fordyca);

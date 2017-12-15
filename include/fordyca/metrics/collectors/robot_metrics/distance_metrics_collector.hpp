@@ -54,7 +54,7 @@ class distance_metrics_collector : public base_metric_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
   distance_metrics_collector(const std::string ofname, size_t n_robots) :
-      base_metric_collector(ofname), m_n_robots(n_robots), m_stats() {}
+      base_metric_collector(ofname, false), m_n_robots(n_robots), m_stats() {}
 
   void reset(void) override;
   void collect(const collectible_metrics::robot_metrics::distance_metrics& metrics);

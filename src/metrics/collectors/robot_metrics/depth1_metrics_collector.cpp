@@ -1,5 +1,5 @@
 /**
- * @file depth1_collector.cpp
+ * @file depth1_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -33,11 +33,23 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  * Member Functions
  ******************************************************************************/
 std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
+  if (collect_cum()) {
+  return base_metric_collector::csv_header_build(header) +
+      "n_acquiring_cache" + separator() +
+      "n_cum_acquiring_cache" + separator() +
+      "n_vectoring_to_cache" + separator() +
+      "n_cum_vectoring_to_cache" + separator() +
+      "n_exploring_for_cache" + separator() +
+      "n_cum_exploring_for_cache" + separator() +
+      "n_transporting_to_cache" + separator() +
+      "n_cum_transporting_to_cache" + separator();
+  } else {
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +
       "n_vectoring_to_cache" + separator() +
       "n_exploring_for_cache" + separator() +
       "n_transporting_to_cache" + separator();
+  }
 } /* csv_header_build() */
 
 void depth1_metrics_collector::reset(void) {
@@ -51,18 +63,39 @@ void depth1_metrics_collector::collect(
   m_stats.n_acquiring_cache += metrics.is_acquiring_cache();
   m_stats.n_vectoring_to_cache += metrics.is_vectoring_to_cache();
   m_stats.n_transporting_to_cache += metrics.is_transporting_to_cache();
+
+  if (collect_cum()) {
+    m_stats.n_cum_exploring_for_cache += metrics.is_exploring_for_cache();
+    m_stats.n_cum_acquiring_cache += metrics.is_acquiring_cache();
+    m_stats.n_cum_vectoring_to_cache += metrics.is_vectoring_to_cache();
+    m_stats.n_cum_transporting_to_cache += metrics.is_transporting_to_cache();
+  }
 } /* collect() */
 
 bool depth1_metrics_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_acquiring_cache) + separator() +
-         std::to_string(m_stats.n_vectoring_to_cache) + separator() +
-         std::to_string(m_stats.n_exploring_for_cache) + separator() +
-         std::to_string(m_stats.n_transporting_to_cache) + separator();
+  if (collect_cum()) {
+    line = std::to_string(m_stats.n_acquiring_cache) + separator() +
+           std::to_string(m_stats.n_cum_acquiring_cache) + separator() +
+           std::to_string(m_stats.n_vectoring_to_cache) + separator() +
+           std::to_string(m_stats.n_cum_vectoring_to_cache) + separator() +
+           std::to_string(m_stats.n_exploring_for_cache) + separator() +
+           std::to_string(m_stats.n_cum_exploring_for_cache) + separator() +
+           std::to_string(m_stats.n_transporting_to_cache) + separator() +
+           std::to_string(m_stats.n_cum_transporting_to_cache) + separator();
+  } else {
+    line = std::to_string(m_stats.n_acquiring_cache) + separator() +
+           std::to_string(m_stats.n_vectoring_to_cache) + separator() +
+           std::to_string(m_stats.n_exploring_for_cache) + separator() +
+           std::to_string(m_stats.n_transporting_to_cache) + separator();
+  }
   return true;
 } /* store_foraging_stats() */
 
 void depth1_metrics_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0, 0};
+  m_stats.n_exploring_for_cache = 0;
+  m_stats.n_acquiring_cache = 0;
+  m_stats.n_vectoring_to_cache = 0;
+  m_stats.n_transporting_to_cache = 0;
 } /* reset_on_timestep() */
 
 NS_END(robot_metrics, collectors, metrics, fordyca);

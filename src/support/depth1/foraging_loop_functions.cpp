@@ -75,10 +75,12 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
       repo.get_params("output"));
 
   m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
-      metrics_path() + "/" + p_output->metrics.depth1_fname));
+      metrics_path() + "/" + p_output->metrics.depth1_fname,
+      p_output->metrics.collect_cum));
   m_depth1_collector->reset();
   m_task_collector.reset(new metrics::collectors::task_collector(
-      metrics_path() + "/" + p_output->metrics.task_fname));
+      metrics_path() + "/" + p_output->metrics.task_fname,
+      p_output->metrics.collect_cum));
   m_task_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");

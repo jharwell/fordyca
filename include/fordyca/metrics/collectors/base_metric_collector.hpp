@@ -51,8 +51,10 @@ NS_START(collectors);
  */
 class base_metric_collector {
  public:
-  explicit base_metric_collector(const std::string ofname) :
-      m_ofname(ofname), m_separator(";"), m_ofile() {}
+  base_metric_collector(const std::string ofname, bool collect_cum) :
+      m_collect_cum(collect_cum), m_ofname(ofname), m_separator(";"),
+      m_ofile() {}
+
   virtual ~base_metric_collector(void) {}
 
   /**
@@ -110,8 +112,10 @@ class base_metric_collector {
   void csv_header_write(void);
 
   const std::string& separator(void) const { return m_separator; }
+  bool collect_cum(void) const { return m_collect_cum; }
 
  private:
+  bool          m_collect_cum;
   std::string   m_ofname;
   std::string   m_separator;
   std::ofstream m_ofile;

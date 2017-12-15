@@ -215,9 +215,12 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   fs::create_directories(m_metrics_path);
 
   m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
-      m_metrics_path + "/" + p_output->metrics.stateless_fname));
+      m_metrics_path + "/" + p_output->metrics.stateless_fname,
+      p_output->metrics.collect_cum));
+
   m_block_collector.reset(new collectors::block_metrics_collector(
-      m_metrics_path + "/" + p_output->metrics.block_fname));
+      m_metrics_path + "/" + p_output->metrics.block_fname,
+      p_output->metrics.collect_cum));
 
   m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
       m_metrics_path + "/" + p_output->metrics.distance_fname,
@@ -264,7 +267,7 @@ __pure bool stateless_foraging_loop_functions::IsExperimentFinished(void) {
    * run until I cancel it.
    */
   if (!m_map->respawn_enabled() &&
-      m_block_collector->total_collected() == m_map->n_blocks()) {
+      m_block_collector->cum_collected() == m_map->n_blocks()) {
     return true;
   }
   return false;

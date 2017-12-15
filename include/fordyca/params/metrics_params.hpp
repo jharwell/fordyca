@@ -39,7 +39,7 @@ struct metrics_params : public rcppsw::common::base_params {
   metrics_params(void) : output_dir(), block_fname(),
                          stateless_fname(), stateful_fname(),
                          distance_fname(), depth1_fname(), task_fname(),
-                         n_robots() {}
+                         n_robots(), collect_cum(false) {}
 
   std::string output_dir;
   std::string block_fname;
@@ -49,6 +49,7 @@ struct metrics_params : public rcppsw::common::base_params {
   std::string depth1_fname;
   std::string task_fname;
   size_t n_robots;
+  bool collect_cum;
 };
 
 NS_END(params, fordyca);

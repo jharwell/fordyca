@@ -48,8 +48,8 @@ NS_START(collectors);
  */
 class task_collector : public base_metric_collector {
  public:
-  explicit task_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  task_collector(const std::string ofname, bool collect_cum) :
+      base_metric_collector(ofname, collect_cum), m_stats() {}
 
   void reset(void) override;
   void collect(const collectible_metrics::task_metrics& metrics);
@@ -64,6 +64,9 @@ class task_collector : public base_metric_collector {
     size_t n_collectors;
     size_t n_foragers;
     size_t n_generalists;
+    size_t n_cum_collectors;
+    size_t n_cum_foragers;
+    size_t n_cum_generalists;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
