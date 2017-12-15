@@ -34,7 +34,9 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "block_carries;total_collected_blocks;avg_carries";
+      "block_carries" + separator() +
+      "total_collected_blocks" + separator() +
+      "avg_carries" + separator();
 } /* csv_header_build() */
 
 void block_metrics_collector::reset(void) {
@@ -47,9 +49,9 @@ bool block_metrics_collector::csv_line_build(std::string& line) {
   if (m_metrics.block_carries > 0) {
     avg_carries = static_cast<double>(m_metrics.total_carries)/
                                       m_metrics.total_collected;
-    line = std::to_string(m_metrics.block_carries) + ";" +
-           std::to_string(m_metrics.total_collected) + ";" +
-           std::to_string(avg_carries) + ";";
+    line = std::to_string(m_metrics.block_carries) + separator() +
+           std::to_string(m_metrics.total_collected) + separator() +
+           std::to_string(avg_carries) + separator();
     m_metrics.block_carries = 0;
     return true;
   }

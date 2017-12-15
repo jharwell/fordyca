@@ -34,7 +34,9 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 std::string task_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "n_collectors;n_foragers;n_generalists";
+      "n_collectors"  + separator() +
+      "n_foragers" + separator() +
+      "n_generalists" + separator();
 } /* csv_header_build() */
 
 void task_collector::reset(void) {
@@ -50,9 +52,9 @@ void task_collector::collect(
 } /* collect() */
 
 bool task_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_collectors) + ";" +
-         std::to_string(m_stats.n_foragers) + ";" +
-         std::to_string(m_stats.n_generalists);
+  line = std::to_string(m_stats.n_collectors) + separator() +
+         std::to_string(m_stats.n_foragers) + separator() +
+         std::to_string(m_stats.n_generalists) + separator();
   return true;
 } /* store_foraging_stats() */
 
