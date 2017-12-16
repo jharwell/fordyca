@@ -54,16 +54,15 @@ class distance_metrics_collector : public base_metric_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
   distance_metrics_collector(const std::string ofname, size_t n_robots) :
-      base_metric_collector(ofname, false), m_n_robots(n_robots), m_stats() {}
+      base_metric_collector(ofname, true), m_n_robots(n_robots), m_stats() {}
 
   void reset(void) override;
-  void collect(const collectible_metrics::robot_metrics::distance_metrics& metrics);
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
 
  private:
   struct robot_stats {
     size_t index;
-    double total_distance;
-    double timestep_distance;
+    double cum_distance;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

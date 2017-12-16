@@ -30,6 +30,19 @@
 NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+depth1_metrics_collector::depth1_metrics_collector(const std::string ofname,
+                                                   bool collect_cum,
+                                                   uint collect_interval) :
+    base_metric_collector(ofname, collect_cum), m_stats() {
+  if (collect_cum) {
+    use_interval(true);
+    interval(collect_interval);
+  }
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
@@ -54,21 +67,22 @@ std::string depth1_metrics_collector::csv_header_build(const std::string& header
 
 void depth1_metrics_collector::reset(void) {
   base_metric_collector::reset();
-  reset_on_timestep();
+  reset_after_interval();
 } /* reset() */
 
 void depth1_metrics_collector::collect(
-    const collectible_metrics::robot_metrics::depth1_metrics& metrics) {
-  m_stats.n_exploring_for_cache += metrics.is_exploring_for_cache();
-  m_stats.n_acquiring_cache += metrics.is_acquiring_cache();
-  m_stats.n_vectoring_to_cache += metrics.is_vectoring_to_cache();
-  m_stats.n_transporting_to_cache += metrics.is_transporting_to_cache();
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = static_cast<const collectible_metrics::robot_metrics::depth1_metrics&>(metrics);
+  m_stats.n_exploring_for_cache += m.is_exploring_for_cache();
+  m_stats.n_acquiring_cache += m.is_acquiring_cache();
+  m_stats.n_vectoring_to_cache += m.is_vectoring_to_cache();
+  m_stats.n_transporting_to_cache += m.is_transporting_to_cache();
 
   if (collect_cum()) {
-    m_stats.n_cum_exploring_for_cache += metrics.is_exploring_for_cache();
-    m_stats.n_cum_acquiring_cache += metrics.is_acquiring_cache();
-    m_stats.n_cum_vectoring_to_cache += metrics.is_vectoring_to_cache();
-    m_stats.n_cum_transporting_to_cache += metrics.is_transporting_to_cache();
+    m_stats.n_cum_exploring_for_cache += m.is_exploring_for_cache();
+    m_stats.n_cum_acquiring_cache += m.is_acquiring_cache();
+    m_stats.n_cum_vectoring_to_cache += m.is_vectoring_to_cache();
+    m_stats.n_cum_transporting_to_cache += m.is_transporting_to_cache();
   }
 } /* collect() */
 
@@ -91,11 +105,18 @@ bool depth1_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* store_foraging_stats() */
 
-void depth1_metrics_collector::reset_on_timestep(void) {
+void depth1_metrics_collector::reset_after_interval(void) {
+  m_stats.n_cum_exploring_for_cache = 0;
+  m_stats.n_cum_acquiring_cache = 0;
+  m_stats.n_cum_vectoring_to_cache = 0;
+  m_stats.n_cum_transporting_to_cache = 0;
+} /* reset_after_interval() */
+
+void depth1_metrics_collector::reset_after_timestep(void) {
   m_stats.n_exploring_for_cache = 0;
   m_stats.n_acquiring_cache = 0;
   m_stats.n_vectoring_to_cache = 0;
   m_stats.n_transporting_to_cache = 0;
-} /* reset_on_timestep() */
+} /* reset_after_timestep() */
 
 NS_END(robot_metrics, collectors, metrics, fordyca);

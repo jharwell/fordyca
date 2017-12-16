@@ -45,6 +45,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 namespace fs = std::experimental::filesystem;
+namespace rmetrics = metrics::collectible_metrics::robot_metrics;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -161,8 +162,8 @@ void stateless_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& rob
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    m_stateless_collector->collect(controller);
-    m_distance_collector->collect(controller);
+  m_stateless_collector->collect(static_cast<rmetrics::stateless_metrics&>(controller));
+  m_distance_collector->collect(static_cast<rmetrics::distance_metrics&>(controller));
 
     if(!handle_nest_block_drop<controller::depth0::stateless_foraging_controller>(robot,
                                                                                   *m_map,
@@ -189,7 +190,14 @@ void stateless_foraging_loop_functions::pre_step_final(void) {
   m_block_collector->csv_line_write(GetSpace().GetSimulationClock());
   m_stateless_collector->csv_line_write(GetSpace().GetSimulationClock());
   m_distance_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_stateless_collector->reset_on_timestep();
+
+  m_stateless_collector->timestep_reset();
+  m_stateless_collector->interval_reset();
+  m_stateless_collector->timestep_inc();
+
+  m_block_collector->timestep_reset();
+  m_block_collector->interval_reset();
+  m_block_collector->timestep_inc();
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
@@ -216,11 +224,13 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
   m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
       m_metrics_path + "/" + p_output->metrics.stateless_fname,
-      p_output->metrics.collect_cum));
+      p_output->metrics.collect_cum,
+      p_output->metrics.collect_interval));
 
   m_block_collector.reset(new collectors::block_metrics_collector(
       m_metrics_path + "/" + p_output->metrics.block_fname,
-      p_output->metrics.collect_cum));
+      p_output->metrics.collect_cum,
+      p_output->metrics.collect_interval));
 
   m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
       m_metrics_path + "/" + p_output->metrics.distance_fname,

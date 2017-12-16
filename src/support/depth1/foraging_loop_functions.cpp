@@ -44,6 +44,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+namespace rmetrics = metrics::collectible_metrics::robot_metrics;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -76,11 +77,13 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
       metrics_path() + "/" + p_output->metrics.depth1_fname,
-      p_output->metrics.collect_cum));
+      p_output->metrics.collect_cum,
+      p_output->metrics.collect_interval));
   m_depth1_collector->reset();
   m_task_collector.reset(new metrics::collectors::task_collector(
       metrics_path() + "/" + p_output->metrics.task_fname,
-      p_output->metrics.collect_cum));
+      p_output->metrics.collect_cum,
+      p_output->metrics.collect_interval));
   m_task_collector->reset();
 
   ER_NOM("depth1_foraging loop functions initialization finished");
@@ -126,11 +129,11 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     }
 
     /* get stats from this robot before its state changes */
-    stateless_collector()->collect(controller);
-    stateful_collector()->collect(controller);
-    distance_collector()->collect(controller);
-    m_depth1_collector->collect(controller);
-    m_task_collector->collect(controller);
+    stateless_collector()->collect(static_cast<rmetrics::stateless_metrics&>(controller));
+    stateful_collector()->collect(static_cast<rmetrics::stateful_metrics&>(controller));
+    distance_collector()->collect(static_cast<rmetrics::distance_metrics&>(controller));
+    m_depth1_collector->collect(static_cast<rmetrics::depth1_metrics&>(controller));
+    m_task_collector->collect(static_cast<metrics::collectible_metrics::task_metrics&>(controller));
 
     utils::set_robot_pos<controller::depth1::foraging_controller>(robot);
     utils::set_robot_los<controller::depth1::foraging_controller>(robot,
@@ -249,9 +252,14 @@ void foraging_loop_functions::pre_step_final(void) {
   }
 
   m_depth1_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_depth1_collector->reset_on_timestep();
+  m_depth1_collector->timestep_reset();
+  m_depth1_collector->interval_reset();
+  m_depth1_collector->timestep_inc();
+
   m_task_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_task_collector->reset_on_timestep();
+  m_task_collector->timestep_reset();
+  m_task_collector->interval_reset();
+  m_task_collector->timestep_inc();
 } /* pre_step_final() */
 
 /*

@@ -57,4 +57,10 @@ void base_metric_collector::reset(void) {
   csv_header_write();
 } /* reset() */
 
+void base_metric_collector::interval_reset(void) {
+  if (m_use_interval && (m_timestep % m_interval == 0)) {
+    reset_after_interval();
+  }
+} /* interval_reset() */
+
 NS_END(collectors, metrics, fordyca);

@@ -51,14 +51,15 @@ void distance_metrics_collector::reset(void) {
 
 bool distance_metrics_collector::csv_line_build(std::string& line) {
   for (auto s : m_stats) {
-    line += std::to_string(s.total_distance) + separator();
+    line += std::to_string(s.cum_distance) + separator();
   } /* for(s..) */
   return true;
 } /* csv_line_build() */
 
 void distance_metrics_collector::collect(
-    const collectible_metrics::robot_metrics::distance_metrics& metrics) {
-  m_stats[metrics.entity_id()].total_distance += metrics.timestep_distance();
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = static_cast<const collectible_metrics::robot_metrics::distance_metrics&>(metrics);
+  m_stats[m.entity_id()].cum_distance += m.timestep_distance();
 } /* collect() */
 
 

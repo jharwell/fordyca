@@ -30,11 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-
-namespace collectible_metrics { namespace robot_metrics { class stateless_metrics; } }
-
-NS_START(collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,12 +44,14 @@ NS_START(collectors, robot_metrics);
  */
 class stateless_metrics_collector : public base_metric_collector {
  public:
-  stateless_metrics_collector(const std::string ofname, bool collect_cum) :
-      base_metric_collector(ofname, collect_cum), m_stats() {}
+  stateless_metrics_collector(const std::string ofname, bool
+                              collect_cum,
+                              uint collect_interval);
 
   void reset() override;
-  void collect(const collectible_metrics::robot_metrics::stateless_metrics& metrics);
-  void reset_on_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  void reset_after_timestep(void) override;
+  void reset_after_interval(void) override;
 
  private:
   struct sim_stats {
