@@ -33,13 +33,10 @@ NS_START(fordyca, metrics, collectors);
  * Constructors/Destructor
  ******************************************************************************/
 block_metrics_collector::block_metrics_collector(const std::string ofname,
-                                                 bool collect_cum,
                                                  uint collect_interval) :
-    base_metric_collector(ofname, collect_cum), m_metrics() {
-  if (collect_cum) {
+    base_metric_collector(ofname, true), m_metrics() {
     use_interval(true);
     interval(collect_interval);
-  }
 }
 
 /*******************************************************************************
@@ -48,53 +45,40 @@ block_metrics_collector::block_metrics_collector(const std::string ofname,
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
-        "block_carries" + separator() +
         "avg_carries" + separator() +
         "cum_collected" + separator();
   } else {
     return base_metric_collector::csv_header_build(header);
-        "block_carries" + separator() +
-        "avg_carries" + separator();
+    "block_carries" + separator();
   }
 } /* csv_header_build() */
 
 void block_metrics_collector::reset(void) {
   base_metric_collector::reset();
-  m_metrics = {0, 0, 0};
+  m_metrics = {0, 0};
 } /* reset() */
 
 bool block_metrics_collector::csv_line_build(std::string& line) {
   double avg_carries = 0;
-  if (m_metrics.block_carries > 0) {
-    avg_carries = static_cast<double>(m_metrics.cum_carries)/
-                                      m_metrics.cum_collected;
-    if (collect_cum()) {
-      line = std::to_string(m_metrics.block_carries) + separator() +
-             std::to_string(avg_carries) + separator() +
-             std::to_string(m_metrics.cum_collected) + separator();
-    } else {
-      line = std::to_string(m_metrics.block_carries) + separator() +
-             std::to_string(avg_carries) + separator();
-    }
-    m_metrics.block_carries = 0;
-    return true;
+  if (!((timestep() + 1) % interval() == 0)) {
+    return false;
   }
-  return false;
+
+  if (m_metrics.cum_collected > 0) {
+    avg_carries = static_cast<double>(m_metrics.cum_carries)/
+                  m_metrics.cum_collected;
+  }
+  line = std::to_string(avg_carries) + separator() +
+         std::to_string(m_metrics.cum_collected) + separator();
+  return true;
 } /* csv_line_build() */
 
 void block_metrics_collector::collect(
     const collectible_metrics::base_collectible_metrics& metrics) {
   auto& m = dynamic_cast<const collectible_metrics::block_metrics&>(metrics);
-  m_metrics.block_carries = m.n_carries();
-  if (collect_cum()) {
-    m_metrics.cum_carries += m.n_carries();
-    ++m_metrics.cum_collected;
-  }
+  m_metrics.cum_carries += m.n_carries();
+  ++m_metrics.cum_collected;
 } /* collect() */
-
-void block_metrics_collector::reset_after_timestep(void) {
-  m_metrics.block_carries = 0;
-} /* reset_after_timestep() */
 
 void block_metrics_collector::reset_after_interval(void) {
   m_metrics.cum_carries = 0;
