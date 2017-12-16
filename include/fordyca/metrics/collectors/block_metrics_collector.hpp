@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca, metrics);
 
-namespace collectible_metrics { class block_metrics; }
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors);
@@ -51,12 +50,14 @@ NS_START(collectors);
 class block_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<block_metrics_collector> {
  public:
-  block_metrics_collector(const std::string ofname, bool collect_cum) :
-      base_metric_collector(ofname, collect_cum), m_metrics() {}
+  block_metrics_collector(const std::string ofname,
+                          bool collect_cum,
+                          uint collect_interval);
 
   void reset(void) override;
-  void reset_on_timestep(void) override { m_metrics.block_carries = 0; }
-  void collect(const collectible_metrics::block_metrics& metrics);
+  void reset_after_interval(void) override;
+  void reset_after_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
   size_t cum_collected(void) const { return m_metrics.cum_collected; }
 
  private:
@@ -68,7 +69,6 @@ class block_metrics_collector : public base_metric_collector,
 
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
-
   struct block_metrics m_metrics;
 };
 

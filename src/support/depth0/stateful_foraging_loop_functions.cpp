@@ -47,6 +47,7 @@
 NS_START(fordyca, support, depth0);
 
 namespace robot_collectors = metrics::collectors::robot_metrics;
+namespace rmetrics = metrics::collectible_metrics::robot_metrics;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -70,7 +71,8 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
       repo.get_params("output"));
   m_collector.reset(new robot_collectors::stateful_metrics_collector(
       metrics_path() + "/" + p_output->metrics.stateful_fname,
-      p_output->metrics.collect_cum));
+      p_output->metrics.collect_cum,
+      p_output->metrics.collect_interval));
   m_collector->reset();
 
   /* configure robots */
@@ -100,9 +102,9 @@ void stateful_foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robo
         robot.GetControllableEntity().GetController());
 
     /* get stats from this robot before its state changes */
-    distance_collector()->collect(controller);
-    stateless_collector()->collect(controller);
-    m_collector->collect(controller);
+    distance_collector()->collect(static_cast<rmetrics::distance_metrics&>(controller));
+    stateless_collector()->collect(static_cast<rmetrics::stateless_metrics&>(controller));
+    m_collector->collect(static_cast<rmetrics::stateful_metrics&>(controller));
 
     /* Send the robot its new line of sight */
     utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
@@ -150,7 +152,11 @@ void stateful_foraging_loop_functions::Reset(void) {
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
   stateless_foraging_loop_functions::pre_step_final();
-  m_collector->reset_on_timestep();
+
+  m_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_collector->timestep_reset();
+  m_collector->interval_reset();
+  m_collector->timestep_inc();
 } /* pre_step_final() */
 
 void stateful_foraging_loop_functions::PreStep() {

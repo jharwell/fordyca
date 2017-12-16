@@ -30,6 +30,19 @@
 NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+stateful_metrics_collector::stateful_metrics_collector(const std::string ofname,
+                                                       bool collect_cum,
+                                                       uint collect_interval) :
+    base_metric_collector(ofname, collect_cum), m_stats() {
+  if (collect_cum) {
+    use_interval(true);
+    interval(collect_interval);
+  }
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string stateful_metrics_collector::csv_header_build(const std::string& header) {
@@ -48,16 +61,17 @@ std::string stateful_metrics_collector::csv_header_build(const std::string& head
 
 void stateful_metrics_collector::reset(void) {
   base_metric_collector::reset();
-  reset_on_timestep();
+  reset_after_interval();
 } /* reset() */
 
 void stateful_metrics_collector::collect(
-    const collectible_metrics::robot_metrics::stateful_metrics& metrics) {
-  m_stats.n_acquiring_block += metrics.is_acquiring_block();
-  m_stats.n_vectoring_to_block += metrics.is_vectoring_to_block();
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = static_cast<const collectible_metrics::robot_metrics::stateful_metrics&>(metrics);
+  m_stats.n_acquiring_block += m.is_acquiring_block();
+  m_stats.n_vectoring_to_block += m.is_vectoring_to_block();
 
-  m_stats.n_cum_acquiring_block += metrics.is_acquiring_block();
-  m_stats.n_cum_vectoring_to_block += metrics.is_vectoring_to_block();
+  m_stats.n_cum_acquiring_block += m.is_acquiring_block();
+  m_stats.n_cum_vectoring_to_block += m.is_vectoring_to_block();
 } /* collect() */
 
 bool stateful_metrics_collector::csv_line_build(std::string& line) {
@@ -71,12 +85,16 @@ bool stateful_metrics_collector::csv_line_build(std::string& line) {
            std::to_string(m_stats.n_vectoring_to_block) + separator();
   }
   return true;
-} /* store_foraging_stats() */
+} /* csv_line_build() */
 
-void stateful_metrics_collector::reset_on_timestep(void) {
+void stateful_metrics_collector::reset_after_interval(void) {
+  m_stats.n_cum_acquiring_block = 0;
+  m_stats.n_cum_vectoring_to_block = 0;
+} /* reset_after_interval() */
+
+void stateful_metrics_collector::reset_after_timestep(void) {
   m_stats.n_acquiring_block = 0;
   m_stats.n_vectoring_to_block = 0;
-} /* reset_on_timestep() */
-
+} /* reset_after_timestep() */
 
 NS_END(robot_metrics, collectors, metrics, fordyca);

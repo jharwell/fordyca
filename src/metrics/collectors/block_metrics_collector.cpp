@@ -30,6 +30,19 @@
 NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+block_metrics_collector::block_metrics_collector(const std::string ofname,
+                                                 bool collect_cum,
+                                                 uint collect_interval) :
+    base_metric_collector(ofname, collect_cum), m_metrics() {
+  if (collect_cum) {
+    use_interval(true);
+    interval(collect_interval);
+  }
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
@@ -70,12 +83,22 @@ bool block_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void block_metrics_collector::collect(
-    const collectible_metrics::block_metrics& metrics) {
-  m_metrics.block_carries = metrics.n_carries();
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = dynamic_cast<const collectible_metrics::block_metrics&>(metrics);
+  m_metrics.block_carries = m.n_carries();
   if (collect_cum()) {
-    m_metrics.cum_carries += metrics.n_carries();
+    m_metrics.cum_carries += m.n_carries();
     ++m_metrics.cum_collected;
   }
 } /* collect() */
+
+void block_metrics_collector::reset_after_timestep(void) {
+  m_metrics.block_carries = 0;
+} /* reset_after_timestep() */
+
+void block_metrics_collector::reset_after_interval(void) {
+  m_metrics.cum_carries = 0;
+  m_metrics.cum_collected = 0;
+} /* reset_after_interval() */
 
 NS_END(collectors, metrics, fordyca);

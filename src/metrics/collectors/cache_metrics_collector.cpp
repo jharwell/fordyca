@@ -56,11 +56,12 @@ bool cache_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void cache_metrics_collector::collect(
-    const collectible_metrics::cache_metrics& metrics) {
+    const collectible_metrics::base_collectible_metrics& metrics) {
 
-  m_stats.total_blocks += metrics.n_blocks();
-  m_stats.total_pickups += metrics.n_block_pickups();
-  m_stats.total_drops += metrics.n_block_drops();
+  auto& m = static_cast<const collectible_metrics::cache_metrics&>(metrics);
+  m_stats.total_blocks += m.n_blocks();
+  m_stats.total_pickups += m.n_block_pickups();
+  m_stats.total_drops += m.n_block_drops();
   m_new_data = true;
 } /* collect() */
 

@@ -52,7 +52,8 @@ NS_START(collectors);
 class base_metric_collector {
  public:
   base_metric_collector(const std::string ofname, bool collect_cum) :
-      m_collect_cum(collect_cum), m_ofname(ofname), m_separator(";"),
+      m_collect_cum(collect_cum), m_use_interval(false), m_interval(-1),
+      m_timestep(0), m_ofname(ofname), m_separator(";"),
       m_ofile() {}
 
   virtual ~base_metric_collector(void) {}
@@ -67,9 +68,15 @@ class base_metric_collector {
   /**
    * @brief Reset some metrics (possibly).
    *
-   * Can be called every timestep. By default it does nothing.
+   * Can be called at the end of every interval. By default it does nothing.
    */
-  virtual void reset_on_timestep(void) {}
+  virtual void reset_after_interval(void) {}
+
+  virtual void reset_after_timestep(void) {}
+
+  void interval_reset(void);
+  void timestep_inc(void) { ++m_timestep; }
+  void timestep_reset(void) { reset_after_timestep(); }
 
   /**
    * @brief Write out the gathered metrics.
@@ -82,6 +89,9 @@ class base_metric_collector {
    * @brief Finalize metrics and flush files.
    */
   void finalize(void) { m_ofile.close(); }
+
+  void use_interval(bool use_interval) { m_use_interval = use_interval; }
+  void interval(int interval) { m_interval = interval; }
 
  protected:
   /**
@@ -106,8 +116,10 @@ class base_metric_collector {
    */
   virtual bool csv_line_build(std::string& line) = 0;
 
+  virtual void collect(const collectible_metrics::base_collectible_metrics& metrics) = 0;
+
   /**
-   * @brief Write out the default header, when only contains "clock;"
+   * @brief Write out the default header, which only contains "clock;"
    */
   void csv_header_write(void);
 
@@ -116,6 +128,9 @@ class base_metric_collector {
 
  private:
   bool          m_collect_cum;
+  bool          m_use_interval;
+  int           m_interval;
+  uint          m_timestep;
   std::string   m_ofname;
   std::string   m_separator;
   std::ofstream m_ofile;
