@@ -45,18 +45,16 @@ NS_START(collectors);
  *
  * @brief Collector for \ref block_metrics.
  *
- * Metrics are not written out until at least 1 block has been collected.
+ * Metrics are written out at the specified interval.
  */
 class block_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<block_metrics_collector> {
  public:
   block_metrics_collector(const std::string ofname,
-                          bool collect_cum,
                           uint collect_interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void reset_after_timestep(void) override;
   void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
   size_t cum_collected(void) const { return m_metrics.cum_collected; }
 
@@ -64,7 +62,6 @@ class block_metrics_collector : public base_metric_collector,
   struct block_metrics {
     size_t cum_collected; /* aggregate across blocks, not reset each timestep*/
     size_t cum_carries; /* aggregate across blocks, not reset each timstep */
-    size_t block_carries; /* carries for most recently collected block */
   };
 
   std::string csv_header_build(const std::string& header = "") override;

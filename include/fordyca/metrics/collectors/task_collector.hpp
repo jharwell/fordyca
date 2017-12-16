@@ -40,7 +40,7 @@ NS_START(fordyca, metrics, collectors);
  *
  * @brief Collector for \ref task_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics are written out at the specified interval.
  */
 class task_collector : public base_metric_collector {
  public:

@@ -229,7 +229,6 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
   m_block_collector.reset(new collectors::block_metrics_collector(
       m_metrics_path + "/" + p_output->metrics.block_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval));
 
   m_distance_collector.reset(new robot_collectors::distance_metrics_collector(

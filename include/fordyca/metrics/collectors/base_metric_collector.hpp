@@ -76,6 +76,8 @@ class base_metric_collector {
 
   void interval_reset(void);
   void timestep_inc(void) { ++m_timestep; }
+  uint timestep(void) const { return m_timestep; }
+
   void timestep_reset(void) { reset_after_timestep(); }
 
   /**
@@ -92,6 +94,7 @@ class base_metric_collector {
 
   void use_interval(bool use_interval) { m_use_interval = use_interval; }
   void interval(int interval) { m_interval = interval; }
+  int interval(void) const { return m_interval; }
 
  protected:
   /**

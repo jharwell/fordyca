@@ -94,7 +94,7 @@
           task_fname="task-stats.csv"
           n_robots="20"
           collect_cum="true"
-          collect_interval="100"
+          collect_interval="750"
           />
     </output>
     <arena_map>
