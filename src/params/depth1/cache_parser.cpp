@@ -35,14 +35,13 @@ NS_START(fordyca, params, depth1);
 void cache_parser::parse(argos::TConfigurationNode& node) {
   m_params.reset(new struct cache_params);
 
-  argos::TConfigurationNode bnode = argos::GetNode(node, "caches");
-  argos::GetNodeAttribute(bnode, "dimension", m_params->dimension);
-  argos::GetNodeAttribute(bnode, "min_dist", m_params->min_dist);
-  argos::GetNodeAttribute(bnode, "static_size", m_params->static_size);
-  argos::GetNodeAttribute(bnode, "usage_penalty", m_params->usage_penalty);
-  argos::GetNodeAttribute(bnode, "create_static", m_params->create_static);
-  argos::GetNodeAttribute(bnode, "create_dynamic", m_params->create_dynamic);
-  argos::GetNodeAttribute(bnode, "static_respawn_scale_factor",
+  argos::GetNodeAttribute(node, "dimension", m_params->dimension);
+  argos::GetNodeAttribute(node, "min_dist", m_params->min_dist);
+  argos::GetNodeAttribute(node, "static_size", m_params->static_size);
+  argos::GetNodeAttribute(node, "usage_penalty", m_params->usage_penalty);
+  argos::GetNodeAttribute(node, "create_static", m_params->create_static);
+  argos::GetNodeAttribute(node, "create_dynamic", m_params->create_dynamic);
+  argos::GetNodeAttribute(node, "static_respawn_scale_factor",
                           m_params->static_respawn_scale_factor);
 } /* parse() */
 

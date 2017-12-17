@@ -38,7 +38,8 @@
 namespace rcppsw { namespace er { class server; }}
 
 NS_START(fordyca);
-namespace params { struct perceived_grid_params; }
+namespace params { namespace depth0 { struct perceived_arena_map_params; }}
+
 NS_START(representation);
 class line_of_sight;
 
@@ -60,7 +61,7 @@ class perceived_arena_map: public rcppsw::er::client,
                            public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
   perceived_arena_map(const std::shared_ptr<rcppsw::er::server>& server,
-                      const struct params::perceived_grid_params* params,
+                      const struct params::depth0::perceived_arena_map_params* params,
                       const std::string& robot_id);
 
   /**

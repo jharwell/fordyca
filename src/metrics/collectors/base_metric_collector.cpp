@@ -34,7 +34,7 @@ NS_START(fordyca, metrics, collectors);
 void base_metric_collector::csv_line_write(uint timestep) {
   std::string line;
   if (csv_line_build(line)) {
-    m_ofile << std::to_string(timestep) + ";" +
+    m_ofile << std::to_string(timestep) + m_separator +
         line << std::endl;
   }
 } /* csv_line_write() */
@@ -45,7 +45,7 @@ void base_metric_collector::csv_header_write(void) {
 } /* csv_header_write() */
 
 std::string base_metric_collector::csv_header_build(const std::string& header) {
-  return header + "clock;";
+  return header + "clock" + m_separator;
 } /* csv_header_build() */
 
 void base_metric_collector::reset(void) {
@@ -56,5 +56,11 @@ void base_metric_collector::reset(void) {
   m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
   csv_header_write();
 } /* reset() */
+
+void base_metric_collector::interval_reset(void) {
+  if (m_use_interval && (m_timestep % m_interval == 0)) {
+    reset_after_interval();
+  }
+} /* interval_reset() */
 
 NS_END(collectors, metrics, fordyca);

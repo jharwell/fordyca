@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <assert.h>
 #include <utility>
+
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
@@ -65,12 +67,10 @@ class block : public cell_entity,
   /**
    * @brief Reset the state of the block (i.e. not carried by a robot anymore).
    */
-  void reset(void) { m_carries = 0; m_robot_index = -1; }
+  void reset_index(void) { m_robot_index = -1; }
 
-  void move_out_of_sight(void) {
-    real_loc(argos::CVector2(100.0, 100.0));
-    discrete_loc(discrete_coord(100, 100));
-  }
+  void move_out_of_sight(void);
+  void reset_carries(void) { m_carries = 0; }
 
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block

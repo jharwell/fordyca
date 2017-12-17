@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file perceived_arena_map_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,11 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,13 +30,22 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Member Functions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>("output");
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-}
+void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct perceived_arena_map_params);
+  argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
+
+  m_grid_parser.parse(argos::GetNode(pnode, "grid"));
+  m_pheromone_parser.parse(argos::GetNode(pnode, "pheromone"));
+  m_params->grid = *m_grid_parser.get_results();
+  m_params->pheromone = *m_pheromone_parser.get_results();
+} /* parse() */
+
+void perceived_arena_map_parser::show(std::ostream& stream) {
+  stream << "====================\nPerceived arena_map params\n====================\n";
+  m_grid_parser.show(stream);
+  m_pheromone_parser.show(stream);
+} /* show() */
 
 NS_END(depth0, params, fordyca);

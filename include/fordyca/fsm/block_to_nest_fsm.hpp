@@ -154,6 +154,8 @@ class block_to_nest_fsm : public base_foraging_fsm,
   };
 
  private:
+  constexpr static uint kPICKUP_TIMEOUT = 100;
+
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
                      state_machine::event_data);
@@ -179,6 +181,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm(const block_to_nest_fsm& fsm) = delete;
   block_to_nest_fsm& operator=(const block_to_nest_fsm& fsm) = delete;
 
+  uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   depth1::acquire_cache_fsm                             m_cache_fsm;

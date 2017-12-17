@@ -24,7 +24,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const struct params::perceived_grid_params* params,
+    const struct params::depth0::perceived_arena_map_params* params,
     const std::string& robot_id) :
     m_server(server),
     m_grid(params->grid.resolution, params->grid.upper.GetX(),
@@ -53,9 +53,10 @@ perceived_arena_map::perceived_arena_map(
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       perceived_cell2D& cell = m_grid.access(i, j);
-      cell.rho(params->pheromone_rho);
+      cell.pheromone_rho(params->pheromone.rho);
+      cell.pheromone_repeat_deposit(params->pheromone.repeat_deposit);
       cell.robot_id(robot_id);
-      cell.cell().loc(discrete_coord(i, j));
+      cell.decoratee().loc(discrete_coord(i, j));
     } /* for(j..) */
   } /* for(i..) */
 }
@@ -78,26 +79,35 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
 
 std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
   std::list<perceived_cache> pcaches;
+
   for (auto& c : m_caches) {
     representation::perceived_cache p(&c,
                                       m_grid.access(c.discrete_loc().first,
                                                     c.discrete_loc().second).density());
     pcaches.push_back(p);
   } /* for(c..) */
-
   return pcaches;
 } /* caches() */
 
 void perceived_arena_map::update_density(void) {
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      m_grid.access(i, j).update_density();
+      m_grid.access(i, j).density_update();
     } /* for(j..) */
   } /* for(i..) */
 } /* update_density() */
 
 void perceived_arena_map::cache_add(representation::cache& cache) {
-  m_caches.push_back(cache);
+  /*
+   * If the cache is already in our list of caches we know about it needs to be
+   * removed, because the new version we just got from our LOS is more up to
+   * date.
+   */
+  auto it = std::find(m_caches.begin(), m_caches.end(), cache);
+  if (m_caches.end() != it) {
+    cache_remove(*it);
+  }
+    m_caches.push_back(cache);
 } /* cache_add() */
 
 void perceived_arena_map::cache_remove(representation::cache& victim) {

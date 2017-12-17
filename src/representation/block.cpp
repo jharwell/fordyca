@@ -1,5 +1,5 @@
 /**
- * @file perceived_grid_parser.hpp
+ * @file block.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,40 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
+#include <assert.h>
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
-/*******************************************************************************
- * Class Definitions
+/***********************e*******************************************************
+ * Member Functions
  ******************************************************************************/
-class perceived_grid_parser: public rcppsw::common::xml_param_parser {
- public:
-  perceived_grid_parser(void): m_params(), m_grid_parser() {}
+void block::move_out_of_sight(void) {
+  real_loc(argos::CVector2(100.0, 100.0));
+  discrete_loc(discrete_coord(100, 100));
+} /* move_out_of_sight() */
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct perceived_grid_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct perceived_grid_params> m_params;
-  grid_parser m_grid_parser;
-};
-
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARSER_HPP_ */
+NS_END(representation, fordyca);

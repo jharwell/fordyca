@@ -43,8 +43,6 @@ void task_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(task_node, "abort_offset", m_params->tasks.abort_offset);
   argos::GetNodeAttribute(task_node, "partition_reactivity", m_params->tasks.partition_reactivity);
   argos::GetNodeAttribute(task_node, "partition_offset", m_params->tasks.partition_offset);
-  argos::GetNodeAttribute(task_node, "proportionality_estimate",
-                          m_params->tasks.proportionality_estimate);
   argos::GetNodeAttribute(task_node, "subtask_selection_method",
                           m_params->tasks.subtask_selection_method);
   argos::GetNodeAttribute(task_node, "partition_method",
@@ -60,7 +58,6 @@ void task_parser::show(std::ostream& stream) {
   stream << "abort_offset=" << m_params->tasks.abort_offset << std::endl;
   stream << "partition_reactivity=" << m_params->tasks.partition_reactivity << std::endl;
   stream << "partition_offset=" << m_params->tasks.partition_offset << std::endl;
-  stream << "proportionality_estimate=" << m_params->tasks.proportionality_estimate << std::endl;
   stream << "subtask_selection_method=" << m_params->tasks.subtask_selection_method << std::endl;
   stream << "partition_method=" << m_params->tasks.partition_method << std::endl;
   stream << "init_random_estimates=" << m_params->init_random_estimates << std::endl;

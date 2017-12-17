@@ -38,7 +38,6 @@ foraging_sensors::foraging_sensors(
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
     base_foraging_sensors(params, rabs, proximity, light, ground),
-    m_tick(0),
     m_los() {}
 
 NS_END(depth0, controller, fordyca);

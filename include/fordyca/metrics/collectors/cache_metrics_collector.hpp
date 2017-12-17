@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca, metrics);
 
-namespace collectible_metrics { class cache_metrics; }
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors);
@@ -52,11 +51,11 @@ NS_START(collectors);
 class cache_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<cache_metrics_collector> {
  public:
-  explicit cache_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_new_data(false), m_stats() {}
+  cache_metrics_collector(const std::string ofname) :
+      base_metric_collector(ofname, false), m_new_data(false), m_stats() {}
 
   void reset(void) override;
-  void collect(const collectible_metrics::cache_metrics& metrics);
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
 
  private:
   struct stats {

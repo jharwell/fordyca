@@ -30,11 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-
-namespace collectible_metrics { class task_metrics; }
-
-NS_START(collectors);
+NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
  * Class Definitions
@@ -44,16 +40,18 @@ NS_START(collectors);
  *
  * @brief Collector for \ref task_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics are written out at the specified interval.
  */
 class task_collector : public base_metric_collector {
  public:
-  explicit task_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  task_collector(const std::string ofname,
+                 bool collect_cum,
+                 uint collect_interval);
 
   void reset(void) override;
-  void collect(const collectible_metrics::task_metrics& metrics);
-  void reset_on_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  void reset_after_interval(void) override;
+  void reset_after_timestep(void) override;
 
   size_t n_collectors(void) const { return m_stats.n_collectors; }
   size_t n_foragers(void) const { return m_stats.n_foragers; }
@@ -64,6 +62,9 @@ class task_collector : public base_metric_collector {
     size_t n_collectors;
     size_t n_foragers;
     size_t n_generalists;
+    size_t n_cum_collectors;
+    size_t n_cum_foragers;
+    size_t n_cum_generalists;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

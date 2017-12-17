@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file pheromone_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_PHEROMONE_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_PHEROMONE_PARSER_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params/depth0/pheromone_params.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,13 +36,22 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>("output");
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-}
+class pheromone_parser: public rcppsw::common::xml_param_parser {
+ public:
+  pheromone_parser(void): m_params() {}
+
+  void parse(argos::TConfigurationNode& node) override;
+  const struct pheromone_params* get_results(void) override {
+    return m_params.get();
+  }
+  void show(std::ostream& stream) override;
+
+ private:
+  std::unique_ptr<struct pheromone_params> m_params;
+};
 
 NS_END(depth0, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_PHEROMONE_PARSER_HPP_ */

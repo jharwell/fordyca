@@ -90,8 +90,8 @@ void free_block_pickup::visit(representation::arena_map& map) {
  * Stateless Foraging
  ******************************************************************************/
 void free_block_pickup::visit(representation::block& block) {
-  block.add_carry();
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
+  block.add_carry();
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */
@@ -108,7 +108,6 @@ void free_block_pickup::visit(controller::depth0::stateless_foraging_controller&
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
-  ER_NOM("stateless_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -117,7 +116,7 @@ void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
  * Stateful Foraging
  ******************************************************************************/
 void free_block_pickup::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(representation::perceived_arena_map& map) {
@@ -132,7 +131,6 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
-  ER_NOM("depth0_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -167,13 +165,11 @@ void free_block_pickup::visit(tasks::forager& task) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {
-  ER_NOM("block_to_cache_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
-  ER_NOM("block_to_nest_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

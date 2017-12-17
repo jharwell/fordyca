@@ -1,5 +1,5 @@
 /**
- * @file perceived_grid_parser.cpp
+ * @file pheromone_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,30 +21,26 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/perceived_grid_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/params/depth0/pheromone_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_grid_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct perceived_grid_params);
-
-  m_grid_parser.parse(node);
-  m_params->grid = *m_grid_parser.get_results();
-  m_params->pheromone_rho = std::atof(
-      argos::GetNode(node, "grid").GetAttribute("pheromone_rho").c_str());
+void pheromone_parser::parse(argos::TConfigurationNode& node) {
+  m_params.reset(new struct pheromone_params);
+  m_params->rho = std::atof(node.GetAttribute("rho").c_str());
+  argos::GetNodeAttribute(node, "repeat_deposit", m_params->repeat_deposit);
 } /* parse() */
 
-void perceived_grid_parser::show(std::ostream& stream) {
-  stream << "====================\nPerceived grid params\n====================\n";
-  m_grid_parser.show(stream);
-  stream << "pheromone_rho=" << m_params->pheromone_rho << std::endl;
+void pheromone_parser::show(std::ostream& stream) {
+  stream << "====================\nPheromone params\n====================\n";
+  stream << "rho=" << m_params->rho << std::endl;
+  stream << "repeat_deposit=" << m_params->repeat_deposit << std::endl;
 } /* show() */
 
-NS_END(params, fordyca);
+NS_END(depth0, params, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file perceived_arena_map_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
+#include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/grid_params.hpp"
+#include "fordyca/params/depth0/pheromone_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,13 +34,15 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>("output");
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-}
+struct perceived_arena_map_params : public rcppsw::common::base_params {
+  perceived_arena_map_params(void) : grid(), pheromone() {}
+
+  struct grid_params grid;
+  struct pheromone_params pheromone;
+};
 
 NS_END(depth0, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_ */

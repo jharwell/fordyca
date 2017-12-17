@@ -35,8 +35,9 @@ NS_START(fordyca, events);
  * Member Functions
  ******************************************************************************/
 void cell_unknown::visit(representation::perceived_cell2D& cell) {
-  cell.cell().accept(*this);
+  cell.decoratee().accept(*this);
 } /* visit() */
+
 void cell_unknown::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);

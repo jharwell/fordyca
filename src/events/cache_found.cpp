@@ -51,9 +51,27 @@ cache_found::~cache_found(void) { client::rmmod(); }
  * Depth1 Foraging
  ******************************************************************************/
 void cache_found::visit(representation::perceived_cell2D& cell) {
-  cell.add_pheromone(1.0);
-  cell.update_density();
-  cell.cell().accept(*this);
+  /*
+   * Update the pheromone density associated with the cell BEFORE updating the
+   * state of the cell.
+   *
+   * It is possible that this cache found event was generated because we
+   * previous had a block in our LOS and now the cell that it was on is now
+   * occupied by a cache (either because we were near the static cache in the
+   * arena, or because someone else dropped a block near to this one).In that
+   * case, the cell will still be in the HAS_BLOCK state until the event is
+   * propagated all the way through, and we can use that to reset the pheromone
+   * density for the cell, which may be very high. Should be reset to 1.0 for a
+   * newly discovered cache.
+   */
+  if (cell.state_has_block()) {
+    cell.density_reset();
+  }
+  if (!cell.state_has_cache() || (cell.state_has_cache() &&
+                                  cell.pheromone_repeat_deposit())) {
+    cell.pheromone_add(1.0);
+  }
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void cache_found::visit(representation::cell2D& cell) {
@@ -80,7 +98,7 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {
-  map.caches().push_back(*m_cache);
+  map.cache_add(*m_cache);
   m_cache = &map.caches().back();
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */

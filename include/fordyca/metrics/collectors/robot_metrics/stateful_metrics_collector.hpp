@@ -30,11 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-
-namespace collectible_metrics { namespace robot_metrics { class stateful_metrics; } }
-
-NS_START(collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,17 +44,22 @@ NS_START(collectors, robot_metrics);
  */
 class stateful_metrics_collector : public base_metric_collector {
  public:
-  explicit stateful_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  stateful_metrics_collector(const std::string ofname,
+                             bool collect_cum,
+                             uint collect_interval);
 
   void reset(void) override;
-  void collect(const collectible_metrics::robot_metrics::stateful_metrics& metrics);
-  void reset_on_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  void reset_after_interval(void) override;
+  void reset_after_timestep(void) override;
 
  private:
   struct stats {
     size_t n_acquiring_block;
     size_t n_vectoring_to_block;
+
+    size_t n_cum_acquiring_block;
+    size_t n_cum_vectoring_to_block;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

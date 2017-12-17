@@ -42,6 +42,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void) :
+    base_foraging_controller(),
     m_fsm() {}
 
 /*******************************************************************************
@@ -59,14 +60,17 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
   m_fsm.reset(
       new fsm::depth0::stateless_foraging_fsm(static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
-                                   base_foraging_controller::server(),
-                                   base_foraging_controller::sensors(),
-                                   base_foraging_controller::actuators()));
+                                              base_foraging_controller::server(),
+                                              base_foraging_controller::sensors(),
+                                              base_foraging_controller::actuators()));
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 
 void stateless_foraging_controller::Reset(void) {
-  m_fsm->init();
+  base_foraging_controller::Reset();
+  if (m_fsm) {
+    m_fsm->init();
+  }
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {

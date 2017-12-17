@@ -30,11 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-
-namespace collectible_metrics { namespace robot_metrics { class depth1_metrics; } }
-
-NS_START(collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, robot_metrics);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,12 +44,14 @@ NS_START(collectors, robot_metrics);
  */
 class depth1_metrics_collector : public base_metric_collector {
  public:
-  explicit depth1_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_stats() {}
+  depth1_metrics_collector(const std::string ofname,
+                           bool collect_cum,
+                           uint collect_interval);
 
   void reset(void) override;
-  void collect(const collectible_metrics::robot_metrics::depth1_metrics& metrics);
-  void reset_on_timestep(void) override;
+  void reset_after_interval(void) override;
+  void reset_after_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
 
  private:
   struct stats {
@@ -61,6 +59,11 @@ class depth1_metrics_collector : public base_metric_collector {
     size_t n_vectoring_to_cache;
     size_t n_acquiring_cache;
     size_t n_transporting_to_cache;
+
+    size_t n_cum_exploring_for_cache;
+    size_t n_cum_vectoring_to_cache;
+    size_t n_cum_acquiring_cache;
+    size_t n_cum_transporting_to_cache;
   };
 
   std::string csv_header_build(const std::string& header = "") override;

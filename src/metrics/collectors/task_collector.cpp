@@ -30,34 +30,85 @@
 NS_START(fordyca, metrics, collectors);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+task_collector::task_collector(const std::string ofname,
+                               bool collect_cum,
+                               uint collect_interval) :
+    base_metric_collector(ofname, collect_cum), m_stats() {
+  if (collect_cum) {
+    use_interval(true);
+    interval(collect_interval);
+  }
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string task_collector::csv_header_build(const std::string& header) {
-  return base_metric_collector::csv_header_build(header) +
-      "n_collectors;n_foragers;n_generalists";
+  if (collect_cum()) {
+    return base_metric_collector::csv_header_build(header) +
+        "n_collectors"  + separator() +
+        "n_cum_collectors"  + separator() +
+        "n_foragers" + separator() +
+        "n_cum_foragers" + separator() +
+        "n_generalists" + separator() +
+        "n_cum_generalists" + separator();
+
+  } else {
+    return base_metric_collector::csv_header_build(header) +
+        "n_collectors"  + separator() +
+        "n_foragers" + separator() +
+        "n_generalists" + separator();
+  }
 } /* csv_header_build() */
 
 void task_collector::reset(void) {
   base_metric_collector::reset();
-  reset_on_timestep();
+  reset_after_interval();
+  reset_after_timestep();
 } /* reset() */
 
 void task_collector::collect(
-    const collectible_metrics::task_metrics& metrics) {
-  m_stats.n_collectors += metrics.task_name() == "collector";
-  m_stats.n_foragers += metrics.task_name() == "forager";
-  m_stats.n_generalists += metrics.task_name() == "generalist";
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = static_cast<const collectible_metrics::task_metrics&>(metrics);
+  m_stats.n_collectors += m.task_name() == "collector";
+  m_stats.n_foragers += m.task_name() == "forager";
+  m_stats.n_generalists += m.task_name() == "generalist";
+
+  if (collect_cum()) {
+    m_stats.n_cum_collectors += m.task_name() == "collector";
+    m_stats.n_cum_foragers += m.task_name() == "forager";
+    m_stats.n_cum_generalists += m.task_name() == "generalist";
+  }
 } /* collect() */
 
 bool task_collector::csv_line_build(std::string& line) {
-  line = std::to_string(m_stats.n_collectors) + ";" +
-         std::to_string(m_stats.n_foragers) + ";" +
-         std::to_string(m_stats.n_generalists);
+  if (collect_cum()) {
+    line = std::to_string(m_stats.n_collectors) + separator() +
+           std::to_string(m_stats.n_cum_collectors) + separator() +
+           std::to_string(m_stats.n_foragers) + separator() +
+           std::to_string(m_stats.n_cum_foragers) + separator() +
+           std::to_string(m_stats.n_generalists) + separator() +
+           std::to_string(m_stats.n_cum_generalists) + separator();
+  } else {
+    line = std::to_string(m_stats.n_collectors) + separator() +
+           std::to_string(m_stats.n_foragers) + separator() +
+           std::to_string(m_stats.n_generalists) + separator();
+  }
   return true;
 } /* store_foraging_stats() */
 
-void task_collector::reset_on_timestep(void) {
-  m_stats = {0, 0, 0};
-} /* reset_on_timestep() */
+void task_collector::reset_after_timestep(void) {
+  m_stats.n_collectors = 0;
+  m_stats.n_foragers = 0;
+  m_stats.n_generalists = 0;
+} /* reset_after_timestep() */
+
+void task_collector::reset_after_interval(void) {
+  m_stats.n_cum_collectors = 0;
+  m_stats.n_cum_foragers = 0;
+  m_stats.n_cum_generalists = 0;
+} /* reset_after_interval() */
 
 NS_END(collectors, metrics, fordyca);

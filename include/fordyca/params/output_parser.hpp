@@ -1,5 +1,5 @@
 /**
- * @file perceived_grid_params.hpp
+ * @file output_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/grid_params.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/params/output_params.hpp"
+#include "fordyca/params/metrics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,15 +37,23 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-struct perceived_grid_params : public rcppsw::common::base_params {
-  perceived_grid_params(void) : grid(), pheromone_rho(0.0) {}
+class output_parser: public rcppsw::common::xml_param_parser {
+ public:
+  output_parser(void): m_params(), m_metrics_parser() {}
 
-  struct grid_params grid;
-  double pheromone_rho;
+  void parse(argos::TConfigurationNode& node) override;
+  const struct output_params* get_results(void) override {
+    return m_params.get();
+  }
+  void show(std::ostream& stream) override;
+
+ private:
+  std::unique_ptr<struct output_params> m_params;
+  metrics_parser m_metrics_parser;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_PERCEIVED_GRID_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_ */

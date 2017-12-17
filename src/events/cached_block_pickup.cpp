@@ -74,7 +74,7 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
-  if (!cell.fsm().state_has_cache()) {
+  if (!cell.state_has_cache()) {
       cell.entity(m_orphan_block);
   }
 } /* visit() */
@@ -86,7 +86,7 @@ void cached_block_pickup::visit(representation::cache& cache) {
 
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
-  cell.cell().accept(*this);
+  cell.decoratee().accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {
@@ -178,8 +178,8 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block& block) {
-  block.add_carry();
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
+  block.add_carry();
   block.robot_index(m_robot_index);
 
   /* Move block out of sight */
@@ -196,12 +196,12 @@ void cached_block_pickup::visit(controller::depth1::foraging_controller& control
          controller.GetId().c_str(), m_pickup_block->id());
 } /* visit() */
 
-void cached_block_pickup::visit(tasks::collector& task) {
+void cached_block_pickup::visit(tasks::collector& task)
+{
   static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
-  ER_NOM("block_to_nest_fsm: register cached_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

@@ -39,7 +39,6 @@ block_distributor::block_distributor(argos::CRange<double> arena_x,
                                      argos::CRange<double> nest_y,
                                      const struct params::block_params* params) :
     m_dist_model(params->dist_model),
-    m_respawn(params->respawn),
     m_arena_x(arena_x),
     m_arena_y(arena_y),
     m_nest_x(nest_x),
@@ -50,11 +49,8 @@ block_distributor::block_distributor(argos::CRange<double> arena_x,
  * Member Functions
  ******************************************************************************/
 bool block_distributor::distribute_block(const representation::block& block,
-                                         bool first_time,
                                          argos::CVector2* const coord) {
-  if (!m_respawn && !first_time) {
-    return false;
-  } else if (m_dist_model == "random") {
+  if (m_dist_model == "random") {
     *coord = dist_random(block);
     return true;
   } else if (m_dist_model == "single_source") {

@@ -56,10 +56,8 @@ nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::er::server>& serv
  ******************************************************************************/
 void nest_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
-  int index = m_block->robot_index();
-  map.distribute_block(m_block, false);
+  map.distribute_block(m_block);
   m_block->accept(*this);
-  ER_NOM("fb%d dropped block%d in nest", index, m_block->id());
 } /* visit() */
 
 void nest_block_drop::visit(metrics::collectors::block_metrics_collector& collector) {
@@ -70,19 +68,18 @@ void nest_block_drop::visit(metrics::collectors::block_metrics_collector& collec
  * Stateless Foraging
  ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
-  block.reset();
+  block.reset_index();
+  block.reset_carries();
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::stateless_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(nullptr);
-  ER_NOM("stateless_foraging_controller: %s dropped block%d in nest",
-         controller.GetId().c_str(), m_block->id());
+  ER_NOM("stateless_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 
 
 void nest_block_drop::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
-  ER_NOM("stateless_foraging_fsm: register nest_block_drop event");
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -93,12 +90,10 @@ void nest_block_drop::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
 void nest_block_drop::visit(controller::depth0::stateful_foraging_controller& controller) {
   controller.current_task()->accept(*this);
   controller.block(nullptr);
-  ER_NOM("stateful_foraging_controller: %s dropped block%d in nest",
-         controller.GetId().c_str(), m_block->id());
+  ER_NOM("stateful_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
-  ER_NOM("stateful_foraging_fsm: register nest_block_drop event");
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -110,8 +105,7 @@ void nest_block_drop::visit(controller::depth1::foraging_controller& controller)
   controller.block(nullptr);
   controller.current_task()->accept(*this);
 
-  ER_NOM("depth1_foraging_controller: %s dropped block%d in nest",
-         controller.GetId().c_str(), m_block->id());
+  ER_NOM("depth1_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 
 void nest_block_drop::visit(tasks::generalist& task) {
@@ -123,7 +117,6 @@ void nest_block_drop::visit(tasks::collector& task) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::block_to_nest_fsm& fsm) {
-  ER_NOM("block_to_nest_fsm: register nest_block_drop event");
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

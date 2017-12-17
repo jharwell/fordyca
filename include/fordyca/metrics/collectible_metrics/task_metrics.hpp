@@ -27,6 +27,7 @@
 #include <string>
 
 #include "rcppsw/common/common.hpp"
+#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, metrics, collectible_metrics);
  *
  * @brief Interface defining metrics that can be collected on running tasks.
  */
-class task_metrics {
+class task_metrics : public base_collectible_metrics {
  public:
   task_metrics(void) {}
   virtual ~task_metrics(void) {}

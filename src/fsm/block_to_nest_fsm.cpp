@@ -55,6 +55,7 @@ block_to_nest_fsm::block_to_nest_fsm(
     HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
     entry_wait_for_pickup(),
+    m_pickup_count(0),
     m_sensors(sensors),
     m_block_fsm(params, server, sensors, actuators, map),
     m_cache_fsm(params, server, sensors, actuators, map),
@@ -111,7 +112,26 @@ HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {
 HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_block_pickup, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_block_fsm.task_reset();
+    m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_NEST);
+  }
+  /*
+   * It is possible that robots can be waiting in this wait indefinitely for a
+   * block pickup signal that will never come if they got here by "detecting" a
+   * block by sprawling across multiple blocks (i.e. all ground sensors did not
+   * detect the same block). This is only a problem for generalists, who
+   * cannot/do not abort their tasks.
+   *
+   * In that case, the timeout here will cause the robot to try again, and
+   * because of the decaying relevance of cells, it will eventually pick a
+   * different block than the one that got it into this predicament, and the
+   * system will be able to continue profitably.
+   */
+  ++m_pickup_count;
+  if (m_pickup_count >= kPICKUP_TIMEOUT) {
+    m_pickup_count = 0;
+    m_block_fsm.task_reset();
+    internal_event(ST_ACQUIRE_FREE_BLOCK);
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -183,7 +203,7 @@ bool block_to_nest_fsm::cache_acquired(void) const {
 
 bool block_to_nest_fsm::block_acquired(void) const {
   return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-} /* cache_acquired() */
+} /* block_acquired() */
 
 void block_to_nest_fsm::init(void) {
   base_foraging_fsm::init();

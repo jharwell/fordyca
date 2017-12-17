@@ -24,6 +24,7 @@
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,6 +52,8 @@ block_to_cache_fsm::block_to_cache_fsm(
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+    entry_wait_for_pickup(),
+    m_pickup_count(0),
     m_sensors(sensors),
     m_block_fsm(params, server,
                 std::static_pointer_cast<controller::depth0::foraging_sensors>(sensors),
@@ -58,9 +61,11 @@ block_to_cache_fsm::block_to_cache_fsm(
     m_cache_fsm(params, server, sensors, actuators, map),
     mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
       HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
-      HFSM_STATE_MAP_ENTRY_EX(&wait_for_block_pickup),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup, NULL,
+                                  &entry_wait_for_pickup, NULL),
       HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
-      HFSM_STATE_MAP_ENTRY_EX(&wait_for_cache_drop),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_drop, NULL,
+                                  &entry_wait_for_pickup, NULL),
       HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
                                   &entry_collision_avoidance, NULL),
       HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
@@ -89,7 +94,6 @@ HFSM_STATE_DEFINE_ND(block_to_cache_fsm, acquire_free_block) {
 }
 
 HFSM_STATE_DEFINE_ND(block_to_cache_fsm, transport_to_cache) {
-
   if (m_cache_fsm.task_finished()) {
     m_cache_fsm.task_reset();
     internal_event(ST_WAIT_FOR_CACHE_DROP);
@@ -99,18 +103,45 @@ HFSM_STATE_DEFINE_ND(block_to_cache_fsm, transport_to_cache) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_block_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_block_pickup,
+                  state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.task_reset();
+    m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_CACHE);
   }
+  /*
+   * It is possible that robots can be waiting in this wait indefinitely for a
+   * block pickup signal that will never come if they got here by "detecting" a
+   * block by sprawling across multiple blocks (i.e. all ground sensors did not
+   * detect the same block). This is only a problem for generalists, who
+   * cannot/do not abort their tasks.
+   *
+   * In that case, the timeout here will cause the robot to try again, and
+   * because of the decaying relevance of cells, it will eventually pick a
+   * different block than the one that got it into this predicament, and the
+   * system will be able to continue profitably.
+   */
+  ++m_pickup_count;
+  if (m_pickup_count >= kPICKUP_TIMEOUT) {
+    m_pickup_count = 0;
+    m_block_fsm.task_reset();
+    internal_event(ST_ACQUIRE_FREE_BLOCK);
+  }
+
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_cache_drop, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_cache_fsm, wait_for_cache_drop,
+                  state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     internal_event(ST_FINISHED);
   }
   return controller::foraging_signal::HANDLED;
+}
+
+HFSM_ENTRY_DEFINE_ND(block_to_cache_fsm, entry_wait_for_pickup) {
+  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {
@@ -158,7 +189,7 @@ __pure bool block_to_cache_fsm::is_acquiring_cache(void) const {
 } /* is_acquiring_cache */
 
 __pure bool block_to_cache_fsm::is_transporting_to_cache(void) const {
-  return current_state() == ST_TRANSPORT_TO_CACHE || cache_acquired();
+  return current_state() == ST_TRANSPORT_TO_CACHE;
 }
 
 /*******************************************************************************
@@ -178,7 +209,8 @@ bool block_to_cache_fsm::block_acquired(void) const {
   return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
 } /* block_acquired() */
 
-void block_to_cache_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
+void block_to_cache_fsm::task_start(
+    const rcppsw::task_allocation::taskable_argument* const arg) {
   const tasks::foraging_signal_argument* const a =
       dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");

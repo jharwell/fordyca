@@ -59,7 +59,7 @@ NS_START(fordyca, representation);
 class cache : public cell_entity,
               public metrics::collectible_metrics::cache_metrics,
               public rcppsw::patterns::visitor::visitable_any<cache>,
-              public prototype::clonable {
+              public prototype::clonable<cache> {
  public:
   cache(double dimension, double resolution,
         argos::CVector2 center,
@@ -73,7 +73,7 @@ class cache : public cell_entity,
   void inc_block_pickups(void) { ++m_n_block_pickups; }
   void inc_block_drops(void) { ++m_n_block_drops; }
 
-  std::unique_ptr<prototype::clonable> clone(void) const override;
+  std::unique_ptr<cache> clone(void) const override;
 
   /**
    * @brief \c TRUE iff the cache contains the specified block.
@@ -94,10 +94,7 @@ class cache : public cell_entity,
   void block_remove(block* block);
   block* block_get(void) { return m_blocks.front(); }
 
-  __pure bool operator==(const cache &other) const {
-    return cell_entity::real_loc() == other.cell_entity::real_loc() &&
-        m_blocks == other.m_blocks;
-  }
+  __pure bool operator==(const cache &other) const;
 
  private:
   static int        m_next_id;

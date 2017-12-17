@@ -28,6 +28,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
-  block.reset();
+  block.reset_index();
   representation::discrete_coord d(cell_op::x(),cell_op::y());
   block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
   block.discrete_loc(d);
@@ -72,9 +73,23 @@ void free_block_drop::visit(representation::block& block) {
 
 void free_block_drop::visit(representation::arena_map& map) {
   representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+
+  /*
+   * @todo We should be able to handle dropping a block on a cell in any
+   * state. However, until we get to depth2, dropping a block onto a cell that
+   * already contains a single block (but not a cache) does not work, so we have
+   * to fudge it and just distribute the block. Failing to do this results
+   * robots that are carrying a block and that abort their current task causing
+   * the cell that the drop the block onto to go into a HAS_CACHE state, when
+   * the cell entity is not a cache.
+   *
+   * This was a terrible bug to track down.
+   */
   if (cell.state_has_cache()) {
     cache_block_drop op(m_server, m_block, cell.cache(), m_resolution);
     map.accept(op);
+  } else if (cell.state_has_block()) {
+    map.distribute_block(m_block);
   } else {
     cell.accept(*this);
   }

@@ -56,9 +56,9 @@ class stateless_foraging_fsm : public base_foraging_fsm,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const struct params::fsm_params* params,
-                      std::shared_ptr<rcppsw::er::server> server,
-                      std::shared_ptr<controller::base_foraging_sensors> sensors,
-                      std::shared_ptr<controller::actuator_manager> actuators);
+                         const std::shared_ptr<rcppsw::er::server>& server,
+                         std::shared_ptr<controller::base_foraging_sensors> sensors,
+                         std::shared_ptr<controller::actuator_manager> actuators);
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;

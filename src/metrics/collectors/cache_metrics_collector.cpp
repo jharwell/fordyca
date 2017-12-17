@@ -34,7 +34,9 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 std::string cache_metrics_collector::csv_header_build(const std::string& header) {
   return base_metric_collector::csv_header_build(header) +
-      "total_blocks;total_pickups;total_drops";
+      "total_blocks" + separator() +
+      "total_pickups"  + separator() +
+      "total_drops"  + separator();
 } /* csv_header_build() */
 
 void cache_metrics_collector::reset(void) {
@@ -46,19 +48,20 @@ bool cache_metrics_collector::csv_line_build(std::string& line) {
   if (!m_new_data) {
     return false;
   }
-  line = std::to_string(m_stats.total_blocks) + ";" +
-         std::to_string(m_stats.total_pickups) + ";" +
-         std::to_string(m_stats.total_drops) + ";";
+  line = std::to_string(m_stats.total_blocks) + separator() +
+         std::to_string(m_stats.total_pickups) + separator() +
+         std::to_string(m_stats.total_drops) + separator();
   m_new_data = false;
   return true;
 } /* csv_line_build() */
 
 void cache_metrics_collector::collect(
-    const collectible_metrics::cache_metrics& metrics) {
+    const collectible_metrics::base_collectible_metrics& metrics) {
 
-  m_stats.total_blocks += metrics.n_blocks();
-  m_stats.total_pickups += metrics.n_block_pickups();
-  m_stats.total_drops += metrics.n_block_drops();
+  auto& m = static_cast<const collectible_metrics::cache_metrics&>(metrics);
+  m_stats.total_blocks += m.n_blocks();
+  m_stats.total_pickups += m.n_block_pickups();
+  m_stats.total_drops += m.n_block_drops();
   m_new_data = true;
 } /* collect() */
 

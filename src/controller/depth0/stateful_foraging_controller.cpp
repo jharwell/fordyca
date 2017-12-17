@@ -33,7 +33,7 @@
 #include "rcppsw/task_allocation/task_params.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/perceived_grid_params.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
@@ -122,8 +122,8 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_map.reset(new representation::perceived_arena_map(
       server(),
-      static_cast<const struct params::perceived_grid_params*>(
-          param_repo.get_params("perceived_grid")),
+      static_cast<const struct params::depth0::perceived_arena_map_params*>(
+          param_repo.get_params("perceived_arena_map")),
       GetId()));
 
   m_sensors.reset(new depth1::foraging_sensors(
@@ -161,6 +161,18 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
 void stateful_foraging_controller::process_los(const representation::line_of_sight* const los) {
   for (auto block : los->blocks()) {
+    /*
+     * Right now, if a robot already knows about a block it does not take into
+     * account seeing it again in a subsequent timestep. This is mostly OK, I
+     * think, because blocks cannot change state in between observations (caches
+     * can, which is why cache_found events must always be processed).
+     *
+     * This does result in cells containing blocks to only have pheromone
+     * densities [0, 1], while caches can be much higher. Since we always do
+     * apples to apples comparisons, this is not an issue. However, it does mean
+     * that the pheromone decay rates for blocks/caches need to be different in
+     * order to be realistic.
+     */
     if (!m_map->access(block->discrete_loc()).state_has_block()) {
       events::block_found op(base_foraging_controller::server(), block,
                              block->discrete_loc().first,

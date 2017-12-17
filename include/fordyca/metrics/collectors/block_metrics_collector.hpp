@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca, metrics);
 
-namespace collectible_metrics { class block_metrics; }
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(collectors);
@@ -46,29 +45,27 @@ NS_START(collectors);
  *
  * @brief Collector for \ref block_metrics.
  *
- * Metrics are not written out until at least 1 block has been collected.
+ * Metrics are written out at the specified interval.
  */
 class block_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<block_metrics_collector> {
  public:
-  explicit block_metrics_collector(const std::string ofname) :
-      base_metric_collector(ofname), m_metrics() {}
+  block_metrics_collector(const std::string ofname,
+                          uint collect_interval);
 
   void reset(void) override;
-  void reset_on_timestep(void) override { m_metrics.block_carries = 0; }
-  void collect(const collectible_metrics::block_metrics& metrics);
-  size_t total_collected(void) const { return m_metrics.total_collected; }
+  void reset_after_interval(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  size_t cum_collected(void) const { return m_metrics.cum_collected; }
 
  private:
   struct block_metrics {
-    size_t total_collected; /* aggregate across blocks, not reset each timestep*/
-    size_t total_carries; /* aggregate across blocks, not reset each timstep */
-    size_t block_carries; /* for one block, reset each timestep */
+    size_t cum_collected; /* aggregate across blocks, not reset each timestep*/
+    size_t cum_carries; /* aggregate across blocks, not reset each timstep */
   };
 
   std::string csv_header_build(const std::string& header = "") override;
   bool csv_line_build(std::string& line) override;
-
   struct block_metrics m_metrics;
 };
 

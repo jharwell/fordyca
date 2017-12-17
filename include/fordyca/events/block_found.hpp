@@ -59,11 +59,11 @@ class block_found : public perceived_cell_op,
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_cell2D& cell) override;
-  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(controller::depth0::stateful_foraging_controller&) override {}
   void visit(representation::perceived_arena_map& map) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(controller::depth1::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been found.

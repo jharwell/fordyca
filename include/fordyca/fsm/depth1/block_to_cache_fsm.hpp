@@ -123,6 +123,8 @@ class block_to_cache_fsm : public base_foraging_fsm,
   };
 
  private:
+  constexpr static uint kPICKUP_TIMEOUT = 100;
+
   /* inherited states */
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
@@ -136,6 +138,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(block_to_cache_fsm, wait_for_cache_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_cache_fsm, finished);
+  HFSM_ENTRY_DECLARE_ND(block_to_cache_fsm, entry_wait_for_pickup);
 
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
@@ -144,6 +147,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
   block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
 
+  uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   acquire_cache_fsm                                     m_cache_fsm;

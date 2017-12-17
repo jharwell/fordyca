@@ -123,7 +123,6 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool task_aborted(void) const { return m_task_aborted; }
 
-
  private:
   void task_abort_cleanup(task_allocation::executable_task* const);
 

@@ -35,11 +35,6 @@ NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
- * Constants
- ******************************************************************************/
-uint vector_fsm::kCOLLISION_RECOVERY_TIME = 20;
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(uint frequent_collision_thresh,
@@ -126,7 +121,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
   double ang_speed = 0;
   double lin_speed = 0;
   if (data) {
-    m_goal_data = *data;
+      m_goal_data = *data;
+      ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
   if (m_sensors->calc_diffusion_vector(NULL)) {
