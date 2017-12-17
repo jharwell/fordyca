@@ -24,10 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/depth0/pheromone_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +42,8 @@ NS_START(fordyca, params, depth0);
  ******************************************************************************/
 class perceived_arena_map_parser: public rcppsw::common::xml_param_parser {
  public:
-  perceived_arena_map_parser(void): m_params(), m_grid_parser() {}
+  perceived_arena_map_parser(void): m_params(), m_grid_parser(),
+                                    m_pheromone_parser() {}
 
   void parse(argos::TConfigurationNode& node) override;
   const struct perceived_arena_map_params* get_results(void) override {
@@ -50,6 +54,7 @@ class perceived_arena_map_parser: public rcppsw::common::xml_param_parser {
  private:
   std::unique_ptr<struct perceived_arena_map_params> m_params;
   grid_parser m_grid_parser;
+  pheromone_parser m_pheromone_parser;
 };
 
 NS_END(depth0, params, fordyca);

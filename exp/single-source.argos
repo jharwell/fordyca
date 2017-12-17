@@ -23,7 +23,7 @@
   <controllers>
 
     <depth1_foraging_controller id="ffc"
-                         library="build/lib/libfordyca">
+                                library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -36,16 +36,17 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-    <output>
-      <robot
-           output_root="output"
-           output_dir="__current_date__"
-           />
-      </output>
+        <output>
+          <robot output_root="output"
+                 output_dir="__current_date__"
+                 />
+        </output>
         <perceived_arena_map>
-              <grid resolution="0.2"
-                    size="10, 5, 2"
-                    />
+          <grid resolution="0.2"
+                size="10, 5, 2"
+                />
+          <pheromone rho="0.0001"
+                     repeat_deposit="true"/>
         </perceived_arena_map>
         <task estimation_alpha="0.8"
               abort_reactivity="8"
@@ -84,7 +85,7 @@
            output_root="output"
            output_dir="__current_date__"
            />
-        <metrics
+      <metrics
           output_dir="metrics"
           stateless_fname="stateless-stats.csv"
           stateful_fname="stateful-stats.csv"

@@ -37,15 +37,15 @@ void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
 
   m_grid_parser.parse(argos::GetNode(pnode, "grid"));
+  m_pheromone_parser.parse(argos::GetNode(pnode, "pheromone"));
   m_params->grid = *m_grid_parser.get_results();
-  m_params->pheromone_rho = std::atof(
-      pnode.GetAttribute("pheromone_rho").c_str());
+  m_params->pheromone = *m_pheromone_parser.get_results();
 } /* parse() */
 
 void perceived_arena_map_parser::show(std::ostream& stream) {
   stream << "====================\nPerceived arena_map params\n====================\n";
   m_grid_parser.show(stream);
-  stream << "pheromone_rho=" << m_params->pheromone_rho << std::endl;
+  m_pheromone_parser.show(stream);
 } /* show() */
 
 NS_END(depth0, params, fordyca);
