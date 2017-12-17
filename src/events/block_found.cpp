@@ -78,6 +78,9 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 
 void block_found::visit(representation::perceived_cell2D& cell) {
   /*
+   * Update the pheromone density associated with the cell BEFORE updating the
+   * state of the cell.
+   *
    * It is possible that this block found event was generated because we were
    * in/on a cache that someone else picked up the last block from, and the
    * remaining orphan block has now entered our LOS. In that case, the cell will
@@ -89,25 +92,16 @@ void block_found::visit(representation::perceived_cell2D& cell) {
   if (cell.state_has_cache()) {
     cell.density_reset();
   }
-  cell.add_pheromone(1.0);
-  cell.density_update();
+
+  if ((cell.state_has_block() && cell.pheromone_repeat_deposit()) ||
+      !cell.state_has_block()) {
+    cell.pheromone_add(1.0);
+  }
   cell.decoratee().accept(*this);
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
-
-void block_found::visit(controller::depth0::stateful_foraging_controller& controller) {
-  controller.map()->accept(*this);
-} /* visit() */
-
-/*******************************************************************************
- * Depth1 Foraging
- ******************************************************************************/
-void block_found::visit(controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
-} /* visit() */
-
 
 NS_END(events, fordyca);

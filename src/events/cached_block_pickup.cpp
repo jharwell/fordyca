@@ -87,11 +87,6 @@ void cached_block_pickup::visit(representation::cache& cache) {
 void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
   cell.decoratee().accept(*this);
-  if (!cell.state_has_cache()) {
-    cell.density_reset();
-    cell.add_pheromone(1.0);
-    cell.density_update();
-  }
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {

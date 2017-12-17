@@ -59,7 +59,10 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    *
    * @param rho The new value.
    */
-  void rho(double rho) { m_density.rho(rho); }
+  void pheromone_rho(double rho) { m_density.rho(rho); }
+  void pheromone_repeat_deposit(bool b) { m_pheromone_repeat_deposit = b; }
+  bool pheromone_repeat_deposit(void) const { return m_pheromone_repeat_deposit; }
+
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) { return m_robot_id; }
 
@@ -99,7 +102,7 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    *
    * @param amount The amount of pheromone to add.
    */
-  void add_pheromone(double amount) { m_density.add_pheromone(amount); }
+  void pheromone_add(double amount) { m_density.pheromone_add(amount); }
 
   double epsilon(void) const { return kEpsilon; }
 
@@ -110,6 +113,7 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    */
   static const double              kEpsilon;
 
+  bool                             m_pheromone_repeat_deposit;
   std::string                      m_robot_id;
   rcppsw::swarm::pheromone_density m_density;
 };

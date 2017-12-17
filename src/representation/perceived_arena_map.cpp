@@ -53,7 +53,8 @@ perceived_arena_map::perceived_arena_map(
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       perceived_cell2D& cell = m_grid.access(i, j);
-      cell.rho(params->pheromone_rho);
+      cell.pheromone_rho(params->pheromone.rho);
+      cell.pheromone_repeat_deposit(params->pheromone.repeat_deposit);
       cell.robot_id(robot_id);
       cell.decoratee().loc(discrete_coord(i, j));
     } /* for(j..) */
