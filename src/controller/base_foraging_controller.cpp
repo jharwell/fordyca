@@ -86,26 +86,8 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
       static_cast<const struct params::output_params*>(
           param_repo.get_params("output"));
 
-  std::string output_root;
-  if ("__current_date__" == params->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    output_root = params->output_root + "/" + std::to_string(now.date().year()) + "-" +
-                    std::to_string(now.date().month()) + "-" +
-                    std::to_string(now.date().day()) + ":" +
-                    std::to_string(now.time_of_day().hours()) + "-" +
-                    std::to_string(now.time_of_day().minutes());
-  } else {
-    output_root = params->output_root + "/" + params->output_dir;
-  }
-
-  if (!fs::exists(output_root)) {
-    fs::create_directories(output_root);
-  }
-  client::server_handle()->change_logfile(output_root + "/" +
-                                          this->GetId() + ".log");
-
-
   param_repo.show_all(client::server_handle()->log_stream());
+  output_init(params);
 
   m_actuators.reset(new actuator_manager(
       static_cast<const struct params::actuator_params*>(
@@ -129,5 +111,43 @@ void base_foraging_controller::Reset(void) {
   CCI_Controller::Reset();
   m_block = nullptr;
 } /* Reset() */
+
+void base_foraging_controller::output_init(
+    const struct params::output_params* const params) {
+  std::string output_root;
+  if ("__current_date__" == params->output_dir) {
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    output_root = params->output_root + "/" + std::to_string(now.date().year()) + "-" +
+                  std::to_string(now.date().month()) + "-" +
+                  std::to_string(now.date().day()) + ":" +
+                  std::to_string(now.time_of_day().hours()) + "-" +
+                  std::to_string(now.time_of_day().minutes());
+  } else {
+    output_root = params->output_root + "/" + params->output_dir;
+  }
+
+  if (!fs::exists(output_root)) {
+    fs::create_directories(output_root);
+  }
+
+  /* setup logging timestamp calculator */
+  client::server_handle()->log_ts_calculator(std::bind(
+      &base_foraging_controller::log_header_calc,
+      this));
+  client::server_handle()->dbg_ts_calculator(std::bind(
+      &base_foraging_controller::dbg_header_calc,
+      this));
+
+  client::server_handle()->change_logfile(output_root + "/" +
+                                          this->GetId() + ".log");
+} /* output_init() */
+
+std::string base_foraging_controller::log_header_calc(void) {
+  return "[t=" + std::to_string(m_sensors->tick()) + "," + this->GetId() + "]";
+} /* log_header_calc() */
+
+std::string base_foraging_controller::dbg_header_calc(void) {
+  return this->GetId();
+} /* dbg_header_calc() */
 
 NS_END(controller, fordyca);

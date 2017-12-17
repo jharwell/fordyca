@@ -69,21 +69,10 @@ class foraging_sensors : public base_foraging_sensors {
     m_los = std::move(los);
   }
 
-  /**
-   * @brief Get the current simulation time tick.
-   */
-  uint tick(void) const { return m_tick; }
-
-  /**
-   * @brief Set the current simulation time tick.
-   */
-  void tick(uint tick) { m_tick = tick; }
-
  private:
   foraging_sensors(const foraging_sensors& fsm) = delete;
   foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 
-  uint                                          m_tick;
   std::unique_ptr<representation::line_of_sight> m_los;
 };
 

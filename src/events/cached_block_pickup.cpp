@@ -196,12 +196,12 @@ void cached_block_pickup::visit(controller::depth1::foraging_controller& control
          controller.GetId().c_str(), m_pickup_block->id());
 } /* visit() */
 
-void cached_block_pickup::visit(tasks::collector& task) {
+void cached_block_pickup::visit(tasks::collector& task)
+{
   static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
-  ER_NOM("block_to_nest_fsm: register cached_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

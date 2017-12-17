@@ -288,7 +288,7 @@ robot_collectors::stateless_metrics_collector* stateless_foraging_loop_functions
 } /* stateless_collector() */
 
 std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {
-  return "[t=" + std::to_string(GetSpace().GetSimulationClock()) + "] ";
+  return "[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]";
 } /* log_timestamp_calc() */
 
 using namespace argos;

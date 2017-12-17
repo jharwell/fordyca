@@ -107,6 +107,15 @@ class base_foraging_sensors {
     m_robot_loc = robot_loc;
   }
 
+  /**
+   * @brief Get the current simulation time tick.
+   */
+  uint tick(void) const { return m_tick; }
+
+  /**
+   * @brief Set the current simulation time tick.
+   */
+  void tick(uint tick) { m_tick = tick; }
 
   /**
    * @brief Get the robot's heading, which is computed from the previous 2
@@ -132,6 +141,7 @@ class base_foraging_sensors {
   base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
   base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
 
+  uint                                        m_tick;
   const double                                mc_diffusion_delta;
   argos::CVector2                             m_robot_loc;
   argos::CVector2                             m_prev_robot_loc;
