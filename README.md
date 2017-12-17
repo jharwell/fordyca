@@ -14,9 +14,14 @@ following programs:
 - cmake
 - make
 - g++
-- cppcheck (optional; for additional static analysis)
-- clang++ (optional; for additional syntax checking/static analysis )
-- icpc (optional; for additional syntax checking)
+
+In addition, you will possibly want to install these programs:
+
+- ccache (will make compiling a lot faster)
+- cppcheck (static analysis)
+- clang++ (syntax checking/static analysis )
+- icpc (additional syntax checking)
+- ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
 1. After cloning this repo, you will also need to clone the following repos:
 
