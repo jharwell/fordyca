@@ -13,6 +13,6 @@ for s in $scenarios
                 if not string match "depth1" $c
                         sed 's/create_static="true"/create_static="false"/g' -i /tmp/exp-$c.argos
                 end
-                # argos3 -c /tmp/exp.argos 2>&1 > /dev/null
+                argos3 -c /tmp/exp-$c.argos 2>&1 > /dev/null
         end
 end

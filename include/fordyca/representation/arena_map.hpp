@@ -88,12 +88,8 @@ class arena_map: public rcppsw::er::client,
 
   /**
    * @brief Distribute all blocks in the arena.
-   *
-   * @param first_time Is this the first time we are distributing blocks?
-   * (needed for simulations in which the blocks do not respawn/reappear after
-   * being brought to the nest).
    */
-  void distribute_blocks(bool first_time);
+  void distribute_blocks(void);
 
   /**
    * @brief Distribute a particular block in the arena, according to whatever
@@ -102,7 +98,7 @@ class arena_map: public rcppsw::er::client,
    * @param block The block to distribute.
    * @param first_time Is this the first time distributing this block?
    */
-  void distribute_block(block* const block, bool first_time = false);
+  void distribute_block(block* const block);
 
   void static_cache_create(void);
 
@@ -117,19 +113,6 @@ class arena_map: public rcppsw::er::client,
    * @brief Get the # of caches currently in the arena.
    */
   size_t n_caches(void) const { return m_caches.size(); }
-
-  /**
-   * @brief Check if FORDYCA was configured to have respawning blocks or not. If
-   * not, then after a block is brought to the nest and deposited for the first
-   * time, then it does not reappear in the arena. In that case, once all blocks
-   * have been collected, the simulation ends. Otherwise, the simulation goes on
-   * indefinitely.
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
-   */
-  bool respawn_enabled(void) const {
-    return m_block_distributor.respawn_enabled();
-  }
 
   /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the

@@ -103,7 +103,6 @@
       <blocks n_blocks="20"
               dimension="0.2"
               dist_model="single_source"
-              respawn="true"
               />
       <caches create_static="true"
               create_dynamic="false"

@@ -92,11 +92,11 @@ int arena_map::robot_on_cache(const argos::CVector2& pos) {
   return -1;
 } /* robot_on_cache() */
 
-void arena_map::distribute_block(block* const block, bool first_time) {
+void arena_map::distribute_block(block* const block) {
   cell2D* cell = nullptr;
   while (1) {
     argos::CVector2 r_coord;
-    if (m_block_distributor.distribute_block(*block, first_time, &r_coord)) {
+    if (m_block_distributor.distribute_block(*block, &r_coord)) {
       discrete_coord d_coord = representation::real_to_discrete_coord(r_coord,
                                                                       m_grid.resolution());
       cell = &m_grid.access(d_coord.first, d_coord.second);
@@ -138,8 +138,12 @@ void arena_map::static_cache_create(void) {
     std::vector<representation::block*> blocks;
 
     /*
-     * Only blocks that are not currently carried by a robot are eligible for
-     * being used to re-create the static cache.
+     * Only blocks that are not:
+     *
+     * - Currently carried by a robot
+     * - Currently placed on the cell where the cache is to be created
+     *
+     * are eligible for being used to re-create the static cache.
      */
     for (auto& b : m_blocks) {
       if (-1 == b.robot_index() &&
@@ -156,14 +160,10 @@ void arena_map::static_cache_create(void) {
     c.update_host_cells(m_caches);
 } /* static_cache_create() */
 
-void arena_map::distribute_blocks(bool first_time) {
+void arena_map::distribute_blocks(void) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    distribute_block(&m_blocks[i], first_time);
+    distribute_block(&m_blocks[i]);
   } /* for(i..) */
-
-  if (first_time && mc_cache_params.create_static) {
-    static_cache_create();
-  }
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been
