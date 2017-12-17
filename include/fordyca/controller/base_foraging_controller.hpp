@@ -33,6 +33,7 @@
 NS_START(fordyca);
 
 namespace representation { class block; class line_of_sight; }
+namespace params { struct output_params; }
 
 NS_START(controller);
 
@@ -128,12 +129,16 @@ class base_foraging_controller : public argos::CCI_Controller,
    */
   bool block_detected(void) const;
 
+
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
   const std::shared_ptr<base_foraging_sensors>& sensors(void) const { return m_sensors; }
 
  private:
+  void output_init(const struct params::output_params* const params);
+  std::string log_header_calc(void);
+  std::string dbg_header_calc(void);
   base_foraging_controller(const base_foraging_controller& other) = delete;
   base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
 

@@ -52,6 +52,7 @@ block_to_cache_fsm::block_to_cache_fsm(
     HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
     HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+    entry_wait_for_pickup(),
     m_pickup_count(0),
     m_sensors(sensors),
     m_block_fsm(params, server,

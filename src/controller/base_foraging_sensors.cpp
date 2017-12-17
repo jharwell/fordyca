@@ -43,6 +43,7 @@ base_foraging_sensors::base_foraging_sensors(
     argos::CCI_FootBotProximitySensor* const proximity,
     argos::CCI_FootBotLightSensor* const light,
     argos::CCI_FootBotMotorGroundSensor* const ground) :
+    m_tick(0),
     mc_diffusion_delta(params->diffusion.delta),
     m_robot_loc(),
     m_prev_robot_loc(),

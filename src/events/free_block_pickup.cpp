@@ -108,7 +108,6 @@ void free_block_pickup::visit(controller::depth0::stateless_foraging_controller&
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
-  ER_NOM("stateless_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -132,7 +131,6 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
-  ER_NOM("depth0_foraging_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -167,13 +165,11 @@ void free_block_pickup::visit(tasks::forager& task) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {
-  ER_NOM("block_to_cache_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
-  ER_NOM("block_to_nest_fsm: register free_block_pickup event");
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
