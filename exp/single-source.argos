@@ -54,8 +54,10 @@
               partition_reactivity="0.5"
               partition_offset="2"
               init_random_estimates="true"
-              subtask_selection_method="random"
-              partition_method="pini2011"/>
+              subtask_selection_method="brutcshy2014"
+              partition_method="pini2011"
+              always_partition="false"
+              never_partition="false"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
                      delta="0.1" />
