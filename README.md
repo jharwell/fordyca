@@ -14,14 +14,20 @@ following programs:
 - cmake
 - make
 - g++
-- cppcheck (optional; for additional static analysis)
-- clang++ (optional; for additional syntax checking/static analysis )
-- icpc (optional; for additional syntax checking)
+
+In addition, you will possibly want to install these programs:
+
+- ccache (will make compiling a lot faster)
+- cppcheck (static analysis)
+- clang++ (syntax checking/static analysis )
+- icpc (additional syntax checking)
+- ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
 1. After cloning this repo, you will also need to clone the following repos:
 
-  - https://github.com/jharwell/rcppsw
-  - https://github.com/jharwell/rcsw
+  - https://github.com/jharwell/rcppsw (Reusable C++ software)
+  - https://github.com/jharwell/rcsw (Reusable C software)
+  - https://github.com/jharwell/devel (dotfiles, project config, templates)
 
   Before you can build anything, you will need to define some environment
   variables:
@@ -30,6 +36,8 @@ following programs:
 
   - `rcppsw` - Set to the path to wherever you cloned the `rcppsw` repo.
 
+  - `develroot` - Set to the path to wherever you cloned the `devel` repo.
+
 2. Verify you can build `rcsw`, `rcppsw`, and `fordyca` (in that order), by
    doing:
 
@@ -37,8 +45,6 @@ following programs:
         mkdir build && cd build
         cmake ..
         make
-
-## Relevant Papers
 
 ## Style Guide
 
@@ -51,16 +57,17 @@ this project. In particular:
 - All file, class, variable, and namespace names are `specified_like_this`, NOT
   `specifiedLikeThis` or `SpecifiedLikeThis`.
 
-- Exactly one class definition per .cpp/.hpp file, unless there is a very good
-  reason.
+- Exactly one class/struct definition per .cpp/.hpp file, unless there is a very good
+  reason to do otherwise.
 
 - The namespace hierarchy exactly corresponds to the directory hierarchy that
   the source/header files for classes can be found in.
 
 - All classes have a doxygen brief, as do all non-getter/non-setter member
   functions. Tricky/nuanced issues with member variables should be documented,
-  though in general the class name + member variable name + type should be
-  enough documentation. If its not, chances are you are doing it wrong.
+  though in general the namespace name + class name + member variable name +
+  type should be enough documentation. If its not, chances are you are naming
+  things somewhat obfuscatingly.
 
   This may seem like overkill, but I have learned over the years that `If it is
   hard to document, it is probably wrong, and if it is hard to test, it is
@@ -79,6 +86,10 @@ this project. In particular:
 
 ## Development Guide
 
+In addition to reading this README, you should also build the documentation for
+the project and look through it to try to get a sense of how things are
+organized via `make documentation`.
+
 ### Directory layout
 
 - `src/` - All `.cpp` files live under here.
@@ -87,7 +98,7 @@ this project. In particular:
 
 - `tests` - All test code lives under here.
 
-- `docs/` - All documentation besides this README lives under me.
+- `docs/` - All documentation besides this README lives under here.
 
 - `exp/` - This is the directory where the ARGoS simulation input files live.
 
@@ -173,9 +184,9 @@ be named the same thing as the branch. This may seem pedantic, but when you have
 hundreds or thousands of issues and branches, any little thing you can do to
 increase the self-documenting nature of the development process is worth doing.
 
-For more details, see [Git usage guidlines](docs/f17-git-usage.pdf). It's from
+For more details, see [Git usage guidelines](docs/f17-git-usage.pdf). It's from
 3081, and is focused on git usage from a course perspective, but there is still
-a lot of good stuf in it.
+a lot of good stuff in it.
 
 ### General Workflow
 
@@ -192,8 +203,8 @@ a lot of good stuf in it.
    issue # of the task so that in-progress commits show up in github, and
    describe what was done and why in reasonable detail. Don't do things like "in
    progress", or "misc updates", or if you do such things, rebase/collapse your
-   history into a single detailed commit when you are done. Be sure you know
-   what you are doing if you go this route...
+   history into a single detailed commit when you are done BEFORE merging to
+   devel. Be sure you know what you are doing if you go this route...
 
 5. Finish the task, updating the `VERSION` file appropriately if needed, and
    change status to `Status: Needs Review` and open a pull request.
