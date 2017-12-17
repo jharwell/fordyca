@@ -129,7 +129,7 @@ void stateless_foraging_loop_functions::Reset() {
   m_block_collector->reset();
   m_stateless_collector->reset();
   m_distance_collector->reset();
-  m_map->distribute_blocks(true);
+  m_map->distribute_blocks();
 }
 
 void stateless_foraging_loop_functions::Destroy() {
@@ -250,7 +250,7 @@ void stateless_foraging_loop_functions::arena_map_init(
           repo.get_params("loop_functions"));
 
   m_map.reset(new representation::arena_map(arena_params));
-  m_map->distribute_blocks(true);
+  m_map->distribute_blocks();
   for (size_t i = 0; i < m_map->blocks().size(); ++i) {
     m_map->blocks()[i].display_id(l_params->display_block_id);
   } /* for(i..) */
@@ -268,19 +268,6 @@ void stateless_foraging_loop_functions::output_init(const struct params::output_
     m_output_root = params->output_root + "/" + params->output_dir;
   }
 } /* output_init() */
-
-__pure bool stateless_foraging_loop_functions::IsExperimentFinished(void) {
-  /*
-   * If we are not respawning blocks and all blocks have been collected, signal
-   * the end of the experiment. If respawn is enabled, then the experiment will
-   * run until I cancel it.
-   */
-  if (!m_map->respawn_enabled() &&
-      m_block_collector->cum_collected() == m_map->n_blocks()) {
-    return true;
-  }
-  return false;
-} /* IsExperimentFinished() */
 
 void stateless_foraging_loop_functions::PostExperiment(void) {
   if (m_sim_type == "scripted") {

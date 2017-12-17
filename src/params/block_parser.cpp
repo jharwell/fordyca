@@ -38,7 +38,6 @@ void block_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
   argos::GetNodeAttribute(node, "dimension", m_params->dimension);
   argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
-  argos::GetNodeAttribute(node, "respawn", m_params->respawn);
 } /* parse() */
 
 void block_parser::show(std::ostream& stream) {
@@ -46,7 +45,6 @@ void block_parser::show(std::ostream& stream) {
   stream << "n_blocks=" << m_params->n_blocks << std::endl;
   stream << "dimension=" << m_params->dimension << std::endl;
   stream << "dist_model=" << m_params->dist_model << std::endl;
-  stream << "respawn=" << m_params->respawn << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

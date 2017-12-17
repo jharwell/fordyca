@@ -69,7 +69,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void Reset() override;
   void Destroy() override;
   void PreStep() override;
-  bool IsExperimentFinished(void) override;
   void PostExperiment(void) override;
 
  protected:

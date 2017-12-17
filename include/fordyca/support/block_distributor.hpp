@@ -65,13 +65,7 @@ class block_distributor {
    * block. Only matters if respawn is not enabled.
    */
   bool distribute_block(const representation::block& block,
-                        bool first_time, argos::CVector2* const coord);
-
-  /**
-   * @brief If TRUE, then blocks should be respawned every time they are placed
-   * in the nest.
-   */
-  bool respawn_enabled(void) const { return m_respawn; }
+                        argos::CVector2* const coord);
 
   argos::CRange<double> single_src_xrange(void);
 
@@ -102,7 +96,6 @@ class block_distributor {
   block_distributor& operator=(const block_distributor& s) = delete;
 
   std::string           m_dist_model;
-  bool                  m_respawn;
   argos::CRange<double> m_arena_x;
   argos::CRange<double> m_arena_y;
   argos::CRange<double> m_nest_x;

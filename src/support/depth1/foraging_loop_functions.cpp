@@ -66,10 +66,20 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
   repo.parse_all(node);
 
-  mc_cache_penalty = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"))->cache.usage_penalty;
-  mc_cache_respawn_scale_factor = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"))->cache.static_respawn_scale_factor;
+  const struct params::arena_map_params* arenap =
+      static_cast<const struct params::arena_map_params*>(
+          repo.get_params("arena_map"));
+
+  /*
+   * Regardless of how many foragers/collectors/etc there are, always create an
+   * initial cache
+   */
+  if (arenap->cache.create_static) {
+    map()->static_cache_create();
+  }
+
+  mc_cache_penalty = arenap->cache.usage_penalty;
+  mc_cache_respawn_scale_factor = arenap->cache.static_respawn_scale_factor;
 
   /* initialize stat collecting */
     const params::output_params* p_output = static_cast<const struct params::output_params*>(
@@ -212,6 +222,7 @@ void foraging_loop_functions::Reset() {
   depth0::stateful_foraging_loop_functions::Reset();
   m_depth1_collector->reset();
   m_task_collector->reset();
+  map()->static_cache_create();
 }
 
 void foraging_loop_functions::Destroy() {
