@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void arena_map_parser::parse(argos::TConfigurationNode& node) {
+void arena_map_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct arena_map_params);
   argos::TConfigurationNode anode = argos::GetNode(node, "arena_map");
 
@@ -51,21 +51,21 @@ void arena_map_parser::parse(argos::TConfigurationNode& node) {
   res = parser.parse(argos::GetNode(anode, "nest").GetAttribute("center"));
   res2 = parser.parse(argos::GetNode(anode, "nest").GetAttribute("size"));
 
-  m_params->nest_center = argos::CVector2(std::atof(res[0].c_str()),
-                                          std::atof(res[1].c_str()));
+  m_params->nest_center =
+      argos::CVector2(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
   m_params->nest_x.Set(std::atof(res[0].c_str()) - std::atof(res2[0].c_str()),
                        std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
   m_params->nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
                        std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
 } /* parse() */
 
-void arena_map_parser::show(std::ostream& stream) {
+void arena_map_parser::show(std::ostream &stream) {
   stream << "====================\nArena_Map params\n====================\n";
   m_grid_parser.show(stream);
   m_block_parser.show(stream);
   m_cache_parser.show(stream);
-  stream << "nest_x=" << m_params->nest_x << std:: endl;
-  stream << "nest_y=" << m_params->nest_y << std:: endl;
+  stream << "nest_x=" << m_params->nest_x << std::endl;
+  stream << "nest_y=" << m_params->nest_y << std::endl;
   stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 

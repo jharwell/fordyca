@@ -32,21 +32,23 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_metrics_collector::stateless_metrics_collector(const std::string ofname,
-                                                         bool collect_cum,
-                                                         uint collect_interval) :
-    base_metric_collector(ofname, collect_cum), m_stats() {
+stateless_metrics_collector::stateless_metrics_collector(
+    const std::string ofname,
+    bool collect_cum,
+    uint collect_interval)
+    : base_metric_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
   }
 }
 
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string stateless_metrics_collector::csv_header_build(const std::string& header) {
+std::string stateless_metrics_collector::csv_header_build(
+    const std::string &header) {
+  // clang-format off
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
         "n_exploring_for_block"  + separator() +
@@ -61,6 +63,7 @@ std::string stateless_metrics_collector::csv_header_build(const std::string& hea
       "n_avoiding_collision" + separator() +
       "n_transporting_to_nest" + separator();
   }
+  // clang-format on
 } /* csv_header_build() */
 
 void stateless_metrics_collector::reset(void) {
@@ -69,8 +72,10 @@ void stateless_metrics_collector::reset(void) {
 } /* reset() */
 
 void stateless_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::robot_metrics::stateless_metrics&>(metrics);
+    const collectible_metrics::base_collectible_metrics &metrics) {
+  auto &m =
+      static_cast<const collectible_metrics::robot_metrics::stateless_metrics &>(
+          metrics);
   m_stats.n_exploring_for_block += m.is_exploring_for_block();
   m_stats.n_transporting_to_nest += m.is_transporting_to_nest();
   m_stats.n_avoiding_collision += m.is_avoiding_collision();
@@ -82,7 +87,7 @@ void stateless_metrics_collector::collect(
   }
 } /* collect() */
 
-bool stateless_metrics_collector::csv_line_build(std::string& line) {
+bool stateless_metrics_collector::csv_line_build(std::string &line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_exploring_for_block) + separator() +
            std::to_string(m_stats.n_cum_exploring_for_block) + separator() +
@@ -94,7 +99,7 @@ bool stateless_metrics_collector::csv_line_build(std::string& line) {
     line = std::to_string(m_stats.n_exploring_for_block) + separator() +
            std::to_string(m_stats.n_avoiding_collision) + separator() +
            std::to_string(m_stats.n_transporting_to_nest) + separator();
-    }
+  }
   return true;
 } /* store_foraging_stats() */
 

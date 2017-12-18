@@ -32,7 +32,7 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
+void perceived_arena_map_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct perceived_arena_map_params);
   argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
 
@@ -42,8 +42,9 @@ void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
   m_params->pheromone = *m_pheromone_parser.get_results();
 } /* parse() */
 
-void perceived_arena_map_parser::show(std::ostream& stream) {
-  stream << "====================\nPerceived arena_map params\n====================\n";
+void perceived_arena_map_parser::show(std::ostream &stream) {
+  stream << "====================\nPerceived arena_map "
+            "params\n====================\n";
   m_grid_parser.show(stream);
   m_pheromone_parser.show(stream);
 } /* show() */

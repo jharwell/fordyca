@@ -33,15 +33,15 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_sensors::foraging_sensors(
-    const struct params::sensor_params* params,
-    argos::CCI_RangeAndBearingSensor* const rabs,
-    argos::CCI_FootBotProximitySensor* const proximity,
-    argos::CCI_FootBotLightSensor* const light,
-    argos::CCI_FootBotMotorGroundSensor* const ground) :
-    depth0::foraging_sensors(params, rabs, proximity, light, ground) {}
+    const struct params::sensor_params *params,
+    argos::CCI_RangeAndBearingSensor *const rabs,
+    argos::CCI_FootBotProximitySensor *const proximity,
+    argos::CCI_FootBotLightSensor *const light,
+    argos::CCI_FootBotMotorGroundSensor *const ground)
+    : depth0::foraging_sensors(params, rabs, proximity, light, ground) {}
 
 bool foraging_sensors::cache_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
+  const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =
       base_foraging_sensors::ground()->GetReadings();
   int sum = 0;
 

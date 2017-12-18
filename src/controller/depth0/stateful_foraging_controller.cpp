@@ -22,30 +22,30 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
+#include "fordyca/params/depth0/stateful_foraging_repository.hpp"
+#include "fordyca/params/depth1/task_params.hpp"
+#include "fordyca/params/depth1/task_repository.hpp"
+#include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/tasks/generalist.hpp"
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
-#include "fordyca/tasks/generalist.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
-#include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth1/task_repository.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,19 +55,19 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_foraging_controller::stateful_foraging_controller(void) :
-    base_foraging_controller(),
-    m_light_loc(),
-    m_map(),
-    m_sensors(),
-    m_executive(),
-    m_generalist() {}
+stateful_foraging_controller::stateful_foraging_controller(void)
+    : base_foraging_controller(),
+      m_light_loc(),
+      m_map(),
+      m_sensors(),
+      m_executive(),
+      m_generalist() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-tasks::foraging_task* stateful_foraging_controller::current_task(void) const {
-  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
+tasks::foraging_task *stateful_foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
 } /* current_task() */
 
 bool stateful_foraging_controller::block_acquired(void) const {
@@ -90,11 +90,12 @@ void stateful_foraging_controller::tick(uint tick) {
   m_sensors->tick(tick);
 } /* tick() */
 
-__pure const representation::line_of_sight* stateful_foraging_controller::los(void) const {
+__pure const representation::line_of_sight *stateful_foraging_controller::los(
+    void) const {
   return m_sensors->los();
 }
 void stateful_foraging_controller::los(
-    std::unique_ptr<representation::line_of_sight>& new_los) {
+    std::unique_ptr<representation::line_of_sight> &new_los) {
   m_sensors->los(new_los);
 }
 
@@ -109,7 +110,7 @@ void stateful_foraging_controller::ControlStep(void) {
   m_executive->run();
 } /* ControlStep() */
 
-void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
   params::depth0::stateful_foraging_repository param_repo;
   params::depth1::task_repository task_repo;
 
@@ -122,23 +123,24 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_map.reset(new representation::perceived_arena_map(
       server(),
-      static_cast<const struct params::depth0::perceived_arena_map_params*>(
+      static_cast<const struct params::depth0::perceived_arena_map_params *>(
           param_repo.get_params("perceived_arena_map")),
       GetId()));
 
   m_sensors.reset(new depth1::foraging_sensors(
-      static_cast<const struct params::sensor_params*>(
+      static_cast<const struct params::sensor_params *>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
-  const params::fsm_params * fsm_params = static_cast<const struct params::fsm_params*>(
-      param_repo.get_params("fsm"));
+  const params::fsm_params *fsm_params =
+      static_cast<const struct params::fsm_params *>(
+          param_repo.get_params("fsm"));
 
-  const params::depth1::task_params* task_params =
-      static_cast<const params::depth1::task_params*>(
+  const params::depth1::task_params *task_params =
+      static_cast<const params::depth1::task_params *>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
@@ -148,18 +150,20 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist.reset(new tasks::generalist(&task_params->tasks, generalist_fsm));
+  m_generalist.reset(
+      new tasks::generalist(&task_params->tasks, generalist_fsm));
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
 
-  m_executive.reset(new task_allocation::polled_executive(
-      base_foraging_controller::server(),
-      m_generalist.get()));
+  m_executive.reset(
+      new task_allocation::polled_executive(base_foraging_controller::server(),
+                                            m_generalist.get()));
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
-void stateful_foraging_controller::process_los(const representation::line_of_sight* const los) {
+void stateful_foraging_controller::process_los(
+    const representation::line_of_sight *const los) {
   for (auto block : los->blocks()) {
     /*
      * Right now, if a robot already knows about a block it does not take into
@@ -174,12 +178,15 @@ void stateful_foraging_controller::process_los(const representation::line_of_sig
      * order to be realistic.
      */
     if (!m_map->access(block->discrete_loc()).state_has_block()) {
-      events::block_found op(base_foraging_controller::server(), block,
+      events::block_found op(base_foraging_controller::server(),
+                             block,
                              block->discrete_loc().first,
                              block->discrete_loc().second);
       m_map->accept(op);
-      ER_NOM("Discovered block%d at (%zu, %zu)", block->id(),
-             block->discrete_loc().first, block->discrete_loc().second);
+      ER_NOM("Discovered block%d at (%zu, %zu)",
+             block->id(),
+             block->discrete_loc().first,
+             block->discrete_loc().second);
     }
   } /* for(block..) */
 } /* process_los() */
@@ -215,7 +222,7 @@ bool stateful_foraging_controller::is_transporting_to_nest(void) const {
  * Distance Diagnostics
  ******************************************************************************/
 size_t stateful_foraging_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str()+2);
+  return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
 
 double stateful_foraging_controller::timestep_distance(void) const {
@@ -250,6 +257,7 @@ bool stateful_foraging_controller::is_vectoring_to_block(void) const {
 } /* is_vectoring_to_block() */
 
 using namespace argos;
-REGISTER_CONTROLLER(stateful_foraging_controller, "stateful_foraging_controller")
+REGISTER_CONTROLLER(stateful_foraging_controller,
+                    "stateful_foraging_controller")
 
 NS_END(depth0, controller, fordyca);

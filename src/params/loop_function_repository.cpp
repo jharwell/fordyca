@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/loop_functions_parser.hpp"
+#include "fordyca/params/output_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

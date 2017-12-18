@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell2D.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,25 +34,25 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server) :
-    m_entity(nullptr), m_loc(), m_fsm(server) {
+cell2D::cell2D(const std::shared_ptr<rcppsw::er::server> &server)
+    : m_entity(nullptr), m_loc(), m_fsm(server) {
   m_fsm.init();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const representation::block* cell2D::block(void) const {
-  return static_cast<representation::block*>(m_entity);
+const representation::block *cell2D::block(void) const {
+  return static_cast<representation::block *>(m_entity);
 } /* block() */
 
-representation::block* cell2D::block(void) {
-  return const_cast<representation::block*>(static_cast<representation::block*>(m_entity));
+representation::block *cell2D::block(void) {
+  return const_cast<representation::block *>(
+      static_cast<representation::block *>(m_entity));
 } /* block() */
 
-representation::cache* cell2D::cache(void) const {
-  return static_cast<representation::cache*>(m_entity);
+representation::cache *cell2D::cache(void) const {
+  return static_cast<representation::cache *>(m_entity);
 } /* cache() */
-
 
 NS_END(representation, fordyca);

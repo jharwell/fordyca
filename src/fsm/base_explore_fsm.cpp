@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/base_explore_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,36 +40,38 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(
     double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-                                   uint8_t max_states) :
-    base_foraging_fsm(server, sensors, actuators, max_states),
-    HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-    entry_new_direction(),
-    entry_explore(),
-    mc_dir_change_thresh(unsuccessful_dir_change_thresh),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_state(),
-    m_new_dir() {
-  insmod("base_explore_fsm",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::base_foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators,
+    uint8_t max_states)
+    : base_foraging_fsm(server, sensors, actuators, max_states),
+      HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+      entry_new_direction(),
+      entry_explore(),
+      mc_dir_change_thresh(unsuccessful_dir_change_thresh),
+      m_rng(argos::CRandom::CreateRNG("argos")),
+      m_state(),
+      m_new_dir() {
+  insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
 HFSM_STATE_DEFINE(base_explore_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = base_foraging_fsm::sensors()->calc_vector_to_light().Angle();
+  argos::CRadians current_dir =
+      base_foraging_fsm::sensors()->calc_vector_to_light().Angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  const new_direction_data* dir_data = dynamic_cast<const new_direction_data*>(data);
+  const new_direction_data *dir_data =
+      dynamic_cast<const new_direction_data *>(data);
   if (dir_data) {
     m_new_dir = dir_data->dir;
   }
-  base_foraging_fsm::actuators()->set_heading(argos::CVector2(
-      base_foraging_fsm::actuators()->max_wheel_speed() * 0.25, m_new_dir), true);
+  base_foraging_fsm::actuators()->set_heading(
+      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.25,
+                      m_new_dir),
+      true);
 
   /* We have changed direction and started a new exploration */
   if (std::fabs((current_dir - m_new_dir).GetValue()) < 0.1) {
@@ -98,6 +100,5 @@ void base_explore_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* run() */
-
 
 NS_END(fsm, fordyca);

@@ -31,7 +31,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void metrics_parser::parse(argos::TConfigurationNode& node) {
+void metrics_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct metrics_params);
 
   argos::GetNodeAttribute(node, "output_dir", m_params->output_dir);
@@ -47,7 +47,7 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "collect_interval", m_params->collect_interval);
 } /* parse() */
 
-void metrics_parser::show(std::ostream& stream) {
+void metrics_parser::show(std::ostream &stream) {
   stream << "====================\nMetrics params\n====================\n";
   if (m_params) {
     stream << "output_dir=" << m_params->output_dir << std::endl;

@@ -35,30 +35,32 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
     std::shared_ptr<rcppsw::er::server> server,
-    representation::occupancy_grid& grid,
-    const argos::CVector2& center,
-    double cache_size, double resolution) :
-    cache_creator(server, grid, cache_size, resolution),
-    m_center(center) {
+    representation::occupancy_grid &grid,
+    const argos::CVector2 &center,
+    double cache_size,
+    double resolution)
+    : cache_creator(server, grid, cache_size, resolution), m_center(center) {
   client::insmod("static_cache_creator",
-                    rcppsw::er::er_lvl::DIAG,
-                    rcppsw::er::er_lvl::NOM);
-    }
+                 rcppsw::er::er_lvl::DIAG,
+                 rcppsw::er::er_lvl::NOM);
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> static_cache_creator::create_all(
-    std::vector<representation::block*>& blocks) {
+    std::vector<representation::block *> &blocks) {
   std::vector<representation::cache> caches;
 
   ER_ASSERT(blocks.size() >= 2,
             "FATAL: Cannot create static cache from <= 2 blocks");
-  ER_NOM("Creating static cache @(%f, %f) from %zu free blocks", m_center.GetX(),
-         m_center.GetY(), blocks.size());
-  std::list<representation::block*> starter_blocks;
+  ER_NOM("Creating static cache @(%f, %f) from %zu free blocks",
+         m_center.GetX(),
+         m_center.GetY(),
+         blocks.size());
+  std::list<representation::block *> starter_blocks;
   for (auto b : blocks) {
-  starter_blocks.push_back(b);
+    starter_blocks.push_back(b);
   } /* for(i..) */
 
   caches.push_back(cache_creator::create_single(starter_blocks, m_center));

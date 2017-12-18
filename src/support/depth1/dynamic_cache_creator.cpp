@@ -35,36 +35,40 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(
     std::shared_ptr<rcppsw::er::server> server,
-    representation::occupancy_grid& grid,
+    representation::occupancy_grid &grid,
     double cache_size,
     double resolution,
-    double min_dist) :
-    cache_creator(server, grid, cache_size, resolution),
-    m_min_dist(min_dist) {}
+    double min_dist)
+    : cache_creator(server, grid, cache_size, resolution),
+      m_min_dist(min_dist) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> dynamic_cache_creator::create_all(
-    std::vector<representation::block*>& blocks) {
+    std::vector<representation::block *> &blocks) {
   std::vector<representation::cache> caches;
 
   ER_NOM("Dynamically creating caches: %zu free blocks", blocks.size());
 
   for (size_t i = 0; i < blocks.size() - 1; ++i) {
-    std::list<representation::block*> starter_blocks;
+    std::list<representation::block *> starter_blocks;
     for (size_t j = i + 1; j < blocks.size(); ++j) {
       if ((blocks[i]->real_loc() - blocks[j]->real_loc()).Length() <=
           m_min_dist) {
         if (std::find(starter_blocks.begin(),
                       starter_blocks.end(),
                       blocks[i]) == starter_blocks.end()) {
-          ER_DIAG("Add block %zu: (%f, %f)", i, blocks[i]->real_loc().GetX(),
+          ER_DIAG("Add block %zu: (%f, %f)",
+                  i,
+                  blocks[i]->real_loc().GetX(),
                   blocks[i]->real_loc().GetY());
           starter_blocks.push_back(blocks[i]);
         }
         starter_blocks.push_back(blocks[j]);
-        ER_DIAG("Add block %zu: (%f, %f)", j, blocks[j]->real_loc().GetX(),
+        ER_DIAG("Add block %zu: (%f, %f)",
+                j,
+                blocks[j]->real_loc().GetX(),
                 blocks[j]->real_loc().GetY());
       }
     } /* for(j..) */
@@ -77,7 +81,7 @@ std::vector<representation::cache> dynamic_cache_creator::create_all(
 } /* create() */
 
 argos::CVector2 dynamic_cache_creator::calc_center(
-    std::list<representation::block*> blocks) {
+    std::list<representation::block *> blocks) {
   double x = 0;
   double y = 0;
   for (auto block : blocks) {

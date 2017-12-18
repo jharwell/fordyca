@@ -31,23 +31,36 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-int robot_on_block(const argos::CFootBotEntity& robot,
-                   representation::arena_map& map) {
+int robot_on_block(const argos::CFootBotEntity &robot,
+                   representation::arena_map &map) {
   argos::CVector2 pos;
-  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  pos.Set(const_cast<argos::CFootBotEntity &>(robot)
+              .GetEmbodiedEntity()
+              .GetOriginAnchor()
+              .Position.GetX(),
+          const_cast<argos::CFootBotEntity &>(robot)
+              .GetEmbodiedEntity()
+              .GetOriginAnchor()
+              .Position.GetY());
   return map.robot_on_block(pos);
 } /* robot_on_block() */
 
-int robot_id(const argos::CFootBotEntity& robot) {
+int robot_id(const argos::CFootBotEntity &robot) {
   /* +2 because the ID string starts with 'fb' */
-  return std::atoi(robot.GetId().c_str()+2);
+  return std::atoi(robot.GetId().c_str() + 2);
 } /* robot_id() */
 
-int robot_on_cache(const argos::CFootBotEntity& robot, representation::arena_map& map) {
+int robot_on_cache(const argos::CFootBotEntity &robot,
+                   representation::arena_map &map) {
   argos::CVector2 pos;
-  pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+  pos.Set(const_cast<argos::CFootBotEntity &>(robot)
+              .GetEmbodiedEntity()
+              .GetOriginAnchor()
+              .Position.GetX(),
+          const_cast<argos::CFootBotEntity &>(robot)
+              .GetEmbodiedEntity()
+              .GetOriginAnchor()
+              .Position.GetY());
   return map.robot_on_cache(pos);
 }
 

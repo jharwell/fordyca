@@ -32,14 +32,10 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_selector::block_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc) :
-    client(server),
-    m_nest_loc(nest_loc) {
-  insmod("block_selector",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+block_selector::block_selector(const std::shared_ptr<rcppsw::er::server> &server,
+                               argos::CVector2 nest_loc)
+    : client(server), m_nest_loc(nest_loc) {
+  insmod("block_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -49,7 +45,7 @@ representation::perceived_block block_selector::calc_best(
     const std::list<representation::perceived_block> blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  const representation::block* best = nullptr;
+  const representation::block *best = nullptr;
 
   for (auto pair : blocks) {
     /*

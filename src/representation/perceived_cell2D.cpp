@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_cell2D.hpp"
+#include "fordyca/events/cell_unknown.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
-#include "fordyca/events/cell_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,18 +40,18 @@ const double perceived_cell2D::kEpsilon = 0.0001;
  * Constructors/Destructor
  ******************************************************************************/
 perceived_cell2D::perceived_cell2D(
-    const std::shared_ptr<rcppsw::er::server>& server) :
-    decorator(server),
-    client(server),
-    m_pheromone_repeat_deposit(false),
-    m_robot_id(),
-    m_density() {
+    const std::shared_ptr<rcppsw::er::server> &server)
+    : decorator(server),
+      client(server),
+      m_pheromone_repeat_deposit(false),
+      m_robot_id(),
+      m_density() {
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
            rcppsw::er::er_lvl::DIAG,
            rcppsw::er::er_lvl::NOM);
   }
-    }
+}
 
 /*******************************************************************************
  * Member Functions
@@ -64,11 +64,15 @@ void perceived_cell2D::density_update(void) {
 
   if (m_density.calc() < kEpsilon) {
     if (decoratee().state_has_block()) {
-      ER_VER("Relevance of block%d is within %f of 0 for %s", block()->id(),
-             kEpsilon, m_robot_id.c_str());
+      ER_VER("Relevance of block%d is within %f of 0 for %s",
+             block()->id(),
+             kEpsilon,
+             m_robot_id.c_str());
     } else if (decoratee().state_has_cache()) {
-      ER_VER("Relevance of cache%d is within %f of 0 for %s", cache()->id(),
-             kEpsilon, m_robot_id.c_str());
+      ER_VER("Relevance of cache%d is within %f of 0 for %s",
+             cache()->id(),
+             kEpsilon,
+             m_robot_id.c_str());
     }
     events::cell_unknown op(decorator::decoratee().loc().first,
                             decorator::decoratee().loc().second);

@@ -31,25 +31,30 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void loop_functions_parser::parse(argos::TConfigurationNode& node) {
+void loop_functions_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct loop_functions_params);
 
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_id",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "robot_id",
                           m_params->display_robot_id);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_los",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "robot_los",
                           m_params->display_robot_los);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "block_id",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "block_id",
                           m_params->display_block_id);
-  argos::GetNodeAttribute(argos::GetNode(node, "simulation"), "experiment",
+  argos::GetNodeAttribute(argos::GetNode(node, "simulation"),
+                          "experiment",
                           m_params->simulation_type);
 } /* parse() */
 
-void loop_functions_parser::show(std::ostream& stream) {
-  stream << "====================\nLoop Function params\n====================\n";
+void loop_functions_parser::show(std::ostream &stream) {
+  stream << "====================\nLoop Function "
+            "params\n====================\n";
   stream << "display_robot_id=" << m_params->display_robot_id << std::endl;
   stream << "display_robot_los=" << m_params->display_robot_los << std::endl;
   stream << "display_block_id=" << m_params->display_block_id << std::endl;
-  stream << "simulation_type=" << m_params->simulation_type << std:: endl;
+  stream << "simulation_type=" << m_params->simulation_type << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

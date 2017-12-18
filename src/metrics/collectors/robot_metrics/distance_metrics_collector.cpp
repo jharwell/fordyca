@@ -32,7 +32,8 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string distance_metrics_collector::csv_header_build(const std::string& header) {
+std::string distance_metrics_collector::csv_header_build(
+    const std::string &header) {
   std::string line = "";
   for (size_t i = 0; i < m_n_robots; ++i) {
     line += "robot" + std::to_string(i) + separator();
@@ -49,7 +50,7 @@ void distance_metrics_collector::reset(void) {
   } /* for(i..) */
 } /* reset() */
 
-bool distance_metrics_collector::csv_line_build(std::string& line) {
+bool distance_metrics_collector::csv_line_build(std::string &line) {
   for (auto s : m_stats) {
     line += std::to_string(s.cum_distance) + separator();
   } /* for(s..) */
@@ -57,10 +58,11 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void distance_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::robot_metrics::distance_metrics&>(metrics);
+    const collectible_metrics::base_collectible_metrics &metrics) {
+  auto &m =
+      static_cast<const collectible_metrics::robot_metrics::distance_metrics &>(
+          metrics);
   m_stats[m.entity_id()].cum_distance += m.timestep_distance();
 } /* collect() */
-
 
 NS_END(robot_metrics, collectors, metrics, fordyca);

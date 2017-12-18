@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,28 +40,35 @@ NS_START(fordyca, fsm, depth1);
  ******************************************************************************/
 explore_for_cache_fsm::explore_for_cache_fsm(
     double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators) :
-    base_explore_fsm(unsuccessful_dir_change_thresh, server, sensors,
-                     actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-    entry_collision_avoidance(),
-    entry_new_direction(),
-    entry_explore(),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    m_sensors(sensors),
-    mc_state_map {
-        HFSM_STATE_MAP_ENTRY_EX(&start),
-            HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
-            HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
-                                        &entry_collision_avoidance, NULL),
-            HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction, NULL,
-                                        &entry_new_direction, NULL),
-            HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators)
+    : base_explore_fsm(unsuccessful_dir_change_thresh,
+                       server,
+                       sensors,
+                       actuators,
+                       ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+      entry_collision_avoidance(),
+      entry_new_direction(),
+      entry_explore(),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      m_sensors(sensors),
+      mc_state_map{
+          HFSM_STATE_MAP_ENTRY_EX(&start),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
+                                      NULL,
+                                      &entry_collision_avoidance,
+                                      NULL),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction,
+                                      NULL,
+                                      &entry_new_direction,
+                                      NULL),
+          HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_cache_fsm",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
@@ -107,7 +114,8 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
    */
   argos::CVector2 vector;
   base_foraging_fsm::sensors()->calc_diffusion_vector(&vector);
-  base_foraging_fsm::actuators()->set_heading(base_foraging_fsm::actuators()->max_wheel_speed() * vector);
+  base_foraging_fsm::actuators()->set_heading(
+      base_foraging_fsm::actuators()->max_wheel_speed() * vector);
   return controller::foraging_signal::HANDLED;
 }
 

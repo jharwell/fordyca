@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/representation/perceived_arena_map.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/representation/cache.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,29 +36,33 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const struct params::depth0::perceived_arena_map_params* params,
-    const std::string& robot_id) :
-    m_server(server),
-    m_grid(params->grid.resolution, params->grid.upper.GetX(),
-           params->grid.upper.GetY(), m_server),
-    m_caches() {
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const struct params::depth0::perceived_arena_map_params *params,
+    const std::string &robot_id)
+    : m_server(server),
+      m_grid(params->grid.resolution,
+             params->grid.upper.GetX(),
+             params->grid.upper.GetY(),
+             m_server),
+      m_caches() {
   deferred_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
-  ER_NOM("%zu x %zu @ %f resolution", m_grid.xsize(), m_grid.ysize(),
+  ER_NOM("%zu x %zu @ %f resolution",
+         m_grid.xsize(),
+         m_grid.ysize(),
          m_grid.resolution());
 
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      perceived_cell2D& cell = m_grid.access(i, j);
+      perceived_cell2D &cell = m_grid.access(i, j);
       cell.pheromone_rho(params->pheromone.rho);
       cell.pheromone_repeat_deposit(params->pheromone.repeat_deposit);
       cell.robot_id(robot_id);
       cell.decoratee().loc(discrete_coord(i, j));
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
 }
 
 /*******************************************************************************
@@ -73,17 +77,19 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
                                          m_grid.access(i, j).density()));
       }
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
   return blocks;
 } /* blocks() */
 
 std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
   std::list<perceived_cache> pcaches;
 
-  for (auto& c : m_caches) {
+  for (auto &c : m_caches) {
     representation::perceived_cache p(&c,
-                                      m_grid.access(c.discrete_loc().first,
-                                                    c.discrete_loc().second).density());
+                                      m_grid
+                                          .access(c.discrete_loc().first,
+                                                  c.discrete_loc().second)
+                                          .density());
     pcaches.push_back(p);
   } /* for(c..) */
   return pcaches;
@@ -94,10 +100,10 @@ void perceived_arena_map::update_density(void) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       m_grid.access(i, j).density_update();
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
 } /* update_density() */
 
-void perceived_arena_map::cache_add(representation::cache& cache) {
+void perceived_arena_map::cache_add(representation::cache &cache) {
   /*
    * If the cache is already in our list of caches we know about it needs to be
    * removed, because the new version we just got from our LOS is more up to
@@ -107,12 +113,11 @@ void perceived_arena_map::cache_add(representation::cache& cache) {
   if (m_caches.end() != it) {
     cache_remove(*it);
   }
-    m_caches.push_back(cache);
+  m_caches.push_back(cache);
 } /* cache_add() */
 
-void perceived_arena_map::cache_remove(representation::cache& victim) {
-  m_caches.erase(std::remove(m_caches.begin(),
-                             m_caches.end(), victim));
+void perceived_arena_map::cache_remove(representation::cache &victim) {
+  m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
 
 NS_END(representation, fordyca);

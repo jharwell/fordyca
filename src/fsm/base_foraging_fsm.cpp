@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
@@ -43,17 +43,17 @@ base_foraging_fsm::base_foraging_fsm(
     std::shared_ptr<rcppsw::er::server> server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators,
-    uint8_t max_states) :
-    state_machine::hfsm(server, max_states),
-    HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
-    entry_transport_to_nest(),
-    entry_collision_avoidance(),
-    entry_leaving_nest(),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_sensors(sensors),
-    m_actuators(actuators) {
+    uint8_t max_states)
+    : state_machine::hfsm(server, max_states),
+      HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
+      entry_transport_to_nest(),
+      entry_collision_avoidance(),
+      entry_leaving_nest(),
+      m_rng(argos::CRandom::CreateRNG("argos")),
+      m_sensors(sensors),
+      m_actuators(actuators) {
   /* client::insmod("base_foraging_fsm", */
   /*                   rcppsw::er::er_lvl::DIAG, */
   /*                   rcppsw::er::er_lvl::NOM); */
@@ -81,15 +81,17 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   argos::CVector2 diff_vector;
   argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
   m_sensors->calc_diffusion_vector(&diff_vector);
-  m_actuators->set_heading(m_actuators->max_wheel_speed() * diff_vector -
-                           argos::CVector2(m_actuators->max_wheel_speed() * 0.25,
-                                           current_heading));
+  m_actuators->set_heading(
+      m_actuators->max_wheel_speed() * diff_vector -
+      argos::CVector2(m_actuators->max_wheel_speed() * 0.25, current_heading));
   if (!m_sensors->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
   }
   return state_machine::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, state_machine::event_data) {
+HFSM_STATE_DEFINE(base_foraging_fsm,
+                  transport_to_nest,
+                  state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
             "FATAL: ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
@@ -163,7 +165,8 @@ void base_foraging_fsm::init(void) {
   hfsm::init();
 } /* init() */
 
-argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
+argos::CVector2 base_foraging_fsm::randomize_vector_angle(
+    argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
   vector.Rotate(m_rng->Uniform(range));

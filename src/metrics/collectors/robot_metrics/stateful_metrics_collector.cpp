@@ -34,8 +34,8 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  ******************************************************************************/
 stateful_metrics_collector::stateful_metrics_collector(const std::string ofname,
                                                        bool collect_cum,
-                                                       uint collect_interval) :
-    base_metric_collector(ofname, collect_cum), m_stats() {
+                                                       uint collect_interval)
+    : base_metric_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -45,7 +45,9 @@ stateful_metrics_collector::stateful_metrics_collector(const std::string ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string stateful_metrics_collector::csv_header_build(const std::string& header) {
+std::string stateful_metrics_collector::csv_header_build(
+    const std::string &header) {
+  // clang-format off
   if (collect_cum()) {
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_block"  + separator() +
@@ -57,6 +59,7 @@ std::string stateful_metrics_collector::csv_header_build(const std::string& head
         "n_acquiring_block"  + separator() +
         "n_vectoring_to_block"  + separator();
   }
+  // clang-format on
 } /* csv_header_build() */
 
 void stateful_metrics_collector::reset(void) {
@@ -65,8 +68,10 @@ void stateful_metrics_collector::reset(void) {
 } /* reset() */
 
 void stateful_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::robot_metrics::stateful_metrics&>(metrics);
+    const collectible_metrics::base_collectible_metrics &metrics) {
+  auto &m =
+      static_cast<const collectible_metrics::robot_metrics::stateful_metrics &>(
+          metrics);
   m_stats.n_acquiring_block += m.is_acquiring_block();
   m_stats.n_vectoring_to_block += m.is_vectoring_to_block();
 
@@ -74,7 +79,7 @@ void stateful_metrics_collector::collect(
   m_stats.n_cum_vectoring_to_block += m.is_vectoring_to_block();
 } /* collect() */
 
-bool stateful_metrics_collector::csv_line_build(std::string& line) {
+bool stateful_metrics_collector::csv_line_build(std::string &line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_acquiring_block) + separator() +
            std::to_string(m_stats.n_cum_acquiring_block) + separator() +

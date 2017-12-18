@@ -22,15 +22,15 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include <argos3/core/utility/datatypes/color.h>
 
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -43,31 +43,41 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_fsm::acquire_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-    const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors), actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_cache, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    exit_acquire_cache(),
-    mc_nest_center(params->nest_center),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_map(map),
-    m_server(server),
-    m_sensors(sensors),
-    m_vector_fsm(params->times.frequent_collision_thresh,
-                 server, sensors, actuators),
-    m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                  server, sensors, actuators),
-    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache, NULL,
-                                  NULL, &exit_acquire_cache),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE, &acquire_cache);
+    const struct params::fsm_params *params,
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    : base_foraging_fsm(
+          server,
+          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          actuators,
+          ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_cache, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      exit_acquire_cache(),
+      mc_nest_center(params->nest_center),
+      m_rng(argos::CRandom::CreateRNG("argos")),
+      m_map(map),
+      m_server(server),
+      m_sensors(sensors),
+      m_vector_fsm(params->times.frequent_collision_thresh,
+                   server,
+                   sensors,
+                   actuators),
+      m_explore_fsm(params->times.unsuccessful_explore_dir_change,
+                    server,
+                    sensors,
+                    actuators),
+      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache,
+                                               NULL,
+                                               NULL,
+                                               &exit_acquire_cache),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE,
+                              &acquire_cache);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
@@ -104,7 +114,7 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
  ******************************************************************************/
 bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
-      m_vector_fsm.is_avoiding_collision();
+         m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 /*******************************************************************************
@@ -133,7 +143,6 @@ void acquire_cache_fsm::init(void) {
 
 bool acquire_cache_fsm::acquire_known_cache(
     std::list<representation::perceived_cache> caches) {
-
   /*
    * If we don't know of any caches, and we aren't currently running, we cannot
    * acquire a known cache. However, if we don't know of any caches, but we are
@@ -163,8 +172,7 @@ bool acquire_cache_fsm::acquire_known_cache(
   if (!m_vector_fsm.task_running()) {
     controller::depth1::existing_cache_selector selector(m_server,
                                                          mc_nest_center);
-    auto best = selector.calc_best(caches,
-                                   m_sensors->robot_loc());
+    auto best = selector.calc_best(caches, m_sensors->robot_loc());
     ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
            best.first->id(),
            best.first->discrete_loc().first,

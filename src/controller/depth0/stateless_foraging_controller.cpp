@@ -24,14 +24,14 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
 
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/params/sensor_params.hpp"
-#include "fordyca/params/actuator_params.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
+#include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,14 +41,13 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_foraging_controller::stateless_foraging_controller(void) :
-    base_foraging_controller(),
-    m_fsm() {}
+stateless_foraging_controller::stateless_foraging_controller(void)
+    : base_foraging_controller(), m_fsm() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateless_foraging controller");
@@ -57,12 +56,12 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
   param_repo.parse_all(node);
   param_repo.show_all(client::server_handle()->log_stream());
 
-  m_fsm.reset(
-      new fsm::depth0::stateless_foraging_fsm(static_cast<const struct params::fsm_params*>(
+  m_fsm.reset(new fsm::depth0::stateless_foraging_fsm(
+      static_cast<const struct params::fsm_params *>(
           param_repo.get_params("fsm")),
-                                              base_foraging_controller::server(),
-                                              base_foraging_controller::sensors(),
-                                              base_foraging_controller::actuators()));
+      base_foraging_controller::server(),
+      base_foraging_controller::sensors(),
+      base_foraging_controller::actuators()));
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 
@@ -96,7 +95,7 @@ bool stateless_foraging_controller::is_avoiding_collision(void) const {
  * Distance Diagnostics
  ******************************************************************************/
 size_t stateless_foraging_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str()+2);
+  return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
 
 double stateless_foraging_controller::timestep_distance(void) const {
@@ -105,6 +104,7 @@ double stateless_foraging_controller::timestep_distance(void) const {
 
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;
-REGISTER_CONTROLLER(stateless_foraging_controller, "stateless_foraging_controller");
+REGISTER_CONTROLLER(stateless_foraging_controller,
+                    "stateless_foraging_controller");
 
 NS_END(depth0, controller, fordyca);
