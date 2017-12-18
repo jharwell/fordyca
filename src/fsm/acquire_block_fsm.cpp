@@ -22,14 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_block_fsm.hpp"
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/params/fsm_params.hpp"
+#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/controller/depth0/block_selector.hpp"
+#include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -42,30 +42,39 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_block_fsm::acquire_block_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-    const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors), actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    exit_acquire_block(),
-    mc_nest_center(params->nest_center),
-    m_rng(argos::CRandom::CreateRNG("argos")),
-    m_map(map),
-    m_server(server),
-    m_sensors(sensors),
-    m_vector_fsm(params->times.frequent_collision_thresh,
-                 server, sensors, actuators),
-    m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                  server, sensors, actuators),
-    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block, NULL,
-                                  NULL, &exit_acquire_block),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+    const struct params::fsm_params *params,
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::depth0::foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    : base_foraging_fsm(
+          server,
+          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          actuators,
+          ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      exit_acquire_block(),
+      mc_nest_center(params->nest_center),
+      m_rng(argos::CRandom::CreateRNG("argos")),
+      m_map(map),
+      m_server(server),
+      m_sensors(sensors),
+      m_vector_fsm(params->times.frequent_collision_thresh,
+                   server,
+                   sensors,
+                   actuators),
+      m_explore_fsm(params->times.unsuccessful_explore_dir_change,
+                    server,
+                    sensors,
+                    actuators),
+      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block,
+                                               NULL,
+                                               NULL,
+                                               &exit_acquire_block),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE_ND(acquire_block_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
@@ -103,7 +112,7 @@ bool acquire_block_fsm::is_exploring_for_block(void) const {
 
 bool acquire_block_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
-      m_vector_fsm.is_avoiding_collision();
+         m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 /*******************************************************************************
@@ -127,14 +136,13 @@ void acquire_block_fsm::init(void) {
 } /* init() */
 
 bool acquire_block_fsm::acquire_known_block(
-    std::list<std::pair<const representation::block*, double>> blocks) {
-
-    /*
-   * If we don't know of any blocks, and we aren't currently running, we cannot
-   * acquire a known block. However, if we don't know of any blocks, but we are
-   * currently on our way to a block (i.e. we "forgot" about it en-route, then
-   * we still might be able to acquire one, so don't give up just yet).
-   */
+    std::list<std::pair<const representation::block *, double>> blocks) {
+  /*
+ * If we don't know of any blocks, and we aren't currently running, we cannot
+ * acquire a known block. However, if we don't know of any blocks, but we are
+ * currently on our way to a block (i.e. we "forgot" about it en-route, then
+ * we still might be able to acquire one, so don't give up just yet).
+ */
   if (!blocks.size() && !m_vector_fsm.task_running()) {
     return false;
   }
@@ -205,6 +213,5 @@ void acquire_block_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
-
 
 NS_END(controller, fordyca);

@@ -21,11 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
+#include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,31 +37,32 @@ NS_START(fordyca, support, depth0);
  ******************************************************************************/
 stateful_foraging_qt_user_functions::stateful_foraging_qt_user_functions() {
   RegisterUserFunction<stateful_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(&stateful_foraging_qt_user_functions::Draw);
+                       argos::CFootBotEntity>(
+      &stateful_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity &c_entity) {
   stateless_foraging_qt_user_functions::Draw(c_entity);
 
-  controller::base_foraging_controller& controller =
-      dynamic_cast<controller::base_foraging_controller&>(
+  controller::base_foraging_controller &controller =
+      dynamic_cast<controller::base_foraging_controller &>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_los()) {
-    const representation::line_of_sight* los = controller.los();
+    const representation::line_of_sight *los = controller.los();
     const double resolution = 0.2;
     std::vector<argos::CVector2> points;
-    points.emplace_back(-resolution * los->sizex()/2,
-                        -resolution * los->sizey()/2);
-    points.emplace_back(-resolution * los->sizex()/2,
-                        resolution * los->sizey()/2);
-    points.emplace_back(resolution * los->sizex()/2,
-                        resolution * los->sizey()/2);
-    points.emplace_back(resolution * los->sizex()/2,
-                        -resolution * los->sizey()/2);
+    points.emplace_back(-resolution * los->sizex() / 2,
+                        -resolution * los->sizey() / 2);
+    points.emplace_back(-resolution * los->sizex() / 2,
+                        resolution * los->sizey() / 2);
+    points.emplace_back(resolution * los->sizex() / 2,
+                        resolution * los->sizey() / 2);
+    points.emplace_back(resolution * los->sizex() / 2,
+                        -resolution * los->sizey() / 2);
 
     /* draw slightly above the ground so that it renders better */
     DrawPolygon(argos::CVector3(0, 0, 0.05),

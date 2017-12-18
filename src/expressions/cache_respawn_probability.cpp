@@ -32,20 +32,20 @@ NS_START(fordyca, expressions);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_respawn_probability::cache_respawn_probability(double scale_factor) :
-    mc_scale_factor(scale_factor) {}
+cache_respawn_probability::cache_respawn_probability(double scale_factor)
+    : mc_scale_factor(scale_factor) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {
-    double tmp;
-    if (0 == n_collectors) {
-      tmp = mc_scale_factor * n_foragers;
-    } else {
-      tmp = mc_scale_factor * n_foragers/n_collectors;
-    }
-    return set_result(1 - std::exp(-tmp));
-  } /* calc() */
+  double tmp;
+  if (0 == n_collectors) {
+    tmp = mc_scale_factor * n_foragers;
+  } else {
+    tmp = mc_scale_factor * n_foragers / n_collectors;
+  }
+  return set_result(1 - std::exp(-tmp));
+} /* calc() */
 
 NS_END(expressions, fordyca);

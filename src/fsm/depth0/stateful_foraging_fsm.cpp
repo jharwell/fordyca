@@ -21,9 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,31 +35,38 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateful_foraging_fsm::stateful_foraging_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-    const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
-                      actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-    entry_leaving_nest(),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    m_task_running(false),
-    m_sensors(sensors),
-    m_block_fsm(params, server,
-                std::static_pointer_cast<controller::depth1::foraging_sensors>(sensors),
-                actuators, map),
-    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest, NULL,
-                                  &entry_leaving_nest, NULL),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+    const struct params::fsm_params *params,
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    : base_foraging_fsm(
+          server,
+          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          actuators,
+          ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(leaving_nest, &start),
+      entry_leaving_nest(),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      m_task_running(false),
+      m_sensors(sensors),
+      m_block_fsm(params,
+                  server,
+                  std::static_pointer_cast<controller::depth1::foraging_sensors>(
+                      sensors),
+                  actuators,
+                  map),
+      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+                   HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                               NULL,
+                                               &entry_leaving_nest,
+                                               NULL),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
-    }
+}
 
 HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
   /* first time running FSM */
@@ -81,12 +88,16 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
   ER_ASSERT(0, "FATAL: Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
-  HFSM_STATE_DEFINE(stateful_foraging_fsm, block_to_nest, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
+HFSM_STATE_DEFINE(stateful_foraging_fsm,
+                  block_to_nest,
+                  state_machine::event_data) {
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
+            "Bad event type");
 
   /* first time running FSM; transitioned from START state */
   if (!this->task_running()) {
-    tasks::foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
+    tasks::foraging_signal_argument a(
+        controller::foraging_signal::ACQUIRE_FREE_BLOCK);
     m_block_fsm.task_start(&a);
     m_task_running = true;
     return controller::foraging_signal::HANDLED;
@@ -160,6 +171,5 @@ void stateful_foraging_fsm::task_execute(void) {
 bool stateful_foraging_fsm::block_acquired(void) const {
   return m_block_fsm.block_acquired();
 } /* block_acquired() */
-
 
 NS_END(depth0, fsm, fordyca);

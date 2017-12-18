@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,48 +36,59 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 block_to_nest_fsm::block_to_nest_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-    const std::shared_ptr<const representation::perceived_arena_map>& map) :
-    base_foraging_fsm(server,
-                      std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
-                      actuators, ST_MAX_STATES),
-    HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
-    HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
-    entry_transport_to_nest(),
-    entry_collision_avoidance(),
-    HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
-    HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-    entry_wait_for_pickup(),
-    m_pickup_count(0),
-    m_sensors(sensors),
-    m_block_fsm(params, server, sensors, actuators, map),
-    m_cache_fsm(params, server, sensors, actuators, map),
-    mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-        HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup, NULL,
-                                  &entry_wait_for_pickup, NULL),
-        HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_pickup, NULL,
-                                  &entry_wait_for_pickup, NULL),
-        HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest, NULL,
-                                    &entry_transport_to_nest, NULL),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance, NULL,
-                                  &entry_collision_avoidance, NULL),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+    const struct params::fsm_params *params,
+    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
+    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    : base_foraging_fsm(
+          server,
+          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          actuators,
+          ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
+      HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
+      entry_transport_to_nest(),
+      entry_collision_avoidance(),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      entry_wait_for_pickup(),
+      m_pickup_count(0),
+      m_sensors(sensors),
+      m_block_fsm(params, server, sensors, actuators, map),
+      m_cache_fsm(params, server, sensors, actuators, map),
+      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                                               NULL,
+                                               &entry_wait_for_pickup,
+                                               NULL),
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_pickup,
+                                               NULL,
+                                               &entry_wait_for_pickup,
+                                               NULL),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                                               NULL,
+                                               &entry_transport_to_nest,
+                                               NULL),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
+                                               NULL,
+                                               &entry_collision_avoidance,
+                                               NULL),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {
     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal()) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
+    } else if (controller::foraging_signal::ACQUIRE_CACHED_BLOCK ==
+               data->signal()) {
       internal_event(ST_ACQUIRE_CACHED_BLOCK);
       return controller::foraging_signal::HANDLED;
     }
@@ -85,7 +96,8 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
     if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_FINISHED);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
+    } else if (controller::foraging_signal::COLLISION_IMMINENT ==
+               data->signal()) {
       internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
@@ -109,7 +121,9 @@ HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_block_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_nest_fsm,
+                  wait_for_block_pickup,
+                  state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_block_fsm.task_reset();
     m_pickup_count = 0;
@@ -136,7 +150,9 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_block_pickup, state_machine::event
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_nest_fsm, wait_for_cache_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(block_to_nest_fsm,
+                  wait_for_cache_pickup,
+                  state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
@@ -161,7 +177,7 @@ __pure bool block_to_nest_fsm::is_exploring_for_block(void) const {
 
 __pure bool block_to_nest_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
-      m_cache_fsm.is_avoiding_collision();
+         m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 __pure bool block_to_nest_fsm::is_transporting_to_nest(void) const {
@@ -211,9 +227,10 @@ void block_to_nest_fsm::init(void) {
   m_block_fsm.task_reset();
 } /* init() */
 
-void block_to_nest_fsm::task_start(const rcppsw::task_allocation::taskable_argument* const arg) {
-  const tasks::foraging_signal_argument* const a =
-      dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
+void block_to_nest_fsm::task_start(
+    const rcppsw::task_allocation::taskable_argument *const arg) {
+  const tasks::foraging_signal_argument *const a =
+      dynamic_cast<const tasks::foraging_signal_argument *const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   inject_event(a->signal(), state_machine::event_type::NORMAL);
 }

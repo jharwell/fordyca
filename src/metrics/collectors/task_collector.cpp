@@ -34,8 +34,8 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 task_collector::task_collector(const std::string ofname,
                                bool collect_cum,
-                               uint collect_interval) :
-    base_metric_collector(ofname, collect_cum), m_stats() {
+                               uint collect_interval)
+    : base_metric_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -45,7 +45,8 @@ task_collector::task_collector(const std::string ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string task_collector::csv_header_build(const std::string& header) {
+std::string task_collector::csv_header_build(const std::string &header) {
+  // clang-format off
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
         "n_collectors"  + separator() +
@@ -61,6 +62,7 @@ std::string task_collector::csv_header_build(const std::string& header) {
         "n_foragers" + separator() +
         "n_generalists" + separator();
   }
+  // clang-format on
 } /* csv_header_build() */
 
 void task_collector::reset(void) {
@@ -70,8 +72,8 @@ void task_collector::reset(void) {
 } /* reset() */
 
 void task_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::task_metrics&>(metrics);
+    const collectible_metrics::base_collectible_metrics &metrics) {
+  auto &m = static_cast<const collectible_metrics::task_metrics &>(metrics);
   m_stats.n_collectors += m.task_name() == "collector";
   m_stats.n_foragers += m.task_name() == "forager";
   m_stats.n_generalists += m.task_name() == "generalist";
@@ -83,7 +85,7 @@ void task_collector::collect(
   }
 } /* collect() */
 
-bool task_collector::csv_line_build(std::string& line) {
+bool task_collector::csv_line_build(std::string &line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_collectors) + separator() +
            std::to_string(m_stats.n_cum_collectors) + separator() +

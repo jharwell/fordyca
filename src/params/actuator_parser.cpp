@@ -31,13 +31,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node = argos::GetNode(
-      argos::GetNode(node, "actuators"), "wheels");
+void actuator_parser::parse(argos::TConfigurationNode &node) {
+  argos::TConfigurationNode wheel_node =
+      argos::GetNode(argos::GetNode(node, "actuators"), "wheels");
 
   m_params.reset(new struct actuator_params);
 
-try {
+  try {
     argos::CDegrees cAngle;
     argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
     m_params->wheels.hard_turn_threshold = ToRadians(cAngle);
@@ -45,19 +45,24 @@ try {
     m_params->wheels.soft_turn_threshold = ToRadians(cAngle);
     argos::GetNodeAttribute(wheel_node, "no_turn_angle_threshold", cAngle);
     m_params->wheels.no_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "max_speed", m_params->wheels.max_speed);
-  }
-  catch(argos::CARGoSException& ex) {
+    argos::GetNodeAttribute(wheel_node,
+                            "max_speed",
+                            m_params->wheels.max_speed);
+  } catch (argos::CARGoSException &ex) {
     using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing controller wheel turning parameters.", ex);
+    THROW_ARGOSEXCEPTION_NESTED(
+        "Error initializing controller wheel turning parameters.", ex);
   }
 } /* parse() */
 
-void actuator_parser::show(std::ostream& stream) {
+void actuator_parser::show(std::ostream &stream) {
   stream << "====================\nActuator params\n====================\n";
-  stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold << std::endl;
-  stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold << std::endl;
-  stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold << std::endl;
+  stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold
+         << std::endl;
+  stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold
+         << std::endl;
+  stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold
+         << std::endl;
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
 } /* show() */
 

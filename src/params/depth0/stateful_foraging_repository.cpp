@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
 #include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/sensor_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

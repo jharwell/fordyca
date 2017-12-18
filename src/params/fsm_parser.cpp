@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/utils/line_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fsm_parser::parse(argos::TConfigurationNode& node) {
+void fsm_parser::parse(argos::TConfigurationNode &node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
   m_params.reset(new fsm_params);
@@ -50,7 +50,7 @@ void fsm_parser::parse(argos::TConfigurationNode& node) {
                             std::atof(res[1].c_str()));
 } /* parse() */
 
-void fsm_parser::show(std::ostream& stream) {
+void fsm_parser::show(std::ostream &stream) {
   stream << "====================\nFSM params\n====================\n";
   stream << "times.unsuccessful_explore_dir_change="
          << m_params->times.unsuccessful_explore_dir_change << std::endl;

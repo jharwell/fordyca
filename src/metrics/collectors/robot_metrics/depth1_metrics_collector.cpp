@@ -34,8 +34,8 @@ NS_START(fordyca, metrics, collectors, robot_metrics);
  ******************************************************************************/
 depth1_metrics_collector::depth1_metrics_collector(const std::string ofname,
                                                    bool collect_cum,
-                                                   uint collect_interval) :
-    base_metric_collector(ofname, collect_cum), m_stats() {
+                                                   uint collect_interval)
+    : base_metric_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -45,7 +45,9 @@ depth1_metrics_collector::depth1_metrics_collector(const std::string ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
+std::string depth1_metrics_collector::csv_header_build(
+    const std::string &header) {
+  // clang-format off
   if (collect_cum()) {
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +
@@ -63,6 +65,7 @@ std::string depth1_metrics_collector::csv_header_build(const std::string& header
       "n_exploring_for_cache" + separator() +
       "n_transporting_to_cache" + separator();
   }
+  // clang-format on
 } /* csv_header_build() */
 
 void depth1_metrics_collector::reset(void) {
@@ -71,8 +74,10 @@ void depth1_metrics_collector::reset(void) {
 } /* reset() */
 
 void depth1_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::robot_metrics::depth1_metrics&>(metrics);
+    const collectible_metrics::base_collectible_metrics &metrics) {
+  auto &m =
+      static_cast<const collectible_metrics::robot_metrics::depth1_metrics &>(
+          metrics);
   m_stats.n_exploring_for_cache += m.is_exploring_for_cache();
   m_stats.n_acquiring_cache += m.is_acquiring_cache();
   m_stats.n_vectoring_to_cache += m.is_vectoring_to_cache();
@@ -86,7 +91,7 @@ void depth1_metrics_collector::collect(
   }
 } /* collect() */
 
-bool depth1_metrics_collector::csv_line_build(std::string& line) {
+bool depth1_metrics_collector::csv_line_build(std::string &line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_acquiring_cache) + separator() +
            std::to_string(m_stats.n_cum_acquiring_cache) + separator() +

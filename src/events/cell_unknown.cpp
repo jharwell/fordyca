@@ -34,16 +34,16 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_unknown::visit(representation::perceived_cell2D& cell) {
+void cell_unknown::visit(representation::perceived_cell2D &cell) {
   cell.decoratee().accept(*this);
 } /* visit() */
 
-void cell_unknown::visit(representation::cell2D& cell) {
+void cell_unknown::visit(representation::cell2D &cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
+void cell_unknown::visit(fsm::cell2D_fsm &fsm) {
   /*
    * Much faster to check this than to send a redundant event to the
    * FSM. Doesn't matter for just a few robots, but it does when you have

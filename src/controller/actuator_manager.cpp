@@ -38,29 +38,29 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 actuator_manager::actuator_manager(
-    const struct params::actuator_params* params,
-    argos::CCI_DifferentialSteeringActuator* const wheels,
-    argos::CCI_LEDsActuator* const leds,
-    argos::CCI_RangeAndBearingActuator* const raba) :
-    state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
-    no_turn(),
-    soft_turn(),
-    hard_turn(),
-    m_wheels(wheels),
-    m_leds(leds),
-    m_raba(raba),
-    mc_params(*params) {}
+    const struct params::actuator_params *params,
+    argos::CCI_DifferentialSteeringActuator *const wheels,
+    argos::CCI_LEDsActuator *const leds,
+    argos::CCI_RangeAndBearingActuator *const raba)
+    : state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
+      no_turn(),
+      soft_turn(),
+      hard_turn(),
+      m_wheels(wheels),
+      m_leds(leds),
+      m_raba(raba),
+      mc_params(*params) {}
 
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void actuator_manager::set_heading(const argos::CVector2& heading,
+void actuator_manager::set_heading(const argos::CVector2 &heading,
                                    bool force_hard_turn) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_NO_TURN,    /* no turn */
-        ST_SOFT_TURN,  /* slow turn */
-        ST_HARD_TURN,  /* hard turn */
-        };
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
+      ST_NO_TURN,   /* no turn */
+      ST_SOFT_TURN, /* slow turn */
+      ST_HARD_TURN, /* hard turn */
+  };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<turn_data>(heading, force_hard_turn));
@@ -72,45 +72,49 @@ void actuator_manager::set_heading(const argos::CVector2& heading,
 FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   if (data->force_hard ||
       Abs(data->heading.Angle().SignedNormalize()) >
-      mc_params.wheels.hard_turn_threshold) {
+          mc_params.wheels.hard_turn_threshold) {
     internal_event(ST_HARD_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) >
              mc_params.wheels.soft_turn_threshold) {
     internal_event(ST_SOFT_TURN);
   }
-  set_wheel_speeds(data->heading.Length(), data->heading.Length(),
+  set_wheel_speeds(data->heading.Length(),
+                   data->heading.Length(),
                    data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   if (data->force_hard ||
       Abs(data->heading.Angle().SignedNormalize()) >
-      mc_params.wheels.hard_turn_threshold) {
+          mc_params.wheels.hard_turn_threshold) {
     internal_event(ST_HARD_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) <=
              mc_params.wheels.no_turn_threshold) {
     internal_event(ST_NO_TURN);
   }
   /* Both wheels go straight, but one is faster than the other */
-  double speed_factor = (mc_params.wheels.hard_turn_threshold -
-                              Abs(data->heading.Angle())) /
-                             mc_params.wheels.hard_turn_threshold;
-  double speed1 = data->heading.Length() - data->heading.Length() *
-                  (1.0 - speed_factor);
-  double speed2 = data->heading.Length() + data->heading.Length() *
-                  (1.0 - speed_factor);
+  double speed_factor =
+      (mc_params.wheels.hard_turn_threshold - Abs(data->heading.Angle())) /
+      mc_params.wheels.hard_turn_threshold;
+  double speed1 =
+      data->heading.Length() - data->heading.Length() * (1.0 - speed_factor);
+  double speed2 =
+      data->heading.Length() + data->heading.Length() * (1.0 - speed_factor);
   set_wheel_speeds(speed1, speed2, data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (Abs(data->heading.Angle().SignedNormalize()) <
-      mc_params.wheels.hard_turn_threshold && !data->force_hard) {
+          mc_params.wheels.hard_turn_threshold &&
+      !data->force_hard) {
     internal_event(ST_SOFT_TURN);
   } else if (Abs(data->heading.Angle().SignedNormalize()) <=
-             mc_params.wheels.no_turn_threshold && !data->force_hard) {
+                 mc_params.wheels.no_turn_threshold &&
+             !data->force_hard) {
     internal_event(ST_NO_TURN);
   }
-  set_wheel_speeds(-mc_params.wheels.max_speed, mc_params.wheels.max_speed,
+  set_wheel_speeds(-mc_params.wheels.max_speed,
+                   mc_params.wheels.max_speed,
                    data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
@@ -118,24 +122,25 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_manager::set_wheel_speeds(double speed1, double speed2,
+void actuator_manager::set_wheel_speeds(double speed1,
+                                        double speed2,
                                         argos::CRadians heading) {
   double left_wheel_speed, right_wheel_speed;
   if (heading > argos::CRadians::ZERO) {
     /* Turn Left */
-    left_wheel_speed  = speed1;
+    left_wheel_speed = speed1;
     right_wheel_speed = speed2;
   } else {
     /* Turn Right */
-    left_wheel_speed  = speed2;
+    left_wheel_speed = speed2;
     right_wheel_speed = speed1;
   }
 
   /* Finally, set the wheel speeds */
-  left_wheel_speed = argos::Min<double>(left_wheel_speed,
-                                             mc_params.wheels.max_speed);
-  right_wheel_speed = argos::Min<double>(right_wheel_speed,
-                                             mc_params.wheels.max_speed);
+  left_wheel_speed =
+      argos::Min<double>(left_wheel_speed, mc_params.wheels.max_speed);
+  right_wheel_speed =
+      argos::Min<double>(right_wheel_speed, mc_params.wheels.max_speed);
   m_wheels->SetLinearVelocity(left_wheel_speed, right_wheel_speed);
 } /* set_wheel_speeds() */
 
@@ -144,10 +149,10 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
 
   if (ang_speed < 0) {
     right_wheel_speed = lin_speed + ang_speed;
-    left_wheel_speed  = lin_speed;
+    left_wheel_speed = lin_speed;
   } else {
-    left_wheel_speed  = lin_speed + ang_speed;
-     right_wheel_speed  = lin_speed;
+    left_wheel_speed = lin_speed + ang_speed;
+    right_wheel_speed = lin_speed;
   }
 
   left_wheel_speed = std::min(left_wheel_speed, mc_params.wheels.max_speed);

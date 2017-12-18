@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/support/depth0/stateless_foraging_qt_user_functions.hpp"
+#include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
 
@@ -35,16 +35,18 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {
-RegisterUserFunction<stateless_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(&stateless_foraging_qt_user_functions::Draw);
+  RegisterUserFunction<stateless_foraging_qt_user_functions,
+                       argos::CFootBotEntity>(
+      &stateless_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  controller::base_foraging_controller& controller =
-      dynamic_cast<controller::base_foraging_controller&>(
+void stateless_foraging_qt_user_functions::Draw(
+    argos::CFootBotEntity &c_entity) {
+  controller::base_foraging_controller &controller =
+      dynamic_cast<controller::base_foraging_controller &>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.is_carrying_block()) {
@@ -59,18 +61,15 @@ void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
             argos::CColor::BLACK);
     std::string text;
     if (controller.block()->display_id()) {
-      text = c_entity.GetId() + "/" +
-              + "b" + std::to_string(controller.block()->id());
+      text = c_entity.GetId() + "/" + +"b" +
+             std::to_string(controller.block()->id());
     } else {
       text = c_entity.GetId();
     }
-      DrawText(argos::CVector3(0.0, 0.0, 0.5),
-               text.c_str(),
-               argos::CColor::RED);
+    DrawText(argos::CVector3(0.0, 0.0, 0.5), text.c_str(), argos::CColor::RED);
   } else {
     if (controller.display_id()) {
-      DrawText(argos::CVector3(0.0, 0.0, 0.3),
-               c_entity.GetId().c_str());
+      DrawText(argos::CVector3(0.0, 0.0, 0.3), c_entity.GetId().c_str());
     }
   }
 }

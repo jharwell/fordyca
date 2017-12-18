@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,21 +35,21 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         const representation::block* block, size_t x, size_t y) :
-    perceived_cell_op(x, y),
-    client(server),
-    m_block(block) {
+block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
+                         const representation::block *block,
+                         size_t x,
+                         size_t y)
+    : perceived_cell_op(x, y), client(server), m_block(block) {
   client::insmod("block_found",
-                    rcppsw::er::er_lvl::DIAG,
-                    rcppsw::er::er_lvl::NOM);
+                 rcppsw::er::er_lvl::DIAG,
+                 rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_found::visit(representation::cell2D& cell) {
-  cell.entity(const_cast<representation::block*>(m_block));
+void block_found::visit(representation::cell2D &cell) {
+  cell.entity(const_cast<representation::block *>(m_block));
 
   /*
    * We do not assert that the cell we found a block in does not have a cache,
@@ -64,7 +64,7 @@ void block_found::visit(representation::cell2D& cell) {
   }
 } /* visit() */
 
-void block_found::visit(fsm::cell2D_fsm& fsm) {
+void block_found::visit(fsm::cell2D_fsm &fsm) {
   if (fsm.state_has_cache()) {
     for (size_t i = fsm.block_count(); i > 1; --i) {
       fsm.event_block_pickup();
@@ -73,10 +73,11 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
     fsm.event_block_drop();
   }
   ER_ASSERT(fsm.state_has_block(),
-            "FATAL: Perceived cell does not contain block after block found event");
+            "FATAL: Perceived cell does not contain block after block found "
+            "event");
 } /* visit() */
 
-void block_found::visit(representation::perceived_cell2D& cell) {
+void block_found::visit(representation::perceived_cell2D &cell) {
   /*
    * Update the pheromone density associated with the cell BEFORE updating the
    * state of the cell.
@@ -100,7 +101,7 @@ void block_found::visit(representation::perceived_cell2D& cell) {
   cell.decoratee().accept(*this);
 } /* visit() */
 
-void block_found::visit(representation::perceived_arena_map& map) {
+void block_found::visit(representation::perceived_arena_map &map) {
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 

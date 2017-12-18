@@ -31,27 +31,27 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void sensor_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode diff_node = argos::GetNode(
-      argos::GetNode(node, "sensors"), "diffusion");
+void sensor_parser::parse(argos::TConfigurationNode &node) {
+  argos::TConfigurationNode diff_node =
+      argos::GetNode(argos::GetNode(node, "sensors"), "diffusion");
   m_params.reset(new sensor_params);
 
-      argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0),
-                                                     argos::CDegrees(10.0));
-      argos::GetNodeAttribute(diff_node,
-                              "go_straight_angle_range",
-                              m_params->diffusion.go_straight_angle_range);
-      m_params->diffusion.go_straight_angle_range.Set(
-          m_params->diffusion.go_straight_angle_range.GetMin(),
-          m_params->diffusion.go_straight_angle_range.GetMax());
-      argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
+  argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0),
+                                                 argos::CDegrees(10.0));
+  argos::GetNodeAttribute(diff_node,
+                          "go_straight_angle_range",
+                          m_params->diffusion.go_straight_angle_range);
+  m_params->diffusion.go_straight_angle_range.Set(
+      m_params->diffusion.go_straight_angle_range.GetMin(),
+      m_params->diffusion.go_straight_angle_range.GetMax());
+  argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
 } /* parse() */
 
-void sensor_parser::show(std::ostream& stream) {
+void sensor_parser::show(std::ostream &stream) {
   stream << "====================\nSensor params\n====================\n";
   stream << "delta=" << m_params->diffusion.delta << std::endl;
-  stream << "go_straight_angle_range=" <<
-      m_params->diffusion.go_straight_angle_range << std::endl;
+  stream << "go_straight_angle_range="
+         << m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
 
 NS_END(params, fordyca);

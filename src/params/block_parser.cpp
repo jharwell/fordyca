@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_parser::parse(argos::TConfigurationNode& node) {
+void block_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct block_params);
 
   argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
@@ -40,7 +40,7 @@ void block_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
 } /* parse() */
 
-void block_parser::show(std::ostream& stream) {
+void block_parser::show(std::ostream &stream) {
   stream << "====================\nBlock params\n====================\n";
   stream << "n_blocks=" << m_params->n_blocks << std::endl;
   stream << "dimension=" << m_params->dimension << std::endl;

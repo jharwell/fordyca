@@ -32,7 +32,7 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_parser::parse(argos::TConfigurationNode& node) {
+void cache_parser::parse(argos::TConfigurationNode &node) {
   m_params.reset(new struct cache_params);
 
   argos::GetNodeAttribute(node, "dimension", m_params->dimension);
@@ -41,11 +41,12 @@ void cache_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "usage_penalty", m_params->usage_penalty);
   argos::GetNodeAttribute(node, "create_static", m_params->create_static);
   argos::GetNodeAttribute(node, "create_dynamic", m_params->create_dynamic);
-  argos::GetNodeAttribute(node, "static_respawn_scale_factor",
+  argos::GetNodeAttribute(node,
+                          "static_respawn_scale_factor",
                           m_params->static_respawn_scale_factor);
 } /* parse() */
 
-void cache_parser::show(std::ostream& stream) {
+void cache_parser::show(std::ostream &stream) {
   stream << "====================\nCache params\n====================\n";
   stream << "dimension=" << m_params->dimension << std::endl;
   stream << "min_dist=" << m_params->min_dist << std::endl;
@@ -53,8 +54,8 @@ void cache_parser::show(std::ostream& stream) {
   stream << "usage_penalty=" << m_params->usage_penalty << std::endl;
   stream << "create_static=" << m_params->create_static << std::endl;
   stream << "create_dynamic=" << m_params->create_dynamic << std::endl;
-  stream << "static_respawn_scale_factor=" <<
-      m_params->static_respawn_scale_factor << std::endl;
+  stream << "static_respawn_scale_factor="
+         << m_params->static_respawn_scale_factor << std::endl;
 } /* show() */
 
 NS_END(depth1, params, fordyca);

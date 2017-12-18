@@ -30,14 +30,13 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D_fsm::cell2D_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server) :
-    state_machine::simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
-    state_unknown(),
-    state_empty(),
-    state_block(),
-    state_cache(),
-    m_block_count(0) {
+cell2D_fsm::cell2D_fsm(const std::shared_ptr<rcppsw::er::server> &server)
+    : state_machine::simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
+      state_unknown(),
+      state_empty(),
+      state_block(),
+      state_cache(),
+      m_block_count(0) {
   /* if (ERROR == attmod("cell2D_fsm")) { */
   /*   client::insmod("cell2D_fsm", */
   /*                     rcppsw::er::er_lvl::NOM, */
@@ -49,46 +48,46 @@ cell2D_fsm::cell2D_fsm(
  * Event Functions
  ******************************************************************************/
 void cell2D_fsm::event_unknown(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_UNKNOWN,   /* unknown */
-        ST_UNKNOWN,     /* empty */
-        ST_UNKNOWN, /* has block */
-        ST_UNKNOWN  /* has cache */
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
+      ST_UNKNOWN, /* unknown */
+      ST_UNKNOWN, /* empty */
+      ST_UNKNOWN, /* has block */
+      ST_UNKNOWN  /* has cache */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_unknown() */
 
 void cell2D_fsm::event_empty(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_EMPTY,                 /* unknown */
-        ST_EMPTY,                 /* empty */
-        ST_EMPTY,                 /* has block */
-        ST_EMPTY,                 /* has cache */
-        };
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
+      ST_EMPTY, /* unknown */
+      ST_EMPTY, /* empty */
+      ST_EMPTY, /* has block */
+      ST_EMPTY, /* has cache */
+  };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()], NULL);
 } /* event_empty() */
 
 void cell2D_fsm::event_block_drop(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        ST_HAS_BLOCK,             /* unknown */
-        ST_HAS_BLOCK,             /* empty */
-        ST_HAS_CACHE,             /* has block */
-        ST_HAS_CACHE              /* has cache */
-    };
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
+      ST_HAS_BLOCK, /* unknown */
+      ST_HAS_BLOCK, /* empty */
+      ST_HAS_CACHE, /* has block */
+      ST_HAS_CACHE  /* has cache */
+  };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<block_data>(false));
 } /* event_empty() */
 
 void cell2D_fsm::event_block_pickup(void) {
-  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS) {
-        state_machine::event_signal::FATAL,   /* unknown */
-        state_machine::event_signal::FATAL,   /* empty */
-        ST_EMPTY,                   /* has block */
-        ST_HAS_CACHE                /* has cache */
-    };
+  FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
+      state_machine::event_signal::FATAL, /* unknown */
+      state_machine::event_signal::FATAL, /* empty */
+      ST_EMPTY,                           /* has block */
+      ST_HAS_CACHE                        /* has cache */
+  };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<block_data>(true));
@@ -142,8 +141,6 @@ FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell2D_fsm::init(void) {
-  state_machine::simple_fsm::init();
-} /* init() */
+void cell2D_fsm::init(void) { state_machine::simple_fsm::init(); } /* init() */
 
 NS_END(fsm, fordyca);
