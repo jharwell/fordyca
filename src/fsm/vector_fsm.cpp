@@ -216,8 +216,8 @@ void vector_fsm::task_start(
       controller::foraging_signal::IGNORED, /* collision recovery */
       controller::foraging_signal::IGNORED, /* arrived */
   };
-  auto *const a = dynamic_cast<const tasks::vector_argument *>(arg);
-  ER_ASSERT(a, "FATAL: bad argument passed");
+  auto *const a = dynamic_cast<const tasks::vector_argument *>(c_arg);
+  ER_ASSERT(nullptr != a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<struct goal_data>(a->vector(),

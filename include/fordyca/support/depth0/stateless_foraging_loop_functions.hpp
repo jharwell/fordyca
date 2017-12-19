@@ -84,6 +84,12 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   std::string log_timestamp_calc(void);
   const std::string& metrics_path(void) const { return m_metrics_path; }
 
+  template<typename T>
+  void set_robot_tick(argos::CFootBotEntity& robot) {
+    auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+    controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
+  }
+
  private:
   void arena_map_init(params::loop_function_repository& repo);
   void output_init(const struct params::output_params* p_output);

@@ -194,13 +194,10 @@ void foraging_controller::process_los(
      * Cloning is definitely necessary here.
      */
     std::unique_ptr<representation::cache> clone = cache->clone();
-    events::cache_found op(base_foraging_controller::server(),
-                           clone.get(),
-                           clone->discrete_loc().first,
-                           clone->discrete_loc().second);
+    events::cache_found op(base_foraging_controller::server(), clone.get());
     map()->accept(op);
-    clone.reset(); /* get rid of clone--it is now safety copied */
-  }                /* for(cache..) */
+    clone.reset();
+  } /* for(cache..) */
 } /* process_los() */
 
 /*******************************************************************************

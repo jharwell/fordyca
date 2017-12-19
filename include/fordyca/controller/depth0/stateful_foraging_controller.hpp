@@ -100,15 +100,6 @@ class stateful_foraging_controller : public base_foraging_controller,
   tasks::foraging_task* current_task(void) const;
 
   /**
-   * @brief Set the current clock tick.
-   *
-   * In a real world, each robot would maintain its own clock tick, and overall
-   * there would no doubt be considerable skew; this is a simulation hack that
-   * makes things much nicer/easier to deal with.
-   */
-  void tick(uint tick);
-
-  /**
    * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);

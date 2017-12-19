@@ -50,8 +50,7 @@ class cache_found : public perceived_cell_op,
                     public rcppsw::er::client {
  public:
   cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-              representation::cache* cache,
-              size_t x, size_t y);
+              representation::cache* cache);
   ~cache_found(void) override;
 
   cache_found(const cache_found& op) = delete;

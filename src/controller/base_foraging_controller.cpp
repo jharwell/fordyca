@@ -151,4 +151,8 @@ std::string base_foraging_controller::dbg_header_calc(void) {
   return this->GetId();
 } /* dbg_header_calc() */
 
+void base_foraging_controller::tick(uint tick) {
+  sensors()->tick(tick);
+} /* tick() */
+
 NS_END(controller, fordyca);

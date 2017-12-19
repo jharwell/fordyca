@@ -25,6 +25,8 @@
 
 #include "fordyca/params/depth0/perceived_arena_map_params.hpp"
 #include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -44,7 +46,8 @@ perceived_arena_map::perceived_arena_map(
              c_params->grid.upper.GetX(),
              c_params->grid.upper.GetY(),
              m_server),
-      m_caches() {
+      m_caches(),
+      m_blocks() {
   deferred_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
@@ -68,17 +71,18 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<perceived_block> perceived_arena_map::blocks(void) const {
-  std::list<perceived_block> blocks;
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      if (m_grid.access(i, j).state_has_block()) {
-        blocks.emplace_back(m_grid.access(i, j).block(),
-                            m_grid.access(i, j).density());
-      }
-    } /* for(j..) */
-  }   /* for(i..) */
-  return blocks;
+std::list<perceived_block> perceived_arena_map::perceived_blocks(void) const {
+  std::list<perceived_block> pblocks;
+
+  for (auto &b : m_blocks) {
+    representation::perceived_block p(&b,
+                                      m_grid
+                                      .access(b.discrete_loc().first,
+                                              b.discrete_loc().second)
+                                      .density());
+    pblocks.push_back(p);
+  } /* for(&b..) */
+  return pblocks;
 } /* blocks() */
 
 std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
@@ -117,7 +121,48 @@ void perceived_arena_map::cache_add(representation::cache &cache) {
 } /* cache_add() */
 
 void perceived_arena_map::cache_remove(representation::cache &victim) {
+  /*
+   * We are removing a cache whose relevance probably has not yet expired, but
+   * we do not want to update the state of its hosting cell to empty just yet,
+   * like we do for blocks, the reason being that the logic for correctly doing
+   * so lies in the \ref cached_block_pickup class, and doing it here makes it
+   * impossible to handle OTHER cases of cached block pickup. So just erase the
+   * cache here.
+   */
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
+
+void perceived_arena_map::block_add(representation::block &block) {
+  /*
+   * If the block is already in our list of blocks we know about it needs to be
+   * removed, because the new version we just got from our LOS is more up to
+   * date.
+   */
+  assert(block.id() != -1);
+  auto it = std::find(m_blocks.begin(), m_blocks.end(), block);
+  if (m_blocks.end() != it) {
+    block_remove(*it);
+  }
+  it = std::find(m_blocks.begin(), m_blocks.end(), block);
+  assert(it == m_blocks.end());
+  for (auto& i : m_blocks) {
+    assert(i.id() != block.id());
+  } /* for(i..) */
+
+  m_blocks.push_back(block);
+} /* block_add() */
+
+void perceived_arena_map::block_remove(representation::block &victim) {
+  /*
+   * We are removing a block whose relevance probably has not yet expired, and
+   * therefore its hosting cell needs to have its state updated to be empty as
+   * well.
+   */
+  events::cell_empty op(victim.discrete_loc().first,
+                        victim.discrete_loc().second);
+  m_grid.access(victim.discrete_loc().first,
+                victim.discrete_loc().second).accept(op);
+  m_blocks.erase(std::remove(m_blocks.begin(), m_blocks.end(), victim));
+} /* block_remove() */
 
 NS_END(representation, fordyca);

@@ -125,13 +125,16 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool acquire_any_cache(void);
 
   /**
-   * @brief Acquirea known cache.
+   * @brief Acquire a known cache. If the robot's knowledge of the chosen
+   * cache's existence expires during the pursuit of said cache, that is
+   * ignored.
    *
-   * If the robot's knowledge of the chosen cache's existence expires during the
-   * pursuit of said cache, that is ignored.
+   * @param caches The list of perceived caches. This CANNOT be a reference, as
+   * the robot's list of perceived caches can change during the course of
+   * acquiring a cache, and refering to specific positions within the vector
+   * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_cache(
-      const std::list<representation::perceived_cache>& caches);
+  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
 
   /*
    * States for locate_block FSM. Note that the states for the vector_fsm

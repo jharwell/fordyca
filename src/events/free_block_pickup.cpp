@@ -130,9 +130,14 @@ void free_block_pickup::visit(representation::perceived_cell2D &cell) {
 
 void free_block_pickup::visit(representation::perceived_arena_map &map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                representation::discrete_coord(cell_op::x(), cell_op::y()),
+            representation::discrete_coord(cell_op::x(), cell_op::y()),
             "FATAL: Coordinates for block/cell do not agree");
 
+  representation::perceived_cell2D& cell = map.access(cell_op::x(),
+                                                      cell_op::y());
+  if (cell.state_has_block()) {
+    map.block_remove(*cell.block());
+  }
   events::cell_empty op(cell_op::x(), cell_op::y());
   map.accept(op);
   ER_NOM("perceived_arena_map: fb%zu: (%zu, %zu) is now empty",

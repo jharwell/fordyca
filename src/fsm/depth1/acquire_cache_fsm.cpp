@@ -142,7 +142,7 @@ void acquire_cache_fsm::init(void) {
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
-    const std::list<representation::perceived_cache>& caches) {
+    std::list<representation::perceived_cache> caches) {
   /*
    * If we don't know of any caches, and we aren't currently running, we cannot
    * acquire a known cache. However, if we don't know of any caches, but we are

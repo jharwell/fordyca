@@ -122,8 +122,13 @@ class acquire_block_fsm : public base_foraging_fsm,
    * @brief Acquire a known block. If the robot's knowledge of the chosen
    * block's existence expires during the pursuit of a known block, that is
    * ignored.
+   *
+   * @param blocks The list of perceived blocks. This CANNOT be a reference, as
+   * the robot's list of perceived blocks can change during the course of
+   * acquiring a block, and refering to specific positions within the vector
+   * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_block(const std::list<representation::perceived_block>& blocks);
+  bool acquire_known_block(std::list<representation::perceived_block> blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);

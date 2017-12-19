@@ -28,12 +28,15 @@
 #include <utility>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace prototype = rcppsw::patterns::prototype;
+
 NS_START(fordyca, representation);
 
 /*******************************************************************************
@@ -49,11 +52,16 @@ NS_START(fordyca, representation);
  */
 class block : public cell_entity,
               public metrics::collectible_metrics::block_metrics,
-              public rcppsw::patterns::visitor::visitable_any<block> {
+              public rcppsw::patterns::visitor::visitable_any<block>,
+              public prototype::clonable<block> {
  public:
   explicit block(double dimension) :
       cell_entity(dimension, dimension, argos::CColor::BLACK),
       m_robot_index(-1), m_carries(0) {}
+
+  __pure bool operator==(const block &other) const {
+    return this->id() == other.id();
+  }
 
   /* metrics */
   size_t n_carries(void) const override { return m_carries; }
@@ -63,6 +71,8 @@ class block : public cell_entity,
    * to the nest.
    */
   void add_carry(void) { ++m_carries; }
+
+  std::unique_ptr<block> clone(void) const override;
 
   /**
    * @brief Reset the state of the block (i.e. not carried by a robot anymore).

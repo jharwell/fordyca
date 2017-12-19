@@ -35,10 +35,10 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::er::server> &server,
-                         representation::cache *const cache,
-                         size_t x,
-                         size_t y)
-    : perceived_cell_op(x, y), client(server), m_cache(cache) {
+                         representation::cache *const cache)
+    : perceived_cell_op(cache->discrete_loc().first,
+                        cache->discrete_loc().second),
+      client(server), m_cache(cache) {
   client::insmod("cache_found",
                  rcppsw::er::er_lvl::VER,
                  rcppsw::er::er_lvl::NOM);

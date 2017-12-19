@@ -136,13 +136,13 @@ void acquire_block_fsm::init(void) {
 } /* init() */
 
 bool acquire_block_fsm::acquire_known_block(
-    const std::list<representation::perceived_block>& blocks) {
+    std::list<representation::perceived_block> blocks) {
   /*
- * If we don't know of any blocks, and we aren't currently running, we cannot
- * acquire a known block. However, if we don't know of any blocks, but we are
- * currently on our way to a block (i.e. we "forgot" about it en-route, then
- * we still might be able to acquire one, so don't give up just yet).
- */
+   * If we don't know of any blocks, and we aren't currently running, we cannot
+   * acquire a known block. However, if we don't know of any blocks, but we are
+   * currently on our way to a block (i.e. we "forgot" about it en-route, then
+   * we still might be able to acquire one, so don't give up just yet).
+   */
   if (blocks.empty() && !m_vector_fsm.task_running()) {
     return false;
   }
@@ -187,7 +187,7 @@ bool acquire_block_fsm::acquire_any_block(void) {
    * exploration we find one through our LOS, then stop exploring and go vector
    * to it.
    */
-  if (!acquire_known_block(m_map->blocks())) {
+  if (!acquire_known_block(m_map->perceived_blocks())) {
     if (m_vector_fsm.task_running()) {
       return false;
     }
