@@ -136,14 +136,14 @@ void acquire_block_fsm::init(void) {
 } /* init() */
 
 bool acquire_block_fsm::acquire_known_block(
-    std::list<std::pair<const representation::block *, double>> blocks) {
+    const std::list<representation::perceived_block>& blocks) {
   /*
  * If we don't know of any blocks, and we aren't currently running, we cannot
  * acquire a known block. However, if we don't know of any blocks, but we are
  * currently on our way to a block (i.e. we "forgot" about it en-route, then
  * we still might be able to acquire one, so don't give up just yet).
  */
-  if (!blocks.size() && !m_vector_fsm.task_running()) {
+  if (blocks.empty() && !m_vector_fsm.task_running()) {
     return false;
   }
 
@@ -202,9 +202,8 @@ bool acquire_block_fsm::acquire_any_block(void) {
       ER_ASSERT(m_sensors->block_detected(),
                 "FATAL: No block detected after successful exploration");
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
   return true;
 } /* acquire_any_block() */

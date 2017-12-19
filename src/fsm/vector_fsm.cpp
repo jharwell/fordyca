@@ -39,7 +39,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 vector_fsm::vector_fsm(
     uint frequent_collision_thresh,
-    std::shared_ptr<rcppsw::er::server> server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     std::shared_ptr<controller::depth0::foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators)
     : polled_simple_fsm(server, ST_MAX_STATES),
@@ -55,8 +55,8 @@ vector_fsm::vector_fsm(
       m_state(),
       m_freq_collision_thresh(frequent_collision_thresh),
       m_collision_rec_count(0),
-      m_sensors(sensors),
-      m_actuators(actuators),
+      m_sensors(std::move(sensors)),
+      m_actuators(std::move(actuators)),
       m_goal_data(),
       m_ang_pid(4.0,
                 0.0,
@@ -124,7 +124,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
 
   double ang_speed = 0;
   double lin_speed = 0;
-  if (data) {
+  if (nullptr != data) {
     m_goal_data = *data;
     ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
@@ -208,7 +208,7 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
  * General Member Functions
  ******************************************************************************/
 void vector_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument *const arg) {
+    const rcppsw::task_allocation::taskable_argument *const c_arg) {
   static const uint8_t kTRANSITIONS[] = {
       ST_VECTOR,                            /* start */
       ST_VECTOR,                            /* vector */
@@ -216,8 +216,7 @@ void vector_fsm::task_start(
       controller::foraging_signal::IGNORED, /* collision recovery */
       controller::foraging_signal::IGNORED, /* arrived */
   };
-  const tasks::vector_argument *const a =
-      dynamic_cast<const tasks::vector_argument *>(arg);
+  auto *const a = dynamic_cast<const tasks::vector_argument *>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],

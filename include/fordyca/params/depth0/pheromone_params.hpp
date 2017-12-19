@@ -36,10 +36,10 @@ NS_START(fordyca, params, depth0);
  * Structure Definitions
  ******************************************************************************/
 struct pheromone_params : public rcppsw::common::base_params {
-  pheromone_params(void) : rho(0.0), repeat_deposit(false) {}
+  pheromone_params(void) = default;
 
-  double rho;
-  bool repeat_deposit;
+  double rho{0.0};
+  bool repeat_deposit{false};
 };
 
 NS_END(depth0, params, fordyca);

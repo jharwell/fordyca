@@ -54,10 +54,13 @@ namespace state_machine = rcppsw::patterns::state_machine;
  */
 class actuator_manager: public state_machine::simple_fsm {
  public:
-  actuator_manager(const struct params::actuator_params* params,
-                   argos::CCI_DifferentialSteeringActuator* const wheels,
-                   argos::CCI_LEDsActuator* const leds,
-                   argos::CCI_RangeAndBearingActuator* const raba);
+  actuator_manager(const struct params::actuator_params* c_params,
+                   argos::CCI_DifferentialSteeringActuator* wheels,
+                   argos::CCI_LEDsActuator* leds,
+                   argos::CCI_RangeAndBearingActuator* raba);
+
+  actuator_manager(const actuator_manager& fsm) = delete;
+  actuator_manager& operator=(const actuator_manager& fsm) = delete;
 
   /**
    * @brief Set the color of the robot's LEDs.
@@ -72,9 +75,9 @@ class actuator_manager: public state_machine::simple_fsm {
    * @brief Gets a direction vector as input and transforms it into wheel
    * actuation commands
    *
-   * @param heading The new heading. Note that the direction is relative (i.e."change
-   * this much from the direction you are currently going in"), but the
-   * magnitude is absolute (i.e. "change to this speed").
+   * @param heading The new heading. Note that the direction is relative
+   * (i.e."change this much from the direction you are currently going in"), but
+   * the magnitude is absolute (i.e. "change to this speed").
    *
    * @param force_hard_turn Whether or not a hard turn should be performed,
    * regardless of the angle difference. If this is not passed, then a hard turn
@@ -124,8 +127,6 @@ class actuator_manager: public state_machine::simple_fsm {
    * apply to which wheel, so that the proper turn direction is executed.
    */
   void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
-  actuator_manager(const actuator_manager& fsm) = delete;
-  actuator_manager& operator=(const actuator_manager& fsm) = delete;
 
   /*
    * @enum The robot can be in three different turning states.

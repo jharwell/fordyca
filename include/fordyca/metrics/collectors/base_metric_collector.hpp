@@ -51,12 +51,12 @@ NS_START(collectors);
  */
 class base_metric_collector {
  public:
-  base_metric_collector(const std::string ofname, bool collect_cum) :
+  base_metric_collector(const std::string& ofname, bool collect_cum) :
       m_collect_cum(collect_cum), m_use_interval(false), m_interval(-1),
       m_timestep(0), m_ofname(ofname), m_separator(";"),
       m_ofile() {}
 
-  virtual ~base_metric_collector(void) {}
+  virtual ~base_metric_collector(void)  = default;
 
   /**
    * @brief Reset the metrics completely, as if none have yet been collected.
@@ -106,7 +106,7 @@ class base_metric_collector {
    *
    * @return The built header.
    */
-  virtual std::string csv_header_build(const std::string& header = "");
+  virtual std::string csv_header_build(const std::string& header);
 
   /**
    * @brief Build the next line of metrics

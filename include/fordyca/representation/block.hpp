@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <assert.h>
+#include <cassert>
 #include <utility>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -88,7 +88,7 @@ class block : public cell_entity,
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<const block*, double> perceived_block;
+using perceived_block = std::pair<const block*, double>;
 
 NS_END(representation, fordyca);
 

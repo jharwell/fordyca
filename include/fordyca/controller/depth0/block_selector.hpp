@@ -49,7 +49,7 @@ class block_selector: public rcppsw::er::client {
       const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
-  ~block_selector(void) { rmmod(); }
+  ~block_selector(void) override { rmmod(); }
 
   /**
    * @brief Given a list of blocks that a robot knows about (i.e. have not faded
@@ -59,7 +59,7 @@ class block_selector: public rcppsw::er::client {
    * @return A pointer to the "best" block, along with its utility value.
    */
   representation::perceived_block calc_best(
-      const std::list<representation::perceived_block> blocks,
+      const std::list<representation::perceived_block>& blocks,
       argos::CVector2 robot_loc);
 
  private:

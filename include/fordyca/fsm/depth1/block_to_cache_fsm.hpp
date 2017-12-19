@@ -75,8 +75,10 @@ class block_to_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
-  /* taskable overrides */
+  block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
+  block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
 
+  /* taskable overrides */
   void task_execute(void) override;
   void task_start(const task_allocation::taskable_argument * arg) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
@@ -143,9 +145,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }
-
-  block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
-  block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
 
   uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;

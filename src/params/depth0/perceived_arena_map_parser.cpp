@@ -33,7 +33,7 @@ NS_START(fordyca, params, depth0);
  * Member Functions
  ******************************************************************************/
 void perceived_arena_map_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct perceived_arena_map_params);
+  m_params = rcppsw::make_unique<struct perceived_arena_map_params>();
   argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
 
   m_grid_parser.parse(argos::GetNode(pnode, "grid"));

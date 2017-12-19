@@ -50,9 +50,12 @@ class cache_found : public perceived_cell_op,
                     public rcppsw::er::client {
  public:
   cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-              representation::cache* const cache,
+              representation::cache* cache,
               size_t x, size_t y);
-  ~cache_found(void);
+  ~cache_found(void) override;
+
+  cache_found(const cache_found& op) = delete;
+  cache_found& operator=(const cache_found& op) = delete;
 
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
@@ -61,8 +64,8 @@ class cache_found : public perceived_cell_op,
   /* depth1 foraging */
   void visit(representation::perceived_arena_map& map) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(controller::depth1::foraging_controller&) override {}
-  void visit(controller::depth0::stateful_foraging_controller&) override {}
+  void visit(__unused controller::depth1::foraging_controller&) override {}
+  void visit(__unused controller::depth0::stateful_foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the cache that has been found.
@@ -70,9 +73,6 @@ class cache_found : public perceived_cell_op,
   /* const representation::cache* cache(void) const { return m_cache; } */
 
  private:
-  cache_found(const cache_found& op) = delete;
-  cache_found& operator=(const cache_found& op) = delete;
-
   representation::cache* m_cache;
 };
 

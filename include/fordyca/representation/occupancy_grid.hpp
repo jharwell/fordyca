@@ -36,7 +36,8 @@ class cell2D;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> occupancy_grid;
+using occupancy_grid = rcppsw::ds::grid2D_ptr<cell2D,
+                                              std::shared_ptr<rcppsw::er::server>&>;
 
 NS_END(representation, fordyca);
 

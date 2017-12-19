@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell_entity.hpp"
-#include <assert.h>
 
 /*******************************************************************************
  * Namespaces
@@ -35,13 +34,10 @@ NS_START(fordyca, representation);
 __pure bool cell_entity::contains_point(const argos::CVector2 &point) {
   double x = real_loc().GetX();
   double y = real_loc().GetY();
-  if (point.GetX() < (x + (0.5 * xsize())) &&
-      point.GetX() > (x - (0.5 * xsize())) &&
-      point.GetY() < (y + (0.5 * ysize())) &&
-      point.GetY() > (y - (0.5 * ysize()))) {
-    return true;
-  }
-  return false;
+  return (point.GetX() < (x + (0.5 * xsize())) &&
+          point.GetX() > (x - (0.5 * xsize())) &&
+          point.GetY() < (y + (0.5 * ysize())) &&
+          point.GetY() > (y - (0.5 * ysize())));
 } /* contains_point() */
 
 NS_END(representation, fordyca);

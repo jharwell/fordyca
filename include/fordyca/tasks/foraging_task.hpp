@@ -65,7 +65,7 @@ class foraging_task : public metrics::collectible_metrics::robot_metrics::statel
                                                             events::free_block_pickup,
                                                             events::nest_block_drop> {
  public:
-  foraging_task(void) {}
+  foraging_task(void) = default;
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the

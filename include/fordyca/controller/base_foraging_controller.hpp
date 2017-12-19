@@ -56,7 +56,10 @@ class base_foraging_controller : public argos::CCI_Controller,
                                  public rcppsw::er::client {
  public:
   base_foraging_controller(void);
-  virtual ~base_foraging_controller(void) {}
+  ~base_foraging_controller(void) override = default;
+
+  base_foraging_controller(const base_foraging_controller& other) = delete;
+  base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
 
   /* CCI_Controller overrides */
   void Init(argos::TConfigurationNode& node) override;
@@ -139,8 +142,6 @@ class base_foraging_controller : public argos::CCI_Controller,
   void output_init(const struct params::output_params* const params);
   std::string log_header_calc(void);
   std::string dbg_header_calc(void);
-  base_foraging_controller(const base_foraging_controller& other) = delete;
-  base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
 
   bool                                   m_display_los;
   bool                                   m_display_id;

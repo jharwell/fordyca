@@ -68,7 +68,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& t_node) override;
+  void Init(argos::TConfigurationNode& node) override;
   void ControlStep(void) override;
 
   tasks::foraging_task* current_task(void) const;
@@ -115,7 +115,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   /**
    * @brief Process the LOS for the current timestep (blocks and caches)
    */
-  void process_los(const representation::line_of_sight* const los) override;
+  void process_los(const representation::line_of_sight* c_los) override;
 
   /**
    * @brief \c TRUE iff the robot aborted its current task, and only on the
@@ -124,9 +124,9 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool task_aborted(void) const { return m_task_aborted; }
 
  private:
-  void task_abort_cleanup(task_allocation::executable_task* const);
+  void task_abort_cleanup(__unused task_allocation::executable_task*);
 
-  bool                                               m_task_aborted;
+  bool                                               m_task_aborted{false};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;
   std::unique_ptr<tasks::collector>                  m_collector;

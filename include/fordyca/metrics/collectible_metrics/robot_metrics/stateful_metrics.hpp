@@ -43,8 +43,8 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
  */
 class stateful_metrics : public base_collectible_metrics {
  public:
-  stateful_metrics(void) {}
-  virtual ~stateful_metrics(void) {}
+  stateful_metrics(void) = default;
+  ~stateful_metrics(void) override = default;
 
   /**
    * @brief If \c TRUE, then a robot is currently acquiring a block (either via

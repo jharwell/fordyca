@@ -45,11 +45,11 @@ existing_cache_selector::existing_cache_selector(
  * Member Functions
  ******************************************************************************/
 representation::perceived_cache existing_cache_selector::calc_best(
-    const std::list<representation::perceived_cache> existing_caches,
+    const std::list<representation::perceived_cache>& existing_caches,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::cache *best = nullptr;
-  ER_ASSERT(existing_caches.size(), "FATAL: no known existing caches");
+  ER_ASSERT(!existing_caches.empty(), "FATAL: no known existing caches");
 
   for (auto pair : existing_caches) {
     expressions::existing_cache_utility u(pair.first->real_loc(), m_nest_loc);
@@ -67,6 +67,8 @@ representation::perceived_cache existing_cache_selector::calc_best(
       best = pair.first;
     }
   } /* for(existing_cache..) */
+
+  ER_ASSERT(nullptr != best, "FATAL: No best perceived cache found?");
 
   ER_NOM("Best utility: existing_cache%d at (%zu, %zu): %f",
          best->id(),

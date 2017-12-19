@@ -63,9 +63,8 @@ HFSM_STATE_DEFINE(base_explore_fsm, new_direction, state_machine::event_data) {
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  const new_direction_data *dir_data =
-      dynamic_cast<const new_direction_data *>(data);
-  if (dir_data) {
+  auto *dir_data = dynamic_cast<const new_direction_data *>(data);
+  if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
   }
   base_foraging_fsm::actuators()->set_heading(

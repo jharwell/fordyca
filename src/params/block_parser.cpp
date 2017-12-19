@@ -33,7 +33,7 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void block_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct block_params);
+  m_params = rcppsw::make_unique<struct block_params>();
 
   argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
   argos::GetNodeAttribute(node, "dimension", m_params->dimension);

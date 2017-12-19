@@ -42,14 +42,15 @@ block_selector::block_selector(const std::shared_ptr<rcppsw::er::server> &server
  * Member Functions
  ******************************************************************************/
 representation::perceived_block block_selector::calc_best(
-    const std::list<representation::perceived_block> blocks,
+    const std::list<representation::perceived_block>& blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::block *best = nullptr;
 
+  ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto pair : blocks) {
     /*
-     * @bug WARNING: UGLY hack. See #202. Needed to gather good date for
+     * @bug WARNING: UGLY hack. See #202. Needed to gather good data for
      * presentation.
      */
     if (pair.first->discrete_loc().first >= 100) {
@@ -69,6 +70,8 @@ representation::perceived_block block_selector::calc_best(
       best = pair.first;
     }
   } /* for(block..) */
+
+  ER_ASSERT(nullptr != best, "FATAL: No best perceived block?");
   ER_NOM("Best utility: block%d at (%zu, %zu): %f",
          best->id(),
          best->discrete_loc().first,

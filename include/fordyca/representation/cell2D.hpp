@@ -53,6 +53,9 @@ class cell2D : public visitor::visitable_any<cell2D> {
  public:
   explicit cell2D(const std::shared_ptr<rcppsw::er::server>& server);
 
+  cell2D(const cell2D& other) = delete;
+  cell2D& operator=(const cell2D& other) = delete;
+
   /* state inquiry */
 
   /**
@@ -110,9 +113,6 @@ class cell2D : public visitor::visitable_any<cell2D> {
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
-  cell2D(const cell2D& other) = delete;
-  cell2D& operator=(const cell2D& other) = delete;
-
   cell_entity*    m_entity;
   discrete_coord  m_loc;
   fsm::cell2D_fsm m_fsm;

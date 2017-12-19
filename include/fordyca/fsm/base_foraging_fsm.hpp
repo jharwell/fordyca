@@ -52,11 +52,15 @@ NS_START(fsm);
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
-  base_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
+  base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
                     std::shared_ptr<controller::base_foraging_sensors> sensors,
                     std::shared_ptr<controller::actuator_manager> actuators,
                     uint8_t max_states);
-  virtual ~base_foraging_fsm(void) {}
+  ~base_foraging_fsm(void) override = default;
+
+
+  base_foraging_fsm(const base_foraging_fsm& fsm) = delete;
+  base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;
 
   /**
    * @brief (Re)-initialize the FSM.
@@ -132,9 +136,6 @@ class base_foraging_fsm : public state_machine::hfsm {
    * visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_leaving_nest);
-
-  base_foraging_fsm(const base_foraging_fsm& fsm) = delete;
-  base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;
 
   argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;

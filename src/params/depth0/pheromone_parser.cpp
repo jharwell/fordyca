@@ -32,7 +32,7 @@ NS_START(fordyca, params, depth0);
  * Member Functions
  ******************************************************************************/
 void pheromone_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct pheromone_params);
+  m_params = rcppsw::make_unique<struct pheromone_params>();
   m_params->rho = std::atof(node.GetAttribute("rho").c_str());
   argos::GetNodeAttribute(node, "repeat_deposit", m_params->repeat_deposit);
 } /* parse() */

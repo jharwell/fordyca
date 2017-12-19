@@ -43,8 +43,8 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
  */
 class depth1_metrics : public base_collectible_metrics {
  public:
-  depth1_metrics(void) {}
-  virtual ~depth1_metrics(void) {}
+  depth1_metrics(void) = default;
+  ~depth1_metrics(void) override = default;
 
   /**
    * @brief If \c TRUE, then the robot is currently running the

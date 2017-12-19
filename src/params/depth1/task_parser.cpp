@@ -35,7 +35,7 @@ NS_START(fordyca, params, depth1);
 void task_parser::parse(argos::TConfigurationNode &node) {
   argos::TConfigurationNode task_node = argos::GetNode(node, "task");
 
-  m_params.reset(new task_params);
+  m_params = rcppsw::make_unique<struct task_params>();
 
   argos::GetNodeAttribute(task_node,
                           "estimation_alpha",

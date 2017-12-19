@@ -36,13 +36,13 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const struct params::depth0::perceived_arena_map_params *params,
-    const std::string &robot_id)
-    : m_server(server),
-      m_grid(params->grid.resolution,
-             params->grid.upper.GetX(),
-             params->grid.upper.GetY(),
+    std::shared_ptr<rcppsw::er::server> server,
+    const struct params::depth0::perceived_arena_map_params *c_params,
+    const std::string& robot_id)
+    : m_server(std::move(server)),
+      m_grid(c_params->grid.resolution,
+             c_params->grid.upper.GetX(),
+             c_params->grid.upper.GetY(),
              m_server),
       m_caches() {
   deferred_init(m_server);
@@ -57,8 +57,8 @@ perceived_arena_map::perceived_arena_map(
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       perceived_cell2D &cell = m_grid.access(i, j);
-      cell.pheromone_rho(params->pheromone.rho);
-      cell.pheromone_repeat_deposit(params->pheromone.repeat_deposit);
+      cell.pheromone_rho(c_params->pheromone.rho);
+      cell.pheromone_repeat_deposit(c_params->pheromone.repeat_deposit);
       cell.robot_id(robot_id);
       cell.decoratee().loc(discrete_coord(i, j));
     } /* for(j..) */
@@ -73,8 +73,8 @@ std::list<perceived_block> perceived_arena_map::blocks(void) const {
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
       if (m_grid.access(i, j).state_has_block()) {
-        blocks.push_back(perceived_block(m_grid.access(i, j).block(),
-                                         m_grid.access(i, j).density()));
+        blocks.emplace_back(m_grid.access(i, j).block(),
+                            m_grid.access(i, j).density());
       }
     } /* for(j..) */
   }   /* for(i..) */

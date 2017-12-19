@@ -80,7 +80,7 @@ class stateful_foraging_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_reset(void) override { init(); }
-  void task_start(const task_allocation::taskable_argument* const) override {}
+  void task_start(__unused const task_allocation::taskable_argument* ) override {}
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
@@ -130,9 +130,6 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }
-
-  stateful_foraging_fsm(const stateful_foraging_fsm& fsm) = delete;
-  stateful_foraging_fsm& operator=(const stateful_foraging_fsm& fsm) = delete;
 
   bool                                                  m_task_running;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;

@@ -78,6 +78,9 @@ class acquire_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
 
+  acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
+  acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
+
   /* taskable overrides */
   void task_execute(void) override;
   void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
@@ -127,7 +130,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * If the robot's knowledge of the chosen cache's existence expires during the
    * pursuit of said cache, that is ignored.
    */
-  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
+  bool acquire_known_cache(
+      const std::list<representation::perceived_cache>& caches);
 
   /*
    * States for locate_block FSM. Note that the states for the vector_fsm
@@ -144,9 +148,6 @@ class acquire_cache_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }
-
-  acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
-  acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
 
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;

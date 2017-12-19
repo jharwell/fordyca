@@ -55,7 +55,7 @@ class cell_op : public visitor::visitor,
                                           fsm::cell2D_fsm> {
  public:
   cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
-  virtual ~cell_op(void) {}
+  ~cell_op(void) override = default;
 
   size_t x(void) const { return m_x; }
   size_t y(void) const { return m_y; }

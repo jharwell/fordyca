@@ -53,8 +53,8 @@ class collector : public task_allocation::polled_task, public foraging_task {
   /* event handling */
   void accept(events::cached_block_pickup &visitor) override;
   void accept(events::nest_block_drop &visitor) override;
-  void accept(events::cache_block_drop &) override {};
-  void accept(events::free_block_pickup &) override {};
+  void accept(__unused events::cache_block_drop &) override {};
+  void accept(__unused events::free_block_pickup &) override {};
 
   /* base metrics */
   bool is_exploring_for_block(void) const override { return false; };
@@ -75,7 +75,7 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }
 
-  void task_start(const task_allocation::taskable_argument* const) override;
+  void task_start(const task_allocation::taskable_argument*) override;
   double current_time(void) const override;
   double calc_abort_prob(void) override;
   double calc_interface_time(double start_time) override;

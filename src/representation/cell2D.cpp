@@ -47,8 +47,7 @@ const representation::block *cell2D::block(void) const {
 } /* block() */
 
 representation::block *cell2D::block(void) {
-  return const_cast<representation::block *>(
-      static_cast<representation::block *>(m_entity));
+  return static_cast<representation::block *>(m_entity);
 } /* block() */
 
 representation::cache *cell2D::cache(void) const {

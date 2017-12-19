@@ -33,7 +33,7 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void grid_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct grid_params);
+  m_params = rcppsw::make_unique<struct grid_params>();
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');

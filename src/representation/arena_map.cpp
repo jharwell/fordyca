@@ -96,7 +96,7 @@ int arena_map::robot_on_cache(const argos::CVector2 &pos) {
 
 void arena_map::distribute_block(block *const block) {
   cell2D *cell = nullptr;
-  while (1) {
+  while (true) {
     argos::CVector2 r_coord;
     if (m_block_distributor.distribute_block(*block, &r_coord)) {
       discrete_coord d_coord =
@@ -169,9 +169,9 @@ void arena_map::static_cache_create(void) {
 } /* static_cache_create() */
 
 void arena_map::distribute_blocks(void) {
-  for (size_t i = 0; i < m_blocks.size(); ++i) {
-    distribute_block(&m_blocks[i]);
-  } /* for(i..) */
+  for (auto& b : m_blocks) {
+    distribute_block(&b);
+  } /* for(b..) */
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been

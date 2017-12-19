@@ -82,8 +82,8 @@ class cache : public cell_entity,
    *
    * @return
    */
-  __pure bool contains_block(const block* const block) const {
-    return std::find(m_blocks.begin(), m_blocks.end(), block) != m_blocks.end();
+  __pure bool contains_block(const block* c_block) const {
+    return std::find(m_blocks.begin(), m_blocks.end(), c_block) != m_blocks.end();
   }
   /**
    * @brief Get a list of the blocks currently in the cache.

@@ -118,9 +118,6 @@ class explore_for_block_fsm : public base_explore_fsm {
     return &mc_state_map[index];
   }
 
-  explore_for_block_fsm(const explore_for_block_fsm& fsm) = delete;
-  explore_for_block_fsm& operator=(const explore_for_block_fsm& fsm) = delete;
-
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

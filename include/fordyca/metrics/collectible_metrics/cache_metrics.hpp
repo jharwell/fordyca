@@ -42,8 +42,8 @@ NS_START(fordyca, metrics, collectible_metrics);
  */
 class cache_metrics : public base_collectible_metrics {
  public:
-  cache_metrics(void) {}
-  virtual ~cache_metrics(void) {}
+  cache_metrics(void) = default;
+  ~cache_metrics(void) override = default;
 
   /**
    * @brif Get the # of blocks in the cache

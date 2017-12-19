@@ -37,8 +37,7 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct diffusion_params {
-  diffusion_params() :
-      delta(0.0),
+  diffusion_params(void) :
       go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
   /*
@@ -46,7 +45,7 @@ struct diffusion_params {
    * closest obstacle.  The proximity reading is 0 when nothing is detected and
    * grows exponentially to 1 when the obstacle is touching the robot.
    */
-  double delta;
+  double delta{0.0};
 
   /* Angle tolerance range to go straight. */
   argos::CRange<argos::CRadians> go_straight_angle_range;

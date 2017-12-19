@@ -85,7 +85,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(stateful_foraging_fsm,

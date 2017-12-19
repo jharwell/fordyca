@@ -62,7 +62,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
 
   explicit cell2D_fsm(
       const std::shared_ptr<rcppsw::er::server>& server);
-  virtual ~cell2D_fsm(void) {}
+  ~cell2D_fsm(void) override = default;
 
   bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
