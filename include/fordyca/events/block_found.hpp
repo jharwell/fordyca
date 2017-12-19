@@ -52,7 +52,7 @@ class block_found : public perceived_cell_op,
                     public rcppsw::er::client {
  public:
   block_found(const std::shared_ptr<rcppsw::er::server>& server,
-              const representation::block* block, size_t x, size_t y);
+              representation::block* block);
   ~block_found(void) { client::rmmod(); }
 
   /* stateful foraging */
@@ -74,7 +74,7 @@ class block_found : public perceived_cell_op,
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
 
-  const representation::block* m_block;
+  representation::block* m_block;
 };
 
 NS_END(events, fordyca);

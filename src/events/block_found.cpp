@@ -36,10 +36,11 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
-                         const representation::block *block,
-                         size_t x,
-                         size_t y)
-    : perceived_cell_op(x, y), client(server), m_block(block) {
+                         representation::block *block)
+    : perceived_cell_op(block->discrete_loc().first,
+                        block->discrete_loc().second),
+      client(server),
+      m_block(block) {
   client::insmod("block_found",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -102,6 +103,8 @@ void block_found::visit(representation::perceived_cell2D &cell) {
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map &map) {
+  map.block_add(*m_block);
+  m_block = &map.blocks().back();
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 

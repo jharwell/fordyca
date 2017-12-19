@@ -65,6 +65,10 @@ class cache : public cell_entity,
         argos::CVector2 center,
         std::vector<block*>& blocks);
 
+  __pure bool operator==(const cache &other) const {
+    return this->discrete_loc() == other.discrete_loc();
+  }
+
   /* metrics */
   size_t n_blocks(void) const override { return m_blocks.size(); }
   size_t n_block_pickups(void) const override { return m_n_block_pickups; }
@@ -77,10 +81,6 @@ class cache : public cell_entity,
 
   /**
    * @brief \c TRUE iff the cache contains the specified block.
-   *
-   * @param block
-   *
-   * @return
    */
   __pure bool contains_block(const block* c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) != m_blocks.end();
@@ -93,8 +93,6 @@ class cache : public cell_entity,
   void block_add(block* block) { m_blocks.push_back(block);  }
   void block_remove(block* block);
   block* block_get(void) { return m_blocks.front(); }
-
-  __pure bool operator==(const cache &other) const;
 
  private:
   static int        m_next_id;

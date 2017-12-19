@@ -161,6 +161,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity &robot) {
   utils::set_robot_pos<controller::depth1::foraging_controller>(robot);
   utils::set_robot_los<controller::depth1::foraging_controller>(robot, *map());
   set_robot_tick<controller::depth1::foraging_controller>(robot);
+
   if (controller.task_aborted()) {
     return;
   }

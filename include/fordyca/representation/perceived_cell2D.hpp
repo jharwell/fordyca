@@ -84,6 +84,8 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
 
   const representation::block* block(void) const { return decoratee().block(); }
   const representation::cache* cache(void) const { return decoratee().cache(); }
+  representation::block* block(void) { return decoratee().block(); }
+  representation::cache* cache(void) { return decoratee().cache(); }
   const representation::cell_entity* entity(void) const { return decoratee().entity(); }
 
   /**

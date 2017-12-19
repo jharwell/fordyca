@@ -66,12 +66,6 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   robot_collectors::stateful_metrics_collector* stateful_collector(void) const;
   void pre_step_final(void) override;
 
-  template<typename T>
-  void set_robot_tick(argos::CFootBotEntity& robot) {
-    T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-    controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
-  }
-
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;

@@ -67,7 +67,7 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
 
 void stateless_foraging_controller::Reset(void) {
   base_foraging_controller::Reset();
-  if (m_fsm) {
+  if (nullptr != m_fsm) {
     m_fsm->init();
   }
 } /* Reset() */

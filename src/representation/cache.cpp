@@ -66,8 +66,4 @@ std::unique_ptr<cache> cache::clone(void) const {
                                         m_blocks));
 } /* clone() */
 
-__pure bool cache::operator==(const cache &other) const {
-  return cell_entity::discrete_loc() == other.cell_entity::discrete_loc();
-}
-
 NS_END(fordyca, representation);

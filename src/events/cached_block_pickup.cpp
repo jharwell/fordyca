@@ -179,7 +179,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map &map) {
     cell.accept(*this);
   }
 
-  if (pcache) {
+  if (nullptr != pcache) {
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(),

@@ -168,6 +168,8 @@ void stateless_foraging_loop_functions::pre_step_iter(
   m_distance_collector->collect(
       static_cast<rmetrics::distance_metrics &>(controller));
 
+  set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
+
   if (!handle_nest_block_drop<controller::depth0::stateless_foraging_controller>(
           robot, *m_map, *m_block_collector)) {
     if (!controller.in_nest() && controller.is_exploring_for_block() &&

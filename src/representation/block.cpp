@@ -36,4 +36,12 @@ void block::move_out_of_sight(void) {
   discrete_loc(discrete_coord(100, 100));
 } /* move_out_of_sight() */
 
+std::unique_ptr<block> block::clone(void) const {
+  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(cell_entity::xsize());
+  tmp->discrete_loc(this->discrete_loc());
+  tmp->real_loc(this->real_loc());
+  tmp->id(this->id());
+  tmp->reset_index();
+  return tmp;
+} /* clone() */
 NS_END(representation, fordyca);

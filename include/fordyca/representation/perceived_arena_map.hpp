@@ -65,26 +65,36 @@ class perceived_arena_map: public rcppsw::er::client,
                       const std::string& robot_id);
 
   /**
-   * @brief Get a list of all blocks the robot is currently aware of/that are
-   * currently relevant.
+   * @brief Get a list of all blocks the robot is currently aware of and their
+   * relevance.
    *
-   * @return The list of perceived blocks (really a list of std::pair<block,
-   * double>).
+   * @return The list of perceived blocks.
    */
-  std::list<perceived_block> blocks(void) const;
+  std::list<perceived_block> perceived_blocks(void) const;
 
   /**
-   * @brief Get a list of all caches the robot is currently aware of/that are
-   * currently relevant.
+   * @brief Get a list of all blocks the robot is currently aware of.
+   */
+  std::vector<representation::block>& blocks(void) { return m_blocks; };
+
+  /**
+   * @brief Get a list of all cache the robot is currently aware of and their
+   * relevance.
    *
-   * @return The list of perceived caches (really a list of std::pair<cache,
-   * double>).
+   * @return The list of perceived cache.
+   */
+  std::list<representation::perceived_cache> perceived_caches(void) const;
+
+  /**
+   * @brief Get a list of all caches the robot is currently aware of.
    */
   std::vector<representation::cache>& caches(void) { return m_caches; }
-  std::list<representation::perceived_cache> perceived_caches(void) const;
 
   void cache_add(representation::cache& cache);
   void cache_remove(representation::cache& victim);
+
+  void block_add(representation::block& block);
+  void block_remove(representation::block& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -116,6 +126,13 @@ class perceived_arena_map: public rcppsw::er::client,
    * resides in, and not the cache itself.
    */
   std::vector<representation::cache> m_caches;
+
+  /**
+   * @brief The blocks that the robot currently knows about. Their relevance is
+   * not stored with the block, because that is a properly of the cell the block
+   * resides in, and not the block itself.
+   */
+  std::vector<representation::block> m_blocks;
 };
 
 NS_END(representation, fordyca);
