@@ -111,7 +111,7 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    * The tolerance to zero which the pheromone density has to reach before the
    * cell will transition back to an unknown state.
    */
-  static const double              kEpsilon;
+  static constexpr double          kEpsilon{0.0001};
 
   bool                             m_pheromone_repeat_deposit;
   std::string                      m_robot_id;

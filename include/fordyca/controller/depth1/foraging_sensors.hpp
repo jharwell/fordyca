@@ -42,11 +42,14 @@ NS_START(fordyca, controller, depth1);
 class foraging_sensors: public depth0::foraging_sensors {
  public:
   foraging_sensors(
-      const struct params::sensor_params* params,
-      argos::CCI_RangeAndBearingSensor* const rabs,
-      argos::CCI_FootBotProximitySensor* const proximity,
-      argos::CCI_FootBotLightSensor* const light,
-      argos::CCI_FootBotMotorGroundSensor* const ground);
+      const struct params::sensor_params* c_params,
+      argos::CCI_RangeAndBearingSensor* rabs,
+      argos::CCI_FootBotProximitySensor* proximity,
+      argos::CCI_FootBotLightSensor* light,
+      argos::CCI_FootBotMotorGroundSensor* ground);
+
+  foraging_sensors(const foraging_sensors& fsm) = delete;
+  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 
   /**
    * @brief If \c TRUE, a cache has *possibly* been detected.
@@ -55,10 +58,6 @@ class foraging_sensors: public depth0::foraging_sensors {
    * timestep, before ARGoS has finished initializing things.
    */
   bool cache_detected(void);
-
- private:
-  foraging_sensors(const foraging_sensors& fsm) = delete;
-  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 };
 
 NS_END(depth1, controller, fordyca);

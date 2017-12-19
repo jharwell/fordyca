@@ -33,7 +33,7 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void arena_map_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct arena_map_params);
+  m_params = rcppsw::make_unique<struct arena_map_params>();
   argos::TConfigurationNode anode = argos::GetNode(node, "arena_map");
 
   m_grid_parser.parse(argos::GetNode(anode, "grid"));

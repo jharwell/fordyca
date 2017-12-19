@@ -33,7 +33,7 @@ NS_START(fordyca, params, depth1);
  * Member Functions
  ******************************************************************************/
 void cache_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct cache_params);
+  m_params = rcppsw::make_unique<struct cache_params>();
 
   argos::GetNodeAttribute(node, "dimension", m_params->dimension);
   argos::GetNodeAttribute(node, "min_dist", m_params->min_dist);

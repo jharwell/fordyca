@@ -38,10 +38,10 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 actuator_manager::actuator_manager(
-    const struct params::actuator_params *params,
-    argos::CCI_DifferentialSteeringActuator *const wheels,
-    argos::CCI_LEDsActuator *const leds,
-    argos::CCI_RangeAndBearingActuator *const raba)
+    const struct params::actuator_params *c_params,
+    argos::CCI_DifferentialSteeringActuator *wheels,
+    argos::CCI_LEDsActuator *leds,
+    argos::CCI_RangeAndBearingActuator *raba)
     : state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
       no_turn(),
       soft_turn(),
@@ -49,7 +49,7 @@ actuator_manager::actuator_manager(
       m_wheels(wheels),
       m_leds(leds),
       m_raba(raba),
-      mc_params(*params) {}
+      mc_params(*c_params) {}
 
 /*******************************************************************************
  * Events

@@ -14,12 +14,14 @@ following programs:
 - cmake
 - make
 - g++
+- cppcheck (static analysis)
+- clang-check3.8 (syntax checking/static analysis )
+- clang-format-4.0 (automatic code formatting)
+- clang-tidy-4.0 (static analysis/automated checking of naming conventions)
 
 In addition, you will possibly want to install these programs:
 
 - ccache (will make compiling a lot faster)
-- cppcheck (static analysis)
-- clang++ (syntax checking/static analysis )
 - icpc (additional syntax checking)
 - ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
@@ -54,11 +56,14 @@ this project. In particular:
 - All source files have the `.cpp` extension, and all header files have the
   `.hpp` extension.
 
-- All file, class, variable, and namespace names are `specified_like_this`, NOT
-  `specifiedLikeThis` or `SpecifiedLikeThis`.
+- All file, class, variable, enum, namespace, etc. names are
+  `specified_like_this`, NOT `specifiedLikeThis` or
+  `SpecifiedLikeThis`. Rationale: Most of the time you shouldnot really need to
+  know whether the thing in between `::` is a class, namespace, enum, etc. You
+  really only need to know what operations it has.
 
-- Exactly one class/struct definition per .cpp/.hpp file, unless there is a very good
-  reason to do otherwise.
+- Exactly one class/struct definition per .cpp/.hpp file, unless there is a very
+  good reason to do otherwise.
 
 - The namespace hierarchy exactly corresponds to the directory hierarchy that
   the source/header files for classes can be found in.
@@ -79,10 +84,27 @@ this project. In particular:
 
   - Use of non-const references--I do this all the time.
 
-  - Line length >= 80 ONLY for: member variable decls, function decls, inheritance
-    lists, and function definitions. Sometimes the names of
-    variables/namespaces/templates make this impossible to do without obfuscating
-    the code.
+  - Header ordering (whatever the auto-formatter does is fine, but should
+    generally be google style).
+
+  - rand_r() instead of rand().
+
+  - Line length >= 80 ONLY if it is only 1-2 chars too long, and breaking the
+    line would decrease readability.
+
+- Code should pass the clang-tidy linter, which checks for style elements like:
+
+  - All members prefixed with `m_`
+
+  - All constant parameters prefixed with `c_`.
+
+  - All constant members prefixed with `mc_`.
+
+  - All global variables prefixed with `g_`.
+
+  - All functions less than 100 lines, with no more than 5 parameters/10
+    branches. If you have something longer than this, 9/10 times it can and
+    should be split up.
 
 ## Development Guide
 
@@ -206,10 +228,24 @@ a lot of good stuff in it.
    history into a single detailed commit when you are done BEFORE merging to
    devel. Be sure you know what you are doing if you go this route...
 
-5. Finish the task, updating the `VERSION` file appropriately if needed, and
-   change status to `Status: Needs Review` and open a pull request.
+5. Finish the task, updating the `VERSION` file appropriately if needed.
 
-6. Once the task has been reviewed and given the green light, merge it into
+6. Run static analysis on the code:
+
+        make clang-check-all
+        make cppcheck-all
+
+   Pay special attention to files that you have changed. Fix anything the
+   statica analyzer flags.
+
+7. Run the clang formatter on the code to fix any formatting things you may have
+   inadverdently missed.
+
+        make format-all
+
+8. Change status to `Status: Needs Review` and open a pull request.
+
+9. Once the task has been reviewed and given the green light, merge it into
    devel, and marked the issue as `Status: Completed`. Don't close the issue.
 
-7. Repeat as necessary.
+10. Repeat as necessary.

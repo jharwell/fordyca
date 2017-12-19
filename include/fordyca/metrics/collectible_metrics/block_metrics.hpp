@@ -41,8 +41,8 @@ NS_START(fordyca, metrics, collectible_metrics);
  */
 class block_metrics : public base_collectible_metrics {
  public:
-  block_metrics(void) {}
-  virtual ~block_metrics(void) {}
+  block_metrics(void) = default;
+  ~block_metrics(void) override = default;
 
   /**
    * @brief Get how many carries this object has had on its way from its

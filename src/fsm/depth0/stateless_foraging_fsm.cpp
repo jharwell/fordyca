@@ -107,7 +107,8 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
    * block.
    */
   if (m_explore_fsm.task_finished()) {
-    if (data && controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    if (nullptr != data &&
+        controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
       m_explore_fsm.task_reset();
       ER_NOM("Block acquired");
       internal_event(ST_TRANSPORT_TO_NEST);

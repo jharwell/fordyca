@@ -38,14 +38,12 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct loop_functions_params : public rcppsw::common::base_params {
-  loop_functions_params(void) :
-      display_robot_id(false), display_robot_los(false),
-      display_block_id(false), simulation_type(), arena_map() {}
+  loop_functions_params(void) : arena_map() {}
 
-  bool display_robot_id;
-  bool display_robot_los;
-  bool display_block_id;
-  std::string simulation_type;
+  bool display_robot_id{false};
+  bool display_robot_los{false};
+  bool display_block_id{false};
+  std::string simulation_type{""};
   struct arena_map_params arena_map;
 };
 

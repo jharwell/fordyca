@@ -35,6 +35,7 @@
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
+#include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,6 +76,10 @@ class acquire_block_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       const std::shared_ptr<const representation::perceived_arena_map>& map);
+
+
+  acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
+  acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -118,8 +123,7 @@ class acquire_block_fsm : public base_foraging_fsm,
    * block's existence expires during the pursuit of a known block, that is
    * ignored.
    */
-  bool acquire_known_block(
-      std::list<std::pair<const representation::block*, double>> blocks);
+  bool acquire_known_block(const std::list<representation::perceived_block>& blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);
@@ -130,9 +134,6 @@ class acquire_block_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }
-
-  acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
-  acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;

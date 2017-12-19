@@ -142,14 +142,14 @@ void acquire_cache_fsm::init(void) {
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
-    std::list<representation::perceived_cache> caches) {
+    const std::list<representation::perceived_cache>& caches) {
   /*
    * If we don't know of any caches, and we aren't currently running, we cannot
    * acquire a known cache. However, if we don't know of any caches, but we are
    * currently on our way to a cache (i.e. we "forgot" about it en-route, then
    * we still might be able to acquire one, so don't give up just yet).
    */
-  if (!caches.size() && !m_vector_fsm.task_running()) {
+  if (caches.empty() && !m_vector_fsm.task_running()) {
     return false;
   }
 
@@ -209,9 +209,8 @@ bool acquire_cache_fsm::acquire_any_cache(void) {
       ER_ASSERT(m_sensors->cache_detected(),
                 "FATAL: No cache detected after successful exploration");
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
   return true;
 } /* acquire_any_cache() */

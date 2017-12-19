@@ -75,7 +75,7 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;
 
-  void task_start(const task_allocation::taskable_argument* const) override;
+  void task_start(const task_allocation::taskable_argument*) override;
   double current_time(void) const override;
   double calc_abort_prob(void) override;
   double calc_interface_time(double start_time) override;

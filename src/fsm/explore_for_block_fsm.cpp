@@ -98,7 +98,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
    * spent in collision avoidance still counts towards the direction change
    * threshold.
    */
-  if (base_foraging_fsm::sensors()->calc_diffusion_vector(NULL)) {
+  if (base_foraging_fsm::sensors()->calc_diffusion_vector(nullptr)) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),

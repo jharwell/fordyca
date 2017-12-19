@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, collectible_metrics);
  */
 class base_collectible_metrics {
  public:
-  virtual ~base_collectible_metrics(void) {}
+  virtual ~base_collectible_metrics(void) = default;
 };
 
 NS_END(collectible_metrics, metrics, fordyca);

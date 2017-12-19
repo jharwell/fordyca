@@ -37,9 +37,10 @@ NS_START(fordyca, params, depth1);
  * Structure Definitions
  ******************************************************************************/
 struct task_params : public rcppsw::common::base_params {
-  task_params(void) : tasks(), init_random_estimates(false) {}
+  task_params(void) : tasks() {}
+
   struct rcppsw::task_allocation::partitionable_task_params tasks;
-  bool init_random_estimates;
+  bool init_random_estimates{false};
 };
 
 NS_END(depth1, params, fordyca);

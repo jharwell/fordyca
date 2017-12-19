@@ -35,7 +35,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<double, double> real_coord;
+using real_coord = std::pair<double, double>;
 
 NS_END(representation, fordyca);
 

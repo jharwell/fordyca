@@ -36,7 +36,7 @@ class cache;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<const cache*, double> perceived_cache;
+using perceived_cache = std::pair<const cache*, double>;
 
 NS_END(representation, fordyca);
 

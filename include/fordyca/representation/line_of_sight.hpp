@@ -57,9 +57,9 @@ class cell2D;
  */
 class line_of_sight {
  public:
-  line_of_sight(const rcppsw::ds::grid_view<cell2D*> view,
+  line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
                 discrete_coord center) :
-      m_center(center), m_view(view) {}
+      m_center(std::move(center)), m_view(c_view) {}
 
   std::list<const representation::block*> blocks(void) const;
   std::list<const representation::cache*> caches(void) const;

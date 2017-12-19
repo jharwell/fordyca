@@ -35,7 +35,7 @@ NS_START(fordyca, params);
 void fsm_parser::parse(argos::TConfigurationNode &node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
-  m_params.reset(new fsm_params);
+  m_params = rcppsw::make_unique<fsm_params>();
 
   argos::GetNodeAttribute(fsm_node,
                           "unsuccessful_explore_dir_change",

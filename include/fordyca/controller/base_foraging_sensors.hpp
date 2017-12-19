@@ -54,11 +54,14 @@ NS_START(controller);
 class base_foraging_sensors {
  public:
   base_foraging_sensors(
-      const struct params::sensor_params* params,
-      argos::CCI_RangeAndBearingSensor* const rabs,
-      argos::CCI_FootBotProximitySensor* const proximity,
-      argos::CCI_FootBotLightSensor* const light,
-      argos::CCI_FootBotMotorGroundSensor* const ground);
+      const struct params::sensor_params* c_params,
+      argos::CCI_RangeAndBearingSensor* rabs,
+      argos::CCI_FootBotProximitySensor* proximity,
+      argos::CCI_FootBotLightSensor* light,
+      argos::CCI_FootBotMotorGroundSensor* ground);
+
+  base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
+  base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
 
   /**
    * @brief If \c TRUE, a block has *possibly* been detected.
@@ -82,7 +85,7 @@ class base_foraging_sensors {
    * whether a collision avoidance just happened or not. It is necessary for the
    * collision rule.
    */
-  bool calc_diffusion_vector(argos::CVector2* const vector);
+  bool calc_diffusion_vector(argos::CVector2* vector);
 
   /*
    * Calculates the vector to the light. Used to perform
@@ -138,9 +141,6 @@ class base_foraging_sensors {
   argos::CCI_FootBotMotorGroundSensor* ground(void) { return m_ground; }
 
  private:
-  base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
-  base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
-
   uint                                        m_tick;
   const double                                mc_diffusion_delta;
   argos::CVector2                             m_robot_loc;

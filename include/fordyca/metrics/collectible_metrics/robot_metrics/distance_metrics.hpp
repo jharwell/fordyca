@@ -42,8 +42,8 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
  */
 class distance_metrics : public base_collectible_metrics {
  public:
-  distance_metrics(void) {}
-  virtual ~distance_metrics(void) {}
+  distance_metrics(void) = default;
+  ~distance_metrics(void) override = default;
 
   /**
    * @brief Get the distance that a robot has traveled in a single timestep.

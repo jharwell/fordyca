@@ -35,9 +35,8 @@ void actuator_parser::parse(argos::TConfigurationNode &node) {
   argos::TConfigurationNode wheel_node =
       argos::GetNode(argos::GetNode(node, "actuators"), "wheels");
 
-  m_params.reset(new struct actuator_params);
+  m_params = rcppsw::make_unique<struct actuator_params>();
 
-  try {
     argos::CDegrees cAngle;
     argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
     m_params->wheels.hard_turn_threshold = ToRadians(cAngle);
@@ -48,11 +47,6 @@ void actuator_parser::parse(argos::TConfigurationNode &node) {
     argos::GetNodeAttribute(wheel_node,
                             "max_speed",
                             m_params->wheels.max_speed);
-  } catch (argos::CARGoSException &ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED(
-        "Error initializing controller wheel turning parameters.", ex);
-  }
 } /* parse() */
 
 void actuator_parser::show(std::ostream &stream) {

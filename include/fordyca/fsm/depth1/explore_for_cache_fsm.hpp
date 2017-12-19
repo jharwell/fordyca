@@ -64,16 +64,19 @@ class explore_for_cache_fsm : public base_explore_fsm {
                         const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
                         const std::shared_ptr<controller::actuator_manager>& actuators);
 
-  /**
-   * @brief Reset the FSM
-   */
-  void init(void) override;
+  explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
+  explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
+
+  /**
+   * @brief Reset the FSM
+   */
+  void init(void) override;
 
   /**
    * @brief Get if the robot is currently engaged in collision avoidance.
@@ -115,9 +118,6 @@ class explore_for_cache_fsm : public base_explore_fsm {
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }
-
-  explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
-  explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;
 
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

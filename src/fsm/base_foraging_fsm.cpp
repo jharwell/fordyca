@@ -40,7 +40,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators,
     uint8_t max_states)
@@ -52,12 +52,8 @@ base_foraging_fsm::base_foraging_fsm(
       entry_collision_avoidance(),
       entry_leaving_nest(),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_sensors(sensors),
-      m_actuators(actuators) {
-  /* client::insmod("base_foraging_fsm", */
-  /*                   rcppsw::er::er_lvl::DIAG, */
-  /*                   rcppsw::er::er_lvl::NOM); */
-}
+      m_sensors(std::move(sensors)),
+      m_actuators(std::move(actuators)) {}
 
 /*******************************************************************************
  * States
@@ -119,7 +115,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   /*
    * Check for nearby obstacles, and if any are detected tell the upper FSM.
    */
-  if (base_foraging_fsm::sensors()->calc_diffusion_vector(NULL)) {
+  if (base_foraging_fsm::sensors()->calc_diffusion_vector(nullptr)) {
     return controller::foraging_signal::COLLISION_IMMINENT;
   }
 

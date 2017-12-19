@@ -61,8 +61,11 @@ class base_explore_fsm : public base_foraging_fsm,
                    const std::shared_ptr<controller::actuator_manager>& actuators,
                    uint8_t max_states);
 
+  base_explore_fsm(const base_explore_fsm& fsm) = delete;
+  base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
+
   /* taskable overrides */
-  void task_start(const rcppsw::task_allocation::taskable_argument* const) override {}
+  void task_start( __unused const rcppsw::task_allocation::taskable_argument*) override {}
 
   /**
    * @brief Reset the FSM
@@ -106,9 +109,7 @@ class base_explore_fsm : public base_foraging_fsm,
   };
  private:
   struct fsm_state {
-    fsm_state(void) : time_exploring_unsuccessfully(0) {}
-
-    size_t time_exploring_unsuccessfully;
+    size_t time_exploring_unsuccessfully{0};
   };
 
   /**
@@ -130,9 +131,6 @@ class base_explore_fsm : public base_foraging_fsm,
    * LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_explore);
-
-  base_explore_fsm(const base_explore_fsm& fsm) = delete;
-  base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
 
   const double          mc_dir_change_thresh;
 

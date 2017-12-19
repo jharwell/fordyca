@@ -32,7 +32,7 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void loop_functions_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct loop_functions_params);
+  m_params = rcppsw::make_unique<struct loop_functions_params>();
 
   argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
                           "robot_id",

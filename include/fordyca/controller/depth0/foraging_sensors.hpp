@@ -44,11 +44,14 @@ NS_START(fordyca, controller, depth0);
 class foraging_sensors : public base_foraging_sensors {
  public:
   foraging_sensors(
-      const struct params::sensor_params* params,
-      argos::CCI_RangeAndBearingSensor* const rabs,
-      argos::CCI_FootBotProximitySensor* const proximity,
-      argos::CCI_FootBotLightSensor* const light,
-      argos::CCI_FootBotMotorGroundSensor* const ground);
+      const struct params::sensor_params* c_params,
+      argos::CCI_RangeAndBearingSensor* rabs,
+      argos::CCI_FootBotProximitySensor* proximity,
+      argos::CCI_FootBotLightSensor* light,
+      argos::CCI_FootBotMotorGroundSensor* ground);
+
+  foraging_sensors(const foraging_sensors& fsm) = delete;
+  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 
   /**
    * @brief Get the robot's current line-of-sight (LOS)
@@ -70,9 +73,6 @@ class foraging_sensors : public base_foraging_sensors {
   }
 
  private:
-  foraging_sensors(const foraging_sensors& fsm) = delete;
-  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
-
   std::unique_ptr<representation::line_of_sight> m_los;
 };
 

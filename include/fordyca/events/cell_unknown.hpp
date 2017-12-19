@@ -31,7 +31,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class cell2D; class cell2D_fsm; }
+namespace representation { class cell2D; }
 namespace fsm { class perceived_cell2D_fsm; }
 
 NS_START(events);

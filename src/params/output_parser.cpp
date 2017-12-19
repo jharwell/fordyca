@@ -33,21 +33,21 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void output_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct output_params);
+  m_params = rcppsw::make_unique<output_params>();
   std::vector<std::string> res, res2;
   argos::TConfigurationNode onode = argos::GetNode(node, "output");
 
-  if (onode.FirstChild("metrics", false)) {
+  if (nullptr != onode.FirstChild("metrics", false)) {
     m_metrics_parser.parse(argos::GetNode(onode, "metrics"));
     m_params->metrics = *m_metrics_parser.get_results();
   }
 
-  if (onode.FirstChild("sim", false)) {
+  if (nullptr != onode.FirstChild("sim", false)) {
     argos::TConfigurationNode snode = argos::GetNode(onode, "sim");
     argos::GetNodeAttribute(snode, "output_root", m_params->output_root);
     argos::GetNodeAttribute(snode, "output_dir", m_params->output_dir);
     argos::GetNodeAttribute(snode, "sim_log_fname", m_params->sim_log_fname);
-  } else if (onode.FirstChild("robot", false)) {
+  } else if (nullptr != onode.FirstChild("robot", false)) {
     argos::TConfigurationNode rnode = argos::GetNode(onode, "robot");
     argos::GetNodeAttribute(rnode, "output_root", m_params->output_root);
     argos::GetNodeAttribute(rnode, "output_dir", m_params->output_dir);

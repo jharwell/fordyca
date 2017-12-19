@@ -36,9 +36,9 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct grid_params : public rcppsw::common::base_params {
-  grid_params(void) : resolution(0.0), upper(), lower() {}
+  grid_params(void) : upper(), lower() {}
 
-  double resolution;
+  double resolution{0.0};
   argos::CVector2 upper;
   argos::CVector2 lower;
 };

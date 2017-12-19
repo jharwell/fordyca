@@ -58,6 +58,9 @@ class block_distributor {
                     argos::CRange<double> nest_y,
                     const struct params::block_params* params);
 
+  block_distributor(const block_distributor& s) = delete;
+  block_distributor& operator=(const block_distributor& s) = delete;
+
   /**
    * @brief Distribute a block in the arena.
    *
@@ -65,7 +68,7 @@ class block_distributor {
    * block. Only matters if respawn is not enabled.
    */
   bool distribute_block(const representation::block& block,
-                        argos::CVector2* const coord);
+                        argos::CVector2* coord);
 
   argos::CRange<double> single_src_xrange(void);
 
@@ -91,9 +94,6 @@ class block_distributor {
   argos::CVector2 dist_outside_range(double dimension,
                                      argos::CRange<double> x_range,
                                      argos::CRange<double> y_range);
-
-  block_distributor(const block_distributor& s) = delete;
-  block_distributor& operator=(const block_distributor& s) = delete;
 
   std::string           m_dist_model;
   argos::CRange<double> m_arena_x;

@@ -59,19 +59,22 @@ class free_block_drop : public cell_op,
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   representation::block* block, size_t x, size_t y,
                   double resolution);
-  ~free_block_drop(void) { client::rmmod(); }
+  ~free_block_drop(void) override { client::rmmod(); }
+
+  free_block_drop(const free_block_drop& op) = delete;
+  free_block_drop& operator=(const free_block_drop& op) = delete;
 
   /* stateless foraging */
   void visit(representation::cell2D& cell) override;
   void visit(representation::block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map&) override;
+  void visit(representation::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_cell2D&) override {}
+  void visit(__unused representation::perceived_cell2D& cell) override {}
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller&) override {}
+  void visit(__unused controller::depth1::foraging_controller& c) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.
@@ -79,9 +82,6 @@ class free_block_drop : public cell_op,
   representation::block* block(void) const { return m_block; }
 
  private:
-  free_block_drop(const free_block_drop& op) = delete;
-  free_block_drop& operator=(const free_block_drop& op) = delete;
-
   double m_resolution;
   representation::block* m_block;
   std::shared_ptr<rcppsw::er::server> m_server;

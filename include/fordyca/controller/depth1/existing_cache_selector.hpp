@@ -50,7 +50,7 @@ class existing_cache_selector: public rcppsw::er::client {
       const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
-  ~existing_cache_selector(void) { rmmod(); }
+  ~existing_cache_selector(void) override { rmmod(); }
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
@@ -61,7 +61,7 @@ class existing_cache_selector: public rcppsw::er::client {
    * value.
    */
   representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache> existing_caches,
+      const std::list<representation::perceived_cache>& existing_caches,
       argos::CVector2 robot_loc);
 
  private:

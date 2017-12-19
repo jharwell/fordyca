@@ -70,9 +70,12 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
   vector_fsm(uint frequent_collision_thresh,
-             std::shared_ptr<rcppsw::er::server> server,
+             const std::shared_ptr<rcppsw::er::server>& server,
              std::shared_ptr<controller::depth0::foraging_sensors> sensors,
              std::shared_ptr<controller::actuator_manager> actuators);
+
+  vector_fsm(const vector_fsm& fsm) = delete;
+  vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_reset(void) override { init(); }
@@ -80,7 +83,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
 
-  void task_start(const rcppsw::task_allocation::taskable_argument* const arg) override;
+  void task_start(const rcppsw::task_allocation::taskable_argument* c_arg) override;
   bool task_finished(void) const override { return current_state() == ST_ARRIVED; }
 
   /**
@@ -114,15 +117,14 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   struct goal_data : public rcppsw::patterns::state_machine::event_data {
     goal_data(argos::CVector2 loc_, double tolerance_) :
         tolerance(tolerance_), loc(loc_) {}
-    goal_data(void) : tolerance(), loc() {}
+    goal_data(void) : loc() {}
 
-    double tolerance;
+    double tolerance{0.0};
     argos::CVector2 loc;
   };
 
   struct fsm_state {
-    fsm_state(void) : last_collision_time(0) {}
-    uint last_collision_time;
+    uint last_collision_time{0};
   };
 
   /* constants */
@@ -170,9 +172,6 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
           };
     return &kSTATE_MAP[index];
   }
-
-  vector_fsm(const vector_fsm& fsm) = delete;
-  vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
   argos::CRandom::CRNG*                                 m_rng;
   struct fsm_state                                      m_state;

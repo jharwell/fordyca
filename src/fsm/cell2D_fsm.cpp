@@ -55,7 +55,7 @@ void cell2D_fsm::event_unknown(void) {
       ST_UNKNOWN  /* has cache */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
-  external_event(kTRANSITIONS[current_state()], NULL);
+  external_event(kTRANSITIONS[current_state()], nullptr);
 } /* event_unknown() */
 
 void cell2D_fsm::event_empty(void) {
@@ -66,7 +66,7 @@ void cell2D_fsm::event_empty(void) {
       ST_EMPTY, /* has cache */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
-  external_event(kTRANSITIONS[current_state()], NULL);
+  external_event(kTRANSITIONS[current_state()], nullptr);
 } /* event_empty() */
 
 void cell2D_fsm::event_block_drop(void) {
@@ -125,7 +125,7 @@ FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
     ER_ASSERT(1 == m_block_count,
               "FATAL: block count should be 1 on transition to HAS_CACHE");
   }
-  if (data) {
+  if (nullptr != data) {
     if (data->pickup) {
       --m_block_count;
     } else {

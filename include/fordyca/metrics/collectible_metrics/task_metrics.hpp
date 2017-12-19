@@ -44,8 +44,8 @@ NS_START(fordyca, metrics, collectible_metrics);
  */
 class task_metrics : public base_collectible_metrics {
  public:
-  task_metrics(void) {}
-  virtual ~task_metrics(void) {}
+  task_metrics(void) = default;
+  ~task_metrics(void) override = default;
 
   /**
    * @brief Get the name of the name that is currently being executed

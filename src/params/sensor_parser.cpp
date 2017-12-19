@@ -34,7 +34,7 @@ NS_START(fordyca, params);
 void sensor_parser::parse(argos::TConfigurationNode &node) {
   argos::TConfigurationNode diff_node =
       argos::GetNode(argos::GetNode(node, "sensors"), "diffusion");
-  m_params.reset(new sensor_params);
+  m_params = rcppsw::make_unique<struct sensor_params>();
 
   argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0),
                                                  argos::CDegrees(10.0));

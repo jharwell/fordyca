@@ -36,7 +36,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<size_t, size_t> discrete_coord;
+using discrete_coord = std::pair<size_t, size_t>;
 
 /*******************************************************************************
  * Functions

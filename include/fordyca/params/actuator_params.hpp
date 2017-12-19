@@ -36,17 +36,15 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 struct wheel_params {
-  /* Angular thresholds to change turning state. */
+  wheel_params(void)
+      : hard_turn_threshold(),
+        soft_turn_threshold(),
+        no_turn_threshold() {}
+
   argos::CRadians hard_turn_threshold;
   argos::CRadians soft_turn_threshold;
   argos::CRadians no_turn_threshold;
-  argos::Real max_speed;
-
-  wheel_params(void) :
-      hard_turn_threshold(),
-      soft_turn_threshold(),
-      no_turn_threshold(),
-      max_speed() {}
+  double max_speed{0.0};
 };
 
 

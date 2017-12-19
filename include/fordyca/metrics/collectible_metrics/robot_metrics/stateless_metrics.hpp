@@ -43,8 +43,8 @@ NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
  */
 class stateless_metrics : public base_collectible_metrics {
  public:
-  stateless_metrics(void) {}
-  virtual ~stateless_metrics(void) {}
+  stateless_metrics(void) = default;
+  ~stateless_metrics(void) override = default;
 
   /**
    * @brief If \c TRUE, then a robot is currently executing the

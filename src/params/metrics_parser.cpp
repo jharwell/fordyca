@@ -32,7 +32,7 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(argos::TConfigurationNode &node) {
-  m_params.reset(new struct metrics_params);
+  m_params = rcppsw::make_unique<struct metrics_params>();
 
   argos::GetNodeAttribute(node, "output_dir", m_params->output_dir);
 
