@@ -50,19 +50,8 @@ block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(representation::cell2D &cell) {
-  cell.entity(const_cast<representation::block *>(m_block));
-
-  /*
-   * We do not assert that the cell we found a block in does not have a cache,
-   * because it is possible that we got into this function on the timestep that
-   * another robot picked up the last block from a cache we are also on/in, and
-   * the cell containing the cache in the actual arena is now just a block.
-   *
-   * We just update our view of the world to reflect the new information.
-   */
-  if (!cell.fsm().state_has_block()) {
-    cell.fsm().accept(*this);
-  }
+  cell.entity(m_block);
+  cell.fsm().accept(*this);
 } /* visit() */
 
 void block_found::visit(fsm::cell2D_fsm &fsm) {
@@ -70,7 +59,7 @@ void block_found::visit(fsm::cell2D_fsm &fsm) {
     for (size_t i = fsm.block_count(); i > 1; --i) {
       fsm.event_block_pickup();
     } /* for(i..) */
-  } else {
+  } else if (!fsm.state_has_block()) {
     fsm.event_block_drop();
   }
   ER_ASSERT(fsm.state_has_block(),
@@ -95,8 +84,8 @@ void block_found::visit(representation::perceived_cell2D &cell) {
     cell.density_reset();
   }
 
-  if ((cell.state_has_block() && cell.pheromone_repeat_deposit()) ||
-      !cell.state_has_block()) {
+  if (cell.pheromone_repeat_deposit() ||
+      (!cell.pheromone_repeat_deposit() && !cell.state_has_block())) {
     cell.pheromone_add(1.0);
   }
   cell.decoratee().accept(*this);

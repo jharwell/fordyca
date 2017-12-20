@@ -182,7 +182,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
 }
 
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
-  if (ST_VECTOR != last_state()) {
+  if (ST_ARRIVED != last_state()) {
     ER_DIAG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
             data->loc.GetX(),
             data->loc.GetY(),

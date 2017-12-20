@@ -138,30 +138,32 @@ void perceived_arena_map::block_add(representation::block &block) {
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  assert(block.id() != -1);
   auto it = std::find(m_blocks.begin(), m_blocks.end(), block);
+  /*
+   * If we already know about the block that we are adding from our current LOS,
+   * remove the old version iff its location has changed (i.e. has been carried
+   * to the nest and the re-distributed) since we last saw it, and add an
+   * updated version of the new block. If the location of a previously known
+   * block has not changed then don't do anything, as the state of a block can't
+   * change other than to appear/disappear in perceived map.
+   *
+   * If we don't currently know about the block, then add it (obviously).
+   */
   if (m_blocks.end() != it) {
-    block_remove(*it);
+    if (block.discrete_loc() != it->discrete_loc()) {
+      block_remove(*it);
+      events::cell_empty op((*it).discrete_loc().first,
+                            (*it).discrete_loc().second);
+      m_grid.access((*it).discrete_loc().first,
+                    (*it).discrete_loc().second).accept(op);
+    m_blocks.push_back(block);
+    }
+  } else {
+    m_blocks.push_back(block);
   }
-  it = std::find(m_blocks.begin(), m_blocks.end(), block);
-  assert(it == m_blocks.end());
-  for (auto& i : m_blocks) {
-    assert(i.id() != block.id());
-  } /* for(i..) */
-
-  m_blocks.push_back(block);
 } /* block_add() */
 
 void perceived_arena_map::block_remove(representation::block &victim) {
-  /*
-   * We are removing a block whose relevance probably has not yet expired, and
-   * therefore its hosting cell needs to have its state updated to be empty as
-   * well.
-   */
-  events::cell_empty op(victim.discrete_loc().first,
-                        victim.discrete_loc().second);
-  m_grid.access(victim.discrete_loc().first,
-                victim.discrete_loc().second).accept(op);
   m_blocks.erase(std::remove(m_blocks.begin(), m_blocks.end(), victim));
 } /* block_remove() */
 

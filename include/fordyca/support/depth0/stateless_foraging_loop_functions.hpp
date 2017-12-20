@@ -87,7 +87,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   template<typename T>
   void set_robot_tick(argos::CFootBotEntity& robot) {
     auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-    controller.tick(GetSpace().GetSimulationClock() + 1); /* for next timestep */
+    controller.tick(GetSpace().GetSimulationClock());
   }
 
  private:

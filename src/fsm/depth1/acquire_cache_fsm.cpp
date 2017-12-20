@@ -143,46 +143,41 @@ void acquire_cache_fsm::init(void) {
 
 bool acquire_cache_fsm::acquire_known_cache(
     std::list<representation::perceived_cache> caches) {
-  /*
-   * If we don't know of any caches, and we aren't currently running, we cannot
-   * acquire a known cache. However, if we don't know of any caches, but we are
-   * currently on our way to a cache (i.e. we "forgot" about it en-route, then
-   * we still might be able to acquire one, so don't give up just yet).
-   */
-  if (caches.empty() && !m_vector_fsm.task_running()) {
-    return false;
+
+    if (!caches.empty() && !m_vector_fsm.task_running()) {
+    /*
+     * If we get here, we must know of some caches, but not be currently
+     * vectoring toward any of them.
+     */
+    if (!m_vector_fsm.task_running()) {
+      controller::depth1::existing_cache_selector selector(m_server,
+                                                           mc_nest_center);
+      auto best = selector.calc_best(caches, m_sensors->robot_loc());
+      ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
+             best.first->id(),
+             best.first->discrete_loc().first,
+             best.first->discrete_loc().second,
+             best.second);
+      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
+                               best.first->real_loc());
+      m_explore_fsm.task_reset();
+      m_vector_fsm.task_reset();
+      m_vector_fsm.task_start(&v);
+    }
   }
 
-  if (!m_vector_fsm.task_finished() && m_vector_fsm.task_running()) {
+  /* we are vectoring */
+  if (!m_vector_fsm.task_finished()) {
     m_vector_fsm.task_execute();
   }
 
   if (m_vector_fsm.task_finished()) {
+    m_vector_fsm.task_reset();
     if (m_sensors->cache_detected()) {
       return true;
     }
     ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");
     return false;
-  }
-
-  /*
-   * If we get here, we must know of some caches, but not be currently vectoring
-   * toward any of them.
-   */
-  if (!m_vector_fsm.task_running()) {
-    controller::depth1::existing_cache_selector selector(m_server,
-                                                         mc_nest_center);
-    auto best = selector.calc_best(caches, m_sensors->robot_loc());
-    ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
-           best.first->id(),
-           best.first->discrete_loc().first,
-           best.first->discrete_loc().second,
-           best.second);
-    tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                             best.first->real_loc());
-    m_explore_fsm.task_reset();
-    m_vector_fsm.task_reset();
-    m_vector_fsm.task_start(&v);
   }
   return false;
 } /* acquire_known_cache() */

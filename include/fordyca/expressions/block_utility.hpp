@@ -37,7 +37,7 @@ NS_START(fordyca, expressions);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_utilityppp
+ * @class block_utility
  *
  * @brief Calculates the utility associated with a known block, as part of a
  * robot's decision on whether or not to go and attempt to pick it up.
