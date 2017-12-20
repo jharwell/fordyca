@@ -135,9 +135,9 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
       &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
 
   if (p->init_random_estimates) {
-    m_generalist->init_random(10000, 2000);
-    m_forager->init_random(1000, 2000);
-    m_collector->init_random(1000, 2000);
+    m_generalist->init_random(500, 1000);
+    m_forager->init_random(100, 500);
+    m_collector->init_random(100, 500);
   }
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */

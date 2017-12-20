@@ -53,6 +53,7 @@ std::list<const representation::block *> line_of_sight::blocks(void) const {
 
 std::list<const representation::cache *> line_of_sight::caches(void) const {
   std::list<const representation::cache *> caches;
+
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       representation::cell2D *cell = m_view[i][j];

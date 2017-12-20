@@ -49,13 +49,6 @@ representation::perceived_block block_selector::calc_best(
 
   ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto pair : blocks) {
-    /*
-     * @bug WARNING: UGLY hack. See #202. Needed to gather good data for
-     * presentation.
-     */
-    if (pair.first->discrete_loc().first >= 100) {
-      continue;
-    }
     expressions::block_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second);

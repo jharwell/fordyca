@@ -45,7 +45,7 @@
           <grid resolution="0.2"
                 size="10, 5, 2"
                 />
-          <pheromone rho="0.0001"
+          <pheromone rho="0.00001"
                      repeat_deposit="true"/>
         </perceived_arena_map>
         <task estimation_alpha="0.8"
@@ -56,7 +56,7 @@
               init_random_estimates="true"
               subtask_selection_method="brutschy2014"
               partition_method="pini2011"
-              always_partition="false"
+              always_partition="true"
               never_partition="false"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"

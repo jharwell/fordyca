@@ -43,15 +43,15 @@ cell2D::cell2D(const std::shared_ptr<rcppsw::er::server> &server)
  * Member Functions
  ******************************************************************************/
 const representation::block *cell2D::block(void) const {
-  return static_cast<representation::block *>(m_entity);
+  return dynamic_cast<representation::block *>(m_entity);
 } /* block() */
 
 representation::block *cell2D::block(void) {
-  return static_cast<representation::block *>(m_entity);
+  return dynamic_cast<representation::block *>(m_entity);
 } /* block() */
 
 representation::cache *cell2D::cache(void) const {
-  return static_cast<representation::cache *>(m_entity);
+  return dynamic_cast<representation::cache *>(m_entity);
 } /* cache() */
 
 NS_END(representation, fordyca);

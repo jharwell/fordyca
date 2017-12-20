@@ -38,6 +38,7 @@ NS_START(fordyca, events);
  ******************************************************************************/
 void cell_empty::visit(representation::perceived_cell2D &cell) {
   cell.decoratee().accept(*this);
+  cell.density_reset();
 } /* visit() */
 
 void cell_empty::visit(representation::cell2D &cell) {
