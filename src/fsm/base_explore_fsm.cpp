@@ -66,14 +66,22 @@ HFSM_STATE_DEFINE(base_explore_fsm, new_direction, state_machine::event_data) {
   auto *dir_data = dynamic_cast<const new_direction_data *>(data);
   if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
+    ER_DIAG("Change direction: %f -> %f\n",
+            current_dir.GetValue(),
+            m_new_dir.GetValue());
   }
+
+  /*
+   * The amount we change our direction is proportional to how far off we are
+   * from our desired new direction. This prevents excessive spinning due to
+   * overshoot. See #191.
+   */
   base_foraging_fsm::actuators()->set_heading(
-      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.25,
-                      m_new_dir),
+      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
+                      (current_dir - m_new_dir)),
       true);
 
-  /* We have changed direction and started a new exploration */
-  if (std::fabs((current_dir - m_new_dir).GetValue()) < 0.1) {
+  if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL) {
     m_state.time_exploring_unsuccessfully = 0;
     internal_event(previous_state());
   }

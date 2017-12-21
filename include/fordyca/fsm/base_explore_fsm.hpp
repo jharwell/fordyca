@@ -112,6 +112,8 @@ class base_explore_fsm : public base_foraging_fsm,
     size_t time_exploring_unsuccessfully{0};
   };
 
+  static constexpr double kDIR_CHANGE_TOL = 0.25;
+
   /**
    * @brief Robots entering this state will randomly change their exploration
    * direction to the specified direction. All signals are ignored in this

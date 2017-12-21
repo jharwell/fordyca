@@ -150,7 +150,7 @@
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
-           intensity="4.0"
+           intensity="10.0"
            medium="leds" />
     <distribute>
       <position method="uniform" min="1,1,0" max="18,4,0" />
