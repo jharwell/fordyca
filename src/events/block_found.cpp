@@ -92,9 +92,15 @@ void block_found::visit(representation::perceived_cell2D &cell) {
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map &map) {
+  representation::perceived_cell2D& cell = map.access(cell_op::x(),
+                                                      cell_op::y());
+
+  if (cell.state_has_cache()) {
+    map.cache_remove(*cell.cache());
+  }
   map.block_add(*m_block);
   m_block = &map.blocks().back();
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+  cell.accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

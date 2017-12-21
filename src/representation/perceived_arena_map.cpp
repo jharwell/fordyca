@@ -164,7 +164,15 @@ void perceived_arena_map::block_add(representation::block &block) {
 } /* block_add() */
 
 void perceived_arena_map::block_remove(representation::block &victim) {
-  m_blocks.erase(std::remove(m_blocks.begin(), m_blocks.end(), victim));
+  /*
+   * @bug For some reason when I erase from this vector and the victim element
+   * has already been erased and the vector no longer contains it, I get a
+   * segmentation fault. Not sure why. This fixes it, at least for now. See
+   * #226, #227, #228.
+   */
+  if (!m_blocks.empty()) {
+    m_blocks.erase(std::remove(m_blocks.begin(), m_blocks.end(), victim));
+  }
 } /* block_remove() */
 
 NS_END(representation, fordyca);
