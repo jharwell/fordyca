@@ -43,7 +43,7 @@ double existing_cache_utility::calc(const argos::CVector2 &rloc,
                                     double density,
                                     size_t n_blocks) {
   return set_result(
-      (std::exp(-density) * n_blocks) /
+      (std::exp(density) * n_blocks) /
       ((mc_cache_loc - rloc).Length() * (mc_cache_loc - mc_nest_loc).Length()));
 } /* calc() */
 
