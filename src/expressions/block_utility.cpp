@@ -41,7 +41,7 @@ block_utility::block_utility(const argos::CVector2 &block_loc,
 double block_utility::calc(const argos::CVector2 &rloc, double density) {
   return set_result(
       ((mc_block_loc - mc_nest_loc).Length() / (mc_block_loc - rloc).Length()) *
-      std::exp(-density));
+      std::exp(density));
 } /* calc() */
 
 NS_END(expressions, fordyca);
