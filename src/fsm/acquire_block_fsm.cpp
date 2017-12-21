@@ -46,7 +46,7 @@ acquire_block_fsm::acquire_block_fsm(
     const std::shared_ptr<rcppsw::er::server> &server,
     const std::shared_ptr<controller::depth0::foraging_sensors> &sensors,
     const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    const std::shared_ptr<representation::perceived_arena_map> &map)
     : base_foraging_fsm(
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
@@ -147,20 +147,19 @@ bool acquire_block_fsm::acquire_known_block(
      * If we get here, we must know of some blocks, but not be currently
      * vectoring toward any of them.
      */
-    if (!m_vector_fsm.task_running()) {
-      controller::depth0::block_selector selector(m_server, mc_nest_center);
-      auto best = selector.calc_best(blocks, m_sensors->robot_loc());
-      ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
-             best.first->id(),
-             best.first->discrete_loc().first,
-             best.first->discrete_loc().second,
-             best.second);
-      tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
-                               best.first->real_loc());
-      m_explore_fsm.task_reset();
-      m_vector_fsm.task_reset();
-      m_vector_fsm.task_start(&v);
-    }
+    controller::depth0::block_selector selector(m_server, mc_nest_center);
+    auto best = selector.calc_best(blocks, m_sensors->robot_loc());
+    ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
+           best.first->id(),
+           best.first->discrete_loc().first,
+           best.first->discrete_loc().second,
+           best.second);
+    tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
+                             best.first->real_loc());
+    m_best_block = const_cast<representation::block*>(best.first);
+    m_explore_fsm.task_reset();
+    m_vector_fsm.task_reset();
+    m_vector_fsm.task_start(&v);
   }
 
   /* we are vectoring */
@@ -174,6 +173,7 @@ bool acquire_block_fsm::acquire_known_block(
       return true;
     }
     ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
+    m_map->block_remove(*m_best_block);
     return false;
   }
   return false;

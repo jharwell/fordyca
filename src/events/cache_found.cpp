@@ -97,9 +97,15 @@ void cache_found::visit(fsm::cell2D_fsm &fsm) {
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map &map) {
+  representation::perceived_cell2D& cell = map.access(cell_op::x(),
+                                                      cell_op::y());
+
+  if (cell.state_has_block()) {
+    map.block_remove(*cell.block());
+  }
   map.cache_add(*m_cache);
   m_cache = &map.caches().back();
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+  cell.accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

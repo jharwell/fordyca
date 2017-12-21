@@ -39,7 +39,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server> &server,
     const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
     const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    const std::shared_ptr<representation::perceived_arena_map> &map)
     : base_foraging_fsm(
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
@@ -64,7 +64,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
                                                NULL,
                                                &entry_leaving_nest,
                                                NULL),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 

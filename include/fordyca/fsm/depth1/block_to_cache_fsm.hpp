@@ -73,7 +73,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
-      const std::shared_ptr<const representation::perceived_arena_map>& map);
+      const std::shared_ptr<representation::perceived_arena_map>& map);
 
   block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
   block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
