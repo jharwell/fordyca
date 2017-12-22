@@ -53,7 +53,7 @@ forager::forager(const struct task_allocation::task_params *params,
 double forager::current_time(void) const {
   return dynamic_cast<fsm::depth1::block_to_cache_fsm *>(
              polled_task::mechanism())
-      ->sensors()
+      ->base_sensors()
       ->tick();
 } /* current_time() */
 

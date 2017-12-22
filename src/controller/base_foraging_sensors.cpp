@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_foraging_sensors.hpp"
+#include <limits>
+
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
@@ -38,20 +40,31 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_sensors::base_foraging_sensors(
-    const struct params::sensor_params *params,
+    double diffusion_delta,
+    argos::CRange<argos::CRadians> go_straight_angle_range,
     argos::CCI_RangeAndBearingSensor *const rabs,
     argos::CCI_FootBotProximitySensor *const proximity,
     argos::CCI_FootBotLightSensor *const light,
     argos::CCI_FootBotMotorGroundSensor *const ground)
     : m_tick(0),
-      mc_diffusion_delta(params->diffusion.delta),
+      mc_obstacle_delta(diffusion_delta),
       m_robot_loc(),
       m_prev_robot_loc(),
-      mc_go_straight_angle_range(params->diffusion.go_straight_angle_range),
+      mc_go_straight_angle_range(go_straight_angle_range),
       m_rabs(rabs),
       m_proximity(proximity),
       m_light(light),
       m_ground(ground) {}
+
+base_foraging_sensors::base_foraging_sensors(
+    const struct params::sensor_params *params,
+    argos::CCI_RangeAndBearingSensor *const rabs,
+    argos::CCI_FootBotProximitySensor *const proximity,
+    argos::CCI_FootBotLightSensor *const light,
+    argos::CCI_FootBotMotorGroundSensor *const ground) :
+    base_foraging_sensors(params->diffusion.delta,
+                          params->diffusion.go_straight_angle_range,
+                          rabs, proximity, light, ground) {}
 
 /*******************************************************************************
  * Member Functions
@@ -75,36 +88,35 @@ bool base_foraging_sensors::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-bool base_foraging_sensors::calc_diffusion_vector(
-    argos::CVector2 *const vector_in) {
+std::pair<argos::CVector2, bool> base_foraging_sensors::calc_obstacle_vector(void) {
   const argos::CCI_FootBotProximitySensor::TReadings &tProxReads =
       m_proximity->GetReadings();
-  argos::CVector2 *vector;
-  argos::CVector2 tmp;
-
-  if (vector_in == NULL) {
-    vector = &tmp;
-  } else {
-    vector = vector_in;
-  }
+  std::pair<argos::CVector2, bool> res;
+  argos::CVector2 closest;
 
   for (size_t i = 0; i < tProxReads.size(); ++i) {
-    *vector += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
+      closest += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
   } /* for(i..) */
+  closest /= tProxReads.size();
 
   /*
-   * If the angle of the vector is small enough and the closest obstacle is far
-   * enough, ignore the vector and go straight, otherwise return it.
+   * For obstacle detection, if the average obstacle distance is less than our
+   * minimum threshold, return the vector. We ignore whether or not the detected
+   * obstacle is only within our "go straight" angle range, because that results
+   * in most robots not avoiding collisions that can generally be avoided.
    */
-  if (mc_go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(
-          vector->Angle()) &&
-      vector->Length() < mc_diffusion_delta) {
-    *vector = argos::CVector2::X;
-    return false;
+  if (closest.Length() <= 0 || closest.Length() >= mc_obstacle_delta) {
+    res.first = argos::CVector2::X;
+    res.second = false;
+  } else {
+    if (mc_go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(
+            closest.Angle())) {
+      res.first = -closest.Normalize();
+      res.second = true;
+    }
   }
-  *vector = -vector->Normalize();
-  return true;
-}
+  return res;
+} /* calc_obstacle_vector() */
 
 argos::CVector2 base_foraging_sensors::calc_vector_to_light(void) {
   const argos::CCI_FootBotLightSensor::TReadings &tLightReads =

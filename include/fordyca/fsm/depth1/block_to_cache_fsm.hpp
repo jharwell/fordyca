@@ -110,7 +110,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth1::foraging_sensors* sensors(void) const { return m_sensors.get(); }
+  controller::depth1::foraging_sensors* depth1_sensors(void) const { return m_sensors.get(); }
 
  protected:
   enum fsm_states {

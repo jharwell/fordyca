@@ -24,6 +24,7 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
 
+#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/params/actuator_params.hpp"
@@ -31,7 +32,6 @@
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,7 +60,7 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
       static_cast<const struct params::fsm_params *>(
           param_repo.get_params("fsm")),
       base_foraging_controller::server(),
-      base_foraging_controller::sensors(),
+      base_foraging_controller::base_sensors_ref(),
       base_foraging_controller::actuators()));
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
@@ -99,7 +99,7 @@ size_t stateless_foraging_controller::entity_id(void) const {
 } /* entity_id() */
 
 double stateless_foraging_controller::timestep_distance(void) const {
-  return sensors()->robot_heading().Length();
+  return base_sensors()->robot_heading().Length();
 } /* timestep_distance() */
 
 /* Notifiy ARGoS of the existence of the controller. */

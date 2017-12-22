@@ -59,7 +59,6 @@ stateful_foraging_controller::stateful_foraging_controller(void)
     : base_foraging_controller(),
       m_light_loc(),
       m_map(),
-      m_sensors(),
       m_executive(),
       m_generalist() {}
 
@@ -79,29 +78,36 @@ bool stateful_foraging_controller::block_acquired(void) const {
 } /* block_acquired() */
 
 void stateful_foraging_controller::robot_loc(argos::CVector2 loc) {
-  m_sensors->robot_loc(loc);
+  base_sensors()->robot_loc(loc);
 }
 
 argos::CVector2 stateful_foraging_controller::robot_loc(void) const {
-  return m_sensors->robot_loc();
+  return base_sensors()->robot_loc();
 }
 
-__pure const representation::line_of_sight *stateful_foraging_controller::los(
+__pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {
-  return m_sensors->los();
+  return stateful_sensors()->los();
 }
 void stateful_foraging_controller::los(
-    std::unique_ptr<representation::line_of_sight> &new_los) {
-  m_sensors->los(new_los);
+    std::unique_ptr<representation::line_of_sight>& new_los) {
+  stateful_sensors()->los(new_los);
 }
 
+depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(void) const {
+  return static_cast<depth1::foraging_sensors*>(base_sensors());
+}
+
+std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::stateful_sensors_ref(void) const {
+  return std::static_pointer_cast<depth1::foraging_sensors>(base_sensors_ref());
+}
 void stateful_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
    * the relevance of information within it. Then, you can run the main FSM
    * loop.
    */
-  process_los(m_sensors->los());
+  process_los(stateful_sensors()->los());
   m_map->update_density();
   m_executive->run();
 } /* ControlStep() */
@@ -117,14 +123,14 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
   param_repo.show_all(server_handle()->log_stream());
   task_repo.show_all(server_handle()->log_stream());
 
-  m_map.reset(new representation::perceived_arena_map(
+  m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
       static_cast<const struct params::depth0::perceived_arena_map_params *>(
           param_repo.get_params("perceived_arena_map")),
-      GetId()));
+      GetId());
 
-  m_sensors.reset(new depth1::foraging_sensors(
-      static_cast<const struct params::sensor_params *>(
+  base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
+            static_cast<const struct params::sensor_params *>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
@@ -143,17 +149,17 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_params,
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::sensors_ref(),
+          stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist.reset(
-      new tasks::generalist(&task_params->tasks, generalist_fsm));
+  m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->tasks,
+                                                        generalist_fsm);
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
 
-  m_executive.reset(
-      new task_allocation::polled_executive(base_foraging_controller::server(),
-                                            m_generalist.get()));
+  m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
+      base_foraging_controller::server(),
+      m_generalist.get());
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
@@ -214,8 +220,8 @@ double stateful_foraging_controller::timestep_distance(void) const {
    * because of the prev/current location not being set up properly yet. Might
    * be worth fixing at some point...
    */
-  if (m_sensors->tick() > 2) {
-    return m_sensors->robot_heading().Length();
+  if (base_sensors()->tick() > 2) {
+    return base_sensors()->robot_heading().Length();
   }
   return 0;
 } /* timestep_distance() */

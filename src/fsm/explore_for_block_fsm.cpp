@@ -86,7 +86,10 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
-  if (base_foraging_fsm::sensors()->block_detected()) {
+  if (ST_NEW_DIRECTION == last_state()) {
+    explore_time_reset();
+  }
+  if (base_foraging_fsm::base_sensors()->block_detected()) {
     ER_DIAG("Block detected");
     internal_event(ST_FINISHED);
   }
@@ -98,7 +101,8 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
    * spent in collision avoidance still counts towards the direction change
    * threshold.
    */
-  if (base_foraging_fsm::sensors()->calc_diffusion_vector(nullptr)) {
+  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
+  if (res.second) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
@@ -108,13 +112,9 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
                    rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
   }
   /*
-   * No obstacles nearby and have not hit direction changing threshold--use the
-   * diffusion vector only to set speeds.
+   * No obstacles nearby--all ahead full!
    */
-  argos::CVector2 vector;
-  base_foraging_fsm::sensors()->calc_diffusion_vector(&vector);
-  base_foraging_fsm::actuators()->set_heading(
-      base_foraging_fsm::actuators()->max_wheel_speed() * vector);
+  actuators()->set_heading(actuators()->max_wheel_speed() * res.first);
   return controller::foraging_signal::HANDLED;
 }
 

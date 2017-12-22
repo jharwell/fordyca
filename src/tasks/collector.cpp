@@ -49,7 +49,7 @@ collector::collector(const struct task_allocation::task_params *const params,
  ******************************************************************************/
 double collector::current_time(void) const {
   return dynamic_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
-      ->sensors()
+      ->base_sensors()
       ->tick();
 } /* current_time() */
 

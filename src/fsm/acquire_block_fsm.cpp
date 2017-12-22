@@ -25,6 +25,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
+
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/foraging_sensors.hpp"
@@ -48,6 +49,7 @@ acquire_block_fsm::acquire_block_fsm(
     const std::shared_ptr<controller::actuator_manager> &actuators,
     const std::shared_ptr<representation::perceived_arena_map> &map)
     : base_foraging_fsm(
+          params->times.unsuccessful_explore_dir_change,
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
           actuators,
@@ -57,6 +59,7 @@ acquire_block_fsm::acquire_block_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       exit_acquire_block(),
       mc_nest_center(params->nest_center),
+      m_best_block(nullptr),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_map(map),
       m_server(server),

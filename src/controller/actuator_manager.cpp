@@ -122,6 +122,12 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void actuator_manager::set_speed(double speed) {
+  m_wheels->SetLinearVelocity(
+      argos::Min<double>(speed, mc_params.wheels.max_speed),
+      argos::Min<double>(speed, mc_params.wheels.max_speed));
+} /* set_speed() */
+
 void actuator_manager::set_wheel_speeds(double speed1,
                                         double speed2,
                                         argos::CRadians heading) {

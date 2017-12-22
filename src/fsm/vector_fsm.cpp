@@ -26,7 +26,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,36 +40,35 @@ namespace state_machine = rcppsw::patterns::state_machine;
 vector_fsm::vector_fsm(
     uint frequent_collision_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    std::shared_ptr<controller::depth0::foraging_sensors> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators)
-    : polled_simple_fsm(server, ST_MAX_STATES),
-      start(),
-      vector(),
-      collision_avoidance(),
-      collision_recovery(),
-      arrived(),
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators)
+    : base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+      HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
+      entry_new_direction(),
+      HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(vector, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(collision_recovery, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(arrived, hfsm::top_state()),
       entry_vector(),
       entry_collision_avoidance(),
       entry_collision_recovery(),
-      m_rng(argos::CRandom::CreateRNG("argos")),
       m_state(),
       m_freq_collision_thresh(frequent_collision_thresh),
       m_collision_rec_count(0),
-      m_sensors(std::move(sensors)),
-      m_actuators(std::move(actuators)),
       m_goal_data(),
       m_ang_pid(4.0,
                 0.0,
                 0,
                 1,
-                -m_actuators->max_wheel_speed() * 0.50,
-                m_actuators->max_wheel_speed() * 0.50),
+                -this->actuators()->max_wheel_speed() * 0.50,
+                this->actuators()->max_wheel_speed() * 0.50),
       m_lin_pid(3.0,
                 0,
                 0,
                 1,
-                m_actuators->max_wheel_speed() * 0.1,
-                m_actuators->max_wheel_speed() * 0.7) {
+                this->actuators()->max_wheel_speed() * 0.1,
+                this->actuators()->max_wheel_speed() * 0.7) {
   insmod("vector_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -81,58 +80,70 @@ FSM_STATE_DEFINE_ND(vector_fsm, start) {
 }
 
 FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
-  argos::CVector2 diff_vector;
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
-
+  if (ST_NEW_DIRECTION == last_state()) {
+    internal_event(ST_COLLISION_RECOVERY);
+  }
   /*
    * We stay in collision avoidance until we are sufficiently distant/heading
    * away from the obstacle. We do collision recovery ONLY if we came from the
    * vector_to_target state to get back on trajectory, but not if we are
    * randomly exploring or doing something else.
    */
-  if (m_sensors->calc_diffusion_vector(&diff_vector)) {
-    if (m_sensors->tick() - m_state.last_collision_time <
+  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
+  if (res.second) {
+    if (base_sensors()->tick() - m_state.last_collision_time <
         m_freq_collision_thresh) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time,
-              m_sensors->tick());
-      diff_vector = randomize_vector_angle(diff_vector);
+              base_sensors()->tick());
+     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
+      internal_event(ST_NEW_DIRECTION,
+                     rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     }
-    m_actuators->set_heading(diff_vector);
+    actuators()->set_heading(res.first);
+    actuators()->set_speed(actuators()->max_wheel_speed() * 0.5);
   } else {
+    m_state.last_collision_time = base_sensors()->tick();
+    actuators()->set_heading(res.first);
+    actuators()->set_speed(actuators()->max_wheel_speed() * 0.5);
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
 }
+
 FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   if (ST_COLLISION_RECOVERY != last_state()) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
 
-  if (m_collision_rec_count++ >= kCOLLISION_RECOVERY_TIME) {
+  if (++m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
     m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
   return controller::foraging_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
+FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   if (ST_VECTOR != last_state()) {
     ER_DIAG("Executing ST_VECTOR");
   }
 
   double ang_speed = 0;
   double lin_speed = 0;
-  if (nullptr != data) {
-    m_goal_data = *data;
+  auto* goal = dynamic_cast<const struct goal_data*>(data);
+  if (nullptr != goal) {
+    m_goal_data = *goal;
     ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
-  if (m_sensors->calc_diffusion_vector(NULL)) {
+  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
+  if (res.second) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
-  if ((m_goal_data.loc - m_sensors->robot_loc()).Length() <=
+
+  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <=
       m_goal_data.tolerance) {
     m_ang_pid.reset();
     m_lin_pid.reset();
@@ -140,7 +151,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
   }
   argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal_data.loc);
-  argos::CVector2 heading = m_sensors->robot_heading();
+  argos::CVector2 heading = base_sensors()->robot_heading();
 
   /*
    * Can't use the angle obtained from the  (heading - robot_to_goal) vector
@@ -154,8 +165,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
    * timesteps.
    */
   double angle_to_goal =
-      std::atan2(m_goal_data.loc.GetY() - m_sensors->robot_loc().GetY(),
-                 m_goal_data.loc.GetX() - m_sensors->robot_loc().GetX());
+      std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
+                 m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
   double angle_diff = angle_to_goal - heading.Angle().GetValue();
   angle_diff = atan2(std::sin(angle_diff), std::cos(angle_diff));
 
@@ -177,7 +188,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, goal_data) {
          heading.Angle().GetValue(),
          ang_speed,
          lin_speed);
-  m_actuators->set_wheel_speeds(lin_speed, ang_speed);
+  actuators()->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }
 
@@ -193,16 +204,15 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DIAG("Entering ST_VECTOR");
-  m_actuators->leds_set_color(argos::CColor::BLUE);
+  actuators()->leds_set_color(argos::CColor::BLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  m_actuators->leds_set_color(argos::CColor::RED);
-  m_state.last_collision_time = m_sensors->tick();
+  actuators()->leds_set_color(argos::CColor::RED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
-  m_actuators->leds_set_color(argos::CColor::YELLOW);
+  actuators()->leds_set_color(argos::CColor::YELLOW);
 }
 /*******************************************************************************
  * General Member Functions
@@ -214,6 +224,7 @@ void vector_fsm::task_start(
       ST_VECTOR,                            /* vector */
       controller::foraging_signal::IGNORED, /* collision avoidance */
       controller::foraging_signal::IGNORED, /* collision recovery */
+      controller::foraging_signal::IGNORED, /* new direction */
       controller::foraging_signal::IGNORED, /* arrived */
   };
   auto *const a = dynamic_cast<const tasks::vector_argument *>(c_arg);
@@ -222,22 +233,20 @@ void vector_fsm::task_start(
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<struct goal_data>(a->vector(),
                                                        a->tolerance()));
-}
+} /* task_start() */
+
+void vector_fsm::task_execute(void) {
+  inject_event(controller::foraging_signal::FSM_RUN,
+               state_machine::event_type::NORMAL);
+} /* task_execute() */
 
 void vector_fsm::init(void) {
-  m_actuators->reset();
+  actuators()->reset();
   state_machine::simple_fsm::init();
 } /* init() */
 
 argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2 &goal) {
-  return goal - m_sensors->robot_loc();
+  return goal - base_sensors()->robot_loc();
 } /* calc_vector_to_goal() */
-
-argos::CVector2 vector_fsm::randomize_vector_angle(argos::CVector2 v) {
-  argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
-                                       argos::CRadians(1.0));
-  v.Rotate(m_rng->Uniform(range));
-  return v;
-} /* randomize_vector_angle() */
 
 NS_END(fsm, fordyca);

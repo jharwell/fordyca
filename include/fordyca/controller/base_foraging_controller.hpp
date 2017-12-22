@@ -144,7 +144,14 @@ class base_foraging_controller : public argos::CCI_Controller,
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
-  const std::shared_ptr<base_foraging_sensors>& sensors(void) const { return m_sensors; }
+  const std::shared_ptr<base_foraging_sensors>& sensors_ref(void) const {
+    return m_sensors;
+  }
+  base_foraging_sensors* base_sensors(void) const { return m_sensors.get(); }
+  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const { return m_sensors; }
+  void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
+    m_sensors = sensors;
+  }
 
  private:
   void output_init(const struct params::output_params* const params);

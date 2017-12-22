@@ -39,7 +39,8 @@ stateless_foraging_fsm::stateless_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server> &server,
     std::shared_ptr<controller::base_foraging_sensors> sensors,
     std::shared_ptr<controller::actuator_manager> actuators)
-    : base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+    : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
+                        server, sensors, actuators, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),

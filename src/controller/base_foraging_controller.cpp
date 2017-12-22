@@ -152,7 +152,7 @@ std::string base_foraging_controller::dbg_header_calc(void) {
 } /* dbg_header_calc() */
 
 void base_foraging_controller::tick(uint tick) {
-  sensors()->tick(tick);
+  m_sensors->tick(tick);
 } /* tick() */
 
 NS_END(controller, fordyca);

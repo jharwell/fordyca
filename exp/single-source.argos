@@ -60,7 +60,7 @@
               never_partition="false"/>
         <sensors>
           <diffusion go_straight_angle_range="-5:5"
-                     delta="1.0" />
+                     delta="0.05" />
         </sensors>
         <actuators>
           <wheels hard_turn_angle_threshold="90"

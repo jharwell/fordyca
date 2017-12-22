@@ -50,7 +50,7 @@ class foraging_sensors : public base_foraging_sensors {
       argos::CCI_FootBotLightSensor* light,
       argos::CCI_FootBotMotorGroundSensor* ground);
 
-  foraging_sensors(const foraging_sensors& fsm) = delete;
+  foraging_sensors(const foraging_sensors& sensors) = delete;
   foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
 
   /**

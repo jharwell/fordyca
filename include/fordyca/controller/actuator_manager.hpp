@@ -87,6 +87,8 @@ class actuator_manager: public state_machine::simple_fsm {
   void set_heading(const argos::CVector2& heading,
                    bool force_hard_turn = false);
 
+  void set_speed(double speed);
+
   /**
    * @brief Get the max wheel speed
    */

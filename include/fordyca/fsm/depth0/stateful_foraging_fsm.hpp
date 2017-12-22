@@ -105,7 +105,7 @@ class stateful_foraging_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth0::foraging_sensors* sensors(void) const { return m_sensors.get(); }
+  controller::depth0::foraging_sensors* depth0_sensors(void) const { return m_sensors.get(); }
 
  protected:
   enum fsm_states {

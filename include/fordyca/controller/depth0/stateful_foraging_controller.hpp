@@ -119,10 +119,8 @@ class stateful_foraging_controller : public base_foraging_controller,
   std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
     return m_map;
   }
-  std::shared_ptr<depth1::foraging_sensors>& sensors_ref(void) {
-    return m_sensors;
-  }
-  depth1::foraging_sensors* sensors(void) const { return m_sensors.get(); }
+  depth1::foraging_sensors* stateful_sensors(void) const;
+  std::shared_ptr<depth1::foraging_sensors> stateful_sensors_ref(void) const;
 
   /**
    * @brief Set the current location of the robot.
@@ -140,7 +138,6 @@ class stateful_foraging_controller : public base_foraging_controller,
  private:
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::shared_ptr<depth1::foraging_sensors>            m_sensors;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;
   std::unique_ptr<tasks::generalist>                   m_generalist;
 };
