@@ -101,8 +101,10 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
    * spent in collision avoidance still counts towards the direction change
    * threshold.
    */
-  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
-  if (res.second) {
+  if (base_sensors()->threatening_obstacle_exists()) {
+    argos::CVector2 force = base_sensors()->calc_avoidance_force();
+    ER_NOM("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+           force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
@@ -114,7 +116,8 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   /*
    * No obstacles nearby--all ahead full!
    */
-  actuators()->set_heading(actuators()->max_wheel_speed() * res.first);
+  actuators()->set_rel_heading(argos::CVector2::X *
+                               actuators()->max_wheel_speed());
   return controller::foraging_signal::HANDLED;
 }
 

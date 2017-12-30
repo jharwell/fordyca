@@ -88,47 +88,64 @@ bool base_foraging_sensors::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-std::pair<argos::CVector2, bool> base_foraging_sensors::calc_obstacle_vector(void) {
-  const argos::CCI_FootBotProximitySensor::TReadings &tProxReads =
-      m_proximity->GetReadings();
+bool base_foraging_sensors::obstacle_is_threatening(
+    const argos::CVector2& obstacle) {
+  return obstacle.Length() >= mc_obstacle_delta;
+} /* obstacle_is_threatening() */
+
+argos::CVector2 base_foraging_sensors::find_closest_obstacle(void) {
   std::pair<argos::CVector2, bool> res;
-  argos::CVector2 closest;
+  argos::CVector2 closest(0, 0);
 
-  for (size_t i = 0; i < tProxReads.size(); ++i) {
-      closest += argos::CVector2(tProxReads[i].Value, tProxReads[i].Angle);
-  } /* for(i..) */
-  closest /= tProxReads.size();
-
-  /*
-   * For obstacle detection, if the average obstacle distance is less than our
-   * minimum threshold, return the vector. We ignore whether or not the detected
-   * obstacle is only within our "go straight" angle range, because that results
-   * in most robots not avoiding collisions that can generally be avoided.
-   */
-  if (closest.Length() <= 0 || closest.Length() >= mc_obstacle_delta) {
-    res.first = argos::CVector2::X;
-    res.second = false;
-  } else {
-    if (mc_go_straight_angle_range.WithinMinBoundIncludedMaxBoundIncluded(
-            closest.Angle())) {
-      res.first = -closest.Normalize();
-      res.second = true;
+  for (auto& r : m_proximity->GetReadings()) {
+    argos::CVector2 obstacle(r.Value, r.Angle);
+    if (obstacle_is_threatening(obstacle)) {
+      if ((robot_loc() - obstacle).Length() < closest.Length() ||
+          closest.Length() == 0) {
+        closest = obstacle;
+      }
     }
+  } /* for(r..) */
+  return closest;
+} /* find_closest_obstacle() */
+
+bool base_foraging_sensors::threatening_obstacle_exists(void) {
+  return find_closest_obstacle().Length() > 0;
+} /* threatening_obstacle_exists() */
+
+argos::CVector2 base_foraging_sensors::calc_avoidance_force(void) {
+  argos::CVector2 closest = find_closest_obstacle();
+  argos::CVector2 avoidance;
+
+  if (closest.Length() > 0) {
+    avoidance = -closest;
+    avoidance.Normalize();
+    avoidance *= kSCALE_AVOIDANCE_FORCE;
+  } else {
+    avoidance.Scale(0.0, 0.0);
   }
-  return res;
+  return avoidance;
 } /* calc_obstacle_vector() */
 
-argos::CVector2 base_foraging_sensors::calc_vector_to_light(void) {
-  const argos::CCI_FootBotLightSensor::TReadings &tLightReads =
-      m_light->GetReadings();
+argos::CVector2 base_foraging_sensors::calc_light_attract_force(void) {
   argos::CVector2 accum;
 
-  for (size_t i = 0; i < tLightReads.size(); ++i) {
-    accum += argos::CVector2(tLightReads[i].Value, tLightReads[i].Angle);
-  } /* for(i..) */
+  for (auto& r : m_light->GetReadings()) {
+    accum += argos::CVector2(r.Value, r.Angle);
+  } /* for(r..) */
 
-  return argos::CVector2(1.0, accum.Angle());
-} /* calc_vector_to_light() */
+  return argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_ATTRACT;
+} /* calc_light_attract_force() */
+
+argos::CVector2 base_foraging_sensors::calc_light_repel_force(void) {
+  argos::CVector2 accum;
+
+  for (auto& r : m_light->GetReadings()) {
+    accum += argos::CVector2(r.Value, r.Angle);
+  } /* for(r..) */
+
+  return argos::CVector2(1.0, -accum.Angle()) * kSCALE_LIGHT_FORCE_REPEL;
+} /* calc_light_repel_force() */
 
 bool base_foraging_sensors::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =

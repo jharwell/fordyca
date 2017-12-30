@@ -86,14 +86,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
   if (ST_NEW_DIRECTION == last_state()) {
     internal_event(ST_COLLISION_RECOVERY);
   }
-  /*
-   * We stay in collision avoidance until we are sufficiently distant/heading
-   * away from the obstacle. We do collision recovery ONLY if we came from the
-   * vector_to_target state to get back on trajectory, but not if we are
-   * randomly exploring or doing something else.
-   */
-  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
-  if (res.second) {
+
+  if (base_sensors()->threatening_obstacle_exists()) {
     if (base_sensors()->tick() - m_state.last_collision_time <
         m_freq_collision_thresh) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
@@ -102,13 +96,14 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
      argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
+    } else {
+      actuators()->set_rel_heading(argos::CVector2::X +
+                                   base_sensors()->calc_avoidance_force());
     }
-    actuators()->set_heading(res.first);
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.5);
   } else {
     m_state.last_collision_time = base_sensors()->tick();
-    actuators()->set_heading(res.first);
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.5);
+    actuators()->set_rel_heading(argos::CVector2::X +
+                             base_sensors()->calc_avoidance_force());
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -138,8 +133,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
     ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
-  std::pair<argos::CVector2, bool> res = base_sensors()->calc_obstacle_vector();
-  if (res.second) {
+  if (base_sensors()->threatening_obstacle_exists()) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 

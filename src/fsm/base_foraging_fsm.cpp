@@ -86,11 +86,9 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
    * The vector returned by calc_vector_to_light() points to the light. Thus,
    * the minus sign is because we want to go away from the light.
    */
-  argos::CRadians current_heading = m_sensors->calc_vector_to_light().Angle();
-  std::pair<argos::CVector2, bool> v = m_sensors->calc_obstacle_vector();
-  m_actuators->set_heading(
-      m_actuators->max_wheel_speed() * v.first -
-      argos::CVector2(m_actuators->max_wheel_speed() * 0.5, current_heading));
+  argos::CRadians current_heading = m_sensors->calc_light_attract_force().Angle();
+  m_actuators->set_rel_heading(argos::CVector2(m_actuators->max_wheel_speed()* 0.5,
+                                           -current_heading));
 
   if (!m_sensors->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
@@ -123,17 +121,9 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
     return data->signal();
   }
 
-  /*
-   * Check for nearby obstacles, and if any are detected tell the upper FSM.
-   */
-  std::pair<argos::CVector2, bool> res = m_sensors->calc_obstacle_vector();
-
-  if (res.second) {
-    return controller::foraging_signal::COLLISION_IMMINENT;
-  }
-
-  m_actuators->set_heading(m_actuators->max_wheel_speed() *
-                           m_sensors->calc_vector_to_light());
+  m_actuators->set_rel_heading(m_actuators->max_wheel_speed() *
+                               m_sensors->calc_light_attract_force() +
+                               m_sensors->calc_avoidance_force());
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
@@ -141,10 +131,8 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
 
-  std::pair<argos::CVector2, bool> res = m_sensors->calc_obstacle_vector();
-
-  if (res.second) {
-    m_actuators->set_heading(res.first);
+  if (m_sensors->threatening_obstacle_exists()) {
+    m_actuators->set_rel_heading(m_sensors->calc_avoidance_force());
   } else {
     internal_event(previous_state());
   }
@@ -152,7 +140,7 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = base_sensors()->calc_vector_to_light().Angle();
+  argos::CRadians current_dir = base_sensors()->calc_light_attract_force().Angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -172,11 +160,14 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * from our desired new direction. This prevents excessive spinning due to
    * overshoot. See #191.
    */
-  actuators()->set_heading(
+  actuators()->set_rel_heading(
       argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
-                      (current_dir - m_new_dir)),
-      true);
+                      (current_dir - m_new_dir)), true);
 
+  /*
+   * We limit the maximum # of steps that we spin, and have an arrival tolerance
+   * to also help limit excessive spinning. See #191.
+   */
   if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
       m_new_dir_count >= kDIR_CHANGE_MAX_STEPS ) {
     m_new_dir_count = 0;

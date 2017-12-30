@@ -86,17 +86,28 @@ class base_foraging_sensors {
    */
   bool in_nest(void);
 
-  /*
-   * @brief Calculates the vector AWAY from the nearest obstacle, if there is
-   * one within range.
+  /**
+   * @brief Calculates the force applied to a robot as it nears an obstacle.
+   *
+   * Since robots have only a proximity sensor which returns something in [0, 1]
+   * indication how close something is, NOT how far it actually is away from the
+   * robot, I'm not able to do the usual lookahead/prediction using current
+   * velocity to smoothly navigate around obstacles. The result is not terrible,
+   * but it could be better.
    */
-  std::pair<argos::CVector2, bool> calc_obstacle_vector(void);
+  argos::CVector2 calc_avoidance_force(void);
 
-  /*
-   * Calculates the vector to the light. Used to perform
-   * phototaxis and antiphototaxis.
+  /**
+   * @brief Calculates the attraction to the light source. Used to perform
+   * phototaxis.
    */
-  argos::CVector2 calc_vector_to_light(void);
+  argos::CVector2 calc_light_attract_force(void);
+
+  /**
+   * @brief Calculates the repulsion from the light source. Used to perform
+   * antiphototaxis.
+   */
+  argos::CVector2 calc_light_repel_force(void);
 
   /**
    * @brief Get the robot's current location.
@@ -147,9 +158,16 @@ class base_foraging_sensors {
   const argos::CRange<argos::CRadians>& go_straight_angle_range(void) const {
     return mc_go_straight_angle_range;
   }
-
+  bool threatening_obstacle_exists(void);
 
  private:
+  bool obstacle_is_threatening(const argos::CVector2& obstacle);
+  argos::CVector2 find_closest_obstacle(void);
+
+  static constexpr double kSCALE_LIGHT_FORCE_ATTRACT = 0.8;
+  static constexpr double kSCALE_LIGHT_FORCE_REPEL = 0.5;
+  static constexpr double kSCALE_AVOIDANCE_FORCE = 0.5;
+
   uint                                        m_tick;
   const double                                mc_obstacle_delta;
   argos::CVector2                             m_robot_loc;
