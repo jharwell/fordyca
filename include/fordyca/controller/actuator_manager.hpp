@@ -84,8 +84,9 @@ class actuator_manager: public state_machine::simple_fsm {
    * is performed only when the heading change is sufficiently different from
    * the current heading (as determined by paremeters).
    */
-  void set_heading(const argos::CVector2& heading,
-                   bool force_hard_turn = false);
+  void set_rel_heading(const argos::CVector2& heading,
+                       bool force_hard_turn = false);
+  void set_speed(double speed);
 
   /**
    * @brief Get the max wheel speed
@@ -108,7 +109,7 @@ class actuator_manager: public state_machine::simple_fsm {
    *
    * This provides an alternative interface much more precise rather than just
    * saying "go in this direction now" than you get with \ref
-   * set_heading(). However, it is also more difficult to use. Note that if
+   * set_rel_heading(). However, it is also more difficult to use. Note that if
    * lin_speed + ang_speed is greater than the specified parameter value for max
    * wheel speed for either wheel it will saturate.
    *
@@ -177,7 +178,8 @@ class actuator_manager: public state_machine::simple_fsm {
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
-
+  double m_lwheel_speed{0.0};
+  double m_rwheel_speed{0.0};
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */

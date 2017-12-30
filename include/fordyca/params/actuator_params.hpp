@@ -37,13 +37,11 @@ NS_START(fordyca, params);
  ******************************************************************************/
 struct wheel_params {
   wheel_params(void)
-      : hard_turn_threshold(),
-        soft_turn_threshold(),
-        no_turn_threshold() {}
+      : soft_turn_max(),
+        no_turn_max() {}
 
-  argos::CRadians hard_turn_threshold;
-  argos::CRadians soft_turn_threshold;
-  argos::CRadians no_turn_threshold;
+  argos::CRadians soft_turn_max;
+  argos::CRadians no_turn_max;
   double max_speed{0.0};
 };
 

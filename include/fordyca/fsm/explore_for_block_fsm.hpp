@@ -83,9 +83,9 @@ class explore_for_block_fsm : public base_explore_fsm {
  private:
   /* inherited states */
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_STATE_INHERIT(base_explore_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_explore_fsm, entry_new_direction);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
   HFSM_ENTRY_INHERIT_ND(base_explore_fsm, entry_explore);
 
   /* exploration states */

@@ -26,18 +26,18 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/task_allocation/polled_simple_fsm.hpp"
 #include "rcppsw/control/pid_loop.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/fsm/base_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-namespace depth0 { class foraging_sensors; } class actuator_manager; }
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm);
 
@@ -55,7 +55,8 @@ NS_START(fsm);
  * avoid multiple robots all trying to drive to the center of the cache to
  * "arrive" at it.
  */
-class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
+class vector_fsm : public base_foraging_fsm,
+                   public task_allocation::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -71,8 +72,8 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
 
   vector_fsm(uint frequent_collision_thresh,
              const std::shared_ptr<rcppsw::er::server>& server,
-             std::shared_ptr<controller::depth0::foraging_sensors> sensors,
-             std::shared_ptr<controller::actuator_manager> actuators);
+             const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+              const std::shared_ptr<controller::actuator_manager>& actuators);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
@@ -82,7 +83,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
   bool task_running(void) const override {
     return current_state() != ST_START && current_state() != ST_ARRIVED;
   }
-
+  void task_execute(void) override;
   void task_start(const rcppsw::task_allocation::taskable_argument* c_arg) override;
   bool task_finished(void) const override { return current_state() == ST_ARRIVED; }
 
@@ -103,6 +104,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
     ST_VECTOR,
     ST_COLLISION_AVOIDANCE,
     ST_COLLISION_RECOVERY,
+    ST_NEW_DIRECTION,
     ST_ARRIVED,
     ST_MAX_STATES
   };
@@ -114,7 +116,7 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
    */
-  struct goal_data : public rcppsw::patterns::state_machine::event_data {
+  struct goal_data : public state_machine::event_data {
     goal_data(argos::CVector2 loc_, double tolerance_) :
         tolerance(tolerance_), loc(loc_) {}
     goal_data(void) : loc() {}
@@ -134,11 +136,9 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  constexpr static uint kCOLLISION_RECOVERY_TIME = 20;
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 50;
 
   /* member functions */
-  argos::CVector2 randomize_vector_angle(argos::CVector2 v);
-
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
    *
@@ -149,12 +149,17 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
    */
   argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
-  /* states */
-  FSM_STATE_DECLARE_ND(vector_fsm, start);
-  FSM_STATE_DECLARE(vector_fsm, vector, struct goal_data);
-  FSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
-  FSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);
-  FSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);
+
+  /* inherited states */
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
+
+  /* vector states */
+  HFSM_STATE_DECLARE_ND(vector_fsm, start);
+  HFSM_STATE_DECLARE(vector_fsm, vector, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
+  HFSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);
+  HFSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);
 
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_vector);
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_avoidance);
@@ -168,17 +173,18 @@ class vector_fsm : public rcppsw::task_allocation::polled_simple_fsm {
                                      &entry_collision_avoidance, NULL),
           FSM_STATE_MAP_ENTRY_EX_ALL(&collision_recovery, NULL,
                                      &entry_collision_recovery, NULL),
+          FSM_STATE_MAP_ENTRY_EX_ALL(&new_direction,
+                                      NULL,
+                                      &entry_new_direction,
+                                      NULL),
           FSM_STATE_MAP_ENTRY_EX_ALL(&arrived, NULL, NULL, NULL)
           };
     return &kSTATE_MAP[index];
   }
 
-  argos::CRandom::CRNG*                                 m_rng;
   struct fsm_state                                      m_state;
-  uint                                                  m_freq_collision_thresh;
-  uint                                                  m_collision_rec_count;
-  std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
-  std::shared_ptr<controller::actuator_manager>         m_actuators;
+  uint                                                  m_freq_collision_thresh{0};
+  uint                                                  m_collision_rec_count{0};
   struct goal_data                                      m_goal_data;
   rcppsw::control::pid_loop                             m_ang_pid;
   rcppsw::control::pid_loop                             m_lin_pid;

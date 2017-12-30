@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -60,7 +61,14 @@ class base_foraging_sensors {
       argos::CCI_FootBotLightSensor* light,
       argos::CCI_FootBotMotorGroundSensor* ground);
 
-  base_foraging_sensors(const base_foraging_sensors& fsm) = delete;
+  base_foraging_sensors(double diffusion_delta,
+                        argos::CRange<argos::CRadians> go_straight_angle_range,
+                        argos::CCI_RangeAndBearingSensor* rabs,
+                        argos::CCI_FootBotProximitySensor* proximity,
+                        argos::CCI_FootBotLightSensor* light,
+                        argos::CCI_FootBotMotorGroundSensor* ground);
+
+  base_foraging_sensors(const base_foraging_sensors& fsm) = default;
   base_foraging_sensors& operator=(const base_foraging_sensors& fsm) = delete;
 
   /**
@@ -76,22 +84,6 @@ class base_foraging_sensors {
    * of its ground sensors.
    */
   bool in_nest(void);
-
-  /*
-   * @brief Calculates the diffusion vector.
-   *
-   * If there is a close obstacle, it points away from it; it there is none, it
-   * points forwards.  The b_collision parameter is used to return true or false
-   * whether a collision avoidance just happened or not. It is necessary for the
-   * collision rule.
-   */
-  bool calc_diffusion_vector(argos::CVector2* vector);
-
-  /*
-   * Calculates the vector to the light. Used to perform
-   * phototaxis and antiphototaxis.
-   */
-  argos::CVector2 calc_vector_to_light(void);
 
   /**
    * @brief Get the robot's current location.
@@ -134,15 +126,22 @@ class base_foraging_sensors {
    */
   argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
 
- protected:
-  argos::CCI_RangeAndBearingSensor* rabs(void) { return m_rabs; }
-  argos::CCI_FootBotProximitySensor* proximity(void) { return m_proximity; }
-  argos::CCI_FootBotLightSensor* light(void) { return m_light; }
-  argos::CCI_FootBotMotorGroundSensor* ground(void) { return m_ground; }
+  argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_rabs; }
+  argos::CCI_FootBotProximitySensor* proximity(void) const { return m_proximity; }
+  argos::CCI_FootBotLightSensor* light(void) const { return m_light; }
+  argos::CCI_FootBotMotorGroundSensor* ground(void) const { return m_ground; }
+  double diffusion_delta(void) const { return mc_obstacle_delta; }
+  const argos::CRange<argos::CRadians>& go_straight_angle_range(void) const {
+    return mc_go_straight_angle_range;
+  }
+  bool threatening_obstacle_exists(void);
+  argos::CVector2 find_closest_obstacle(void);
 
  private:
+  bool obstacle_is_threatening(const argos::CVector2& obstacle);
+
   uint                                        m_tick;
-  const double                                mc_diffusion_delta;
+  const double                                mc_obstacle_delta;
   argos::CVector2                             m_robot_loc;
   argos::CVector2                             m_prev_robot_loc;
   const argos::CRange<argos::CRadians>        mc_go_straight_angle_range;

@@ -25,6 +25,7 @@
 #include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,6 +43,7 @@ block_to_cache_fsm::block_to_cache_fsm(
     const std::shared_ptr<controller::actuator_manager> &actuators,
     const std::shared_ptr<representation::perceived_arena_map> &map)
     : base_foraging_fsm(
+          params->times.unsuccessful_explore_dir_change,
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
           actuators,
@@ -107,6 +109,7 @@ HFSM_STATE_DEFINE_ND(block_to_cache_fsm, acquire_free_block) {
 HFSM_STATE_DEFINE_ND(block_to_cache_fsm, transport_to_cache) {
   if (m_cache_fsm.task_finished()) {
     m_cache_fsm.task_reset();
+    actuators()->stop_wheels();
     internal_event(ST_WAIT_FOR_CACHE_DROP);
   } else {
     m_cache_fsm.task_execute();

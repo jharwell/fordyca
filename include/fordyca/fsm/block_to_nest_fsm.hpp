@@ -130,8 +130,6 @@ class block_to_nest_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth1::foraging_sensors* sensors(void) const { return m_sensors.get(); }
-
  protected:
   enum fsm_states {
     ST_START,

@@ -51,7 +51,7 @@ generalist::generalist(
 double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::stateful_foraging_fsm *>(
              polled_task::mechanism())
-      ->sensors()
+      ->base_sensors()
       ->tick();
 } /* current_time() */
 

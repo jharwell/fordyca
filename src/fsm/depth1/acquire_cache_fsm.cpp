@@ -49,6 +49,7 @@ acquire_cache_fsm::acquire_cache_fsm(
     const std::shared_ptr<controller::actuator_manager> &actuators,
     const std::shared_ptr<const representation::perceived_arena_map> &map)
     : base_foraging_fsm(
+          params->times.unsuccessful_explore_dir_change,
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
           actuators,

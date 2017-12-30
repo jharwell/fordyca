@@ -68,7 +68,7 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
   pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
           const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
-  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+  auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.robot_loc(pos);
 }
 
@@ -89,7 +89,7 @@ void set_robot_los(argos::CFootBotEntity& robot,
 
   representation::discrete_coord robot_loc =
       representation::real_to_discrete_coord(pos, map.grid_resolution());
-  T& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+  auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
           map.subgrid(robot_loc.first, robot_loc.second, 2),

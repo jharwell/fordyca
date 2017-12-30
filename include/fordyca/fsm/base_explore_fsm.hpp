@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include <argos3/core/utility/math/rng.h>
 
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
@@ -95,24 +94,11 @@ class base_explore_fsm : public base_foraging_fsm,
    * for a block.
    */
   size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
-  double dir_change_thresh(void) const { return mc_dir_change_thresh; }
 
-  /**
-   * @brief Inject randomness into robot exploring by having them change their
-   * direction every X timesteps if they have not yet located a block, where X
-   * is set in the .argos configuration file.
-   */
-  struct new_direction_data : public state_machine::event_data {
-    explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
-
-    argos::CRadians dir;
-  };
  private:
   struct fsm_state {
     size_t time_exploring_unsuccessfully{0};
   };
-
-  static constexpr double kDIR_CHANGE_TOL = 0.25;
 
   /**
    * @brief Robots entering this state will randomly change their exploration
@@ -134,11 +120,7 @@ class base_explore_fsm : public base_foraging_fsm,
    */
   HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_explore);
 
-  const double          mc_dir_change_thresh;
-
-  argos::CRandom::CRNG* m_rng;
   struct fsm_state      m_state;
-  argos::CRadians       m_new_dir;
 };
 
 NS_END(fsm, fordyca);

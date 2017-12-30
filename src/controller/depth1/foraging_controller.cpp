@@ -95,7 +95,7 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
           static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
   m_collector = rcppsw::make_unique<tasks::collector>(&p->tasks, collector_fsm);
@@ -104,7 +104,7 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
   m_forager = rcppsw::make_unique<tasks::forager>(&p->tasks, forager_fsm);
@@ -113,7 +113,7 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
   m_generalist = rcppsw::make_unique<tasks::generalist>(&p->tasks,
@@ -209,8 +209,8 @@ double foraging_controller::timestep_distance(void) const {
    * because of the prev/current location not being set up properly yet. Might
    * be worth fixing at some point...
    */
-  if (sensors()->tick() > 2) {
-    return sensors()->robot_heading().Length();
+  if (base_sensors()->tick() > 2) {
+    return base_sensors()->robot_heading().Length();
   }
   return 0;
 } /* timestep_distance() */

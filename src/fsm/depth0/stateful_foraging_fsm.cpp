@@ -24,6 +24,7 @@
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +42,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
     const std::shared_ptr<controller::actuator_manager> &actuators,
     const std::shared_ptr<representation::perceived_arena_map> &map)
     : base_foraging_fsm(
+          params->times.unsuccessful_explore_dir_change,
           server,
           std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
           actuators,

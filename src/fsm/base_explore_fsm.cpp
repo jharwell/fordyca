@@ -44,55 +44,17 @@ base_explore_fsm::base_explore_fsm(
     const std::shared_ptr<controller::base_foraging_sensors> &sensors,
     const std::shared_ptr<controller::actuator_manager> &actuators,
     uint8_t max_states)
-    : base_foraging_fsm(server, sensors, actuators, max_states),
+    : base_foraging_fsm(unsuccessful_dir_change_thresh, server, sensors,
+                        actuators, max_states),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
       entry_explore(),
-      mc_dir_change_thresh(unsuccessful_dir_change_thresh),
-      m_rng(argos::CRandom::CreateRNG("argos")),
-      m_state(),
-      m_new_dir() {
+      m_state() {
   insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
-
-HFSM_STATE_DEFINE(base_explore_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir =
-      base_foraging_fsm::sensors()->calc_vector_to_light().Angle();
-
-  /*
-   * The new direction is only passed the first time this state is entered, so
-   * save it. After that, a standard HFSM signal is passed we which ignore.
-   */
-  auto *dir_data = dynamic_cast<const new_direction_data *>(data);
-  if (nullptr != dir_data) {
-    m_new_dir = dir_data->dir;
-    ER_DIAG("Change direction: %f -> %f\n",
-            current_dir.GetValue(),
-            m_new_dir.GetValue());
-  }
-
-  /*
-   * The amount we change our direction is proportional to how far off we are
-   * from our desired new direction. This prevents excessive spinning due to
-   * overshoot. See #191.
-   */
-  base_foraging_fsm::actuators()->set_heading(
-      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
-                      (current_dir - m_new_dir)),
-      true);
-
-  if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL) {
-    m_state.time_exploring_unsuccessfully = 0;
-    internal_event(previous_state());
-  }
-  return controller::foraging_signal::HANDLED;
 }
 
 HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
   base_foraging_fsm::actuators()->leds_set_color(argos::CColor::MAGENTA);
-}
-HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_new_direction) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::CYAN);
 }
 
 /*******************************************************************************
