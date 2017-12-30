@@ -97,13 +97,14 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
-      actuators()->set_rel_heading(argos::CVector2::X +
-                                   base_sensors()->calc_avoidance_force());
+      actuators()->set_rel_heading(kinematics().calc_avoidance_force());
     }
   } else {
     m_state.last_collision_time = base_sensors()->tick();
-    actuators()->set_rel_heading(argos::CVector2::X +
-                             base_sensors()->calc_avoidance_force());
+    /*
+     * Go in whatever direction you are currently facing for collision recovery.
+     */
+    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -134,6 +135,9 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
+    argos::CVector2 force = kinematics().calc_avoidance_force();
+    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+            force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 

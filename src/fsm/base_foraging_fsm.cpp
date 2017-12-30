@@ -58,7 +58,8 @@ base_foraging_fsm::base_foraging_fsm(
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_sensors(std::move(sensors)),
-      m_actuators(std::move(actuators)) {}
+      m_actuators(std::move(actuators)),
+      m_kinematics(m_sensors, m_actuators) {}
 
 base_foraging_fsm::base_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
@@ -82,13 +83,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
 
-  /*
-   * The vector returned by calc_vector_to_light() points to the light. Thus,
-   * the minus sign is because we want to go away from the light.
-   */
-  argos::CRadians current_heading = m_sensors->calc_light_attract_force().Angle();
-  m_actuators->set_rel_heading(argos::CVector2(m_actuators->max_wheel_speed()* 0.5,
-                                           -current_heading));
+  m_actuators->set_rel_heading(m_kinematics.calc_light_repel_force());
 
   if (!m_sensors->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
@@ -121,9 +116,8 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
     return data->signal();
   }
 
-  m_actuators->set_rel_heading(m_actuators->max_wheel_speed() *
-                               m_sensors->calc_light_attract_force() +
-                               m_sensors->calc_avoidance_force());
+  m_actuators->set_rel_heading(m_kinematics.calc_light_attract_force() +
+                               m_kinematics.calc_avoidance_force());
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
@@ -132,7 +126,7 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   }
 
   if (m_sensors->threatening_obstacle_exists()) {
-    m_actuators->set_rel_heading(m_sensors->calc_avoidance_force());
+    m_actuators->set_rel_heading(m_kinematics.calc_avoidance_force());
   } else {
     internal_event(previous_state());
   }
@@ -140,7 +134,7 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = base_sensors()->calc_light_attract_force().Angle();
+  argos::CRadians current_dir = m_kinematics.calc_light_attract_force().Angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so

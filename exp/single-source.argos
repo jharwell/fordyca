@@ -63,9 +63,8 @@
                      delta="0.01" />
         </sensors>
         <actuators>
-          <wheels hard_turn_angle_threshold="30"
-                  soft_turn_angle_threshold="30"
-                  no_turn_angle_threshold="5"
+          <wheels soft_turn_angle_max="30"
+                  no_turn_angle_max="5"
                   max_speed="10" />
         </actuators>
         <fsm unsuccessful_explore_dir_change="1000"

@@ -28,13 +28,17 @@
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
+#include "fordyca/controller/kinematics_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { class base_foraging_sensors; class actuator_manager; }
+namespace controller {
+class base_foraging_sensors;
+class actuator_manager;
+}
 namespace state_machine = rcppsw::patterns::state_machine;
 NS_START(fsm);
 
@@ -87,6 +91,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
   controller::actuator_manager*  actuators(void) const { return m_actuators.get(); }
+  controller::kinematics_calculator&  kinematics(void) { return m_kinematics; }
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -169,6 +174,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager>      m_actuators;
+  controller::kinematics_calculator                   m_kinematics;
 };
 
 NS_END(fsm, fordyca);

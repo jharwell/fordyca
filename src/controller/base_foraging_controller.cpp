@@ -89,20 +89,20 @@ void base_foraging_controller::Init(argos::TConfigurationNode &node) {
   param_repo.show_all(client::server_handle()->log_stream());
   output_init(params);
 
-  m_actuators.reset(new actuator_manager(
+  m_actuators = std::make_shared<actuator_manager>(
       static_cast<const struct params::actuator_params *>(
           param_repo.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>(
           "differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
-      GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")));
-  m_sensors.reset(new base_foraging_sensors(
+      GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
+  m_sensors = std::make_shared<base_foraging_sensors>(
       static_cast<const struct params::sensor_params *>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground"));
 
   this->Reset();
   ER_NOM("Base foraging controller initialization finished");

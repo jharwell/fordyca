@@ -113,40 +113,6 @@ bool base_foraging_sensors::threatening_obstacle_exists(void) {
   return find_closest_obstacle().Length() > 0;
 } /* threatening_obstacle_exists() */
 
-argos::CVector2 base_foraging_sensors::calc_avoidance_force(void) {
-  argos::CVector2 closest = find_closest_obstacle();
-  argos::CVector2 avoidance;
-
-  if (closest.Length() > 0) {
-    avoidance = -closest;
-    avoidance.Normalize();
-    avoidance *= kSCALE_AVOIDANCE_FORCE;
-  } else {
-    avoidance.Scale(0.0, 0.0);
-  }
-  return avoidance;
-} /* calc_obstacle_vector() */
-
-argos::CVector2 base_foraging_sensors::calc_light_attract_force(void) {
-  argos::CVector2 accum;
-
-  for (auto& r : m_light->GetReadings()) {
-    accum += argos::CVector2(r.Value, r.Angle);
-  } /* for(r..) */
-
-  return argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_ATTRACT;
-} /* calc_light_attract_force() */
-
-argos::CVector2 base_foraging_sensors::calc_light_repel_force(void) {
-  argos::CVector2 accum;
-
-  for (auto& r : m_light->GetReadings()) {
-    accum += argos::CVector2(r.Value, r.Angle);
-  } /* for(r..) */
-
-  return argos::CVector2(1.0, -accum.Angle()) * kSCALE_LIGHT_FORCE_REPEL;
-} /* calc_light_repel_force() */
-
 bool base_foraging_sensors::block_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =
       m_ground->GetReadings();

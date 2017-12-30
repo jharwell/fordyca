@@ -37,13 +37,11 @@ void actuator_parser::parse(argos::TConfigurationNode &node) {
 
   m_params = rcppsw::make_unique<struct actuator_params>();
 
-    argos::CDegrees cAngle;
-    argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
-    m_params->wheels.hard_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_threshold", cAngle);
-    m_params->wheels.soft_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "no_turn_angle_threshold", cAngle);
-    m_params->wheels.no_turn_threshold = ToRadians(cAngle);
+    argos::CDegrees angle;
+    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_max", angle);
+    m_params->wheels.soft_turn_max = ToRadians(angle);
+    argos::GetNodeAttribute(wheel_node, "no_turn_angle_max", angle);
+    m_params->wheels.no_turn_max = ToRadians(angle);
     argos::GetNodeAttribute(wheel_node,
                             "max_speed",
                             m_params->wheels.max_speed);
@@ -51,11 +49,9 @@ void actuator_parser::parse(argos::TConfigurationNode &node) {
 
 void actuator_parser::show(std::ostream &stream) {
   stream << "====================\nActuator params\n====================\n";
-  stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold
+  stream << "soft_turn_max=" << m_params->wheels.soft_turn_max
          << std::endl;
-  stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold
-         << std::endl;
-  stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold
+  stream << "no_turn_max=" << m_params->wheels.no_turn_max
          << std::endl;
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
 } /* show() */

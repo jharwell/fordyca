@@ -72,10 +72,10 @@ void actuator_manager::set_rel_heading(const argos::CVector2 &heading,
 FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   if (data->force_hard ||
       argos::Abs(data->heading.Angle().SignedNormalize()) >
-          mc_params.wheels.soft_turn_threshold) {
+          mc_params.wheels.soft_turn_max) {
     internal_event(ST_HARD_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) >
-             mc_params.wheels.no_turn_threshold) {
+             mc_params.wheels.no_turn_max) {
     internal_event(ST_SOFT_TURN);
   }
   set_wheel_speeds(data->heading.Length(),
@@ -85,18 +85,18 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
 }
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
     if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-            mc_params.wheels.no_turn_threshold) {
+            mc_params.wheels.no_turn_max) {
      internal_event(ST_NO_TURN);
     } else if (data->force_hard ||
                argos::Abs(data->heading.Angle().SignedNormalize()) >
-               mc_params.wheels.soft_turn_threshold) {
+               mc_params.wheels.soft_turn_max) {
       internal_event(ST_HARD_TURN);
     }
 
   /* Both wheels go straight, but one is faster than the other */
   double speed_factor =
-      (mc_params.wheels.hard_turn_threshold - argos::Abs(data->heading.Angle())) /
-      mc_params.wheels.hard_turn_threshold;
+      (mc_params.wheels.soft_turn_max - argos::Abs(data->heading.Angle())) /
+      mc_params.wheels.soft_turn_max;
   double speed1 =
       data->heading.Length() - data->heading.Length() * (1.0 - speed_factor);
   double speed2 =
@@ -106,11 +106,11 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-                 mc_params.wheels.no_turn_threshold &&
+                 mc_params.wheels.no_turn_max &&
              !data->force_hard) {
     internal_event(ST_NO_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-             mc_params.wheels.soft_turn_threshold &&
+             mc_params.wheels.soft_turn_max &&
              !data->force_hard) {
     internal_event(ST_SOFT_TURN);
   }
