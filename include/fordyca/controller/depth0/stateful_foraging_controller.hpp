@@ -28,9 +28,9 @@
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace depth1 { class foraging_sensors; }
 
 NS_START(depth0);
-namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace rmetrics = metrics::collectible_metrics::fsm;
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************

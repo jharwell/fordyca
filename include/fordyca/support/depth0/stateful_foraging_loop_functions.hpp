@@ -31,8 +31,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace robot_collectors = metrics::collectors::robot_metrics;
-namespace metrics { namespace collectors { namespace robot_metrics {
+namespace robot_collectors = metrics::collectors::fsm;
+namespace metrics { namespace collectors { namespace fsm {
 class stateful_metrics_collector;
 }}}
 namespace controller { namespace depth0 { class foraging_controller; }}

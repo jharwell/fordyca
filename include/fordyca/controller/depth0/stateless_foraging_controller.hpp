@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
-namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Class Definitions

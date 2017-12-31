@@ -29,10 +29,10 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/expressions/cache_respawn_probability.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/depth1_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/depth1_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
@@ -44,7 +44,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Constructors/Destructor

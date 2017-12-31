@@ -37,17 +37,17 @@
 #include "rcppsw/er/server.hpp"
 
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 
-namespace robot_collectors = metrics::collectors::robot_metrics;
-namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace robot_collectors = metrics::collectors::fsm;
+namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Constructors/Destructor

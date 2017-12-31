@@ -36,14 +36,14 @@ NS_START(fordyca);
 
 namespace metrics { namespace collectors {
 class block_metrics_collector;
-namespace robot_metrics {
+namespace fsm {
 class stateless_metrics_collector;
 class distance_metrics_collector;
 }}}
 namespace params { struct output_params; class loop_function_repository; }
 
 namespace collectors = metrics::collectors;
-namespace robot_collectors = collectors::robot_metrics;
+namespace robot_collectors = collectors::fsm;
 
 NS_START(support, depth0);
 

@@ -37,10 +37,10 @@ NS_START(fordyca);
 
 namespace metrics { namespace collectors {
 class task_collector;
-namespace robot_metrics {
+namespace fsm {
 class depth1_metrics_collector;
 }}}
-namespace robot_collectors = metrics::collectors::robot_metrics;
+namespace robot_collectors = metrics::collectors::fsm;
 
 NS_START(support, depth1);
 

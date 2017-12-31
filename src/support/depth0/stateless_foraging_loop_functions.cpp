@@ -31,8 +31,8 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/robot_metrics/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
@@ -45,7 +45,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 namespace fs = std::experimental::filesystem;
-namespace rmetrics = metrics::collectible_metrics::robot_metrics;
+namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Constructors/Destructor
