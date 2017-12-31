@@ -43,7 +43,6 @@ struct loop_functions_params : public rcppsw::common::base_params {
   bool display_robot_id{false};
   bool display_robot_los{false};
   bool display_block_id{false};
-  std::string simulation_type{""};
   struct arena_map_params arena_map;
 };
 
