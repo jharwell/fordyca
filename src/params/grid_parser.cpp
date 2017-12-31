@@ -51,4 +51,14 @@ void grid_parser::show(std::ostream &stream) {
   stream << "upper=" << m_params->upper << std::endl;
 } /* show() */
 
+bool grid_parser::validate(void) {
+  if (!(m_params->resolution > 0.0)) {
+    return false;
+  }
+  if (!(m_params->upper.GetX() > 0) || !(m_params->upper.GetY() > 0)) {
+    return false;
+  }
+  return true;
+} /* validate() */
+
 NS_END(params, fordyca);

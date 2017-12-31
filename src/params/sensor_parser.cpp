@@ -36,14 +36,9 @@ void sensor_parser::parse(argos::TConfigurationNode &node) {
       argos::GetNode(argos::GetNode(node, "sensors"), "diffusion");
   m_params = rcppsw::make_unique<struct sensor_params>();
 
-  argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0),
-                                                 argos::CDegrees(10.0));
   argos::GetNodeAttribute(diff_node,
                           "go_straight_angle_range",
                           m_params->diffusion.go_straight_angle_range);
-  m_params->diffusion.go_straight_angle_range.Set(
-      m_params->diffusion.go_straight_angle_range.GetMin(),
-      m_params->diffusion.go_straight_angle_range.GetMax());
   argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
 } /* parse() */
 
@@ -53,5 +48,15 @@ void sensor_parser::show(std::ostream &stream) {
   stream << "go_straight_angle_range="
          << m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
+
+bool sensor_parser::validate(void) {
+  if (!(m_params->diffusion.go_straight_angle_range.GetSpan().GetAbsoluteValue() > 0)) {
+      return false;
+  }
+  if (m_params->diffusion.delta <= 0) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);

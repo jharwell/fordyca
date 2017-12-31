@@ -55,6 +55,8 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
   param_repo.show_all(client::server_handle()->log_stream());
+  ER_ASSERT(param_repo.validate_all(),
+            "FATAL: Not all parameters were validated");
 
   m_fsm.reset(new fsm::depth0::stateless_foraging_fsm(
       static_cast<const struct params::fsm_params *>(

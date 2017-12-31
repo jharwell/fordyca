@@ -58,4 +58,17 @@ void cache_parser::show(std::ostream &stream) {
          << m_params->static_respawn_scale_factor << std::endl;
 } /* show() */
 
+bool cache_parser::validate(void) {
+  if (m_params->dimension <= 0.0) {
+    return false;
+  }
+  if (m_params->create_static && 0 == m_params->static_size) {
+    return false;
+  }
+  if (m_params->static_respawn_scale_factor <= 0.0) {
+    return false;
+  }
+  return true;
+} /* validate() */
+
 NS_END(depth1, params, fordyca);

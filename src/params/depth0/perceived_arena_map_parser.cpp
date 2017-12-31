@@ -49,4 +49,8 @@ void perceived_arena_map_parser::show(std::ostream &stream) {
   m_pheromone_parser.show(stream);
 } /* show() */
 
+bool perceived_arena_map_parser::validate(void) {
+  return m_grid_parser.validate() && m_pheromone_parser.validate();
+} /* validate() */
+
 NS_END(depth0, params, fordyca);

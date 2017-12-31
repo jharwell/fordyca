@@ -43,4 +43,11 @@ void pheromone_parser::show(std::ostream &stream) {
   stream << "repeat_deposit=" << m_params->repeat_deposit << std::endl;
 } /* show() */
 
+bool pheromone_parser::validate(void) {
+  if (m_params->rho <= 0.0) {
+    return false;
+  }
+  return true;
+} /* validate() */
+
 NS_END(depth0, params, fordyca);

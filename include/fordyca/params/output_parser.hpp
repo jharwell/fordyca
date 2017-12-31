@@ -49,6 +49,8 @@ class output_parser: public rcppsw::common::xml_param_parser {
   }
   void show(std::ostream& stream) override;
 
+  bool validate(void) override;
+
  private:
   std::unique_ptr<struct output_params> m_params;
   metrics_parser m_metrics_parser;
