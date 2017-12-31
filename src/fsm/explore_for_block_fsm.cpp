@@ -103,7 +103,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
    */
   if (base_sensors()->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_NOM("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
            force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {

@@ -44,6 +44,7 @@ class sensor_parser: public rcppsw::common::xml_param_parser {
   void parse(argos::TConfigurationNode& node) override;
   const struct sensor_params* get_results(void) override { return m_params.get(); }
   void show(std::ostream& stream) override;
+  bool validate(void) override;
 
  private:
   std::unique_ptr<struct sensor_params> m_params;

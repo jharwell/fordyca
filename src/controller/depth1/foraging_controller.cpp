@@ -86,6 +86,11 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
   fsm_repo.parse_all(node);
   fsm_repo.show_all(server_handle()->log_stream());
 
+  ER_ASSERT(task_repo.validate_all(),
+            "FATAL: Not all FSM parameters were validated");
+  ER_ASSERT(fsm_repo.validate_all(),
+            "FATAL: Not all task parameters were validated");
+
   ER_NOM("Initializing depth1 controller");
   const params::depth1::task_params *p =
       static_cast<const params::depth1::task_params *>(

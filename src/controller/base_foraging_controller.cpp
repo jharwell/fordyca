@@ -81,6 +81,8 @@ void base_foraging_controller::Init(argos::TConfigurationNode &node) {
   ER_NOM("Initializing base foraging controller");
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
+  ER_ASSERT(param_repo.validate_all(),
+            "FATAL: Not all parameters were validated");
 
   const struct params::output_params *params =
       static_cast<const struct params::output_params *>(
@@ -96,6 +98,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode &node) {
           "differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
+
   m_sensors = std::make_shared<base_foraging_sensors>(
       static_cast<const struct params::sensor_params *>(
           param_repo.get_params("sensors")),

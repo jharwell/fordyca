@@ -50,6 +50,7 @@ class perceived_arena_map_parser: public rcppsw::common::xml_param_parser {
     return m_params.get();
   }
   void show(std::ostream& stream) override;
+  bool validate(void) override;
 
  private:
   std::unique_ptr<struct perceived_arena_map_params> m_params;

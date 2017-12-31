@@ -69,4 +69,22 @@ void arena_map_parser::show(std::ostream &stream) {
   stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 
+bool arena_map_parser::validate(void) {
+  if (!m_grid_parser.validate() || !m_block_parser.validate() ||
+      !m_cache_parser.validate()) {
+    return false;
+  }
+  if (!(m_params->nest_center.GetX() > 0) ||
+      !(m_params->nest_center.GetY() > 0)) {
+    return false;
+  }
+  if (!(m_params->nest_x.GetMin() > 0) || !(m_params->nest_x.GetMax() > 0)) {
+    return false;
+  }
+  if (!(m_params->nest_y.GetMin() > 0) || !(m_params->nest_y.GetMax() > 0)) {
+    return false;
+  }
+  return true;
+} /* validate() */
+
 NS_END(params, fordyca);

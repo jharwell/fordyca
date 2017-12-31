@@ -122,6 +122,10 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
   task_repo.parse_all(node);
   param_repo.show_all(server_handle()->log_stream());
   task_repo.show_all(server_handle()->log_stream());
+  ER_ASSERT(param_repo.validate_all(),
+            "FATAL: Not all parameters were validated");
+  ER_ASSERT(task_repo.validate_all(),
+            "FATAL: Not all task parameters were validated");
 
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),

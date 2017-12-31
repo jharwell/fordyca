@@ -49,6 +49,7 @@ class arena_map_parser: public rcppsw::common::xml_param_parser {
   void parse(argos::TConfigurationNode& node) override;
   const struct arena_map_params* get_results(void) override { return m_params.get(); }
   void show(std::ostream& stream) override;
+  bool validate(void) override;
 
  private:
   std::unique_ptr<struct arena_map_params> m_params;
