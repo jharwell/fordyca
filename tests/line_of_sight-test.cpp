@@ -26,7 +26,7 @@
 #include <catch.hpp>
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/params/params.hpp"
+#include "fordyca/params/grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,28 +37,28 @@ using namespace fordyca;
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-struct grid_params params = {
+struct params::grid_params gparams = {
   0.2, argos::CVector2(10, 5), argos::CVector2(0, 0),
   {25, 0.2, "random", true}
 };
-argos::CRange<argos::Real> nest_x(0.5, 1.5);
-argos::CRange<argos::Real> nest_y(2.5, 3.5);
+argos::CRange<double> nest_x(0.5, 1.5);
+argos::CRange<double> nest_y(2.5, 3.5);
 
 /*******************************************************************************
  * Test Cases
  ******************************************************************************/
 CATCH_TEST_CASE("init-test", "[line_of_sight]") {
   argos::CRandom::CreateCategory("argos", 123);
-  arena_map map(&params, nest_x, nest_y);
-  line_of_sight los(map.subgrid(1, 1, 0.2));
+  arena_map map(&gparams, nest_x, nest_y);
+  line_of_sight los(map.subgrid(1, 1, 1), discrete_coord(1, 1));
 }
 
 CATCH_TEST_CASE("resolution-test", "[line_of_sight]") {
   argos::CRandom::CreateCategory("argos", 123);
-  arena_map map(&params, nest_x, nest_y);
-  line_of_sight los(map.subgrid(1, 1, 0.4));
-  CATCH_REQUIRE(los.size() == 16);
+  arena_map map(&gparams, nest_x, nest_y);
+  line_of_sight los(map.subgrid(5, 5, 1), discrete_coord(1, 1));
+  CATCH_REQUIRE(los.size() == 9);
 
-  line_of_sight los2(map.subgrid(0.2, 0.2, 0.2));
-  CATCH_REQUIRE(los2.size() == 4);
+  line_of_sight los2(map.subgrid(2, 2, 2), discrete_coord(0, 0));
+  CATCH_REQUIRE(los2.size() == 25);
 }

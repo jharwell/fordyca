@@ -24,37 +24,47 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <cassert>
 #include <utility>
-#include "fordyca/representation/cell_entity.hpp"
+
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace prototype = rcppsw::patterns::prototype;
+
 NS_START(fordyca, representation);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class block
+ *
  * @brief A representation of a block within the arena map. Blocks do not have
  * state (other than if they are currently being carried by a robot). Blocks
  * have both real (where they actually live in the world) and discretized
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public rcppsw::patterns::visitor::visitable<block> {
+              public metrics::collectible_metrics::block_metrics,
+              public rcppsw::patterns::visitor::visitable_any<block>,
+              public prototype::clonable<block> {
  public:
   explicit block(double dimension) :
-      cell_entity(dimension, dimension), m_robot_index(-1), m_carries(0) {}
+      cell_entity(dimension, dimension, argos::CColor::BLACK),
+      m_robot_index(-1), m_carries(0) {}
 
-  /**
-   * @brief Get how many carries this block has had on its way from its original
-   * arena location back to the nest.
-   *
-   * @return # carries.
-   */
-  size_t carries(void) const { return m_carries; }
+  __pure bool operator==(const block &other) const {
+    return this->id() == other.id();
+  }
+
+  /* metrics */
+  size_t n_carries(void) const override { return m_carries; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -62,23 +72,15 @@ class block : public cell_entity,
    */
   void add_carry(void) { ++m_carries; }
 
+  std::unique_ptr<block> clone(void) const override;
+
   /**
    * @brief Reset the state of the block (i.e. not carried by a robot anymore).
    */
-  void reset(void) { m_carries = 0; m_robot_index = -1; }
+  void reset_index(void) { m_robot_index = -1; }
 
-  /**
-   * @brief Determine if a real-valued point lies within the extent of the block
-   * for:
-   *
-   * 1. Visualization purposes.
-   * 2. Determining if a robot is on top of a block.
-   *
-   * @param point The point to check.
-   *
-   * @return TRUE if the condition is met, and FALSE otherwise.
-   */
-  bool contains_point(const argos::CVector2& point);
+  void move_out_of_sight(void);
+  void reset_carries(void) { m_carries = 0; }
 
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
@@ -86,17 +88,17 @@ class block : public cell_entity,
    * @return The robot index, or -1 if no robot is currently carrying this block.
    */
   int robot_index(void) const { return m_robot_index; }
-  void robot_index(size_t robot_index) { m_robot_index = robot_index; }
+  void robot_index(int robot_index) { m_robot_index = robot_index; }
 
  private:
-  int m_robot_index;
+  int    m_robot_index;
   size_t m_carries;
 };
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<const block*, double> perceived_block;
+using perceived_block = std::pair<const block*, double>;
 
 NS_END(representation, fordyca);
 

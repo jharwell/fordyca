@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/loop_functions_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,39 +31,26 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void loop_functions_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct loop_functions_params);
-  ticpp::Node *arena = node.NextSibling("arena");
-  std::vector<std::string> res, res2;
+void loop_functions_parser::parse(argos::TConfigurationNode &node) {
+  m_params = rcppsw::make_unique<struct loop_functions_params>();
 
-  rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(arena->ToElement()->GetAttribute("size"));
-
-  res = parser.parse(node.FirstChildElement("nest")->GetAttribute("center"));
-  res2 = parser.parse(node.FirstChildElement("nest")->GetAttribute("size"));
-
-  m_params->nest_x.Set(std::atof(res[0].c_str()) - std::atof(res2[0].c_str()),
-                       std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
-  m_params->nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
-                       std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
-
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_id",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "robot_id",
                           m_params->display_robot_id);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "robot_los",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "robot_los",
                           m_params->display_robot_los);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"), "block_id",
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "block_id",
                           m_params->display_block_id);
-  argos::GetNodeAttribute(argos::GetNode(node, "simulation"), "experiment",
-                          m_params->simulation_type);
 } /* parse() */
 
-void loop_functions_parser::show(std::ostream& stream) {
-  stream << "====================\nLoop Function params\n====================\n";
-  stream << "nest_x=" << m_params->nest_x << std::endl;
-  stream << "nest_y=" << m_params->nest_y << std::endl;
+void loop_functions_parser::show(std::ostream &stream) {
+  stream << "====================\nLoop Function "
+            "params\n====================\n";
   stream << "display_robot_id=" << m_params->display_robot_id << std::endl;
+  stream << "display_robot_los=" << m_params->display_robot_los << std::endl;
   stream << "display_block_id=" << m_params->display_block_id << std::endl;
-  stream << "simulation_type=" << m_params->simulation_type << std:: endl;
 } /* show() */
 
 NS_END(params, fordyca);

@@ -25,21 +25,14 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/events/block_drop.hpp"
+#include "fordyca/events/block_pickup.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 using namespace fordyca::representation;
-
-/*******************************************************************************
- * Global Variables
- ******************************************************************************/
-struct grid_params params = {
-  0.2, argos::CVector2(10, 5), argos::CVector2(0, 0),
-  {25, 0.2, "random", true}
-};
-argos::CRange<argos::Real> nest_x(0.5, 1.5);
-argos::CRange<argos::Real> nest_y(2.5, 3.5);
+using namespace fordyca::events;
 
 /*******************************************************************************
  * Test Cases
@@ -51,14 +44,38 @@ CATCH_TEST_CASE("init-test", "[cell2D]") {
 
 CATCH_TEST_CASE("transition-test", "[cell2D]") {
   cell2D cell;
-  cell.event_unknown();
+  block b(0.2);
+  block_drop(rcppsw::er::g_server, &b);
+  cell.fsm().event_unknown();
   CATCH_REQUIRE(!cell.state_is_known());
-  cell.event_empty();
+  cell.fsm().event_empty();
   CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_has_block();
+  cell.fsm().event_block_drop();
   CATCH_REQUIRE(cell.state_has_block());
-  cell.event_empty();
-CATCH_REQUIRE(cell.state_is_empty());
-  cell.event_unknown();
-CATCH_REQUIRE(!cell.state_is_known());
+  cell.fsm().event_block_pickup();
+  CATCH_REQUIRE(cell.state_is_empty());
+  cell.fsm().event_unknown();
+  CATCH_REQUIRE(!cell.state_is_known());
+}
+
+CATCH_TEST_CASE("cache-test", "[cell2D]") {
+  cell2D cell;
+  block b(0.2);
+  block_drop(rcppsw::er::g_server, &b);
+
+  cell.fsm().event_block_drop();
+  cell.fsm().event_block_drop();
+  CATCH_REQUIRE(cell.state_has_cache());
+  cell.fsm().event_block_pickup();
+  CATCH_REQUIRE(cell.state_has_block());
+  cell.fsm().event_block_drop();
+  CATCH_REQUIRE(cell.state_has_cache());
+  cell.fsm().event_block_drop();
+  CATCH_REQUIRE(cell.state_has_cache());
+  cell.fsm().event_block_pickup();
+  CATCH_REQUIRE(cell.state_has_cache());
+  cell.fsm().event_block_pickup();
+  CATCH_REQUIRE(cell.state_has_block());
+  cell.fsm().event_block_pickup();
+  CATCH_REQUIRE(cell.state_is_empty());
 }

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <utility>
 #include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/datatypes/color.h>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
@@ -38,16 +39,21 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class cell_entity
+ *
  * @brief A base class from which objects that are able to occupy a cell within
  * a 2D grid derive.
  */
 class cell_entity {
  public:
-  cell_entity(double x_dim, double y_dim) : m_id(-1),
-                                            m_display_id(false),
-                                            m_x_dim(x_dim), m_y_dim(y_dim),
-                                            m_real_loc(), m_discrete_loc() {}
-  virtual ~cell_entity(void) {}
+  cell_entity(double x_dim, double y_dim, argos::CColor color) :
+      m_id(-1), m_display_id(false), m_x_dim(x_dim), m_y_dim(y_dim),
+      m_color(color), m_real_loc(), m_discrete_loc() {}
+
+  cell_entity(const cell_entity& other) = default;
+  cell_entity& operator=(const cell_entity& other) = default;
+
+  virtual ~cell_entity(void) = default;
 
   /**
    * @brief Get the size of the cell entity in the X direction
@@ -87,6 +93,19 @@ class cell_entity {
   void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
 
   /**
+   * @brief Determine if a real-valued point lies within the extent of the entity
+   * for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of an entity.
+   *
+   * @param point The point to check.
+   *
+   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   */
+  bool contains_point(const argos::CVector2& point);
+
+  /**
    * @brief Set the ID of the object.
    */
   void id(int id) { m_id = id; }
@@ -97,13 +116,19 @@ class cell_entity {
   int id(void) const { return m_id; }
 
  private:
-  int m_id;
-  bool m_display_id;
-  double m_x_dim;
-  double m_y_dim;
+  int             m_id;
+  bool            m_display_id;
+  double          m_x_dim;
+  double          m_y_dim;
+  argos::CColor   m_color;
   argos::CVector2 m_real_loc;
-  discrete_coord m_discrete_loc;
+  discrete_coord  m_discrete_loc;
 };
+
+/*******************************************************************************
+ * Type Definitions
+ ******************************************************************************/
+using perceived_entity = std::pair<const cell_entity*, double>;
 
 NS_END(representation, fordyca);
 

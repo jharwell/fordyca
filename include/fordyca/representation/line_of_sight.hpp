@@ -27,39 +27,42 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "fordyca/representation/grid2D.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
-
+class block;
+class cache;
+class cell2D;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class line_of_sight
+ *
  * @brief A representation of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
  *
- * The LOS for a robot is always square. Furthermore, it is always a multiple of
- * 4, as the smallest LOS is a 2x2 grid, the next smallest a 4x4, etc., UNLESS
- * the robot is near the edge of the arena, and a square grid would result in
- * out-of-bounds array accesses. In that case, a truncated LOS is created.
+ * The LOS for a robot is always square' UNLESS the robot is near the edge of
+ * the arena, and a square grid would result in out-of-bounds array accesses. In
+ * that case, a truncated LOS is created.
  *
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
  */
 class line_of_sight {
  public:
-  explicit line_of_sight(const grid_view<cell2D*> view,
-                         discrete_coord center) :
-      m_center(center), m_view(view) {}
-  std::list<const representation::block*> blocks(void);
+  line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
+                discrete_coord center) :
+      m_center(std::move(center)), m_view(c_view) {}
+
+  std::list<const representation::block*> blocks(void) const;
+  std::list<const representation::cache*> caches(void) const;
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -90,7 +93,7 @@ class line_of_sight {
    * @param i The RELATIVE X coord within the LOS.
    * @param j The RELATIVE Y coord within the LOS.
    *
-   * @return
+   * @return A reference to the cell.
    */
   cell2D& cell(size_t i, size_t j) const;
 
@@ -113,8 +116,8 @@ class line_of_sight {
   const discrete_coord& center(void) const { return m_center; }
 
  private:
-  discrete_coord m_center;
-  grid_view<cell2D*> m_view;
+  discrete_coord                 m_center;
+  rcppsw::ds::grid_view<cell2D*> m_view;
 };
 
 NS_END(representation, fordyca);

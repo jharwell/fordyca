@@ -21,7 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <assert.h>
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -29,19 +28,20 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-/*******************************************************************************
+/***********************e*******************************************************
  * Member Functions
  ******************************************************************************/
-bool block::contains_point(const argos::CVector2& point) {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  if (point.GetX() < (x + (.5 * xsize())) &&
-      point.GetX() > (x - (.5 * xsize())) &&
-      point.GetY() < (y + (.5 * xsize())) &&
-      point.GetY() > (y - (.5 * xsize()))) {
-    return true;
-  }
-  return false;
-} /* contains_point() */
+void block::move_out_of_sight(void) {
+  real_loc(argos::CVector2(100.0, 100.0));
+  discrete_loc(discrete_coord(100, 100));
+} /* move_out_of_sight() */
 
+std::unique_ptr<block> block::clone(void) const {
+  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(cell_entity::xsize());
+  tmp->discrete_loc(this->discrete_loc());
+  tmp->real_loc(this->real_loc());
+  tmp->id(this->id());
+  tmp->reset_index();
+  return tmp;
+} /* clone() */
 NS_END(representation, fordyca);

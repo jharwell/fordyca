@@ -25,32 +25,40 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include "rcppsw/common/er_server.hpp"
+
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/grid2D.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace params { struct arena_map_params; }
+
+NS_START(representation);
+
+class cell2D;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class arena_map
+ *
  * @brief The arena map stores a logical representation of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map: public rcppsw::common::er_client,
-                 public rcppsw::patterns::visitor::visitable<arena_map> {
+class arena_map: public rcppsw::er::client,
+                 public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
-  arena_map(const struct grid_params* params,
-            argos::CRange<argos::Real> nest_x,
-            argos::CRange<argos::Real> nest_y);
+  explicit arena_map(const struct params::arena_map_params* params);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -59,16 +67,29 @@ class arena_map: public rcppsw::common::er_client,
    * by robots.
    */
   std::vector<block>& blocks(void) { return m_blocks; }
+
+  /**
+   * @brief Get the list of all the caches currently present in the arena.
+   */
+  std::vector<cache>& caches(void) { return m_caches; }
+
+  /**
+   * @brief Remove a cache from the list of caches.
+   *
+   * @param victim The cache to remove.
+   */
+  void cache_remove(cache& victim);
+
+  void cache_removed(bool b) { m_cache_removed = b; }
+  bool cache_removed(void) const { return m_cache_removed; }
+
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  cell2D& access(const discrete_coord& coord) { return access(coord.first, coord.second); }
 
   /**
    * @brief Distribute all blocks in the arena.
-   *
-   * @param first_time Is this the first time we are distributing blocks?
-   * (needed for simulations in which the blocks do not respawn/reappear after
-   * being brought to the nest).
    */
-  void distribute_blocks(bool first_time);
+  void distribute_blocks(void);
 
   /**
    * @brief Distribute a particular block in the arena, according to whatever
@@ -77,7 +98,11 @@ class arena_map: public rcppsw::common::er_client,
    * @param block The block to distribute.
    * @param first_time Is this the first time distributing this block?
    */
-  void distribute_block(block* const block, bool first_time);
+  void distribute_block(block* block);
+
+  void static_cache_create(void);
+
+  bool has_static_cache(void) const { return mc_cache_params.create_static; }
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -85,17 +110,9 @@ class arena_map: public rcppsw::common::er_client,
   size_t n_blocks(void) const { return m_blocks.size(); }
 
   /**
-   * @brief Check if FORDYCA was configured to have respawning blocks or not. If
-   * not, then after a block is brought to the nest and deposited for the first
-   * time, then it does not reappear in the arena. In that case, once all blocks
-   * have been collected, the simulation ends. Otherwise, the simulation goes on
-   * indefinitely.
-   *
-   * @return TRUE if the condition is met, FALSE otherwise.
+   * @brief Get the # of caches currently in the arena.
    */
-  bool respawn_enabled(void) const {
-    return m_block_distributor.respawn_enabled();
-  }
+  size_t n_caches(void) const { return m_caches.size(); }
 
   /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the
@@ -115,6 +132,8 @@ class arena_map: public rcppsw::common::er_client,
    */
   int robot_on_block(const argos::CVector2& pos);
 
+  int robot_on_cache(const argos::CVector2& pos);
+
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.
    *
@@ -124,16 +143,20 @@ class arena_map: public rcppsw::common::er_client,
    *
    * @return The subgrid.
    */
-  grid_view<cell2D*> subgrid(double x, double y, double radius) {
-    return m_grid.subgrid(x, y, radius);
+  rcppsw::ds::grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
+    return m_grid.subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
-  std::vector<block> m_blocks;
-  support::block_distributor m_block_distributor;
-  std::shared_ptr<rcppsw::common::er_server> m_server;
-  grid2D<cell2D> m_grid;
+  bool                                      m_cache_removed;
+  const struct params::depth1::cache_params mc_cache_params;
+  const argos::CVector2                     mc_nest_center;
+  std::vector<block>                        m_blocks;
+  std::vector<cache>                        m_caches;
+  support::block_distributor                m_block_distributor;
+  std::shared_ptr<rcppsw::er::server>       m_server;
+  occupancy_grid                            m_grid;
 };
 
 NS_END(representation, fordyca);

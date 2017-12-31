@@ -26,22 +26,25 @@
  ******************************************************************************/
 #include <utility>
 #include "rcppsw/common/common.hpp"
+#include <argos/core/utility/math/vector2.h>
 
 /*******************************************************************************
- * Namespaces
+ * namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-typedef std::pair<size_t, size_t> discrete_coord;
+using discrete_coord = std::pair<size_t, size_t>;
 
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-discrete_coord real_to_discrete_coord(std::pair<double, double> real_coord,
+discrete_coord real_to_discrete_coord(const argos::CVector2& r_coord,
                                       double resolution);
+argos::CVector2 discrete_to_real_coord(const discrete_coord& d_coord,
+                                       double resolution);
 
 NS_END(representation, fordyca);
 

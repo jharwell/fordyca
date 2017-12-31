@@ -25,39 +25,44 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <utility>
 #include <string>
 
 #include "rcppsw/swarm/pheromone_density.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+namespace decorator = rcppsw::patterns::decorator;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Per-robot representation of a cell on the 2D grid. The fsm er_server
- * is disabled, so you can't use any of the standard event reporting macros
- * without modifying \ref grid2D.
+ * @class perceived_cell2D
+ *
+ * @brief Per-robot representation of a cell on the 2D grid, as it appears to a
+ * robot, in which the knowledge of the cell's state decays over time.
  */
-class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
-                         public rcppsw::common::er_client {
+class perceived_cell2D : public decorator::decorator<cell2D>,
+                         public visitor::visitable_any<perceived_cell2D>,
+                         public rcppsw::er::client {
  public:
   explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::common::er_server>& server);
+      const std::shared_ptr<rcppsw::er::server>& server);
 
   /**
    * @brief Set the relevance decay parameter for the cell.
    *
    * @param rho The new value.
    */
-  void rho(double rho) { m_density.rho(rho); }
+  void pheromone_rho(double rho) { m_density.rho(rho); }
+  void pheromone_repeat_deposit(bool b) { m_pheromone_repeat_deposit = b; }
+  bool pheromone_repeat_deposit(void) const { return m_pheromone_repeat_deposit; }
+
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) { return m_robot_id; }
 
@@ -69,17 +74,19 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    */
   double density(void) const { return m_density.last_result(); }
 
-  bool state_is_known(void) { return m_cell.state_is_known(); }
-  bool state_has_block(void) { return m_cell.state_has_block(); }
-  bool state_is_empty(void) { return m_cell.state_is_empty(); }
 
-  /**
-   * @brief Get the block current associated with this cell. NULL if no block
-   * currently associated.
-   *
-   * @return The associated block.
-   */
-  const representation::block* block(void) const { return m_cell.block(); }
+  bool state_is_known(void) const { return decoratee().state_is_known(); }
+  bool state_has_block(void) const { return decoratee().state_has_block(); }
+  bool state_has_cache(void) const { return decoratee().state_has_cache(); }
+  bool state_is_empty(void) const { return decoratee().state_is_empty(); }
+
+  size_t block_count(void) const { return decoratee().block_count(); }
+
+  const representation::block* block(void) const { return decoratee().block(); }
+  const representation::cache* cache(void) const { return decoratee().cache(); }
+  representation::block* block(void) { return decoratee().block(); }
+  representation::cache* cache(void) { return decoratee().cache(); }
+  const representation::cell_entity* entity(void) const { return decoratee().entity(); }
 
   /**
    * @brief Update the information relevance/pheromone density associated with
@@ -89,27 +96,28 @@ class perceived_cell2D : public visitor::visitable<perceived_cell2D>,
    * cell transitions back to an unknown state, as the robot can no longer trust
    * its information.
    */
-  void update_density(void);
+  void density_update(void);
+  void density_reset(void) { m_density.reset(); }
 
   /**
    * @brief Add the specified amount to the pheromone density for this cell.
    *
-   * @param density The amount of pheromone to add.
+   * @param amount The amount of pheromone to add.
    */
-  void update_density(double density) { m_density.add_pheromone(density); }
+  void pheromone_add(double amount) { m_density.pheromone_add(amount); }
 
-  cell2D& cell(void) { return m_cell; }
+  double epsilon(void) const { return kEpsilon; }
 
  private:
   /**
    * The tolerance to zero which the pheromone density has to reach before the
    * cell will transition back to an unknown state.
    */
-  static const double kEpsilon;
+  static constexpr double          kEpsilon{0.0001};
 
-  std::string m_robot_id;  /// For debugging purposes only
+  bool                             m_pheromone_repeat_deposit;
+  std::string                      m_robot_id;
   rcppsw::swarm::pheromone_density m_density;
-  cell2D m_cell;
 };
 
 NS_END(representation, fordyca);

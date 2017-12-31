@@ -31,33 +31,32 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void sensor_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode diff_node = argos::GetNode(
-      argos::GetNode(node, "sensors"), "diffusion");
-  m_params.reset(new sensor_params);
+void sensor_parser::parse(argos::TConfigurationNode &node) {
+  argos::TConfigurationNode diff_node =
+      argos::GetNode(argos::GetNode(node, "sensors"), "diffusion");
+  m_params = rcppsw::make_unique<struct sensor_params>();
 
-    try {
-      argos::CRange<argos::CDegrees> angle_range_deg(argos::CDegrees(-10.0f),
-                                                     argos::CDegrees(10.0f));
-      argos::GetNodeAttribute(diff_node,
-                              "go_straight_angle_range",
-                              m_params->diffusion.go_straight_angle_range);
-      m_params->diffusion.go_straight_angle_range.Set(
-          argos::ToRadians(angle_range_deg.GetMin()),
-          argos::ToRadians(angle_range_deg.GetMax()));
-      argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
-    }
-    catch (argos::CARGoSException& ex) {
-      using namespace argos;
-      THROW_ARGOSEXCEPTION_NESTED("Error parsing sensor parameters.", ex);
-    }
+  argos::GetNodeAttribute(diff_node,
+                          "go_straight_angle_range",
+                          m_params->diffusion.go_straight_angle_range);
+  argos::GetNodeAttribute(diff_node, "delta", m_params->diffusion.delta);
 } /* parse() */
 
-void sensor_parser::show(std::ostream& stream) {
+void sensor_parser::show(std::ostream &stream) {
   stream << "====================\nSensor params\n====================\n";
   stream << "delta=" << m_params->diffusion.delta << std::endl;
-  stream << "go_straight_angle_range=" <<
-      m_params->diffusion.go_straight_angle_range << std::endl;
+  stream << "go_straight_angle_range="
+         << m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
+
+bool sensor_parser::validate(void) {
+  if (!(m_params->diffusion.go_straight_angle_range.GetSpan().GetAbsoluteValue() > 0)) {
+      return false;
+  }
+  if (m_params->diffusion.delta <= 0) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);

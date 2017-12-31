@@ -24,55 +24,53 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
 #include <string>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/params.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/discrete_coord.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace representation { class block; }
+namespace params { struct block_params; }
+
+NS_START(support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_distributor
+ *
+ * @brief Distributes all blocks as directed on simulation start, and then
+ * re-dstributes individual blocks every time they are dropped in the nest
+ * (unless respawn is not enabled).
+ */
 class block_distributor {
  public:
-  block_distributor(double resolution,
-                    argos::CRange<argos::Real> arena_x,
-                    argos::CRange<argos::Real> arena_y,
-                    argos::CRange<argos::Real> nest_x,
-                    argos::CRange<argos::Real> nest_y,
-                    const struct block_params* params) :
-      m_resolution(resolution),
-      m_dist_model(params->dist_model),
-      m_respawn(params->respawn),
-      m_arena_x(arena_x),
-      m_arena_y(arena_y),
-      m_nest_x(nest_x),
-      m_nest_y(nest_y),
-      m_rng(argos::CRandom::CreateRNG("argos")) {}
+  block_distributor(argos::CRange<double> arena_x,
+                    argos::CRange<double> arena_y,
+                    argos::CRange<double> nest_x,
+                    argos::CRange<double> nest_y,
+                    const struct params::block_params* params);
 
+  block_distributor(const block_distributor& s) = delete;
+  block_distributor& operator=(const block_distributor& s) = delete;
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * @brief Distribute a block in the arena.
    *
    * @param first_time Whether or not this is the first time to distribute a
    * block. Only matters if respawn is not enabled.
    */
-  void distribute_blocks(std::vector<representation::block>& blocks,
-                         bool first_time);
-  void distribute_block(representation::block& block, bool first_time);
+  bool distribute_block(const representation::block& block,
+                        argos::CVector2* coord);
 
-  /**
-   * @brief If TRUE, then blocks should be respawned every time they are placed
-   * in the nest.
-   */
-  bool respawn_enabled(void) const { return m_respawn; }
+  argos::CRange<double> single_src_xrange(void);
 
  private:
   /**
@@ -81,31 +79,27 @@ class block_distributor {
    * nest. Collisions are not checked, as having 2 blocks on 1 square is not a
    * big deal for now.
    *
-   * @param i The index of the block to place/distribute.
+   * @param block The block to place/distribute.
    */
-  void dist_random(representation::block& block);
+  argos::CVector2 dist_random(const representation::block& block);
 
   /**
-   * @brief Distribute a block within a small range about 75% of the way between
+   * @brief Distribute a block within a small range about 90% of the way between
    * the nest and the far wall. Assumes a horizontally rectangular arena.
    */
-  void dist_single_src(representation::block& block);
-  argos::CVector2 dist_in_range(argos::CRange<argos::Real> x_range,
-                                argos::CRange<argos::Real> y_range);
+  argos::CVector2 dist_single_src(const representation::block& block);
+
+  argos::CVector2 dist_in_range(argos::CRange<double> x_range,
+                                argos::CRange<double> y_range);
   argos::CVector2 dist_outside_range(double dimension,
-                                     argos::CRange<argos::Real> x_range,
-                                     argos::CRange<argos::Real> y_range);
+                                     argos::CRange<double> x_range,
+                                     argos::CRange<double> y_range);
 
-  block_distributor(const block_distributor& s) = delete;
-  block_distributor& operator=(const block_distributor& s) = delete;
-
-  double m_resolution;
-  std::string m_dist_model;
-  bool m_respawn;
-  argos::CRange<argos::Real> m_arena_x;
-  argos::CRange<argos::Real> m_arena_y;
-  argos::CRange<argos::Real> m_nest_x;
-  argos::CRange<argos::Real> m_nest_y;
+  std::string           m_dist_model;
+  argos::CRange<double> m_arena_x;
+  argos::CRange<double> m_arena_y;
+  argos::CRange<double> m_nest_x;
+  argos::CRange<double> m_nest_y;
   argos::CRandom::CRNG* m_rng;
 };
 

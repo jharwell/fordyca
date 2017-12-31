@@ -32,36 +32,33 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grid_parser::parse(argos::TConfigurationNode& node) {
-  m_params.reset(new struct grid_params);
-  ticpp::Node *arena = node.NextSibling("arena");
+void grid_parser::parse(argos::TConfigurationNode &node) {
+  m_params = rcppsw::make_unique<struct grid_params>();
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(arena->ToElement()->GetAttribute("size"));
+  res = parser.parse(node.GetAttribute("size"));
 
-  m_params->resolution = std::atof(
-      argos::GetNode(node, "grid").GetAttribute("resolution").c_str());
+  m_params->resolution = std::atof(node.GetAttribute("resolution").c_str());
   m_params->lower.Set(0, 0);
-  m_params->upper.Set(std::atoi(res[0].c_str()),
-                      std::atoi(res[1].c_str()));
-
-  argos::TConfigurationNode bnode = argos::GetNode(node, "blocks");
-  argos::GetNodeAttribute(bnode, "n_blocks", m_params->block.n_blocks);
-  argos::GetNodeAttribute(bnode, "dimension", m_params->block.dimension);
-  argos::GetNodeAttribute(bnode, "dist_model", m_params->block.dist_model);
-  argos::GetNodeAttribute(bnode, "respawn", m_params->block.respawn);
+  m_params->upper.Set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
 } /* parse() */
 
-void grid_parser::show(std::ostream& stream) {
+void grid_parser::show(std::ostream &stream) {
   stream << "====================\nGrid params\n====================\n";
   stream << "resolution=" << m_params->resolution << std::endl;
   stream << "lower=" << m_params->lower << std::endl;
   stream << "upper=" << m_params->upper << std::endl;
-  stream << "block.n_items=" << m_params->block.n_blocks << std::endl;
-  stream << "block.dimension=" << m_params->block.dimension << std::endl;
-  stream << "block.dist_model=" << m_params->block.dist_model << std::endl;
-  stream << "block.respawn=" << m_params->block.respawn << std::endl;
 } /* show() */
+
+bool grid_parser::validate(void) {
+  if (!(m_params->resolution > 0.0)) {
+    return false;
+  }
+  if (!(m_params->upper.GetX() > 0) || !(m_params->upper.GetY() > 0)) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);

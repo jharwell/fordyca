@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_distributor.hpp"
+#include "fordyca/params/block_params.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,71 +31,81 @@
 NS_START(fordyca, support);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+block_distributor::block_distributor(argos::CRange<double> arena_x,
+                                     argos::CRange<double> arena_y,
+                                     argos::CRange<double> nest_x,
+                                     argos::CRange<double> nest_y,
+                                     const struct params::block_params *params)
+    : m_dist_model(params->dist_model),
+      m_arena_x(arena_x),
+      m_arena_y(arena_y),
+      m_nest_x(nest_x),
+      m_nest_y(nest_y),
+      m_rng(argos::CRandom::CreateRNG("argos")) {}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distributor::distribute_blocks(
-    std::vector<representation::block>& blocks,
-    bool first_time) {
-  for (size_t i = 0; i < blocks.size(); ++i) {
-    distribute_block(blocks[i], first_time);
-  } /* for(i..) */
-} /* distribute_blocks() */
-
-void block_distributor::distribute_block(representation::block& block,
-                                         bool first_time) {
-  if (!m_respawn && !first_time) {
-    return;
-  } else if (m_dist_model == "random") {
-    dist_random(block);
+bool block_distributor::distribute_block(const representation::block &block,
+                                         argos::CVector2 *const coord) {
+  if (m_dist_model == "random") {
+    *coord = dist_random(block);
+    return true;
   } else if (m_dist_model == "single_source") {
-    dist_single_src(block);
+    *coord = dist_single_src(block);
+    return true;
   }
+  return false;
 } /* distribute_block() */
 
-void block_distributor::dist_random(representation::block& block) {
-  block.real_loc(dist_outside_range(block.xsize(),
-                                    m_nest_x, m_nest_y));
-  block.discrete_loc(representation::real_to_discrete_coord(
-      std::pair<double, double>(block.real_loc().GetX(),
-                                block.real_loc().GetY()), m_resolution));
+argos::CVector2 block_distributor::dist_random(
+    const representation::block &block) {
+  return dist_outside_range(block.xsize(), m_nest_x, m_nest_y);
 } /* dist_random() */
 
-void block_distributor::dist_single_src(representation::block& block) {
+argos::CRange<double> block_distributor::single_src_xrange(void) {
+  return argos::CRange<double>(m_arena_x.GetMax() * 0.9 - 0.75,
+                               m_arena_x.GetMax() * 0.9);
+} /* single_src_xrange() */
+
+argos::CVector2 block_distributor::dist_single_src(
+    const representation::block &block) {
   /*
-   * Find the 3/4 point between the nest and the source along the Y (horizontal)
+   * Find the 90% point between the nest and the source along the X (horizontal)
    * direction, and put all the blocks around there.
    */
-  argos::CRange<argos::Real> y_range = m_nest_y;
-  argos::CRange<argos::Real> x_range = argos::CRange<argos::Real>(
-      m_arena_x.GetMax() * 0.75 - 0.5,
-      m_arena_x.GetMax() * 0.75);
-  block.real_loc(dist_in_range(x_range, y_range));
-  block.discrete_loc(representation::real_to_discrete_coord(
-      std::pair<double, double>(block.real_loc().GetX(),
-                                block.real_loc().GetY()), m_resolution));
+  argos::CRange<double> y_range(m_nest_y.GetMin() - 1.0,
+                                m_nest_y.GetMax() + 1.0);
+  argos::CRange<double> x_range = single_src_xrange();
+  x_range.Set(x_range.GetMin() - block.xsize(),
+              x_range.GetMax() + block.xsize());
+  y_range.Set(y_range.GetMin() - block.xsize(),
+              y_range.GetMax() + block.xsize());
+
+  return dist_in_range(x_range, y_range);
 } /* dist_single_src() */
 
-argos::CVector2 block_distributor::dist_in_range(
-    argos::CRange<argos::Real> x_range,
-    argos::CRange<argos::Real> y_range) {
-  return argos::CVector2(m_rng->Uniform(x_range),
-                         m_rng->Uniform(y_range));
+argos::CVector2 block_distributor::dist_in_range(argos::CRange<double> x_range,
+                                                 argos::CRange<double> y_range) {
+  return argos::CVector2(m_rng->Uniform(x_range), m_rng->Uniform(y_range));
 } /* dist_in_range() */
 
 argos::CVector2 block_distributor::dist_outside_range(
     double dimension,
-    argos::CRange<argos::Real> x_range,
-    argos::CRange<argos::Real> y_range) {
+    argos::CRange<double> x_range,
+    argos::CRange<double> y_range) {
   double x, y;
   x_range.Set(x_range.GetMin() - dimension, x_range.GetMax() + dimension);
   y_range.Set(y_range.GetMin() - dimension, y_range.GetMax() + dimension);
   do {
     x = m_rng->Uniform(
-        argos::CRange<argos::Real>(m_arena_x.GetMin() + dimension,
-                                   m_arena_x.GetMax() - dimension));
+        argos::CRange<double>(m_arena_x.GetMin() + dimension * 4,
+                              m_arena_x.GetMax() - dimension * 4));
     y = m_rng->Uniform(
-        argos::CRange<argos::Real>(m_arena_y.GetMin() + dimension,
-                                   m_arena_y.GetMax() - dimension));
+        argos::CRange<double>(m_arena_y.GetMin() + dimension * 4,
+                              m_arena_y.GetMax() - dimension * 4));
   } while (x_range.WithinMinBoundIncludedMaxBoundIncluded(x) &&
            y_range.WithinMinBoundIncludedMaxBoundIncluded(y));
   return argos::CVector2(x, y);

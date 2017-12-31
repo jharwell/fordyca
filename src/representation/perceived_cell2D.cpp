@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/events/block_drop.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/cell_unknown.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,40 +32,47 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Constants
- ******************************************************************************/
-const double perceived_cell2D::kEpsilon = 0.0001;
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 perceived_cell2D::perceived_cell2D(
-    const std::shared_ptr<rcppsw::common::er_server>& server) :
-    er_client(server), m_robot_id(), m_density(),
-    m_cell(server) {
+    const std::shared_ptr<rcppsw::er::server> &server)
+    : decorator(server),
+      client(server),
+      m_pheromone_repeat_deposit(false),
+      m_robot_id(),
+      m_density() {
   if (ERROR == attmod("perceived_cell2D")) {
     insmod("perceived_cell2D",
-           rcppsw::common::er_lvl::DIAG,
-           rcppsw::common::er_lvl::NOM);
+           rcppsw::er::er_lvl::DIAG,
+           rcppsw::er::er_lvl::NOM);
   }
-    }
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void perceived_cell2D::update_density(void) {
-  if (!m_cell.state_is_known()) {
-    return;
+void perceived_cell2D::density_update(void) {
+  if (!pheromone_repeat_deposit()) {
+    ER_ASSERT(m_density.last_result() <= 1.0,
+              "FATAL: Repeat pheromone deposit detected");
   }
-  m_density.calc();
-  if (m_density.last_result() < kEpsilon) {
-    if (m_cell.state_has_block()) {
-      ER_NOM("Relevance of block%d is within %f of 0 for %s", block()->id(),
-             kEpsilon, m_robot_id.c_str());
+
+  if (m_density.calc() < kEpsilon) {
+    if (decoratee().state_has_block()) {
+      ER_VER("Relevance of block%d is within %f of 0 for %s",
+             block()->id(),
+             kEpsilon,
+             m_robot_id.c_str());
+    } else if (decoratee().state_has_cache()) {
+      ER_VER("Relevance of cache%d is within %f of 0 for %s",
+             cache()->id(),
+             kEpsilon,
+             m_robot_id.c_str());
     }
-    events::cell_unknown op;
-    m_cell.accept(op);
+    events::cell_unknown op(decorator::decoratee().loc().first,
+                            decorator::decoratee().loc().second);
+    decoratee().accept(op);
   }
-} /* update_density() */
+} /* density_update() */
 
 NS_END(representation, fordyca);

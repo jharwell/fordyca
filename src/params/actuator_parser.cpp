@@ -31,34 +31,39 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node = argos::GetNode(
-      argos::GetNode(node, "actuators"), "wheels");
+void actuator_parser::parse(argos::TConfigurationNode &node) {
+  argos::TConfigurationNode wheel_node =
+      argos::GetNode(argos::GetNode(node, "actuators"), "wheels");
 
-  m_params.reset(new struct actuator_params);
+  m_params = rcppsw::make_unique<struct actuator_params>();
 
-try {
-    argos::CDegrees cAngle;
-    argos::GetNodeAttribute(wheel_node, "hard_turn_angle_threshold", cAngle);
-    m_params->wheels.hard_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_threshold", cAngle);
-    m_params->wheels.soft_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "no_turn_angle_threshold", cAngle);
-    m_params->wheels.no_turn_threshold = ToRadians(cAngle);
-    argos::GetNodeAttribute(wheel_node, "max_speed", m_params->wheels.max_speed);
-  }
-  catch(argos::CARGoSException& ex) {
-    using namespace argos;
-    THROW_ARGOSEXCEPTION_NESTED("Error initializing controller wheel turning parameters.", ex);
-  }
+    argos::CDegrees angle;
+    argos::GetNodeAttribute(wheel_node, "soft_turn_angle_max", angle);
+    m_params->wheels.soft_turn_max = ToRadians(angle);
+    argos::GetNodeAttribute(wheel_node, "no_turn_angle_max", angle);
+    m_params->wheels.no_turn_max = ToRadians(angle);
+    argos::GetNodeAttribute(wheel_node,
+                            "max_speed",
+                            m_params->wheels.max_speed);
 } /* parse() */
 
-void actuator_parser::show(std::ostream& stream) {
+void actuator_parser::show(std::ostream &stream) {
   stream << "====================\nActuator params\n====================\n";
-  stream << "hard_turn_threshold=" << m_params->wheels.hard_turn_threshold << std::endl;
-  stream << "soft_turn_threshold=" << m_params->wheels.soft_turn_threshold << std::endl;
-  stream << "no_turn_threshold=" << m_params->wheels.no_turn_threshold << std::endl;
+  stream << "soft_turn_max=" << m_params->wheels.soft_turn_max
+         << std::endl;
+  stream << "no_turn_max=" << m_params->wheels.no_turn_max
+         << std::endl;
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
 } /* show() */
+
+bool actuator_parser::validate(void) {
+  if (!(m_params->wheels.soft_turn_max.GetValue() > 0)) {
+    return false;
+  }
+  if (!(m_params->wheels.no_turn_max.GetValue() > 0)) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);

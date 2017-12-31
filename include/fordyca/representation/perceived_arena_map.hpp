@@ -25,42 +25,76 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <utility>
+#include <string>
 
-#include "fordyca/representation/grid2D.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
-#include "fordyca/representation/block.hpp"
-#include "rcppsw/common/er_server.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/perceived_block.hpp"
+#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+namespace rcppsw { namespace er { class server; }}
+
+NS_START(fordyca);
+namespace params { namespace depth0 { struct perceived_arena_map_params; }}
+
+NS_START(representation);
+class line_of_sight;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
+ * @class perceived_arena_map
+ *
  * @brief The arena map stores a logical representation of the state of the
- * arena. Basically, it combines a 2D grid with sets of objects that populate
- * the grid and move around as the state of the arena changes.
+ * arena, from the perspective of the robot.
+ *
+ * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
+ * where they actually live (clone not referenc), which decouples/simplifies a
+ * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
-class perceived_arena_map: public rcppsw::common::er_client,
-                           public rcppsw::patterns::visitor::visitable<perceived_arena_map> {
+class perceived_arena_map: public rcppsw::er::client,
+                           public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
-  perceived_arena_map(const std::shared_ptr<rcppsw::common::er_server>& server,
-                      const struct perceived_grid_params* params,
+  perceived_arena_map(std::shared_ptr<rcppsw::er::server> server,
+                      const struct params::depth0::perceived_arena_map_params* c_params,
                       const std::string& robot_id);
 
   /**
-   * @brief Get a list of all blocks the robot is currently aware of/that are
-   * currently relevant.
+   * @brief Get a list of all blocks the robot is currently aware of and their
+   * relevance.
    *
-   * @return The list of perceived blocks (really a list of std::pair<block,
-   * double>).
+   * @return The list of perceived blocks.
    */
-  std::list<perceived_block> blocks(void) const;
+  std::list<perceived_block> perceived_blocks(void) const;
+
+  /**
+   * @brief Get a list of all blocks the robot is currently aware of.
+   */
+  std::vector<representation::block>& blocks(void) { return m_blocks; };
+
+  /**
+   * @brief Get a list of all cache the robot is currently aware of and their
+   * relevance.
+   *
+   * @return The list of perceived cache.
+   */
+  std::list<representation::perceived_cache> perceived_caches(void) const;
+
+  /**
+   * @brief Get a list of all caches the robot is currently aware of.
+   */
+  std::vector<representation::cache>& caches(void) { return m_caches; }
+
+  void cache_add(representation::cache& cache);
+  void cache_remove(representation::cache& victim);
+
+  void block_add(representation::block& block);
+  void block_remove(representation::block& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -72,26 +106,33 @@ class perceived_arena_map: public rcppsw::common::er_client,
    *
    * @return The cell.
    */
-  perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i, j); }
+  perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
+  perceived_cell2D& access(const discrete_coord& c) { return access(c.first, c.second); }
+  const perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i,j); }
 
   /**
    * @brief Update the density of all cells in the perceived arena.
    */
   void update_density(void);
 
-  /**
-   * @brief Handle the event of a robot acquiring a new line-of-sight (happens
-   * every timestep).
-   *
-   * @param los The new LOS.
-   *
-   * @return Whethor or not any new blocks have been detected.
-   */
-  bool event_new_los(const line_of_sight* los);
-
  private:
-  std::shared_ptr<rcppsw::common::er_server> m_server;
-  grid2D<perceived_cell2D> m_grid;
+  std::shared_ptr<rcppsw::er::server>                          m_server;
+  rcppsw::ds::grid2D_ptr<perceived_cell2D,
+                         std::shared_ptr<rcppsw::er::server>&> m_grid;
+
+  /**
+   * @brief The caches that the robot currently knows about. Their relevance is
+   * not stored with the cache, because that is a properly of the cell the cache
+   * resides in, and not the cache itself.
+   */
+  std::vector<representation::cache> m_caches;
+
+  /**
+   * @brief The blocks that the robot currently knows about. Their relevance is
+   * not stored with the block, because that is a properly of the cell the block
+   * resides in, and not the block itself.
+   */
+  std::vector<representation::block> m_blocks;
 };
 
 NS_END(representation, fordyca);

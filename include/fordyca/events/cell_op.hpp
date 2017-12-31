@@ -32,20 +32,37 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class cell2D;
-class arena_map;
-} /* namespace representation */
+namespace representation { class cell2D; class perceived_cell2D; }
+namespace fsm { class cell2D_fsm; }
 
 NS_START(events);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cell_op
+ *
+ * @brief Non-abstract interface specifying the minimum set of classes that all
+ * events that operate on cells within an occupany grid need to visit.
+ *
+ * Also provided are the (x, y) coordinates of the cell to which the event is
+ * directed. Not all derived events may need them, but they are there.
+ */
 class cell_op : public visitor::visitor,
-                public visitor::can_visit<representation::cell2D, void> {
+                public visitor::visit_set<representation::cell2D,
+                                          representation::perceived_cell2D,
+                                          fsm::cell2D_fsm> {
  public:
-  cell_op(void) {}
+  cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
+  ~cell_op(void) override = default;
+
+  size_t x(void) const { return m_x; }
+  size_t y(void) const { return m_y; }
+
+ private:
+  size_t m_x;
+  size_t m_y;
 };
 
 NS_END(events, fordyca);

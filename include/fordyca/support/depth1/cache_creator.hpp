@@ -1,0 +1,83 @@
+/**
+ * @file cache_creator.hpp
+ *
+ * @copyright 2017 John Harwell, All rights reserved.
+ *
+ * This file is part of FORDYCA.
+ *
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_
+
+/*******************************************************************************
+ * Includes
+ ******************************************************************************/
+#include <list>
+#include <argos/core/utility/math/vector2.h>
+
+#include "fordyca/representation/real_coord.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/occupancy_grid.hpp"
+#include "rcppsw/er/client.hpp"
+
+/*******************************************************************************
+ * Namespaces
+ ******************************************************************************/
+NS_START(fordyca, support, depth1);
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+/**
+ * @class cache_creator
+ *
+ * @brief Base class for creating static/dynamic caches in the arena.
+ *
+ * Used by the arena to actually create caches, and by robots to create
+ * "virtual" caches in their on-board representation of the arena.
+ */
+class cache_creator : public rcppsw::er::client {
+ public:
+  cache_creator(std::shared_ptr<rcppsw::er::server> server,
+                representation::occupancy_grid& grid,
+                double cache_size, double resolution);
+
+  /**
+   * @brief Create caches from all blocks in the provided list that are close
+   * enough together.
+   *
+   * @return A vector of created caches.
+   */
+  virtual std::vector<representation::cache> create_all(
+      std::vector<representation::block*>& blocks) = 0;
+
+  void update_host_cells(std::vector<representation::cache>& caches);
+
+ protected:
+  representation::occupancy_grid& grid(void) const { return m_grid; }
+  rcppsw::er::server* server(void) const { return m_server.get(); }
+  representation::cache create_single(std::list<representation::block*> blocks,
+                                      const argos::CVector2& center);
+
+ private:
+  double                              m_cache_size;
+  double                              m_resolution;
+  representation::occupancy_grid&     m_grid;
+  std::shared_ptr<rcppsw::er::server> m_server;
+};
+NS_END(support, fordyca, depth1);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_ */

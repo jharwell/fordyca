@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/logging_parser.hpp"
+#include "fordyca/params/arena_map_parser.hpp"
 #include "fordyca/params/loop_functions_parser.hpp"
+#include "fordyca/params/output_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,12 +35,9 @@ NS_START(fordyca, params);
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) {
-  factory().register_type<grid_parser>("grid");
-  factory().register_type<logging_parser>("logging");
-  factory().register_type<loop_functions_parser>("loop_functions");
-  parsers()["grid"]             = factory().create("grid");
-  parsers()["logging"]          = factory().create("logging");
-  parsers()["loop_functions"]   = factory().create("loop_functions");
+  register_parser<output_parser>("output");
+  register_parser<arena_map_parser>("arena_map");
+  register_parser<loop_functions_parser>("loop_functions");
 }
 
 NS_END(params, fordyca);
