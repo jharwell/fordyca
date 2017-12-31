@@ -69,7 +69,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void Reset() override;
   void Destroy() override;
   void PreStep() override;
-  void PostExperiment(void) override;
 
  protected:
   representation::arena_map* map(void) const { return m_map.get(); }
@@ -101,7 +100,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
 
   argos::CRange<double>                                          m_nest_x;
   argos::CRange<double>                                          m_nest_y;
-  std::string                                                    m_sim_type;
   std::string                                                    m_output_root;
   std::string                                                    m_metrics_path;
   std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;

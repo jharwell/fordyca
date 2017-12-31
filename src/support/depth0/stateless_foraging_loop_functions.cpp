@@ -54,7 +54,6 @@ stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
     : client(rcppsw::er::g_server),
       m_nest_x(),
       m_nest_y(),
-      m_sim_type(),
       m_output_root(),
       m_metrics_path(),
       m_stateless_collector(),
@@ -102,7 +101,6 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
           repo.get_params("loop_functions"));
   m_nest_x = p_arena->nest_x;
   m_nest_y = p_arena->nest_y;
-  m_sim_type = l_params->simulation_type;
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
@@ -275,12 +273,6 @@ void stateless_foraging_loop_functions::output_init(
     m_output_root = params->output_root + "/" + params->output_dir;
   }
 } /* output_init() */
-
-void stateless_foraging_loop_functions::PostExperiment(void) {
-  if (m_sim_type == "scripted") {
-    std::exit(0);
-  }
-} /* PostExperiment() */
 
 collectors::block_metrics_collector *
 stateless_foraging_loop_functions::block_collector(void) const {
