@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/robot_metrics/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/stateful_metrics.hpp"
+#include "fordyca/metrics/collectors/fsm/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, fsm);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -70,7 +70,7 @@ void stateful_metrics_collector::reset(void) {
 void stateful_metrics_collector::collect(
     const collectible_metrics::base_collectible_metrics &metrics) {
   auto &m =
-      static_cast<const collectible_metrics::robot_metrics::stateful_metrics &>(
+      static_cast<const collectible_metrics::fsm::stateful_metrics &>(
           metrics);
   m_stats.n_acquiring_block += m.is_acquiring_block();
   m_stats.n_vectoring_to_block += m.is_vectoring_to_block();
@@ -102,4 +102,4 @@ void stateful_metrics_collector::reset_after_timestep(void) {
   m_stats.n_vectoring_to_block = 0;
 } /* reset_after_timestep() */
 
-NS_END(robot_metrics, collectors, metrics, fordyca);
+NS_END(fsm, collectors, metrics, fordyca);

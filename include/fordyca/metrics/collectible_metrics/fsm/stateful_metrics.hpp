@@ -1,5 +1,5 @@
 /**
- * @file distance_metrics.hpp
+ * @file stateful_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DISTANCE_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DISTANCE_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATEFUL_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATEFUL_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,37 +29,37 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
+NS_START(fordyca, metrics, collectible_metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class distance_metrics
+ * @class stateful_metrics
  *
- * @brief Interface defining what metrics regarding distance traveled should be
- * collected from all robots.
+ * @brief Interface defining what metrics should be collected from all robots
+ * executing the \ref stateful_foraging_controller, or any controller derived
+ * from that controller.
  */
-class distance_metrics : public base_collectible_metrics {
+class stateful_metrics : public base_collectible_metrics {
  public:
-  distance_metrics(void) = default;
-  ~distance_metrics(void) override = default;
+  stateful_metrics(void) = default;
+  ~stateful_metrics(void) override = default;
 
   /**
-   * @brief Get the distance that a robot has traveled in a single timestep.
-   *
-   * This will be called every timestep by the \ref distance_metrics_collector
-   * on all robots.
+   * @brief If \c TRUE, then a robot is currently acquiring a block (either via
+   * exploring or via vectoring), and is executing the \ref explore_for_block_fsm/
+   * \ref acquire_block_fsm.
    */
-  virtual double timestep_distance(void) const = 0;
+  virtual bool is_acquiring_block(void) const = 0;
 
   /**
-   * @brief Get the ID of a robot, for use in associating gathered metrics with
-   * a specific robot.
+   * @brief If \c TRUE, then a robot is currently acquiring a block via
+   * vectoring and is executing the \ref vector_fsm/ \ref acquire_block_fsm.
    */
-  virtual size_t entity_id(void) const = 0;
+  virtual bool is_vectoring_to_block(void) const = 0;
 };
 
-NS_END(robot_metrics, collectible_metrics, metrics, fordyca);
+NS_END(fsm, collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DISTANCE_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATEFUL_METRICS_HPP_ */

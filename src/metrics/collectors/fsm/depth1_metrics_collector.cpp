@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/robot_metrics/depth1_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
+#include "fordyca/metrics/collectors/fsm/depth1_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, fsm);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -76,7 +76,7 @@ void depth1_metrics_collector::reset(void) {
 void depth1_metrics_collector::collect(
     const collectible_metrics::base_collectible_metrics &metrics) {
   auto &m =
-      static_cast<const collectible_metrics::robot_metrics::depth1_metrics &>(
+      static_cast<const collectible_metrics::fsm::depth1_metrics &>(
           metrics);
   m_stats.n_exploring_for_cache += m.is_exploring_for_cache();
   m_stats.n_acquiring_cache += m.is_acquiring_cache();
@@ -124,4 +124,4 @@ void depth1_metrics_collector::reset_after_timestep(void) {
   m_stats.n_transporting_to_cache = 0;
 } /* reset_after_timestep() */
 
-NS_END(robot_metrics, collectors, metrics, fordyca);
+NS_END(fsm, collectors, metrics, fordyca);

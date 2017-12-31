@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/stateless_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +52,7 @@ NS_START(fsm, depth0);
  * block back to the nest, and fdrops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::collectible_metrics::robot_metrics::stateless_metrics,
+                               public metrics::collectible_metrics::fsm::stateless_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const struct params::fsm_params* params,

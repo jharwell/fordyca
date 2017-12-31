@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/robot_metrics/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/distance_metrics.hpp"
+#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, fsm);
 
 /*******************************************************************************
  * Member Functions
@@ -60,9 +60,9 @@ bool distance_metrics_collector::csv_line_build(std::string &line) {
 void distance_metrics_collector::collect(
     const collectible_metrics::base_collectible_metrics &metrics) {
   auto &m =
-      static_cast<const collectible_metrics::robot_metrics::distance_metrics &>(
+      static_cast<const collectible_metrics::fsm::distance_metrics &>(
           metrics);
   m_stats[m.entity_id()].cum_distance += m.timestep_distance();
 } /* collect() */
 
-NS_END(robot_metrics, collectors, metrics, fordyca);
+NS_END(fsm, collectors, metrics, fordyca);

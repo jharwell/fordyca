@@ -1,5 +1,5 @@
 /**
- * @file stateful_metrics_collector.hpp
+ * @file depth1_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_STATEFUL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_STATEFUL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,36 +30,40 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, robot_metrics);
+NS_START(fordyca, metrics, collectors, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateful_metrics_collector
+ * @class depth1_metrics_collector
  *
- * @brief Collector for \ref stateful_metrics.
+ * @brief Collector for \ref depth1_metrics.
  *
  * Metrics are written out every timestep.
  */
-class stateful_metrics_collector : public base_metric_collector {
+class depth1_metrics_collector : public base_metric_collector {
  public:
-  stateful_metrics_collector(const std::string ofname,
-                             bool collect_cum,
-                             uint collect_interval);
+  depth1_metrics_collector(const std::string ofname,
+                           bool collect_cum,
+                           uint collect_interval);
 
   void reset(void) override;
-  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
   void reset_after_interval(void) override;
   void reset_after_timestep(void) override;
+  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
 
  private:
   struct stats {
-    size_t n_acquiring_block;
-    size_t n_vectoring_to_block;
+    size_t n_exploring_for_cache;
+    size_t n_vectoring_to_cache;
+    size_t n_acquiring_cache;
+    size_t n_transporting_to_cache;
 
-    size_t n_cum_acquiring_block;
-    size_t n_cum_vectoring_to_block;
+    size_t n_cum_exploring_for_cache;
+    size_t n_cum_vectoring_to_cache;
+    size_t n_cum_acquiring_cache;
+    size_t n_cum_transporting_to_cache;
   };
 
   std::string csv_header_build(const std::string& header = "") override;
@@ -68,6 +72,6 @@ class stateful_metrics_collector : public base_metric_collector {
   struct stats m_stats;
 };
 
-NS_END(robot_metrics, collectors, metrics, fordyca);
+NS_END(fsm, collectors, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_ROBOT_METRICS_STATEFUL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_ */

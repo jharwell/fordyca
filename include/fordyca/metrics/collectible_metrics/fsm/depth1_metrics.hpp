@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics, robot_metrics);
+NS_START(fordyca, metrics, collectible_metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -73,6 +73,6 @@ class depth1_metrics : public base_collectible_metrics {
   virtual bool is_transporting_to_cache(void) const = 0;
 };
 
-NS_END(robot_metrics, collectible_metrics, metrics, fordyca);
+NS_END(fsm, collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_ROBOT_METRICS_DEPTH1_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_ */

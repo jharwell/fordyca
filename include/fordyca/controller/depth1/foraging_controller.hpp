@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/robot_metrics/depth1_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
 /*******************************************************************************
@@ -61,7 +61,7 @@ NS_START(controller, depth1);
  * environment and/or execution times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public metrics::collectible_metrics::robot_metrics::depth1_metrics,
+                            public metrics::collectible_metrics::fsm::depth1_metrics,
                             public metrics::collectible_metrics::task_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
