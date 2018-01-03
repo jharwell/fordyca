@@ -40,7 +40,7 @@ In addition, you will possibly want to install these programs:
 
   - `develroot` - Set to the path to wherever you cloned the `devel` repo.
 
-2. Adjust symlinks, as describe in the RCPPSW https://github.com/jharwell/rcppsw/README.md[README].
+2. Adjust symlinks, as describe in the RCPPSW [README](https://github.com/jharwell/rcppsw/README.md).
 
 3. Verify you can build `rcsw`, `rcppsw`, and `fordyca` (in that order), by
    doing:
@@ -52,4 +52,4 @@ In addition, you will possibly want to install these programs:
 
 ## Development Guide
 
-See the development guide in RCPPSW: https://github.com/jharwell/rcppsw/README.md [README]
+See the development guide in RCPPSW: [README](https://github.com/jharwell/rcppsw/README.md).
