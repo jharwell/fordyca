@@ -41,9 +41,10 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class collector
+ * @ingroup tasks
  *
  * @brief Task in which robots locate a cache and bring a block from it to the
- * nest.
+ * nest. It is abortable, and has one task interface.
  */
 class collector : public task_allocation::polled_task, public foraging_task {
  public:

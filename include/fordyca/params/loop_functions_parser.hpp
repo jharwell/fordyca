@@ -38,6 +38,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class loop_functions_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to loop functions into
+ * \ref loop_functions_params.
+ */
 class loop_functions_parser: public rcppsw::common::xml_param_parser {
  public:
   loop_functions_parser(void): m_params() {}

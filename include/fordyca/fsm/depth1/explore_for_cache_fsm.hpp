@@ -43,18 +43,34 @@ NS_START(fsm, depth1);
  ******************************************************************************/
 /**
  * @class explore_for_cache_fsm
+ * @ingroup fsm depth1
  *
- * @brief The base FSM for an exploration subtask. Each robot executing this FSM
- * will roam around randomly until it finds a cache, and then signal that its
- * task is finished once it has done so.
+ * @brief Robots executing this task will roam around randomly looking for a
+ * cache. Once they have found one, the FSM will signal that its task is
+ * complete.
  */
 class explore_for_cache_fsm : public base_explore_fsm {
  public:
   enum fsm_states {
     ST_START,
+    /**
+     * Roaming around looking for a cache.
+     */
     ST_EXPLORE,
-    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
-    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
+
+    /**
+     * Obstacle nearby--avoid it.
+     */
+    ST_COLLISION_AVOIDANCE,
+
+    /**
+     * Changing direction to a (hopefully) more profitable search trajectory.
+     */
+    ST_NEW_DIRECTION,
+
+    /**
+     * A cache has been acquired.
+     */
     ST_FINISHED,
     ST_MAX_STATES
   };
@@ -111,9 +127,10 @@ class explore_for_cache_fsm : public base_explore_fsm {
   HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM. Note that the order of the states
-   * in the map MUST match the order of the states in \enum fsm_states, or
-   * things will not work correctly.
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];

@@ -45,6 +45,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class block_distributor
+ * @ingroup support
  *
  * @brief Distributes all blocks as directed on simulation start, and then
  * re-dstributes individual blocks every time they are dropped in the nest
@@ -63,9 +64,6 @@ class block_distributor {
 
   /**
    * @brief Distribute a block in the arena.
-   *
-   * @param first_time Whether or not this is the first time to distribute a
-   * block. Only matters if respawn is not enabled.
    */
   bool distribute_block(const representation::block& block,
                         argos::CVector2* coord);

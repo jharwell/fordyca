@@ -1,5 +1,5 @@
 /**
- * @file block_target_selector.hpp
+ * @file block_selector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -39,6 +39,7 @@ NS_START(fordyca, controller, depth0);
  ******************************************************************************/
 /**
  * @class block_selector
+ * @ingroup controller depth0
  *
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.

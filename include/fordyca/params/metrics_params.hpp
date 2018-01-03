@@ -35,6 +35,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct metrics_params
+ * @ingroup params
+ */
 struct metrics_params : public rcppsw::common::base_params {
   std::string output_dir{""};
   std::string block_fname{""};

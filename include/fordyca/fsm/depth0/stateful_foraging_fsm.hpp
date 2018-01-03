@@ -56,6 +56,7 @@ NS_START(fsm, depth0);
  ******************************************************************************/
 /**
  * @class stateful_foraging_fsm
+ * @ingroup fsm depth0
  *
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
  * FSM will locate for a block (either a known block or via random exploration),
@@ -127,6 +128,12 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(stateful_foraging_fsm, block_to_nest, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, finished);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }

@@ -38,6 +38,17 @@ class actuator_manager;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class kinematics_calculator
+ * @ingroup controller
+ *
+ * @brief Calculate various attractive/repulsive forces acting on the robot at
+ * any given time, such as
+ *
+ * - Obstacle avoidance
+ * - light attraction
+ * - light repulsion
+ */
 class kinematics_calculator {
  public:
   kinematics_calculator(std::shared_ptr<base_foraging_sensors>& sensors,

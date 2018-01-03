@@ -44,6 +44,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 /**
  * @class block
+ * @ingroup representation
  *
  * @brief A representation of a block within the arena map. Blocks do not have
  * state (other than if they are currently being carried by a robot). Blocks
@@ -79,7 +80,15 @@ class block : public cell_entity,
    */
   void reset_index(void) { m_robot_index = -1; }
 
+  /**
+   * @brief change the block's location to something outside the visitable space
+   * in the arena when it is being carried by robot.
+   */
   void move_out_of_sight(void);
+
+  /**
+   * @brief Reset the # carries for the block after it is dropped in the nest.
+   */
   void reset_carries(void) { m_carries = 0; }
 
   /**

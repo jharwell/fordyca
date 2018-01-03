@@ -1,5 +1,5 @@
 /**
- * @file depth0_foraging_repository.cpp
+ * @file stateful_foraging_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

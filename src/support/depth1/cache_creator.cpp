@@ -106,9 +106,10 @@ representation::cache cache_creator::create_single(
 } /* create_single() */
 
 void cache_creator::update_host_cells(
+    representation::occupancy_grid& grid,
     std::vector<representation::cache> &caches) {
   for (auto &cache : caches) {
-    m_grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
+    grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
         .entity(&cache);
   } /* for(cache..) */
 } /* update_host_cells() */

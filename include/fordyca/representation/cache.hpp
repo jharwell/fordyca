@@ -46,6 +46,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 /**
  * @class cache
+ * @ingroup representation
  *
  * @brief A representation of a cache within the arena map. Caches do not have
  * state, and if/when a cache becomes empty, it needs to be deleted by an
@@ -90,8 +91,24 @@ class cache : public cell_entity,
    */
   std::vector<block*>& blocks(void) { return m_blocks; }
 
+  /**
+   * @brief Add a new block to the cache's list of blocks.
+   *
+   * Does not update the block's location.
+   */
   void block_add(block* block) { m_blocks.push_back(block);  }
+
+  /**
+   * @brief Remove a block from the cache's list of blocks.
+   *
+   * Does not update the block's location.
+   */
   void block_remove(block* block);
+
+  /**
+   * @brief Get the oldest block in the cache (the one that has been in the
+   * cache the longest).
+   */
   block* block_get(void) { return m_blocks.front(); }
 
  private:

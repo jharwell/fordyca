@@ -38,6 +38,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters for related to \ref block objects into
+ * \ref block_params.
+ */
 class block_parser: public rcppsw::common::xml_param_parser {
  public:
   block_parser(void): m_params() {}

@@ -34,6 +34,13 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class task_repository
+ * @ingroup params depth1
+ *
+ * @brief Collection of all parameter parsers and parse results needed
+ * controllers using tasks.
+ */
 class task_repository: public rcppsw::common::xml_param_repository {
  public:
   task_repository(void);

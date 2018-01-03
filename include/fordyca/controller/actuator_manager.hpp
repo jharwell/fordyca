@@ -43,14 +43,15 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 /**
  * @class actuator_manager
+ * @ingroup controller
  *
  * @brief Handles the control of all actuators on the robot.
  *
  * Currently, that is:
  *
- * - \ref argos::CCI_DifferentSteeringActuator
- * - \ref argos::CCI_LEDsActuator
- * - \ref argos::CCI_RangeAndBearingActuator
+ * - argos::CCI_DifferentSteeringActuator
+ * - argos::CCI_LEDsActuator
+ * - argos::CCI_RangeAndBearingActuator
  */
 class actuator_manager: public state_machine::simple_fsm {
  public:
@@ -89,15 +90,14 @@ class actuator_manager: public state_machine::simple_fsm {
   void set_speed(double speed);
 
   /**
-   * @brief Get the max wheel speed
+   * @brief Get the max wheel speed.
    */
   double max_wheel_speed(void) const;
 
   /**
-   * @brief Stop the robot
+   * @brief Stop the robot.
    */
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0, 0.0); }
-  void set_raba_data(uint8_t data) { m_raba->SetData(0, data); }
 
   /**
    * @brief Reset the actuators, including stopping the robot.

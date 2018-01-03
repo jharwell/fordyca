@@ -38,6 +38,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class grid_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters for \ref arena_map grid into \ref grid_params.
+ */
+
 class grid_parser: public rcppsw::common::xml_param_parser {
  public:
   grid_parser(void): m_params() {}

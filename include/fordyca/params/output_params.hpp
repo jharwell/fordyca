@@ -36,13 +36,16 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct output_params
+ * @ingroup params
+ */
 struct output_params : public rcppsw::common::base_params {
-  output_params(void) : output_root(), output_dir(), sim_log_fname(),
-                        metrics() {}
+  output_params(void) : metrics() {}
 
-  std::string output_root;
-  std::string output_dir;
-  std::string sim_log_fname;
+  std::string output_root{""};
+  std::string output_dir{""};
+  std::string sim_log_fname{""};
   struct metrics_params metrics;
 };
 

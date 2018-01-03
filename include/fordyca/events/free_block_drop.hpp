@@ -43,6 +43,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class free_block_drop
+ * @ingroup events
  *
  * @brief Created whenever a block is dropped somewhere in the arena that is not
  * a cache or the nest.
@@ -50,7 +51,7 @@ NS_START(events);
  * This can happen when:
  *
  * - The loop functions are doing block distribution.
- * - The robot aborts its task, and is carrying a block.
+ * - A robot aborts its task, and is carrying a block.
  */
 class free_block_drop : public cell_op,
                         public rcppsw::er::client,
@@ -71,10 +72,10 @@ class free_block_drop : public cell_op,
   void visit(representation::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(__unused representation::perceived_cell2D& cell) override {}
+  void visit(representation::perceived_cell2D&) override {}
 
   /* depth1 foraging */
-  void visit(__unused controller::depth1::foraging_controller& c) override {}
+  void visit(controller::depth1::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.

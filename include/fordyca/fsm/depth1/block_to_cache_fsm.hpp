@@ -54,6 +54,9 @@ NS_START(fsm, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
+ * @class block_to_cache_fsm
+ * @ingroup fsm depth1
+ *
  * @brief The FSM for the block-to-cache subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
@@ -115,11 +118,34 @@ class block_to_cache_fsm : public base_foraging_fsm,
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a free block */
+    /**
+     * Superstate for acquiring a free block.
+     */
+    ST_ACQUIRE_FREE_BLOCK,
+
+    /**
+     * A block has been acquired--wait for area to send the block pickup signal.
+     */
     ST_WAIT_FOR_BLOCK_PICKUP,
-    ST_TRANSPORT_TO_CACHE,    /* Block found--bring it back to a cache */
+
+    /**
+     * We are transporting a carried block to a cache.
+     */
+    ST_TRANSPORT_TO_CACHE,
+
+    /**
+     * We have acquired a cache--wait for arena to send the block drop signal.
+     */
     ST_WAIT_FOR_CACHE_DROP,
+
+    /**
+     * Obstacle nearby--avoid it.
+     */
     ST_COLLISION_AVOIDANCE,
+
+    /**
+     * Block has been successfully dropped in a cache.
+     */
     ST_FINISHED,
     ST_MAX_STATES,
   };
@@ -142,6 +168,12 @@ class block_to_cache_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(block_to_cache_fsm, finished);
   HFSM_ENTRY_DECLARE_ND(block_to_cache_fsm, entry_wait_for_pickup);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }

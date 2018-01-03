@@ -44,11 +44,12 @@ NS_START(events);
  ******************************************************************************/
 /*
  * @class cached_block_pickup
+ * @ingroup events
  *
  * @brief Created whenever a robot picks up a block from a cache.
  *
  * The cache usage penalty, if there is one, is assessed prior to this event
- * being created.
+ * being created, at a higher level.
  */
 class cached_block_pickup : public cell_op,
                             public rcppsw::er::client,
@@ -59,6 +60,9 @@ class cached_block_pickup : public cell_op,
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                       representation::cache* cache, size_t robot_index);
   ~cached_block_pickup(void) { client::rmmod(); }
+
+  cached_block_pickup(const cached_block_pickup& op) = delete;
+  cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   /* depth1 foraging */
   void visit(representation::arena_map& map) override;
@@ -73,9 +77,6 @@ class cached_block_pickup : public cell_op,
   void visit(tasks::collector& task) override;
 
  private:
-  cached_block_pickup(const cached_block_pickup& op) = delete;
-  cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
-
   size_t m_robot_index;
   representation::cache* m_real_cache;
 

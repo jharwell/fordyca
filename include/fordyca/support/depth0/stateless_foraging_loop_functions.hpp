@@ -52,6 +52,7 @@ NS_START(support, depth0);
  ******************************************************************************/
 /**
  * @class statless_foraging_loop_functions
+ * @ingroup support depth0
  *
  * @brief Contains the simulation support functions for stateless foraging:
  *

@@ -47,11 +47,13 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class base_foraging_fsm
+ * @ingroup fsm
  *
  * @brief A collection of base states/common functionality that foraging FSMs
  * can use if they choose.
  *
- * This class cannot be instantiated on its own.
+ * This class cannot be instantiated on its own, as does not define an FSM
+ * per-se.
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
@@ -77,6 +79,15 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   void init(void) override;
 
+  /**
+   * @brief Get a reference to the \ref base_foraging_sensors.
+   *
+   * Classes needing to reference these sensors should use this function rather
+   * than maintaining their own std::shared_ptr copy of things, as that can
+   * cause nasty bugs involving things set by the arena loop functions such as
+   * tick, location, etc., and that do not get propagated down the
+   * composition/inheritance hierarchy of robot controllers properly.
+   */
   controller::base_foraging_sensors*  base_sensors(void) const { return m_sensors.get(); }
 
  protected:
@@ -96,7 +107,8 @@ class base_foraging_fsm : public state_machine::hfsm {
   /**
    * @brief Robots entering this state will return to the nest.
    *
-   * This state MUST have a parent state defined that is not \ref hfsm::top_state().
+   * This state MUST have a parent state defined that is not
+   * \ref task_allocation::hfsm::top_state().
    *
    * Upon return to the nest, a \ref foraging_signal::BLOCK_DROP
    * signal will be returned to the parent state. No robot should return to the
@@ -109,7 +121,9 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @brief Robots entering this state will leave the nest (they are assumed to
    * already be in the nest when this state is entered).
    *
-   * This state MUST have a parent state defined that is not \ref hfsm::top_state().
+   * This state MUST have a parent state defined that is not \ref
+   * \ref task_allocation.hfsm::top_state().
+   *
    * When the robot has actually left the nest, according to sensor readings, a
    * \ref foraging_signal::LEFT_NEST signal is returned to the
    * parent state.
@@ -138,7 +152,10 @@ class base_foraging_fsm : public state_machine::hfsm {
    * state. Once the direction change has been accomplished, the robot will
    * transition back to its previous state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm,
+                     new_direction,
+                     state_machine::event_data);
+
   /**
    * @brief A simple entry state for returning to nest, used to set LED colors
    * for visualization purposes.
@@ -165,7 +182,25 @@ class base_foraging_fsm : public state_machine::hfsm {
 
 
  private:
+  /**
+   * @brief When changing direction, a robot is spinning at such a speed that it
+   * may overshoot its desired new direction, but as long as it does not
+   * overshoot by more than this tolerance, the direction change will still be
+   * considered to have occurred successfully.
+   */
   static constexpr double kDIR_CHANGE_TOL = 0.25;
+
+  /**
+   * @brief When changing direction, it may not be enough to have an arrival
+   * tolerance for the new heading; it is possible that given the new direction,
+   * the robot's initial heading, and the spinning speed, and it is impossible
+   * for the robot to arrive within tolerance of the desired new direction. So,
+   * I also define a max number of steps that the robot will spin as a secondary
+   * safeguard.
+   *
+   * Not doing this leads to robots that will spin more or less indefinitely
+   * when changing direction on occasion.
+   */
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
   const double          mc_dir_change_thresh;
@@ -174,7 +209,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager>      m_actuators;
-  controller::kinematics_calculator                   m_kinematics;
+  controller::kinematics_calculator                  m_kinematics;
 };
 
 NS_END(fsm, fordyca);

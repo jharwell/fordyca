@@ -42,8 +42,9 @@ NS_START(collectors);
  ******************************************************************************/
 /**
  * @class cache_metrics_collector
+ * @ingroup metrics
  *
- * @brief Collect for \ref cache_metrics.
+ * @brief Collector for \ref cache_metrics.
  *
  * Metrics are not output every timestep, but only on timesteps in which a
  * cache-related event occurs (pickup from/drop in).

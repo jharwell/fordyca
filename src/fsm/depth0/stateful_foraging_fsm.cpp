@@ -1,5 +1,5 @@
 /**
- * @file foraging_fsm.cpp
+ * @file stateful_foraging_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

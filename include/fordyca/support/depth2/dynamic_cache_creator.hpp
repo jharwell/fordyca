@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DYNAMIC_CACHE_CREATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DYNAMIC_CACHE_CREATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,12 +29,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_cache_creator : public cache_creator {
+class dynamic_cache_creator : public depth1::cache_creator {
  public:
   dynamic_cache_creator(std::shared_ptr<rcppsw::er::server> server,
                         representation::occupancy_grid& grid,
@@ -55,6 +55,6 @@ class dynamic_cache_creator : public cache_creator {
   double m_min_dist;
 };
 
-NS_END(depth1, support, fordyca);
+NS_END(depth2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DYNAMIC_CACHE_CREATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DYNAMIC_CACHE_CREATOR_HPP_ */

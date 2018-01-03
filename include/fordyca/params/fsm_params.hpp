@@ -35,6 +35,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct threshold_times
+ * @ingroup params
+ */
 struct threshold_times {
   /*
    * The number of exploration steps without finding block after which the
@@ -50,7 +54,10 @@ struct threshold_times {
   uint frequent_collision_thresh;
 };
 
-
+/**
+ * @struct fsm_params
+ * @ingroup params
+ */
 struct fsm_params : public rcppsw::common::base_params {
   fsm_params(void) : times(), nest_center() {}
   struct threshold_times times;

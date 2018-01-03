@@ -38,6 +38,12 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_parser
+ * @ingroup params depth1
+ *
+ * @brief Parses XML parameters for relating to caches into \ref cache_params.
+ */
 class cache_parser: public rcppsw::common::xml_param_parser {
  public:
   cache_parser(void): m_params() {}

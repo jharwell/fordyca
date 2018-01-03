@@ -43,6 +43,7 @@ namespace decorator = rcppsw::patterns::decorator;
  ******************************************************************************/
 /**
  * @class perceived_cell2D
+ * @ingroup representation
  *
  * @brief Per-robot representation of a cell on the 2D grid, as it appears to a
  * robot, in which the knowledge of the cell's state decays over time.

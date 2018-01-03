@@ -39,6 +39,7 @@ NS_START(fordyca, metrics, collectible_metrics);
  ******************************************************************************/
 /**
  * @class task_metrics
+ * @ingroup metrics
  *
  * @brief Interface defining metrics that can be collected on running tasks.
  */
@@ -48,7 +49,8 @@ class task_metrics : public base_collectible_metrics {
   ~task_metrics(void) override = default;
 
   /**
-   * @brief Get the name of the name that is currently being executed
+   * @brief Get the name of the name that is currently being executed by a
+   * robot.
    */
   virtual std::string task_name(void) const = 0;
 };

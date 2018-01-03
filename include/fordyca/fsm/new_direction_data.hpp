@@ -37,8 +37,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Inject randomness into robot motion by having them change their
- * direction
+ * @struct new_direction_data
+ * @ingroup fsm
+ *
+ * @brief Structure containing randomness to inject into robot motion by having
+ * them change their direction.
  */
 struct new_direction_data : public state_machine::event_data {
   explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}

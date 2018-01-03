@@ -41,6 +41,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class block_found
+ * @ingroup events
  *
  * @brief Event that is created whenever a NEW block (i.e. one that is not
  * currently known to the robot, but that has possibly been seen before and had

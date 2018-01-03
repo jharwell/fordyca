@@ -38,6 +38,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class fsm_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to robot controller FSMs into
+ * \ref fsm_params.
+ */
 class fsm_parser: public rcppsw::common::xml_param_parser {
  public:
   fsm_parser(void) : m_params() {}

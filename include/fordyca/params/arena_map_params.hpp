@@ -38,6 +38,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct arena_map_params
+ * @ingroup params
+ */
 struct arena_map_params : public rcppsw::common::base_params {
   arena_map_params(void) : grid(), block(), cache(), nest_center(), nest_x(),
                            nest_y() {}
