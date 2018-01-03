@@ -38,6 +38,13 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class pheromone_parser
+ * @ingroup params depth0
+ *
+ * @brief Parses XML parameters relating to pheromones into
+ * \ref pheromone_params.
+ */
 class pheromone_parser: public rcppsw::common::xml_param_parser {
  public:
   pheromone_parser(void): m_params() {}

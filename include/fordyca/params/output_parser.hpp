@@ -39,6 +39,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class output_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to simulation output into
+ * \ref output_params.
+ */
 class output_parser: public rcppsw::common::xml_param_parser {
  public:
   output_parser(void): m_params(), m_metrics_parser() {}

@@ -42,12 +42,14 @@ NS_START(collectors);
  ******************************************************************************/
 /**
  * @class base_metric_collector
+ * @ingroup metrics
  *
- * @brief Base class that uses the template design pattern to hooks
- * for derived classes so that the process of writing out metrics is centralized
- * in one place (here).
+ * @brief Base class that uses the template design pattern to provide hooks for
+ * derived classes so that the process of writing out metrics is centralized in
+ * one place (here).
  *
- * Metrics are written out in .csv format.
+ * Metrics are written out in .csv format at whatever frequency derived classes
+ * choose.
  */
 class base_metric_collector {
  public:
@@ -66,18 +68,22 @@ class base_metric_collector {
   virtual void reset(void);
 
   /**
-   * @brief Reset some metrics (possibly).
+   * @brief Reset metrics at the end of an interval.
    *
-   * Can be called at the end of every interval. By default it does nothing.
-   */
-  virtual void reset_after_interval(void) {}
-
-  virtual void reset_after_timestep(void) {}
-
+   * Can be called every timestep (and probably should be for consistency as
+   * behavior of derived classes possibly changes), and metrics will only be
+   * reset after the specified number of timesteps in the interval has elapsed.
+  */
   void interval_reset(void);
+
   void timestep_inc(void) { ++m_timestep; }
   uint timestep(void) const { return m_timestep; }
 
+  /**
+   * @brief Reset metrics at the end of a timestep.
+   *
+   * Should be called every timestep (default implementation does nothing).
+   */
   void timestep_reset(void) { reset_after_timestep(); }
 
   /**
@@ -92,11 +98,32 @@ class base_metric_collector {
    */
   void finalize(void) { m_ofile.close(); }
 
+  /**
+   * @brief Enable/disable interval usage for the current collector.
+   */
   void use_interval(bool use_interval) { m_use_interval = use_interval; }
+
+  /**
+   * @brief Set the interval (# timesteps) for the current collector.
+   */
   void interval(int interval) { m_interval = interval; }
   int interval(void) const { return m_interval; }
 
  protected:
+  /**
+   * @brief Reset some metrics (possibly).
+   *
+   * Can be called at the end of every interval. By default it does nothing.
+   */
+  virtual void reset_after_interval(void) {}
+
+  /**
+   * @brief Reset some metrics (possibly).
+   *
+   * Can be called every timestep. By default it does nothing.
+   */
+  virtual void reset_after_timestep(void) {}
+
   /**
    * @brief Build the header line for a particular collector.
    *

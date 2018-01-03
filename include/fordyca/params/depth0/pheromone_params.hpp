@@ -35,6 +35,10 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct pheromone_params
+ * @ingroup params depth0
+ */
 struct pheromone_params : public rcppsw::common::base_params {
   pheromone_params(void) = default;
 

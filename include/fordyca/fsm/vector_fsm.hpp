@@ -46,12 +46,16 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class vector_fsm
+ * @ingroup fsm
  *
  * @brief An FSM used to send a robot to a particular ABSOLUTE location in the
- * arena (a block or cache location)
+ * arena.
+ *
+ * Vectoring is controlled by two PID loops: one for angle between robot heading
+ * and the heading to the goal, and one for distance of robot to the goal.
  *
  * Arrival tolerance can be specified differently for blocks and caches, which
- * is necessary to avoid false positives in the cache of blocks, and also to
+ * is necessary to avoid false positives in the case of blocks, and also to
  * avoid multiple robots all trying to drive to the center of the cache to
  * "arrive" at it.
  */
@@ -101,10 +105,34 @@ class vector_fsm : public base_foraging_fsm,
  protected:
   enum fsm_states {
     ST_START,
+    /**
+     * Vectoring toward the target.
+     */
     ST_VECTOR,
+
+    /**
+     * Avoiding an obstacle nearby to the robot's current location.
+     */
     ST_COLLISION_AVOIDANCE,
+
+    /**
+     * Recovering from frequent collision avoidance by driving AWAY from the
+     * site of the most recent collision in a random direction for a set number
+     * of timesteps. This is intended to help prevent robot's from wasting lots
+     * of time butting heads when they are traveling in opposite/spatially
+     * conflicting directions.
+     */
     ST_COLLISION_RECOVERY,
+
+    /**
+     * We have been colliding too frequently--time to change things up and
+     * hopefully move away from the problem location.
+     */
     ST_NEW_DIRECTION,
+
+    /**
+     * We have arrived at the specified location within tolerance.
+     */
     ST_ARRIVED,
     ST_MAX_STATES
   };
@@ -129,8 +157,6 @@ class vector_fsm : public base_foraging_fsm,
     uint last_collision_time{0};
   };
 
-  /* constants */
-
   /**
    * @brief The # of timesteps according to collision recovery. This is mainly
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
@@ -138,7 +164,6 @@ class vector_fsm : public base_foraging_fsm,
    */
   constexpr static uint kCOLLISION_RECOVERY_TIME = 50;
 
-  /* member functions */
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
    *
@@ -165,6 +190,16 @@ class vector_fsm : public base_foraging_fsm,
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_avoidance);
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_recovery);
 
+    /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   *
+   * Note also that all robots will share the SAME state map in memory, so you
+   * cannot change the parent of any statein this FSM for only SOME other
+   * objects. But that should not be necessary, as it is taskable.
+   */
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP) {
       FSM_STATE_MAP_ENTRY_EX_ALL(&start, NULL, NULL, NULL),

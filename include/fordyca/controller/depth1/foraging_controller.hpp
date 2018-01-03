@@ -1,5 +1,5 @@
 /**
- * @file depth1_foraging_controller.hpp
+ * @file depth1/foraging_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -55,10 +55,11 @@ NS_START(controller, depth1);
  ******************************************************************************/
 /**
  * @class foraging_controller
+ * @ingroup controller depth1
  *
  * @brief A foraging controller that switches between \ref generalist,
  * \ref forager, and \ref collector tasks, according to dynamic changes in the
- * environment and/or execution times of the tasks.
+ * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
                             public metrics::collectible_metrics::fsm::depth1_metrics,

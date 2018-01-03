@@ -35,7 +35,14 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-class stateless_foraging_qt_user_functions : public argos::CQTOpenGLUserFunctions {
+/**
+ * @class stateful_foraging_qt_user_functions
+ * @ingroup support depth0
+ *
+ * @brief Contains hooks for Qt to draw the robot's ID, the block they are
+ * carrying, and the ID of the block they are carrying, if so configured.
+ */
+ class stateless_foraging_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
   stateless_foraging_qt_user_functions(void);
 

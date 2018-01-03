@@ -37,6 +37,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct loop_functions_params
+ * @ingroup params
+ */
 struct loop_functions_params : public rcppsw::common::base_params {
   loop_functions_params(void) : arena_map() {}
 

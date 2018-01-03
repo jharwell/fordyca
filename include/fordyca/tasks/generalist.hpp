@@ -40,13 +40,14 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class generalist
+ * @ingroup tasks
  *
  * @brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
  *
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager.
+ * \ref collector and \ref forager. It is not abortable.
  */
 class generalist : public task_allocation::partitionable_polled_task,
                    public foraging_task {
@@ -57,8 +58,8 @@ class generalist : public task_allocation::partitionable_polled_task,
   /* event handling */
   void accept(events::free_block_pickup &visitor) override;
   void accept(events::nest_block_drop &visitor) override;
-  void accept(__unused events::cache_block_drop &) override {};
-  void accept(__unused events::cached_block_pickup &) override {};
+  void accept(events::cache_block_drop &) override {};
+  void accept(events::cached_block_pickup &) override {};
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;

@@ -45,6 +45,7 @@ NS_START(collectors, fsm);
  ******************************************************************************/
 /**
  * @class distance_metrics_collector
+ * @ingroup metrics fsm
  *
  * @brief Collector for \ref distance_metrics.
  *

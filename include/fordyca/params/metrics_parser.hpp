@@ -38,6 +38,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class metrics_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters related to metric collection into
+ * \ref metrics_params.
+ */
 class metrics_parser: public rcppsw::common::xml_param_parser {
  public:
   metrics_parser(void): m_params() {}

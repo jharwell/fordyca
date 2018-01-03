@@ -46,10 +46,11 @@ NS_START(fsm, depth0);
  ******************************************************************************/
 /**
  * @class stateless_foraging_fsm
+ * @ingroup fsm depth0
  *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
- * block back to the nest, and fdrops it.
+ * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
                                public metrics::collectible_metrics::fsm::stateless_metrics,
@@ -102,6 +103,12 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(stateless_foraging_fsm, acquire_block,
                      state_machine::event_data);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return (&mc_state_map[index]);
   }

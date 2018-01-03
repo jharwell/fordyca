@@ -33,6 +33,12 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
+/**
+ * @class stateful_foraging_qt_user_functions
+ * @ingroup support depth0
+ *
+ * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
+ */
 class stateful_foraging_qt_user_functions : public stateless_foraging_qt_user_functions {
  public:
   stateful_foraging_qt_user_functions(void);

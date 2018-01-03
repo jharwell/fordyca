@@ -36,6 +36,7 @@ NS_START(fordyca, metrics, collectible_metrics, fsm);
  ******************************************************************************/
 /**
  * @class distance_metrics
+ * @ingroup metrics fsm
  *
  * @brief Interface defining what metrics regarding distance traveled should be
  * collected from all robots.

@@ -1,5 +1,5 @@
 /**
- * @file foraging_sensors.hpp
+ * @file depth0/foraging_sensors.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -37,6 +37,7 @@ NS_START(fordyca, controller, depth0);
  ******************************************************************************/
 /*
  * @class foraging_sensors
+ * @ingroup controller
  *
  * @brief The sensors used by depth0 (\ref stateless_foraging_controller,
  * \ref stateful_foraging_controller) controllers.
@@ -55,6 +56,8 @@ class foraging_sensors : public base_foraging_sensors {
 
   /**
    * @brief Get the robot's current line-of-sight (LOS)
+   *
+   * Not used by \ref stateless_foraging_controller.
    */
   const representation::line_of_sight* los(void) const { return m_los.get(); }
 

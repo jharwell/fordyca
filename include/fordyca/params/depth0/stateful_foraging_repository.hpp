@@ -34,6 +34,13 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class stateful_foraging_repository
+ * @ingroup params depth0
+ *
+ * @brief Collection of all parameter parsers and parse results needed by
+ * \ref stateful_foraging_controller.
+ */
 class stateful_foraging_repository: public rcppsw::common::xml_param_repository {
  public:
   stateful_foraging_repository(void);

@@ -36,6 +36,10 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct perceived_arena_map_params
+ * @ingroup params depth0
+ */
 struct perceived_arena_map_params : public rcppsw::common::base_params {
   perceived_arena_map_params(void) : grid(), pheromone() {}
 

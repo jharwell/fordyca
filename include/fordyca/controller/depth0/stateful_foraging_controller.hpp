@@ -57,10 +57,11 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class stateful_foraging_controller
+ * @ingroup controller depth0
  *
  * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge decays according to an exponential model, @see
- * pheromone_density).
+ * time (knowledge decays according to an exponential model,
+ * @see pheromone_density).
  *
  * Robots using this controller execute the \ref generalist task, in which a
  * block is acquired (either via randomized exploring or by vectoring to a known

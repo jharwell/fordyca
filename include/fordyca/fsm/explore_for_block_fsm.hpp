@@ -39,6 +39,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * @class explore_for_block_fsm
+ * @ingroup fsm
  *
  * @brief Robots executing this task will roam around randomly looking for a
  * free block. Once they have found one, the FSM will signal that its task is
@@ -48,9 +49,24 @@ class explore_for_block_fsm : public base_explore_fsm {
  public:
   enum fsm_states {
     ST_START,
+    /**
+     * Roaming around looking for a block.
+     */
     ST_EXPLORE,
-    ST_COLLISION_AVOIDANCE,   /* Avoiding colliding with something */
-    ST_NEW_DIRECTION,         /* Time to change direction during exploration */
+
+    /**
+     * Obstacle nearby--avoid it.
+     */
+    ST_COLLISION_AVOIDANCE,
+
+    /**
+     * Changing direction to a (hopefully) more profitable search trajectory.
+     */
+    ST_NEW_DIRECTION,
+
+    /**
+     * A block has been acquired.
+     */
     ST_FINISHED,
     ST_MAX_STATES
   };
@@ -102,6 +118,10 @@ class explore_for_block_fsm : public base_explore_fsm {
    */
   HFSM_STATE_DECLARE_ND(explore_for_block_fsm, explore);
 
+  /**
+   * @brief Once a block has been acquired, robots wait in this state until
+   * reset by a higher level FSM.
+   */
   HFSM_STATE_DECLARE_ND(explore_for_block_fsm, finished);
 
   /**
@@ -109,10 +129,6 @@ class explore_for_block_fsm : public base_explore_fsm {
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
-   *
-   * Note also that all robots will share the SAME state map in memory, so you
-   * cannot change the parent of any statein this FSM for only SOME other
-   * objects. But that should not be necessary, as it is taskable.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];

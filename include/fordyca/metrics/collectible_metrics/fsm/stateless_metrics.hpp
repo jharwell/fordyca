@@ -36,6 +36,7 @@ NS_START(fordyca, metrics, collectible_metrics, fsm);
  ******************************************************************************/
 /**
  * @class stateless_metrics
+ * @ingroup metrics fsm
  *
  * @brief Interface defining what metrics should be collected from any robot
  * executing the \ref stateless_foraging_controller, or any controller logically

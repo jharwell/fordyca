@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <vector>
 #include <argos/core/utility/math/vector2.h>
 
 #include "fordyca/representation/real_coord.hpp"
@@ -43,6 +44,7 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 /**
  * @class cache_creator
+ * @ingroup support depth1
  *
  * @brief Base class for creating static/dynamic caches in the arena.
  *
@@ -64,7 +66,15 @@ class cache_creator : public rcppsw::er::client {
   virtual std::vector<representation::cache> create_all(
       std::vector<representation::block*>& blocks) = 0;
 
-  void update_host_cells(std::vector<representation::cache>& caches);
+  /**
+   * @brief Update the cells for all newly created caches to reflect the fact
+   * they now contain caches.
+   *
+   * @param grid The arena map grid.
+   * @param caches Vector of newly created caches.
+   */
+  static void update_host_cells(representation::occupancy_grid& grid,
+                                std::vector<representation::cache>& caches);
 
  protected:
   representation::occupancy_grid& grid(void) const { return m_grid; }

@@ -46,15 +46,15 @@ class line_of_sight;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
  * @class perceived_arena_map
+ * @ingroup representation
  *
  * @brief The arena map stores a logical representation of the state of the
  * arena, from the perspective of the robot.
  *
  * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
- * where they actually live (clone not referenc), which decouples/simplifies a
+ * where they actually live (clone not reference), which decouples/simplifies a
  * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
 class perceived_arena_map: public rcppsw::er::client,
@@ -90,10 +90,40 @@ class perceived_arena_map: public rcppsw::er::client,
    */
   std::vector<representation::cache>& caches(void) { return m_caches; }
 
+  /**
+   * @brief Add a cache to the list of perceived caches.
+   *
+   * If the cache is already in the list of known caches it needs to be removed,
+   * because the new version we just got from our LOS is more up to date.
+   *
+   * @param cache Cache to add.
+   */
   void cache_add(representation::cache& cache);
+
+  /**
+   * @brief Remove a cache from the list of perceived caches.
+   *
+   * If we are removing a cache whose relevance probably has not yet expired,
+   * but we do not want to update the state of its hosting cell to empty just
+   * yet, like we do for blocks, the reason being that the logic for correctly
+   * doing so lies in the \ref cached_block_pickup class, and doing it here
+   * makes it impossible to handle OTHER cases of cached block pickup. So just
+   * erase the cache here.
+   */
   void cache_remove(representation::cache& victim);
 
+  /*
+   * @brief Add a free block to the list of known blocks.
+   *
+   * If the block is already in our list of blocks we know about it needs to be
+   * removed, because the new version we just got from our LOS is more up to
+   * date.
+   */
   void block_add(representation::block& block);
+
+  /*
+   * @brief Remove a block from the list of known blocks.
+   */
   void block_remove(representation::block& victim);
 
   /**

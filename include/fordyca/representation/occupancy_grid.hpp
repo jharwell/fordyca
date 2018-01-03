@@ -1,5 +1,6 @@
 /**
  * @file occupancy_grid.hpp
+ * @ingroup representation
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

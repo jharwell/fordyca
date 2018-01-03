@@ -49,6 +49,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class block_pickup_event
+ * @ingroup events
  *
  * @brief Interface specifying the minimum set of classes that any event
  * involving picking up a block will need to visit.

@@ -57,6 +57,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class acquire_block_fsm
+ * @ingroup fsm
  *
  * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.
@@ -136,6 +137,12 @@ class acquire_block_fsm : public base_foraging_fsm,
 
   HFSM_EXIT_DECLARE(acquire_block_fsm, exit_acquire_block);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }

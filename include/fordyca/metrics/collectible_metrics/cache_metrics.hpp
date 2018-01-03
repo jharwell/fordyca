@@ -36,6 +36,7 @@ NS_START(fordyca, metrics, collectible_metrics);
  ******************************************************************************/
 /**
  * @class cache_metrics
+ * @ingroup metrics
  *
  * @brief Interface defining collectible metrics on static/dynamic caches in the
  * arena.
@@ -46,7 +47,7 @@ class cache_metrics : public base_collectible_metrics {
   ~cache_metrics(void) override = default;
 
   /**
-   * @brif Get the # of blocks in the cache
+   * @brief Get the # of blocks in the cache
    */
   virtual size_t n_blocks(void) const = 0;
 
@@ -58,7 +59,7 @@ class cache_metrics : public base_collectible_metrics {
 
   /**
    * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
-   * that have been picked dropped in the cache
+   * that have been dropped in the cache
    */
   virtual size_t n_block_drops(void) const = 0;
 };

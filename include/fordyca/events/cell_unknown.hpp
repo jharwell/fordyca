@@ -41,6 +41,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class cell_unknown
+ * @ingroup events
  *
  * @brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.

@@ -165,7 +165,7 @@ void arena_map::static_cache_create(void) {
   } /* for(b..) */
 
   m_caches = c.create_all(blocks);
-  c.update_host_cells(m_caches);
+  c.update_host_cells(m_grid, m_caches);
 } /* static_cache_create() */
 
 void arena_map::distribute_blocks(void) {

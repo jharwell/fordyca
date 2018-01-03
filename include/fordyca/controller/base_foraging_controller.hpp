@@ -45,6 +45,7 @@ class base_foraging_sensors;
  ******************************************************************************/
 /**
  * @class base_foraging_controller
+ * @ingroup controller
  *
  * @brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some

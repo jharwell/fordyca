@@ -43,12 +43,13 @@ class cell2D;
  ******************************************************************************/
 /**
  * @class line_of_sight
+ * @ingroup representation
  *
  * @brief A representation of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
  *
- * The LOS for a robot is always square' UNLESS the robot is near the edge of
+ * The LOS for a robot is always square UNLESS the robot is near the edge of
  * the arena, and a square grid would result in out-of-bounds array accesses. In
  * that case, a truncated LOS is created.
  *

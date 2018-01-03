@@ -36,6 +36,10 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct task_params
+ * @ingroup params depth1
+ */
 struct task_params : public rcppsw::common::base_params {
   task_params(void) : tasks() {}
 

@@ -40,12 +40,14 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class cell_empty
+ * @ingroup events
  *
  * @brief Created whenever a cell needs to go from some other state to being
  * empty.
  *
  * The most common example of this is when a free block is picked up, and the
- * square that the block was on is now empty.
+ * square that the block was on is now  (probably) empty. It might not be if in
+ * the same timestep a new cache is created on that same cell.
  */
 class cell_empty : public cell_op,
                    public visitor::can_visit<representation::arena_map>,

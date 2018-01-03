@@ -108,11 +108,6 @@ void perceived_arena_map::update_density(void) {
 } /* update_density() */
 
 void perceived_arena_map::cache_add(representation::cache &cache) {
-  /*
-   * If the cache is already in our list of caches we know about it needs to be
-   * removed, because the new version we just got from our LOS is more up to
-   * date.
-   */
   auto it = std::find(m_caches.begin(), m_caches.end(), cache);
   if (m_caches.end() != it) {
     cache_remove(*it);
@@ -121,23 +116,10 @@ void perceived_arena_map::cache_add(representation::cache &cache) {
 } /* cache_add() */
 
 void perceived_arena_map::cache_remove(representation::cache &victim) {
-  /*
-   * We are removing a cache whose relevance probably has not yet expired, but
-   * we do not want to update the state of its hosting cell to empty just yet,
-   * like we do for blocks, the reason being that the logic for correctly doing
-   * so lies in the \ref cached_block_pickup class, and doing it here makes it
-   * impossible to handle OTHER cases of cached block pickup. So just erase the
-   * cache here.
-   */
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
 
 void perceived_arena_map::block_add(representation::block &block) {
-  /*
-   * If the block is already in our list of blocks we know about it needs to be
-   * removed, because the new version we just got from our LOS is more up to
-   * date.
-   */
   auto it = std::find(m_blocks.begin(), m_blocks.end(), block);
   /*
    * If we already know about the block that we are adding from our current LOS,

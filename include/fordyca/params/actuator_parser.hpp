@@ -37,6 +37,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class actuator_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters for \ref actuator_manager into
+ * \ref actuator_params.
+ */
 class actuator_parser : public rcppsw::common::xml_param_parser {
  public:
   actuator_parser(void) : m_params() {}

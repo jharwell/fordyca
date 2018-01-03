@@ -1,5 +1,6 @@
 /**
  * @file discrete_coord.hpp
+ * @ingroup representation
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -41,8 +42,17 @@ using discrete_coord = std::pair<size_t, size_t>;
 /*******************************************************************************
  * Functions
  ******************************************************************************/
+/**
+ * @brief Translate real (continuous) coordinates to discrete ones using the
+ * specified resolution.
+ */
 discrete_coord real_to_discrete_coord(const argos::CVector2& r_coord,
                                       double resolution);
+
+/**
+ * @brief Translate discrete coordinates to real (continuous) ones using the
+ * specified resolution.
+ */
 argos::CVector2 discrete_to_real_coord(const discrete_coord& d_coord,
                                        double resolution);
 

@@ -41,6 +41,7 @@ NS_START(events);
  ******************************************************************************/
 /*
  * @class cache_found
+ * @ingroup events
  *
  * @brief Created whenever a NEW cache (i.e. one that is not currently known to
  * a robot, but possibly one that it has seen before and whose relevance had
@@ -63,13 +64,8 @@ class cache_found : public perceived_cell_op,
   /* depth1 foraging */
   void visit(representation::perceived_arena_map& map) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(__unused controller::depth1::foraging_controller&) override {}
-  void visit(__unused controller::depth0::stateful_foraging_controller&) override {}
-
-  /**
-   * @brief Get the handle on the cache that has been found.
-   */
-  /* const representation::cache* cache(void) const { return m_cache; } */
+  void visit(controller::depth1::foraging_controller&) override {}
+  void visit(controller::depth0::stateful_foraging_controller&) override {}
 
  private:
   representation::cache* m_cache;

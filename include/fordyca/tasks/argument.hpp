@@ -40,9 +40,11 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class vector_argument
+ * @ingroup tasks
  *
- * @brief An argument that can be passed to a \ref task_start() function which
- * contains a vector, mostly likely representing an arena location.
+ * @brief An argument that can be passed to a
+ * \ref rcppsw.task_allocation.taskable function which contains a vector, mostly
+ * likely representing an arena location.
  */
 class vector_argument : public task_allocation::taskable_argument {
  public:
@@ -59,10 +61,11 @@ class vector_argument : public task_allocation::taskable_argument {
 
 /**
  * @class foraging_signal_argument
+ * @ingroup tasks
  *
- * @brief An argument that can be passed to a \ref task_start() function which
- * contains a foraging signal, for use in specifying initial conditions/commands
- * for certain state machines.
+ * @brief An argument that can be passed to a
+ * \ref rcppsw::task_allocation::taskable::task_start() function which contains a foraging signal,
+ * for use in specifying initial conditions/commands for certain state machines.
  */
 class foraging_signal_argument : public task_allocation::taskable_argument {
  public:

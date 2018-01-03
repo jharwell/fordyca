@@ -1,5 +1,9 @@
 /**
  * @file loop_functions_utils.hpp
+ * @ingroup support
+ *
+ * Helpers for loop functions that CAN be free functions, as they do not require
+ * access to anything in \ref argos::CLoopFunctions.
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

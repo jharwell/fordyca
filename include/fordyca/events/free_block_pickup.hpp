@@ -54,6 +54,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class free_block_pickup
+ * @ingroup events
  *
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
@@ -72,6 +73,9 @@ class free_block_pickup : public cell_op,
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                     representation::block* block, size_t robot_index);
   ~free_block_pickup(void) { client::rmmod(); }
+
+  free_block_pickup(const free_block_pickup& op) = delete;
+  free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   /* stateless foraging */
   void visit(representation::arena_map& map) override;
@@ -95,9 +99,6 @@ class free_block_pickup : public cell_op,
   void visit(tasks::forager& task) override;
 
  private:
-  free_block_pickup(const free_block_pickup& op) = delete;
-  free_block_pickup& operator=(const free_block_pickup& op) = delete;
-
   size_t m_robot_index;
   representation::block* m_block;
   std::shared_ptr<rcppsw::er::server> m_server;

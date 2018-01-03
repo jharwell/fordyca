@@ -47,6 +47,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class perceived_cell_op
+ * @ingroup events
  *
  * @brief Non-abstract interface defining the minimum visit set for al events
  * that involve robot perception.

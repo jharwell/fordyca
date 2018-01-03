@@ -50,6 +50,7 @@ class cell2D;
  ******************************************************************************/
 /**
  * @class arena_map
+ * @ingroup representation
  *
  * @brief The arena map stores a logical representation of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
@@ -96,10 +97,12 @@ class arena_map: public rcppsw::er::client,
    * policy was specified in the .argos file.
    *
    * @param block The block to distribute.
-   * @param first_time Is this the first time distributing this block?
    */
   void distribute_block(block* block);
 
+  /**
+   * @brief (Re)-create the static cache in the arena (depth 1 only).
+   */
   void static_cache_create(void);
 
   bool has_static_cache(void) const { return mc_cache_params.create_static; }
@@ -121,9 +124,10 @@ class arena_map: public rcppsw::er::client,
    *
    * While the robots also have their own means of checking if they are on a
    * block or not, there are some false positives, so this function is used as
-   * the final arbiter when deciding whether or not to trigger a "block_found"
-   * event for a particular robot. This happens during initialization when the
-   * robot's sensors have not yet been properly initialized by ARGoS.
+   * the final arbiter when deciding whether or not to trigger a \ref
+   * block_found event or a \ref free_block_pickup event for a particular
+   * robot. This happens during initialization when the robot's sensors have not
+   * yet been properly initialized by ARGoS.
    *
    * @param pos The position of a robot.
    *
@@ -132,6 +136,23 @@ class arena_map: public rcppsw::er::client,
    */
   int robot_on_block(const argos::CVector2& pos);
 
+  /**
+   * @brief Determine if a robot is currently on top of a cache (i.e. if the
+   * center of the robot has crossed over into the space occupied by the block
+   * extent).
+   *
+   * While the robots also have their own means of checking if they are on a
+   * cache or not, there are some false positives, so this function is used as
+   * the final arbiter when deciding whether or not to trigger a
+   * \ref cache_block_drop or a \ref cached_block_pickup event for a particular
+   * robot. This happens during initialization when the robot's sensors have not
+   * yet been properly initialized by ARGoS.
+   *
+   * @param pos The position of a robot.
+   *
+   * @return The ID of the cache that the robot is on, or -1 if the robot is not
+   * actually on a cache.
+   */
   int robot_on_cache(const argos::CVector2& pos);
 
   /**

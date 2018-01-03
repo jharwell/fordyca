@@ -44,10 +44,10 @@ class cell_entity;
  ******************************************************************************/
 /**
  * @class cell2D
+ * @ingroup representation
  *
- * @brief Base representation of a cell on a 2D grid. This class represents
- * the ACTUAL state of the grid (i.e. not whatever robots happen to think the
- * state is).
+ * @brief Base representation of a cell on a 2D grid. A combination of FSM +
+ * handle to whatever \ref cell_entity the cell contains, if any.
  */
 class cell2D : public visitor::visitable_any<cell2D> {
  public:

@@ -37,13 +37,22 @@ NS_START(fordyca, metrics, collectors, fsm);
  ******************************************************************************/
 /**
  * @class stateful_metrics_collector
+ * @ingroup metrics fsm
  *
  * @brief Collector for \ref stateful_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics are written out every timestep, or after the specified interval,
+ * depending.
  */
 class stateful_metrics_collector : public base_metric_collector {
  public:
+  /**
+   * @param ofname Output file name.
+   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
+   * specified interval, and written out and reset at the end of it. If
+   * \c FALSE, they will be written out every timestep.
+   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   */
   stateful_metrics_collector(const std::string ofname,
                              bool collect_cum,
                              uint collect_interval);

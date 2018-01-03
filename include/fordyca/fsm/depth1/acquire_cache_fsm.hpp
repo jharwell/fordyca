@@ -58,6 +58,7 @@ NS_START(fsm, depth1);
  ******************************************************************************/
 /**
  * @class acquire_cache_fsm
+ * @ingroup fsm depth1
  *
  * @brief The FSM for an acquiring a block from a cache in the arena.
  *
@@ -136,18 +137,18 @@ class acquire_cache_fsm : public base_foraging_fsm,
    */
   bool acquire_known_cache(std::list<representation::perceived_cache> caches);
 
-  /*
-   * States for locate_block FSM. Note that the states for the vector_fsm
-   * sub-fsm cannot be part of the locate_block hfsm, because that sub-fsm is
-   * initiated from multiple states, and hfsm states can only have ONE parent
-   * state.
-   **/
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, finished);
 
   HFSM_EXIT_DECLARE(acquire_cache_fsm, exit_acquire_cache);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
     return &mc_state_map[index];
   }

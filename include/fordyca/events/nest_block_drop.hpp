@@ -56,6 +56,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class nest_block_drop
+ * @ingroup events
  *
  * @brief Fired whenever a robot drops a block in the nest.
  */
@@ -75,13 +76,15 @@ class nest_block_drop : public visitor::visitor,
              representation::block* block);
   ~nest_block_drop(void) { client::rmmod(); }
 
+  nest_block_drop(const nest_block_drop& op) = delete;
+  nest_block_drop& operator=(const nest_block_drop& op) = delete;
+
   /* stateless foraging */
   void visit(representation::arena_map& map) override;
   void visit(metrics::collectors::block_metrics_collector& collector) override;
   void visit(representation::block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(controller::depth0::stateless_foraging_controller& controller) override;
-
 
   /* stateful foraging */
   void visit(controller::depth0::stateful_foraging_controller& controller) override;
@@ -99,8 +102,6 @@ class nest_block_drop : public visitor::visitor,
   representation::block* block(void) const { return m_block; }
 
  private:
-  nest_block_drop(const nest_block_drop& op) = delete;
-  nest_block_drop& operator=(const nest_block_drop& op) = delete;
   representation::block* m_block;
 };
 

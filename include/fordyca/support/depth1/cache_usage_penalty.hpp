@@ -40,10 +40,10 @@ NS_START(support, depth1);
  ******************************************************************************/
 /**
  * @class cache_usage_penalty
+ * @ingroup support depth1
  *
- * @brief Handles subjecting a controller to a penalty when picking up
- * from/dropping in a cache via a specified timeout in which robots will sit
- * still.
+ * @brief Handles subjecting a robot to a penalty when picking up from/dropping
+ * in a cache via a specified timeout in which the robot will sit still.
  */
 class cache_usage_penalty {
  public:
