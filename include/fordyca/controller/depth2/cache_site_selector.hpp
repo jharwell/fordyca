@@ -41,9 +41,11 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 /**
  * @class cache_site_selector
+ * @ingroup depth2
+ *
  * @brief Selects the best cache site between the location of the block pickup
  * and the nest (ideally the halfway point), subject to constraints such as it
- * can't be too new other known caches.
+ * can't be too near other known caches.
  */
 class cache_site_selector: public rcppsw::er::client {
  public:

@@ -37,13 +37,22 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 /**
  * @class task_collector
+ * @ingroup metrics
  *
  * @brief Collector for \ref task_metrics.
  *
- * Metrics are written out at the specified interval.
+ * Metrics are written out at the specified interval, or every timestep,
+ * depending.
  */
 class task_collector : public base_metric_collector {
  public:
+  /**
+   * @param ofname Output file name.
+   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
+   * specified interval, and written out and reset at the end of it. If
+   * \c FALSE, they will be written out every timestep.
+   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   */
   task_collector(const std::string ofname,
                  bool collect_cum,
                  uint collect_interval);

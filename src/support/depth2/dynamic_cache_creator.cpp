@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/dynamic_cache_creator.hpp"
+#include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -91,4 +91,4 @@ argos::CVector2 dynamic_cache_creator::calc_center(
   return argos::CVector2(x / blocks.size(), y / blocks.size());
 } /* calc_center() */
 
-NS_END(depth1, support, fordyca);
+NS_END(depth2, support, fordyca);

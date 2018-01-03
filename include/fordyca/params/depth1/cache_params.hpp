@@ -35,6 +35,10 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct cache_params
+ * @ingroup params depth1
+ */
 struct cache_params : public rcppsw::common::base_params {
   bool create_static{false};
   bool create_dynamic{false};

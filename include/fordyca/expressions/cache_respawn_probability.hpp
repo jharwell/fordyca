@@ -37,6 +37,7 @@ NS_START(fordyca, expressions);
  ******************************************************************************/
 /**
  * @class cache_respawn_probability
+ * @ingroup expressions
  *
  * @brief Calculate the probability that loop functions should respawn a static
  * cache after it has been emptied (turned into a single block that is).

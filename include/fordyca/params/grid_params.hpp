@@ -35,6 +35,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct grid_params
+ * @ingroup params
+ */
 struct grid_params : public rcppsw::common::base_params {
   grid_params(void) : upper(), lower() {}
 

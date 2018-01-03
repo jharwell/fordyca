@@ -36,10 +36,10 @@ NS_START(fordyca, metrics, collectible_metrics, fsm);
  ******************************************************************************/
 /**
  * @class depth1_metrics
+ * @ingroup metrics fsm
  *
  * @brief Interface defining what metrics that should be collected from robots
- * executing the \ref depth1::foraging_controller, or any controller derived
- * from that one.
+ * executing the depth1 foraging controller.
  */
 class depth1_metrics : public base_collectible_metrics {
  public:
@@ -67,7 +67,7 @@ class depth1_metrics : public base_collectible_metrics {
 
   /**
    * @brief If \c TRUE, then the robot is currently running the
-   * \ref block_to_cach_fsm, and is transporting an acquired block to its cache
+   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
    * of choice.
    */
   virtual bool is_transporting_to_cache(void) const = 0;

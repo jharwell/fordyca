@@ -51,6 +51,7 @@ class cache_usage_penalty;
  ******************************************************************************/
 /**
  * @class foraging_loop_functions
+ * @ingroup support depth1
  *
  * @brief The loop functions for depth 1 foraging.
  *

@@ -48,6 +48,7 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * @class base_foraging_sensors
+ * @ingroup controller
  *
  * @brief The base sensor class for all sensors used by the different foraging
  * controllers. Contains common functionality to all sensors.
@@ -131,13 +132,32 @@ class base_foraging_sensors {
   argos::CCI_FootBotLightSensor* light(void) const { return m_light; }
   argos::CCI_FootBotMotorGroundSensor* ground(void) const { return m_ground; }
   double diffusion_delta(void) const { return mc_obstacle_delta; }
-  const argos::CRange<argos::CRadians>& go_straight_angle_range(void) const {
-    return mc_go_straight_angle_range;
-  }
+
+  /**
+   * @brief Figure out if a threatening obstacle exists near to the robot's
+   * current location.
+   *
+   * A threatening obstacle is defined as one that is closer than the defined
+   * obstacle delta to the robot. Note that the obstacle delta is NOT a measure
+   * of distance, but a measure [0, 1] indicating how close an obstacle is which
+   * increases exponentially as the obstacle nears.
+   *
+   * @return \c TRUE if a threatening obstacle is found, \c FALSE otherwise.
+   */
   bool threatening_obstacle_exists(void);
+
+  /**
+   * @brief Return the closest obstacle (i.e. the most threatening).
+   *
+   * Should be used in conjunction with \ref threatening_obstacle_exists().
+   */
   argos::CVector2 find_closest_obstacle(void);
 
  private:
+  /**
+   * @brief Determine if the obstacle represented by its closest point to the
+   * robot is threatening.
+   */
   bool obstacle_is_threatening(const argos::CVector2& obstacle);
 
   uint                                        m_tick;

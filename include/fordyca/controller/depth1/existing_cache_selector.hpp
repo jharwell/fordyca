@@ -40,9 +40,11 @@ NS_START(fordyca, controller, depth1);
  ******************************************************************************/
 /**
  * @class existing_cache_selector
+ * @ingroup controller depth1
  *
- * @brief Selects from among existing caches for the best one to go get a block
- * from.
+ * @brief Selects from among known caches (which are presumed to still exist at
+ * this point, although that may not be true as a robot's knowledge of the arena
+ * is imperfect).
  */
 class existing_cache_selector: public rcppsw::er::client {
  public:

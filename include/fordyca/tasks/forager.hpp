@@ -41,9 +41,10 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class forager
+ * @ingroup tasks
  *
  * @brief Task in which robots locate a free block and bring it to a known
- * cache.
+ * cache. It is abortable, and has one task interface.
  */
 class forager : public task_allocation::polled_task, public foraging_task {
  public:

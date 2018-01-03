@@ -66,7 +66,7 @@ add_dependencies(${target} rcppsw_EXTERNAL-build rcsw_EXTERNAL-build)
 
 # Use the actual .a files rather than rcppsw/rcsw project names to force
 # recompilation of fordyca when a source file within one of those libraries
-# changes. 
+# changes.
 target_link_libraries(${target}
   ${rcppsw_LIB}
   ${rcsw_LIB}

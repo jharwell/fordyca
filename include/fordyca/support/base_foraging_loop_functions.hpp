@@ -46,6 +46,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * @class base_foraging_loop_functions
+ * @ingroup support
  *
  * @brief The base loop functions in FORDYCA that all other loop functions
  * inherit from.
@@ -61,6 +62,13 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
 
   void Init(argos::TConfigurationNode&) override { m_floor = &GetSpace().GetFloorEntity(); }
 
+  /**
+   * @brief Determine if a robot is waiting to pick up a free block, and if it
+   * is actually on a free block, send it the \ref free_block_pickup event.
+   *
+   * @return \c TRUE if the robot was sent the \ref free_block_pickup event,
+   * \c FALSE otherwise.
+   */
   template<typename T>
   bool handle_free_block_pickup(argos::CFootBotEntity& robot,
                                 representation::arena_map& map) {
@@ -84,6 +92,13 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
     return false;
   }
 
+  /**
+   * @brief Determine if a robot is waiting to drop a block in the nest, and if
+   * so send it the \ref nest_block_drop event.
+   *
+   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
+   * otherwise.
+   */
   template <typename T>
   bool handle_nest_block_drop(argos::CFootBotEntity& robot,
                               representation::arena_map& map,

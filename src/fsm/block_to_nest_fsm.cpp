@@ -133,18 +133,6 @@ HFSM_STATE_DEFINE(block_to_nest_fsm,
     m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_NEST);
   }
-  /*
-   * It is possible that robots can be waiting in this wait indefinitely for a
-   * block pickup signal that will never come if they got here by "detecting" a
-   * block by sprawling across multiple blocks (i.e. all ground sensors did not
-   * detect the same block). This is only a problem for generalists, who
-   * cannot/do not abort their tasks.
-   *
-   * In that case, the timeout here will cause the robot to try again, and
-   * because of the decaying relevance of cells, it will eventually pick a
-   * different block than the one that got it into this predicament, and the
-   * system will be able to continue profitably.
-   */
   ++m_pickup_count;
   if (m_pickup_count >= kPICKUP_TIMEOUT) {
     m_pickup_count = 0;

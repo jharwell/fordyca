@@ -40,6 +40,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 /**
  * @class cell_entity
+ * @ingroup representation
  *
  * @brief A base class from which objects that are able to occupy a cell within
  * a 2D grid derive.

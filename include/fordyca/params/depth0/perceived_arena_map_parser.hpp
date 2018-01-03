@@ -40,6 +40,13 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class perceived_arena_map_parser
+ * @ingroup params depth0
+ *
+ * @brief Parses XML parameters for \ref perceived_arena_map into
+ * \ref perceived_arena_map_params.
+ */
 class perceived_arena_map_parser: public rcppsw::common::xml_param_parser {
  public:
   perceived_arena_map_parser(void): m_params(), m_grid_parser(),

@@ -35,6 +35,10 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct wheel_params
+ * @ingroup params
+ */
 struct wheel_params {
   wheel_params(void)
       : soft_turn_max(),
@@ -46,6 +50,10 @@ struct wheel_params {
 };
 
 
+/**
+ * @struct actuator_params
+ * @ingroup params
+ */
 struct actuator_params : public rcppsw::common::base_params {
   actuator_params(void) : wheels() {}
 

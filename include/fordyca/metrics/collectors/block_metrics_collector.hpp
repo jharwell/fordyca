@@ -42,6 +42,7 @@ NS_START(collectors);
  ******************************************************************************/
 /**
  * @class block_metrics_collector
+ * @ingroup metrics
  *
  * @brief Collector for \ref block_metrics.
  *

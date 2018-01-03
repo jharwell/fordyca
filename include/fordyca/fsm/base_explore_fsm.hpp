@@ -45,6 +45,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class base_explore_fsm
+ * @ingroup fsm
  *
  * @brief The base FSM for an exploration subtask. Does not actually contain an
  * FSM per-se, but just some pieces common to all exploration FSMs.
@@ -64,7 +65,7 @@ class base_explore_fsm : public base_foraging_fsm,
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
 
   /* taskable overrides */
-  void task_start( __unused const rcppsw::task_allocation::taskable_argument*) override {}
+  void task_start(const rcppsw::task_allocation::taskable_argument*) override {}
 
   /**
    * @brief Reset the FSM
@@ -104,7 +105,7 @@ class base_explore_fsm : public base_foraging_fsm,
    * @brief Robots entering this state will randomly change their exploration
    * direction to the specified direction. All signals are ignored in this
    * state. Once the direction change has been accomplished, the robot will
-   * transition back to \enum fsm_states::ST_EXPLORE.
+   * transition back to its previous state.
    */
   HFSM_STATE_DECLARE(base_explore_fsm, new_direction, state_machine::event_data);
 

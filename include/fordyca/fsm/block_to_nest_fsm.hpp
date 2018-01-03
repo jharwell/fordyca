@@ -56,6 +56,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class block_to_nest_fsm
+ * @ingroup fsm
  *
  * @brief Each robot executing this FSM will locate for a block (either a known
  * block or via random exploration), pickup the block and bring it all the way
@@ -133,14 +134,22 @@ class block_to_nest_fsm : public base_foraging_fsm,
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_FREE_BLOCK,    /* superstate for finding a  free block */
+    /**
+     * Superstate for finding a free block.
+     */
+    ST_ACQUIRE_FREE_BLOCK,
+
     /**
      * @brief State robots wait in after acquiring a block for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_BLOCK_PICKUP,
-    ST_ACQUIRE_CACHED_BLOCK,  /* superstate for finding a cached block */
+
+    /**
+     * Superstate for finding a cached block.
+     */
+    ST_ACQUIRE_CACHED_BLOCK,
 
     /**
      * @brief State robots wait in after acquiring a cache for the simulation to
@@ -148,13 +157,36 @@ class block_to_nest_fsm : public base_foraging_fsm,
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_CACHE_PICKUP,
-    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+
+    /**
+     * Block found--bring it back to the nest.
+     */
+    ST_TRANSPORT_TO_NEST,
+
+    /**
+     * Obstacle nearby--avoid it.
+     */
     ST_COLLISION_AVOIDANCE,
+
+    /**
+     * Block has been brought to the nest successfully.
+     */
     ST_FINISHED,
     ST_MAX_STATES,
   };
 
  private:
+  /**
+   * @brief It is possible that robots can be waiting indefinitely for a block
+   * pickup signal that will never come once a block has been acquired if they
+   * "detect" a block by sprawling across multiple blocks (i.e. all ground
+   * sensors did not detect the same block).
+   *
+   * In that case, this timeout will cause the robot to try again to acquire a
+   * block, and because of the decaying relevance of cells, it will eventually
+   * pick a different block than the one that got it into this predicament, and
+   * the system will be able to continue profitably.
+   */
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
@@ -175,6 +207,12 @@ class block_to_nest_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
   HFSM_ENTRY_DECLARE_ND(block_to_nest_fsm, entry_wait_for_pickup);
 
+  /**
+   * @brief Defines the state map for the FSM.
+   *
+   * Note that the order of the states in the map MUST match the order of the
+   * states in \enum fsm_states, or things will not work correctly.
+   */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return &mc_state_map[index];
   }

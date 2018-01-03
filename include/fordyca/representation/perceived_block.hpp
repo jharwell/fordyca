@@ -1,5 +1,6 @@
 /**
  * @file perceived_block.hpp
+ * @ingroup representation
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

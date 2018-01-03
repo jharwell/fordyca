@@ -52,8 +52,9 @@ NS_START(tasks);
  ******************************************************************************/
 /**
  * @class foraging_task
+ * @ingroup tasks
  *
- * @brief Interface specified the visit set for all foraging tasks in FORDYCA.
+ * @brief Interface specifying the visit set for all foraging tasks in FORDYCA.
  */
 class foraging_task : public metrics::collectible_metrics::fsm::stateless_metrics,
                       public metrics::collectible_metrics::fsm::stateful_metrics,

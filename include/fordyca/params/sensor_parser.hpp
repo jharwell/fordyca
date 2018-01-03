@@ -37,6 +37,12 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class sensor_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to sensors into \ref sensor_params.
+ */
 class sensor_parser: public rcppsw::common::xml_param_parser {
  public:
   sensor_parser(void) : m_params() {}

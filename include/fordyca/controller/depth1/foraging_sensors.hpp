@@ -1,5 +1,5 @@
 /**
- * @file depth1_foraging_sensors.hpp
+ * @file depth1/foraging_sensors.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -36,8 +36,9 @@ NS_START(fordyca, controller, depth1);
  ******************************************************************************/
 /**
  * @class foraging_sensors
+ * @ingroup controller depth1
  *
- * @brief The sensors used by the depth1 foraging controller
+ * @brief The sensors used by the depth1 foraging controller.
  */
 class foraging_sensors: public depth0::foraging_sensors {
  public:

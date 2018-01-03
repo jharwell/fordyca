@@ -45,6 +45,7 @@ namespace rmetrics = metrics::collectible_metrics::fsm;
  ******************************************************************************/
 /**
  * @class stateless_foraging_controller
+ * @ingroup controller depth0
  *
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.

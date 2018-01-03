@@ -41,6 +41,7 @@ namespace visitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class cell2D_fsm
+ * @ingroup fsm
  *
  * @brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown).

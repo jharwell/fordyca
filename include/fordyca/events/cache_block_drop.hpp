@@ -46,6 +46,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class cache_block_drop
+ * @ingroup events
  *
  * @brief Created whenever a robot drops a block in a cache.
  *
@@ -65,6 +66,9 @@ class cache_block_drop : public cell_op,
                    double resolution);
   ~cache_block_drop(void) { client::rmmod(); }
 
+  cache_block_drop(const cache_block_drop& op) = delete;
+  cache_block_drop& operator=(const cache_block_drop& op) = delete;
+
   /* depth1 foraging */
   void visit(class representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
@@ -78,9 +82,6 @@ class cache_block_drop : public cell_op,
   void visit(tasks::forager& task) override;
 
  private:
-  cache_block_drop(const cache_block_drop& op) = delete;
-  cache_block_drop& operator=(const cache_block_drop& op) = delete;
-
   double m_resolution;
   representation::block* m_block;
   representation::cache* m_cache;

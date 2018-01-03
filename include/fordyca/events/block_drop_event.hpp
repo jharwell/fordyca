@@ -43,6 +43,7 @@ NS_START(events);
  ******************************************************************************/
 /**
  * @class block_drop_event
+ * @ingroup events
  *
  * @brief Interface specifying the minimum set of classes any action involving
  * dropping a block will need to visit.

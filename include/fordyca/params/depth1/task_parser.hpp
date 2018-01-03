@@ -40,6 +40,12 @@ struct task_params;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class task_parser
+ * @ingroup params depth1
+ *
+ * @brief Parses XML parameters for relating to tasks into \ref task_params.
+ */
 class task_parser: public rcppsw::common::xml_param_parser {
  public:
   task_parser(void) : m_params() {}

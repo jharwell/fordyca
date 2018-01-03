@@ -38,6 +38,7 @@ NS_START(fordyca, expressions);
  ******************************************************************************/
 /**
  * @class cache_site_utility
+ * @ingroup expressions
  *
  * @brief Calculates the utility associated with a new cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.

@@ -1,5 +1,5 @@
 /**
- * @file foraging_sensors.cpp
+ * @file depth1/foraging_sensors.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

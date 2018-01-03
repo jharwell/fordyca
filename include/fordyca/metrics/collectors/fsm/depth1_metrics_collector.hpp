@@ -37,13 +37,22 @@ NS_START(fordyca, metrics, collectors, fsm);
  ******************************************************************************/
 /**
  * @class depth1_metrics_collector
+ * @ingroup metrics fsm
  *
  * @brief Collector for \ref depth1_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics are written out every timestep, or at the end of the specified
+ * interval, depending.
  */
 class depth1_metrics_collector : public base_metric_collector {
  public:
+  /**
+   * @param ofname Output file name.
+   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
+   * specified interval, and written out and reset at the end of it. If
+   * \c FALSE, they will be written out every timestep.
+   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   */
   depth1_metrics_collector(const std::string ofname,
                            bool collect_cum,
                            uint collect_interval);

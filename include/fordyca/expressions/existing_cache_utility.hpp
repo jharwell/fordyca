@@ -38,6 +38,7 @@ NS_START(fordyca, expressions);
  ******************************************************************************/
 /**
  * @class existing_cache_utility
+ * @ingroup expressions
  *
  * @brief Calculates the utility associated with an existing cache that the
  * robot knows about.
