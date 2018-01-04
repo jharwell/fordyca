@@ -208,13 +208,13 @@ argos::CColor foraging_loop_functions::GetFloorColor(
    */
   for (size_t i = 0; i < map()->caches().size(); ++i) {
     if (map()->caches()[i].contains_point(plane_pos)) {
-      return argos::CColor::GRAY40;
+      return map()->caches()[i].color();
     }
   } /* for(i..) */
 
   for (size_t i = 0; i < map()->blocks().size(); ++i) {
     if (map()->blocks()[i].contains_point(plane_pos)) {
-      return argos::CColor::BLACK;
+      return map()->blocks()[i].color();
     }
   } /* for(i..) */
 

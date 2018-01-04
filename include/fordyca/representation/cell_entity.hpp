@@ -51,6 +51,9 @@ class cell_entity {
       m_id(-1), m_display_id(false), m_x_dim(x_dim), m_y_dim(y_dim),
       m_color(color), m_real_loc(), m_discrete_loc() {}
 
+  cell_entity(double dim, argos::CColor color) :
+      cell_entity(dim, dim, color) {}
+
   cell_entity(const cell_entity& other) = default;
   cell_entity& operator=(const cell_entity& other) = default;
 
@@ -81,17 +84,17 @@ class cell_entity {
   /**
    * @brief Get the real location of the object.
    */
-  const argos::CVector2& real_loc(void) const { return m_real_loc; }
+  virtual const argos::CVector2& real_loc(void) const { return m_real_loc; }
 
   /**
    * @brief Get the discretized coordinates of the object, which can be used to
    * index into an arena_map.
    *
    */
-  const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
+  virtual const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
 
-  void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
+  virtual void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
+  virtual void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the entity
@@ -115,6 +118,11 @@ class cell_entity {
    * @brief Get the ID of the object.
    */
   int id(void) const { return m_id; }
+
+  /**
+   * @brief Get the color of the entity.
+   */
+  const argos::CColor& color(void) const { return m_color; }
 
  private:
   int             m_id;
