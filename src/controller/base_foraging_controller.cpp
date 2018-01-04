@@ -49,9 +49,6 @@ namespace fs = std::experimental::filesystem;
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
     : client(),
-      m_display_los(false),
-      m_display_id(false),
-      m_block(nullptr),
       m_actuators(),
       m_sensors(),
       m_server(std::make_shared<rcppsw::er::server>()) {

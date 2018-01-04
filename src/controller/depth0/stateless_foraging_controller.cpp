@@ -44,6 +44,8 @@ NS_START(fordyca, controller, depth0);
 stateless_foraging_controller::stateless_foraging_controller(void)
     : base_foraging_controller(), m_fsm() {}
 
+stateless_foraging_controller::~stateless_foraging_controller(void) {}
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/

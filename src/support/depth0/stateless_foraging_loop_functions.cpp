@@ -79,12 +79,10 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   params::loop_function_repository repo;
   repo.parse_all(node);
 
-  const params::output_params *p_output =
-      static_cast<const struct params::output_params *>(
-          repo.get_params("output"));
-  const params::arena_map_params *p_arena =
-      static_cast<const struct params::arena_map_params *>(
-          repo.get_params("arena_map"));
+  auto *p_output = static_cast<const struct params::output_params *>(
+      repo.get_params("output"));
+  auto *p_arena = static_cast<const struct params::arena_map_params *>(
+      repo.get_params("arena_map"));
 
   output_init(p_output);
 
@@ -96,9 +94,8 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   rcppsw::er::g_server->log_ts_calculator(
       std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
 
-  const struct params::loop_functions_params *l_params =
-      static_cast<const struct params::loop_functions_params *>(
-          repo.get_params("loop_functions"));
+  auto *l_params = static_cast<const struct params::loop_functions_params *>(
+      repo.get_params("loop_functions"));
   m_nest_x = p_arena->nest_x;
   m_nest_y = p_arena->nest_y;
 
@@ -116,9 +113,8 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
        ++it) {
     argos::CFootBotEntity &robot =
         *argos::any_cast<argos::CFootBotEntity *>(it->second);
-    controller::base_foraging_controller &controller =
-        static_cast<controller::base_foraging_controller &>(
-            robot.GetControllableEntity().GetController());
+    auto &controller = static_cast<controller::base_foraging_controller &>(
+        robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
   } /* for(it..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
@@ -156,7 +152,7 @@ argos::CColor stateless_foraging_loop_functions::GetFloorColor(
 
 void stateless_foraging_loop_functions::pre_step_iter(
     argos::CFootBotEntity &robot) {
-  controller::depth0::stateless_foraging_controller &controller =
+  auto &controller =
       static_cast<controller::depth0::stateless_foraging_controller &>(
           robot.GetControllableEntity().GetController());
 
@@ -244,12 +240,10 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository &repo) {
-  const struct params::arena_map_params *arena_params =
-      static_cast<const struct params::arena_map_params *>(
-          repo.get_params("arena_map"));
-  const struct params::loop_functions_params *l_params =
-      static_cast<const struct params::loop_functions_params *>(
-          repo.get_params("loop_functions"));
+  auto *arena_params = static_cast<const struct params::arena_map_params *>(
+      repo.get_params("arena_map"));
+  auto *l_params = static_cast<const struct params::loop_functions_params *>(
+      repo.get_params("loop_functions"));
 
   m_map.reset(new representation::arena_map(arena_params));
   m_map->distribute_blocks();

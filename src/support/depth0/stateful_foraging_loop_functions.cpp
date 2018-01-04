@@ -68,9 +68,8 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  const params::output_params *p_output =
-      static_cast<const struct params::output_params *>(
-          repo.get_params("output"));
+  auto *p_output = static_cast<const struct params::output_params *>(
+      repo.get_params("output"));
   m_collector.reset(new robot_collectors::stateful_metrics_collector(
       metrics_path() + "/" + p_output->metrics.stateful_fname,
       p_output->metrics.collect_cum,
@@ -85,11 +84,10 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
        ++it) {
     argos::CFootBotEntity &robot =
         *argos::any_cast<argos::CFootBotEntity *>(it->second);
-    controller::base_foraging_controller &controller =
-        dynamic_cast<controller::base_foraging_controller &>(
+    auto &controller =
+        dynamic_cast<controller::depth0::stateful_foraging_controller &>(
             robot.GetControllableEntity().GetController());
-    const struct params::loop_functions_params *l_params =
-        static_cast<const struct params::loop_functions_params *>(
+    auto *l_params = static_cast<const struct params::loop_functions_params *>(
             repo.get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);
@@ -101,8 +99,7 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
 
 void stateful_foraging_loop_functions::pre_step_iter(
     argos::CFootBotEntity &robot) {
-  controller::depth0::stateful_foraging_controller &controller =
-      static_cast<controller::depth0::stateful_foraging_controller &>(
+  auto &controller = static_cast<controller::depth0::stateful_foraging_controller &>(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
