@@ -152,7 +152,7 @@ void foraging_controller::task_abort_cleanup(
   m_task_aborted = true;
 } /* task_abort_cleanup() */
 
-tasks::foraging_task *foraging_controller::current_task(void) const {
+__pure tasks::foraging_task *foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
 } /* current_task() */
 

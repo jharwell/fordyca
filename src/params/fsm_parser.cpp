@@ -59,7 +59,7 @@ void fsm_parser::show(std::ostream &stream) {
   stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 
-bool fsm_parser::validate(void) {
+__pure bool fsm_parser::validate(void) {
   if (!(m_params->nest_center.GetX() > 0) ||
       !(m_params->nest_center.GetY() > 0)) {
     return false;

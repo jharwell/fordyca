@@ -92,7 +92,7 @@ void task_parser::show(std::ostream &stream) {
          << std::endl;
 } /* show() */
 
-bool task_parser::validate(void) {
+__pure bool task_parser::validate(void) {
   if (m_params->tasks.estimation_alpha <= 0.0 ||
       m_params->tasks.abort_reactivity <= 0.0 ||
       m_params->tasks.abort_offset <= 0.0 ||

@@ -47,7 +47,7 @@ collector::collector(const struct task_allocation::task_params *const params,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double collector::current_time(void) const {
+__pure double collector::current_time(void) const {
   return dynamic_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
       ->base_sensors()
       ->tick();

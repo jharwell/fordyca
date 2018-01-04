@@ -51,7 +51,7 @@ void grid_parser::show(std::ostream &stream) {
   stream << "upper=" << m_params->upper << std::endl;
 } /* show() */
 
-bool grid_parser::validate(void) {
+__pure bool grid_parser::validate(void) {
   if (!(m_params->resolution > 0.0)) {
     return false;
   }

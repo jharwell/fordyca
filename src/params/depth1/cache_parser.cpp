@@ -58,7 +58,7 @@ void cache_parser::show(std::ostream &stream) {
          << m_params->static_respawn_scale_factor << std::endl;
 } /* show() */
 
-bool cache_parser::validate(void) {
+__pure bool cache_parser::validate(void) {
   if (m_params->dimension <= 0.0) {
     return false;
   }

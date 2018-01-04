@@ -50,7 +50,7 @@ forager::forager(const struct task_allocation::task_params *params,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double forager::current_time(void) const {
+__pure double forager::current_time(void) const {
   return dynamic_cast<fsm::depth1::block_to_cache_fsm *>(
              polled_task::mechanism())
       ->base_sensors()

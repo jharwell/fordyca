@@ -49,7 +49,7 @@ void sensor_parser::show(std::ostream &stream) {
          << m_params->diffusion.go_straight_angle_range << std::endl;
 } /* show() */
 
-bool sensor_parser::validate(void) {
+__pure bool sensor_parser::validate(void) {
   if (!(m_params->diffusion.go_straight_angle_range.GetSpan().GetAbsoluteValue() > 0)) {
       return false;
   }

@@ -107,7 +107,7 @@ class cell_entity {
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point);
+  bool contains_point(const argos::CVector2& point) const;
 
   /**
    * @brief Set the ID of the object.

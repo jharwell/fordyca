@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 /*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
-bool acquire_cache_fsm::is_avoiding_collision(void) const {
+__pure bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */

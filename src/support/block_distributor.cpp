@@ -65,7 +65,7 @@ argos::CVector2 block_distributor::dist_random(
   return dist_outside_range(block.xsize(), m_nest_x, m_nest_y);
 } /* dist_random() */
 
-argos::CRange<double> block_distributor::single_src_xrange(void) {
+__pure argos::CRange<double> block_distributor::single_src_xrange(void) {
   return argos::CRange<double>(m_arena_x.GetMax() * 0.9 - 0.75,
                                m_arena_x.GetMax() * 0.9);
 } /* single_src_xrange() */
