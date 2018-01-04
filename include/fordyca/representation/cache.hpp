@@ -31,7 +31,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
-#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -53,18 +53,26 @@ NS_START(fordyca, representation);
  * enclosing class. Caches have both real (where they actually live in the
  * world) and discretized locations (where they are mapped to within the arena
  * map).
- *
- * @todo Caches do not change their location for their lifetime, although this
- * is not currently enforced by the class.
  */
-class cache : public cell_entity,
+class cache : public immovable_cell_entity,
               public metrics::collectible_metrics::cache_metrics,
               public rcppsw::patterns::visitor::visitable_any<cache>,
               public prototype::clonable<cache> {
  public:
+  /**
+   * @param dimension The size of the cache. Does not have to be a multiple of
+   * the arena resolution, but doing so makes it easier.
+   * @param resolution The arena resolution.
+   * @param center (X,Y) coordinates of the center of the cache.
+   * @param blocks The initial block list for the cache.
+   * @param id The ID to assign to the cache; -1 for a new cache, which
+   * will generate a new ID, or any positive # to use the same ID as an existing
+   * cache (used when cloning a cache into a robot's perceived arena map).
+   */
   cache(double dimension, double resolution,
         argos::CVector2 center,
-        std::vector<block*>& blocks);
+        std::vector<block*>& blocks,
+        int id);
 
   __pure bool operator==(const cache &other) const {
     return this->discrete_loc() == other.discrete_loc();
@@ -86,6 +94,7 @@ class cache : public cell_entity,
   __pure bool contains_block(const block* c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) != m_blocks.end();
   }
+
   /**
    * @brief Get a list of the blocks currently in the cache.
    */

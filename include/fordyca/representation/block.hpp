@@ -57,7 +57,7 @@ class block : public cell_entity,
               public prototype::clonable<block> {
  public:
   explicit block(double dimension) :
-      cell_entity(dimension, dimension, argos::CColor::BLACK),
+      cell_entity(dimension, argos::CColor::BLACK),
       m_robot_index(-1), m_carries(0) {}
 
   __pure bool operator==(const block &other) const {

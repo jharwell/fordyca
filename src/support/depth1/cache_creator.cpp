@@ -97,12 +97,11 @@ representation::cache cache_creator::create_single(
 
   std::vector<representation::block *> blocks_list(blocks.begin(),
                                                    blocks.end());
-  representation::cache c(m_cache_size,
-                          m_grid.resolution(),
-                          center,
-                          blocks_list);
-  c.discrete_loc(representation::real_to_discrete_coord(center, m_resolution));
-  return c;
+  return representation::cache(m_cache_size,
+                               m_grid.resolution(),
+                               center,
+                               blocks_list,
+                               -1);
 } /* create_single() */
 
 void cache_creator::update_host_cells(

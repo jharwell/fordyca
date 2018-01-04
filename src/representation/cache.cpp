@@ -39,16 +39,21 @@ int cache::m_next_id = 0;
 cache::cache(double dimension,
              double resolution,
              argos::CVector2 center,
-             std::vector<block *> &blocks)
-    : cell_entity(dimension, dimension, argos::CColor::BLUE),
+             std::vector<block *> &blocks,
+             int id)
+    : immovable_cell_entity(dimension,
+                            argos::CColor::GRAY40,
+                            center,
+                            resolution),
       m_resolution(resolution),
       m_n_block_pickups(),
       m_n_block_drops(),
       m_blocks(blocks) {
-  this->real_loc(center);
-  this->discrete_loc(
-      representation::real_to_discrete_coord(center, resolution));
-  id(m_next_id++);
+  if (-1 == id) {
+    this->id(m_next_id++);
+  } else {
+    this->id(id);
+  }
 }
 
 /*******************************************************************************
@@ -63,7 +68,8 @@ std::unique_ptr<cache> cache::clone(void) const {
                                     m_resolution,
                                     real_loc(),
                                     const_cast<std::vector<block *> &>(
-                                        m_blocks));
+                                        m_blocks),
+                                    id());
 } /* clone() */
 
 NS_END(fordyca, representation);
