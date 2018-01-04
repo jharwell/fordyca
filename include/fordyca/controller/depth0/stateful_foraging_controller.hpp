@@ -27,10 +27,8 @@
 #include <argos/core/utility/math/vector2.h>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,10 +65,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * block is acquired (either via randomized exploring or by vectoring to a known
  * block) and then bring the block to the nest.
  */
-class stateful_foraging_controller : public base_foraging_controller,
-                                     public rmetrics::stateless_metrics,
+class stateful_foraging_controller : public stateless_foraging_controller,
                                      public rmetrics::stateful_metrics,
-                                     public rmetrics::distance_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);
@@ -115,13 +111,25 @@ class stateful_foraging_controller : public base_foraging_controller,
   /**
    * @brief Get the current LOS for the robot.
    */
-  const representation::line_of_sight* los(void) const override;
+  const representation::line_of_sight* los(void) const;
 
   std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
     return m_map;
   }
   depth1::foraging_sensors* stateful_sensors(void) const;
   std::shared_ptr<depth1::foraging_sensors> stateful_sensors_ref(void) const;
+
+  /**
+   * @brief Set whether or not a robot is supposed to display it's LOS as a
+   * square of the appropriate size during simulation.
+   */
+  void display_los(bool display_los) { m_display_los = display_los; }
+
+  /**
+   * @brief If \c TRUE, then the robot should display its approximate LOS as a
+   * circle on the ground during simulation.
+   */
+  bool display_los(void) const { return m_display_los; }
 
   /**
    * @brief Set the current location of the robot.
@@ -137,6 +145,7 @@ class stateful_foraging_controller : public base_foraging_controller,
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
 
  private:
+  bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;

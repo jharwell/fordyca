@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
@@ -47,8 +47,8 @@ stateful_foraging_qt_user_functions::stateful_foraging_qt_user_functions() {
 void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity &c_entity) {
   stateless_foraging_qt_user_functions::Draw(c_entity);
 
-  controller::base_foraging_controller &controller =
-      dynamic_cast<controller::base_foraging_controller &>(
+  auto &controller =
+      dynamic_cast<controller::depth0::stateful_foraging_controller &>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_los()) {
@@ -64,7 +64,7 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity &c_entity) 
     points.emplace_back(resolution * los->sizex() / 2,
                         -resolution * los->sizey() / 2);
 
-    /* draw slightly above the ground so that it renders better */
+    /* draw LOS slightly above the ground so that it renders better */
     DrawPolygon(argos::CVector3(0, 0, 0.05),
                 argos::CQuaternion(),
                 points,

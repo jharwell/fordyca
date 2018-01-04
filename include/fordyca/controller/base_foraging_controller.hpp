@@ -67,18 +67,6 @@ class base_foraging_controller : public argos::CCI_Controller,
   void Reset(void) override;
 
   /**
-   * @brief Set whether or not a robot is supposed to display it's LOS as a
-   * square of the appropriate size during simulation.
-   */
-  void display_los(bool display_los) { m_display_los = display_los; }
-
-  /**
-   * @brief If \c TRUE, then the robot should display its approximate LOS as a
-   * circle on the ground during simulation.
-   */
-  bool display_los(void) const { return m_display_los; }
-
-  /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
    * head during simulation.
    */
@@ -95,15 +83,6 @@ class base_foraging_controller : public argos::CCI_Controller,
    * nest, as reported by the sensors.
    */
   bool in_nest(void) const;
-
-  /**
-   * @brief Get the current LOS for the robot.
-   *
-   * By default this returns nullptr. It is only here so that it this class can
-   * be used as the robot controller handle when rendering QT graphics
-   * overlays.
-   */
-  virtual const representation::line_of_sight* los(void) const { return nullptr; }
 
   /**
    * @brief Return if the robot is currently carrying a block.
@@ -159,9 +138,8 @@ class base_foraging_controller : public argos::CCI_Controller,
   std::string log_header_calc(void);
   std::string dbg_header_calc(void);
 
-  bool                                   m_display_los;
-  bool                                   m_display_id;
-  representation::block*                 m_block;
+  bool                                   m_display_id{false};
+  representation::block*                 m_block{nullptr};
   std::shared_ptr<actuator_manager>      m_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::er::server>    m_server;

@@ -41,6 +41,9 @@ void loop_functions_parser::parse(argos::TConfigurationNode &node) {
                           "robot_los",
                           m_params->display_robot_los);
   argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
+                          "robot_task",
+                          m_params->display_robot_task);
+  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
                           "block_id",
                           m_params->display_block_id);
 } /* parse() */
@@ -50,6 +53,7 @@ void loop_functions_parser::show(std::ostream &stream) {
             "params\n====================\n";
   stream << "display_robot_id=" << m_params->display_robot_id << std::endl;
   stream << "display_robot_los=" << m_params->display_robot_los << std::endl;
+  stream << "display_robot_task=" << m_params->display_robot_task << std::endl;
   stream << "display_block_id=" << m_params->display_block_id << std::endl;
 } /* show() */
 

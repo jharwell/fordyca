@@ -56,7 +56,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
-    : base_foraging_controller(),
+    : stateless_foraging_controller(),
       m_light_loc(),
       m_map(),
       m_executive(),
@@ -116,7 +116,12 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
   params::depth0::stateful_foraging_repository param_repo;
   params::depth1::task_repository task_repo;
 
+  /*
+   * Note that we do not call the stateless_foraging_controller::Init()--there
+   * is nothing in there that we need.
+   */
   base_foraging_controller::Init(node);
+
   ER_NOM("Initializing stateful_foraging controller");
   param_repo.parse_all(node);
   task_repo.parse_all(node);

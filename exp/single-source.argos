@@ -118,6 +118,7 @@
     </arena_map>
     <visualization robot_id="true"
                    robot_los="true"
+                   robot_task="true"
                    block_id="true"
                    />
   </loop_functions>

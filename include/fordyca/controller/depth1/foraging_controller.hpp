@@ -124,9 +124,22 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool task_aborted(void) const { return m_task_aborted; }
 
+  /**
+   * @brief Set whether or not a robot is supposed to display the task it is
+   * currently working on above itself during simulation.
+   */
+  void display_task(bool display_task) { m_display_task = display_task; }
+
+  /**
+   * @brief If \c TRUE, then the robot should display the task it is currently
+   * working on above itself during simulation.
+   */
+  bool display_task(void) const { return m_display_task; }
+
  private:
   void task_abort_cleanup(__unused task_allocation::executable_task*);
 
+  bool                                               m_display_task{false};
   bool                                               m_task_aborted{false};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;

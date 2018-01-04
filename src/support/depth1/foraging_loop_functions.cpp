@@ -69,9 +69,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode &node) {
 
   repo.parse_all(node);
 
-  const struct params::arena_map_params *arenap =
-      static_cast<const struct params::arena_map_params *>(
-          repo.get_params("arena_map"));
+  auto *arenap = static_cast<const struct params::arena_map_params *>(
+      repo.get_params("arena_map"));
 
   /*
    * Regardless of how many foragers/collectors/etc there are, always create an
@@ -85,9 +84,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   mc_cache_respawn_scale_factor = arenap->cache.static_respawn_scale_factor;
 
   /* initialize stat collecting */
-  const params::output_params *p_output =
-      static_cast<const struct params::output_params *>(
-          repo.get_params("output"));
+  auto *p_output = static_cast<const struct params::output_params *>(
+      repo.get_params("output"));
 
   m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
       metrics_path() + "/" + p_output->metrics.depth1_fname,
@@ -100,13 +98,28 @@ void foraging_loop_functions::Init(argos::TConfigurationNode &node) {
       p_output->metrics.collect_interval));
   m_task_collector->reset();
 
+  /* configure robots */
+  argos::CSpace::TMapPerType &footbots =
+      GetSpace().GetEntitiesByType("foot-bot");
+  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
+       it != footbots.end();
+       ++it) {
+    argos::CFootBotEntity &robot =
+        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+    auto &controller =
+        dynamic_cast<controller::depth1::foraging_controller &>(
+            robot.GetControllableEntity().GetController());
+    auto *l_params = static_cast<const struct params::loop_functions_params *>(
+        repo.get_params("loop_functions"));
+
+    controller.display_task(l_params->display_robot_task);
+  } /* for(it..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity &robot) {
-  controller::depth1::foraging_controller &controller =
-      dynamic_cast<controller::depth1::foraging_controller &>(
-          robot.GetControllableEntity().GetController());
+  auto &controller = dynamic_cast<controller::depth1::foraging_controller &>(
+      robot.GetControllableEntity().GetController());
 
   /*
    * If a robot aborted its task and was carrying a block it needs to drop it,

@@ -56,6 +56,7 @@ class stateless_foraging_controller : public base_foraging_controller,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);
+  virtual ~stateless_foraging_controller(void);
 
   /* CCI_Controller overrides */
   void Init(argos::TConfigurationNode& t_node) override;
