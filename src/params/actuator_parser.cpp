@@ -56,7 +56,7 @@ void actuator_parser::show(std::ostream &stream) {
   stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
 } /* show() */
 
-bool actuator_parser::validate(void) {
+__pure bool actuator_parser::validate(void) {
   if (!(m_params->wheels.soft_turn_max.GetValue() > 0)) {
     return false;
   }

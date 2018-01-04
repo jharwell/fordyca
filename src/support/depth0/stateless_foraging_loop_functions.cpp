@@ -268,17 +268,17 @@ void stateless_foraging_loop_functions::output_init(
   }
 } /* output_init() */
 
-collectors::block_metrics_collector *
+__pure collectors::block_metrics_collector *
 stateless_foraging_loop_functions::block_collector(void) const {
   return m_block_collector.get();
 } /* block_collector() */
 
-robot_collectors::distance_metrics_collector *
+__pure robot_collectors::distance_metrics_collector *
 stateless_foraging_loop_functions::distance_collector(void) const {
   return m_distance_collector.get();
 } /* distance_collector() */
 
-robot_collectors::stateless_metrics_collector *
+__pure robot_collectors::stateless_metrics_collector *
 stateless_foraging_loop_functions::stateless_collector(void) const {
   return m_stateless_collector.get();
 } /* stateless_collector() */

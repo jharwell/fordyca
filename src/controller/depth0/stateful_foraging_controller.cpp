@@ -65,7 +65,7 @@ stateful_foraging_controller::stateful_foraging_controller(void)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-tasks::foraging_task *stateful_foraging_controller::current_task(void) const {
+__pure tasks::foraging_task *stateful_foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
 } /* current_task() */
 
@@ -94,7 +94,7 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(void) const {
+__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(void) const {
   return static_cast<depth1::foraging_sensors*>(base_sensors());
 }
 

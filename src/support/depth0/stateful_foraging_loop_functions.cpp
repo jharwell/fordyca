@@ -174,7 +174,7 @@ void stateful_foraging_loop_functions::PreStep() {
   pre_step_final();
 } /* PreStep() */
 
-robot_collectors::stateful_metrics_collector *
+__pure robot_collectors::stateful_metrics_collector *
 stateful_foraging_loop_functions::stateful_collector(void) const {
   return m_collector.get();
 } /* depth0_collector() */

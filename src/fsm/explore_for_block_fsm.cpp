@@ -78,7 +78,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {
+__const HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

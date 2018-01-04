@@ -75,7 +75,7 @@ vector_fsm::vector_fsm(
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE_ND(vector_fsm, start) {
+__const FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 

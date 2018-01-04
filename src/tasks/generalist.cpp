@@ -48,7 +48,7 @@ generalist::generalist(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double generalist::current_time(void) const {
+__pure double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::stateful_foraging_fsm *>(
              polled_task::mechanism())
       ->base_sensors()

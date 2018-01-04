@@ -27,7 +27,6 @@
 #include <random>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/expressions/cache_respawn_probability.hpp"
 #include "fordyca/metrics/collectors/fsm/depth1_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
@@ -121,44 +120,6 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity &robot) {
   auto &controller = dynamic_cast<controller::depth1::foraging_controller &>(
       robot.GetControllableEntity().GetController());
 
-  /*
-   * If a robot aborted its task and was carrying a block it needs to drop it,
-   * in addition to updating its own internal state, so that the block is not
-   * left dangling and unusable for the rest of the simulation.
-   *
-   * Also, if the robot happens to abort its task while serving the cache
-   * penalty, then it needs to be removed from the penalty list to keep things
-   * consistent and avoid assertion failures later.
-   */
-  if (controller.task_aborted()) {
-    if (controller.is_carrying_block()) {
-      representation::discrete_coord d =
-          representation::real_to_discrete_coord(controller.robot_loc(),
-                                                 map()->grid_resolution());
-      events::free_block_drop drop_op(rcppsw::er::g_server,
-                                      controller.block(),
-                                      d.first,
-                                      d.second,
-                                      map()->grid_resolution());
-
-      controller.block(nullptr);
-      map()->accept(drop_op);
-      floor()->SetChanged();
-    }
-    auto it = std::find_if(m_penalty_list.begin(),
-                           m_penalty_list.end(),
-                           [&](const cache_usage_penalty *p) {
-                             return p->controller() == &controller;
-                           });
-    if (it != m_penalty_list.end()) {
-      m_penalty_list.remove(*it);
-    }
-    ER_ASSERT(
-        !robot_serving_cache_penalty<controller::depth1::foraging_controller>(
-            robot),
-        "FATAL: Multiple instances of same controller serving cache penalty");
-  }
-
   /* get stats from this robot before its state changes */
   stateless_collector()->collect(
       static_cast<rmetrics::stateless_metrics &>(controller));
@@ -175,7 +136,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity &robot) {
   utils::set_robot_los<controller::depth1::foraging_controller>(robot, *map());
   set_robot_tick<controller::depth1::foraging_controller>(robot);
 
-  if (controller.task_aborted()) {
+  if (handle_task_abort<controller::depth1::foraging_controller>(robot)) {
     return;
   }
   if (controller.is_carrying_block()) {
@@ -305,6 +266,15 @@ void foraging_loop_functions::pre_step_final(void) {
   m_task_collector->timestep_inc();
 } /* pre_step_final() */
 
+bool foraging_loop_functions::block_drop_overlap_with_cache(
+    const representation::block* block,
+    const representation::cache& cache,
+    const argos::CVector2& drop_loc) {
+  return !(cache.contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
+           cache.contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
+           cache.contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
+           cache.contains_point(drop_loc - argos::CVector2(0, block->ysize())));
+} /* block_drop_overlap_with_cache() */
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different

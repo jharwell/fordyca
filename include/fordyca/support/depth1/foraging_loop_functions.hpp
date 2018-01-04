@@ -29,6 +29,7 @@
 #include "fordyca/support/depth1/cache_usage_penalty.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -192,9 +193,85 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     return false;
   }
 
+  /**
+   * @brief Handle cases in which a robot aborts its current task, and perform
+   * any necessary cleanup, such as dropping/distributing a carried block, etc.
+   *
+   * @param robot The robot to handle task abort for.
+   *
+   * @return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
+   */
+  template<typename T>
+  bool handle_task_abort(argos::CFootBotEntity& robot) {
+    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    /*
+     * If a robot aborted its task and was carrying a block it needs to drop it,
+     * in addition to updating its own internal state, so that the block is not
+     * left dangling and unusable for the rest of the simulation.
+     *
+     * Also, if the robot happens to abort its task while serving the cache
+     * penalty, then it needs to be removed from the penalty list to keep things
+     * consistent and avoid assertion failures later.
+     */
+    if (controller.task_aborted()) {
+      if (controller.is_carrying_block()) {
+        /*
+         * If the robot is currently right on the edge of a cache, we can't just
+         * drop the block here, as it will overlap with the cache, and robots
+         * will think that is accessible, but will not be able to vector to it
+         * (not all 4 wheel sensors will report the color of a block). See #233.
+         */
+        bool conflict = false;
+        for (auto &cache : map()->caches()) {
+          if (block_drop_overlap_with_cache(controller.block(),
+                                            cache,
+                                            controller.robot_loc())) {
+            conflict = true;
+          }
+        } /* for(cache..) */
+
+        if (!conflict) {
+          representation::discrete_coord d =
+              representation::real_to_discrete_coord(controller.robot_loc(),
+                                                     map()->grid_resolution());
+          events::free_block_drop drop_op(rcppsw::er::g_server,
+                                          controller.block(),
+                                          d.first,
+                                          d.second,
+                                          map()->grid_resolution());
+
+          controller.block(nullptr);
+          map()->accept(drop_op);
+          floor()->SetChanged();
+        } else {
+          map()->distribute_block(controller.block());
+          controller.block(nullptr);
+          floor()->SetChanged();
+        }
+      }
+      auto it = std::find_if(m_penalty_list.begin(),
+                             m_penalty_list.end(),
+                             [&](const cache_usage_penalty *p) {
+                               return p->controller() == &controller;
+                             });
+      if (it != m_penalty_list.end()) {
+        m_penalty_list.remove(*it);
+      }
+      ER_ASSERT(
+          !robot_serving_cache_penalty<controller::depth1::foraging_controller>(
+              robot),
+          "FATAL: Multiple instances of same controller serving cache penalty");
+      return true;
+    }
+    return false;
+  }
+
  private:
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
+  bool block_drop_overlap_with_cache(const representation::block* block,
+                                     const representation::cache& cache,
+                                     const argos::CVector2& drop_loc);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   foraging_loop_functions(const foraging_loop_functions& s) = delete;

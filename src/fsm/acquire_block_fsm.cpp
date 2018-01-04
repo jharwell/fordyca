@@ -117,7 +117,7 @@ bool acquire_block_fsm::is_exploring_for_block(void) const {
   return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running());
 } /* is_exploring_for_block() */
 
-bool acquire_block_fsm::is_avoiding_collision(void) const {
+__pure bool acquire_block_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
