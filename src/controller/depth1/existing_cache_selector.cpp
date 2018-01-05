@@ -44,8 +44,8 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_cache existing_cache_selector::calc_best(
-    const std::list<representation::perceived_cache>& existing_caches,
+representation::const_perceived_cache existing_cache_selector::calc_best(
+    const std::list<representation::const_perceived_cache>& existing_caches,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::cache *best = nullptr;
@@ -76,7 +76,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
          best->discrete_loc().first,
          best->discrete_loc().second,
          max_utility);
-  return representation::perceived_cache(best, max_utility);
+  return representation::const_perceived_cache(best, max_utility);
 } /* calc_best() */
 
 NS_END(depth1, controller, fordyca);

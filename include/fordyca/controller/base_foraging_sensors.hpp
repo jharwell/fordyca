@@ -56,7 +56,7 @@ NS_START(controller);
 class base_foraging_sensors {
  public:
   base_foraging_sensors(
-      const struct params::sensor_params* c_params,
+      const struct params::sensor_params* params,
       argos::CCI_RangeAndBearingSensor* rabs,
       argos::CCI_FootBotProximitySensor* proximity,
       argos::CCI_FootBotLightSensor* light,

@@ -32,7 +32,7 @@ NS_START(fordyca, metrics, collectors, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_metrics_collector::stateful_metrics_collector(const std::string ofname,
+stateful_metrics_collector::stateful_metrics_collector(const std::string& ofname,
                                                        bool collect_cum,
                                                        uint collect_interval)
     : base_metric_collector(ofname, collect_cum), m_stats() {
@@ -54,11 +54,10 @@ std::string stateful_metrics_collector::csv_header_build(
       "n_cum_acquiring_block"  + separator() +
       "n_vectoring_to_block"  + separator() +
       "n_cum_vectoring_to_block"  + separator();
-  } else {
-    return base_metric_collector::csv_header_build(header) +
-        "n_acquiring_block"  + separator() +
-        "n_vectoring_to_block"  + separator();
   }
+  return base_metric_collector::csv_header_build(header) +
+      "n_acquiring_block"  + separator() +
+      "n_vectoring_to_block"  + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -72,11 +71,11 @@ void stateful_metrics_collector::collect(
   auto &m =
       static_cast<const collectible_metrics::fsm::stateful_metrics &>(
           metrics);
-  m_stats.n_acquiring_block += m.is_acquiring_block();
-  m_stats.n_vectoring_to_block += m.is_vectoring_to_block();
+  m_stats.n_acquiring_block    += static_cast<uint>(m.is_acquiring_block());
+  m_stats.n_vectoring_to_block += static_cast<uint>(m.is_vectoring_to_block());
 
-  m_stats.n_cum_acquiring_block += m.is_acquiring_block();
-  m_stats.n_cum_vectoring_to_block += m.is_vectoring_to_block();
+  m_stats.n_cum_acquiring_block    += static_cast<uint>(m.is_acquiring_block());
+  m_stats.n_cum_vectoring_to_block += static_cast<uint>(m.is_vectoring_to_block());
 } /* collect() */
 
 bool stateful_metrics_collector::csv_line_build(std::string &line) {

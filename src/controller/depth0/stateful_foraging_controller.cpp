@@ -70,11 +70,10 @@ __pure tasks::foraging_task *stateful_foraging_controller::current_task(void) co
 } /* current_task() */
 
 bool stateful_foraging_controller::block_acquired(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->block_acquired();
-  } else {
-    return false;
   }
+  return false;
 } /* block_acquired() */
 
 void stateful_foraging_controller::robot_loc(argos::CVector2 loc) {
@@ -193,27 +192,24 @@ void stateful_foraging_controller::process_los(
  * Stateless Diagnostics
  ******************************************************************************/
 bool stateful_foraging_controller::is_exploring_for_block(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_exploring_for_block();
-  } else {
-    return false;
   }
+  return false;
 } /* is_exploring */
 
 bool stateful_foraging_controller::is_avoiding_collision(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_avoiding_collision();
-  } else {
-    return false;
   }
+  return false;
 } /* is_avoiding_collision() */
 
 bool stateful_foraging_controller::is_transporting_to_nest(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_transporting_to_nest();
-  } else {
-    return false;
   }
+  return false;
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
@@ -239,23 +235,21 @@ double stateful_foraging_controller::timestep_distance(void) const {
  * Stateful Diagnostics
  ******************************************************************************/
 bool stateful_foraging_controller::is_acquiring_block(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_acquiring_block();
-  } else {
-    return false;
   }
+  return false;
 } /* is_acquiring_block() */
 
 bool stateful_foraging_controller::is_vectoring_to_block(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_vectoring_to_block();
-  } else {
-    return false;
   }
+  return false;
 } /* is_vectoring_to_block() */
 
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,
-                    "stateful_foraging_controller")
+                    "stateful_foraging_controller"); // NOLINT
 
 NS_END(depth0, controller, fordyca);

@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_drop.hpp"
-#include <argos/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"

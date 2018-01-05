@@ -72,7 +72,7 @@ class free_block_pickup : public cell_op,
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                     representation::block* block, size_t robot_index);
-  ~free_block_pickup(void) { client::rmmod(); }
+  ~free_block_pickup(void) override { client::rmmod(); }
 
   free_block_pickup(const free_block_pickup& op) = delete;
   free_block_pickup& operator=(const free_block_pickup& op) = delete;

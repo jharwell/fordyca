@@ -121,11 +121,13 @@ class cache : public immovable_cell_entity,
   block* block_get(void) { return m_blocks.front(); }
 
  private:
-  static int        m_next_id;
-  double            m_resolution;
-  size_t            m_n_block_pickups;
-  size_t            m_n_block_drops;
+  // clang-format off
+  static int          m_next_id;
+  double              m_resolution;
+  size_t              m_n_block_pickups;
+  size_t              m_n_block_drops;
   std::vector<block*> m_blocks;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
@@ -72,7 +72,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   stateful_foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& t_node) override;
+  void Init(argos::TConfigurationNode& node) override;
   void ControlStep(void) override;
 
   /* stateless metrics */
@@ -106,7 +106,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    *
    * Only handles blocks within a LOS; caches are ignored.
    */
-  virtual void process_los(const representation::line_of_sight* const los);
+  virtual void process_los(const representation::line_of_sight* los);
 
   /**
    * @brief Get the current LOS for the robot.

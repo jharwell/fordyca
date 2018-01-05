@@ -74,7 +74,7 @@ class nest_block_drop : public visitor::visitor,
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
              representation::block* block);
-  ~nest_block_drop(void) { client::rmmod(); }
+  ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
   nest_block_drop& operator=(const nest_block_drop& op) = delete;

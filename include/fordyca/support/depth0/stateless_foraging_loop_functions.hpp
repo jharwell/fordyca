@@ -64,7 +64,10 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
                                           public rcppsw::er::client {
  public:
   stateless_foraging_loop_functions(void);
-  virtual ~stateless_foraging_loop_functions(void);
+  ~stateless_foraging_loop_functions(void) override;
+
+  stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;
+  stateless_foraging_loop_functions& operator=(const stateless_foraging_loop_functions& s) = delete;
 
   void Init(argos::TConfigurationNode& node) override;
   void Reset() override;
@@ -96,8 +99,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void metric_collecting_init(const struct params::output_params* p_output);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;
-  stateless_foraging_loop_functions& operator=(const stateless_foraging_loop_functions& s) = delete;
 
   argos::CRange<double>                                          m_nest_x;
   argos::CRange<double>                                          m_nest_y;

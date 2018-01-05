@@ -64,7 +64,10 @@ class cache_usage_penalty;
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
   foraging_loop_functions(void);
-  virtual ~foraging_loop_functions(void);
+  ~foraging_loop_functions(void) override;
+
+  foraging_loop_functions(const foraging_loop_functions& s) = delete;
+  foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep() override;
@@ -80,7 +83,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   template<typename T>
   bool init_cache_usage_penalty(
       argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.cache_acquired()) {
       ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
@@ -105,7 +108,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_usage_penalty* p) {
@@ -124,7 +127,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   void finish_cached_block_pickup(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     cache_usage_penalty* p = m_penalty_list.front();
     ER_ASSERT(p->controller() == &controller,
               "FATAL: Out of order cache penalty handling");
@@ -152,7 +155,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   template<typename T>
   bool robot_serving_cache_penalty(
       argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_usage_penalty* p) {
                              return p->controller() == &controller;});
@@ -165,7 +168,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   bool handle_cache_block_drop(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     /* Check whether the foot-bot is actually on a cache */
     int cache = utils::robot_on_cache(robot, *map());
@@ -203,7 +206,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
    */
   template<typename T>
   bool handle_task_abort(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     /*
      * If a robot aborted its task and was carrying a block it needs to drop it,
      * in addition to updating its own internal state, so that the block is not
@@ -274,11 +277,8 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
                                      const argos::CVector2& drop_loc);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
-  foraging_loop_functions(const foraging_loop_functions& s) = delete;
-  foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
-
-  uint                                                        mc_cache_penalty;
-  double                                                      mc_cache_respawn_scale_factor;
+  uint                                                        mc_cache_penalty{0};
+  double                                                      mc_cache_respawn_scale_factor{0.0};
   std::unique_ptr<robot_collectors::depth1_metrics_collector> m_depth1_collector;
   std::unique_ptr<metrics::collectors::task_collector>        m_task_collector;
   std::list<cache_usage_penalty*>                             m_penalty_list;

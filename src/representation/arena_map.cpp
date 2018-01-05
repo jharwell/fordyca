@@ -51,8 +51,8 @@ arena_map::arena_map(const struct params::arena_map_params *params)
                           &params->block),
       m_server(rcppsw::er::g_server),
       m_grid(params->grid.resolution,
-             params->grid.upper.GetX(),
-             params->grid.upper.GetY(),
+             static_cast<size_t>(params->grid.upper.GetX()),
+             static_cast<size_t>(params->grid.upper.GetY()),
              m_server) {
   deferred_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);

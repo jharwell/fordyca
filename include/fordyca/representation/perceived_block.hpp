@@ -38,7 +38,8 @@ class block;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using perceived_block = std::pair<const block*, double>;
+using perceived_block = std::pair<block*, double>;
+using const_perceived_block = std::pair<const block*, double>;
 
 NS_END(representation, fordyca);
 

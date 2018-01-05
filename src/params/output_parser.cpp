@@ -63,7 +63,7 @@ void output_parser::show(std::ostream &stream) {
 } /* show() */
 
 bool output_parser::validate(void) {
-  if (m_metrics_parser.get_results()) {
+  if (nullptr != m_metrics_parser.get_results()) {
     return m_metrics_parser.validate();
   }
   return true;

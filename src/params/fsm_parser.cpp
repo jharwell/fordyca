@@ -60,11 +60,8 @@ void fsm_parser::show(std::ostream &stream) {
 } /* show() */
 
 __pure bool fsm_parser::validate(void) {
-  if (!(m_params->nest_center.GetX() > 0) ||
-      !(m_params->nest_center.GetY() > 0)) {
-    return false;
-  }
-  return true;
+  return (m_params->nest_center.GetX() > 0) &&
+      (m_params->nest_center.GetY() > 0);
 } /* validate() */
 
 NS_END(params, fordyca);

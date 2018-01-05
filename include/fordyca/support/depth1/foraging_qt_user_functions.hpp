@@ -42,7 +42,7 @@ NS_START(fordyca, support, depth1);
 class foraging_qt_user_functions : public depth0::stateful_foraging_qt_user_functions {
  public:
   foraging_qt_user_functions(void);
-  virtual ~foraging_qt_user_functions(void) {}
+  ~foraging_qt_user_functions(void) override = default;
 
   void Draw(argos::CFootBotEntity& c_entity) override;
 };

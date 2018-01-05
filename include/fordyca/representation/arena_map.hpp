@@ -170,6 +170,7 @@ class arena_map: public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
+  // clang-format off
   bool                                      m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2                     mc_nest_center;
@@ -178,6 +179,7 @@ class arena_map: public rcppsw::er::client,
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
   occupancy_grid                            m_grid;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

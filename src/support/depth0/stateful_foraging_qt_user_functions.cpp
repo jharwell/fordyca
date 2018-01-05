@@ -75,6 +75,6 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity &c_entity) 
 
 using namespace argos;
 REGISTER_QTOPENGL_USER_FUNCTIONS(stateful_foraging_qt_user_functions,
-                                 "stateful_foraging_qt_user_functions")
+                                 "stateful_foraging_qt_user_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

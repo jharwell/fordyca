@@ -154,8 +154,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map &map) {
             "cache=%zu/cell/%zu",
             cell.cache()->n_blocks(),
             cell.block_count());
-  representation::cache *pcache =
-      const_cast<representation::cache *>(cell.cache());
+  auto *pcache = const_cast<representation::cache *>(cell.cache());
 
   ER_ASSERT(pcache->contains_block(m_pickup_block),
             "FATAL: perceived cache does not contain ref to block to be picked "

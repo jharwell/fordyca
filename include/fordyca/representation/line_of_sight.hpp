@@ -117,8 +117,10 @@ class line_of_sight {
   const discrete_coord& center(void) const { return m_center; }
 
  private:
+  // clang-format off
   discrete_coord                 m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

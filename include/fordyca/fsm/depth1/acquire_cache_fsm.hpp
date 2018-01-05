@@ -77,7 +77,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
-      const std::shared_ptr<const representation::perceived_arena_map>& map);
+      std::shared_ptr<const representation::perceived_arena_map> map);
 
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
   acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
@@ -90,19 +90,19 @@ class acquire_cache_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
 
   /* base metrics */
-  bool is_exploring_for_block(void) const override { return false; };
+  bool is_exploring_for_block(void) const override { return false; }
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override { return false; }
 
   /* depth0 metrics */
-  bool is_acquiring_block(void) const override { return false; };
-  bool is_vectoring_to_block(void) const override { return false; };
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
 
   /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override { return false; };
+  bool is_transporting_to_cache(void) const override { return false; }
 
   /**
    * @brief Reset the FSM
@@ -135,7 +135,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * acquiring a cache, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
+  bool acquire_known_cache(std::list<representation::const_perceived_cache> caches);
 
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);

@@ -64,7 +64,7 @@ class cache_block_drop : public cell_op,
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                    representation::block* block, representation::cache* cache,
                    double resolution);
-  ~cache_block_drop(void) { client::rmmod(); }
+  ~cache_block_drop(void) override { client::rmmod(); }
 
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;

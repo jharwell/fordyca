@@ -33,12 +33,16 @@
 namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, representation);
 class cell2D;
+class perceived_cell2D;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
 using occupancy_grid = rcppsw::ds::grid2D_ptr<cell2D,
                                               std::shared_ptr<rcppsw::er::server>&>;
+
+using perceived_occupancy_grid = rcppsw::ds::grid2D_ptr<perceived_cell2D,
+                                                        std::shared_ptr<rcppsw::er::server>&>;
 
 NS_END(representation, fordyca);
 

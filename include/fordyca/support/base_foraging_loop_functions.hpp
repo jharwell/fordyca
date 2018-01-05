@@ -58,7 +58,10 @@ NS_START(fordyca, support);
  */
 class base_foraging_loop_functions : public argos::CLoopFunctions {
  public:
-  base_foraging_loop_functions(void) : m_floor(nullptr) {}
+  base_foraging_loop_functions(void) = default;
+
+  base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
+  base_foraging_loop_functions& operator=(const base_foraging_loop_functions& s) = delete;
 
   void Init(argos::TConfigurationNode&) override { m_floor = &GetSpace().GetFloorEntity(); }
 
@@ -72,7 +75,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   template<typename T>
   bool handle_free_block_pickup(argos::CFootBotEntity& robot,
                                 representation::arena_map& map) {
-    T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.block_acquired()) {
       /* Check whether the foot-bot is actually on a block */
@@ -103,7 +106,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   bool handle_nest_block_drop(argos::CFootBotEntity& robot,
                               representation::arena_map& map,
                               metrics::collectors::block_metrics_collector& block_collector) {
-    T&  controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {
       /* Update arena map state due to a block nest drop */
       events::nest_block_drop drop_op(rcppsw::er::g_server,
@@ -128,10 +131,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   argos::CFloorEntity* floor(void) const { return m_floor; }
 
  private:
-  base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
-  base_foraging_loop_functions& operator=(const base_foraging_loop_functions& s) = delete;
-
-  argos::CFloorEntity*                                           m_floor;
+  argos::CFloorEntity*                                           m_floor{nullptr};
 };
 
 NS_END(support, fordyca);

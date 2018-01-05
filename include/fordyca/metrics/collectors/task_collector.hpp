@@ -53,7 +53,7 @@ class task_collector : public base_metric_collector {
    * \c FALSE, they will be written out every timestep.
    * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
    */
-  task_collector(const std::string ofname,
+  task_collector(const std::string& ofname,
                  bool collect_cum,
                  uint collect_interval);
 
@@ -76,7 +76,7 @@ class task_collector : public base_metric_collector {
     size_t n_cum_generalists;
   };
 
-  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   struct stats m_stats;

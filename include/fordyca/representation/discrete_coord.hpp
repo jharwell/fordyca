@@ -27,7 +27,7 @@
  ******************************************************************************/
 #include <utility>
 #include "rcppsw/common/common.hpp"
-#include <argos/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector2.h>
 
 /*******************************************************************************
  * namespaces

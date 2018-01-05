@@ -77,13 +77,9 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   m_collector->reset();
 
   /* configure robots */
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     auto &controller =
         dynamic_cast<controller::depth0::stateful_foraging_controller &>(
             robot.GetControllableEntity().GetController());
@@ -93,7 +89,7 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
     controller.display_los(l_params->display_robot_los);
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
         robot, *map());
-  } /* for(it..) */
+  } /* for(entity..) */
   ER_NOM("stateful_foraging loop functions initialization finished");
 }
 
@@ -161,16 +157,11 @@ void stateful_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void stateful_foraging_loop_functions::PreStep() {
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     pre_step_iter(robot);
-  } /* for(it..) */
+  } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
 
@@ -181,6 +172,6 @@ stateful_foraging_loop_functions::stateful_collector(void) const {
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
-                        "stateful_foraging_loop_functions");
+                        "stateful_foraging_loop_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

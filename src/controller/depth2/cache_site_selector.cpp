@@ -44,7 +44,7 @@ cache_site_selector::cache_site_selector(
  * Member Functions
  ******************************************************************************/
 argos::CVector2 cache_site_selector::calc_best(
-    const std::list<representation::perceived_cache>,
+    const std::list<representation::perceived_cache>&,
     argos::CVector2 robot_loc) {
   argos::CVector2 site((robot_loc.GetX() - m_nest_loc.GetX()) / 2.0,
                        m_nest_loc.GetY());

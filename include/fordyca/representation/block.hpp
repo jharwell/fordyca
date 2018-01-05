@@ -100,14 +100,11 @@ class block : public cell_entity,
   void robot_index(int robot_index) { m_robot_index = robot_index; }
 
  private:
+  // clang-format off
   int    m_robot_index;
   size_t m_carries;
+  // clang-format on
 };
-
-/*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-using perceived_block = std::pair<const block*, double>;
 
 NS_END(representation, fordyca);
 

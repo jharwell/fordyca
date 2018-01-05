@@ -47,9 +47,6 @@ include_directories(BEFORE SYSTEM
   /usr/include/lua5.2
   ${Qt5Widgets_INCLUDE_DIRS}
   )
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --system-header-prefix=argos/")
-endif()
 
 ################################################################################
 # Submodules                                                                   #

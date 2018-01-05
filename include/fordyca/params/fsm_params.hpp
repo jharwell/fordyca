@@ -44,7 +44,7 @@ struct threshold_times {
    * The number of exploration steps without finding block after which the
    * footboot will randomly change direction.
    */
-  size_t unsuccessful_explore_dir_change;
+  uint unsuccessful_explore_dir_change;
 
   /*
    * The number of time steps between two successive collisions that will be

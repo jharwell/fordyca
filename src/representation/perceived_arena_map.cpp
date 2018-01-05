@@ -43,8 +43,8 @@ perceived_arena_map::perceived_arena_map(
     const std::string& robot_id)
     : m_server(std::move(server)),
       m_grid(c_params->grid.resolution,
-             c_params->grid.upper.GetX(),
-             c_params->grid.upper.GetY(),
+             static_cast<size_t>(c_params->grid.upper.GetX()),
+             static_cast<size_t>(c_params->grid.upper.GetY()),
              m_server),
       m_caches(),
       m_blocks() {
@@ -71,29 +71,29 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<perceived_block> perceived_arena_map::perceived_blocks(void) const {
-  std::list<perceived_block> pblocks;
+std::list<const_perceived_block> perceived_arena_map::perceived_blocks(void) const {
+  std::list<const_perceived_block> pblocks;
 
   for (auto &b : m_blocks) {
-    representation::perceived_block p(&b,
-                                      m_grid
-                                      .access(b.discrete_loc().first,
-                                              b.discrete_loc().second)
-                                      .density());
+    representation::const_perceived_block p(&b,
+                                            m_grid
+                                            .access(b.discrete_loc().first,
+                                                    b.discrete_loc().second)
+                                            .density());
     pblocks.push_back(p);
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
 
-std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
-  std::list<perceived_cache> pcaches;
+std::list<const_perceived_cache> perceived_arena_map::perceived_caches(void) const {
+  std::list<const_perceived_cache> pcaches;
 
   for (auto &c : m_caches) {
-    representation::perceived_cache p(&c,
-                                      m_grid
-                                          .access(c.discrete_loc().first,
-                                                  c.discrete_loc().second)
-                                          .density());
+    representation::const_perceived_cache p(&c,
+                                            m_grid
+                                            .access(c.discrete_loc().first,
+                                                    c.discrete_loc().second)
+                                            .density());
     pcaches.push_back(p);
   } /* for(c..) */
   return pcaches;

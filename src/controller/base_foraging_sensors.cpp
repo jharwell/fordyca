@@ -80,10 +80,10 @@ bool base_foraging_sensors::in_nest(void) {
    * is on a black area.
    */
   int sum = 0;
-  sum += readings[0].Value > 0.60 && readings[0].Value < 0.80;
-  sum += readings[1].Value > 0.60 && readings[1].Value < 0.80;
-  sum += readings[2].Value > 0.60 && readings[2].Value < 0.80;
-  sum += readings[3].Value > 0.60 && readings[3].Value < 0.80;
+  sum += static_cast<int>(readings[0].Value > 0.60 && readings[0].Value < 0.80);
+  sum += static_cast<int>(readings[1].Value > 0.60 && readings[1].Value < 0.80);
+  sum += static_cast<int>(readings[2].Value > 0.60 && readings[2].Value < 0.80);
+  sum += static_cast<int>(readings[3].Value > 0.60 && readings[3].Value < 0.80);
 
   return sum >= 3;
 } /* in_nest() */
@@ -101,7 +101,7 @@ argos::CVector2 base_foraging_sensors::find_closest_obstacle(void) {
     argos::CVector2 obstacle(r.Value, r.Angle);
     if (obstacle_is_threatening(obstacle)) {
       if ((robot_loc() - obstacle).Length() < closest.Length() ||
-          closest.Length() == 0) {
+          closest.Length() <= 0.0) {
         closest = obstacle;
       }
     }
@@ -128,10 +128,10 @@ bool base_foraging_sensors::block_detected(void) {
    *
    * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
-  sum += readings[0].Value < 0.05;
-  sum += readings[1].Value < 0.05;
-  sum += readings[2].Value < 0.05;
-  sum += readings[3].Value < 0.05;
+  sum += static_cast<int>(readings[0].Value < 0.05);
+  sum += static_cast<int>(readings[1].Value < 0.05);
+  sum += static_cast<int>(readings[2].Value < 0.05);
+  sum += static_cast<int>(readings[3].Value < 0.05);
 
   return 4 == sum;
 } /* block_detected() */

@@ -62,8 +62,8 @@ class existing_cache_selector: public rcppsw::er::client {
    * @return A pointer to the "best" existing cache, along with its utility
    * value.
    */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache>& existing_caches,
+  representation::const_perceived_cache calc_best(
+      const std::list<representation::const_perceived_cache>& existing_caches,
       argos::CVector2 robot_loc);
 
  private:
