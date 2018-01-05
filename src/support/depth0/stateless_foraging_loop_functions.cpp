@@ -63,7 +63,7 @@ stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
-stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) {}
+stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -106,17 +106,13 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   metric_collecting_init(p_output);
 
   /* configure robots */
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     auto &controller = static_cast<controller::base_foraging_controller &>(
         robot.GetControllableEntity().GetController());
     controller.display_id(l_params->display_robot_id);
-  } /* for(it..) */
+  } /* for(&robot..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
 }
 
@@ -135,17 +131,18 @@ void stateless_foraging_loop_functions::Destroy() {
 
 argos::CColor stateless_foraging_loop_functions::GetFloorColor(
     const argos::CVector2 &plane_pos) {
+
   /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
     return argos::CColor::GRAY70;
   }
-  /* blocks are black */
-  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
-    if (m_map->blocks()[i].contains_point(plane_pos)) {
-      return argos::CColor::BLACK;
+
+  for (auto &block : map()->blocks()) {
+    if (block.contains_point(plane_pos)) {
+      return block.color();
     }
-  } /* for(i..) */
+  } /* for(&block..) */
 
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
@@ -199,16 +196,11 @@ void stateless_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     pre_step_iter(robot);
-  } /* for(it..) */
+  } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
 
@@ -220,18 +212,18 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   }
   fs::create_directories(m_metrics_path);
 
-  m_stateless_collector.reset(new robot_collectors::stateless_metrics_collector(
+  m_stateless_collector = rcppsw::make_unique<robot_collectors::stateless_metrics_collector>(
       m_metrics_path + "/" + p_output->metrics.stateless_fname,
       p_output->metrics.collect_cum,
-      p_output->metrics.collect_interval));
+      p_output->metrics.collect_interval);
 
-  m_block_collector.reset(new collectors::block_metrics_collector(
+  m_block_collector = rcppsw::make_unique<collectors::block_metrics_collector>(
       m_metrics_path + "/" + p_output->metrics.block_fname,
-      p_output->metrics.collect_interval));
+      p_output->metrics.collect_interval);
 
-  m_distance_collector.reset(new robot_collectors::distance_metrics_collector(
+  m_distance_collector = rcppsw::make_unique<robot_collectors::distance_metrics_collector>(
       m_metrics_path + "/" + p_output->metrics.distance_fname,
-      p_output->metrics.n_robots));
+      p_output->metrics.n_robots);
 
   m_stateless_collector->reset();
   m_distance_collector->reset();
@@ -247,9 +239,9 @@ void stateless_foraging_loop_functions::arena_map_init(
 
   m_map.reset(new representation::arena_map(arena_params));
   m_map->distribute_blocks();
-  for (size_t i = 0; i < m_map->blocks().size(); ++i) {
-    m_map->blocks()[i].display_id(l_params->display_block_id);
-  } /* for(i..) */
+  for (auto &block : m_map->blocks()) {
+    block.display_id(l_params->display_block_id);
+  } /* for(&block..) */
 } /* arena_map_init() */
 
 void stateless_foraging_loop_functions::output_init(

@@ -53,7 +53,7 @@ class stateful_metrics_collector : public base_metric_collector {
    * \c FALSE, they will be written out every timestep.
    * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
    */
-  stateful_metrics_collector(const std::string ofname,
+  stateful_metrics_collector(const std::string& ofname,
                              bool collect_cum,
                              uint collect_interval);
 
@@ -71,7 +71,7 @@ class stateful_metrics_collector : public base_metric_collector {
     size_t n_cum_vectoring_to_block;
   };
 
-  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   struct stats m_stats;

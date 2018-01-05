@@ -33,7 +33,7 @@ NS_START(fordyca, metrics, collectors, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_metrics_collector::stateless_metrics_collector(
-    const std::string ofname,
+    const std::string& ofname,
     bool collect_cum,
     uint collect_interval)
     : base_metric_collector(ofname, collect_cum), m_stats() {
@@ -57,12 +57,11 @@ std::string stateless_metrics_collector::csv_header_build(
         "n_cum_avoiding_collision" + separator() +
         "n_transporting_to_nest" + separator() +
         "n_cum_transporting_to_nest" + separator();
-  } else {
-      return base_metric_collector::csv_header_build(header) +
+  }
+  return base_metric_collector::csv_header_build(header) +
       "n_exploring_for_block"  + separator() +
       "n_avoiding_collision" + separator() +
       "n_transporting_to_nest" + separator();
-  }
   // clang-format on
 } /* csv_header_build() */
 
@@ -76,14 +75,14 @@ void stateless_metrics_collector::collect(
   auto &m =
       static_cast<const collectible_metrics::fsm::stateless_metrics &>(
           metrics);
-  m_stats.n_exploring_for_block += m.is_exploring_for_block();
-  m_stats.n_transporting_to_nest += m.is_transporting_to_nest();
-  m_stats.n_avoiding_collision += m.is_avoiding_collision();
+  m_stats.n_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
+  m_stats.n_transporting_to_nest += static_cast<uint>(m.is_transporting_to_nest());
+  m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
 
   if (collect_cum()) {
-    m_stats.n_cum_exploring_for_block += m.is_exploring_for_block();
-    m_stats.n_cum_transporting_to_nest += m.is_transporting_to_nest();
-    m_stats.n_cum_avoiding_collision += m.is_avoiding_collision();
+    m_stats.n_cum_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
+    m_stats.n_cum_transporting_to_nest += static_cast<uint>(m.is_transporting_to_nest());
+    m_stats.n_cum_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
   }
 } /* collect() */
 

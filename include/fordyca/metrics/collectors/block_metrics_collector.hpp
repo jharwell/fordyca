@@ -51,7 +51,7 @@ NS_START(collectors);
 class block_metrics_collector : public base_metric_collector,
                                 public visitor::visitable_any<block_metrics_collector> {
  public:
-  block_metrics_collector(const std::string ofname,
+  block_metrics_collector(const std::string& ofname,
                           uint collect_interval);
 
   void reset(void) override;
@@ -65,7 +65,7 @@ class block_metrics_collector : public base_metric_collector,
     size_t cum_carries; /* aggregate across blocks, not reset each timstep */
   };
 
-  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
   struct block_metrics m_metrics;
 };

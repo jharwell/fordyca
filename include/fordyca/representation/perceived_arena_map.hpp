@@ -70,12 +70,12 @@ class perceived_arena_map: public rcppsw::er::client,
    *
    * @return The list of perceived blocks.
    */
-  std::list<perceived_block> perceived_blocks(void) const;
+  std::list<const_perceived_block> perceived_blocks(void) const;
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of.
    */
-  std::vector<representation::block>& blocks(void) { return m_blocks; };
+  std::vector<block>& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get a list of all cache the robot is currently aware of and their
@@ -83,7 +83,7 @@ class perceived_arena_map: public rcppsw::er::client,
    *
    * @return The list of perceived cache.
    */
-  std::list<representation::perceived_cache> perceived_caches(void) const;
+  std::list<const_perceived_cache> perceived_caches(void) const;
 
   /**
    * @brief Get a list of all caches the robot is currently aware of.

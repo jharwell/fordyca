@@ -32,7 +32,7 @@ NS_START(fordyca, metrics, collectors, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth1_metrics_collector::depth1_metrics_collector(const std::string ofname,
+depth1_metrics_collector::depth1_metrics_collector(const std::string& ofname,
                                                    bool collect_cum,
                                                    uint collect_interval)
     : base_metric_collector(ofname, collect_cum), m_stats() {
@@ -58,13 +58,12 @@ std::string depth1_metrics_collector::csv_header_build(
       "n_cum_exploring_for_cache" + separator() +
       "n_transporting_to_cache" + separator() +
       "n_cum_transporting_to_cache" + separator();
-  } else {
+  }
   return base_metric_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +
       "n_vectoring_to_cache" + separator() +
       "n_exploring_for_cache" + separator() +
       "n_transporting_to_cache" + separator();
-  }
   // clang-format on
 } /* csv_header_build() */
 
@@ -78,16 +77,16 @@ void depth1_metrics_collector::collect(
   auto &m =
       static_cast<const collectible_metrics::fsm::depth1_metrics &>(
           metrics);
-  m_stats.n_exploring_for_cache += m.is_exploring_for_cache();
-  m_stats.n_acquiring_cache += m.is_acquiring_cache();
-  m_stats.n_vectoring_to_cache += m.is_vectoring_to_cache();
-  m_stats.n_transporting_to_cache += m.is_transporting_to_cache();
+  m_stats.n_exploring_for_cache += static_cast<uint>( m.is_exploring_for_cache());
+  m_stats.n_acquiring_cache += static_cast<uint>( m.is_acquiring_cache());
+  m_stats.n_vectoring_to_cache += static_cast<uint>( m.is_vectoring_to_cache());
+  m_stats.n_transporting_to_cache += static_cast<uint>( m.is_transporting_to_cache());
 
   if (collect_cum()) {
-    m_stats.n_cum_exploring_for_cache += m.is_exploring_for_cache();
-    m_stats.n_cum_acquiring_cache += m.is_acquiring_cache();
-    m_stats.n_cum_vectoring_to_cache += m.is_vectoring_to_cache();
-    m_stats.n_cum_transporting_to_cache += m.is_transporting_to_cache();
+    m_stats.n_cum_exploring_for_cache += static_cast<uint>( m.is_exploring_for_cache());
+    m_stats.n_cum_acquiring_cache += static_cast<uint>( m.is_acquiring_cache());
+    m_stats.n_cum_vectoring_to_cache += static_cast<uint>( m.is_vectoring_to_cache());
+    m_stats.n_cum_transporting_to_cache += static_cast<uint>(m.is_transporting_to_cache());
   }
 } /* collect() */
 

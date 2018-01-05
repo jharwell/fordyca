@@ -157,14 +157,14 @@ __pure tasks::foraging_task *foraging_controller::current_task(void) const {
 } /* current_task() */
 
 bool foraging_controller::cache_acquired(void) const {
-  if (current_task()) {
+  if (nullptr !=current_task()) {
     return current_task()->cache_acquired();
   }
   return false;
 } /* cache_detected() */
 
 bool foraging_controller::block_acquired(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->block_acquired();
   }
   return false;
@@ -279,11 +279,10 @@ bool foraging_controller::is_vectoring_to_cache(void) const {
 } /* is_vectoring_to_cache() */
 
 bool foraging_controller::is_acquiring_cache(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->is_acquiring_cache();
-  } else {
-    return false;
   }
+  return false;
 } /* is_acquring_to_cache() */
 
 bool foraging_controller::is_transporting_to_cache(void) const {

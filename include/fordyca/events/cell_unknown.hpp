@@ -60,7 +60,7 @@ class cell_unknown : public cell_op {
 
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& cell) override;
+  void visit(fsm::cell2D_fsm& fsm) override;
 };
 
 NS_END(events, fordyca);

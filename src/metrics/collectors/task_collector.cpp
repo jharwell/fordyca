@@ -32,7 +32,7 @@ NS_START(fordyca, metrics, collectors);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-task_collector::task_collector(const std::string ofname,
+task_collector::task_collector(const std::string& ofname,
                                bool collect_cum,
                                uint collect_interval)
     : base_metric_collector(ofname, collect_cum), m_stats() {
@@ -74,14 +74,14 @@ void task_collector::reset(void) {
 void task_collector::collect(
     const collectible_metrics::base_collectible_metrics &metrics) {
   auto &m = static_cast<const collectible_metrics::task_metrics &>(metrics);
-  m_stats.n_collectors += m.task_name() == "collector";
-  m_stats.n_foragers += m.task_name() == "forager";
-  m_stats.n_generalists += m.task_name() == "generalist";
+  m_stats.n_collectors += static_cast<uint>(m.task_name() == "collector");
+  m_stats.n_foragers += static_cast<uint>(m.task_name() == "forager");
+  m_stats.n_generalists += static_cast<uint>(m.task_name() == "generalist");
 
   if (collect_cum()) {
-    m_stats.n_cum_collectors += m.task_name() == "collector";
-    m_stats.n_cum_foragers += m.task_name() == "forager";
-    m_stats.n_cum_generalists += m.task_name() == "generalist";
+    m_stats.n_cum_collectors += static_cast<uint>(m.task_name() == "collector");
+    m_stats.n_cum_foragers += static_cast<uint>(m.task_name() == "forager");
+    m_stats.n_cum_generalists += static_cast<uint>(m.task_name() == "generalist");
   }
 } /* collect() */
 

@@ -53,9 +53,9 @@ NS_START(collectors);
  */
 class base_metric_collector {
  public:
-  base_metric_collector(const std::string& ofname, bool collect_cum) :
+  base_metric_collector(std::string ofname, bool collect_cum) :
       m_collect_cum(collect_cum), m_use_interval(false), m_interval(-1),
-      m_timestep(0), m_ofname(ofname), m_separator(";"),
+      m_timestep(0), m_ofname(std::move(ofname)), m_separator(";"),
       m_ofile() {}
 
   virtual ~base_metric_collector(void)  = default;

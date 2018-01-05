@@ -37,8 +37,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateless_foraging_fsm::stateless_foraging_fsm(
     const struct params::fsm_params *params,
     const std::shared_ptr<rcppsw::er::server> &server,
-    std::shared_ptr<controller::base_foraging_sensors> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators)
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators)
     : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
                         server, sensors, actuators, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -97,7 +97,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_ASSERT(0, "FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(stateless_foraging_fsm,

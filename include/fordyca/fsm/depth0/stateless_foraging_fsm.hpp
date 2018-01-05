@@ -58,8 +58,11 @@ class stateless_foraging_fsm : public base_foraging_fsm,
  public:
   stateless_foraging_fsm(const struct params::fsm_params* params,
                          const std::shared_ptr<rcppsw::er::server>& server,
-                         std::shared_ptr<controller::base_foraging_sensors> sensors,
-                         std::shared_ptr<controller::actuator_manager> actuators);
+                         const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+                         const std::shared_ptr<controller::actuator_manager>& actuators);
+
+  stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
+  stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;
@@ -112,9 +115,6 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return (&mc_state_map[index]);
   }
-
-  stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
-  stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
   argos::CRandom::CRNG* m_rng;
   explore_for_block_fsm m_explore_fsm;

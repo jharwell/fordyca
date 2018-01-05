@@ -76,7 +76,7 @@ class acquire_block_fsm : public base_foraging_fsm,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
-      const std::shared_ptr<representation::perceived_arena_map>& map);
+      std::shared_ptr<representation::perceived_arena_map> map);
 
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
@@ -86,7 +86,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   void task_reset(void) override { init(); }
-  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
+  void task_start(const rcppsw::task_allocation::taskable_argument* const) override {}
   bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
 
   /* base metrics */
@@ -129,7 +129,7 @@ class acquire_block_fsm : public base_foraging_fsm,
    * acquiring a block, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_block(std::list<representation::perceived_block> blocks);
+  bool acquire_known_block(std::list<representation::const_perceived_block> blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);
@@ -147,6 +147,7 @@ class acquire_block_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
+  // clang-format off
   const argos::CVector2                                      mc_nest_center;
   representation::block*                                     m_best_block;
   argos::CRandom::CRNG*                                      m_rng;
@@ -155,6 +156,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   std::shared_ptr<controller::depth0::foraging_sensors>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_block_fsm                                      m_explore_fsm;
+  // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

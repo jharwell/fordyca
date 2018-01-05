@@ -65,10 +65,7 @@ void metrics_parser::show(std::ostream &stream) {
 } /* show() */
 
 __pure bool metrics_parser::validate(void) {
-  if (0 == m_params->collect_interval) {
-    return false;
-  }
-  return true;
+  return (0 != m_params->collect_interval);
 } /* validate() */
 
 NS_END(params, fordyca);

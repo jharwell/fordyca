@@ -50,7 +50,7 @@ void stateless_foraging_qt_user_functions::Draw(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_id()) {
-    DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId().c_str());
+    DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());
   }
 
   if (controller.is_carrying_block()) {

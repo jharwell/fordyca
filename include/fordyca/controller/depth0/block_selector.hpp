@@ -25,9 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +60,8 @@ class block_selector: public rcppsw::er::client {
    *
    * @return A pointer to the "best" block, along with its utility value.
    */
-  representation::perceived_block calc_best(
-      const std::list<representation::perceived_block>& blocks,
+  representation::const_perceived_block calc_best(
+      const std::list<representation::const_perceived_block>& blocks,
       argos::CVector2 robot_loc);
 
  private:

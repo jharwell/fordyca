@@ -47,7 +47,7 @@ acquire_cache_fsm::acquire_cache_fsm(
     const std::shared_ptr<rcppsw::er::server> &server,
     const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
     const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -60,7 +60,7 @@ acquire_cache_fsm::acquire_cache_fsm(
       exit_acquire_cache(),
       mc_nest_center(params->nest_center),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_map(map),
+      m_map(std::move(map)),
       m_server(server),
       m_sensors(sensors),
       m_vector_fsm(params->times.frequent_collision_thresh,
@@ -143,7 +143,7 @@ void acquire_cache_fsm::init(void) {
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
-    std::list<representation::perceived_cache> caches) {
+    std::list<representation::const_perceived_cache> caches) {
 
     if (!caches.empty() && !m_vector_fsm.task_running()) {
     /*

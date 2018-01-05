@@ -49,13 +49,11 @@ namespace rmetrics = metrics::collectible_metrics::fsm;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_loop_functions::foraging_loop_functions(void)
-    : mc_cache_penalty(),
-      mc_cache_respawn_scale_factor(),
-      m_depth1_collector(),
+    : m_depth1_collector(),
       m_task_collector(),
       m_penalty_list() {}
 
-foraging_loop_functions::~foraging_loop_functions(void) {}
+foraging_loop_functions::~foraging_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -86,25 +84,21 @@ void foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   auto *p_output = static_cast<const struct params::output_params *>(
       repo.get_params("output"));
 
-  m_depth1_collector.reset(new robot_collectors::depth1_metrics_collector(
+  m_depth1_collector = rcppsw::make_unique<robot_collectors::depth1_metrics_collector>(
       metrics_path() + "/" + p_output->metrics.depth1_fname,
       p_output->metrics.collect_cum,
-      p_output->metrics.collect_interval));
+      p_output->metrics.collect_interval);
   m_depth1_collector->reset();
-  m_task_collector.reset(new metrics::collectors::task_collector(
+  m_task_collector = rcppsw::make_unique<metrics::collectors::task_collector>(
       metrics_path() + "/" + p_output->metrics.task_fname,
       p_output->metrics.collect_cum,
-      p_output->metrics.collect_interval));
+      p_output->metrics.collect_interval);
   m_task_collector->reset();
 
   /* configure robots */
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     auto &controller =
         dynamic_cast<controller::depth1::foraging_controller &>(
             robot.GetControllableEntity().GetController());
@@ -112,7 +106,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode &node) {
         repo.get_params("loop_functions"));
 
     controller.display_task(l_params->display_robot_task);
-  } /* for(it..) */
+
+  } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
@@ -180,32 +175,27 @@ argos::CColor foraging_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks renderin inside of caches.
    */
-  for (size_t i = 0; i < map()->caches().size(); ++i) {
-    if (map()->caches()[i].contains_point(plane_pos)) {
-      return map()->caches()[i].color();
+  for (auto &cache : map()->caches()) {
+    if (cache.contains_point(plane_pos)) {
+      return cache.color();
     }
-  } /* for(i..) */
+  } /* for(&cache..) */
 
-  for (size_t i = 0; i < map()->blocks().size(); ++i) {
-    if (map()->blocks()[i].contains_point(plane_pos)) {
-      return map()->blocks()[i].color();
+  for (auto &block : map()->blocks()) {
+    if (block.contains_point(plane_pos)) {
+      return block.color();
     }
-  } /* for(i..) */
+  } /* for(&block..) */
 
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
 void foraging_loop_functions::PreStep() {
-  argos::CSpace::TMapPerType &footbots =
-      GetSpace().GetEntitiesByType("foot-bot");
-
-  for (argos::CSpace::TMapPerType::iterator it = footbots.begin();
-       it != footbots.end();
-       ++it) {
+  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(it->second);
+        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
     pre_step_iter(robot);
-  } /* for(it..) */
+  } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
 
@@ -233,12 +223,12 @@ void foraging_loop_functions::pre_step_final(void) {
    * recreated immediately. And if there are no foragers, there is no chance
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
-  if (map()->has_static_cache() && 0 == map()->caches().size()) {
+  if (map()->has_static_cache() && map()->caches().empty()) {
     int n_foragers = m_task_collector->n_foragers();
     int n_collectors = m_task_collector->n_collectors();
     expressions::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_foragers, n_collectors) >=
-        static_cast<double>(rand()) / RAND_MAX) {
+        static_cast<double>(random()) / RAND_MAX) {
       map()->static_cache_create();
       representation::cell2D &cell =
           map()->access(map()->caches()[0].discrete_loc());

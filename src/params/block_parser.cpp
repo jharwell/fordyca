@@ -48,11 +48,8 @@ void block_parser::show(std::ostream &stream) {
 } /* show() */
 
 bool block_parser::validate(void) {
-  if (0 == m_params->n_blocks || 0.0 == m_params->dimension ||
-      "" == m_params->dist_model) {
-    return false;
-  }
-  return true;
+  return !(0 == m_params->n_blocks || m_params->dimension <= 0.0 ||
+           "" == m_params->dist_model);
 } /* validate() */
 
 NS_END(params, fordyca);

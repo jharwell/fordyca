@@ -35,7 +35,6 @@ namespace robot_collectors = metrics::collectors::fsm;
 namespace metrics { namespace collectors { namespace fsm {
 class stateful_metrics_collector;
 }}}
-namespace controller { namespace depth0 { class foraging_controller; }}
 
 NS_START(support, depth0);
 
@@ -56,7 +55,10 @@ NS_START(support, depth0);
 class stateful_foraging_loop_functions : public stateless_foraging_loop_functions {
  public:
   stateful_foraging_loop_functions(void);
-  virtual ~stateful_foraging_loop_functions(void);
+  ~stateful_foraging_loop_functions(void) override;
+
+  stateful_foraging_loop_functions(const stateful_foraging_loop_functions& s) = delete;
+  stateful_foraging_loop_functions& operator=(const stateful_foraging_loop_functions& s) = delete;
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep(void) override;
@@ -70,9 +72,6 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  stateful_foraging_loop_functions(const stateful_foraging_loop_functions& s) = delete;
-  stateful_foraging_loop_functions& operator=(const stateful_foraging_loop_functions& s) = delete;
-
   std::unique_ptr<robot_collectors::stateful_metrics_collector> m_collector;
 };
 

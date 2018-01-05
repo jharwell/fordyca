@@ -54,7 +54,7 @@ NS_START(collectors, fsm);
 class distance_metrics_collector : public base_metric_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
-  distance_metrics_collector(const std::string ofname, size_t n_robots) :
+  distance_metrics_collector(const std::string& ofname, size_t n_robots) :
       base_metric_collector(ofname, true), m_n_robots(n_robots), m_stats() {}
 
   void reset(void) override;
@@ -66,7 +66,7 @@ class distance_metrics_collector : public base_metric_collector,
     double cum_distance;
   };
 
-  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   size_t                          m_n_robots;

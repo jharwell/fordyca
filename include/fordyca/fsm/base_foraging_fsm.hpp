@@ -64,8 +64,8 @@ class base_foraging_fsm : public state_machine::hfsm {
                     uint8_t max_states);
 
   base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                    std::shared_ptr<controller::base_foraging_sensors> sensors,
-                    std::shared_ptr<controller::actuator_manager> actuators,
+                    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+                    const std::shared_ptr<controller::actuator_manager>& actuators,
                     uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;

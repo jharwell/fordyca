@@ -59,7 +59,7 @@ class cached_block_pickup : public cell_op,
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                       representation::cache* cache, size_t robot_index);
-  ~cached_block_pickup(void) { client::rmmod(); }
+  ~cached_block_pickup(void) override { client::rmmod(); }
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;

@@ -113,9 +113,11 @@ class cell2D : public visitor::visitable_any<cell2D> {
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
+  // clang-format off
   cell_entity*    m_entity;
   discrete_coord  m_loc;
   fsm::cell2D_fsm m_fsm;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

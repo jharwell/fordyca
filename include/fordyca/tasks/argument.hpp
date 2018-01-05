@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "rcppsw/task_allocation/taskable_argument.hpp"
 #include "fordyca/controller/foraging_signal.hpp"

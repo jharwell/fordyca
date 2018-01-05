@@ -38,11 +38,11 @@ NS_START(fordyca, tasks);
  * Constructors/Destructor
  ******************************************************************************/
 generalist::generalist(
-    const struct task_allocation::partitionable_task_params *const c_params,
+    const struct task_allocation::partitionable_task_params *const params,
     std::unique_ptr<task_allocation::taskable> &mechanism)
     : partitionable_polled_task(rcppsw::er::g_server,
                                 "generalist",
-                                c_params,
+                                params,
                                 mechanism) {}
 
 /*******************************************************************************

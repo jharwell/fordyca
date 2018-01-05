@@ -53,7 +53,7 @@ class cache_site_selector: public rcppsw::er::client {
       const std::shared_ptr<rcppsw::er::server>& server,
       argos::CVector2 nest_loc);
 
-  ~cache_site_selector(void) { client::rmmod(); }
+  ~cache_site_selector(void) override { client::rmmod(); }
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
@@ -62,7 +62,7 @@ class cache_site_selector: public rcppsw::er::client {
    * @return A pointer to the "best" cache site, along with its utility value.
    */
   argos::CVector2 calc_best(
-      const std::list<representation::perceived_cache> known_caches,
+      const std::list<representation::perceived_cache>& known_caches,
       argos::CVector2 robot_loc);
 
  private:

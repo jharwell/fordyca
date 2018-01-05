@@ -134,7 +134,7 @@ class base_foraging_controller : public argos::CCI_Controller,
   }
 
  private:
-  void output_init(const struct params::output_params* const params);
+  void output_init(const struct params::output_params* params);
   std::string log_header_calc(void);
   std::string dbg_header_calc(void);
 

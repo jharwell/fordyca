@@ -53,7 +53,7 @@ class depth1_metrics_collector : public base_metric_collector {
    * \c FALSE, they will be written out every timestep.
    * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
    */
-  depth1_metrics_collector(const std::string ofname,
+  depth1_metrics_collector(const std::string& ofname,
                            bool collect_cum,
                            uint collect_interval);
 
@@ -75,7 +75,7 @@ class depth1_metrics_collector : public base_metric_collector {
     size_t n_cum_transporting_to_cache;
   };
 
-  std::string csv_header_build(const std::string& header = "") override;
+  std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   struct stats m_stats;

@@ -44,7 +44,7 @@ NS_START(fordyca, controller, depth0);
 stateless_foraging_controller::stateless_foraging_controller(void)
     : base_foraging_controller(), m_fsm() {}
 
-stateless_foraging_controller::~stateless_foraging_controller(void) {}
+stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -60,12 +60,12 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
-  m_fsm.reset(new fsm::depth0::stateless_foraging_fsm(
+  m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       static_cast<const struct params::fsm_params *>(
           param_repo.get_params("fsm")),
       base_foraging_controller::server(),
       base_foraging_controller::base_sensors_ref(),
-      base_foraging_controller::actuators()));
+      base_foraging_controller::actuators());
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 

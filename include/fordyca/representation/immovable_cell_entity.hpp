@@ -61,11 +61,11 @@ class immovable_cell_entity : public cell_entity {
   immovable_cell_entity(double dim, argos::CColor color,
                         const argos::CVector2& loc, double resolution) :
       immovable_cell_entity(dim, dim, color, loc, resolution) {}
+  ~immovable_cell_entity(void) override = default;
+
 
   immovable_cell_entity(const immovable_cell_entity& other) = default;
   immovable_cell_entity& operator=(const immovable_cell_entity& other) = default;
-
-  virtual ~immovable_cell_entity(void) = default;
 
   const argos::CVector2& real_loc(void) const override { return cell_entity::real_loc(); }
   const discrete_coord& discrete_loc(void) const override { return cell_entity::discrete_loc(); }

@@ -54,7 +54,10 @@ class block_found : public perceived_cell_op,
  public:
   block_found(const std::shared_ptr<rcppsw::er::server>& server,
               representation::block* block);
-  ~block_found(void) { client::rmmod(); }
+  ~block_found(void) override { client::rmmod(); }
+
+  block_found(const block_found& op) = delete;
+  block_found& operator=(const block_found& op) = delete;
 
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
@@ -72,9 +75,6 @@ class block_found : public perceived_cell_op,
   const representation::block* block(void) const { return m_block; }
 
  private:
-  block_found(const block_found& op) = delete;
-  block_found& operator=(const block_found& op) = delete;
-
   representation::block* m_block;
 };
 

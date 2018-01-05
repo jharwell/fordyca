@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include <vector>
-#include <argos/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/block.hpp"
@@ -53,7 +53,7 @@ NS_START(fordyca, support, depth1);
  */
 class cache_creator : public rcppsw::er::client {
  public:
-  cache_creator(std::shared_ptr<rcppsw::er::server> server,
+  cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
                 representation::occupancy_grid& grid,
                 double cache_size, double resolution);
 

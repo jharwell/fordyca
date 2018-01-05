@@ -125,6 +125,7 @@ class cell_entity {
   const argos::CColor& color(void) const { return m_color; }
 
  private:
+  // clang-format off
   int             m_id;
   bool            m_display_id;
   double          m_x_dim;
@@ -132,6 +133,7 @@ class cell_entity {
   argos::CColor   m_color;
   argos::CVector2 m_real_loc;
   discrete_coord  m_discrete_loc;
+  // clang-format on
 };
 
 /*******************************************************************************

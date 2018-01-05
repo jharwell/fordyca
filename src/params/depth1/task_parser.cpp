@@ -93,14 +93,11 @@ void task_parser::show(std::ostream &stream) {
 } /* show() */
 
 __pure bool task_parser::validate(void) {
-  if (m_params->tasks.estimation_alpha <= 0.0 ||
-      m_params->tasks.abort_reactivity <= 0.0 ||
-      m_params->tasks.abort_offset <= 0.0 ||
-      m_params->tasks.partition_reactivity <= 0.0 ||
-      m_params->tasks.partition_offset <= 0.0) {
-    return false;
-  }
-  return true;
+  return !(m_params->tasks.estimation_alpha <= 0.0 ||
+           m_params->tasks.abort_reactivity <= 0.0 ||
+           m_params->tasks.abort_offset <= 0.0 ||
+           m_params->tasks.partition_reactivity <= 0.0 ||
+           m_params->tasks.partition_offset <= 0.0);
 } /* validate() */
 
 

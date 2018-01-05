@@ -58,7 +58,7 @@ class perceived_cell_op : public cell_op,
                                                     representation::perceived_arena_map> {
  public:
   perceived_cell_op(size_t x, size_t y) : cell_op(x, y) {}
-  virtual ~perceived_cell_op(void) {}
+  ~perceived_cell_op(void) override = default;
 };
 
 NS_END(events, fordyca);

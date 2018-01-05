@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/expressions/block_utility.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +42,8 @@ block_selector::block_selector(const std::shared_ptr<rcppsw::er::server> &server
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_block block_selector::calc_best(
-    const std::list<representation::perceived_block>& blocks,
+representation::const_perceived_block block_selector::calc_best(
+    const std::list<representation::const_perceived_block>& blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
   const representation::block *best = nullptr;
@@ -70,7 +71,7 @@ representation::perceived_block block_selector::calc_best(
          best->discrete_loc().first,
          best->discrete_loc().second,
          max_utility);
-  return representation::perceived_block(best, max_utility);
+  return representation::const_perceived_block(best, max_utility);
 } /* calc_best() */
 
 NS_END(depth0, controller, fordyca);
