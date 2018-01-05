@@ -44,6 +44,8 @@ class block_metrics : public base_collectible_metrics {
  public:
   block_metrics(void) = default;
   ~block_metrics(void) override = default;
+  block_metrics(const block_metrics&) = default;
+  block_metrics& operator=(const block_metrics&) = default;
 
   /**
    * @brief Get how many carries this object has had on its way from its

@@ -172,6 +172,6 @@ stateful_foraging_loop_functions::stateful_collector(void) const {
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
-                        "stateful_foraging_loop_functions");
+                        "stateful_foraging_loop_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

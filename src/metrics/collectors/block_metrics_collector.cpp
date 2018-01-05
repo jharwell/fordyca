@@ -50,8 +50,8 @@ std::string block_metrics_collector::csv_header_build(
         "avg_carries" + separator() +
         "cum_collected" + separator();
   }
-  return base_metric_collector::csv_header_build(header);
-  "block_carries" + separator();
+  return base_metric_collector::csv_header_build(header) +
+      "block_carries" + separator();
   // clang-format on
 } /* csv_header_build() */
 

@@ -27,7 +27,7 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/ds/grid2D_ptr.hpp"
+#include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
@@ -147,8 +147,7 @@ class perceived_arena_map: public rcppsw::er::client,
 
  private:
   std::shared_ptr<rcppsw::er::server>                          m_server;
-  rcppsw::ds::grid2D_ptr<perceived_cell2D,
-                         std::shared_ptr<rcppsw::er::server>&> m_grid;
+  perceived_occupancy_grid m_grid;
 
   /**
    * @brief The caches that the robot currently knows about. Their relevance is

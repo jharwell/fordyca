@@ -75,7 +75,7 @@ class explore_for_cache_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_cache_fsm(double unsuccessful_dir_change_thresh,
+  explore_for_cache_fsm(uint unsuccessful_dir_change_thresh,
                         const std::shared_ptr<rcppsw::er::server>& server,
                         const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
                         const std::shared_ptr<controller::actuator_manager>& actuators);

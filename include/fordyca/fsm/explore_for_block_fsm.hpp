@@ -71,7 +71,7 @@ class explore_for_block_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_block_fsm(double unsuccessful_dir_change_thresh,
+  explore_for_block_fsm(uint unsuccessful_dir_change_thresh,
                    const std::shared_ptr<rcppsw::er::server>& server,
                    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
                    const std::shared_ptr<controller::actuator_manager>& actuators);

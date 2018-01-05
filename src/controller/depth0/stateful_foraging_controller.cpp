@@ -250,6 +250,6 @@ bool stateful_foraging_controller::is_vectoring_to_block(void) const {
 
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,
-                    "stateful_foraging_controller")
+                    "stateful_foraging_controller"); // NOLINT
 
 NS_END(depth0, controller, fordyca);

@@ -109,6 +109,6 @@ double stateless_foraging_controller::timestep_distance(void) const {
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;
 REGISTER_CONTROLLER(stateless_foraging_controller,
-                    "stateless_foraging_controller");
+                    "stateless_foraging_controller"); // NOLINT
 
 NS_END(depth0, controller, fordyca);

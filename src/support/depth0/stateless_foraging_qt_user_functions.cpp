@@ -71,6 +71,6 @@ void stateless_foraging_qt_user_functions::Draw(
 
 using namespace argos;
 REGISTER_QTOPENGL_USER_FUNCTIONS(stateless_foraging_qt_user_functions,
-                                 "stateless_foraging_qt_user_functions");
+                                 "stateless_foraging_qt_user_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

@@ -43,8 +43,8 @@ perceived_arena_map::perceived_arena_map(
     const std::string& robot_id)
     : m_server(std::move(server)),
       m_grid(c_params->grid.resolution,
-             c_params->grid.upper.GetX(),
-             c_params->grid.upper.GetY(),
+             static_cast<size_t>(c_params->grid.upper.GetX()),
+             static_cast<size_t>(c_params->grid.upper.GetY()),
              m_server),
       m_caches(),
       m_blocks() {

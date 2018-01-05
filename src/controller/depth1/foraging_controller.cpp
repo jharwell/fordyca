@@ -307,6 +307,6 @@ std::string foraging_controller::task_name(void) const {
  */
 using namespace argos;
 using depth1_foraging_controller = foraging_controller;
-REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller");
+REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller"); // NOLINT
 
 NS_END(depth1, controller, fordyca);

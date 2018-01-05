@@ -281,6 +281,6 @@ std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions,
-                        "stateless_foraging_loop_functions")
+                        "stateless_foraging_loop_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

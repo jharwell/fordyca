@@ -45,6 +45,8 @@ class cache_metrics : public base_collectible_metrics {
  public:
   cache_metrics(void) = default;
   ~cache_metrics(void) override = default;
+  cache_metrics(const cache_metrics&) = default;
+  cache_metrics& operator=(const cache_metrics&) = default;
 
   /**
    * @brief Get the # of blocks in the cache
