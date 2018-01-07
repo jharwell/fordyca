@@ -95,6 +95,25 @@ class actuator_manager: public state_machine::simple_fsm {
   double max_wheel_speed(void) const;
 
   /**
+   * @brief Set the percentage of the overall maxmimum speed that robots will be
+   * able to attain (i.e. set a temporary new maximum) when throttling is
+   * currently enabled.
+   */
+  void set_throttle_percent(double percent) { m_throttle_percent = percent; }
+
+  /**
+   * @brief Set whether or not temporary throttling of overall maximum speed is
+   * enabled.
+   */
+  void set_speed_throttle(bool en) { m_throttle = en;}
+
+  /**
+   * @brief Get whether or not temporary throttling of overall maximum speed is
+   * currently enabled.
+   */
+  bool get_speed_throttle(void) { return m_throttle;}
+
+  /**
    * @brief Stop the robot.
    */
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0, 0.0); }
@@ -128,6 +147,16 @@ class actuator_manager: public state_machine::simple_fsm {
    * apply to which wheel, so that the proper turn direction is executed.
    */
   void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
+
+  /**
+   * @brief Clamp the desired speed to a maximum (maximum will be either the
+   * global maximum or the throttled maximum).
+   *
+   * @param desired The desired wheel speed.
+   *
+   * @return The clamped speed.
+   */
+  double clamp_wheel_speed(double desired);
 
   /*
    * @enum The robot can be in three different turning states.
@@ -178,6 +207,8 @@ class actuator_manager: public state_machine::simple_fsm {
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
+  bool m_throttle{false};
+  double m_throttle_percent{0.0};
   double m_lwheel_speed{0.0};
   double m_rwheel_speed{0.0};
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */

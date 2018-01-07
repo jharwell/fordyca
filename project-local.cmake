@@ -1,75 +1,63 @@
 ################################################################################
 # External Projects                                                            #
 ################################################################################
+set(PROJECT_NAME fordyca CACHE INTERNAL "PROJECT_NAME")
+
 # Qt
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 
-# Boost
-set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.58.0 COMPONENTS system filesystem thread)
-
 # RCPPSW
-ExternalProject_Add(rcppsw_EXTERNAL
-  SOURCE_DIR "$ENV{rcppsw}"
-  BINARY_DIR "$ENV{rcppsw}/build"
-  STEP_TARGETS build
-  INSTALL_COMMAND true
-)
-
-ExternalProject_Get_Property(rcppsw_EXTERNAL binary_dir)
-ExternalProject_Get_Property(rcppsw_EXTERNAL source_dir)
-add_library(rcppsw STATIC IMPORTED)
-set_property(TARGET rcppsw PROPERTY IMPORTED_LOCATION ${binary_dir}/lib/librcppsw.a)
-include_directories(${source_dir}/include)
-set(rcppsw_LIB ${binary_dir}/lib/librcppsw.a)
+if (NOT EXISTS ext/rcppsw)
+  execute_process(COMMAND git submodule update --init ext/rcppsw
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+add_subdirectory(ext/rcppsw)
+include_directories(${rcppsw_INCLUDE_DIRS})
 
 # RCSW
-ExternalProject_Add(rcsw_EXTERNAL
-  SOURCE_DIR "$ENV{rcsw}"
-  BINARY_DIR "$ENV{rcsw}/build"
-  STEP_TARGETS build
-  INSTALL_COMMAND true
-)
-
-ExternalProject_Get_Property(rcsw_EXTERNAL binary_dir)
-ExternalProject_Get_Property(rcsw_EXTERNAL source_dir)
-add_library(rcsw STATIC IMPORTED)
-set_property(TARGET rcsw PROPERTY IMPORTED_LOCATION ${binary_dir}/lib/librcsw.a)
-include_directories(${source_dir}/include)
-set(rcsw_LIB ${binary_dir}/lib/librcsw.a)
+# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/ext/rcsw)
+#   execute_process(COMMAND git submodule update --init ext/rcsw
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# endif()
+# add_subdirectory(${CMAKE_SOURCE_DIR}/ext/rcsw)
+# include_directories(${rcsw_INCLUDE_DIRS})
 
 ################################################################################
 # Includes                                                                     #
 ################################################################################
+if (NOT IS_ROOT_PROJECT)
+  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" PARENT_SCOPE)
+else()
+  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}")
+endif()
+
 include_directories(BEFORE SYSTEM
   /usr/include/lua5.2
   ${Qt5Widgets_INCLUDE_DIRS}
   )
 
 ################################################################################
-# Submodules                                                                   #
-################################################################################
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-################################################################################
 # Libraries                                                                    #
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
-link_directories(/usr/lib/argos3)
+link_directories(/usr/lib/argos3 ${rcppsw_LINK_DIRS})
 add_library(${target} SHARED ${${target}_ROOT_SRC})
-add_dependencies(${target} rcppsw_EXTERNAL-build rcsw_EXTERNAL-build)
+add_dependencies(${target} rcsw rcppsw)
+message("${rcppsw_LIBS}")
 
 # Use the actual .a files rather than rcppsw/rcsw project names to force
 # recompilation of fordyca when a source file within one of those libraries
 # changes.
 target_link_libraries(${target}
-  ${rcppsw_LIB}
-  ${rcsw_LIB}
-  stdc++fs
+  rcppsw
+  rcsw
   argos3core_simulator
   argos3plugin_simulator_footbot
   argos3plugin_simulator_genericrobot
-  ${Boost_LIBRARIES}
+  stdc++fs
+  rcppsw
+  rcsw
   )

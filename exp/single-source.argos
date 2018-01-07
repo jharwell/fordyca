@@ -59,18 +59,20 @@
               always_partition="true"
               never_partition="false"/>
         <sensors>
-          <diffusion go_straight_angle_range="-5:5"
-                     delta="0.01" />
+          <proximity go_straight_angle_range="-5:5"
+                    delta="0.01" />
         </sensors>
         <actuators>
           <wheels soft_turn_angle_max="30"
                   no_turn_angle_max="5"
                   max_speed="10" />
         </actuators>
-        <fsm unsuccessful_explore_dir_change="1000"
-             frequent_collision_thresh="100"
-             nest="2.0, 2.5"
-             />
+        <fsm
+          unsuccessful_explore_dir_change="1000"
+          frequent_collision_thresh="100"
+          nest="2.0, 2.5"
+          speed_throttle_block_carry="0.5"
+          />
       </params>
     </depth1_foraging_controller>
 

@@ -26,6 +26,7 @@
 
 #include "rcppsw/er/server.hpp"
 #include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
@@ -77,6 +78,11 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
+  if (is_carrying_block()) {
+    actuators()->set_speed_throttle(true);
+  } else {
+    actuators()->set_speed_throttle(false);
+  }
   m_fsm->run();
 } /* ControlStep() */
 

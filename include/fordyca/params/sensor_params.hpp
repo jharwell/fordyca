@@ -37,11 +37,11 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct obstacle_params
+ * @struct proximity_params
  * @ingroup params
  */
-struct obstacle_params {
-  obstacle_params(void) :
+struct proximity_params {
+  proximity_params(void) :
       go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
   /*
@@ -60,9 +60,9 @@ struct obstacle_params {
  * @ingroup params
  */
 struct sensor_params : public rcppsw::common::base_params {
-  sensor_params(void) : diffusion() {}
+  sensor_params(void) : proximity () {}
 
-  struct obstacle_params diffusion;
+  struct proximity_params proximity;
 };
 
 NS_END(params, fordyca);

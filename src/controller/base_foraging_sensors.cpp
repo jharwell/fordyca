@@ -62,8 +62,8 @@ base_foraging_sensors::base_foraging_sensors(
     argos::CCI_FootBotProximitySensor *const proximity,
     argos::CCI_FootBotLightSensor *const light,
     argos::CCI_FootBotMotorGroundSensor *const ground) :
-    base_foraging_sensors(params->diffusion.delta,
-                          params->diffusion.go_straight_angle_range,
+    base_foraging_sensors(params->proximity.delta,
+                          params->proximity.go_straight_angle_range,
                           rabs, proximity, light, ground) {}
 
 /*******************************************************************************

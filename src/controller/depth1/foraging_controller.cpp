@@ -29,6 +29,7 @@
 #include <fstream>
 
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -73,6 +74,11 @@ void foraging_controller::ControlStep(void) {
   process_los(depth0::stateful_foraging_controller::los());
   depth0::stateful_foraging_controller::map()->update_density();
   m_task_aborted = false;
+  if (is_carrying_block()) {
+    actuators()->set_speed_throttle(true);
+  } else {
+    actuators()->set_speed_throttle(false);
+  }
   m_executive->run();
 } /* ControlStep() */
 

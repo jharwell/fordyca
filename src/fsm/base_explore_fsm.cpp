@@ -46,8 +46,6 @@ base_explore_fsm::base_explore_fsm(
     uint8_t max_states)
     : base_foraging_fsm(unsuccessful_dir_change_thresh, server, sensors,
                         actuators, max_states),
-      HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-      entry_new_direction(),
       entry_explore(),
       m_state() {
   insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);

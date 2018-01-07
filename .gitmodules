@@ -1,0 +1,6 @@
+[submodule "ext/rcsw"]
+	path = ext/rcsw
+	url = git@github.com:jharwell/rcsw
+[submodule "ext/rcppsw"]
+	path = ext/rcppsw
+	url = git@github.com:jharwell/rcppsw
