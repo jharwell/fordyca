@@ -14,10 +14,6 @@ following programs:
 - cmake
 - make
 - g++
-- cppcheck (static analysis)
-- clang-check3.8 (syntax checking/static analysis )
-- clang-format-4.0 (automatic code formatting)
-- clang-tidy-4.0 (static analysis/automated checking of naming conventions)
 
 In addition, you will possibly want to install these programs:
 
@@ -27,23 +23,16 @@ In addition, you will possibly want to install these programs:
 
 1. After cloning this repo, you will also need to clone the following repos:
 
-  - https://github.com/jharwell/rcppsw (Reusable C++ software)
-  - https://github.com/jharwell/rcsw (Reusable C software)
   - https://github.com/jharwell/devel (dotfiles, project config, templates)
 
   Before you can build anything, you will need to define some environment
   variables:
 
-  - `rcsw` - Set to the path to wherever you cloned the `rcsw` repo.
-
-  - `rcppsw` - Set to the path to wherever you cloned the `rcppsw` repo.
-
   - `develroot` - Set to the path to wherever you cloned the `devel` repo.
 
 2. Adjust symlinks, as describe in the RCPPSW [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
 
-3. Verify you can build `rcsw`, `rcppsw`, and `fordyca` (in that order), by
-   doing:
+3. Verify you can build, by doing:
 
         cd /path/to/repo
         mkdir build && cd build
@@ -51,5 +40,13 @@ In addition, you will possibly want to install these programs:
         make
 
 ## Development Guide
+
+You will also want to clone `rcsw`, `rcppsw` somewhere and link it into
+`ext/rcsw` and `ext/rcppsw` respectively, rather than having cmake clone them,
+so that if you make changes to it they will be reflected in the code you are
+building.
+
+  - https://github.com/jharwell/rcsw (Reusable C software)
+  - https://github.com/jharwell/rcppsw (Reusable C++ software)
 
 See the development guide in RCPPSW: [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
