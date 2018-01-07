@@ -55,12 +55,21 @@ struct threshold_times {
 };
 
 /**
+ * @struct speed_throttling
+ * @ingroup params
+ */
+struct speed_throttling {
+  double block_carry{0.0};
+};
+
+/**
  * @struct fsm_params
  * @ingroup params
  */
 struct fsm_params : public rcppsw::common::base_params {
-  fsm_params(void) : times(), nest_center() {}
+  fsm_params(void) : times(), speed_throttling(), nest_center() {}
   struct threshold_times times;
+  struct speed_throttling speed_throttling;
   argos::CVector2 nest_center;
 };
 

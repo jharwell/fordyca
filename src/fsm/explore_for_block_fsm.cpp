@@ -106,12 +106,14 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
     ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
            force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
+    return controller::foraging_signal::HANDLED;
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
                                          argos::CRadians(1.0));
     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
     internal_event(ST_NEW_DIRECTION,
                    rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
+    return controller::foraging_signal::HANDLED;
   }
   /*
    * No obstacles nearby--all ahead full!

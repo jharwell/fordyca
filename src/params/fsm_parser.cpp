@@ -43,6 +43,10 @@ void fsm_parser::parse(argos::TConfigurationNode &node) {
   argos::GetNodeAttribute(fsm_node,
                           "frequent_collision_thresh",
                           m_params->times.frequent_collision_thresh);
+  argos::GetNodeAttribute(fsm_node,
+                          "speed_throttle_block_carry",
+                          m_params->speed_throttling.block_carry);
+
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
   res = parser.parse(fsm_node.GetAttribute("nest"));
@@ -56,6 +60,8 @@ void fsm_parser::show(std::ostream &stream) {
          << m_params->times.unsuccessful_explore_dir_change << std::endl;
   stream << "times.frequent_collision_thresh="
          << m_params->times.frequent_collision_thresh << std::endl;
+  stream << "speed_throttling.block_carry="
+         << m_params->speed_throttling.block_carry << std::endl;
   stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 

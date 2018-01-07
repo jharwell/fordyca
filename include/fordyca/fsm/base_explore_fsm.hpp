@@ -102,20 +102,6 @@ class base_explore_fsm : public base_foraging_fsm,
   };
 
   /**
-   * @brief Robots entering this state will randomly change their exploration
-   * direction to the specified direction. All signals are ignored in this
-   * state. Once the direction change has been accomplished, the robot will
-   * transition back to its previous state.
-   */
-  HFSM_STATE_DECLARE(base_explore_fsm, new_direction, state_machine::event_data);
-
-  /**
-   * @brief Simple state for entry into the new direction state, used to change
-   * LED color for visualization purposes.
-   */
-  HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_new_direction);
-
-  /**
    * @brief Simple state for entry in the main exploration state, used to change
    * LED color for visualization purposes.
    */

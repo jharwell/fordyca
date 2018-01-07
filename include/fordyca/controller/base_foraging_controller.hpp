@@ -121,6 +121,7 @@ class base_foraging_controller : public argos::CCI_Controller,
    */
   void tick(uint tick);
 
+
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
   const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
@@ -133,16 +134,21 @@ class base_foraging_controller : public argos::CCI_Controller,
     m_sensors = sensors;
   }
 
+  double speed_throttle_block_carry(void) const { return m_speed_throttle_block_carry; }
+
  private:
   void output_init(const struct params::output_params* params);
   std::string log_header_calc(void);
   std::string dbg_header_calc(void);
 
+  // clang-format off
   bool                                   m_display_id{false};
+  double                                 m_speed_throttle_block_carry{0.0};
   representation::block*                 m_block{nullptr};
   std::shared_ptr<actuator_manager>      m_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::er::server>    m_server;
+  // clang-format on
 };
 
 NS_END(fordyca, controller);

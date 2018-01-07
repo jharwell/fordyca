@@ -36,6 +36,7 @@
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/fsm_params.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -96,6 +97,14 @@ void base_foraging_controller::Init(argos::TConfigurationNode &node) {
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
 
+  auto *fsm_params = static_cast<const struct params::fsm_params *>(
+      param_repo.get_params("fsm"));
+
+  m_speed_throttle_block_carry = fsm_params->speed_throttling.block_carry;
+  if (m_speed_throttle_block_carry > 0) {
+    actuators()->set_throttle_percent(m_speed_throttle_block_carry);
+  }
+
   m_sensors = std::make_shared<base_foraging_sensors>(
       static_cast<const struct params::sensor_params *>(
           param_repo.get_params("sensors")),
@@ -103,6 +112,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode &node) {
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground"));
+
 
   this->Reset();
   ER_NOM("Base foraging controller initialization finished");
