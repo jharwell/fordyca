@@ -75,11 +75,18 @@ void forager::task_start(const task_allocation::taskable_argument *const) {
 } /* task_start() */
 
 double forager::calc_abort_prob(void) {
+  /*
+   * Foragers always have a small chance of aborting their task when not at a
+   * task interface. Having the forager task un-abortable until AFTER it
+   * acquires a block can cause it to get stuck and not switch to another task
+   * if it cannot find a block anywhere. See #232.
+   */
   if (is_transporting_to_cache()) {
     return m_abort_prob.calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
-  return 0.0;
+  return m_abort_prob.calc(executable_task::exec_time(),
+                           executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
 double forager::calc_interface_time(double start_time) {

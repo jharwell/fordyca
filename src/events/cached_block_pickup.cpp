@@ -76,6 +76,7 @@ void cached_block_pickup::visit(representation::cell2D &cell) {
   cell.fsm().accept(*this);
   if (!cell.state_has_cache()) {
     cell.entity(m_orphan_block);
+    ER_NOM("Cell gets orphan block%d", m_orphan_block->id());
   }
 } /* visit() */
 
@@ -136,7 +137,7 @@ void cached_block_pickup::visit(representation::arena_map &map) {
   }
   m_pickup_block->accept(*this);
   ER_NOM(
-      "arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu blocks remain)",
+      "arena_map: fb%zu: block%d from cache%d @(%zu, %zu) [%zu blocks remain]",
       m_robot_index,
       m_pickup_block->id(),
       cache_id,
@@ -190,8 +191,8 @@ void cached_block_pickup::visit(representation::perceived_arena_map &map) {
               cell_op::y());
   }
   ER_NOM(
-      "perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) (%zu "
-      "blocks remain)",
+      "perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) [%zu "
+      "blocks remain]",
       m_robot_index,
       m_pickup_block->id(),
       (pcache) ? pcache->id() : -1,

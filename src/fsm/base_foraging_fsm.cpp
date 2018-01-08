@@ -144,7 +144,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
   if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
     m_new_dir_count = 0;
-    ER_DIAG("Change direction: %f -> %f\n",
+    ER_DIAG("Change direction: %f -> %f",
             current_dir.GetValue(),
             m_new_dir.GetValue());
   }

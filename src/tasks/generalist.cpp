@@ -28,6 +28,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "rcppsw/er/server.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +44,8 @@ generalist::generalist(
     : partitionable_polled_task(rcppsw::er::g_server,
                                 "generalist",
                                 params,
-                                mechanism) {}
+                                mechanism),
+      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
 /*******************************************************************************
  * Member Functions
@@ -60,6 +62,17 @@ bool generalist::block_acquired(void) const {
              polled_task::mechanism())
       ->block_acquired();
 } /* cache_acquired() */
+
+double generalist::calc_abort_prob(void) {
+  /*
+   * Generalists always have a small chance of aborting their task when not at a
+   * task interface. Not strictly necessary at least for now, but it IS
+   * necessary for foragers and so it seems like a good idea to add this to all
+   * tasks.
+   */
+  return m_abort_prob.calc(executable_task::exec_time(),
+                           executable_task::exec_estimate());
+} /* calc_abort_prob() */
 
 /*******************************************************************************
  * Event Handling

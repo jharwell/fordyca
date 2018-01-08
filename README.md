@@ -13,7 +13,8 @@ following programs:
 
 - cmake
 - make
-- g++
+- gcc
+- g++ (a version that supports C++11 is required)
 
 In addition, you will possibly want to install these programs:
 
@@ -21,32 +22,26 @@ In addition, you will possibly want to install these programs:
 - icpc (additional syntax checking)
 - ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
-1. After cloning this repo, you will also need to clone the following repos:
+After cloning this repo, you will need to:
 
-  - https://github.com/jharwell/devel (dotfiles, project config, templates)
+1. Pull in the cmake config:
 
-  Before you can build anything, you will need to define some environment
-  variables:
+        git submodule update --init --recursive
 
-  - `develroot` - Set to the path to wherever you cloned the `devel` repo.
+2. Clone `rcsw` https://github.com/jharwell/rcsw (Reusable C software) somewhere
+   and link it into `ext/rcsw`.
 
-2. Adjust symlinks, as describe in the RCPPSW [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
+3. Clone `rcppsw` https://github.com/jharwell/rcppsw (Reusable C++ software)
+   somewhere and link it into `ext/rcppsw`.
 
-3. Verify you can build, by doing:
+3. Then you can build via:
 
-        cd /path/to/repo
         mkdir build && cd build
         cmake ..
         make
 
 ## Development Guide
 
-You will also want to clone `rcsw`, `rcppsw` somewhere and link it into
-`ext/rcsw` and `ext/rcppsw` respectively, rather than having cmake clone them,
-so that if you make changes to it they will be reflected in the code you are
-building.
-
-  - https://github.com/jharwell/rcsw (Reusable C software)
-  - https://github.com/jharwell/rcppsw (Reusable C++ software)
-
-See the development guide in RCPPSW: [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
+See the development guide in RCPPSW:
+[README](https://github.com/jharwell/rcppsw/blob/master/README.md), as it is
+basically the same for FORDYCA.

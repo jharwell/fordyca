@@ -86,11 +86,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.cache_acquired()) {
-      ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
 
       /* Check whether the foot-bot is actually on a cache */
       int cache = utils::robot_on_cache(robot, *map());
       if (-1 != cache) {
+        ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
         ER_NOM("fb%d incurring cache usage penalty: start=%u, duration=%u",
                utils::robot_id(robot), GetSpace().GetSimulationClock(), mc_cache_penalty);
         m_penalty_list.push_back(new cache_usage_penalty(&controller,

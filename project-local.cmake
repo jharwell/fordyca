@@ -8,6 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
+set(CMAKE_AUTOMOC OFF)
 
 # RCPPSW
 add_subdirectory(ext/rcppsw)
