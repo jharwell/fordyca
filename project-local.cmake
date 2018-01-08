@@ -10,20 +10,8 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 
 # RCPPSW
-if (NOT EXISTS ext/rcppsw)
-  execute_process(COMMAND git submodule update --init ext/rcppsw
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
 add_subdirectory(ext/rcppsw)
 include_directories(${rcppsw_INCLUDE_DIRS})
-
-# RCSW
-# if (NOT EXISTS ${CMAKE_SOURCE_DIR}/ext/rcsw)
-#   execute_process(COMMAND git submodule update --init ext/rcsw
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-# endif()
-# add_subdirectory(${CMAKE_SOURCE_DIR}/ext/rcsw)
-# include_directories(${rcsw_INCLUDE_DIRS})
 
 ################################################################################
 # Includes                                                                     #
