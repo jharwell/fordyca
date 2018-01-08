@@ -109,6 +109,11 @@ void perceived_arena_map::update_density(void) {
 
 void perceived_arena_map::cache_add(representation::cache &cache) {
   auto it = std::find(m_caches.begin(), m_caches.end(), cache);
+
+  /*
+   * If the cache is already in the list of known caches it needs to be removed,
+   * because the new version we just got from our LOS is more up to date.
+   */
   if (m_caches.end() != it) {
     cache_remove(*it);
   }
@@ -150,10 +155,13 @@ void perceived_arena_map::block_remove(representation::block &victim) {
    * @bug For some reason when I erase from this vector and the victim element
    * has already been erased and the vector no longer contains it, I get a
    * segmentation fault. Not sure why. This fixes it, at least for now. See
-   * #226, #227, #228.
+   * #229.
    */
-  if (!m_blocks.empty()) {
+  size_t old_size;
+  if (std::find(m_blocks.begin(), m_blocks.end(), victim) != m_blocks.end()) {
+    old_size = m_blocks.size();
     m_blocks.erase(std::remove(m_blocks.begin(), m_blocks.end(), victim));
+    ER_ASSERT(old_size - 1 == m_blocks.size(), "FATAL: Block not removed from map");
   }
 } /* block_remove() */
 

@@ -187,10 +187,11 @@ void foraging_controller::process_los(
      * caches in the LOS, even if you already know about them.
      */
     if (!map()->access(cache->discrete_loc()).state_has_cache()) {
-      ER_NOM("Discovered cache%d at (%zu, %zu)",
+      ER_NOM("Discovered cache%d at (%zu, %zu): %zu blocks",
              cache->id(),
              cache->discrete_loc().first,
-             cache->discrete_loc().second);
+             cache->discrete_loc().second,
+             cache->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't

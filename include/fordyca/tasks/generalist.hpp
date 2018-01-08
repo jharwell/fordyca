@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
-
+#include "rcppsw/task_allocation/abort_probability.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -84,8 +84,11 @@ class generalist : public task_allocation::partitionable_polled_task,
   void task_start(const task_allocation::taskable_argument* const) override {}
 
   double current_time(void) const override;
-  double calc_abort_prob(void) override { return 0.0; }
+  double calc_abort_prob(void) override;
   double calc_interface_time(double) override { return 0.0; }
+
+ private:
+  task_allocation::abort_probability m_abort_prob;
 };
 
 NS_END(tasks, fordyca);

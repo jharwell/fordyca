@@ -93,9 +93,6 @@ class perceived_arena_map: public rcppsw::er::client,
   /**
    * @brief Add a cache to the list of perceived caches.
    *
-   * If the cache is already in the list of known caches it needs to be removed,
-   * because the new version we just got from our LOS is more up to date.
-   *
    * @param cache Cache to add.
    */
   void cache_add(representation::cache& cache);

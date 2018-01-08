@@ -146,6 +146,14 @@ void acquire_block_fsm::init(void) {
 bool acquire_block_fsm::acquire_known_block(
     std::list<representation::const_perceived_block> blocks) {
 
+  /*
+   * If we don't know of any blocks and we are not current vectoring towards
+   * one, then there is no way we can acquire a known block, so bail out.
+   */
+  if (blocks.empty() && !m_vector_fsm.task_running()) {
+    return false;
+  }
+
   if (!blocks.empty() && !m_vector_fsm.task_running()) {
     /*
      * If we get here, we must know of some blocks, but not be currently
