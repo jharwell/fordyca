@@ -34,61 +34,49 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const representation::block *> line_of_sight::blocks(void) const {
-  std::list<const representation::block *> blocks;
-
+std::list<const block*> line_of_sight::blocks(void) const {
+  std::list<const block*> blocks;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      representation::cell2D *cell = m_view[i][j];
+      cell2D *cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_block()) {
-        assert(dynamic_cast<const representation::block *>(cell->entity()));
+        assert(dynamic_cast<const block *>(cell->entity()));
         blocks.push_back(cell->block());
       }
     } /* for(j..) */
   }   /* for(i..) */
-
   return blocks;
 } /* blocks() */
 
-std::list<const representation::cache *> line_of_sight::caches(void) const {
-  std::list<const representation::cache *> caches;
+std::list<const cache*> line_of_sight::caches(void) const {
+  std::list<const cache*> caches = m_caches;
 
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      representation::cell2D *cell = m_view[i][j];
+      cell2D *cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_cache()) {
-        assert(dynamic_cast<const representation::cache *>(cell->entity()));
+        assert(dynamic_cast<const cache *>(cell->entity()));
         caches.push_back(cell->cache());
       }
     } /* for(j..) */
   }   /* for(i..) */
-
   return caches;
 } /* caches() */
+
+void line_of_sight::cache_add(const cache* cache) {
+  auto los_caches = caches();
+  if (los_caches.end() == std::find(los_caches.begin(),
+                                    los_caches.end(), cache)) {
+    m_caches.push_back(cache);
+  }
+} /* cache_add() */
 
 __pure cell2D &line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
   return *m_view[i][j];
 }
-
-discrete_coord line_of_sight::cell_abs_coord(size_t i, size_t j) const {
-  size_t abs_i_coord, abs_j_coord;
-  if (i < sizex() / 2) {
-    abs_i_coord = m_center.first - i;
-  } else {
-    abs_i_coord = m_center.first + i;
-  }
-  if (j < sizey() / 2) {
-    abs_j_coord = m_center.second - j;
-  } else {
-    abs_j_coord = m_center.second + j;
-  }
-  assert(abs_i_coord > 0);
-  assert(abs_j_coord > 0);
-  return discrete_coord(abs_i_coord, abs_j_coord);
-} /* cell_abs_coord() */
 
 NS_END(representation, fordyca);

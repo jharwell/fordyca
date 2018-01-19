@@ -75,7 +75,6 @@ class generalist : public task_allocation::partitionable_polled_task,
   bool is_vectoring_to_cache(void) const override { return false; }
   bool is_acquiring_cache(void) const override { return false; }
   bool is_transporting_to_cache(void) const override { return false; }
-  std::string task_name(void) const override { return "generalist"; }
 
   bool cache_acquired(void) const override { return false; }
   bool block_acquired(void) const override;

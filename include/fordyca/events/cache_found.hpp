@@ -51,7 +51,7 @@ class cache_found : public perceived_cell_op,
                     public rcppsw::er::client {
  public:
   cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-              representation::cache* cache);
+              std::unique_ptr<representation::cache> cache);
   ~cache_found(void) override;
 
   cache_found(const cache_found& op) = delete;
@@ -68,7 +68,8 @@ class cache_found : public perceived_cell_op,
   void visit(controller::depth0::stateful_foraging_controller&) override {}
 
  private:
-  representation::cache* m_cache;
+  std::unique_ptr<representation::cache> m_cache;
+  representation::cache* m_tmp_cache{nullptr};
 };
 
 NS_END(events, fordyca);

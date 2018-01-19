@@ -88,6 +88,8 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
   representation::block* block(void) { return decoratee().block(); }
   representation::cache* cache(void) { return decoratee().cache(); }
   const representation::cell_entity* entity(void) const { return decoratee().entity(); }
+  void entity(cell_entity* e) { decoratee().entity(e); }
+  representation::discrete_coord loc(void) const { return decoratee().loc(); }
 
   /**
    * @brief Update the information relevance/pheromone density associated with

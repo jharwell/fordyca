@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -74,10 +75,6 @@ void cached_block_pickup::visit(representation::cell2D &cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   cell.fsm().accept(*this);
-  if (!cell.state_has_cache()) {
-    cell.entity(m_orphan_block);
-    ER_NOM("Cell gets orphan block%d", m_orphan_block->id());
-  }
 } /* visit() */
 
 void cached_block_pickup::visit(representation::cache &cache) {
@@ -110,6 +107,7 @@ void cached_block_pickup::visit(representation::arena_map &map) {
             "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
             m_real_cache->n_blocks(),
             cell.block_count());
+
   /*
    * If there are more than 2 blocks in cache, just remove one, and update the
    * underlying cell. If there are only 2 left, do the same thing but also
@@ -127,10 +125,14 @@ void cached_block_pickup::visit(representation::arena_map &map) {
     m_real_cache->block_remove(m_pickup_block);
     m_orphan_block = m_real_cache->block_get();
     cell.accept(*this);
+
     ER_ASSERT(cell.state_has_block(),
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(),
               cell_op::y());
+    cell.entity(m_orphan_block);
+    ER_DIAG("Cell gets orphan block%d", m_orphan_block->id());
+
     map.cache_remove(*m_real_cache);
     map.cache_removed(true);
     m_real_cache = nullptr;
@@ -161,44 +163,35 @@ void cached_block_pickup::visit(representation::perceived_arena_map &map) {
             "FATAL: perceived cache does not contain ref to block to be picked "
             "up");
 
-  pcache->block_remove(m_pickup_block);
-  if (1 == pcache->n_blocks()) {
-    map.cache_remove(*pcache);
-    pcache = nullptr;
-  }
-
-  /*
-   * If the cell does not contain a cache, then the robot has managed to drive
-   * into the cache without the cell that actually contains the blocks/cache
-   * ending up in its LOS, and so it thinks it is empty, which will trigger an
-   * assert later. This *should* never happen (see fixed issue #152), but if it
-   * does, we don't want to assert. Instead, because the cell will be in an
-   * empty state, we just don't do anything.
-   */
-  if (cell.state_has_cache()) {
+  if (pcache->n_blocks() > 2) {
+    pcache->block_remove(m_pickup_block);
     cell.accept(*this);
-  }
-
-  if (nullptr != pcache) {
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(),
               cell_op::y());
+    ER_NOM(
+        "perceived_arena_map: fb%zu: block%d from cache%d@(%zu, %zu) [%zu "
+        "blocks remain]",
+        m_robot_index,
+        m_pickup_block->id(),
+        pcache->id(),
+        cell_op::x(),
+        cell_op::y(),
+        pcache->n_blocks());
+
   } else {
-    ER_ASSERT(cell.state_has_block(),
-              "FATAL: cell@(%zu, %zu) with 1 block has cache",
-              cell_op::x(),
-              cell_op::y());
+    pcache->block_remove(m_pickup_block);
+    map.cache_remove(pcache);
+    pcache = nullptr;
+    ER_NOM(
+        "perceived_arena_map: fb%zu: block%d from cache%d@(%zu, %zu) [cache empty]",
+        m_robot_index,
+        m_pickup_block->id(),
+        (pcache) ? pcache->id() : -1,
+        cell_op::x(),
+        cell_op::y());
   }
-  ER_NOM(
-      "perceived_arena_map: fb%zu: block%d from cache%d @(%zu, %zu) [%zu "
-      "blocks remain]",
-      m_robot_index,
-      m_pickup_block->id(),
-      (pcache) ? pcache->id() : -1,
-      cell_op::x(),
-      cell_op::y(),
-      (pcache) ? pcache->n_blocks() : 1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::block &block) {

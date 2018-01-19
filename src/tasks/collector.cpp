@@ -40,7 +40,8 @@ NS_START(fordyca, tasks);
  ******************************************************************************/
 collector::collector(const struct task_allocation::task_params *const params,
                      std::unique_ptr<task_allocation::taskable> &mechanism)
-    : polled_task("collector", params, mechanism),
+    : polled_task(kCollectorName, params, mechanism),
+      foraging_task(kCollectorName),
       m_interface_sw(false),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 

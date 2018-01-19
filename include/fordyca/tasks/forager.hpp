@@ -71,7 +71,6 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override;
-  std::string task_name(void) const override { return "forager"; }
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;

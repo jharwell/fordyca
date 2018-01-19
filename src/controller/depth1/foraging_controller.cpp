@@ -67,12 +67,13 @@ foraging_controller::foraging_controller(void)
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
   /*
-   * Update the perceived arena map with the current line-of-sight, and update
-   * the relevance of information within it. Then, you can run the main FSM
-   * loop.
+   * Update the perceived arena map with the current line-of-sight, update
+   * the relevance of information (density) within it, and fix any blocks that
+   * should be hidden from our awareness.
    */
   process_los(depth0::stateful_foraging_controller::los());
-  depth0::stateful_foraging_controller::map()->update_density();
+  /* map()->hidden_blocks_remove(); */
+  map()->update_density();
   m_task_aborted = false;
   if (is_carrying_block()) {
     actuators()->set_speed_throttle(true);
@@ -180,7 +181,23 @@ void foraging_controller::process_los(
     const representation::line_of_sight *const c_los) {
   depth0::stateful_foraging_controller::process_los(c_los);
 
-  for (auto cache : c_los->caches()) {
+  /*
+   * If the robot thinks that a cell contains a cache, because the cell had one
+   * the last time it passed nearby, but when coming near the cell a second time
+   * the cell does not contain a cache, then the cache was depleted between then
+   * and now, and it needs to update its internal representation accordingly.
+   */
+  for (size_t i = 0; i < c_los->sizex(); ++i) {
+    for (size_t j = 0; j < c_los->sizey(); ++j) {
+      representation::discrete_coord d = c_los->cell(i, j).loc();
+      if (c_los->cell(i, j).state_is_empty() &&
+          map()->access(d).state_has_cache()) {
+        map()->cache_remove(map()->access(d).cache());
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
+
+    for (auto cache : c_los->caches()) {
     /*
      * The state of a cache can change between when the robot saw it last
      * (i.e. different # of blocks in it), and so you need to always process
@@ -198,18 +215,17 @@ void foraging_controller::process_los(
      * want to just pass that into the robot's arena_map, as keeping them in
      * sync is not possible in all situations.
      *
-     * For example if a block executing the collector task picks up a block and
+     * For example, if a block executing the collector task picks up a block and
      * tries to compute the best cache to bring it to, only to have one or more
      * of its cache references be invalid due to other robots causing caches to
      * be created/destroyed.
      *
      * Cloning is definitely necessary here.
      */
-    std::unique_ptr<representation::cache> clone = cache->clone();
-    events::cache_found op(base_foraging_controller::server(), clone.get());
+    events::cache_found op(base_foraging_controller::server(), cache->clone());
     map()->accept(op);
-    clone.reset();
   } /* for(cache..) */
+
 } /* process_los() */
 
 /*******************************************************************************

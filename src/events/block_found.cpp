@@ -36,21 +36,27 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
-                         representation::block *block)
+                         std::unique_ptr<representation::block> block)
     : perceived_cell_op(block->discrete_loc().first,
                         block->discrete_loc().second),
       client(server),
-      m_block(block) {
+      m_block(std::move(block)),
+      m_tmp_block(nullptr) {
   client::insmod("block_found",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
+}
+
+block_found::~block_found(void) {
+  client::rmmod();
 }
 
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(representation::cell2D &cell) {
-  cell.entity(m_block);
+  ER_ASSERT(nullptr != m_tmp_block, "FATAL: NULL block?");
+  cell.entity(m_tmp_block);
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -63,27 +69,13 @@ void block_found::visit(fsm::cell2D_fsm &fsm) {
     fsm.event_block_drop();
   }
   ER_ASSERT(fsm.state_has_block(),
-            "FATAL: Perceived cell does not contain block after block found "
-            "event");
+            "FATAL: Perceived cell in incorrect state after block found event");
 } /* visit() */
 
 void block_found::visit(representation::perceived_cell2D &cell) {
-  /*
-   * Update the pheromone density associated with the cell BEFORE updating the
-   * state of the cell.
-   *
-   * It is possible that this block found event was generated because we were
-   * in/on a cache that someone else picked up the last block from, and the
-   * remaining orphan block has now entered our LOS. In that case, the cell will
-   * still be in the HAS_CACHE state until the event is propagated all the way
-   * through, and we can use that to reset the pheromone density for the cell,
-   * which may be very high (a well known cache). It should be reset to 1.0 for
-   * a newly discovered block.
-   */
   if (cell.state_has_cache()) {
     cell.density_reset();
   }
-
   if (cell.pheromone_repeat_deposit() ||
       (!cell.pheromone_repeat_deposit() && !cell.state_has_block())) {
     cell.pheromone_add(1.0);
@@ -95,12 +87,25 @@ void block_found::visit(representation::perceived_arena_map &map) {
   representation::perceived_cell2D& cell = map.access(cell_op::x(),
                                                       cell_op::y());
 
+  /*
+   * If the cell is currently in a HAS_CACHE state, then that means that this
+   * cell is coming back into our LOS with a block, when it contained a cache
+   * the last time it was seen. Remove the cache/synchronize with reality.
+   */
   if (cell.state_has_cache()) {
-    map.cache_remove(*cell.cache());
+    map.cache_remove(cell.cache());
   }
-  map.block_add(*m_block);
-  m_block = &map.blocks().back();
-  cell.accept(*this);
+  m_tmp_block = m_block.get();
+
+  /*
+   * ONLY if we actually added a block the list of known blocks do we update
+   * what block the cell points to. If we do it unconditionally, we are left
+   * with dangling references as a result of mixing unique_ptr and raw ptr. See
+   * #229.
+   */
+  if (map.block_add(m_block)) {
+    cell.accept(*this);
+  }
 } /* visit() */
 
 NS_END(events, fordyca);

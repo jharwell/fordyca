@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
@@ -66,7 +68,12 @@ class foraging_task : public metrics::collectible_metrics::fsm::stateless_metric
                                                             events::free_block_pickup,
                                                             events::nest_block_drop> {
  public:
-  foraging_task(void) = default;
+  static constexpr char kCollectorName[] = "Collector";
+  static constexpr char kForagerName[] = "Forager";
+  static constexpr char kGeneralistName[] = "Generalist";
+
+  explicit foraging_task(const std::string& name)
+      : mc_name(name) {}
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the
@@ -79,6 +86,11 @@ class foraging_task : public metrics::collectible_metrics::fsm::stateless_metric
    * block pickup signal from the arena.
    */
   virtual bool block_acquired(void) const = 0;
+
+  std::string task_name(void) const override { return mc_name; }
+
+ private:
+  const std::string mc_name;
 };
 
 NS_END(tasks, fordyca);

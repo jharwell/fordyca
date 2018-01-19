@@ -43,7 +43,8 @@ NS_START(fordyca, tasks);
  ******************************************************************************/
 forager::forager(const struct task_allocation::task_params *params,
                  std::unique_ptr<task_allocation::taskable> &mechanism)
-    : polled_task("forager", params, mechanism),
+    : polled_task(kForagerName, params, mechanism),
+      foraging_task(kForagerName),
       m_was_transporting(false),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
