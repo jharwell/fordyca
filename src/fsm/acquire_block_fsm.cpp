@@ -185,7 +185,6 @@ bool acquire_block_fsm::acquire_known_block(
       return true;
     }
     ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-    m_map->block_remove(*m_best_block);
     return false;
   }
   return false;

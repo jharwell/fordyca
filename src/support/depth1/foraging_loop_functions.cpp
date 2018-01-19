@@ -128,7 +128,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity &robot) {
       static_cast<metrics::collectible_metrics::task_metrics &>(controller));
 
   utils::set_robot_pos<controller::depth1::foraging_controller>(robot);
-  utils::set_robot_los<controller::depth1::foraging_controller>(robot, *map());
+  set_robot_los<controller::depth1::foraging_controller>(robot, *map());
   set_robot_tick<controller::depth1::foraging_controller>(robot);
 
   if (handle_task_abort<controller::depth1::foraging_controller>(robot)) {
@@ -260,11 +260,25 @@ bool foraging_loop_functions::block_drop_overlap_with_cache(
     const representation::block* block,
     const representation::cache& cache,
     const argos::CVector2& drop_loc) {
-  return !(cache.contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
-           cache.contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
-           cache.contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
-           cache.contains_point(drop_loc - argos::CVector2(0, block->ysize())));
+  return (cache.contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
+          cache.contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
+          cache.contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
+          cache.contains_point(drop_loc - argos::CVector2(0, block->ysize())));
 } /* block_drop_overlap_with_cache() */
+
+bool foraging_loop_functions::block_drop_overlap_with_nest(
+    const representation::block* block,
+    const argos::CVector2& drop_loc) {
+  return (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(
+      drop_loc.GetX() + block->xsize()) ||
+      nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(
+          drop_loc.GetX() - block->xsize()) ||
+      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(
+          drop_loc.GetY() + block->ysize()) ||
+      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(
+          drop_loc.GetY() - block->ysize()));
+} /* block_drop_overlap_with_nest() */
+
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different

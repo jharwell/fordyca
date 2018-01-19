@@ -88,7 +88,7 @@ void cache_block_drop::visit(representation::arena_map &map) {
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access(cell_op::x(), cell_op::y()).accept(*this);
-  ER_NOM("arena_map: fb%d dropped block%d in cache%d (%zu blocks total)",
+  ER_NOM("arena_map: fb%d dropped block%d in cache%d [%zu blocks total]",
          index,
          m_block->id(),
          m_cache->id(),

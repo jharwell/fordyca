@@ -57,6 +57,7 @@ class cache_usage_penalty {
 
   uint cache_id(void) const { return m_cache_id; }
   const controller::depth1::foraging_controller* controller(void) const { return m_controller; }
+  uint start_time(void) const { return m_start_time; }
 
   /**
    * @brief If \c TRUE, then the robot has satisfied the cache penalty.

@@ -42,9 +42,10 @@ generalist::generalist(
     const struct task_allocation::partitionable_task_params *const params,
     std::unique_ptr<task_allocation::taskable> &mechanism)
     : partitionable_polled_task(rcppsw::er::g_server,
-                                "generalist",
+                                kGeneralistName,
                                 params,
                                 mechanism),
+      foraging_task(kGeneralistName),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
 /*******************************************************************************

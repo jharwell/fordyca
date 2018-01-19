@@ -30,6 +30,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -86,16 +87,26 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.cache_acquired()) {
-
       /* Check whether the foot-bot is actually on a cache */
       int cache = utils::robot_on_cache(robot, *map());
       if (-1 != cache) {
-        ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
-        ER_NOM("fb%d incurring cache usage penalty: start=%u, duration=%u",
-               utils::robot_id(robot), GetSpace().GetSimulationClock(), mc_cache_penalty);
+        ER_ASSERT(!controller.block_detected(),
+                  "FATAL: Block detected in cache?");
+        ER_NOM("fb%d: start=%u, duration=%u",
+               utils::robot_id(robot),
+               GetSpace().GetSimulationClock(),
+               mc_cache_penalty);
+        uint penalty = mc_cache_penalty;
+        for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
+          if ((*it)->start_time() == GetSpace().GetSimulationClock()) {
+            ++penalty;
+            it = m_penalty_list.begin();
+          }
+        } /* for(i..) */
+
         m_penalty_list.push_back(new cache_usage_penalty(&controller,
                                                          cache,
-                                                         mc_cache_penalty,
+                                                         penalty,
                                                          GetSpace().GetSimulationClock()));
         return true;
       }
@@ -218,6 +229,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
      */
     if (controller.task_aborted()) {
       if (controller.is_carrying_block()) {
+        ER_NOM("%s aborted task %s while carrying block%d",
+               controller.GetId().c_str(),
+               controller.current_task()->task_name().c_str(),
+               controller.block()->id());
+
         /*
          * If the robot is currently right on the edge of a cache, we can't just
          * drop the block here, as it will overlap with the cache, and robots
@@ -233,6 +249,17 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
           }
         } /* for(cache..) */
 
+        /*
+         * If the robot is currently right on the edge of the nest, we can't
+         * just drop the block in the nest, as it will not be processed as a
+         * normal block_nest_drop, and will be discoverable by a robot via LOS
+         * but not able to be acquired, as its color is hidden by that of the
+         * nest.
+         */
+        if (block_drop_overlap_with_nest(controller.block(),
+                                         controller.robot_loc())) {
+          conflict = true;
+        }
         if (!conflict) {
           representation::discrete_coord d =
               representation::real_to_discrete_coord(controller.robot_loc(),
@@ -251,6 +278,10 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
           controller.block(nullptr);
           floor()->SetChanged();
         }
+      } else {
+        ER_NOM("%s aborted task %s (no block)",
+               controller.GetId().c_str(),
+               controller.current_task()->task_name().c_str());
       }
       auto it = std::find_if(m_penalty_list.begin(),
                              m_penalty_list.end(),
@@ -269,12 +300,56 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     return false;
   }
 
+  /**
+   * @brief Set the LOS of a robot in the arena, INCLUDING handling caches whose
+   * extent overlaps the LOS but whose host cell is not in the LOS (see #229).
+   */
+  template<typename T>
+  void set_robot_los(argos::CFootBotEntity& robot,
+                     representation::arena_map& map) {
+    argos::CVector2 pos;
+    pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+            const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
+
+    representation::discrete_coord robot_loc =
+        representation::real_to_discrete_coord(pos, map.grid_resolution());
+    auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+    std::unique_ptr<representation::line_of_sight> new_los =
+        rcppsw::make_unique<representation::line_of_sight>(
+            map.subgrid(robot_loc.first, robot_loc.second, 2),
+            robot_loc);
+
+    /* for (auto &c : map.caches()) { */
+    /*   argos::CVector2 ll = representation::discrete_to_real_coord( */
+    /*       new_los->abs_ll(), */
+    /*       map.grid_resolution()); */
+    /*   argos::CVector2 lr = representation::discrete_to_real_coord( */
+    /*       new_los->abs_lr(), */
+    /*       map.grid_resolution()); */
+    /*   argos::CVector2 ul = representation::discrete_to_real_coord( */
+    /*       new_los->abs_ul(), */
+    /*       map.grid_resolution()); */
+    /*   argos::CVector2 ur = representation::discrete_to_real_coord( */
+    /*       new_los->abs_ur(), */
+    /*       map.grid_resolution()); */
+    /*   if (c.contains_point(ll) || c.contains_point(lr) || */
+    /*       c.contains_point(ul) || c.contains_point(ur)) { */
+    /*     auto los_caches = new_los->caches(); */
+    /*     new_los->cache_add(&c); */
+    /*   } */
+    /* } /\* for(&c..) *\/ */
+
+    controller.los(new_los);
+  }
+
  private:
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   bool block_drop_overlap_with_cache(const representation::block* block,
                                      const representation::cache& cache,
                                      const argos::CVector2& drop_loc);
+  bool block_drop_overlap_with_nest(const representation::block* block,
+                                    const argos::CVector2& drop_loc);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   uint                                                        mc_cache_penalty{0};
