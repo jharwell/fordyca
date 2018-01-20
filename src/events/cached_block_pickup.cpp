@@ -179,6 +179,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
         pcache->n_blocks());
 
   } else {
+    int id = pcache->id();
     pcache->block_remove(m_pickup_block);
     map.cache_remove(pcache);
     pcache = nullptr;
@@ -187,7 +188,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
         "empty]",
         m_robot_index,
         m_pickup_block->id(),
-        (pcache) ? pcache->id() : -1,
+        id,
         cell_op::x(),
         cell_op::y());
   }
