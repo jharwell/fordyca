@@ -83,8 +83,7 @@ double forager::calc_abort_prob(void) {
     return m_abort_prob.calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
-  return m_abort_prob.calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
+  return 0.0;
 } /* calc_abort_prob() */
 
 double forager::calc_interface_time(double start_time) {

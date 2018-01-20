@@ -72,8 +72,7 @@ double collector::calc_abort_prob(void) {
    * tasks.
    */
   if (is_transporting_to_nest()) {
-    return m_abort_prob.calc(executable_task::exec_time(),
-                             executable_task::exec_estimate());
+    return 0.0;
   }
   return m_abort_prob.calc(executable_task::interface_time(),
                            executable_task::interface_estimate());
