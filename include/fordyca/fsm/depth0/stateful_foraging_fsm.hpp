@@ -138,9 +138,12 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
+  // clang-format off
   bool                                                  m_task_running;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
   block_to_nest_fsm                                     m_block_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

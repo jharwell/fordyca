@@ -1,5 +1,5 @@
 /**
- * @file cell_unknown.hpp
+ * @file foraging_task.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,55 +18,21 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CELL_UNKNOWN_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CELL_UNKNOWN_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace representation {
-class cell2D;
-}
-namespace fsm {
-class perceived_cell2D_fsm;
-}
-
-NS_START(events);
+NS_START(fordyca, tasks);
 
 /*******************************************************************************
- * Class Definitions
+ * Constant Definitions
  ******************************************************************************/
-/**
- * @class cell_unknown
- * @ingroup events
- *
- * @brief Created whenever a cell within an occupancy grid needs to go into an
- * unknown state.
- *
- * This happens in two cases:
- *
- * 1. After its relevance expires.
- * 2. Before the robot sees it for the first time (ala Fog of War).
- */
-class cell_unknown : public cell_op {
- public:
-  cell_unknown(size_t x, size_t y) : cell_op(x, y) {}
+constexpr char foraging_task::kCollectorName[];
+constexpr char foraging_task::kForagerName[];
+constexpr char foraging_task::kGeneralistName[];
 
-  /* stateless foraging */
-  void visit(representation::perceived_cell2D& cell) override;
-
-  /* stateful foraging */
-  void visit(representation::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-};
-
-NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_CELL_UNKNOWN_HPP_ */
+NS_END(tasks, fordyca);

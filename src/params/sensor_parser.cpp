@@ -31,7 +31,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void sensor_parser::parse(argos::TConfigurationNode &node) {
+void sensor_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode diff_node =
       argos::GetNode(argos::GetNode(node, "sensors"), "proximity");
   m_params = rcppsw::make_unique<struct sensor_params>();
@@ -42,7 +42,7 @@ void sensor_parser::parse(argos::TConfigurationNode &node) {
   argos::GetNodeAttribute(diff_node, "delta", m_params->proximity.delta);
 } /* parse() */
 
-void sensor_parser::show(std::ostream &stream) {
+void sensor_parser::show(std::ostream& stream) {
   stream << "====================\nSensor params\n====================\n";
   stream << "delta=" << m_params->proximity.delta << std::endl;
   stream << "go_straight_angle_range="
@@ -50,8 +50,9 @@ void sensor_parser::show(std::ostream &stream) {
 } /* show() */
 
 __pure bool sensor_parser::validate(void) {
-  if (!(m_params->proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() > 0)) {
-      return false;
+  if (!(m_params->proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
+        0)) {
+    return false;
   }
   if (m_params->proximity.delta <= 0) {
     return false;

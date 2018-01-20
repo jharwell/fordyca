@@ -27,8 +27,8 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -59,11 +59,24 @@ class cell2D;
 class line_of_sight {
  public:
   line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
-                discrete_coord center) :
-      m_center(std::move(center)), m_view(c_view) {}
+                discrete_coord center)
+      : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
-  std::list<const representation::block*> blocks(void) const;
-  std::list<const representation::cache*> caches(void) const;
+  std::list<const block*> blocks(void) const;
+  std::list<const cache*> caches(void) const;
+
+  /**
+   * @brief Add a cache to the LOS, beyond those that currently exist in the
+   * LOS.
+   *
+   * This function is sometimes necessary because there unless the cell that a
+   * cache actually resides in falls within a robot's LOS, they will not
+   * actually see the cache, even if part of the cache's extent overlaps with
+   * the LOS. This can cause robots to get a \ref cached_block_pickup event from
+   * a cache that they do not currently track in their \ref perceived_arena_map,
+   * which is bad.
+   */
+  void cache_add(const cache* cache);
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -71,6 +84,11 @@ class line_of_sight {
    * @return The X dimension.
    */
   size_t sizex(void) const { return m_view.shape()[0]; }
+
+  discrete_coord abs_ll(void) const;
+  discrete_coord abs_lr(void) const;
+  discrete_coord abs_ul(void) const;
+  discrete_coord abs_ur(void) const;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
@@ -99,17 +117,6 @@ class line_of_sight {
   cell2D& cell(size_t i, size_t j) const;
 
   /**
-   * @brief Translate the relative coordinates within a LOS to an absolute
-   * coordinate that can be used to index into the arena_map.
-   *
-   * @param i The relative X coord within the LOS.
-   * @param j The relative Y coord with the LOS.
-   *
-   * @return The absolute (X, Y) coordinates.
-   */
-  discrete_coord cell_abs_coord(size_t i, size_t j) const;
-
-  /**
    * @brief Get the coordinates for the center of the LOS.
    *
    * @return The center coordinates (discrete version).
@@ -117,9 +124,13 @@ class line_of_sight {
   const discrete_coord& center(void) const { return m_center; }
 
  private:
+  void add_caches_from_view(void);
+  void add_blocks_from_view(void);
+
   // clang-format off
   discrete_coord                 m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
+  std::list<const cache*>        m_caches;
   // clang-format on
 };
 

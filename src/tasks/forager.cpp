@@ -41,9 +41,10 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-forager::forager(const struct task_allocation::task_params *params,
-                 std::unique_ptr<task_allocation::taskable> &mechanism)
-    : polled_task("forager", params, mechanism),
+forager::forager(const struct task_allocation::task_params* params,
+                 std::unique_ptr<task_allocation::taskable>& mechanism)
+    : polled_task(kForagerName, params, mechanism),
+      foraging_task(kForagerName),
       m_was_transporting(false),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
@@ -51,25 +52,22 @@ forager::forager(const struct task_allocation::task_params *params,
  * Member Functions
  ******************************************************************************/
 __pure double forager::current_time(void) const {
-  return dynamic_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return dynamic_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
 bool forager::cache_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->cache_acquired();
 } /* cache_acquired() */
 
 bool forager::block_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->block_acquired();
 } /* cache_acquired() */
 
-void forager::task_start(const task_allocation::taskable_argument *const) {
+void forager::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
@@ -106,10 +104,10 @@ double forager::calc_interface_time(double start_time) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void forager::accept(events::cache_block_drop &visitor) {
+void forager::accept(events::cache_block_drop& visitor) {
   visitor.visit(*this);
 }
-void forager::accept(events::free_block_pickup &visitor) {
+void forager::accept(events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 
@@ -117,14 +115,12 @@ void forager::accept(events::free_block_pickup &visitor) {
  * Base Diagnostics
  ******************************************************************************/
 bool forager::is_exploring_for_block(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_exploring_for_block();
 } /* is_exploring_for_block() */
 
 bool forager::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
@@ -132,14 +128,12 @@ bool forager::is_avoiding_collision(void) const {
  * Depth0 Diagnostics
  ******************************************************************************/
 bool forager::is_acquiring_block(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_acquiring_block();
 } /* is_acquiring_block() */
 
 bool forager::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 
@@ -147,26 +141,22 @@ bool forager::is_vectoring_to_block(void) const {
  * Depth1 Diagnostics
  ******************************************************************************/
 bool forager::is_exploring_for_cache(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_exploring_for_cache();
 } /* is_exploring_for_cache() */
 
 bool forager::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_vectoring_to_cache();
 } /* is_vectoring_to_cache() */
 
 bool forager::is_acquiring_cache(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_acquiring_cache();
 } /* is_acquiring_cache() */
 
 bool forager::is_transporting_to_cache(void) const {
-  return static_cast<fsm::depth1::block_to_cache_fsm *>(
-             polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_transporting_to_cache();
 } /* is_transporting_to_cache() */
 

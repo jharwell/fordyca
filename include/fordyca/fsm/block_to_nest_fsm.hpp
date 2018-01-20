@@ -24,27 +24,34 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/task_allocation/taskable.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
+#include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
+namespace params {
+struct fsm_params;
+}
 namespace controller {
-namespace depth1 { class foraging_sensors; }
+namespace depth1 {
+class foraging_sensors;
+}
 class actuator_manager;
 }
-namespace representation { class perceived_arena_map; class block; }
+namespace representation {
+class perceived_arena_map;
+class block;
+}
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
@@ -65,12 +72,13 @@ NS_START(fsm);
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class block_to_nest_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::fsm::stateless_metrics,
-                          public metrics::collectible_metrics::fsm::stateful_metrics,
-                          public metrics::collectible_metrics::fsm::depth1_metrics,
-                          public task_allocation::taskable,
-                          public visitor::visitable_any<block_to_nest_fsm> {
+class block_to_nest_fsm
+    : public base_foraging_fsm,
+      public metrics::collectible_metrics::fsm::stateless_metrics,
+      public metrics::collectible_metrics::fsm::stateful_metrics,
+      public metrics::collectible_metrics::fsm::depth1_metrics,
+      public task_allocation::taskable,
+      public visitor::visitable_any<block_to_nest_fsm> {
  public:
   block_to_nest_fsm(
       const struct params::fsm_params* params,
@@ -84,7 +92,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const task_allocation::taskable_argument * arg) override;
+  void task_start(const task_allocation::taskable_argument* arg) override;
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }
@@ -190,7 +198,8 @@ class block_to_nest_fsm : public base_foraging_fsm,
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm,
+                     transport_to_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
@@ -199,10 +208,12 @@ class block_to_nest_fsm : public base_foraging_fsm,
   /* memory foraging states */
   HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_free_block);
-  HFSM_STATE_DECLARE(block_to_nest_fsm, wait_for_block_pickup,
+  HFSM_STATE_DECLARE(block_to_nest_fsm,
+                     wait_for_block_pickup,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_cached_block);
-  HFSM_STATE_DECLARE(block_to_nest_fsm, wait_for_cache_pickup,
+  HFSM_STATE_DECLARE(block_to_nest_fsm,
+                     wait_for_cache_pickup,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
   HFSM_ENTRY_DECLARE_ND(block_to_nest_fsm, entry_wait_for_pickup);
@@ -214,13 +225,15 @@ class block_to_nest_fsm : public base_foraging_fsm,
    * states in \enum fsm_states, or things will not work correctly.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  return &mc_state_map[index];
+    return &mc_state_map[index];
   }
 
+  // clang-format off
   uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   depth1::acquire_cache_fsm                             m_cache_fsm;
+  // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

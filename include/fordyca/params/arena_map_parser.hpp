@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/arena_map_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/depth1/cache_parser.hpp"
+#include "fordyca/params/grid_parser.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,13 +47,15 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
  */
-class arena_map_parser: public rcppsw::common::xml_param_parser {
+class arena_map_parser : public rcppsw::common::xml_param_parser {
  public:
-  arena_map_parser(void): m_params(), m_grid_parser(), m_block_parser(),
-                          m_cache_parser() {}
+  arena_map_parser(void)
+      : m_params(), m_grid_parser(), m_block_parser(), m_cache_parser() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct arena_map_params* get_results(void) override { return m_params.get(); }
+  const struct arena_map_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

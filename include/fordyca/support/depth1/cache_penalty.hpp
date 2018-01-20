@@ -1,5 +1,5 @@
 /**
- * @file cache_usage_penalty.hpp
+ * @file cache_penalty.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_USAGE_PENALTY_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_USAGE_PENALTY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,15 +39,15 @@ NS_START(support, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_usage_penalty
+ * @class cache_penalty
  * @ingroup support depth1
  *
  * @brief Handles subjecting a robot to a penalty when picking up from/dropping
  * in a cache via a specified timeout in which the robot will sit still.
  */
-class cache_usage_penalty {
+class cache_penalty {
  public:
-  cache_usage_penalty(const controller::depth1::foraging_controller* const controller,
+  cache_penalty(const controller::depth1::foraging_controller* const controller,
                       uint cache_id,
                       uint penalty,
                       uint start_time) : m_cache_id(cache_id),
@@ -57,19 +57,28 @@ class cache_usage_penalty {
 
   uint cache_id(void) const { return m_cache_id; }
   const controller::depth1::foraging_controller* controller(void) const { return m_controller; }
+  uint start_time(void) const { return m_start_time; }
+
+  bool operator==(const cache_penalty& other) {
+    return this->controller() == other.controller();
+  }
 
   /**
    * @brief If \c TRUE, then the robot has satisfied the cache penalty.
    */
-  bool penalty_satisfied(uint current_time) { return current_time - m_start_time >= m_penalty; }
+  bool penalty_satisfied(uint current_time) {
+    return current_time - m_start_time >= m_penalty;
+  }
 
  private:
+  // clang-format off
   uint                                                m_cache_id;
   uint                                                m_penalty;
   uint                                                m_start_time;
   const controller::depth1::foraging_controller*const m_controller;
+  // clang-format on
 };
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_USAGE_PENALTY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HPP_ */

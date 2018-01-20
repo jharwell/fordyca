@@ -33,7 +33,7 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
-    const std::shared_ptr<rcppsw::er::server> &server,
+    const std::shared_ptr<rcppsw::er::server>& server,
     argos::CVector2 nest_loc)
     : client(server), m_nest_loc(nest_loc) {
   insmod("existing_cache_selector",
@@ -48,7 +48,7 @@ representation::const_perceived_cache existing_cache_selector::calc_best(
     const std::list<representation::const_perceived_cache>& existing_caches,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  const representation::cache *best = nullptr;
+  const representation::cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "FATAL: no known existing caches");
 
   for (auto pair : existing_caches) {

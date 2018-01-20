@@ -37,11 +37,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 block_to_nest_fsm::block_to_nest_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<representation::perceived_arena_map> &map)
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -66,22 +66,22 @@ block_to_nest_fsm::block_to_nest_fsm(
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                               NULL,
+                                               nullptr,
                                                &entry_wait_for_pickup,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_pickup,
-                                               NULL,
+                                               nullptr,
                                                &entry_wait_for_pickup,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
-                                               NULL,
+                                               nullptr,
                                                &entry_transport_to_nest,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                               NULL,
+                                               nullptr,
                                                &entry_collision_avoidance,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
@@ -220,8 +220,8 @@ void block_to_nest_fsm::init(void) {
 } /* init() */
 
 void block_to_nest_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument *const arg) {
-  auto * a = dynamic_cast<const tasks::foraging_signal_argument *const>(arg);
+    const rcppsw::task_allocation::taskable_argument* const arg) {
+  auto* a = dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   inject_event(a->signal(), state_machine::event_type::NORMAL);
 }

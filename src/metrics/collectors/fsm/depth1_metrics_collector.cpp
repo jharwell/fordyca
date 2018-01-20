@@ -45,8 +45,7 @@ depth1_metrics_collector::depth1_metrics_collector(const std::string& ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string depth1_metrics_collector::csv_header_build(
-    const std::string &header) {
+std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
   if (collect_cum()) {
   return base_metric_collector::csv_header_build(header) +
@@ -73,24 +72,27 @@ void depth1_metrics_collector::reset(void) {
 } /* reset() */
 
 void depth1_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics &metrics) {
-  auto &m =
-      static_cast<const collectible_metrics::fsm::depth1_metrics &>(
-          metrics);
-  m_stats.n_exploring_for_cache += static_cast<uint>( m.is_exploring_for_cache());
-  m_stats.n_acquiring_cache += static_cast<uint>( m.is_acquiring_cache());
-  m_stats.n_vectoring_to_cache += static_cast<uint>( m.is_vectoring_to_cache());
-  m_stats.n_transporting_to_cache += static_cast<uint>( m.is_transporting_to_cache());
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m =
+      static_cast<const collectible_metrics::fsm::depth1_metrics&>(metrics);
+  m_stats.n_exploring_for_cache += static_cast<uint>(m.is_exploring_for_cache());
+  m_stats.n_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
+  m_stats.n_vectoring_to_cache += static_cast<uint>(m.is_vectoring_to_cache());
+  m_stats.n_transporting_to_cache +=
+      static_cast<uint>(m.is_transporting_to_cache());
 
   if (collect_cum()) {
-    m_stats.n_cum_exploring_for_cache += static_cast<uint>( m.is_exploring_for_cache());
-    m_stats.n_cum_acquiring_cache += static_cast<uint>( m.is_acquiring_cache());
-    m_stats.n_cum_vectoring_to_cache += static_cast<uint>( m.is_vectoring_to_cache());
-    m_stats.n_cum_transporting_to_cache += static_cast<uint>(m.is_transporting_to_cache());
+    m_stats.n_cum_exploring_for_cache +=
+        static_cast<uint>(m.is_exploring_for_cache());
+    m_stats.n_cum_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
+    m_stats.n_cum_vectoring_to_cache +=
+        static_cast<uint>(m.is_vectoring_to_cache());
+    m_stats.n_cum_transporting_to_cache +=
+        static_cast<uint>(m.is_transporting_to_cache());
   }
 } /* collect() */
 
-bool depth1_metrics_collector::csv_line_build(std::string &line) {
+bool depth1_metrics_collector::csv_line_build(std::string& line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_acquiring_cache) + separator() +
            std::to_string(m_stats.n_cum_acquiring_cache) + separator() +

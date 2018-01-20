@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <argos3/core/utility/math/range.h>
-#include "rcppsw/common/base_params.hpp"
+#include <string>
 #include "fordyca/params/arena_map_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces

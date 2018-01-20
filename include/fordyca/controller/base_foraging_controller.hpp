@@ -32,8 +32,13 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class block; class line_of_sight; }
-namespace params { struct output_params; }
+namespace representation {
+class block;
+class line_of_sight;
+}
+namespace params {
+struct output_params;
+}
 
 NS_START(controller);
 
@@ -60,7 +65,8 @@ class base_foraging_controller : public argos::CCI_Controller,
   ~base_foraging_controller(void) override = default;
 
   base_foraging_controller(const base_foraging_controller& other) = delete;
-  base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
+  base_foraging_controller& operator=(const base_foraging_controller& other) =
+      delete;
 
   /* CCI_Controller overrides */
   void Init(argos::TConfigurationNode& node) override;
@@ -121,20 +127,27 @@ class base_foraging_controller : public argos::CCI_Controller,
    */
   void tick(uint tick);
 
-
  protected:
-  const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
-  const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
+  const std::shared_ptr<actuator_manager>& actuators(void) const {
+    return m_actuators;
+  }
+  const std::shared_ptr<rcppsw::er::server>& server(void) const {
+    return m_server;
+  }
   const std::shared_ptr<base_foraging_sensors>& sensors_ref(void) const {
     return m_sensors;
   }
   base_foraging_sensors* base_sensors(void) const { return m_sensors.get(); }
-  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const { return m_sensors; }
+  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const {
+    return m_sensors;
+  }
   void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
     m_sensors = sensors;
   }
 
-  double speed_throttle_block_carry(void) const { return m_speed_throttle_block_carry; }
+  double speed_throttle_block_carry(void) const {
+    return m_speed_throttle_block_carry;
+  }
 
  private:
   void output_init(const struct params::output_params* params);

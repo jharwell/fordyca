@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/metrics/collectors/task_collector.hpp"
 #include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +46,7 @@ task_collector::task_collector(const std::string& ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string task_collector::csv_header_build(const std::string &header) {
+std::string task_collector::csv_header_build(const std::string& header) {
   // clang-format off
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
@@ -72,20 +73,26 @@ void task_collector::reset(void) {
 } /* reset() */
 
 void task_collector::collect(
-    const collectible_metrics::base_collectible_metrics &metrics) {
-  auto &m = static_cast<const collectible_metrics::task_metrics &>(metrics);
-  m_stats.n_collectors += static_cast<uint>(m.task_name() == "collector");
-  m_stats.n_foragers += static_cast<uint>(m.task_name() == "forager");
-  m_stats.n_generalists += static_cast<uint>(m.task_name() == "generalist");
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = static_cast<const collectible_metrics::task_metrics&>(metrics);
+  m_stats.n_collectors +=
+      static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+  m_stats.n_foragers +=
+      static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
+  m_stats.n_generalists +=
+      static_cast<uint>(m.task_name() == tasks::foraging_task::kGeneralistName);
 
   if (collect_cum()) {
-    m_stats.n_cum_collectors += static_cast<uint>(m.task_name() == "collector");
-    m_stats.n_cum_foragers += static_cast<uint>(m.task_name() == "forager");
-    m_stats.n_cum_generalists += static_cast<uint>(m.task_name() == "generalist");
+    m_stats.n_cum_collectors +=
+        static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+    m_stats.n_cum_foragers +=
+        static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
+    m_stats.n_cum_generalists += static_cast<uint>(
+        m.task_name() == tasks::foraging_task::kGeneralistName);
   }
 } /* collect() */
 
-bool task_collector::csv_line_build(std::string &line) {
+bool task_collector::csv_line_build(std::string& line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_collectors) + separator() +
            std::to_string(m_stats.n_cum_collectors) + separator() +

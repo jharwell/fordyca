@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,11 +52,11 @@ NS_START(fordyca, expressions);
  *
  * - TODO: take pheromones into account?
  */
-class sub_area_poa: public rcppsw::math::expression<double> {
+class sub_area_poa : public rcppsw::math::expression<double> {
  public:
   sub_area_poa(const argos::CVector2& area_center,
-               const argos::CVector2& nest_center) :
-      mc_center(area_center), mc_nest(nest_center) {}
+               const argos::CVector2& nest_center)
+      : mc_center(area_center), mc_nest(nest_center) {}
 
   double calc(double caches_dist) {
     return set_result((mc_center - mc_nest).Length() / caches_dist);

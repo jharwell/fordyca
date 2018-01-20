@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/events/block_pickup_event.hpp"
+#include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,8 +34,12 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class cache; }
-namespace tasks { class collector; }
+namespace representation {
+class cache;
+}
+namespace tasks {
+class collector;
+}
 
 NS_START(events);
 
@@ -51,14 +55,15 @@ NS_START(events);
  * The cache usage penalty, if there is one, is assessed prior to this event
  * being created, at a higher level.
  */
-class cached_block_pickup : public cell_op,
-                            public rcppsw::er::client,
-                            public block_pickup_event,
-                            public visitor::visit_set<tasks::collector,
-                                                      representation::cache> {
+class cached_block_pickup
+    : public cell_op,
+      public rcppsw::er::client,
+      public block_pickup_event,
+      public visitor::visit_set<tasks::collector, representation::cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                      representation::cache* cache, size_t robot_index);
+                      representation::cache* cache,
+                      size_t robot_index);
   ~cached_block_pickup(void) override { client::rmmod(); }
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
@@ -77,20 +82,22 @@ class cached_block_pickup : public cell_op,
   void visit(tasks::collector& task) override;
 
  private:
-  size_t m_robot_index;
-  representation::cache* m_real_cache;
+  // clang-format off
+  size_t                              m_robot_index;
+  representation::cache*              m_real_cache;
 
   /**
    * @brief The block that will be picked up by the robot.
    */
-  representation::block* m_pickup_block;
+  representation::block*              m_pickup_block{nullptr};
 
   /**
    * @brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  representation::block* m_orphan_block;
+  representation::block*              m_orphan_block{nullptr};
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

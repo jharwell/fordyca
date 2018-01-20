@@ -40,15 +40,12 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct wheel_params {
-  wheel_params(void)
-      : soft_turn_max(),
-        no_turn_max() {}
+  wheel_params(void) : soft_turn_max(), no_turn_max() {}
 
   argos::CRadians soft_turn_max;
   argos::CRadians no_turn_max;
   double max_speed{0.0};
 };
-
 
 /**
  * @struct actuator_params

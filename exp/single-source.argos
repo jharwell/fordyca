@@ -43,7 +43,7 @@
         </output>
         <perceived_arena_map>
           <grid resolution="0.2"
-                size="20, 5, 2"
+                size="10, 5, 2"
                 />
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
@@ -103,7 +103,7 @@
     </output>
     <arena_map>
       <grid resolution="0.2"
-            size="20, 5, 2"/>
+            size="10, 5, 2"/>
       <blocks n_blocks="20"
               dimension="0.2"
               dist_model="single_source"
@@ -128,20 +128,20 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="20, 5, 2" center="10,2.5,1">
+  <arena size="10, 5, 2" center="5,2.5,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="20,0.1,0.5" movable="false">
-      <body position="10,5,0" orientation="0,0,0" />
+    <box id="wall_north" size="10,0.1,0.5" movable="false">
+      <body position="5,5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="20,0.1,0.5" movable="false">
-      <body position="10,0,0" orientation="0,0,0" />
+    <box id="wall_south" size="10,0.1,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0" />
     </box>
     <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="20,2.5,0" orientation="0,0,0" />
+      <body position="10,2.5,0" orientation="0,0,0" />
     </box>
     <box id="wall_west" size="0.1,5,0.5" movable="false">
       <body position="0,2.5,0" orientation="0,0,0" />
@@ -154,7 +154,7 @@
            intensity="10.0"
            medium="leds" />
     <distribute>
-      <position method="uniform" min="1,1,0" max="18,4,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="10" max_trials="100">
         <foot-bot id="fb">
@@ -187,8 +187,8 @@
     <qt-opengl>
       <camera>
         <placement idx="0"
-                   position="10,2.5,6"
-                   look_at="10,2.5,0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />

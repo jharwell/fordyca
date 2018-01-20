@@ -34,7 +34,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(const std::shared_ptr<rcppsw::er::server> &server)
+cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
     : m_entity(nullptr), m_loc(), m_fsm(server) {
   m_fsm.init();
 }
@@ -42,16 +42,16 @@ cell2D::cell2D(const std::shared_ptr<rcppsw::er::server> &server)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure const representation::block *cell2D::block(void) const {
-  return dynamic_cast<representation::block *>(m_entity);
+__pure const representation::block* cell2D::block(void) const {
+  return dynamic_cast<representation::block*>(m_entity);
 } /* block() */
 
-__pure representation::block *cell2D::block(void) {
-  return dynamic_cast<representation::block *>(m_entity);
+__pure representation::block* cell2D::block(void) {
+  return dynamic_cast<representation::block*>(m_entity);
 } /* block() */
 
-__pure representation::cache *cell2D::cache(void) const {
-  return dynamic_cast<representation::cache *>(m_entity);
+__pure representation::cache* cell2D::cache(void) const {
+  return dynamic_cast<representation::cache*>(m_entity);
 } /* cache() */
 
 NS_END(representation, fordyca);

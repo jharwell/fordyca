@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
+#include "fordyca/params/metrics_parser.hpp"
+#include "fordyca/params/output_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/metrics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,9 +46,9 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to simulation output into
  * \ref output_params.
  */
-class output_parser: public rcppsw::common::xml_param_parser {
+class output_parser : public rcppsw::common::xml_param_parser {
  public:
-  output_parser(void): m_params(), m_metrics_parser() {}
+  output_parser(void) : m_params(), m_metrics_parser() {}
 
   void parse(argos::TConfigurationNode& node) override;
   const struct output_params* get_results(void) override {

@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,7 @@ NS_START(fordyca, expressions);
  * - Pheromone density associated with the cache information (higher is
  *   better).
  */
-class existing_cache_utility: public rcppsw::math::expression<double> {
+class existing_cache_utility : public rcppsw::math::expression<double> {
  public:
   existing_cache_utility(const argos::CVector2& cache_loc,
                          const argos::CVector2& nest_loc);

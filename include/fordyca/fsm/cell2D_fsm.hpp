@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcsw/common/common.h"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcsw/common/common.h"
 
 /*******************************************************************************
  * Namespaces
@@ -61,8 +61,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
     ST_MAX_STATES
   };
 
-  explicit cell2D_fsm(
-      const std::shared_ptr<rcppsw::er::server>& server);
+  explicit cell2D_fsm(const std::shared_ptr<rcppsw::er::server>& server);
   ~cell2D_fsm(void) override = default;
 
   bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
@@ -91,14 +90,14 @@ class cell2D_fsm : public state_machine::simple_fsm,
   FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
-  FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
+    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
         FSM_STATE_MAP_ENTRY(&state_unknown),
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_block),
         FSM_STATE_MAP_ENTRY(&state_cache),
-            };
-  FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
-  return &kSTATE_MAP[index];
+    };
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
+    return &kSTATE_MAP[index];
   }
 
   size_t m_block_count;

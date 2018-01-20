@@ -38,10 +38,10 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 actuator_manager::actuator_manager(
-    const struct params::actuator_params *c_params,
-    argos::CCI_DifferentialSteeringActuator *wheels,
-    argos::CCI_LEDsActuator *leds,
-    argos::CCI_RangeAndBearingActuator *raba)
+    const struct params::actuator_params* c_params,
+    argos::CCI_DifferentialSteeringActuator* wheels,
+    argos::CCI_LEDsActuator* leds,
+    argos::CCI_RangeAndBearingActuator* raba)
     : state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
       no_turn(),
       soft_turn(),
@@ -54,8 +54,8 @@ actuator_manager::actuator_manager(
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void actuator_manager::set_rel_heading(const argos::CVector2 &heading,
-                                   bool force_hard_turn) {
+void actuator_manager::set_rel_heading(const argos::CVector2& heading,
+                                       bool force_hard_turn) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
       ST_NO_TURN,   /* no turn */
       ST_SOFT_TURN, /* slow turn */
@@ -84,14 +84,14 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
   return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
-    if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-            mc_params.wheels.no_turn_max) {
-     internal_event(ST_NO_TURN);
-    } else if (data->force_hard ||
-               argos::Abs(data->heading.Angle().SignedNormalize()) >
-               mc_params.wheels.soft_turn_max) {
-      internal_event(ST_HARD_TURN);
-    }
+  if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
+      mc_params.wheels.no_turn_max) {
+    internal_event(ST_NO_TURN);
+  } else if (data->force_hard ||
+             argos::Abs(data->heading.Angle().SignedNormalize()) >
+                 mc_params.wheels.soft_turn_max) {
+    internal_event(ST_HARD_TURN);
+  }
 
   /* Both wheels go straight, but one is faster than the other */
   double speed_factor =
@@ -106,11 +106,11 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
 }
 FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
   if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-                 mc_params.wheels.no_turn_max &&
-             !data->force_hard) {
+          mc_params.wheels.no_turn_max &&
+      !data->force_hard) {
     internal_event(ST_NO_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-             mc_params.wheels.soft_turn_max &&
+                 mc_params.wheels.soft_turn_max &&
              !data->force_hard) {
     internal_event(ST_SOFT_TURN);
   }

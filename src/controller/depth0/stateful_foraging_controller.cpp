@@ -28,8 +28,8 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -66,8 +66,9 @@ stateful_foraging_controller::stateful_foraging_controller(void)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure tasks::foraging_task *stateful_foraging_controller::current_task(void) const {
-  return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
+__pure tasks::foraging_task* stateful_foraging_controller::current_task(
+    void) const {
+  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 bool stateful_foraging_controller::block_acquired(void) const {
@@ -94,11 +95,13 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(void) const {
+__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(
+    void) const {
   return static_cast<depth1::foraging_sensors*>(base_sensors());
 }
 
-std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::stateful_sensors_ref(void) const {
+std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::
+    stateful_sensors_ref(void) const {
   return std::static_pointer_cast<depth1::foraging_sensors>(base_sensors_ref());
 }
 void stateful_foraging_controller::ControlStep(void) {
@@ -119,7 +122,7 @@ void stateful_foraging_controller::ControlStep(void) {
   m_executive->run();
 } /* ControlStep() */
 
-void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
+void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   params::depth0::stateful_foraging_repository param_repo;
   params::depth1::task_repository task_repo;
 
@@ -141,24 +144,24 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
 
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      static_cast<const struct params::depth0::perceived_arena_map_params *>(
+      static_cast<const struct params::depth0::perceived_arena_map_params*>(
           param_repo.get_params("perceived_arena_map")),
       GetId());
 
   base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
-            static_cast<const struct params::sensor_params *>(
+      static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
-  const params::fsm_params *fsm_params =
-      static_cast<const struct params::fsm_params *>(
+  const params::fsm_params* fsm_params =
+      static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm"));
 
-  const params::depth1::task_params *task_params =
-      static_cast<const params::depth1::task_params *>(
+  const params::depth1::task_params* task_params =
+      static_cast<const params::depth1::task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
@@ -174,14 +177,34 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode &node) {
   m_generalist->set_atomic();
 
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
-      base_foraging_controller::server(),
-      m_generalist.get());
+      base_foraging_controller::server(), m_generalist.get());
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
 void stateful_foraging_controller::process_los(
-    const representation::line_of_sight *const los) {
+    const representation::line_of_sight* const los) {
+  /*
+   * If the robot thinks that a cell contains a block, because the cell had one
+   * the last time it passed nearby, but when coming near the cell a second time
+   * the cell does not contain a block, then someone else picked up the block
+   * between then and now, and it needs to update its internal representation
+   * accordingly.
+   */
+  for (size_t i = 0; i < los->sizex(); ++i) {
+    for (size_t j = 0; j < los->sizey(); ++j) {
+      representation::discrete_coord d = los->cell(i, j).loc();
+      if (los->cell(i, j).state_is_empty() &&
+          map()->access(d).state_has_block()) {
+        ER_DIAG("Correct block%d/empty discrepency at (%zu, %zu)",
+                map()->access(d).block()->id(),
+                d.first,
+                d.second);
+        map()->block_remove(map()->access(d).block());
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
+
   for (auto block : los->blocks()) {
     if (!m_map->access(block->discrete_loc()).state_has_block()) {
       ER_NOM("Discovered block%d at (%zu, %zu)",
@@ -189,10 +212,8 @@ void stateful_foraging_controller::process_los(
              block->discrete_loc().first,
              block->discrete_loc().second);
     }
-    std::unique_ptr<representation::block> clone = block->clone();
-    events::block_found op(base_foraging_controller::server(), clone.get());
+    events::block_found op(base_foraging_controller::server(), block->clone());
     m_map->accept(op);
-    clone.reset();
   } /* for(block..) */
 } /* process_los() */
 

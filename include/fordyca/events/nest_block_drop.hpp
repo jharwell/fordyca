@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/er/client.hpp"
 #include "fordyca/events/block_drop_event.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,18 +36,31 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-namespace depth0 { class stateless_foraging_fsm; class stateful_foraging_fsm; }
-namespace depth1 { class block_to_cache_fsm; }
+namespace depth0 {
+class stateless_foraging_fsm;
+class stateful_foraging_fsm;
+}
+namespace depth1 {
+class block_to_cache_fsm;
+}
 class block_to_nest_fsm;
 }
 namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}}
+}
+}
 
-namespace metrics { namespace collectors { class block_metrics_collector; }}
-namespace tasks { class generalist; class collector; }
+namespace metrics {
+namespace collectors {
+class block_metrics_collector;
+}
+}
+namespace tasks {
+class generalist;
+class collector;
+}
 
 NS_START(events);
 
@@ -60,20 +73,21 @@ NS_START(events);
  *
  * @brief Fired whenever a robot drops a block in the nest.
  */
-class nest_block_drop : public visitor::visitor,
-                        public block_drop_event,
-                        public rcppsw::er::client,
-                        public visitor::visit_set<controller::depth0::stateful_foraging_controller,
-                                                  controller::depth0::stateless_foraging_controller,
-                                                  fsm::depth0::stateless_foraging_fsm,
-                                                  fsm::depth0::stateful_foraging_fsm,
-                                                  fsm::block_to_nest_fsm,
-                                                  tasks::generalist,
-                                                  tasks::collector,
-                                                  metrics::collectors::block_metrics_collector> {
+class nest_block_drop
+    : public visitor::visitor,
+      public block_drop_event,
+      public rcppsw::er::client,
+      public visitor::visit_set<controller::depth0::stateful_foraging_controller,
+                                controller::depth0::stateless_foraging_controller,
+                                fsm::depth0::stateless_foraging_fsm,
+                                fsm::depth0::stateful_foraging_fsm,
+                                fsm::block_to_nest_fsm,
+                                tasks::generalist,
+                                tasks::collector,
+                                metrics::collectors::block_metrics_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-             representation::block* block);
+                  representation::block* block);
   ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -84,10 +98,12 @@ class nest_block_drop : public visitor::visitor,
   void visit(metrics::collectors::block_metrics_collector& collector) override;
   void visit(representation::block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
-  void visit(controller::depth0::stateless_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateless_foraging_controller& controller) override;
 
   /* stateful foraging */
-  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateful_foraging_controller& controller) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
 
   /* depth1 foraging */

@@ -35,16 +35,14 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 perceived_cell2D::perceived_cell2D(
-    const std::shared_ptr<rcppsw::er::server> &server)
+    const std::shared_ptr<rcppsw::er::server>& server)
     : decorator(server),
       client(server),
       m_pheromone_repeat_deposit(false),
       m_robot_id(),
       m_density() {
   if (ERROR == attmod("perceived_cell2D")) {
-    insmod("perceived_cell2D",
-           rcppsw::er::er_lvl::DIAG,
-           rcppsw::er::er_lvl::NOM);
+    insmod("perceived_cell2D", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
   }
 }
 

@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/task_allocation/polled_task.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -52,10 +52,10 @@ class collector : public task_allocation::polled_task, public foraging_task {
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::cached_block_pickup &visitor) override;
-  void accept(events::nest_block_drop &visitor) override;
-  void accept(events::cache_block_drop &) override {}
-  void accept(events::free_block_pickup &) override {}
+  void accept(events::cached_block_pickup& visitor) override;
+  void accept(events::nest_block_drop& visitor) override;
+  void accept(events::cache_block_drop&) override {}
+  void accept(events::free_block_pickup&) override {}
 
   /* base metrics */
   bool is_exploring_for_block(void) const override { return false; }
@@ -71,7 +71,6 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override { return false; }
-  std::string task_name(void) const override { return "collector"; }
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }
@@ -82,8 +81,10 @@ class collector : public task_allocation::polled_task, public foraging_task {
   double calc_interface_time(double start_time) override;
 
  private:
-  bool m_interface_sw;
+  // clang-format off
+  bool                               m_interface_sw;
   task_allocation::abort_probability m_abort_prob;
+  // clang-format on
 };
 
 NS_END(tasks, fordyca);

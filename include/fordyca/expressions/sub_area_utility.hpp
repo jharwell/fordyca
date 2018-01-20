@@ -27,9 +27,9 @@
 #include <algorithm>
 
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
-#include "rcppsw/common/common.hpp"
 #include "fordyca/expressions/sub_area_poa.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,17 +49,17 @@ NS_START(fordyca, expressions);
  * - Sub area distance to nest.
  * - Current robot position.
  */
-class sub_area_utility: public rcppsw::math::expression<double> {
+class sub_area_utility : public rcppsw::math::expression<double> {
  public:
   sub_area_utility(const argos::CVector2& area_center,
                    const argos::CVector2& nest_center,
-                   size_t squares) :
-      expression(),
-      m_squares(squares),
-      m_unexplored(squares),
-      mc_center(area_center),
-      mc_nest(nest_center),
-      m_poa(area_center, nest_center) {}
+                   size_t squares)
+      : expression(),
+        m_squares(squares),
+        m_unexplored(squares),
+        mc_center(area_center),
+        mc_nest(nest_center),
+        m_poa(area_center, nest_center) {}
 
   double calc(const argos::CVector2& rloc,
               const std::vector<argos::CVector2>& caches) {
@@ -70,8 +70,8 @@ class sub_area_utility: public rcppsw::math::expression<double> {
                     sum += (cache - mc_nest).Length();
                   });
 
-    return set_result(m_poa.calc(sum) * (m_unexplored /
-                                         (rloc - mc_center).Length()));
+    return set_result(m_poa.calc(sum) *
+                      (m_unexplored / (rloc - mc_center).Length()));
   }
   void update_explored(size_t explored) { m_unexplored = m_squares - explored; }
 

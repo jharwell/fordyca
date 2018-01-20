@@ -35,7 +35,7 @@ NS_START(fordyca, support, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                             representation::occupancy_grid &grid,
+                             representation::occupancy_grid& grid,
                              double cache_size,
                              double resolution)
     : client(server),
@@ -52,15 +52,15 @@ cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
  * Member Functions
  ******************************************************************************/
 representation::cache cache_creator::create_single(
-    std::list<representation::block *> blocks,
-    const argos::CVector2 &center) {
+    std::list<representation::block*> blocks,
+    const argos::CVector2& center) {
   /*
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
   representation::discrete_coord d =
       representation::real_to_discrete_coord(center, m_resolution);
-  representation::cell2D &cell = m_grid.access(d.first, d.second);
+  representation::cell2D& cell = m_grid.access(d.first, d.second);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
 
@@ -95,19 +95,14 @@ representation::cache cache_creator::create_single(
          d.second,
          blocks.size());
 
-  std::vector<representation::block *> blocks_list(blocks.begin(),
-                                                   blocks.end());
-  return representation::cache(m_cache_size,
-                               m_grid.resolution(),
-                               center,
-                               blocks_list,
-                               -1);
+  std::vector<representation::block*> blocks_list(blocks.begin(), blocks.end());
+  return representation::cache(
+      m_cache_size, m_grid.resolution(), center, blocks_list, -1);
 } /* create_single() */
 
-void cache_creator::update_host_cells(
-    representation::occupancy_grid& grid,
-    std::vector<representation::cache> &caches) {
-  for (auto &cache : caches) {
+void cache_creator::update_host_cells(representation::occupancy_grid& grid,
+                                      std::vector<representation::cache>& caches) {
+  for (auto& cache : caches) {
     grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
         .entity(&cache);
   } /* for(cache..) */

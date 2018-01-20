@@ -36,23 +36,22 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_qt_user_functions::stateful_foraging_qt_user_functions() {
-  RegisterUserFunction<stateful_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(
+  RegisterUserFunction<stateful_foraging_qt_user_functions, argos::CFootBotEntity>(
       &stateful_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity &c_entity) {
+void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   stateless_foraging_qt_user_functions::Draw(c_entity);
 
-  auto &controller =
-      dynamic_cast<controller::depth0::stateful_foraging_controller &>(
+  auto& controller =
+      dynamic_cast<controller::depth0::stateful_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_los()) {
-    const representation::line_of_sight *los = controller.los();
+    const representation::line_of_sight* los = controller.los();
     const double resolution = 0.2;
     std::vector<argos::CVector2> points;
     points.emplace_back(-resolution * los->sizex() / 2,

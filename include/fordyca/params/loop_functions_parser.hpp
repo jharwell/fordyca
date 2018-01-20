@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,9 +45,9 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to loop functions into
  * \ref loop_functions_params.
  */
-class loop_functions_parser: public rcppsw::common::xml_param_parser {
+class loop_functions_parser : public rcppsw::common::xml_param_parser {
  public:
-  loop_functions_parser(void): m_params() {}
+  loop_functions_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
   const struct loop_functions_params* get_results(void) override {

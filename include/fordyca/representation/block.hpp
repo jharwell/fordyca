@@ -27,10 +27,10 @@
 #include <cassert>
 #include <utility>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
-#include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
+#include "fordyca/representation/cell_entity.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,12 +56,13 @@ class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
-  explicit block(double dimension) :
-      cell_entity(dimension, argos::CColor::BLACK),
-      m_robot_index(-1), m_carries(0) {}
+  explicit block(double dimension)
+      : cell_entity(dimension, argos::CColor::BLACK),
+        m_robot_index(-1),
+        m_carries(0) {}
 
-  __pure bool operator==(const block &other) const {
-    return this->id() == other.id();
+  __pure bool operator==(const block& other) const {
+    return (this->id() == other.id());
   }
 
   /* metrics */

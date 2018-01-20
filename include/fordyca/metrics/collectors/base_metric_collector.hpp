@@ -157,6 +157,7 @@ class base_metric_collector {
   bool collect_cum(void) const { return m_collect_cum; }
 
  private:
+  // clang-format off
   bool          m_collect_cum;
   bool          m_use_interval;
   int           m_interval;
@@ -164,6 +165,7 @@ class base_metric_collector {
   std::string   m_ofname;
   std::string   m_separator;
   std::ofstream m_ofile;
+  // clang-format on
 };
 
 NS_END(collectors, metrics, fordyca);

@@ -35,12 +35,15 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::base_foraging_sensors>& sensors,
     const std::shared_ptr<controller::actuator_manager>& actuators)
     : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
-                        server, sensors, actuators, ST_MAX_STATES),
+                        server,
+                        sensors,
+                        actuators,
+                        ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
@@ -57,17 +60,17 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
-                                               NULL,
+                                               nullptr,
                                                &entry_transport_to_nest,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                               NULL,
+                                               nullptr,
                                                &entry_leaving_nest,
-                                               NULL),
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                               NULL,
+                                               nullptr,
                                                &entry_collision_avoidance,
-                                               NULL)} {
+                                               nullptr)} {
   client::insmod("stateless_foraging_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);

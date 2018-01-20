@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,13 +50,13 @@ NS_START(fordyca, expressions);
  * - better).
  * - Distance to nearest known cache (further is better).
  */
-class cache_site_utility: public rcppsw::math::expression<double> {
+class cache_site_utility : public rcppsw::math::expression<double> {
  public:
   cache_site_utility(const argos::CVector2& site_loc,
                      const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc,
-              const argos::CVector2& nearest_cache);
+  double calc(const argos::CVector2& rloc, const argos::CVector2& nearest_cache);
+
  private:
   const argos::CVector2 mc_site_loc;
   const argos::CVector2 mc_nest_loc;

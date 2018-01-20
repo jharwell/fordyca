@@ -24,19 +24,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include <string>
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class block; }
-namespace params { struct block_params; }
+namespace representation {
+class block;
+}
+namespace params {
+struct block_params;
+}
 
 NS_START(support);
 
@@ -93,12 +97,14 @@ class block_distributor {
                                      argos::CRange<double> x_range,
                                      argos::CRange<double> y_range);
 
+  // clang-format off
   std::string           m_dist_model;
   argos::CRange<double> m_arena_x;
   argos::CRange<double> m_arena_y;
   argos::CRange<double> m_nest_x;
   argos::CRange<double> m_nest_y;
   argos::CRandom::CRNG* m_rng;
+  // clang-format on
 };
 
 NS_END(support, fordyca);

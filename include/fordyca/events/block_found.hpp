@@ -32,7 +32,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class block; }
+namespace representation {
+class block;
+}
 
 NS_START(events);
 
@@ -49,12 +51,11 @@ NS_START(events);
  * are not processed by the \ref arena_map, and exist only in a robot's
  * perception.
  */
-class block_found : public perceived_cell_op,
-                    public rcppsw::er::client {
+class block_found : public perceived_cell_op, public rcppsw::er::client {
  public:
   block_found(const std::shared_ptr<rcppsw::er::server>& server,
-              representation::block* block);
-  ~block_found(void) override { client::rmmod(); }
+              std::unique_ptr<representation::block> block);
+  ~block_found(void) override;
 
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
@@ -69,13 +70,11 @@ class block_found : public perceived_cell_op,
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller&) override {}
 
-  /**
-   * @brief Get the handle on the block that has been found.
-   */
-  const representation::block* block(void) const { return m_block; }
-
  private:
-  representation::block* m_block;
+  // clang-format off
+  std::unique_ptr<representation::block> m_block;
+  representation::block*                 m_tmp_block;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

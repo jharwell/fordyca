@@ -31,7 +31,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void loop_functions_parser::parse(argos::TConfigurationNode &node) {
+void loop_functions_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<struct loop_functions_params>();
 
   argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
@@ -48,7 +48,7 @@ void loop_functions_parser::parse(argos::TConfigurationNode &node) {
                           m_params->display_block_id);
 } /* parse() */
 
-void loop_functions_parser::show(std::ostream &stream) {
+void loop_functions_parser::show(std::ostream& stream) {
   stream << "====================\nLoop Function "
             "params\n====================\n";
   stream << "display_robot_id=" << m_params->display_robot_id << std::endl;

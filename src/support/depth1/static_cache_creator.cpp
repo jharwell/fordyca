@@ -35,8 +35,8 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
     const std::shared_ptr<rcppsw::er::server>& server,
-    representation::occupancy_grid &grid,
-    const argos::CVector2 &center,
+    representation::occupancy_grid& grid,
+    const argos::CVector2& center,
     double cache_size,
     double resolution)
     : cache_creator(server, grid, cache_size, resolution), m_center(center) {
@@ -49,7 +49,7 @@ static_cache_creator::static_cache_creator(
  * Member Functions
  ******************************************************************************/
 std::vector<representation::cache> static_cache_creator::create_all(
-    std::vector<representation::block *> &blocks) {
+    std::vector<representation::block*>& blocks) {
   std::vector<representation::cache> caches;
 
   ER_ASSERT(blocks.size() >= 2,
@@ -58,7 +58,7 @@ std::vector<representation::cache> static_cache_creator::create_all(
          m_center.GetX(),
          m_center.GetY(),
          blocks.size());
-  std::list<representation::block *> starter_blocks;
+  std::list<representation::block*> starter_blocks;
   for (auto b : blocks) {
     starter_blocks.push_back(b);
   } /* for(i..) */

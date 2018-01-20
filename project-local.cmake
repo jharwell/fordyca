@@ -1,7 +1,8 @@
 ################################################################################
 # External Projects                                                            #
 ################################################################################
-set(PROJECT_NAME fordyca CACHE INTERNAL "PROJECT_NAME")
+set(${target}_CHECK_LANGUAGE "CXX")
+set(${target}_HAS_RECURSIVE_DIRS NO)
 
 # Qt
 set(CMAKE_AUTOMOC ON)
@@ -35,7 +36,6 @@ get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
 link_directories(/usr/lib/argos3 ${rcppsw_LINK_DIRS})
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 add_dependencies(${target} rcsw rcppsw)
-message("${rcppsw_LIBS}")
 
 # Use the actual .a files rather than rcppsw/rcsw project names to force
 # recompilation of fordyca when a source file within one of those libraries
