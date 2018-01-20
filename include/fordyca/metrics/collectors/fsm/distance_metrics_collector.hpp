@@ -69,8 +69,10 @@ class distance_metrics_collector : public base_metric_collector,
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
+  // clang-format off
   size_t                          m_n_robots;
   std::vector<struct robot_stats> m_stats;
+  // clang-format on
 };
 
 NS_END(fsm, collectors, metrics, fordyca);

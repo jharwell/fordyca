@@ -145,11 +145,13 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
 
  private:
+  // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
   std::shared_ptr<representation::perceived_arena_map> m_map;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;
   std::unique_ptr<tasks::generalist>                   m_generalist;
+  // clang-format on
 };
 
 NS_END(depth0, controller, fordyca);

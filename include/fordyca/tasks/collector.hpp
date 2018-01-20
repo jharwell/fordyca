@@ -81,8 +81,10 @@ class collector : public task_allocation::polled_task, public foraging_task {
   double calc_interface_time(double start_time) override;
 
  private:
-  bool m_interface_sw;
+  // clang-format off
+  bool                               m_interface_sw;
   task_allocation::abort_probability m_abort_prob;
+  // clang-format on
 };
 
 NS_END(tasks, fordyca);

@@ -75,7 +75,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void PreStep() override;
 
  protected:
-  representation::arena_map* map(void) const { return m_map.get(); }
+  const std::shared_ptr<representation::arena_map>& map(void) const { return m_map; }
+  std::shared_ptr<representation::arena_map>& map(void) { return m_map; }
 
   metrics::collectors::block_metrics_collector* block_collector(void) const;
   robot_collectors::distance_metrics_collector* distance_collector(void) const;
@@ -100,6 +101,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
+  // clang-format off
   argos::CRange<double>                                          m_nest_x;
   argos::CRange<double>                                          m_nest_y;
   std::string                                                    m_output_root;
@@ -107,7 +109,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;
   std::unique_ptr<robot_collectors::distance_metrics_collector>  m_distance_collector;
   std::unique_ptr<collectors::block_metrics_collector>           m_block_collector;
-  std::unique_ptr<representation::arena_map>                     m_map;
+  std::shared_ptr<representation::arena_map>                     m_map;
+  // clang-format on
 };
 
 NS_END(depth0, support, fordyca);

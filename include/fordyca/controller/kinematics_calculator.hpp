@@ -84,8 +84,10 @@ class kinematics_calculator {
   static constexpr double kSCALE_LIGHT_FORCE_REPEL = 0.5;
   static constexpr double kSCALE_AVOIDANCE_FORCE = 0.5;
 
-  std::shared_ptr<actuator_manager> mc_actuators;
+  // clang-format off
+  std::shared_ptr<actuator_manager>      mc_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

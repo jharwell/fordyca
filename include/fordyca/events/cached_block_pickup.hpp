@@ -77,20 +77,22 @@ class cached_block_pickup : public cell_op,
   void visit(tasks::collector& task) override;
 
  private:
-  size_t m_robot_index;
-  representation::cache* m_real_cache;
+  // clang-format off
+  size_t                              m_robot_index;
+  representation::cache*              m_real_cache;
 
   /**
    * @brief The block that will be picked up by the robot.
    */
-  representation::block* m_pickup_block;
+  representation::block*              m_pickup_block{nullptr};
 
   /**
    * @brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  representation::block* m_orphan_block;
+  representation::block*              m_orphan_block{nullptr};
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

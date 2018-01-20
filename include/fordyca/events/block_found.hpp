@@ -70,8 +70,10 @@ class block_found : public perceived_cell_op,
   void visit(controller::depth1::foraging_controller&) override {}
 
  private:
+  // clang-format off
   std::unique_ptr<representation::block> m_block;
-  representation::block* m_tmp_block;
+  representation::block*                 m_tmp_block;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

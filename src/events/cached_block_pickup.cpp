@@ -53,8 +53,6 @@ cached_block_pickup::cached_block_pickup(
       client(server),
       m_robot_index(robot_index),
       m_real_cache(cache),
-      m_pickup_block(nullptr),
-      m_orphan_block(nullptr),
       m_server(server) {
   client::insmod("cached_block_pickup",
                  rcppsw::er::er_lvl::DIAG,

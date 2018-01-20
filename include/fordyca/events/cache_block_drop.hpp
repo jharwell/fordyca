@@ -82,10 +82,12 @@ class cache_block_drop : public cell_op,
   void visit(tasks::forager& task) override;
 
  private:
-  double m_resolution;
-  representation::block* m_block;
-  representation::cache* m_cache;
+  // clang-format off
+  double                              m_resolution;
+  representation::block*              m_block;
+  representation::cache*              m_cache;
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

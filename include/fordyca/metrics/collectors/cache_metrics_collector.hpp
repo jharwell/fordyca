@@ -68,8 +68,10 @@ class cache_metrics_collector : public base_metric_collector,
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
+  // clang-format off
   bool         m_new_data;
   struct stats m_stats;
+  // clang-format on
 };
 
 NS_END(metrics, collectors, fordyca);

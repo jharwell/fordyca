@@ -83,10 +83,12 @@ class cache_creator : public rcppsw::er::client {
                                       const argos::CVector2& center);
 
  private:
+  // clang-format off
   double                              m_cache_size;
   double                              m_resolution;
   representation::occupancy_grid&     m_grid;
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 NS_END(support, fordyca, depth1);
 

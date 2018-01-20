@@ -160,6 +160,7 @@ class base_foraging_sensors {
    */
   bool obstacle_is_threatening(const argos::CVector2& obstacle);
 
+  // clang-format off
   uint                                        m_tick;
   const double                                mc_obstacle_delta;
   argos::CVector2                             m_robot_loc;
@@ -169,6 +170,7 @@ class base_foraging_sensors {
   argos::CCI_FootBotProximitySensor*          m_proximity;
   argos::CCI_FootBotLightSensor*              m_light;
   argos::CCI_FootBotMotorGroundSensor*        m_ground;
+  // clang-format off
 };
 
 NS_END(controller, fordyca);

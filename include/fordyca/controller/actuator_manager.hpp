@@ -207,14 +207,16 @@ class actuator_manager: public state_machine::simple_fsm {
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
-  bool m_throttle{false};
-  double m_throttle_percent{0.0};
-  double m_lwheel_speed{0.0};
-  double m_rwheel_speed{0.0};
+  // clang-format off
+  bool                                     m_throttle{false};
+  double                                   m_throttle_percent{0.0};
+  double                                   m_lwheel_speed{0.0};
+  double                                   m_rwheel_speed{0.0};
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   const struct params::actuator_params     mc_params;
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

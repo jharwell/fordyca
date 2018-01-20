@@ -99,9 +99,11 @@ class free_block_pickup : public cell_op,
   void visit(tasks::forager& task) override;
 
  private:
-  size_t m_robot_index;
-  representation::block* m_block;
+  // clang-format off
+  size_t                              m_robot_index;
+  representation::block*              m_block;
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);
