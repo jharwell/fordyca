@@ -127,7 +127,7 @@ void foraging_loop_functions::handle_arena_interactions(
             robot)) {
       if (m_cache_penalty_handler->penalty_satisfied<decltype(controller)>(
               robot, GetSpace().GetSimulationClock())) {
-        handle_cache_block_drop<controller::depth1::foraging_controller>(robot);
+        finish_cache_block_drop<controller::depth1::foraging_controller>(robot);
       }
     } else {
       m_cache_penalty_handler->penalty_init<decltype(controller)>(

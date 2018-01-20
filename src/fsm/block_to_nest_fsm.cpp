@@ -148,6 +148,9 @@ HFSM_STATE_DEFINE(block_to_nest_fsm,
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
+  } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
+    m_cache_fsm.task_reset();
+    internal_event(ST_ACQUIRE_CACHED_BLOCK);
   }
   return controller::foraging_signal::HANDLED;
 }

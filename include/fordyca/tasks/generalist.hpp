@@ -60,6 +60,7 @@ class generalist : public task_allocation::partitionable_polled_task,
   void accept(events::nest_block_drop& visitor) override;
   void accept(events::cache_block_drop&) override {}
   void accept(events::cached_block_pickup&) override {}
+  void accept(events::cache_vanished&) override {}
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;

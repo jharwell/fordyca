@@ -129,8 +129,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
    * It is possible that robots can be waiting in this wait indefinitely for a
    * block pickup signal that will never come if they got here by "detecting" a
    * block by sprawling across multiple blocks (i.e. all ground sensors did not
-   * detect the same block). This is only a problem for generalists, who
-   * cannot/do not abort their tasks.
+   * detect the same block).
    *
    * In that case, the timeout here will cause the robot to try again, and
    * because of the decaying relevance of cells, it will eventually pick a
@@ -152,6 +151,9 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     internal_event(ST_FINISHED);
+  } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
+    m_cache_fsm.task_reset();
+    internal_event(ST_TRANSPORT_TO_CACHE);
   }
   return controller::foraging_signal::HANDLED;
 }

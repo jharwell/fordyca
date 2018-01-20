@@ -53,10 +53,10 @@ class cache_penalty {
                       uint start_time) : m_cache_id(cache_id),
                                          m_penalty(penalty),
                                          m_start_time(start_time),
-                                         m_controller(controller) {}
+                                         mc_controller(controller) {}
 
   uint cache_id(void) const { return m_cache_id; }
-  const controller::depth1::foraging_controller* controller(void) const { return m_controller; }
+  const controller::depth1::foraging_controller* controller(void) const { return mc_controller; }
   uint start_time(void) const { return m_start_time; }
 
   bool operator==(const cache_penalty& other) {
@@ -75,7 +75,7 @@ class cache_penalty {
   uint                                                m_cache_id;
   uint                                                m_penalty;
   uint                                                m_start_time;
-  const controller::depth1::foraging_controller*const m_controller;
+  const controller::depth1::foraging_controller*const mc_controller;
   // clang-format on
 };
 

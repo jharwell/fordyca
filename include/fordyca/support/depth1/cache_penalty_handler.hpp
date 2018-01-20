@@ -80,43 +80,44 @@ class cache_penalty_handler : public rcppsw::er::client {
 
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
-      int cache = utils::robot_on_cache(robot, m_map);
-      if (-1 != cache) {
-        ER_ASSERT(!controller.block_detected(),
-                  "FATAL: Block detected in cache?");
-        ER_ASSERT(!is_serving_penalty<T>(robot),
-                  "FATAL: Robot already serving cache penalty");
-
-        ER_NOM("fb%d: start=%u, duration=%u",
-               utils::robot_id(robot),
-               timestep,
-               mc_penalty);
-        uint penalty = mc_penalty;
-
-        /*
-        * Due to assertions in the \ref cache_block_pickup, if two robots enter
-        * the cache at the EXACT same timestep, whichever one is processed
-        * second for that timestep will trigger an assert due to the cache
-        * having a different amount of blocks than it should (i.e. only one
-        * block pickup is allowed per timestep, otherwise the world is
-        * inconsistent).
-        *
-        * Work around this by extending the penalty of the second robot to not
-        * conflict with any other robots currently waiting/starting to wait.
-        */
-        for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
-          if (it->start_time() == timestep) {
-            ++penalty;
-            it = m_penalty_list.begin();
-          }
-        } /* for(i..) */
-
-        m_penalty_list.push_back(cache_penalty(&controller,
-                                               cache,
-                                               penalty,
-                                               timestep));
-        return true;
+      int cache_id = utils::robot_on_cache(robot, m_map);
+      if (-1 == cache_id) {
+        return false;
       }
+
+      ER_ASSERT(!controller.block_detected(),
+                "FATAL: Block detected in cache?");
+      ER_ASSERT(!is_serving_penalty<T>(robot),
+                "FATAL: Robot already serving cache penalty");
+
+      ER_NOM("fb%d: start=%u, duration=%u",
+             utils::robot_id(robot),
+             timestep,
+             mc_penalty);
+      uint penalty = mc_penalty;
+
+      /*
+       * Due to assertions in the \ref cache_block_pickup, if two robots enter
+       * the cache at the EXACT same timestep, whichever one is processed second
+       * for that timestep will trigger an assert due to the cache having a
+       * different amount of blocks than it should (i.e. only one block pickup
+       * is allowed per timestep, otherwise the world is inconsistent).
+       *
+       * Work around this by extending the penalty of the second robot to not
+       * conflict with any other robots currently waiting/starting to wait.
+       */
+      for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
+        if (it->start_time() == timestep) {
+          ++penalty;
+          it = m_penalty_list.begin();
+        }
+      } /* for(i..) */
+
+      m_penalty_list.push_back(cache_penalty(&controller,
+                                             cache_id,
+                                             penalty,
+                                             timestep));
+      return true;
     }
     return false;
   }

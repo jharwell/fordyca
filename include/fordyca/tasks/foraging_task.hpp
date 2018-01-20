@@ -43,6 +43,7 @@ class cached_block_pickup;
 class cache_block_drop;
 class free_block_pickup;
 class nest_block_drop;
+class cache_vanished;
 }
 
 namespace visitor = rcppsw::patterns::visitor;
@@ -67,7 +68,8 @@ class foraging_task
                                             events::cached_block_pickup,
                                             events::cache_block_drop,
                                             events::free_block_pickup,
-                                            events::nest_block_drop> {
+                                            events::nest_block_drop,
+                                            events::cache_vanished> {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kForagerName[] = "Forager";

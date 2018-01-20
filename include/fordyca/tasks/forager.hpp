@@ -54,6 +54,7 @@ class forager : public task_allocation::polled_task, public foraging_task {
   /* event handling */
   void accept(events::cache_block_drop& visitor) override;
   void accept(events::free_block_pickup& visitor) override;
+  void accept(events::cache_vanished& visitor) override;
   void accept(events::cached_block_pickup&) override {}
   void accept(events::nest_block_drop&) override {}
 

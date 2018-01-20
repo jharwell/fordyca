@@ -88,7 +88,11 @@ The following root XML tags are defined:
                                partitioning for a given task it will select one
                                of the subtasks randomly. If `brutcshy2014`, then
                                it will use the method described in the
-                               corresponding paper.
+                               corresponding paper, which using estimates of
+                               waiting time at the task interface for
+                               selection. If `harwell2018`, it will use the same
+                               method as `brutcshy2014`, but use estimates of
+                               overall execution time as input instead.
 
 - `partition_method` - If `pini2011`, then robots will use the method described
                        in the corresponding paper to determine if a task should

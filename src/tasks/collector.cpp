@@ -26,6 +26,7 @@
 
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -102,6 +103,10 @@ void collector::accept(events::cached_block_pickup& visitor) {
 void collector::accept(events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
+void collector::accept(events::cache_vanished& visitor) {
+  visitor.visit(*this);
+}
+
 
 /*******************************************************************************
  * Base Diagnostics
