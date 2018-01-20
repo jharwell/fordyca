@@ -224,7 +224,6 @@ void foraging_controller::process_los(
     events::cache_found op(base_foraging_controller::server(), cache->clone());
     map()->accept(op);
   } /* for(cache..) */
-
 } /* process_los() */
 
 /*******************************************************************************

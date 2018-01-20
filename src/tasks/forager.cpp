@@ -26,6 +26,7 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
@@ -107,6 +108,9 @@ void forager::accept(events::cache_block_drop& visitor) {
   visitor.visit(*this);
 }
 void forager::accept(events::free_block_pickup& visitor) {
+  visitor.visit(*this);
+}
+void forager::accept(events::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 

@@ -132,8 +132,20 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
             "FATAL: Coordinates for block/cell do not agree");
   representation::perceived_cell2D& cell =
       map.access(cell_op::x(), cell_op::y());
-  ER_ASSERT(cell.state_has_block(), "FATAL: cell does not contain block");
-  map.block_remove(cell.block());
+
+  /*
+   * @bug: This should just be an assert. However, due to #242, the fact that
+   * blocks can appear close to the wall, and rcppsw #82, this may not always be
+   * true (and the fact that it isn't is not an indication of inconsistent
+   * simulation state :-( ). This can happen if, for example, a robot is
+   * exploring for a block very near the edge of the arena, and happens to drive
+   * over a block. In that case the block is not in its LOS (BUG!), or it its
+   * occupancy grid, and hence the assertion failure here.
+   */
+  /* ER_ASSERT(cell.state_has_block(), "FATAL: cell does not contain block"); */
+  if (cell.state_has_block()) {
+    map.block_remove(cell.block());
+  }
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
