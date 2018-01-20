@@ -116,8 +116,11 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   return (&mc_state_map[index]);
   }
 
+  // clang-format off
   argos::CRandom::CRNG* m_rng;
   explore_for_block_fsm m_explore_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

@@ -137,9 +137,11 @@ class perceived_arena_map: public rcppsw::er::client,
    */
   void update_density(void);
 
-  private:
-  std::shared_ptr<rcppsw::er::server>                          m_server;
-  perceived_occupancy_grid m_grid;
+ private:
+  // clang-format off
+  std::shared_ptr<rcppsw::er::server> m_server;
+  perceived_occupancy_grid            m_grid;
+  // clang-format on
 
   /**
    * @brief The caches that the robot currently knows about. Their relevance is

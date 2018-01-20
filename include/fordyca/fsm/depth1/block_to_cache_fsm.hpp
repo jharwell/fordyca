@@ -178,10 +178,13 @@ class block_to_cache_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
+  // clang-format off
   uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   acquire_cache_fsm                                     m_cache_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

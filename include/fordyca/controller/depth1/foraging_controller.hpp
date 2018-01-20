@@ -139,12 +139,14 @@ class foraging_controller : public depth0::stateful_foraging_controller,
  private:
   void task_abort_cleanup(__unused task_allocation::executable_task*);
 
+  // clang-format off
   bool                                               m_display_task{false};
   bool                                               m_task_aborted{false};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;
   std::unique_ptr<tasks::collector>                  m_collector;
   std::unique_ptr<tasks::generalist>                 m_generalist;
+  // clang-format on
 };
 
 NS_END(depth1, controller, fordyca);

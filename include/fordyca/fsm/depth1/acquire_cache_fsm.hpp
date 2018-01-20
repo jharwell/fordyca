@@ -153,6 +153,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
+  // clang-format off
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
@@ -160,6 +161,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
   std::shared_ptr<controller::depth1::foraging_sensors>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_cache_fsm                                      m_explore_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

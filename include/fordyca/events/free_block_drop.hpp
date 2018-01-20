@@ -83,9 +83,11 @@ class free_block_drop : public cell_op,
   representation::block* block(void) const { return m_block; }
 
  private:
-  double m_resolution;
-  representation::block* m_block;
+  // clang-format off
+  double                              m_resolution;
+  representation::block*              m_block;
   std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

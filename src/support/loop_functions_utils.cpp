@@ -51,7 +51,7 @@ int robot_id(const argos::CFootBotEntity &robot) {
 } /* robot_id() */
 
 int robot_on_cache(const argos::CFootBotEntity &robot,
-                   representation::arena_map &map) {
+                   const std::shared_ptr<representation::arena_map> &map) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity &>(robot)
               .GetEmbodiedEntity()
@@ -61,7 +61,7 @@ int robot_on_cache(const argos::CFootBotEntity &robot,
               .GetEmbodiedEntity()
               .GetOriginAnchor()
               .Position.GetY());
-  return map.robot_on_cache(pos);
+  return map->robot_on_cache(pos);
 }
 
 NS_END(utils, support, fordyca);

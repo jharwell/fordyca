@@ -93,12 +93,14 @@ class block_distributor {
                                      argos::CRange<double> x_range,
                                      argos::CRange<double> y_range);
 
+  // clang-format off
   std::string           m_dist_model;
   argos::CRange<double> m_arena_x;
   argos::CRange<double> m_arena_y;
   argos::CRange<double> m_nest_x;
   argos::CRange<double> m_nest_y;
   argos::CRandom::CRNG* m_rng;
+  // clang-format on
 };
 
 NS_END(support, fordyca);

@@ -203,13 +203,15 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
-  const double          mc_dir_change_thresh;
-  uint                  m_new_dir_count{0};
-  argos::CRadians       m_new_dir;
+  // clang-format off
+  const double                                       mc_dir_change_thresh;
+  uint                                               m_new_dir_count{0};
+  argos::CRadians                                    m_new_dir;
   argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager>      m_actuators;
   controller::kinematics_calculator                  m_kinematics;
+  // clang-format on
 };
 
 NS_END(fsm, fordyca);

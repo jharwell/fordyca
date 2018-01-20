@@ -51,7 +51,8 @@ NS_START(fordyca, support, utils);
 int robot_on_block(const argos::CFootBotEntity& robot,
                    representation::arena_map& map);
 
-int robot_on_cache(const argos::CFootBotEntity& robot, representation::arena_map& map);
+int robot_on_cache(const argos::CFootBotEntity& robot,
+                   const std::shared_ptr<representation::arena_map>& map);
 
 /**
  * @brief Get the ID of the robot as an integer.
