@@ -39,7 +39,9 @@ class CCI_FootBotMotorGroundSensor;
 }
 NS_START(fordyca);
 
-namespace params { struct sensor_params; }
+namespace params {
+struct sensor_params;
+}
 
 NS_START(controller);
 
@@ -55,12 +57,11 @@ NS_START(controller);
  */
 class base_foraging_sensors {
  public:
-  base_foraging_sensors(
-      const struct params::sensor_params* params,
-      argos::CCI_RangeAndBearingSensor* rabs,
-      argos::CCI_FootBotProximitySensor* proximity,
-      argos::CCI_FootBotLightSensor* light,
-      argos::CCI_FootBotMotorGroundSensor* ground);
+  base_foraging_sensors(const struct params::sensor_params* params,
+                        argos::CCI_RangeAndBearingSensor* rabs,
+                        argos::CCI_FootBotProximitySensor* proximity,
+                        argos::CCI_FootBotLightSensor* light,
+                        argos::CCI_FootBotMotorGroundSensor* ground);
 
   base_foraging_sensors(double diffusion_delta,
                         argos::CRange<argos::CRadians> go_straight_angle_range,
@@ -128,7 +129,9 @@ class base_foraging_sensors {
   argos::CRadians heading_angle(void) { return robot_heading().Angle(); }
 
   argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_rabs; }
-  argos::CCI_FootBotProximitySensor* proximity(void) const { return m_proximity; }
+  argos::CCI_FootBotProximitySensor* proximity(void) const {
+    return m_proximity;
+  }
   argos::CCI_FootBotLightSensor* light(void) const { return m_light; }
   argos::CCI_FootBotMotorGroundSensor* ground(void) const { return m_ground; }
   double diffusion_delta(void) const { return mc_obstacle_delta; }

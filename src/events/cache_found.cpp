@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,11 +35,12 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(const std::shared_ptr<rcppsw::er::server> &server,
+cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
                          std::unique_ptr<representation::cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),
-      client(server), m_cache(std::move(cache)) {
+      client(server),
+      m_cache(std::move(cache)) {
   client::insmod("cache_found",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -50,7 +51,7 @@ cache_found::~cache_found(void) { client::rmmod(); }
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_found::visit(representation::perceived_cell2D &cell) {
+void cache_found::visit(representation::perceived_cell2D& cell) {
   /*
    * Update the pheromone density associated with the cell BEFORE updating the
    * state of the cell.
@@ -74,12 +75,12 @@ void cache_found::visit(representation::perceived_cell2D &cell) {
   cell.decoratee().accept(*this);
 } /* visit() */
 
-void cache_found::visit(representation::cell2D &cell) {
+void cache_found::visit(representation::cell2D& cell) {
   cell.entity(m_tmp_cache);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cache_found::visit(fsm::cell2D_fsm &fsm) {
+void cache_found::visit(fsm::cell2D_fsm& fsm) {
   /*
    * If there are more blocks in the cache than currently exist in the cell,
    * then other robots have dropped blocks in cache since the last time we saw
@@ -97,9 +98,9 @@ void cache_found::visit(fsm::cell2D_fsm &fsm) {
   } /* for(i..) */
 } /* visit() */
 
-void cache_found::visit(representation::perceived_arena_map &map) {
-  representation::perceived_cell2D& cell = map.access(cell_op::x(),
-                                                      cell_op::y());
+void cache_found::visit(representation::perceived_arena_map& map) {
+  representation::perceived_cell2D& cell =
+      map.access(cell_op::x(), cell_op::y());
 
   /**
    * Remove any and all blocks from the known blocks list that exist in
@@ -118,13 +119,12 @@ void cache_found::visit(representation::perceived_arena_map &map) {
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {
     if (m_cache->contains_point((*it)->real_loc())) {
-      ER_VER("Remove block%d hidden behind cache%d",
-             (*it)->id(), m_cache->id());
+      ER_VER("Remove block%d hidden behind cache%d", (*it)->id(), m_cache->id());
 
       events::cell_empty op((*it)->discrete_loc().first,
                             (*it)->discrete_loc().second);
-      map.access((*it)->discrete_loc().first,
-                    (*it)->discrete_loc().second).accept(op);
+      map.access((*it)->discrete_loc().first, (*it)->discrete_loc().second)
+          .accept(op);
       it = map.blocks().erase(it);
     } else {
       ++it;

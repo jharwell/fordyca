@@ -53,8 +53,7 @@ class kinematics_calculator {
  public:
   kinematics_calculator(std::shared_ptr<base_foraging_sensors>& sensors,
                         std::shared_ptr<actuator_manager>& actuators)
-      : mc_actuators(actuators),
-        m_sensors(sensors) {}
+      : mc_actuators(actuators), m_sensors(sensors) {}
 
   /**
    * @brief Calculates the force applied to a robot as it nears an obstacle.

@@ -38,10 +38,10 @@ std::list<const block*> line_of_sight::blocks(void) const {
   std::list<const block*> blocks;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      cell2D *cell = m_view[i][j];
+      cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_block()) {
-        assert(dynamic_cast<const block *>(cell->entity()));
+        assert(dynamic_cast<const block*>(cell->entity()));
         blocks.push_back(cell->block());
       }
     } /* for(j..) */
@@ -54,10 +54,10 @@ std::list<const cache*> line_of_sight::caches(void) const {
 
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      cell2D *cell = m_view[i][j];
+      cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_cache()) {
-        assert(dynamic_cast<const cache *>(cell->entity()));
+        assert(dynamic_cast<const cache*>(cell->entity()));
         caches.push_back(cell->cache());
       }
     } /* for(j..) */
@@ -67,13 +67,13 @@ std::list<const cache*> line_of_sight::caches(void) const {
 
 void line_of_sight::cache_add(const cache* cache) {
   auto los_caches = caches();
-  if (los_caches.end() == std::find(los_caches.begin(),
-                                    los_caches.end(), cache)) {
+  if (los_caches.end() ==
+      std::find(los_caches.begin(), los_caches.end(), cache)) {
     m_caches.push_back(cache);
   }
 } /* cache_add() */
 
-__pure cell2D &line_of_sight::cell(size_t i, size_t j) const {
+__pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
   return *m_view[i][j];

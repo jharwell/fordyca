@@ -32,7 +32,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class cache; }
+namespace representation {
+class cache;
+}
 
 NS_START(events);
 
@@ -47,8 +49,7 @@ NS_START(events);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public perceived_cell_op,
-                    public rcppsw::er::client {
+class cache_found : public perceived_cell_op, public rcppsw::er::client {
  public:
   cache_found(const std::shared_ptr<rcppsw::er::server>& server,
               std::unique_ptr<representation::cache> cache);

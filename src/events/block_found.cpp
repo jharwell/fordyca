@@ -35,7 +35,7 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
+block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
                          std::unique_ptr<representation::block> block)
     : perceived_cell_op(block->discrete_loc().first,
                         block->discrete_loc().second),
@@ -47,20 +47,18 @@ block_found::block_found(const std::shared_ptr<rcppsw::er::server> &server,
                  rcppsw::er::er_lvl::NOM);
 }
 
-block_found::~block_found(void) {
-  client::rmmod();
-}
+block_found::~block_found(void) { client::rmmod(); }
 
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_found::visit(representation::cell2D &cell) {
-  ER_ASSERT(nullptr != m_tmp_block, "FATAL: NULL block?");
+void block_found::visit(representation::cell2D& cell) {
+  ER_ASSERT(nullptr != m_tmp_block, "FATAL: nullptr block?");
   cell.entity(m_tmp_block);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void block_found::visit(fsm::cell2D_fsm &fsm) {
+void block_found::visit(fsm::cell2D_fsm& fsm) {
   if (fsm.state_has_cache()) {
     for (size_t i = fsm.block_count(); i > 1; --i) {
       fsm.event_block_pickup();
@@ -72,7 +70,7 @@ void block_found::visit(fsm::cell2D_fsm &fsm) {
             "FATAL: Perceived cell in incorrect state after block found event");
 } /* visit() */
 
-void block_found::visit(representation::perceived_cell2D &cell) {
+void block_found::visit(representation::perceived_cell2D& cell) {
   if (cell.state_has_cache()) {
     cell.density_reset();
   }
@@ -83,9 +81,9 @@ void block_found::visit(representation::perceived_cell2D &cell) {
   cell.decoratee().accept(*this);
 } /* visit() */
 
-void block_found::visit(representation::perceived_arena_map &map) {
-  representation::perceived_cell2D& cell = map.access(cell_op::x(),
-                                                      cell_op::y());
+void block_found::visit(representation::perceived_arena_map& map) {
+  representation::perceived_cell2D& cell =
+      map.access(cell_op::x(), cell_op::y());
 
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this

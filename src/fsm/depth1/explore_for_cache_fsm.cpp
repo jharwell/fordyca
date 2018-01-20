@@ -40,9 +40,9 @@ NS_START(fordyca, fsm, depth1);
  ******************************************************************************/
 explore_for_cache_fsm::explore_for_cache_fsm(
     uint unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators)
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators)
     : base_explore_fsm(unsuccessful_dir_change_thresh,
                        server,
                        sensors,
@@ -59,15 +59,15 @@ explore_for_cache_fsm::explore_for_cache_fsm(
       m_sensors(sensors),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
-          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
           HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                      NULL,
+                                      nullptr,
                                       &entry_collision_avoidance,
-                                      NULL),
+                                      nullptr),
           HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction,
-                                      NULL,
+                                      nullptr,
                                       &entry_new_direction,
-                                      NULL),
+                                      nullptr),
           HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_cache_fsm",
          rcppsw::er::er_lvl::DIAG,
@@ -105,7 +105,10 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
   if (base_sensors()->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
     ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-           force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
+            force.GetX(),
+            force.GetY(),
+            force.Angle().GetValue(),
+            force.Length());
 
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {

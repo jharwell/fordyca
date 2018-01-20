@@ -59,7 +59,7 @@ stateful_foraging_loop_functions::~stateful_foraging_loop_functions(void) {}
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
+void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   stateless_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth0_foraging loop functions");
@@ -68,7 +68,7 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   repo.parse_all(node);
 
   /* initialize stat collecting */
-  auto *p_output = static_cast<const struct params::output_params *>(
+  auto* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
   m_collector.reset(new robot_collectors::stateful_metrics_collector(
       metrics_path() + "/" + p_output->metrics.stateful_fname,
@@ -77,14 +77,14 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
   m_collector->reset();
 
   /* configure robots */
-  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
-    auto &controller =
-        dynamic_cast<controller::depth0::stateful_foraging_controller &>(
+  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    argos::CFootBotEntity& robot =
+        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto& controller =
+        dynamic_cast<controller::depth0::stateful_foraging_controller&>(
             robot.GetControllableEntity().GetController());
-    auto *l_params = static_cast<const struct params::loop_functions_params *>(
-            repo.get_params("loop_functions"));
+    auto* l_params = static_cast<const struct params::loop_functions_params*>(
+        repo.get_params("loop_functions"));
 
     controller.display_los(l_params->display_robot_los);
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
@@ -94,21 +94,22 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode &node) {
 }
 
 void stateful_foraging_loop_functions::pre_step_iter(
-    argos::CFootBotEntity &robot) {
-  auto &controller = static_cast<controller::depth0::stateful_foraging_controller &>(
+    argos::CFootBotEntity& robot) {
+  auto& controller =
+      static_cast<controller::depth0::stateful_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
   distance_collector()->collect(
-      static_cast<rmetrics::distance_metrics &>(controller));
+      static_cast<rmetrics::distance_metrics&>(controller));
   stateless_collector()->collect(
-      static_cast<rmetrics::stateless_metrics &>(controller));
-  m_collector->collect(static_cast<rmetrics::stateful_metrics &>(controller));
+      static_cast<rmetrics::stateless_metrics&>(controller));
+  m_collector->collect(static_cast<rmetrics::stateful_metrics&>(controller));
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-      robot, *map());
+  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(robot,
+                                                                         *map());
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
   if (controller.is_carrying_block()) {
@@ -121,7 +122,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
 } /* pre_step_iter() */
 
 argos::CColor stateful_foraging_loop_functions::GetFloorColor(
-    const argos::CVector2 &plane_pos) {
+    const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
       nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
@@ -157,16 +158,16 @@ void stateful_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void stateful_foraging_loop_functions::PreStep() {
-  for (auto &entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity &robot =
-        *argos::any_cast<argos::CFootBotEntity *>(entity_pair.second);
+  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    argos::CFootBotEntity& robot =
+        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
 
-__pure robot_collectors::stateful_metrics_collector *
-stateful_foraging_loop_functions::stateful_collector(void) const {
+__pure robot_collectors::stateful_metrics_collector* stateful_foraging_loop_functions::
+    stateful_collector(void) const {
   return m_collector.get();
 } /* depth0_collector() */
 

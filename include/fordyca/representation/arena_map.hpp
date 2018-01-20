@@ -26,20 +26,22 @@
  ******************************************************************************/
 #include <vector>
 
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/support/block_distributor.hpp"
 #include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/occupancy_grid.hpp"
+#include "fordyca/support/block_distributor.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct arena_map_params; }
+namespace params {
+struct arena_map_params;
+}
 
 NS_START(representation);
 
@@ -56,8 +58,8 @@ class cell2D;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map: public rcppsw::er::client,
-                 public rcppsw::patterns::visitor::visitable_any<arena_map> {
+class arena_map : public rcppsw::er::client,
+                  public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   explicit arena_map(const struct params::arena_map_params* params);
 
@@ -85,7 +87,9 @@ class arena_map: public rcppsw::er::client,
   bool cache_removed(void) const { return m_cache_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  cell2D& access(const discrete_coord& coord) { return access(coord.first, coord.second); }
+  cell2D& access(const discrete_coord& coord) {
+    return access(coord.first, coord.second);
+  }
 
   /**
    * @brief Distribute all blocks in the arena.

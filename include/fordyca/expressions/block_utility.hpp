@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/expression.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,7 @@ NS_START(fordyca, expressions);
  * - Distance of block to robot's current position (closer is better).
  * - Pheromone density associated with the block information (higher is better).
  */
-class block_utility: public rcppsw::math::expression<double>  {
+class block_utility : public rcppsw::math::expression<double> {
  public:
   block_utility(const argos::CVector2& block_loc,
                 const argos::CVector2& nest_loc);

@@ -36,7 +36,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::arena_map_params *params)
+arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
       mc_cache_params(params->cache),
       mc_nest_center(params->nest_center),
@@ -63,7 +63,7 @@ arena_map::arena_map(const struct params::arena_map_params *params)
          m_grid.resolution());
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      cell2D &cell = m_grid.access(i, j);
+      cell2D& cell = m_grid.access(i, j);
       cell.loc(discrete_coord(i, j));
     } /* for(j..) */
   }   /* for(i..) */
@@ -76,7 +76,7 @@ arena_map::arena_map(const struct params::arena_map_params *params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-int arena_map::robot_on_block(const argos::CVector2 &pos) {
+int arena_map::robot_on_block(const argos::CVector2& pos) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i].contains_point(pos)) {
       return static_cast<int>(i);
@@ -85,7 +85,7 @@ int arena_map::robot_on_block(const argos::CVector2 &pos) {
   return -1;
 } /* robot_on_block() */
 
-int arena_map::robot_on_cache(const argos::CVector2 &pos) {
+int arena_map::robot_on_cache(const argos::CVector2& pos) {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     if (m_caches[i].contains_point(pos)) {
       return static_cast<int>(i);
@@ -94,8 +94,8 @@ int arena_map::robot_on_cache(const argos::CVector2 &pos) {
   return -1;
 } /* robot_on_cache() */
 
-void arena_map::distribute_block(block *const block) {
-  cell2D *cell = nullptr;
+void arena_map::distribute_block(block* const block) {
+  cell2D* cell = nullptr;
   while (true) {
     argos::CVector2 r_coord;
     if (m_block_distributor.distribute_block(*block, &r_coord)) {
@@ -108,11 +108,8 @@ void arena_map::distribute_block(block *const block) {
        * anything in them.
        */
       if (!cell->state_has_block() && !cell->state_has_cache()) {
-        events::free_block_drop op(m_server,
-                                   block,
-                                   d_coord.first,
-                                   d_coord.second,
-                                   m_grid.resolution());
+        events::free_block_drop op(
+            m_server, block, d_coord.first, d_coord.second, m_grid.resolution());
         cell->accept(op);
         break;
       }
@@ -126,7 +123,7 @@ void arena_map::distribute_block(block *const block) {
          block->real_loc().GetY(),
          block->discrete_loc().first,
          block->discrete_loc().second,
-         static_cast<const void *>(cell->block()));
+         static_cast<const void*>(cell->block()));
 } /* distribute_block() */
 
 void arena_map::static_cache_create(void) {
@@ -143,7 +140,7 @@ void arena_map::static_cache_create(void) {
                                           mc_cache_params.dimension,
                                           m_grid.resolution());
 
-  std::vector<representation::block *> blocks;
+  std::vector<representation::block*> blocks;
 
   /*
    * Only blocks that are not:
@@ -153,7 +150,7 @@ void arena_map::static_cache_create(void) {
    *
    * are eligible for being used to re-create the static cache.
    */
-  for (auto &b : m_blocks) {
+  for (auto& b : m_blocks) {
     if (-1 == b.robot_index() &&
         b.discrete_loc() != real_to_discrete_coord(argos::CVector2(x, y),
                                                    m_grid.resolution())) {
@@ -180,7 +177,7 @@ void arena_map::distribute_blocks(void) {
    */
   for (size_t i = 0; i < m_grid.xsize(); ++i) {
     for (size_t j = 0; j < m_grid.ysize(); ++j) {
-      cell2D &cell = m_grid.access(i, j);
+      cell2D& cell = m_grid.access(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache()) {
         events::cell_empty op(i, j);
         cell.accept(op);
@@ -189,7 +186,7 @@ void arena_map::distribute_blocks(void) {
   }   /* for(i..) */
 } /* distribute_blocks() */
 
-void arena_map::cache_remove(cache &victim) {
+void arena_map::cache_remove(cache& victim) {
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
 

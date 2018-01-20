@@ -24,14 +24,18 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er { class server; }}
+namespace rcppsw {
+namespace er {
+class server;
+}
+}
 NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;

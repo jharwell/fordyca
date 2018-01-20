@@ -24,15 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <utility>
+#include <vector>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
-#include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/immovable_cell_entity.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,12 +69,13 @@ class cache : public immovable_cell_entity,
    * will generate a new ID, or any positive # to use the same ID as an existing
    * cache (used when cloning a cache into a robot's perceived arena map).
    */
-  cache(double dimension, double resolution,
+  cache(double dimension,
+        double resolution,
         argos::CVector2 center,
         std::vector<block*>& blocks,
         int id);
 
-  __pure bool operator==(const cache &other) const {
+  __pure bool operator==(const cache& other) const {
     return this->discrete_loc() == other.discrete_loc();
   }
 
@@ -92,7 +93,8 @@ class cache : public immovable_cell_entity,
    * @brief \c TRUE iff the cache contains the specified block.
    */
   __pure bool contains_block(const block* c_block) const {
-    return std::find(m_blocks.begin(), m_blocks.end(), c_block) != m_blocks.end();
+    return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
+           m_blocks.end();
   }
 
   /**
@@ -105,7 +107,7 @@ class cache : public immovable_cell_entity,
    *
    * Does not update the block's location.
    */
-  void block_add(block* block) { m_blocks.push_back(block);  }
+  void block_add(block* block) { m_blocks.push_back(block); }
 
   /**
    * @brief Remove a block from the cache's list of blocks.

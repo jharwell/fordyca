@@ -35,18 +35,16 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {
-  RegisterUserFunction<stateless_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(
+  RegisterUserFunction<stateless_foraging_qt_user_functions, argos::CFootBotEntity>(
       &stateless_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_qt_user_functions::Draw(
-    argos::CFootBotEntity &c_entity) {
-  auto &controller =
-      dynamic_cast<controller::depth0::stateless_foraging_controller &>(
+void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  auto& controller =
+      dynamic_cast<controller::depth0::stateless_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_id()) {
@@ -62,8 +60,8 @@ void stateless_foraging_qt_user_functions::Draw(
             argos::CColor::BLACK);
     if (controller.block()->display_id()) {
       DrawText(argos::CVector3(0.0, 0.0, 0.5),
-               std::string(controller.GetId().size()+3, ' ') +
-               "[b" + std::to_string(controller.block()->id()) + "]",
+               std::string(controller.GetId().size() + 3, ' ') + "[b" +
+                   std::to_string(controller.block()->id()) + "]",
                argos::CColor::GREEN);
     }
   }

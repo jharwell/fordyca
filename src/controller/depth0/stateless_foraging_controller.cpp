@@ -24,15 +24,15 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
 
-#include "rcppsw/er/server.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +50,7 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
+void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateless_foraging controller");
@@ -62,7 +62,7 @@ void stateless_foraging_controller::Init(argos::TConfigurationNode &node) {
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      static_cast<const struct params::fsm_params *>(
+      static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm")),
       base_foraging_controller::server(),
       base_foraging_controller::base_sensors_ref(),

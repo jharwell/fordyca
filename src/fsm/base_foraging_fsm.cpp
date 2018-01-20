@@ -140,7 +140,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  auto *dir_data = dynamic_cast<const new_direction_data *>(data);
+  auto* dir_data = dynamic_cast<const new_direction_data*>(data);
   if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
     m_new_dir_count = 0;
@@ -156,14 +156,15 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    */
   actuators()->set_rel_heading(
       argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
-                      (current_dir - m_new_dir)), true);
+                      (current_dir - m_new_dir)),
+      true);
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
    * to also help limit excessive spinning. See #191.
    */
   if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
-      m_new_dir_count >= kDIR_CHANGE_MAX_STEPS ) {
+      m_new_dir_count >= kDIR_CHANGE_MAX_STEPS) {
     m_new_dir_count = 0;
     internal_event(previous_state());
   }
@@ -194,8 +195,7 @@ void base_foraging_fsm::init(void) {
   hfsm::init();
 } /* init() */
 
-argos::CVector2 base_foraging_fsm::randomize_vector_angle(
-    argos::CVector2 vector) {
+argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
   vector.Rotate(m_rng->Uniform(range));

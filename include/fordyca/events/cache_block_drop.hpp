@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/er/client.hpp"
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,9 +35,18 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class perceived_arena_map; class cache; }
-namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
-namespace tasks { class forager; }
+namespace representation {
+class perceived_arena_map;
+class cache;
+}
+namespace fsm {
+namespace depth1 {
+class block_to_cache_fsm;
+}
+}
+namespace tasks {
+class forager;
+}
 
 NS_START(events);
 
@@ -53,16 +62,18 @@ NS_START(events);
  * The cache usuage penalty, if there is one, is not assessed during the event,
  * but at a higher level.
  */
-class cache_block_drop : public cell_op,
-                         public rcppsw::er::client,
-                         public block_drop_event,
-                         public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
-                                                   tasks::forager,
-                                                   representation::perceived_arena_map,
-                                                   representation::cache> {
+class cache_block_drop
+    : public cell_op,
+      public rcppsw::er::client,
+      public block_drop_event,
+      public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
+                                tasks::forager,
+                                representation::perceived_arena_map,
+                                representation::cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   representation::block* block, representation::cache* cache,
+                   representation::block* block,
+                   representation::cache* cache,
                    double resolution);
   ~cache_block_drop(void) override { client::rmmod(); }
 

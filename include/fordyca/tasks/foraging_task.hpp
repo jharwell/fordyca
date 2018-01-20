@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "fordyca/tasks/argument.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
+#include "fordyca/tasks/argument.hpp"
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,22 +58,22 @@ NS_START(tasks);
  *
  * @brief Interface specifying the visit set for all foraging tasks in FORDYCA.
  */
-class foraging_task : public metrics::collectible_metrics::fsm::stateless_metrics,
-                      public metrics::collectible_metrics::fsm::stateful_metrics,
-                      public metrics::collectible_metrics::fsm::depth1_metrics,
-                      public metrics::collectible_metrics::task_metrics,
-                      public visitor::polymorphic_visitable<foraging_task,
-                                                            events::cached_block_pickup,
-                                                            events::cache_block_drop,
-                                                            events::free_block_pickup,
-                                                            events::nest_block_drop> {
+class foraging_task
+    : public metrics::collectible_metrics::fsm::stateless_metrics,
+      public metrics::collectible_metrics::fsm::stateful_metrics,
+      public metrics::collectible_metrics::fsm::depth1_metrics,
+      public metrics::collectible_metrics::task_metrics,
+      public visitor::polymorphic_visitable<foraging_task,
+                                            events::cached_block_pickup,
+                                            events::cache_block_drop,
+                                            events::free_block_pickup,
+                                            events::nest_block_drop> {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kForagerName[] = "Forager";
   static constexpr char kGeneralistName[] = "Generalist";
 
-  explicit foraging_task(const std::string& name)
-      : mc_name(name) {}
+  explicit foraging_task(const std::string& name) : mc_name(name) {}
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the

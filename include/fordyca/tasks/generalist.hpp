@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
-#include "rcppsw/task_allocation/abort_probability.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/task_allocation/abort_probability.hpp"
+#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,14 +52,14 @@ namespace task_allocation = rcppsw::task_allocation;
 class generalist : public task_allocation::partitionable_polled_task,
                    public foraging_task {
  public:
-  generalist(const struct task_allocation::partitionable_task_params *params,
+  generalist(const struct task_allocation::partitionable_task_params* params,
              std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::free_block_pickup &visitor) override;
-  void accept(events::nest_block_drop &visitor) override;
-  void accept(events::cache_block_drop &) override {}
-  void accept(events::cached_block_pickup &) override {}
+  void accept(events::free_block_pickup& visitor) override;
+  void accept(events::nest_block_drop& visitor) override;
+  void accept(events::cache_block_drop&) override {}
+  void accept(events::cached_block_pickup&) override {}
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;
@@ -79,7 +79,9 @@ class generalist : public task_allocation::partitionable_polled_task,
   bool cache_acquired(void) const override { return false; }
   bool block_acquired(void) const override;
 
-  executable_task* partition(void) override { return partitionable_task::partition(); }
+  executable_task* partition(void) override {
+    return partitionable_task::partition();
+  }
   void task_start(const task_allocation::taskable_argument* const) override {}
 
   double current_time(void) const override;

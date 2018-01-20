@@ -27,8 +27,8 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

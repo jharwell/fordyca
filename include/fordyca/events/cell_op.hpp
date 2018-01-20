@@ -32,8 +32,13 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class cell2D; class perceived_cell2D; }
-namespace fsm { class cell2D_fsm; }
+namespace representation {
+class cell2D;
+class perceived_cell2D;
+}
+namespace fsm {
+class cell2D_fsm;
+}
 
 NS_START(events);
 

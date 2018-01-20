@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grid_parser::parse(argos::TConfigurationNode &node) {
+void grid_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<struct grid_params>();
   std::vector<std::string> res;
 
@@ -44,7 +44,7 @@ void grid_parser::parse(argos::TConfigurationNode &node) {
   m_params->upper.Set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
 } /* parse() */
 
-void grid_parser::show(std::ostream &stream) {
+void grid_parser::show(std::ostream& stream) {
   stream << "====================\nGrid params\n====================\n";
   stream << "resolution=" << m_params->resolution << std::endl;
   stream << "lower=" << m_params->lower << std::endl;

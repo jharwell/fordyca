@@ -27,10 +27,10 @@
 #include <algorithm>
 #include <string>
 
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +52,7 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
                          public visitor::visitable_any<perceived_cell2D>,
                          public rcppsw::er::client {
  public:
-  explicit perceived_cell2D(
-      const std::shared_ptr<rcppsw::er::server>& server);
+  explicit perceived_cell2D(const std::shared_ptr<rcppsw::er::server>& server);
 
   /**
    * @brief Set the relevance decay parameter for the cell.
@@ -62,7 +61,9 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    */
   void pheromone_rho(double rho) { m_density.rho(rho); }
   void pheromone_repeat_deposit(bool b) { m_pheromone_repeat_deposit = b; }
-  bool pheromone_repeat_deposit(void) const { return m_pheromone_repeat_deposit; }
+  bool pheromone_repeat_deposit(void) const {
+    return m_pheromone_repeat_deposit;
+  }
 
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) { return m_robot_id; }
@@ -75,7 +76,6 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
    */
   double density(void) const { return m_density.last_result(); }
 
-
   bool state_is_known(void) const { return decoratee().state_is_known(); }
   bool state_has_block(void) const { return decoratee().state_has_block(); }
   bool state_has_cache(void) const { return decoratee().state_has_cache(); }
@@ -87,7 +87,9 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
   const representation::cache* cache(void) const { return decoratee().cache(); }
   representation::block* block(void) { return decoratee().block(); }
   representation::cache* cache(void) { return decoratee().cache(); }
-  const representation::cell_entity* entity(void) const { return decoratee().entity(); }
+  const representation::cell_entity* entity(void) const {
+    return decoratee().entity();
+  }
   void entity(cell_entity* e) { decoratee().entity(e); }
   representation::discrete_coord loc(void) const { return decoratee().loc(); }
 

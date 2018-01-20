@@ -24,19 +24,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include <string>
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class block; }
-namespace params { struct block_params; }
+namespace representation {
+class block;
+}
+namespace params {
+struct block_params;
+}
 
 NS_START(support);
 

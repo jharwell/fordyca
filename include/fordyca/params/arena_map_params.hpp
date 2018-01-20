@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/base_params.hpp"
 #include "fordyca/params/block_params.hpp"
 #include "fordyca/params/depth1/cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,8 +43,8 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct arena_map_params : public rcppsw::common::base_params {
-  arena_map_params(void) : grid(), block(), cache(), nest_center(), nest_x(),
-                           nest_y() {}
+  arena_map_params(void)
+      : grid(), block(), cache(), nest_center(), nest_x(), nest_y() {}
 
   struct grid_params grid;
   struct block_params block;

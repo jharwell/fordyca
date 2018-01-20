@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/block_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,12 +45,14 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for related to \ref block objects into
  * \ref block_params.
  */
-class block_parser: public rcppsw::common::xml_param_parser {
+class block_parser : public rcppsw::common::xml_param_parser {
  public:
-  block_parser(void): m_params() {}
+  block_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct block_params* get_results(void) override { return m_params.get(); }
+  const struct block_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

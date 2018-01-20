@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/grid_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,12 +45,14 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for \ref arena_map grid into \ref grid_params.
  */
 
-class grid_parser: public rcppsw::common::xml_param_parser {
+class grid_parser : public rcppsw::common::xml_param_parser {
  public:
-  grid_parser(void): m_params() {}
+  grid_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override { return m_params.get(); }
+  const struct grid_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

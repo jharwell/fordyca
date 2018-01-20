@@ -38,8 +38,8 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct task_allocation::task_params *const params,
-                     std::unique_ptr<task_allocation::taskable> &mechanism)
+collector::collector(const struct task_allocation::task_params* const params,
+                     std::unique_ptr<task_allocation::taskable>& mechanism)
     : polled_task(kCollectorName, params, mechanism),
       foraging_task(kCollectorName),
       m_interface_sw(false),
@@ -49,17 +49,17 @@ collector::collector(const struct task_allocation::task_params *const params,
  * Member Functions
  ******************************************************************************/
 __pure double collector::current_time(void) const {
-  return dynamic_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
 bool collector::cache_acquired(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->cache_acquired();
 } /* cache_acquired() */
 
-void collector::task_start(const task_allocation::taskable_argument *const) {
+void collector::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
@@ -97,10 +97,10 @@ double collector::calc_interface_time(double start_time) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::cached_block_pickup &visitor) {
+void collector::accept(events::cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::nest_block_drop &visitor) {
+void collector::accept(events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
 
@@ -108,12 +108,12 @@ void collector::accept(events::nest_block_drop &visitor) {
  * Base Diagnostics
  ******************************************************************************/
 bool collector::is_avoiding_collision(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 bool collector::is_transporting_to_nest(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
@@ -121,17 +121,17 @@ bool collector::is_transporting_to_nest(void) const {
  * Depth1 Diagnostics
  ******************************************************************************/
 bool collector::is_exploring_for_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_exploring_for_cache();
 } /* is_exploring_for_cache() */
 
 bool collector::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_vectoring_to_cache();
 } /* is_vectoring_to_cache() */
 
 bool collector::is_acquiring_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm *>(polled_task::mechanism())
+  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_acquiring_cache();
 } /* is_acquiring_cache() */
 

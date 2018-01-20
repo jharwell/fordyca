@@ -28,17 +28,25 @@
 #include <string>
 
 #include "fordyca/representation/occupancy_grid.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
+#include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw { namespace er { class server; }}
+namespace rcppsw {
+namespace er {
+class server;
+}
+}
 
 NS_START(fordyca);
-namespace params { namespace depth0 { struct perceived_arena_map_params; }}
+namespace params {
+namespace depth0 {
+struct perceived_arena_map_params;
+}
+}
 
 NS_START(representation);
 class line_of_sight;
@@ -57,12 +65,14 @@ class line_of_sight;
  * where they actually live (clone not reference), which decouples/simplifies a
  * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
-class perceived_arena_map: public rcppsw::er::client,
-                           public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
+class perceived_arena_map
+    : public rcppsw::er::client,
+      public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
-  perceived_arena_map(std::shared_ptr<rcppsw::er::server> server,
-                      const struct params::depth0::perceived_arena_map_params* c_params,
-                      const std::string& robot_id);
+  perceived_arena_map(
+      std::shared_ptr<rcppsw::er::server> server,
+      const struct params::depth0::perceived_arena_map_params* c_params,
+      const std::string& robot_id);
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of and their
@@ -88,7 +98,9 @@ class perceived_arena_map: public rcppsw::er::client,
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::unique_ptr<representation::cache>>& caches(void) { return m_caches; }
+  std::list<std::unique_ptr<representation::cache>>& caches(void) {
+    return m_caches;
+  }
 
   /**
    * @brief Add a cache to the list of perceived caches.
@@ -129,8 +141,12 @@ class perceived_arena_map: public rcppsw::er::client,
    * @return The cell.
    */
   perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  perceived_cell2D& access(const discrete_coord& c) { return access(c.first, c.second); }
-  const perceived_cell2D& access(size_t i, size_t j) const { return m_grid.access(i,j); }
+  perceived_cell2D& access(const discrete_coord& c) {
+    return access(c.first, c.second);
+  }
+  const perceived_cell2D& access(size_t i, size_t j) const {
+    return m_grid.access(i, j);
+  }
 
   /**
    * @brief Update the density of all cells in the perceived arena.

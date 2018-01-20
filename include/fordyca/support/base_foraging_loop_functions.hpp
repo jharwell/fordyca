@@ -24,17 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <argos3/core/simulator/loop_functions.h>
 #include <argos3/core/simulator/entity/floor_entity.h>
+#include <argos3/core/simulator/loop_functions.h>
+#include <string>
 
-#include "rcppsw/er/server.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,9 +61,12 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   base_foraging_loop_functions(void) = default;
 
   base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
-  base_foraging_loop_functions& operator=(const base_foraging_loop_functions& s) = delete;
+  base_foraging_loop_functions& operator=(
+      const base_foraging_loop_functions& s) = delete;
 
-  void Init(argos::TConfigurationNode&) override { m_floor = &GetSpace().GetFloorEntity(); }
+  void Init(argos::TConfigurationNode&) override {
+    m_floor = &GetSpace().GetFloorEntity();
+  }
 
   /**
    * @brief Determine if a robot is waiting to pick up a free block, and if it
@@ -72,10 +75,11 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * @return \c TRUE if the robot was sent the \ref free_block_pickup event,
    * \c FALSE otherwise.
    */
-  template<typename T>
+  template <typename T>
   bool handle_free_block_pickup(argos::CFootBotEntity& robot,
                                 representation::arena_map& map) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+    auto& controller =
+        static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.block_acquired()) {
       /* Check whether the foot-bot is actually on a block */
@@ -103,14 +107,15 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * otherwise.
    */
   template <typename T>
-  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
-                              representation::arena_map& map,
-                              metrics::collectors::block_metrics_collector& block_collector) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+  bool handle_nest_block_drop(
+      argos::CFootBotEntity& robot,
+      representation::arena_map& map,
+      metrics::collectors::block_metrics_collector& block_collector) {
+    auto& controller =
+        static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {
       /* Update arena map state due to a block nest drop */
-      events::nest_block_drop drop_op(rcppsw::er::g_server,
-                                      controller.block());
+      events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
       /* update block carries */
       block_collector.accept(drop_op);
@@ -131,7 +136,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   argos::CFloorEntity* floor(void) const { return m_floor; }
 
  private:
-  argos::CFloorEntity*                                           m_floor{nullptr};
+  argos::CFloorEntity* m_floor{nullptr};
 };
 
 NS_END(support, fordyca);

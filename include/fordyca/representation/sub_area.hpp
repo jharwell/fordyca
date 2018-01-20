@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <vector>
-#include "rcppsw/common/common.hpp"
 #include "fordyca/expressions/expressions.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,14 +47,14 @@ class sub_area {
  public:
   sub_area(size_t dim,
            const argos::CVector2& area_center,
-           const argos::CVector2& nest_center) :
-      m_dim(dim),
-      m_center(area_center),
-      m_utility(m_center, nest_center, m_dim*m_dim) {}
+           const argos::CVector2& nest_center)
+      : m_dim(dim),
+        m_center(area_center),
+        m_utility(m_center, nest_center, m_dim * m_dim) {}
 
  private:
-  size_t           m_dim;
-  argos::CVector2  m_center;
+  size_t m_dim;
+  argos::CVector2 m_center;
   expressions::sub_area_utility m_utility;
 };
 

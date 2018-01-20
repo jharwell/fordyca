@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,10 +52,10 @@ class forager : public task_allocation::polled_task, public foraging_task {
           std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::cache_block_drop &visitor) override;
-  void accept(events::free_block_pickup &visitor) override;
-  void accept(events::cached_block_pickup &) override {}
-  void accept(events::nest_block_drop &) override {}
+  void accept(events::cache_block_drop& visitor) override;
+  void accept(events::free_block_pickup& visitor) override;
+  void accept(events::cached_block_pickup&) override {}
+  void accept(events::nest_block_drop&) override {}
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;

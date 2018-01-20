@@ -32,10 +32,9 @@ NS_START(fordyca, metrics, collectors, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_metrics_collector::stateless_metrics_collector(
-    const std::string& ofname,
-    bool collect_cum,
-    uint collect_interval)
+stateless_metrics_collector::stateless_metrics_collector(const std::string& ofname,
+                                                         bool collect_cum,
+                                                         uint collect_interval)
     : base_metric_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
@@ -47,7 +46,7 @@ stateless_metrics_collector::stateless_metrics_collector(
  * Member Functions
  ******************************************************************************/
 std::string stateless_metrics_collector::csv_header_build(
-    const std::string &header) {
+    const std::string& header) {
   // clang-format off
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
@@ -71,22 +70,25 @@ void stateless_metrics_collector::reset(void) {
 } /* reset() */
 
 void stateless_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics &metrics) {
-  auto &m =
-      static_cast<const collectible_metrics::fsm::stateless_metrics &>(
-          metrics);
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m =
+      static_cast<const collectible_metrics::fsm::stateless_metrics&>(metrics);
   m_stats.n_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
-  m_stats.n_transporting_to_nest += static_cast<uint>(m.is_transporting_to_nest());
+  m_stats.n_transporting_to_nest +=
+      static_cast<uint>(m.is_transporting_to_nest());
   m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
 
   if (collect_cum()) {
-    m_stats.n_cum_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
-    m_stats.n_cum_transporting_to_nest += static_cast<uint>(m.is_transporting_to_nest());
-    m_stats.n_cum_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
+    m_stats.n_cum_exploring_for_block +=
+        static_cast<uint>(m.is_exploring_for_block());
+    m_stats.n_cum_transporting_to_nest +=
+        static_cast<uint>(m.is_transporting_to_nest());
+    m_stats.n_cum_avoiding_collision +=
+        static_cast<uint>(m.is_avoiding_collision());
   }
 } /* collect() */
 
-bool stateless_metrics_collector::csv_line_build(std::string &line) {
+bool stateless_metrics_collector::csv_line_build(std::string& line) {
   if (collect_cum()) {
     line = std::to_string(m_stats.n_exploring_for_block) + separator() +
            std::to_string(m_stats.n_cum_exploring_for_block) + separator() +

@@ -42,8 +42,7 @@ block_metrics_collector::block_metrics_collector(const std::string& ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string block_metrics_collector::csv_header_build(
-    const std::string &header) {
+std::string block_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
   if (collect_cum()) {
     return base_metric_collector::csv_header_build(header) +
@@ -60,7 +59,7 @@ void block_metrics_collector::reset(void) {
   m_metrics = {0, 0};
 } /* reset() */
 
-bool block_metrics_collector::csv_line_build(std::string &line) {
+bool block_metrics_collector::csv_line_build(std::string& line) {
   double avg_carries = 0;
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
@@ -76,8 +75,8 @@ bool block_metrics_collector::csv_line_build(std::string &line) {
 } /* csv_line_build() */
 
 void block_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics &metrics) {
-  auto &m = dynamic_cast<const collectible_metrics::block_metrics &>(metrics);
+    const collectible_metrics::base_collectible_metrics& metrics) {
+  auto& m = dynamic_cast<const collectible_metrics::block_metrics&>(metrics);
   m_metrics.cum_carries += m.n_carries();
   ++m_metrics.cum_collected;
 } /* collect() */

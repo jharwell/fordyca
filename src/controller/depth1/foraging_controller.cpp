@@ -28,8 +28,8 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -83,7 +83,7 @@ void foraging_controller::ControlStep(void) {
   m_executive->run();
 } /* ControlStep() */
 
-void foraging_controller::Init(argos::TConfigurationNode &node) {
+void foraging_controller::Init(argos::TConfigurationNode& node) {
   params::depth1::task_repository task_repo;
   params::depth0::stateful_foraging_repository fsm_repo;
 
@@ -99,13 +99,13 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
             "FATAL: Not all task parameters were validated");
 
   ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_params *p =
-      static_cast<const params::depth1::task_params *>(
+  const params::depth1::task_params* p =
+      static_cast<const params::depth1::task_params*>(
           task_repo.get_params("task"));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
@@ -114,7 +114,7 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
 
   std::unique_ptr<task_allocation::taskable> forager_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
@@ -123,13 +123,13 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist = rcppsw::make_unique<tasks::generalist>(&p->tasks,
-                                                        generalist_fsm);
+  m_generalist =
+      rcppsw::make_unique<tasks::generalist>(&p->tasks, generalist_fsm);
 
   m_generalist->partition1(m_forager.get());
   m_generalist->partition2(m_collector.get());
@@ -140,8 +140,7 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
   m_collector->parent(m_generalist.get());
 
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
-      base_foraging_controller::server(),
-      m_generalist.get());
+      base_foraging_controller::server(), m_generalist.get());
 
   m_executive->task_abort_cleanup(std::bind(
       &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
@@ -155,16 +154,16 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
 } /* Init() */
 
 void foraging_controller::task_abort_cleanup(
-    task_allocation::executable_task *const) {
+    task_allocation::executable_task* const) {
   m_task_aborted = true;
 } /* task_abort_cleanup() */
 
-__pure tasks::foraging_task *foraging_controller::current_task(void) const {
-  return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
+__pure tasks::foraging_task* foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 bool foraging_controller::cache_acquired(void) const {
-  if (nullptr !=current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->cache_acquired();
   }
   return false;
@@ -178,7 +177,7 @@ bool foraging_controller::block_acquired(void) const {
 } /* block_detected() */
 
 void foraging_controller::process_los(
-    const representation::line_of_sight *const c_los) {
+    const representation::line_of_sight* const c_los) {
   depth0::stateful_foraging_controller::process_los(c_los);
 
   /*
@@ -197,7 +196,7 @@ void foraging_controller::process_los(
     } /* for(j..) */
   }   /* for(i..) */
 
-    for (auto cache : c_los->caches()) {
+  for (auto cache : c_los->caches()) {
     /*
      * The state of a cache can change between when the robot saw it last
      * (i.e. different # of blocks in it), and so you need to always process
@@ -330,6 +329,7 @@ std::string foraging_controller::task_name(void) const {
  */
 using namespace argos;
 using depth1_foraging_controller = foraging_controller;
-REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller"); // NOLINT
+REGISTER_CONTROLLER(depth1_foraging_controller,
+                    "depth1_foraging_controller"); // NOLINT
 
 NS_END(depth1, controller, fordyca);

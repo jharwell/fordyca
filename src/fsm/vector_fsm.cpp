@@ -93,7 +93,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time,
               base_sensors()->tick());
-     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
+      argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
@@ -137,7 +137,10 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   if (base_sensors()->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
     ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
+            force.GetX(),
+            force.GetY(),
+            force.Angle().GetValue(),
+            force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 
@@ -216,7 +219,7 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
  * General Member Functions
  ******************************************************************************/
 void vector_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument *const c_arg) {
+    const rcppsw::task_allocation::taskable_argument* const c_arg) {
   static const uint8_t kTRANSITIONS[] = {
       ST_VECTOR,                            /* start */
       ST_VECTOR,                            /* vector */
@@ -225,7 +228,7 @@ void vector_fsm::task_start(
       controller::foraging_signal::IGNORED, /* new direction */
       controller::foraging_signal::IGNORED, /* arrived */
   };
-  auto *const a = dynamic_cast<const tasks::vector_argument *>(c_arg);
+  auto* const a = dynamic_cast<const tasks::vector_argument*>(c_arg);
   ER_ASSERT(nullptr != a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
@@ -243,7 +246,7 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2 &goal) {
+argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2& goal) {
   return goal - base_sensors()->robot_loc();
 } /* calc_vector_to_goal() */
 

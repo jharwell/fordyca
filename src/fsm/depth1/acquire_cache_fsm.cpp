@@ -43,10 +43,10 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_fsm::acquire_cache_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
@@ -73,12 +73,11 @@ acquire_cache_fsm::acquire_cache_fsm(
                     actuators),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache,
-                                               NULL,
-                                               NULL,
+                                               nullptr,
+                                               nullptr,
                                                &exit_acquire_cache),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE,
-                              &acquire_cache);
+  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE, &acquire_cache);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
@@ -144,7 +143,6 @@ void acquire_cache_fsm::init(void) {
 
 bool acquire_cache_fsm::acquire_known_cache(
     std::list<representation::const_perceived_cache> caches) {
-
   /*
    * If we don't know of any caches and we are not current vectoring towards
    * one, then there is no way we can acquire a known cache, so bail out.

@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "rcppsw/common/common.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include <utility>
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,12 +47,16 @@ NS_START(fordyca, representation);
  */
 class cell_entity {
  public:
-  cell_entity(double x_dim, double y_dim, argos::CColor color) :
-      m_id(-1), m_display_id(false), m_x_dim(x_dim), m_y_dim(y_dim),
-      m_color(color), m_real_loc(), m_discrete_loc() {}
+  cell_entity(double x_dim, double y_dim, argos::CColor color)
+      : m_id(-1),
+        m_display_id(false),
+        m_x_dim(x_dim),
+        m_y_dim(y_dim),
+        m_color(color),
+        m_real_loc(),
+        m_discrete_loc() {}
 
-  cell_entity(double dim, argos::CColor color) :
-      cell_entity(dim, dim, color) {}
+  cell_entity(double dim, argos::CColor color) : cell_entity(dim, dim, color) {}
 
   cell_entity(const cell_entity& other) = default;
   cell_entity& operator=(const cell_entity& other) = default;
@@ -91,7 +95,9 @@ class cell_entity {
    * index into an arena_map.
    *
    */
-  virtual const discrete_coord& discrete_loc(void) const { return m_discrete_loc; }
+  virtual const discrete_coord& discrete_loc(void) const {
+    return m_discrete_loc;
+  }
 
   virtual void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
   virtual void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }

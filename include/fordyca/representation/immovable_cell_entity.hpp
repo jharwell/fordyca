@@ -50,25 +50,33 @@ class immovable_cell_entity : public cell_entity {
    * @param loc The entity's permant (for its lifetime) location in the arena.
    * @param resolution The resolution of the arena's discretization.
    */
-  immovable_cell_entity(double x_dim, double y_dim, argos::CColor color,
-                        const argos::CVector2& loc, double resolution) :
-      cell_entity(x_dim, y_dim, color) {
+  immovable_cell_entity(double x_dim,
+                        double y_dim,
+                        argos::CColor color,
+                        const argos::CVector2& loc,
+                        double resolution)
+      : cell_entity(x_dim, y_dim, color) {
     cell_entity::real_loc(loc);
-    cell_entity::discrete_loc(representation::real_to_discrete_coord(loc,
-                                                                     resolution));
+    cell_entity::discrete_loc(
+        representation::real_to_discrete_coord(loc, resolution));
   }
 
-  immovable_cell_entity(double dim, argos::CColor color,
-                        const argos::CVector2& loc, double resolution) :
-      immovable_cell_entity(dim, dim, color, loc, resolution) {}
+  immovable_cell_entity(double dim,
+                        argos::CColor color,
+                        const argos::CVector2& loc,
+                        double resolution)
+      : immovable_cell_entity(dim, dim, color, loc, resolution) {}
   ~immovable_cell_entity(void) override = default;
-
 
   immovable_cell_entity(const immovable_cell_entity& other) = default;
   immovable_cell_entity& operator=(const immovable_cell_entity& other) = default;
 
-  const argos::CVector2& real_loc(void) const override { return cell_entity::real_loc(); }
-  const discrete_coord& discrete_loc(void) const override { return cell_entity::discrete_loc(); }
+  const argos::CVector2& real_loc(void) const override {
+    return cell_entity::real_loc();
+  }
+  const discrete_coord& discrete_loc(void) const override {
+    return cell_entity::discrete_loc();
+  }
 
  private:
   void discrete_loc(const discrete_coord&) override {}

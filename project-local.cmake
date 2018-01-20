@@ -1,7 +1,8 @@
 ################################################################################
 # External Projects                                                            #
 ################################################################################
-set(PROJECT_NAME fordyca CACHE INTERNAL "PROJECT_NAME")
+set(${target}_CHECK_LANGUAGE "CXX")
+set(${target}_HAS_RECURSIVE_DIRS NO)
 
 # Qt
 set(CMAKE_AUTOMOC ON)

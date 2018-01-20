@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/events/block_drop_event.hpp"
+#include "fordyca/events/cell_op.hpp"
 #include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +58,9 @@ class free_block_drop : public cell_op,
                         public block_drop_event {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  representation::block* block, size_t x, size_t y,
+                  representation::block* block,
+                  size_t x,
+                  size_t y,
                   double resolution);
   ~free_block_drop(void) override { client::rmmod(); }
 

@@ -24,29 +24,36 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/math/vector2.h>
 #include <list>
 #include <utility>
-#include <argos3/core/utility/math/vector2.h>
-#include <argos3/core/utility/math/rng.h>
 
-#include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/representation/perceived_block.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
-namespace representation { class perceived_arena_map; class block; }
+namespace params {
+struct fsm_params;
+}
+namespace representation {
+class perceived_arena_map;
+class block;
+}
 
 namespace controller {
-namespace depth0 { class foraging_sensors; }
+namespace depth0 {
+class foraging_sensors;
+}
 class actuator_manager;
 }
 
@@ -66,10 +73,11 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_block_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::fsm::stateless_metrics,
-                          public metrics::collectible_metrics::fsm::stateful_metrics,
-                          public rcppsw::task_allocation::taskable {
+class acquire_block_fsm
+    : public base_foraging_fsm,
+      public metrics::collectible_metrics::fsm::stateless_metrics,
+      public metrics::collectible_metrics::fsm::stateful_metrics,
+      public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(
       const struct params::fsm_params* params,
@@ -78,16 +86,20 @@ class acquire_block_fsm : public base_foraging_fsm,
       const std::shared_ptr<controller::actuator_manager>& actuators,
       std::shared_ptr<representation::perceived_arena_map> map);
 
-
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
   void task_reset(void) override { init(); }
-  void task_start(const rcppsw::task_allocation::taskable_argument* const) override {}
-  bool task_running(void) const override { return ST_ACQUIRE_BLOCK == current_state(); }
+  void task_start(
+      const rcppsw::task_allocation::taskable_argument* const) override {}
+  bool task_running(void) const override {
+    return ST_ACQUIRE_BLOCK == current_state();
+  }
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;
@@ -129,7 +141,8 @@ class acquire_block_fsm : public base_foraging_fsm,
    * acquiring a block, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_block(std::list<representation::const_perceived_block> blocks);
+  bool acquire_known_block(
+      std::list<representation::const_perceived_block> blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);

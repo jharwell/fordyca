@@ -31,8 +31,8 @@
 #include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,10 +44,10 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_block_fsm::acquire_block_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth0::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
     std::shared_ptr<representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
@@ -75,8 +75,8 @@ acquire_block_fsm::acquire_block_fsm(
                     actuators),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block,
-                                               NULL,
-                                               NULL,
+                                               nullptr,
+                                               nullptr,
                                                &exit_acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   client::insmod("acquire_block_fsm",
@@ -145,7 +145,6 @@ void acquire_block_fsm::init(void) {
 
 bool acquire_block_fsm::acquire_known_block(
     std::list<representation::const_perceived_block> blocks) {
-
   /*
    * If we don't know of any blocks and we are not current vectoring towards
    * one, then there is no way we can acquire a known block, so bail out.
