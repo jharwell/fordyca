@@ -186,8 +186,8 @@ void foraging_controller::process_los(
    * the cell does not contain a cache, then the cache was depleted between then
    * and now, and it needs to update its internal representation accordingly.
    */
-  for (size_t i = 0; i < c_los->sizex(); ++i) {
-    for (size_t j = 0; j < c_los->sizey(); ++j) {
+  for (size_t i = 0; i < c_los->xsize(); ++i) {
+    for (size_t j = 0; j < c_los->ysize(); ++j) {
       representation::discrete_coord d = c_los->cell(i, j).loc();
       if (c_los->cell(i, j).state_is_empty() &&
           map()->access(d).state_has_cache()) {

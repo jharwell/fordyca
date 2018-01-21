@@ -57,12 +57,14 @@ arena_map::arena_map(const struct params::arena_map_params* params)
   deferred_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
-  ER_NOM("%zu x %zu @ %f resolution",
-         m_grid.xsize(),
-         m_grid.ysize(),
+  ER_NOM("%zu x %zu/%zu x %zu @ %f resolution",
+         m_grid.xdsize(),
+         m_grid.ydsize(),
+         m_grid.xrsize(),
+         m_grid.yrsize(),
          m_grid.resolution());
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
       cell.loc(discrete_coord(i, j));
     } /* for(j..) */
@@ -175,8 +177,8 @@ void arena_map::distribute_blocks(void) {
    * created via block consolidation, then all cells that do not have blocks or
    * caches are empty.
    */
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache()) {
         events::cell_empty op(i, j);

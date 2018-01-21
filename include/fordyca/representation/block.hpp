@@ -24,9 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <cassert>
-#include <utility>
-
 #include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"

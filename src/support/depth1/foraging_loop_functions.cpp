@@ -268,6 +268,15 @@ bool foraging_loop_functions::block_drop_overlap_with_nest(
                                                                block->ysize()));
 } /* block_drop_overlap_with_nest() */
 
+bool foraging_loop_functions::block_drop_near_arena_boundary(
+    const representation::block* block,
+    const argos::CVector2& drop_loc) {
+  return (drop_loc.GetX() <= block->xsize() * 2  ||
+          drop_loc.GetX() >= map()->xrsize() - block->xsize() * 2  ||
+          drop_loc.GetY() <= block->ysize() * 2 ||
+          drop_loc.GetY() >= map()->yrsize() - block->ysize() * 2);
+} /* block_drop_overlap_with_nest() */
+
 void foraging_loop_functions::cache_handling_init(
     const struct params::arena_map_params* arenap) {
   /*

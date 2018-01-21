@@ -191,8 +191,8 @@ void stateful_foraging_controller::process_los(
    * between then and now, and it needs to update its internal representation
    * accordingly.
    */
-  for (size_t i = 0; i < los->sizex(); ++i) {
-    for (size_t j = 0; j < los->sizey(); ++j) {
+  for (size_t i = 0; i < los->xsize(); ++i) {
+    for (size_t j = 0; j < los->ysize(); ++j) {
       representation::discrete_coord d = los->cell(i, j).loc();
       if (los->cell(i, j).state_is_empty() &&
           map()->access(d).state_has_block()) {
