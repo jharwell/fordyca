@@ -228,9 +228,16 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
        * normal block_nest_drop, and will be discoverable by a robot via LOS
        * but not able to be acquired, as its color is hidden by that of the
        * nest.
+       *
+       * If the robot is really close to a wall, then dropping a block may make
+       * it inaccessible to future robots trying to reach it, due to obstacle
+       * avoidance kicking in. This can result in an endless loop if said block
+       * is the only one a robot knows about (see #242).
        */
       if (block_drop_overlap_with_nest(controller.block(),
-                                       controller.robot_loc())) {
+                                       controller.robot_loc()) ||
+          block_drop_near_arena_boundary(controller.block(),
+                                         controller.robot_loc())) {
         conflict = true;
       }
       if (!conflict) {
@@ -279,26 +286,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
             map.subgrid(robot_loc.first, robot_loc.second, 2),
             robot_loc);
 
-    /* for (auto &c : map.caches()) { */
-    /*   argos::CVector2 ll = representation::discrete_to_real_coord( */
-    /*       new_los->abs_ll(), */
-    /*       map.grid_resolution()); */
-    /*   argos::CVector2 lr = representation::discrete_to_real_coord( */
-    /*       new_los->abs_lr(), */
-    /*       map.grid_resolution()); */
-    /*   argos::CVector2 ul = representation::discrete_to_real_coord( */
-    /*       new_los->abs_ul(), */
-    /*       map.grid_resolution()); */
-    /*   argos::CVector2 ur = representation::discrete_to_real_coord( */
-    /*       new_los->abs_ur(), */
-    /*       map.grid_resolution()); */
-    /*   if (c.contains_point(ll) || c.contains_point(lr) || */
-    /*       c.contains_point(ul) || c.contains_point(ur)) { */
-    /*     auto los_caches = new_los->caches(); */
-    /*     new_los->cache_add(&c); */
-    /*   } */
-    /* } /\* for(&c..) *\/ */
-
     controller.los(new_los);
   }
 
@@ -310,6 +297,8 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
                                      const argos::CVector2& drop_loc);
   bool block_drop_overlap_with_nest(const representation::block* block,
                                     const argos::CVector2& drop_loc);
+  bool block_drop_near_arena_boundary(const representation::block* block,
+                                      const argos::CVector2& drop_loc);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void metric_collecting_init(const struct params::output_params *output_p);
   void cache_handling_init(const struct params::arena_map_params *arenap);

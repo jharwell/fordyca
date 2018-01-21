@@ -96,6 +96,11 @@ class arena_map : public rcppsw::er::client,
    */
   void distribute_blocks(void);
 
+  size_t xdsize(void) const { return m_grid.xdsize(); }
+  size_t ydsize(void) const { return m_grid.ydsize(); }
+  size_t xrsize(void) const { return m_grid.xrsize(); }
+  size_t yrsize(void) const { return m_grid.yrsize(); }
+
   /**
    * @brief Distribute a particular block in the arena, according to whatever
    * policy was specified in the .argos file.

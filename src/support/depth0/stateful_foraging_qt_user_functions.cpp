@@ -54,14 +54,14 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) 
     const representation::line_of_sight* los = controller.los();
     const double resolution = 0.2;
     std::vector<argos::CVector2> points;
-    points.emplace_back(-resolution * los->sizex() / 2,
-                        -resolution * los->sizey() / 2);
-    points.emplace_back(-resolution * los->sizex() / 2,
-                        resolution * los->sizey() / 2);
-    points.emplace_back(resolution * los->sizex() / 2,
-                        resolution * los->sizey() / 2);
-    points.emplace_back(resolution * los->sizex() / 2,
-                        -resolution * los->sizey() / 2);
+    points.emplace_back(-resolution * los->xsize() / 2,
+                        -resolution * los->ysize() / 2);
+    points.emplace_back(-resolution * los->xsize() / 2,
+                        resolution * los->ysize() / 2);
+    points.emplace_back(resolution * los->xsize() / 2,
+                        resolution * los->ysize() / 2);
+    points.emplace_back(resolution * los->xsize() / 2,
+                        -resolution * los->ysize() / 2);
 
     /* draw LOS slightly above the ground so that it renders better */
     DrawPolygon(argos::CVector3(0, 0, 0.05),

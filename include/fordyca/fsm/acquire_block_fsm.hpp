@@ -27,7 +27,6 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <list>
-#include <utility>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"

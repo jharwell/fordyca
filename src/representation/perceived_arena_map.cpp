@@ -52,13 +52,15 @@ perceived_arena_map::perceived_arena_map(
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
-  ER_NOM("%zu x %zu @ %f resolution",
-         m_grid.xsize(),
-         m_grid.ysize(),
+  ER_NOM("%zu x%zu/%zu x %zu @ %f resolution",
+         m_grid.xdsize(),
+         m_grid.ydsize(),
+         m_grid.xrsize(),
+         m_grid.yrsize(),
          m_grid.resolution());
 
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       perceived_cell2D& cell = m_grid.access(i, j);
       cell.pheromone_rho(c_params->pheromone.rho);
       cell.pheromone_repeat_deposit(c_params->pheromone.repeat_deposit);
@@ -100,8 +102,8 @@ std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
 } /* caches() */
 
 void perceived_arena_map::update_density(void) {
-  for (size_t i = 0; i < m_grid.xsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ysize(); ++j) {
+  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
+    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       m_grid.access(i, j).density_update();
     } /* for(j..) */
   }   /* for(i..) */

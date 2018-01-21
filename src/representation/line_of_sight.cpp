@@ -20,7 +20,7 @@
 
 /*******************************************************************************
  * Includes
- ******************************************************************************/
+ *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"

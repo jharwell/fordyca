@@ -83,7 +83,7 @@ class line_of_sight {
    *
    * @return The X dimension.
    */
-  size_t sizex(void) const { return m_view.shape()[0]; }
+  size_t xsize(void) const { return m_view.shape()[0]; }
 
   discrete_coord abs_ll(void) const;
   discrete_coord abs_lr(void) const;
@@ -95,7 +95,7 @@ class line_of_sight {
    *
    * @return The Y dimension.
    */
-  size_t sizey(void) const { return m_view.shape()[1]; }
+  size_t ysize(void) const { return m_view.shape()[1]; }
 
   /**
    * @brief Get the # elements in a LOS.

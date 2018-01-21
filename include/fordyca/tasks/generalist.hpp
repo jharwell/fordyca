@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include "fordyca/tasks/foraging_task.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
