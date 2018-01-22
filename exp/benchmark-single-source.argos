@@ -13,7 +13,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="0"
+    <experiment length="__0__"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -22,7 +22,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <__controller___controller id="ffc"
                                 library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -56,7 +56,7 @@
               init_random_estimates="true"
               subtask_selection_method="harwell2018"
               partition_method="pini2011"
-              always_partition="false"
+              always_partition="__0__"
               never_partition="false"/>
         <sensors>
           <proximity go_straight_angle_range="-5:5"
@@ -71,10 +71,10 @@
           unsuccessful_explore_dir_change="1000"
           frequent_collision_thresh="100"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.5"
+          speed_throttle_block_carry="__0__"
           />
       </params>
-    </depth1_foraging_controller>
+    </__controller___controller>
 
   </controllers>
 
@@ -82,7 +82,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="__controller___loop_functions">
     <output>
       <sim sim_log_fname="sim.log"
            output_root="output"
@@ -96,9 +96,9 @@
           block_fname="block-stats.csv"
           distance_fname="distance-stats.csv"
           task_fname="task-stats.csv"
-          n_robots="20"
+          n_robots="__0__"
           collect_cum="true"
-          collect_interval="750"
+          collect_interval="1000"
           />
     </output>
     <arena_map>
@@ -114,15 +114,16 @@
               static_respawn_scale_factor="0.05"
               dimension="0.8"
               min_dist="0.6"
-              usage_penalty="10"
+              usage_penalty="__0__"
               />
       <nest size="0.5, 0.5" center="2, 2.5" />
     </arena_map>
-    <visualization robot_id="true"
+        <visualization robot_id="true"
                    robot_los="true"
                    robot_task="true"
                    block_id="false"
                    />
+
   </loop_functions>
 
   <!-- *********************** -->
@@ -156,13 +157,12 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="10" max_trials="1000">
+      <entity quantity="__0__" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
       </entity>
     </distribute>
-
   </arena>
 
   <!-- ******************* -->
@@ -180,21 +180,21 @@
     <led id="leds" />
   </media>
 
-  <!-- ****************** -->
+    <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="__controller___qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

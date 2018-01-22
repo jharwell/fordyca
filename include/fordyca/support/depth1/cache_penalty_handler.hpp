@@ -107,7 +107,7 @@ class cache_penalty_handler : public rcppsw::er::client {
        * conflict with any other robots currently waiting/starting to wait.
        */
       for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
-        if (it->start_time() == timestep) {
+        if (it->start_time() + it->penalty() == timestep + penalty) {
           ++penalty;
           it = m_penalty_list.begin();
         }

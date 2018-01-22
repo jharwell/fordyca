@@ -58,6 +58,7 @@ class cache_penalty {
   uint cache_id(void) const { return m_cache_id; }
   const controller::depth1::foraging_controller* controller(void) const { return mc_controller; }
   uint start_time(void) const { return m_start_time; }
+  uint penalty(void) const { return m_penalty; }
 
   bool operator==(const cache_penalty& other) {
     return this->controller() == other.controller();

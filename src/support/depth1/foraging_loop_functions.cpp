@@ -82,7 +82,6 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
         repo.get_params("loop_functions"));
 
     controller.display_task(l_params->display_robot_task);
-
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
