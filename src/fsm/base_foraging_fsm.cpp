@@ -54,6 +54,7 @@ base_foraging_fsm::base_foraging_fsm(
       entry_collision_avoidance(),
       entry_leaving_nest(),
       entry_new_direction(),
+      entry_wait_for_signal(),
       mc_dir_change_thresh(unsuccessful_dir_change_thresh),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
@@ -122,11 +123,17 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   if (current_state() != last_state()) {
-    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+    ER_DIAG("Executing ST_COLLISION_AVOIDANCE");
   }
 
   if (m_sensors->threatening_obstacle_exists()) {
-    m_actuators->set_rel_heading(m_kinematics.calc_avoidance_force());
+    argos::CVector2 force = kinematics().calc_avoidance_force();
+    ER_DIAG("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+            force.GetX(),
+            force.GetY(),
+            force.Angle().GetValue(),
+            force.Length());
+  m_actuators->set_rel_heading(force);
   } else {
     internal_event(previous_state());
   }
@@ -185,6 +192,9 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(argos::CColor::CYAN);
+}
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
+  actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 /*******************************************************************************

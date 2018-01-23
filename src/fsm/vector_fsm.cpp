@@ -169,7 +169,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
       std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
                  m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
   double angle_diff = angle_to_goal - heading.Angle().GetValue();
-  angle_diff = atan2(std::sin(angle_diff), std::cos(angle_diff));
+  angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
 
   ang_speed = m_ang_pid.calculate(0, -angle_diff);
   lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));

@@ -78,14 +78,6 @@ bool stateful_foraging_controller::block_acquired(void) const {
   return false;
 } /* block_acquired() */
 
-void stateful_foraging_controller::robot_loc(argos::CVector2 loc) {
-  base_sensors()->robot_loc(loc);
-}
-
-argos::CVector2 stateful_foraging_controller::robot_loc(void) const {
-  return base_sensors()->robot_loc();
-}
-
 __pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {
   return stateful_sensors()->los();

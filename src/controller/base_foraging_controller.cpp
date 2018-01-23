@@ -73,6 +73,14 @@ bool base_foraging_controller::block_detected(void) const {
   return m_sensors->block_detected();
 } /* block_detected() */
 
+void base_foraging_controller::robot_loc(argos::CVector2 loc) {
+  m_sensors->robot_loc(loc);
+}
+
+argos::CVector2 base_foraging_controller::robot_loc(void) const {
+  return m_sensors->robot_loc();
+}
+
 void base_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing base foraging controller");
   params::depth0::stateless_foraging_repository param_repo;

@@ -131,17 +131,6 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  /**
-   * @brief Set the current location of the robot.
-   *
-   * This is a hack, as real world robot's would have to do their own
-   * localization. This is far superior to that, in terms of ease of
-   * programming. Plus it helps me focus in on my actual research. Ideally,
-   * robots would calculate this from sensor values, rather than it being set by
-   * the loop functions.
-   */
-  void robot_loc(argos::CVector2 loc);
-  argos::CVector2 robot_loc(void) const;
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
 
  private:

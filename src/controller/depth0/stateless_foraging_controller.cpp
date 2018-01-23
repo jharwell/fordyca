@@ -86,6 +86,10 @@ void stateless_foraging_controller::ControlStep(void) {
   m_fsm->run();
 } /* ControlStep() */
 
+bool stateless_foraging_controller::block_acquired(void) const {
+  return m_fsm->block_acquired();
+} /* block_acquired() */
+
 /*******************************************************************************
  * Stateless Diagnostics
  ******************************************************************************/

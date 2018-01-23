@@ -90,7 +90,6 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
     explore_time_reset();
   }
   if (base_foraging_fsm::base_sensors()->block_detected()) {
-    ER_DIAG("Block detected");
     internal_event(ST_FINISHED);
   }
 
