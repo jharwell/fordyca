@@ -128,7 +128,7 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
 
   if (m_sensors->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_DIAG("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+    ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
             force.GetX(),
             force.GetY(),
             force.Angle().GetValue(),

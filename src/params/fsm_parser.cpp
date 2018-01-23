@@ -67,7 +67,8 @@ void fsm_parser::show(std::ostream& stream) {
 
 __pure bool fsm_parser::validate(void) {
   return (m_params->nest_center.GetX() > 0) &&
-         (m_params->nest_center.GetY() > 0);
+         (m_params->nest_center.GetY() > 0) &&
+      (m_params->speed_throttling.block_carry < 1.0);
 } /* validate() */
 
 NS_END(params, fordyca);
