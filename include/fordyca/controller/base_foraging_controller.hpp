@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -126,6 +127,18 @@ class base_foraging_controller : public argos::CCI_Controller,
    * makes things much nicer/easier to deal with.
    */
   void tick(uint tick);
+
+  /**
+   * @brief Set the current location of the robot.
+   *
+   * This is a hack, as real world robot's would have to do their own
+   * localization. This is far superior to that, in terms of ease of
+   * programming. Plus it helps me focus in on my actual research. Ideally,
+   * robots would calculate this from sensor values, rather than it being set by
+   * the loop functions.
+   */
+  void robot_loc(argos::CVector2 loc);
+  argos::CVector2 robot_loc(void) const;
 
  protected:
   const std::shared_ptr<actuator_manager>& actuators(void) const {

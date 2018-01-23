@@ -160,24 +160,14 @@ void stateless_foraging_loop_functions::pre_step_iter(
       static_cast<rmetrics::distance_metrics&>(controller));
 
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
+  utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
-  if (!handle_nest_block_drop<controller::depth0::stateless_foraging_controller>(
-          robot, *m_map, *m_block_collector)) {
-    if (!controller.in_nest() && controller.is_exploring_for_block() &&
-        controller.block_detected()) {
-      /* Check whether the foot-bot is actually on a block */
-      int block = utils::robot_on_block(robot, *map());
-      if (-1 != block) {
-        events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &m_map->blocks()[block],
-                                            utils::robot_id(robot));
-        controller.accept(pickup_op);
-        m_map->accept(pickup_op);
-
-        /* The floor texture must be updated */
-        floor()->SetChanged();
-      }
-    }
+  if (controller.is_carrying_block()) {
+    handle_nest_block_drop<controller::depth0::stateless_foraging_controller>(
+        robot, *m_map, *m_block_collector);
+  } else {
+    handle_free_block_pickup<controller::depth0::stateless_foraging_controller>(
+        robot, *m_map);
   }
 } /* pre_step_iter() */
 

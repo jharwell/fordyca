@@ -69,6 +69,8 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
+  bool block_acquired(void) const;
+
   /**
    * @brief (Re)-initialize the FSM.
    */
@@ -86,7 +88,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_ACQUIRE_BLOCK,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_COLLISION_AVOIDANCE,
+    ST_WAIT_FOR_BLOCK_PICKUP,
     ST_MAX_STATES
   };
 
@@ -95,15 +97,15 @@ class stateless_foraging_fsm : public base_foraging_fsm,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
 
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* stateless fsm states */
   HFSM_STATE_DECLARE(stateless_foraging_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE(stateless_foraging_fsm, acquire_block,
+  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
                      state_machine::event_data);
 
   /**

@@ -204,6 +204,7 @@ class block_to_nest_fsm
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* memory foraging states */
   HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);
@@ -216,7 +217,6 @@ class block_to_nest_fsm
                      wait_for_cache_pickup,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
-  HFSM_ENTRY_DECLARE_ND(block_to_nest_fsm, entry_wait_for_pickup);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -229,7 +229,7 @@ class block_to_nest_fsm
   }
 
   // clang-format off
-  uint                                                  m_pickup_count;
+  uint                                                  m_pickup_count{0};
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   depth1::acquire_cache_fsm                             m_cache_fsm;

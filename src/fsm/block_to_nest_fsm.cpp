@@ -52,14 +52,13 @@ block_to_nest_fsm::block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_transport_to_nest(),
       entry_collision_avoidance(),
+      entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      entry_wait_for_pickup(),
-      m_pickup_count(0),
       m_sensors(sensors),
       m_block_fsm(params, server, sensors, actuators, map),
       m_cache_fsm(params, server, sensors, actuators, map),
@@ -67,12 +66,12 @@ block_to_nest_fsm::block_to_nest_fsm(
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
-                                               &entry_wait_for_pickup,
+                                               &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_cached_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_pickup,
                                                nullptr,
-                                               &entry_wait_for_pickup,
+                                               &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
@@ -97,10 +96,6 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
   } else if (state_machine::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
       internal_event(ST_FINISHED);
-      return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::COLLISION_IMMINENT ==
-               data->signal()) {
-      internal_event(ST_COLLISION_AVOIDANCE);
       return controller::foraging_signal::HANDLED;
     }
   }
@@ -153,10 +148,6 @@ HFSM_STATE_DEFINE(block_to_nest_fsm,
     internal_event(ST_ACQUIRE_CACHED_BLOCK);
   }
   return controller::foraging_signal::HANDLED;
-}
-
-HFSM_ENTRY_DEFINE_ND(block_to_nest_fsm, entry_wait_for_pickup) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {

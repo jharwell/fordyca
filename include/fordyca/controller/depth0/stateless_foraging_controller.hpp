@@ -72,6 +72,7 @@ class stateless_foraging_controller : public base_foraging_controller,
   size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 
+  bool block_acquired(void) const;
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:

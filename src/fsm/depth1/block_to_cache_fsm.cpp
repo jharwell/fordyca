@@ -50,13 +50,13 @@ block_to_cache_fsm::block_to_cache_fsm(
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_collision_avoidance(),
+      entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      entry_wait_for_pickup(),
       m_pickup_count(0),
       m_sensors(sensors),
       m_block_fsm(params,
@@ -70,12 +70,12 @@ block_to_cache_fsm::block_to_cache_fsm(
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
-                                               &entry_wait_for_pickup,
+                                               &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_drop,
                                                nullptr,
-                                               &entry_wait_for_pickup,
+                                               &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
                                                nullptr,
@@ -89,11 +89,8 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
       return controller::foraging_signal::HANDLED;
     }
-  } else if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
-      internal_event(ST_COLLISION_AVOIDANCE);
-      return controller::foraging_signal::HANDLED;
-    }
+  } else {
+    ER_FATAL_SENTINEL("FATAL: Cannot handle child signals");
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -121,6 +118,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
                   wait_for_block_pickup,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    ER_DIAG("Block pickup signal received");
     m_block_fsm.task_reset();
     m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_CACHE);
@@ -150,16 +148,13 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
                   wait_for_cache_drop,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    ER_DIAG("Block drop signal received");
     internal_event(ST_FINISHED);
   } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_CACHE);
   }
   return controller::foraging_signal::HANDLED;
-}
-
-HFSM_ENTRY_DEFINE_ND(block_to_cache_fsm, entry_wait_for_pickup) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {

@@ -1,7 +1,7 @@
 #!/opt/data/local/bin/fish
 
 set -g scenarios "single-source"
-set -g controllers "stateless"
+set -g controllers "stateless" "stateful" "depth1"
 set -g robots 4 8 12 16 20
 set -g timesteps 20000
 set -g speed_throttles 0 10 20 40 80
