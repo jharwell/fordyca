@@ -81,7 +81,11 @@ block_to_cache_fsm::block_to_cache_fsm(
                                                nullptr,
                                                &entry_collision_avoidance,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+  insmod("block_to_cache_fsm",
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
+}
 
 HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {

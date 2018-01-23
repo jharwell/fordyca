@@ -19,7 +19,7 @@ following programs:
 In addition, you will possibly want to install these programs:
 
 - ccache (will make compiling a lot faster)
-- icpc (additional syntax checking)
+- icpc (additional syntax checking; comes from Intel Parallel Studio, which is ~14GB)
 - ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
 After cloning this repo, you will need to:
@@ -40,8 +40,7 @@ After cloning this repo, you will need to:
         cmake ..
         make
 
-## Development Guide
+## Contributing
 
-See the development guide in RCPPSW:
-[README](https://github.com/jharwell/rcppsw/blob/master/README.md), as it is
-basically the same for FORDYCA.
+We use the same contributing guidelines as RCPPSW, whose guide can be found
+[here](https://github.com/jharwell/rcppsw/blob/master/docs/CONTRIBUTING.md).

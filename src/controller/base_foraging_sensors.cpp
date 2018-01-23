@@ -103,7 +103,6 @@ argos::CVector2 base_foraging_sensors::find_closest_obstacle(void) {
   for (auto& r : m_proximity->GetReadings()) {
     argos::CVector2 obstacle(r.Value, r.Angle);
     if (obstacle_is_threatening(obstacle)) {
-      printf("robot_loc: %f, %f obstacle: %f, %f\n", robot_loc().GetX(), robot_loc().GetY(), obstacle.GetX(), obstacle.GetY());
       if ((robot_loc() - obstacle).Length() < closest.Length() ||
           closest.Length() <= 0.0) {
         closest = obstacle;
