@@ -51,6 +51,9 @@ void distance_metrics_collector::reset(void) {
 } /* reset() */
 
 bool distance_metrics_collector::csv_line_build(std::string& line) {
+  if (!((timestep() + 1) % interval() == 0)) {
+    return false;
+  }
   for (auto s : m_stats) {
     line += std::to_string(s.cum_distance) + separator();
   } /* for(s..) */

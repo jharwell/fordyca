@@ -1,10 +1,10 @@
 #!/opt/data/local/bin/fish
 
 set -g scenarios "single-source"
-set -g controllers "depth1"
-set -g robots 4 8 12 16 20
+set -g controllers "stateless" "stateful"
+set -g robots 4 8 16 32 64
 set -g timesteps 20000
-set -g speed_throttles 0.1 0.2 0.4 0.8
+set -g speed_throttles 0 0.1 0.2 0.4 0.8
 set -g cache_penalties 50 100 200 400 800
 set -g partitionings true false
 
@@ -26,33 +26,33 @@ function generate_input_file
         if not string match "depth1" $argv[2]
                 sed 's/create_static="true"/create_static="false"/g' -i /tmp/exp-$argv[1].argos
         end
-
 end
 
 for s in $scenarios
         for c in $controllers
                 for r in $robots
-                        if string match "stateless" $c
-                                generate_input_file $s $c $r 0 0 false
-                                echo "Running scenario=$s, controller=$c, n_robots=$r"
+                        for t in $speed_throttles
+                                generate_input_file $s $c $r $t 0 false
+                                echo "Running scenario=$s, controller=$c, n_robots=$r, throttle=$t"
                                 argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
+                        end
+
+                        if string match "stateless" $c
                                 continue
                         end
 
-                        for t in $speed_throttles
-                                if string match "stateful" $c
-                                        generate_input_file $s $c $r $t 0 false
-                                        echo "Running scenario=$s, controller=$c, n_robots=$r, throttle=$t"
-                                        argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
-                                        continue
-                                end
-                                for penalty in $cache_penalties
-                                        for partitioning in $partitionings
-                                                generate_input_file $s $c $r $t $penalty $partitioning
-                                                echo "Running scenario=$s, controller=$c, n_robots=$r, throttle=$t, cache_penalty=$penalty, always_partition=$partitioning"
-                                                argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
-                                        end
-                                end
+                        generate_input_file $s $c $r 0 0 true
+                        echo "Running scenario=$s, controller=$c, n_robots=$r, throttle=0, cache_penalty=0, always_partition=true"
+                        argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
+
+                        if string match "stateful" $c
+                                continue
+                        end
+
+                        for penalty in $cache_penalties
+                                generate_input_file $s $c $r 0 $penalty false
+                                echo "Running scenario=$s, controller=$c, n_robots=$r, cache_penalty=$penalty"
+                                argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
                         end
                 end
         end
