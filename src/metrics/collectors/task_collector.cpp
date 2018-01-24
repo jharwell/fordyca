@@ -93,6 +93,9 @@ void task_collector::collect(
 } /* collect() */
 
 bool task_collector::csv_line_build(std::string& line) {
+  if (!((timestep() + 1) % interval() == 0)) {
+    return false;
+  }
   if (collect_cum()) {
     line = std::to_string(m_stats.n_collectors) + separator() +
            std::to_string(m_stats.n_cum_collectors) + separator() +

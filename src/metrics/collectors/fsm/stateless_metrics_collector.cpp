@@ -89,6 +89,9 @@ void stateless_metrics_collector::collect(
 } /* collect() */
 
 bool stateless_metrics_collector::csv_line_build(std::string& line) {
+  if (!((timestep() + 1) % interval() == 0)) {
+    return false;
+  }
   if (collect_cum()) {
     line = std::to_string(m_stats.n_exploring_for_block) + separator() +
            std::to_string(m_stats.n_cum_exploring_for_block) + separator() +
