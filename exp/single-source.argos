@@ -12,7 +12,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
+    <system threads="4" />
     <experiment length="0"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -43,7 +43,7 @@
         </output>
         <perceived_arena_map>
           <grid resolution="0.2"
-                size="10, 5, 2"
+                size="20, 5, 2"
                 />
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
@@ -60,12 +60,12 @@
               never_partition="false"/>
         <sensors>
           <proximity go_straight_angle_range="-5:5"
-                    delta="0.01" />
+                    delta="0.001" />
         </sensors>
         <actuators>
           <wheels soft_turn_angle_max="30"
                   no_turn_angle_max="5"
-                  max_speed="10" />
+                  max_speed="5" />
         </actuators>
         <fsm
           unsuccessful_explore_dir_change="1000"
@@ -96,15 +96,15 @@
           block_fname="block-stats.csv"
           distance_fname="distance-stats.csv"
           task_fname="task-stats.csv"
-          n_robots="20"
+          n_robots="16"
           collect_cum="true"
           collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
-            size="10, 5, 2"/>
-      <blocks n_blocks="20"
+            size="20, 5, 2"/>
+      <blocks n_blocks="40"
               dimension="0.2"
               dist_model="single_source"
               />
@@ -113,10 +113,10 @@
               static_size="2"
               static_respawn_scale_factor="0.05"
               dimension="0.8"
-              min_dist="0.6"
+              min_dist="0.8"
               usage_penalty="10"
               />
-      <nest size="0.5, 0.5" center="2, 2.5" />
+      <nest size="0.5, 2.0" center="2, 2.5" />
     </arena_map>
     <visualization robot_id="true"
                    robot_los="true"
@@ -128,35 +128,48 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 5, 2" center="5,2.5,1">
+  <arena size="20, 5, 2" center="10,2.5,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="10,0.1,0.5" movable="false">
-      <body position="5,5,0" orientation="0,0,0" />
+    <box id="wall_north" size="20,0.1,0.5" movable="false">
+      <body position="10,5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="10,0.1,0.5" movable="false">
-      <body position="5,0,0" orientation="0,0,0" />
+    <box id="wall_south" size="20,0.1,0.5" movable="false">
+      <body position="10,0,0" orientation="0,0,0" />
     </box>
     <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="10,2.5,0" orientation="0,0,0" />
+      <body position="20,2.5,0" orientation="0,0,0" />
     </box>
     <box id="wall_west" size="0.1,5,0.5" movable="false">
       <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
+           position="2,1.25,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_2"
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
+    <light id="light_3"
+           position="2,3.75,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+
     <distribute>
-      <position method="uniform" min="1,1,0" max="8,4,0" />
+      <position method="uniform" min="1,1,0" max="18,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="10" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
