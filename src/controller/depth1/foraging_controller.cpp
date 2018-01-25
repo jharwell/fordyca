@@ -189,8 +189,12 @@ void foraging_controller::process_los(
   for (size_t i = 0; i < c_los->xsize(); ++i) {
     for (size_t j = 0; j < c_los->ysize(); ++j) {
       representation::discrete_coord d = c_los->cell(i, j).loc();
-      if (c_los->cell(i, j).state_is_empty() &&
+      if (!c_los->cell(i, j).state_has_cache() &&
           map()->access(d).state_has_cache()) {
+        ER_DIAG("Correct cache%d discrepency at (%zu, %zu)",
+                map()->access(d).cache()->id(),
+                d.first,
+                d.second);
         map()->cache_remove(map()->access(d).cache());
       }
     } /* for(j..) */

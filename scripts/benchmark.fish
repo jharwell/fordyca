@@ -1,11 +1,11 @@
 #!/opt/data/local/bin/fish
 
 set -g scenarios "single-source"
-set -g controllers "stateless" "stateful"
-set -g robots 4 8 16 32 64
+set -g controllers "stateful" "depth1"
+set -g robots 4 16 64
 set -g timesteps 20000
-set -g speed_throttles 0 0.1 0.2 0.4 0.8
-set -g cache_penalties 50 100 200 400 800
+set -g speed_throttles 0.0 0.4 0.8
+set -g cache_penalties 100 400 800
 set -g partitionings true false
 
 # argv[1] - Scenario
@@ -37,17 +37,16 @@ for s in $scenarios
                                 argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
                         end
 
-                        if string match "stateless" $c
+                        if string match -q "stateless" "$c"
                                 continue
                         end
-
+                        if string match -q "stateful" "$c"
+                                continue
+                        end
                         generate_input_file $s $c $r 0 0 true
                         echo "Running scenario=$s, controller=$c, n_robots=$r, throttle=0, cache_penalty=0, always_partition=true"
                         argos3 -c /tmp/exp-$s.argos 2>&1 > /dev/null
 
-                        if string match "stateful" $c
-                                continue
-                        end
 
                         for penalty in $cache_penalties
                                 generate_input_file $s $c $r 0 $penalty false
