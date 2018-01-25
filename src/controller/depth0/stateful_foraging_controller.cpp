@@ -186,9 +186,9 @@ void stateful_foraging_controller::process_los(
   for (size_t i = 0; i < los->xsize(); ++i) {
     for (size_t j = 0; j < los->ysize(); ++j) {
       representation::discrete_coord d = los->cell(i, j).loc();
-      if (los->cell(i, j).state_is_empty() &&
+      if (!los->cell(i, j).state_has_block() &&
           map()->access(d).state_has_block()) {
-        ER_DIAG("Correct block%d/empty discrepency at (%zu, %zu)",
+        ER_DIAG("Correct block%d discrepency at (%zu, %zu)",
                 map()->access(d).block()->id(),
                 d.first,
                 d.second);

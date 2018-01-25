@@ -76,8 +76,9 @@ argos::CVector2 block_distributor::dist_single_src(
    * Find the 90% point between the nest and the source along the X (horizontal)
    * direction, and put all the blocks around there.
    */
-  argos::CRange<double> y_range(m_nest_y.GetMin() - 1.0,
-                                m_nest_y.GetMax() + 1.0);
+  argos::CRange<double> y_range(std::max(1.0, m_nest_y.GetMin() - 1.0),
+                                std::min(m_arena_y.GetMax() - 1.0,
+                                         m_nest_y.GetMax() + 1.0));
   argos::CRange<double> x_range = single_src_xrange();
   x_range.Set(x_range.GetMin() - block.xsize(),
               x_range.GetMax() + block.xsize());

@@ -175,6 +175,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
     m_new_dir_count = 0;
     internal_event(previous_state());
   }
+  ++m_new_dir_count;
   return controller::foraging_signal::HANDLED;
 }
 
