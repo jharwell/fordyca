@@ -91,7 +91,6 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
   const struct params::output_params* params =
       static_cast<const struct params::output_params*>(
           param_repo.get_params("output"));
-
   param_repo.show_all(client::server_handle()->log_stream());
   output_init(params);
 
