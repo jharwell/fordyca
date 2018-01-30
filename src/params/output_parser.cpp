@@ -62,7 +62,7 @@ void output_parser::show(std::ostream& stream) {
   stream << "sim_log_fname=" << m_params->sim_log_fname << std::endl;
 } /* show() */
 
-bool output_parser::validate(void) {
+__pure bool output_parser::validate(void) {
   if (nullptr != m_metrics_parser.get_results()) {
     return m_metrics_parser.validate();
   }

@@ -54,7 +54,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
              m_server) {
-  deferred_init(m_server);
+  deferred_client_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
   ER_NOM("%zu x %zu/%zu x %zu @ %f resolution",
@@ -78,7 +78,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-int arena_map::robot_on_block(const argos::CVector2& pos) {
+__pure int arena_map::robot_on_block(const argos::CVector2& pos) {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i].contains_point(pos)) {
       return static_cast<int>(i);
@@ -87,7 +87,7 @@ int arena_map::robot_on_block(const argos::CVector2& pos) {
   return -1;
 } /* robot_on_block() */
 
-int arena_map::robot_on_cache(const argos::CVector2& pos) {
+__pure int arena_map::robot_on_cache(const argos::CVector2& pos) {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     if (m_caches[i].contains_point(pos)) {
       return static_cast<int>(i);

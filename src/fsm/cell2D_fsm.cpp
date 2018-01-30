@@ -44,6 +44,20 @@ cell2D_fsm::cell2D_fsm(const std::shared_ptr<rcppsw::er::server>& server)
   /* } */
 }
 
+cell2D_fsm::cell2D_fsm(void)
+    : state_machine::simple_fsm(ST_MAX_STATES, ST_UNKNOWN),
+      state_unknown(),
+      state_empty(),
+      state_block(),
+      state_cache(),
+      m_block_count(0) {
+  /* if (ERROR == attmod("cell2D_fsm")) { */
+  /*   client::insmod("cell2D_fsm", */
+  /*                     rcppsw::er::er_lvl::NOM, */
+  /*                     rcppsw::er::er_lvl::NOM); */
+  /* } */
+}
+
 /*******************************************************************************
  * Event Functions
  ******************************************************************************/

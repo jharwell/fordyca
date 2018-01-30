@@ -56,7 +56,7 @@ base_foraging_controller::base_foraging_controller(void)
   /*
    * Initially, all robots use the RCPPSW er_server to log parameters.
    */
-  client::deferred_init(m_server);
+  client::deferred_client_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
   client::insmod("controller", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);

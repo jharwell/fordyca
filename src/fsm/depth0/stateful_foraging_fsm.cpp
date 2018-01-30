@@ -133,26 +133,26 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 /*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
-bool stateful_foraging_fsm::is_exploring_for_block(void) const {
+__pure bool stateful_foraging_fsm::is_exploring_for_block(void) const {
   return m_block_fsm.is_exploring_for_block();
 } /* is_exploring_for_block() */
 
-bool stateful_foraging_fsm::is_avoiding_collision(void) const {
+__pure bool stateful_foraging_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
+__pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
   return m_block_fsm.is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
  * Depth0 Diagnostics
  ******************************************************************************/
-bool stateful_foraging_fsm::is_acquiring_block(void) const {
+__pure bool stateful_foraging_fsm::is_acquiring_block(void) const {
   return m_block_fsm.is_acquiring_block();
 } /* is_acquiring_block() */
 
-bool stateful_foraging_fsm::is_vectoring_to_block(void) const {
+__pure bool stateful_foraging_fsm::is_vectoring_to_block(void) const {
   return m_block_fsm.is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 

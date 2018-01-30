@@ -244,7 +244,7 @@ void foraging_loop_functions::pre_step_final(void) {
   m_task_collector->timestep_inc();
 } /* pre_step_final() */
 
-bool foraging_loop_functions::block_drop_overlap_with_cache(
+__const bool foraging_loop_functions::block_drop_overlap_with_cache(
     const representation::block* block,
     const representation::cache& cache,
     const argos::CVector2& drop_loc) {
@@ -254,7 +254,7 @@ bool foraging_loop_functions::block_drop_overlap_with_cache(
           cache.contains_point(drop_loc - argos::CVector2(0, block->ysize())));
 } /* block_drop_overlap_with_cache() */
 
-bool foraging_loop_functions::block_drop_overlap_with_nest(
+__pure bool foraging_loop_functions::block_drop_overlap_with_nest(
     const representation::block* block,
     const argos::CVector2& drop_loc) {
   return (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(
@@ -267,7 +267,7 @@ bool foraging_loop_functions::block_drop_overlap_with_nest(
                                                                block->ysize()));
 } /* block_drop_overlap_with_nest() */
 
-bool foraging_loop_functions::block_drop_near_arena_boundary(
+__pure bool foraging_loop_functions::block_drop_near_arena_boundary(
     const representation::block* block,
     const argos::CVector2& drop_loc) {
   return (drop_loc.GetX() <= block->xsize() * 2  ||

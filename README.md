@@ -16,6 +16,17 @@ following programs:
 - gcc
 - g++ (a version that supports C++11 is required)
 
+You will also need recent versions of the following libraries:
+
+- boost (1.58 is known to work; older versions may also work). Install all boost
+  libraries via:
+
+        sudo  apt-get install libboost-all-dev
+
+- Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
+
+        sudo apt-get install qtbase5-dev
+
 In addition, you will possibly want to install these programs:
 
 - ccache (will make compiling a lot faster)
@@ -39,6 +50,11 @@ After cloning this repo, you will need to:
         mkdir build && cd build
         cmake ..
         make
+
+## Notes
+
+- ARGoS cannot run under Qt5 with multiple threads without segfaulting, so make
+  sure the threadcount is always 0 or 1.
 
 ## Contributing
 

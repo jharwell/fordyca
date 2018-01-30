@@ -73,4 +73,9 @@ void perceived_cell2D::density_update(void) {
   }
 } /* density_update() */
 
+void perceived_cell2D::deferred_client_init(std::shared_ptr<rcppsw::er::server> server) {
+  client::deferred_client_init(server);
+  decoratee().fsm().deferred_client_init(server);
+} /* deferred_client_init() */
+
 NS_END(representation, fordyca);

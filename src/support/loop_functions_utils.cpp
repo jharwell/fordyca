@@ -31,7 +31,7 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-int robot_on_block(const argos::CFootBotEntity& robot,
+__pure int robot_on_block(const argos::CFootBotEntity& robot,
                    representation::arena_map& map) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot)
@@ -50,7 +50,7 @@ int robot_id(const argos::CFootBotEntity& robot) {
   return std::atoi(robot.GetId().c_str() + 2);
 } /* robot_id() */
 
-int robot_on_cache(const argos::CFootBotEntity& robot,
+__pure int robot_on_cache(const argos::CFootBotEntity& robot,
                    const std::shared_ptr<representation::arena_map>& map) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot)

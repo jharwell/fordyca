@@ -48,7 +48,7 @@ perceived_arena_map::perceived_arena_map(
              m_server),
       m_caches(),
       m_blocks() {
-  deferred_init(m_server);
+  deferred_client_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
@@ -102,6 +102,7 @@ std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
 } /* caches() */
 
 void perceived_arena_map::update_density(void) {
+  #pragma omp parallel for
   for (size_t i = 0; i < m_grid.xdsize(); ++i) {
     for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       m_grid.access(i, j).density_update();
