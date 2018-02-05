@@ -46,6 +46,13 @@ perceived_cell2D::perceived_cell2D(
   }
 }
 
+perceived_cell2D::perceived_cell2D(void)
+    : decorator(),
+      client(),
+      m_pheromone_repeat_deposit(false),
+      m_robot_id(),
+      m_density() {}
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/

@@ -14,7 +14,9 @@ following programs:
 - cmake
 - make
 - gcc
-- g++ (a version that supports C++11 is required)
+- g++ A version that supports C++11 is required. A version that supports OpenMP
+  is highly recommended, otherwise simulations of large numbers of robots will
+  be (much) slower.
 
 You will also need recent versions of the following libraries:
 
@@ -51,10 +53,17 @@ After cloning this repo, you will need to:
         cmake ..
         make
 
-## Notes
+# Troubleshooting
 
-- ARGoS cannot run under Qt5 with multiple threads without segfaulting, so make
-  sure the threadcount is always 0 or 1.
+- If you are having trouble building, try updating the cmake submodule:
+
+        git submodule update
+
+  If the problem perists, open an issue.
+
+- If you are getting a segfault when running ARGoS, verify that if you are
+  running with Qt visualizations that the threadcount is 0 (Qt5 cannot run with
+  multiple threads without segfaulting).
 
 ## Contributing
 

@@ -6,9 +6,7 @@ set(${target}_HAS_RECURSIVE_DIRS NO)
 
 # Qt
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Core REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
 set(CMAKE_AUTOMOC OFF)
 
 # RCPPSW
@@ -47,6 +45,7 @@ target_link_libraries(${target}
   argos3plugin_simulator_footbot
   argos3plugin_simulator_genericrobot
   stdc++fs
-  rcppsw
-  rcsw
+  Qt5::Widgets
+  Qt5::Gui
+  Qt5::Core
   )

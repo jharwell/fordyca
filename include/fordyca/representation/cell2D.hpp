@@ -56,8 +56,10 @@ class cell_entity;
 class cell2D : public visitor::visitable_any<cell2D> {
  public:
   explicit cell2D(const std::shared_ptr<rcppsw::er::server>& server);
+  cell2D(void);
 
-  cell2D(const cell2D& other) = delete;
+  cell2D(const cell2D& other) = default;
+
   cell2D& operator=(const cell2D& other) = delete;
 
   /* state inquiry */

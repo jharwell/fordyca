@@ -26,6 +26,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/ds/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,8 +46,10 @@ class perceived_cell2D;
 using occupancy_grid =
     rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>;
 
-using perceived_occupancy_grid =
-    rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::er::server>&>;
+/* using perceived_occupancy_grid = */
+/*     rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::er::server>&>; */
+
+using perceived_occupancy_grid = rcppsw::ds::grid2D<perceived_cell2D>;
 
 NS_END(representation, fordyca);
 

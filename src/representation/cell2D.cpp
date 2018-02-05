@@ -39,6 +39,11 @@ cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
   m_fsm.init();
 }
 
+cell2D::cell2D(void)
+    : m_entity(nullptr), m_loc(), m_fsm() {
+  m_fsm.init();
+}
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/

@@ -12,8 +12,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="1" />
-    <experiment length="0"
+    <system threads="4" />
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>

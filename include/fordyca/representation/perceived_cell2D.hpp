@@ -53,7 +53,9 @@ class perceived_cell2D : public decorator::decorator<cell2D>,
                          public rcppsw::er::client {
  public:
   explicit perceived_cell2D(const std::shared_ptr<rcppsw::er::server>& server);
+  perceived_cell2D(void);
   void deferred_client_init(std::shared_ptr<rcppsw::er::server> server_handle) override;
+  perceived_cell2D(const perceived_cell2D& other) = default;
 
   /**
    * @brief Set the relevance decay parameter for the cell.
