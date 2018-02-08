@@ -46,7 +46,6 @@ forager::forager(const struct task_allocation::task_params* params,
                  std::unique_ptr<task_allocation::taskable>& mechanism)
     : polled_task(kForagerName, params, mechanism),
       foraging_task(kForagerName),
-      m_was_transporting(false),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
 /*******************************************************************************
@@ -71,6 +70,7 @@ bool forager::block_acquired(void) const {
 void forager::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
+  m_interface_complete = false;
 } /* task_start() */
 
 double forager::calc_abort_prob(void) {
@@ -89,17 +89,19 @@ double forager::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double forager::calc_interface_time(double start_time) {
-  if (is_transporting_to_cache() && !m_was_transporting) {
-    reset_interface_time();
-    m_was_transporting = true;
-    return 0.0;
+  if (is_transporting_to_cache()) {
+    return current_time() - start_time;
   }
 
-  if (!is_transporting_to_cache()) {
-    m_was_transporting = false;
-    return 0.0;
+  if (cache_acquired()) {
+    if (!m_interface_complete) {
+      m_interface_complete = true;
+      m_last_transport = true;
+      reset_interface_time();
+    }
+    return interface_time();
   }
-  return current_time() - start_time;
+  return 0.0;
 } /* calc_interface_time() */
 
 /*******************************************************************************
@@ -167,12 +169,13 @@ bool forager::is_transporting_to_cache(void) const {
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-bool forager::task_interface_complete(void) const {
-  return is_transporting_to_cache() && !m_was_transporting;
+__pure bool forager::task_interface_complete(void) const {
+  return m_interface_complete && m_last_transport;
 } /* task_interface_complete()() */
 
 __pure double forager::task_interface_time(void) const {
-  return executable_task::interface_time();
+  m_last_transport = false;
+  return executable_task::last_interface_time();
 } /* task_interface_time() */
 
 NS_END(tasks, fordyca);

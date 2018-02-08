@@ -28,7 +28,6 @@
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +65,6 @@ namespace task_allocation = rcppsw::task_allocation;
  * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public stateless_foraging_controller,
-                                     public rmetrics::stateful_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);
@@ -74,18 +72,6 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   /* CCI_Controller overrides */
   void Init(argos::TConfigurationNode& node) override;
   void ControlStep(void) override;
-
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
-
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* distance metrics */
-  double timestep_distance(void) const override;
 
   bool block_acquired(void) const;
 
@@ -131,6 +117,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   bool display_los(void) const { return m_display_los; }
 
   representation::perceived_arena_map* map(void) const { return m_map.get(); }
+  bool is_transporting_to_nest(void) const override;
 
  private:
   // clang-format off

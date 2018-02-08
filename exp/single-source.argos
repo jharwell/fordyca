@@ -65,7 +65,7 @@
           unsuccessful_explore_dir_change="1000"
           frequent_collision_thresh="100"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.5"
+          speed_throttle_block_carry="0.1"
           />
       </params>
     </depth1_foraging_controller>

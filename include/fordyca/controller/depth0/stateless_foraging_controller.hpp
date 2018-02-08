@@ -27,7 +27,6 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +50,6 @@ namespace rmetrics = metrics::collectible_metrics::fsm;
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class stateless_foraging_controller : public base_foraging_controller,
-                                      public rmetrics::stateless_metrics,
                                       public rmetrics::distance_metrics,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
@@ -63,17 +61,11 @@ class stateless_foraging_controller : public base_foraging_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* base metrics */
-  int entity_id(void) const override;
-
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_transporting_to_nest(void) const override;
-  bool is_avoiding_collision(void) const override;
-
   /* distance metrics */
+  int entity_id(void) const override;
   double timestep_distance(void) const override;
 
+  bool is_transporting_to_nest(void) const override;
   bool block_acquired(void) const;
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 

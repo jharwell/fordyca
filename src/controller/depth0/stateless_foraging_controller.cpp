@@ -90,20 +90,9 @@ bool stateless_foraging_controller::block_acquired(void) const {
   return m_fsm->block_acquired();
 } /* block_acquired() */
 
-/*******************************************************************************
- * Stateless Metrics
- ******************************************************************************/
-bool stateless_foraging_controller::is_exploring_for_block(void) const {
-  return m_fsm->is_exploring_for_block();
-} /* is_exploring_for_block() */
-
 bool stateless_foraging_controller::is_transporting_to_nest(void) const {
   return m_fsm->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
-
-bool stateless_foraging_controller::is_avoiding_collision(void) const {
-  return m_fsm->is_avoiding_collision();
-} /* is_avoiding_collision() */
 
 /*******************************************************************************
  * Distance Metrics
@@ -113,7 +102,15 @@ int stateless_foraging_controller::entity_id(void) const {
 } /* entity_id() */
 
 double stateless_foraging_controller::timestep_distance(void) const {
-  return base_sensors()->robot_heading().Length();
+  /*
+   * If you allow distance gathering at timesteps <= 2, you get a big jump
+   * because of the prev/current location not being set up properly yet. Might
+   * be worth fixing at some point...
+   */
+  if (base_sensors()->tick() > 2) {
+    return base_sensors()->robot_heading().Length();
+  }
+  return 0;
 } /* timestep_distance() */
 
 /* Notifiy ARGoS of the existence of the controller. */

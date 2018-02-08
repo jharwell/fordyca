@@ -86,7 +86,8 @@ class forager : public task_allocation::polled_task, public foraging_task {
 
  private:
   // clang-format off
-  bool                               m_was_transporting;
+  mutable bool                       m_interface_complete{false};
+  mutable bool                       m_last_transport{false};
   task_allocation::abort_probability m_abort_prob;
   // clang-format on
 };

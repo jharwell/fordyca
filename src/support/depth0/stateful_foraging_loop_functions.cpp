@@ -40,6 +40,8 @@
 #include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/fsm/stateful_metrics_collector.hpp"
 #include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -102,9 +104,11 @@ void stateful_foraging_loop_functions::pre_step_iter(
   /* get stats from this robot before its state changes */
   distance_collector()->collect(
       static_cast<rmetrics::distance_metrics&>(controller));
-  stateless_collector()->collect(
-      static_cast<rmetrics::stateless_metrics&>(controller));
-  m_collector->collect(static_cast<rmetrics::stateful_metrics&>(controller));
+  if (controller.current_task()) {
+    stateless_collector()->collect(
+        static_cast<rmetrics::stateless_metrics&>(*controller.current_task()));
+    m_collector->collect(static_cast<rmetrics::stateful_metrics&>(*controller.current_task()));
+  }
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);

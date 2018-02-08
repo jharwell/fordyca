@@ -234,92 +234,12 @@ void foraging_controller::process_los(
   } /* for(cache..) */
 } /* process_los() */
 
-/*******************************************************************************
- * Distance Metrics
- ******************************************************************************/
-double foraging_controller::timestep_distance(void) const {
-  /*
-   * If you allow distance gathering at timesteps <= 2, you get a big jump
-   * because of the prev/current location not being set up properly yet. Might
-   * be worth fixing at some point...
-   */
-  if (base_sensors()->tick() > 2) {
-    return base_sensors()->robot_heading().Length();
-  }
-  return 0;
-} /* timestep_distance() */
-
-/*******************************************************************************
- * Stateless Metrics
- ******************************************************************************/
-bool foraging_controller::is_exploring_for_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_exploring_for_block();
-  }
-  return false;
-} /* is_exploring_for_block() */
-
-bool foraging_controller::is_avoiding_collision(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_avoiding_collision();
-  }
-  return false;
-} /* is_avoiding_collision() */
-
 bool foraging_controller::is_transporting_to_nest(void) const {
   if (nullptr != current_task()) {
     return current_task()->is_transporting_to_nest();
   }
   return false;
 } /* is_transporting_to_nest() */
-
-/*******************************************************************************
- * Stateful Metrics
- ******************************************************************************/
-bool foraging_controller::is_acquiring_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_acquiring_block();
-  }
-  return false;
-} /* is_exploring() */
-
-bool foraging_controller::is_vectoring_to_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_vectoring_to_block();
-  }
-  return false;
-} /* is_vectoring_to_block() */
-
-/*******************************************************************************
- * Depth1 Metrics
- ******************************************************************************/
-bool foraging_controller::is_exploring_for_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_exploring_for_cache();
-  }
-  return false;
-} /* is_exploring_for_cache() */
-
-bool foraging_controller::is_vectoring_to_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_vectoring_to_cache();
-  }
-  return false;
-} /* is_vectoring_to_cache() */
-
-bool foraging_controller::is_acquiring_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_acquiring_cache();
-  }
-  return false;
-} /* is_acquring_to_cache() */
-
-bool foraging_controller::is_transporting_to_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_transporting_to_cache();
-  }
-  return false;
-} /* is_transporting_to_cache() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

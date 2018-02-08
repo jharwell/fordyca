@@ -28,6 +28,7 @@
 #include <experimental/filesystem>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/collectors/block_metrics_collector.hpp"
@@ -39,6 +40,7 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -154,10 +156,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_stateless_collector->collect(
-      static_cast<rmetrics::stateless_metrics&>(controller));
   m_distance_collector->collect(
       static_cast<rmetrics::distance_metrics&>(controller));
+  m_stateless_collector->collect(
+      static_cast<rmetrics::stateless_metrics&>(*controller.fsm()));
 
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);

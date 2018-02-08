@@ -158,9 +158,19 @@ class base_foraging_controller : public argos::CCI_Controller,
     m_sensors = sensors;
   }
 
+  /**
+   * @brief Get the amount a robot's speed will be throttled when carrying a
+   * block.
+   */
   double speed_throttle_block_carry(void) const {
     return m_speed_throttle_block_carry;
   }
+
+  /**
+   * @brief Interface for defining how loop functions can determine if a robot
+   * is currently transporting a block to the nest.
+   */
+  virtual bool is_transporting_to_nest(void) const = 0;
 
  private:
   void output_init(const struct params::output_params* params);
