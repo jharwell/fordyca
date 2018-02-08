@@ -116,7 +116,7 @@ void forager::accept(events::cache_vanished& visitor) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Base Metrics
  ******************************************************************************/
 bool forager::is_exploring_for_block(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
@@ -129,7 +129,7 @@ bool forager::is_avoiding_collision(void) const {
 } /* is_avoiding_collision() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Depth0 Metrics
  ******************************************************************************/
 bool forager::is_acquiring_block(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
@@ -142,7 +142,7 @@ bool forager::is_vectoring_to_block(void) const {
 } /* is_vectoring_to_block() */
 
 /*******************************************************************************
- * Depth1 Diagnostics
+ * Depth1 Metrics
  ******************************************************************************/
 bool forager::is_exploring_for_cache(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
@@ -163,5 +163,16 @@ bool forager::is_transporting_to_cache(void) const {
   return static_cast<fsm::depth1::block_to_cache_fsm*>(polled_task::mechanism())
       ->is_transporting_to_cache();
 } /* is_transporting_to_cache() */
+
+/*******************************************************************************
+ * Task Metrics
+ ******************************************************************************/
+bool forager::task_interface_complete(void) const {
+  return is_transporting_to_cache() && !m_was_transporting;
+} /* task_interface_complete()() */
+
+__pure double forager::task_interface_time(void) const {
+  return executable_task::interface_time();
+} /* task_interface_time() */
 
 NS_END(tasks, fordyca);

@@ -35,8 +35,12 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 task_collector::task_collector(const std::string& ofname,
                                bool collect_cum,
-                               uint collect_interval)
-    : base_metric_collector(ofname, collect_cum), m_stats() {
+                               uint collect_interval,
+                               size_t n_robots)
+    : base_metric_collector(ofname, collect_cum),
+      m_n_robots(n_robots),
+      m_count_stats(),
+      m_int_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -48,8 +52,13 @@ task_collector::task_collector(const std::string& ofname,
  ******************************************************************************/
 std::string task_collector::csv_header_build(const std::string& header) {
   // clang-format off
+  std::string line = base_metric_collector::csv_header_build(header);
   if (collect_cum()) {
-    return base_metric_collector::csv_header_build(header) +
+    for (size_t i = 0; i < m_n_robots; ++i) {
+      line += "robot" + std::to_string(i) + "_interface_delay" + separator();
+    } /* for(i..) */
+    line += "swarm_interface_delay" + separator();
+    return line +
         "n_collectors"  + separator() +
         "n_cum_collectors"  + separator() +
         "n_foragers" + separator() +
@@ -58,7 +67,7 @@ std::string task_collector::csv_header_build(const std::string& header) {
         "n_cum_generalists" + separator();
 
   } else {
-    return base_metric_collector::csv_header_build(header) +
+    return line +
         "n_collectors"  + separator() +
         "n_foragers" + separator() +
         "n_generalists" + separator();
@@ -75,19 +84,23 @@ void task_collector::reset(void) {
 void task_collector::collect(
     const collectible_metrics::base_collectible_metrics& metrics) {
   auto& m = static_cast<const collectible_metrics::task_metrics&>(metrics);
-  m_stats.n_collectors +=
+  m_count_stats.n_collectors +=
       static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
-  m_stats.n_foragers +=
+  m_count_stats.n_foragers +=
       static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
-  m_stats.n_generalists +=
+  m_count_stats.n_generalists +=
       static_cast<uint>(m.task_name() == tasks::foraging_task::kGeneralistName);
 
   if (collect_cum()) {
-    m_stats.n_cum_collectors +=
+    if (m.task_interface_complete()) {
+      m_int_stats[m.entity_id()].cum_interface_time += m.task_interface_time();
+    }
+
+    m_count_stats.n_cum_collectors +=
         static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
-    m_stats.n_cum_foragers +=
+    m_count_stats.n_cum_foragers +=
         static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
-    m_stats.n_cum_generalists += static_cast<uint>(
+    m_count_stats.n_cum_generalists += static_cast<uint>(
         m.task_name() == tasks::foraging_task::kGeneralistName);
   }
 } /* collect() */
@@ -97,30 +110,41 @@ bool task_collector::csv_line_build(std::string& line) {
     return false;
   }
   if (collect_cum()) {
-    line = std::to_string(m_stats.n_collectors) + separator() +
-           std::to_string(m_stats.n_cum_collectors) + separator() +
-           std::to_string(m_stats.n_foragers) + separator() +
-           std::to_string(m_stats.n_cum_foragers) + separator() +
-           std::to_string(m_stats.n_generalists) + separator() +
-           std::to_string(m_stats.n_cum_generalists) + separator();
+    double cum_sum = 0.0;
+    for (auto &s : m_int_stats) {
+      cum_sum += s.cum_interface_time;
+      line += std::to_string(s.cum_interface_time / interval()) + separator();
+    } /* for(s..) */
+    line += std::to_string(cum_sum / (m_n_robots * interval())) +
+            std::to_string(m_count_stats.n_collectors) + separator() +
+            std::to_string(m_count_stats.n_cum_collectors) + separator() +
+            std::to_string(m_count_stats.n_foragers) + separator() +
+            std::to_string(m_count_stats.n_cum_foragers) + separator() +
+            std::to_string(m_count_stats.n_generalists) + separator() +
+            std::to_string(m_count_stats.n_cum_generalists) + separator();
   } else {
-    line = std::to_string(m_stats.n_collectors) + separator() +
-           std::to_string(m_stats.n_foragers) + separator() +
-           std::to_string(m_stats.n_generalists) + separator();
+    line = std::to_string(m_count_stats.n_collectors) + separator() +
+           std::to_string(m_count_stats.n_foragers) + separator() +
+           std::to_string(m_count_stats.n_generalists) + separator();
   }
   return true;
 } /* store_foraging_stats() */
 
 void task_collector::reset_after_timestep(void) {
-  m_stats.n_collectors = 0;
-  m_stats.n_foragers = 0;
-  m_stats.n_generalists = 0;
+  m_count_stats.n_collectors = 0;
+  m_count_stats.n_foragers = 0;
+  m_count_stats.n_generalists = 0;
 } /* reset_after_timestep() */
 
 void task_collector::reset_after_interval(void) {
-  m_stats.n_cum_collectors = 0;
-  m_stats.n_cum_foragers = 0;
-  m_stats.n_cum_generalists = 0;
+  m_count_stats.n_cum_collectors = 0;
+  m_count_stats.n_cum_foragers = 0;
+  m_count_stats.n_cum_generalists = 0;
+
+  m_int_stats.clear();
+  for (size_t i = 0; i < m_n_robots; ++i) {
+    m_int_stats.emplace_back();
+  } /* for(i..) */
 } /* reset_after_interval() */
 
 NS_END(collectors, metrics, fordyca);

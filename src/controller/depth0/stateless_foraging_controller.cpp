@@ -91,7 +91,7 @@ bool stateless_foraging_controller::block_acquired(void) const {
 } /* block_acquired() */
 
 /*******************************************************************************
- * Stateless Diagnostics
+ * Stateless Metrics
  ******************************************************************************/
 bool stateless_foraging_controller::is_exploring_for_block(void) const {
   return m_fsm->is_exploring_for_block();
@@ -106,9 +106,9 @@ bool stateless_foraging_controller::is_avoiding_collision(void) const {
 } /* is_avoiding_collision() */
 
 /*******************************************************************************
- * Distance Diagnostics
+ * Distance Metrics
  ******************************************************************************/
-size_t stateless_foraging_controller::entity_id(void) const {
+int stateless_foraging_controller::entity_id(void) const {
   return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
 

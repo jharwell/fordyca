@@ -63,13 +63,15 @@ class stateless_foraging_controller : public base_foraging_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
+  /* base metrics */
+  int entity_id(void) const override;
+
   /* stateless metrics */
   bool is_exploring_for_block(void) const override;
   bool is_transporting_to_nest(void) const override;
   bool is_avoiding_collision(void) const override;
 
   /* distance metrics */
-  size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 
   bool block_acquired(void) const;

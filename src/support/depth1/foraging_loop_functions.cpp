@@ -99,8 +99,10 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       static_cast<rmetrics::distance_metrics&>(controller));
   m_depth1_collector->collect(
       static_cast<rmetrics::depth1_metrics&>(controller));
-  m_task_collector->collect(
-      static_cast<metrics::collectible_metrics::task_metrics&>(controller));
+  if (nullptr != controller.current_task()) {
+    m_task_collector->collect(
+        static_cast<metrics::collectible_metrics::task_metrics&>(*controller.current_task()));
+  }
 
   /* send the robot its view of the world: what it sees and where it is */
   utils::set_robot_pos<decltype(controller)>(robot);
@@ -302,7 +304,8 @@ void foraging_loop_functions::metric_collecting_init(
   m_task_collector = rcppsw::make_unique<metrics::collectors::task_collector>(
       metrics_path() + "/" + output_p->metrics.task_fname,
       output_p->metrics.collect_cum,
-      output_p->metrics.collect_interval);
+      output_p->metrics.collect_interval,
+      output_p->metrics.n_robots);
   m_task_collector->reset();
 } /* metric_collecting_init() */
 

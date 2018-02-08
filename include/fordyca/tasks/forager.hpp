@@ -57,12 +57,12 @@ class forager : public task_allocation::polled_task, public foraging_task {
   void accept(events::cached_block_pickup&) override {}
   void accept(events::nest_block_drop&) override {}
 
-  /* base metrics */
+  /* stateless metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 metrics */
+  /* stateful metrics */
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
@@ -71,6 +71,10 @@ class forager : public task_allocation::polled_task, public foraging_task {
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override;
+
+  /* task metrics */
+  bool task_interface_complete(void) const override;
+  double task_interface_time(void) const override;
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override;

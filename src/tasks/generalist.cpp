@@ -86,7 +86,7 @@ void generalist::accept(events::free_block_pickup& visitor) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Stateless Metrics
  ******************************************************************************/
 bool generalist::is_exploring_for_block(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(
@@ -107,7 +107,7 @@ bool generalist::is_transporting_to_nest(void) const {
 } /* is_tranpsorting_to_nest() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Stateful Metrics
  ******************************************************************************/
 bool generalist::is_acquiring_block(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(

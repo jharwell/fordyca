@@ -28,7 +28,6 @@
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,6 +49,7 @@ class foraging_task;
 }
 
 NS_START(controller, depth1);
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -63,7 +63,6 @@ NS_START(controller, depth1);
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
                             public metrics::collectible_metrics::fsm::depth1_metrics,
-                            public metrics::collectible_metrics::task_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
@@ -91,7 +90,6 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override;
-  std::string task_name(void) const override;
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has

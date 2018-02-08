@@ -246,7 +246,8 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2& goal) {
+__pure argos::CVector2 vector_fsm::calc_vector_to_goal(
+    const argos::CVector2& goal) {
   return goal - base_sensors()->robot_loc();
 } /* calc_vector_to_goal() */
 

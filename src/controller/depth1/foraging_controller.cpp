@@ -139,6 +139,10 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_forager->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
+  /* set ID for metrics collection */
+  m_collector->entity_id(entity_id());
+  m_forager->entity_id(entity_id());
+
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
       base_foraging_controller::server(), m_generalist.get());
 
@@ -231,7 +235,7 @@ void foraging_controller::process_los(
 } /* process_los() */
 
 /*******************************************************************************
- * Distance Diagnostics
+ * Distance Metrics
  ******************************************************************************/
 double foraging_controller::timestep_distance(void) const {
   /*
@@ -246,7 +250,7 @@ double foraging_controller::timestep_distance(void) const {
 } /* timestep_distance() */
 
 /*******************************************************************************
- * Stateless Diagnostics
+ * Stateless Metrics
  ******************************************************************************/
 bool foraging_controller::is_exploring_for_block(void) const {
   if (nullptr != current_task()) {
@@ -270,7 +274,7 @@ bool foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
- * Stateful Diagnostics
+ * Stateful Metrics
  ******************************************************************************/
 bool foraging_controller::is_acquiring_block(void) const {
   if (nullptr != current_task()) {
@@ -287,7 +291,7 @@ bool foraging_controller::is_vectoring_to_block(void) const {
 } /* is_vectoring_to_block() */
 
 /*******************************************************************************
- * Depth1 Diagnostics
+ * Depth1 Metrics
  ******************************************************************************/
 bool foraging_controller::is_exploring_for_cache(void) const {
   if (nullptr != current_task()) {
@@ -316,13 +320,6 @@ bool foraging_controller::is_transporting_to_cache(void) const {
   }
   return false;
 } /* is_transporting_to_cache() */
-
-std::string foraging_controller::task_name(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->task_name();
-  }
-  return "";
-} /* task_name() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

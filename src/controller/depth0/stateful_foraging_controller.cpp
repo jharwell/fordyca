@@ -210,7 +210,7 @@ void stateful_foraging_controller::process_los(
 } /* process_los() */
 
 /*******************************************************************************
- * Stateless Diagnostics
+ * Stateless Metrics
  ******************************************************************************/
 bool stateful_foraging_controller::is_exploring_for_block(void) const {
   if (nullptr != current_task()) {
@@ -234,12 +234,8 @@ bool stateful_foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
- * Distance Diagnostics
+ * Distance Metrics
  ******************************************************************************/
-size_t stateful_foraging_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str() + 2);
-} /* entity_id() */
-
 double stateful_foraging_controller::timestep_distance(void) const {
   /*
    * If you allow distance gathering at timesteps <= 2, you get a big jump
@@ -253,7 +249,7 @@ double stateful_foraging_controller::timestep_distance(void) const {
 } /* timestep_distance() */
 
 /*******************************************************************************
- * Stateful Diagnostics
+ * Stateful Metrics
  ******************************************************************************/
 bool stateful_foraging_controller::is_acquiring_block(void) const {
   if (nullptr != current_task()) {

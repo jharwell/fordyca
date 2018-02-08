@@ -43,7 +43,6 @@ collector::collector(const struct task_allocation::task_params* const params,
                      std::unique_ptr<task_allocation::taskable>& mechanism)
     : polled_task(kCollectorName, params, mechanism),
       foraging_task(kCollectorName),
-      m_interface_sw(false),
       m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
 /*******************************************************************************
@@ -63,6 +62,7 @@ bool collector::cache_acquired(void) const {
 void collector::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
+  m_interface_complete = false;
 } /* task_start() */
 
 double collector::calc_abort_prob(void) {
@@ -80,11 +80,9 @@ double collector::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double collector::calc_interface_time(double start_time) {
-  if (is_transporting_to_nest()) {
-    m_interface_sw = false;
-  }
-  if (!is_transporting_to_nest() && !m_interface_sw) {
-    m_interface_sw = true;
+  if (is_transporting_to_nest() && !m_interface_complete) {
+    m_interface_complete = true;
+    m_first_transport = true;
     reset_interface_time();
   }
 
@@ -109,7 +107,7 @@ void collector::accept(events::cache_vanished& visitor) {
 
 
 /*******************************************************************************
- * Base Diagnostics
+ * Base Metrics
  ******************************************************************************/
 bool collector::is_avoiding_collision(void) const {
   return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
@@ -122,7 +120,7 @@ bool collector::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
- * Depth1 Diagnostics
+ * Depth1 Metrics
  ******************************************************************************/
 bool collector::is_exploring_for_cache(void) const {
   return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
@@ -138,5 +136,23 @@ bool collector::is_acquiring_cache(void) const {
   return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
       ->is_acquiring_cache();
 } /* is_acquiring_cache() */
+
+/*******************************************************************************
+ * Task Metrics
+ ******************************************************************************/
+__pure bool collector::task_interface_complete(void) const {
+  return m_interface_complete && m_first_transport;
+} /* task_interface_complete() */
+
+__pure double collector::task_interface_time(void) const {
+  /*
+   * At this point, the robot has passed through the task interface, and so it
+   * has been reset to 0.0, and to get it we need to get the "last" interface
+   * time.
+   */
+  printf("entity id: %d time: %f\n", entity_id(), last_interface_time());
+  m_first_transport = false;
+  return executable_task::last_interface_time();
+} /* task_interface_time() */
 
 NS_END(tasks, fordyca);

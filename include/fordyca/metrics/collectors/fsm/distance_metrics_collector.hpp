@@ -62,7 +62,6 @@ class distance_metrics_collector : public base_metric_collector,
 
  private:
   struct robot_stats {
-    size_t index;
     double cum_distance;
   };
 

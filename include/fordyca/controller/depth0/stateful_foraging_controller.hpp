@@ -85,7 +85,6 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   bool is_vectoring_to_block(void) const override;
 
   /* distance metrics */
-  size_t entity_id(void) const override;
   double timestep_distance(void) const override;
 
   bool block_acquired(void) const;

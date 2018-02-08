@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,9 +47,9 @@ void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
       c_entity.GetControllableEntity().GetController());
 
-  if (controller.display_task()) {
+  if (controller.display_task() && nullptr != controller.current_task()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.75),
-             controller.task_name(),
+             controller.current_task()->task_name(),
              argos::CColor::BLUE);
   }
 }
