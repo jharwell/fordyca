@@ -91,15 +91,15 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  stateless_collector()->collect(
-      static_cast<rmetrics::stateless_metrics&>(controller));
-  stateful_collector()->collect(
-      static_cast<rmetrics::stateful_metrics&>(controller));
   distance_collector()->collect(
       static_cast<rmetrics::distance_metrics&>(controller));
-  m_depth1_collector->collect(
-      static_cast<rmetrics::depth1_metrics&>(controller));
   if (nullptr != controller.current_task()) {
+    stateless_collector()->collect(
+        static_cast<rmetrics::stateless_metrics&>(*controller.current_task()));
+    stateful_collector()->collect(
+        static_cast<rmetrics::stateful_metrics&>(*controller.current_task()));
+    m_depth1_collector->collect(
+        static_cast<rmetrics::depth1_metrics&>(*controller.current_task()));
     m_task_collector->collect(
         static_cast<metrics::collectible_metrics::task_metrics&>(*controller.current_task()));
   }

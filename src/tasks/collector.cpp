@@ -105,7 +105,6 @@ void collector::accept(events::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 
-
 /*******************************************************************************
  * Base Metrics
  ******************************************************************************/
@@ -150,7 +149,6 @@ __pure double collector::task_interface_time(void) const {
    * has been reset to 0.0, and to get it we need to get the "last" interface
    * time.
    */
-  printf("entity id: %d time: %f\n", entity_id(), last_interface_time());
   m_first_transport = false;
   return executable_task::last_interface_time();
 } /* task_interface_time() */
