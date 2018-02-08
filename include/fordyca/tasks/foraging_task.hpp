@@ -89,9 +89,13 @@ class foraging_task
    */
   virtual bool block_acquired(void) const = 0;
 
+  /* task metrics */
   std::string task_name(void) const override { return mc_name; }
+  int entity_id(void) const override { return m_id; }
+  void entity_id(int id) { m_id = id; }
 
  private:
+  int               m_id{-1};
   const std::string mc_name;
 };
 

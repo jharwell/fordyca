@@ -1,18 +1,12 @@
 <?xml version="1.0" ?>
 
-<!-- *************************************************** -->
-<!-- * A fully commented XML is diffusion_1.xml. Refer * -->
-<!-- * to it to have full information about what       * -->
-<!-- * these options mean.                             * -->
-<!-- *************************************************** -->
-
 <argos-configuration>
 
   <!-- ************************* -->
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="4" />
+    <system threads="0" />
     <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -56,7 +50,7 @@
               init_random_estimates="true"
               subtask_selection_method="harwell2018"
               partition_method="pini2011"
-              always_partition="false"
+              always_partition="true"
               never_partition="false"/>
         <sensors>
           <proximity go_straight_angle_range="-5:5"
@@ -196,18 +190,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth1_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

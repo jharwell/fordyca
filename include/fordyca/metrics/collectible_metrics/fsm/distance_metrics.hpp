@@ -58,7 +58,7 @@ class distance_metrics : public base_collectible_metrics {
    * @brief Get the ID of a robot, for use in associating gathered metrics with
    * a specific robot.
    */
-  virtual size_t entity_id(void) const = 0;
+  virtual int entity_id(void) const = 0;
 };
 
 NS_END(fsm, collectible_metrics, metrics, fordyca);

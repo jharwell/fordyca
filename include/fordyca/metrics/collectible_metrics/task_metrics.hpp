@@ -53,6 +53,14 @@ class task_metrics : public base_collectible_metrics {
    * robot.
    */
   virtual std::string task_name(void) const = 0;
+
+  virtual bool task_interface_complete(void) const = 0;
+  virtual double task_interface_time(void) const = 0;
+  /**
+   * @brief Get the ID of a robot, for use in associating gathered metrics with
+   * a specific robot.
+   */
+  virtual int entity_id(void) const = 0;
 };
 
 NS_END(collectible_metrics, metrics, fordyca);
