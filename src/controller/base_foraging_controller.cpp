@@ -77,7 +77,7 @@ void base_foraging_controller::robot_loc(argos::CVector2 loc) {
   m_sensors->robot_loc(loc);
 }
 
-argos::CVector2 base_foraging_controller::robot_loc(void) const {
+__pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
   return m_sensors->robot_loc();
 }
 

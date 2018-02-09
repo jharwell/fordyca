@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/base_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 

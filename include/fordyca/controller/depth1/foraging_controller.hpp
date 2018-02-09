@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,7 +61,6 @@ NS_START(controller, depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public metrics::collectible_metrics::fsm::depth1_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
@@ -72,24 +70,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void ControlStep(void) override;
 
   tasks::foraging_task* current_task(void) const;
-
-  /* distance metrics */
-  double timestep_distance(void) const override;
-
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
-
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* depth1 metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override;
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has
