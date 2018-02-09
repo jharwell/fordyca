@@ -139,10 +139,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_forager->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
-  /* set ID for metrics collection */
-  m_collector->entity_id(entity_id());
-  m_forager->entity_id(entity_id());
-
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
       base_foraging_controller::server(), m_generalist.get());
 

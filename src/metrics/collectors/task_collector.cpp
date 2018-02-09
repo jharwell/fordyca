@@ -35,10 +35,8 @@ NS_START(fordyca, metrics, collectors);
  ******************************************************************************/
 task_collector::task_collector(const std::string& ofname,
                                bool collect_cum,
-                               uint collect_interval,
-                               size_t n_robots)
+                               uint collect_interval)
     : base_metric_collector(ofname, collect_cum),
-      m_n_robots(n_robots),
       m_count_stats(),
       m_int_stats() {
   if (collect_cum) {
@@ -54,11 +52,9 @@ std::string task_collector::csv_header_build(const std::string& header) {
   // clang-format off
   std::string line = base_metric_collector::csv_header_build(header);
   if (collect_cum()) {
-    for (size_t i = 0; i < m_n_robots; ++i) {
-      line += "robot" + std::to_string(i) + "_interface_delay" + separator();
-    } /* for(i..) */
-    line += "swarm_interface_delay" + separator();
     return line +
+        "collector_avg_interface_delay" + separator() +
+        "forager_avg_interface_delay" + separator() +
         "n_collectors"  + separator() +
         "n_cum_collectors"  + separator() +
         "n_foragers" + separator() +
@@ -92,8 +88,11 @@ void task_collector::collect(
       static_cast<uint>(m.task_name() == tasks::foraging_task::kGeneralistName);
 
   if (collect_cum()) {
-    if (m.task_interface_complete()) {
-      m_int_stats[m.entity_id()].cum_interface_time += m.task_interface_time();
+    if (m.at_task_interface()) {
+      m_int_stats.cum_collector_delay +=
+          static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+      m_int_stats.cum_forager_delay +=
+          static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
     }
 
     m_count_stats.n_cum_collectors +=
@@ -110,18 +109,19 @@ bool task_collector::csv_line_build(std::string& line) {
     return false;
   }
   if (collect_cum()) {
-    double cum_sum = 0.0;
-    for (auto &s : m_int_stats) {
-      cum_sum += s.cum_interface_time;
-      line += std::to_string(s.cum_interface_time / interval()) + separator();
-    } /* for(s..) */
-    line += std::to_string(cum_sum / (m_n_robots * interval())) +
-            std::to_string(m_count_stats.n_collectors) + separator() +
-            std::to_string(m_count_stats.n_cum_collectors) + separator() +
-            std::to_string(m_count_stats.n_foragers) + separator() +
-            std::to_string(m_count_stats.n_cum_foragers) + separator() +
-            std::to_string(m_count_stats.n_generalists) + separator() +
-            std::to_string(m_count_stats.n_cum_generalists) + separator();
+    double avg = m_int_stats.cum_collector_delay /
+                 (m_count_stats.n_cum_collectors/static_cast<double>(interval()));
+    line = std::to_string(avg) + separator();
+    avg = m_int_stats.cum_forager_delay /
+          (m_count_stats.n_cum_foragers/static_cast<double>(interval()));
+    line +=
+           std::to_string(avg) + separator() +
+           std::to_string(m_count_stats.n_collectors) + separator() +
+           std::to_string(m_count_stats.n_cum_collectors) + separator() +
+           std::to_string(m_count_stats.n_foragers) + separator() +
+           std::to_string(m_count_stats.n_cum_foragers) + separator() +
+           std::to_string(m_count_stats.n_generalists) + separator() +
+           std::to_string(m_count_stats.n_cum_generalists) + separator();
   } else {
     line = std::to_string(m_count_stats.n_collectors) + separator() +
            std::to_string(m_count_stats.n_foragers) + separator() +
@@ -140,11 +140,7 @@ void task_collector::reset_after_interval(void) {
   m_count_stats.n_cum_collectors = 0;
   m_count_stats.n_cum_foragers = 0;
   m_count_stats.n_cum_generalists = 0;
-
-  m_int_stats.clear();
-  for (size_t i = 0; i < m_n_robots; ++i) {
-    m_int_stats.emplace_back();
-  } /* for(i..) */
+  m_int_stats = {0, 0};
 } /* reset_after_interval() */
 
 NS_END(collectors, metrics, fordyca);

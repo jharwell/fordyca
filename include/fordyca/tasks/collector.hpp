@@ -73,8 +73,7 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
-  bool task_interface_complete(void) const override;
-  double task_interface_time(void) const override;
+  bool at_task_interface(void) const override;
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }
@@ -87,7 +86,6 @@ class collector : public task_allocation::polled_task, public foraging_task {
  private:
   // clang-format off
   bool                               m_interface_complete{false};
-  mutable bool                       m_first_transport{false};
   task_allocation::abort_probability m_abort_prob;
   // clang-format on
 };

@@ -304,8 +304,7 @@ void foraging_loop_functions::metric_collecting_init(
   m_task_collector = rcppsw::make_unique<metrics::collectors::task_collector>(
       metrics_path() + "/" + output_p->metrics.task_fname,
       output_p->metrics.collect_cum,
-      output_p->metrics.collect_interval,
-      output_p->metrics.n_robots);
+      output_p->metrics.collect_interval);
   m_task_collector->reset();
 } /* metric_collecting_init() */
 

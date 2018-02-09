@@ -77,8 +77,7 @@ class generalist : public task_allocation::partitionable_polled_task,
   bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
-  bool task_interface_complete(void) const override { return false; }
-  double task_interface_time(void) const override { return 0.0; }
+  bool at_task_interface(void) const override { return false; }
 
   bool cache_acquired(void) const override { return false; }
   bool block_acquired(void) const override;
