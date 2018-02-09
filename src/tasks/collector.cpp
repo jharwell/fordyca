@@ -82,7 +82,6 @@ double collector::calc_abort_prob(void) {
 double collector::calc_interface_time(double start_time) {
   if (is_transporting_to_nest() && !m_interface_complete) {
     m_interface_complete = true;
-    m_first_transport = true;
     reset_interface_time();
   }
 
@@ -139,18 +138,8 @@ bool collector::is_acquiring_cache(void) const {
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool collector::task_interface_complete(void) const {
-  return m_interface_complete && m_first_transport;
+__pure bool collector::at_task_interface(void) const {
+  return !is_transporting_to_nest();
 } /* task_interface_complete() */
-
-__pure double collector::task_interface_time(void) const {
-  /*
-   * At this point, the robot has passed through the task interface, and so it
-   * has been reset to 0.0, and to get it we need to get the "last" interface
-   * time.
-   */
-  m_first_transport = false;
-  return executable_task::last_interface_time();
-} /* task_interface_time() */
 
 NS_END(tasks, fordyca);

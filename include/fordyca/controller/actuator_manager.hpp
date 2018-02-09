@@ -127,10 +127,10 @@ class actuator_manager : public state_machine::simple_fsm {
    * @brief Direct control over the linear/angular speeds of the wheels.
    *
    * This provides an alternative interface much more precise rather than just
-   * saying "go in this direction now" than you get with \ref
-   * set_rel_heading(). However, it is also more difficult to use. Note that if
-   * lin_speed + ang_speed is greater than the specified parameter value for max
-   * wheel speed for either wheel it will saturate.
+   * saying "go in this direction now" than you get with \ref set_rel_heading().
+   * However, it is also more difficult to use. Note that if lin_speed +
+   * ang_speed is greater than the specified parameter value for max wheel speed
+   * for either wheel it will saturate.
    *
    * @param lin_speed The desired linear speed.
    * @param ang_speed The desired angular speed.

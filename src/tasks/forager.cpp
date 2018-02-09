@@ -96,7 +96,6 @@ double forager::calc_interface_time(double start_time) {
   if (cache_acquired()) {
     if (!m_interface_complete) {
       m_interface_complete = true;
-      m_last_transport = true;
       reset_interface_time();
     }
     return interface_time();
@@ -169,13 +168,8 @@ bool forager::is_transporting_to_cache(void) const {
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool forager::task_interface_complete(void) const {
-  return m_interface_complete && m_last_transport;
+__pure bool forager::at_task_interface(void) const {
+  return is_transporting_to_cache();
 } /* task_interface_complete()() */
-
-__pure double forager::task_interface_time(void) const {
-  m_last_transport = false;
-  return executable_task::last_interface_time();
-} /* task_interface_time() */
 
 NS_END(tasks, fordyca);

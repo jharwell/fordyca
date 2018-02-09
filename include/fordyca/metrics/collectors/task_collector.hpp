@@ -58,8 +58,7 @@ class task_collector : public base_metric_collector {
    */
   task_collector(const std::string& ofname,
                  bool collect_cum,
-                 uint collect_interval,
-                 size_t n_robots);
+                 uint collect_interval);
 
   void reset(void) override;
   void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
@@ -80,14 +79,14 @@ class task_collector : public base_metric_collector {
     size_t n_cum_generalists;
   };
   struct task_interface_stats {
-    double cum_interface_time;
+    size_t cum_collector_delay;
+    size_t cum_forager_delay;
   };
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  size_t m_n_robots;
   struct task_count_stats m_count_stats;
-  std::vector<struct task_interface_stats> m_int_stats;
+  struct task_interface_stats m_int_stats;
 };
 
 NS_END(collectors, metrics, fordyca);
