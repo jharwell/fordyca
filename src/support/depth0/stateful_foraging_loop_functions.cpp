@@ -36,20 +36,17 @@
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "rcppsw/er/server.hpp"
 
-#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/fsm/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-
-namespace robot_collectors = metrics::collectors::fsm;
-namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -72,7 +69,7 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   auto* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
-  m_collector.reset(new robot_collectors::stateful_metrics_collector(
+  m_collector.reset(new metrics::fsm::stateful_metrics_collector(
       metrics_path() + "/" + p_output->metrics.stateful_fname,
       p_output->metrics.collect_cum,
       p_output->metrics.collect_interval));
@@ -103,11 +100,11 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
   /* get stats from this robot before its state changes */
   distance_collector()->collect(
-      static_cast<rmetrics::distance_metrics&>(controller));
+      static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
     stateless_collector()->collect(
-        static_cast<rmetrics::stateless_metrics&>(*controller.current_task()));
-    m_collector->collect(static_cast<rmetrics::stateful_metrics&>(*controller.current_task()));
+        static_cast<metrics::fsm::stateless_metrics&>(*controller.current_task()));
+    m_collector->collect(static_cast<metrics::fsm::stateful_metrics&>(*controller.current_task()));
   }
 
   /* Send the robot its new line of sight */
@@ -170,8 +167,7 @@ void stateful_foraging_loop_functions::PreStep() {
   pre_step_final();
 } /* PreStep() */
 
-__pure robot_collectors::stateful_metrics_collector* stateful_foraging_loop_functions::
-    stateful_collector(void) const {
+__pure metrics::fsm::stateful_metrics_collector* stateful_foraging_loop_functions::stateful_collector(void) const {
   return m_collector.get();
 } /* depth0_collector() */
 

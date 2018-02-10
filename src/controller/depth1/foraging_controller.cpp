@@ -44,6 +44,7 @@
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
+
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 
@@ -72,9 +73,11 @@ void foraging_controller::ControlStep(void) {
    * should be hidden from our awareness.
    */
   process_los(depth0::stateful_foraging_controller::los());
-  /* map()->hidden_blocks_remove(); */
   map()->update_density();
+
   m_task_aborted = false;
+  m_task_alloc = false;
+
   if (is_carrying_block()) {
     actuators()->set_speed_throttle(true);
   } else {
@@ -145,6 +148,9 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_executive->task_abort_cleanup(std::bind(
       &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
 
+  m_executive->task_alloc_notify(std::bind(
+      &foraging_controller::task_alloc_notify, this, std::placeholders::_1));
+
   if (p->init_random_estimates) {
     m_generalist->init_random(2000, 4000);
     m_forager->init_random(1000, 2000);
@@ -157,6 +163,11 @@ void foraging_controller::task_abort_cleanup(
     task_allocation::executable_task* const) {
   m_task_aborted = true;
 } /* task_abort_cleanup() */
+
+void foraging_controller::task_alloc_notify(
+    task_allocation::executable_task* const) {
+  m_task_alloc = true;
+} /* task_alloc_notify() */
 
 __pure tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
@@ -236,6 +247,40 @@ bool foraging_controller::is_transporting_to_nest(void) const {
   }
   return false;
 } /* is_transporting_to_nest() */
+
+/*******************************************************************************
+ * Task Metrics
+ ******************************************************************************/
+bool foraging_controller::employed_partitioning(void) const {
+  ER_ASSERT(nullptr != current_task(),
+            "FATAL: Have not yet employed partitioning?");
+
+  auto* task = dynamic_cast<task_allocation::executable_task*>(current_task());
+  task_allocation::partitionable_task* p = nullptr;
+
+  if (!task->is_partitionable()) {
+    p = dynamic_cast<task_allocation::partitionable_task*>(task->parent());
+  } else {
+    p = dynamic_cast<task_allocation::partitionable_task*>(task);
+  }
+  ER_ASSERT(nullptr != p, "FATAL: Not an executable task?");
+  return p->employed_partitioning();
+} /* employed_partitioning() */
+
+std::string foraging_controller::subtask_selection(void) const {
+  ER_ASSERT(nullptr != current_task(),
+            "FATAL: Have not yet selected a subtask?");
+  /*
+   * If we get into this function, then employed_partitioning() must have
+   * returned TRUE, so we can just return the name of the current task, which
+   * MUST be a subtask.
+   */
+  return current_task_name();
+} /* subtask_selection() */
+
+std::string foraging_controller::current_task_name(void) const {
+  return dynamic_cast<task_allocation::logical_task*>(current_task())->name();
+} /* current_task_name() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

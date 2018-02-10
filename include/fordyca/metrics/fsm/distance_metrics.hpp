@@ -1,5 +1,5 @@
 /**
- * @file base_collectible_metrics.hpp
+ * @file distance_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_collectible_metrics
- * @ingroup metrics
+ * @class distance_metrics
+ * @ingroup metrics fsm
  *
- * @brief Base class for all collectible metrics in FORDYCA.
+ * @brief Interface defining what metrics regarding distance traveled should be
+ * collected from all robots.
  */
-class base_collectible_metrics {
+class distance_metrics : public rcppsw::metrics::base_metrics {
  public:
-  base_collectible_metrics(void) = default;
-  virtual ~base_collectible_metrics(void) = default;
-  base_collectible_metrics(const base_collectible_metrics&) = default;
-  base_collectible_metrics& operator=(const base_collectible_metrics&) = default;
+  distance_metrics(void) = default;
+  ~distance_metrics(void) override = default;
+
+  /**
+   * @brief Get the distance that a robot has traveled in a single timestep.
+   *
+   * This will be called every timestep by the \ref distance_metrics_collector
+   * on all robots.
+   */
+  virtual double timestep_distance(void) const = 0;
+
+  /**
+   * @brief Get the ID of a robot, for use in associating gathered metrics with
+   * a specific robot.
+   */
+  virtual int entity_id(void) const = 0;
 };
 
-NS_END(collectible_metrics, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_BASE_COLLECTIBLE_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_ */

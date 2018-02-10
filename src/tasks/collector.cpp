@@ -138,8 +138,8 @@ bool collector::is_acquiring_cache(void) const {
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool collector::at_task_interface(void) const {
+__pure bool collector::at_interface(void) const {
   return !is_transporting_to_nest();
-} /* task_interface_complete() */
+} /* at_interface() */
 
 NS_END(tasks, fordyca);

@@ -18,18 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics, fsm);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, collectible_metrics, fsm);
  * @brief Interface defining what metrics that should be collected from robots
  * executing the depth1 foraging controller.
  */
-class depth1_metrics : public base_collectible_metrics {
+class depth1_metrics : public rcppsw::metrics::base_metrics {
  public:
   depth1_metrics(void) = default;
   ~depth1_metrics(void) override = default;
@@ -73,6 +73,6 @@ class depth1_metrics : public base_collectible_metrics {
   virtual bool is_transporting_to_cache(void) const = 0;
 };
 
-NS_END(fsm, collectible_metrics, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_DEPTH1_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_ */

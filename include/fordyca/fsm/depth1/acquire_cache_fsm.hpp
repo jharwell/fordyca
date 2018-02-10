@@ -34,9 +34,9 @@
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,9 +66,9 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::fsm::stateless_metrics,
-                          public metrics::collectible_metrics::fsm::stateful_metrics,
-                          public metrics::collectible_metrics::fsm::depth1_metrics,
+                          public metrics::fsm::stateless_metrics,
+                          public metrics::fsm::stateful_metrics,
+                          public metrics::fsm::depth1_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(

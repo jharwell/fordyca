@@ -1,5 +1,5 @@
 /**
- * @file stateless_metrics.hpp
+ * @file stateful_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,53 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATELESS_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATELESS_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics, fsm);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateless_metrics
+ * @class stateful_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics should be collected from any robot
- * executing the \ref stateless_foraging_controller, or any controller logically
- * (not necessarily in the C++ sense) derived from that controller.
+ * @brief Interface defining what metrics should be collected from all robots
+ * executing the \ref stateful_foraging_controller, or any controller derived
+ * from that controller.
  */
-class stateless_metrics : public base_collectible_metrics {
+class stateful_metrics : public rcppsw::metrics::base_metrics {
  public:
-  stateless_metrics(void) = default;
-  ~stateless_metrics(void) override = default;
+  stateful_metrics(void) = default;
+  ~stateful_metrics(void) override = default;
 
   /**
-   * @brief If \c TRUE, then a robot is currently executing the
-   * \ref explore_for_block_fsm.
+   * @brief If \c TRUE, then a robot is currently acquiring a block (either via
+   * exploring or via vectoring), and is executing the
+   * \ref explore_for_block_fsm or the \ref acquire_block_fsm.
    */
-  virtual bool is_exploring_for_block(void) const = 0;
+  virtual bool is_acquiring_block(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
+   * @brief If \c TRUE, then a robot is currently acquiring a block via
+   * vectoring and is executing the \ref vector_fsm or the
+   * \ref acquire_block_fsm.
    */
-  virtual bool is_avoiding_collision(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block and is currently
-   * taking it back to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
+  virtual bool is_vectoring_to_block(void) const = 0;
 };
 
-NS_END(fsm, collectible_metrics, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_FSM_STATELESS_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file task_metrics.hpp
+ * @file stateless_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,45 +18,53 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "rcppsw/common/common.hpp"
-#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class task_metrics
- * @ingroup metrics
+ * @class stateless_metrics
+ * @ingroup metrics fsm
  *
- * @brief Interface defining metrics that can be collected on running tasks.
+ * @brief Interface defining what metrics should be collected from any robot
+ * executing the \ref stateless_foraging_controller, or any controller logically
+ * (not necessarily in the C++ sense) derived from that controller.
  */
-class task_metrics : public base_collectible_metrics {
+class stateless_metrics : public rcppsw::metrics::base_metrics {
  public:
-  task_metrics(void) = default;
-  ~task_metrics(void) override = default;
+  stateless_metrics(void) = default;
+  ~stateless_metrics(void) override = default;
 
   /**
-   * @brief Get the name of the name that is currently being executed by a
-   * robot.
+   * @brief If \c TRUE, then a robot is currently executing the
+   * \ref explore_for_block_fsm.
    */
-  virtual std::string task_name(void) const = 0;
+  virtual bool is_exploring_for_block(void) const = 0;
 
-  virtual bool at_task_interface(void) const = 0;
+  /**
+   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
+   */
+  virtual bool is_avoiding_collision(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot has acquired a block and is currently
+   * taking it back to the nest.
+   */
+  virtual bool is_transporting_to_nest(void) const = 0;
 };
 
-NS_END(collectible_metrics, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_TASK_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_ */

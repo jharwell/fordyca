@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
+#include "fordyca/metrics/cache_metrics.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"

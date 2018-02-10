@@ -21,20 +21,20 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/cache_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/cache_metrics.hpp"
+#include "fordyca/metrics/cache_metrics_collector.hpp"
+#include "fordyca/metrics/cache_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors);
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string cache_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
-  return base_metric_collector::csv_header_build(header) +
+  return base_metrics_collector::csv_header_build(header) +
       "total_blocks" + separator() +
       "total_pickups" + separator() +
       "total_drops"  + separator();
@@ -42,7 +42,7 @@ std::string cache_metrics_collector::csv_header_build(const std::string& header)
 } /* csv_header_build() */
 
 void cache_metrics_collector::reset(void) {
-  base_metric_collector::reset();
+  base_metrics_collector::reset();
   m_stats = {0, 0, 0};
 } /* reset() */
 
@@ -58,7 +58,7 @@ bool cache_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void cache_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
+    const rcppsw::metrics::base_metrics& metrics) {
   auto& m = static_cast<const collectible_metrics::cache_metrics&>(metrics);
   m_stats.total_blocks += m.n_blocks();
   m_stats.total_pickups += m.n_block_pickups();
@@ -66,4 +66,4 @@ void cache_metrics_collector::collect(
   m_new_data = true;
 } /* collect() */
 
-NS_END(collectors, metrics, fordyca);
+NS_END(metrics, fordyca);

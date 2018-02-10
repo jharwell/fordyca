@@ -27,6 +27,8 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "rcppsw/metrics/tasks/management_metrics.hpp"
+#include "rcppsw/metrics/tasks/allocation_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,6 +63,7 @@ NS_START(controller, depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
+                            public rcppsw::metrics::tasks::management_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
@@ -115,12 +118,21 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+  /* task metrics */
+  bool has_aborted_task(void) const override { return m_task_aborted; }
+  bool has_new_allocation(void) const override { return m_task_alloc; }
+  std::string current_task_name(void) const override;
+  bool employed_partitioning(void) const override;
+  std::string subtask_selection(void) const override;
+
  private:
-  void task_abort_cleanup(__unused task_allocation::executable_task*);
+  void task_abort_cleanup(task_allocation::executable_task*);
+  void task_alloc_notify(task_allocation::executable_task*);
 
   // clang-format off
   bool                                               m_display_task{false};
   bool                                               m_task_aborted{false};
+  bool                                               m_task_alloc{false};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;
   std::unique_ptr<tasks::collector>                  m_collector;

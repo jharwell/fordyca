@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +37,6 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
-namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Class Definitions
@@ -50,7 +49,7 @@ namespace rmetrics = metrics::collectible_metrics::fsm;
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class stateless_foraging_controller : public base_foraging_controller,
-                                      public rmetrics::distance_metrics,
+                                      public metrics::fsm::distance_metrics,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);

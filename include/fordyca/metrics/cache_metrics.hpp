@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_CACHE_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_CACHE_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHE_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHE_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectible_metrics/base_collectible_metrics.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, collectible_metrics);
  * @brief Interface defining collectible metrics on static/dynamic caches in the
  * arena.
  */
-class cache_metrics : public base_collectible_metrics {
+class cache_metrics : public rcppsw::metrics::base_metrics {
  public:
   cache_metrics(void) = default;
   ~cache_metrics(void) override = default;
@@ -68,4 +68,4 @@ class cache_metrics : public base_collectible_metrics {
 
 NS_END(collectible_metrics, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTIBLE_METRICS_CACHE_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHE_METRICS_HPP_ */

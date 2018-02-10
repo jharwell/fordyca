@@ -21,20 +21,20 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
+#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/block_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors);
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 block_metrics_collector::block_metrics_collector(const std::string& ofname,
                                                  uint collect_interval)
-    : base_metric_collector(ofname, true), m_metrics() {
+    : base_metrics_collector(ofname, true), m_metrics() {
   use_interval(true);
   interval(collect_interval);
 }
@@ -45,17 +45,17 @@ block_metrics_collector::block_metrics_collector(const std::string& ofname,
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
   if (collect_cum()) {
-    return base_metric_collector::csv_header_build(header) +
+    return base_metrics_collector::csv_header_build(header) +
         "avg_carries" + separator() +
         "cum_collected" + separator();
   }
-  return base_metric_collector::csv_header_build(header) +
+  return base_metrics_collector::csv_header_build(header) +
       "block_carries" + separator();
   // clang-format on
 } /* csv_header_build() */
 
 void block_metrics_collector::reset(void) {
-  base_metric_collector::reset();
+  base_metrics_collector::reset();
   m_metrics = {0, 0};
 } /* reset() */
 
@@ -75,7 +75,7 @@ bool block_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void block_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
+    const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const collectible_metrics::block_metrics&>(metrics);
   m_metrics.cum_carries += m.n_carries();
   ++m_metrics.cum_collected;
@@ -86,4 +86,4 @@ void block_metrics_collector::reset_after_interval(void) {
   m_metrics.cum_collected = 0;
 } /* reset_after_interval() */
 
-NS_END(collectors, metrics, fordyca);
+NS_END(metrics, fordyca);

@@ -31,8 +31,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -74,8 +74,8 @@ NS_START(fsm);
  */
 class acquire_block_fsm
     : public base_foraging_fsm,
-      public metrics::collectible_metrics::fsm::stateless_metrics,
-      public metrics::collectible_metrics::fsm::stateful_metrics,
+      public metrics::fsm::stateless_metrics,
+      public metrics::fsm::stateful_metrics,
       public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(

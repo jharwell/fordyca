@@ -31,9 +31,9 @@
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
@@ -47,7 +47,6 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 namespace fs = std::experimental::filesystem;
-namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -157,9 +156,9 @@ void stateless_foraging_loop_functions::pre_step_iter(
 
   /* get stats from this robot before its state changes */
   m_distance_collector->collect(
-      static_cast<rmetrics::distance_metrics&>(controller));
+      static_cast<metrics::fsm::distance_metrics&>(controller));
   m_stateless_collector->collect(
-      static_cast<rmetrics::stateless_metrics&>(*controller.fsm()));
+      static_cast<metrics::fsm::stateless_metrics&>(*controller.fsm()));
 
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
@@ -205,17 +204,17 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   fs::create_directories(m_metrics_path);
 
   m_stateless_collector =
-      rcppsw::make_unique<robot_collectors::stateless_metrics_collector>(
+      rcppsw::make_unique<metrics::fsm::stateless_metrics_collector>(
           m_metrics_path + "/" + p_output->metrics.stateless_fname,
           p_output->metrics.collect_cum,
           p_output->metrics.collect_interval);
 
-  m_block_collector = rcppsw::make_unique<collectors::block_metrics_collector>(
+  m_block_collector = rcppsw::make_unique<metrics::block_metrics_collector>(
       m_metrics_path + "/" + p_output->metrics.block_fname,
       p_output->metrics.collect_interval);
 
   m_distance_collector =
-      rcppsw::make_unique<robot_collectors::distance_metrics_collector>(
+      rcppsw::make_unique<metrics::fsm::distance_metrics_collector>(
           m_metrics_path + "/" + p_output->metrics.distance_fname,
           p_output->metrics.n_robots);
 
@@ -253,17 +252,17 @@ void stateless_foraging_loop_functions::output_init(
   }
 } /* output_init() */
 
-__pure collectors::block_metrics_collector* stateless_foraging_loop_functions::
+__pure metrics::block_metrics_collector* stateless_foraging_loop_functions::
     block_collector(void) const {
   return m_block_collector.get();
 } /* block_collector() */
 
-__pure robot_collectors::distance_metrics_collector* stateless_foraging_loop_functions::
+__pure metrics::fsm::distance_metrics_collector* stateless_foraging_loop_functions::
     distance_collector(void) const {
   return m_distance_collector.get();
 } /* distance_collector() */
 
-__pure robot_collectors::stateless_metrics_collector* stateless_foraging_loop_functions::
+__pure metrics::fsm::stateless_metrics_collector* stateless_foraging_loop_functions::
     stateless_collector(void) const {
   return m_stateless_collector.get();
 } /* stateless_collector() */

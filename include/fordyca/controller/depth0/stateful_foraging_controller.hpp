@@ -46,7 +46,6 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace depth1 { class foraging_sensors; }
 
 NS_START(depth0);
-namespace rmetrics = metrics::collectible_metrics::fsm;
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
