@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,8 +34,6 @@
 NS_START(fordyca, metrics);
 
 namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(collectors);
 
 /*******************************************************************************
  * Class Definitions
@@ -49,14 +47,14 @@ NS_START(collectors);
  * Metrics are not output every timestep, but only on timesteps in which a
  * cache-related event occurs (pickup from/drop in).
  */
-class cache_metrics_collector : public base_metric_collector,
+class cache_metrics_collector : public rcppsw::metrics::base_metrics_collector,
                                 public visitor::visitable_any<cache_metrics_collector> {
  public:
   explicit cache_metrics_collector(const std::string& ofname):
-      base_metric_collector(ofname, false), m_new_data(false), m_stats() {}
+      base_metrics_collector(ofname, false), m_new_data(false), m_stats() {}
 
   void reset(void) override;
-  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
   struct stats {
@@ -74,6 +72,6 @@ class cache_metrics_collector : public base_metric_collector,
   // clang-format on
 };
 
-NS_END(metrics, collectors, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_CACHE_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_ */

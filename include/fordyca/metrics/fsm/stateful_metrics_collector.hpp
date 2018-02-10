@@ -1,5 +1,5 @@
 /**
- * @file task_collector.hpp
+ * @file stateful_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,35 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
-
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class task_collector
- * @ingroup metrics
+ * @class stateful_metrics_collector
+ * @ingroup metrics fsm
  *
- * @brief Collector for \ref task_metrics.
+ * @brief Collector for \ref stateful_metrics.
  *
- * Metrics are written out at the specified interval, or every timestep,
+ * Metrics are written out every timestep, or after the specified interval,
  * depending.
  */
-class task_collector : public base_metric_collector {
+class stateful_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -54,41 +52,31 @@ class task_collector : public base_metric_collector {
    * specified interval, and written out and reset at the end of it. If
    * \c FALSE, they will be written out every timestep.
    * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
-   * @param n_robots # of robots in the swarm.
    */
-  task_collector(const std::string& ofname,
-                 bool collect_cum,
-                 uint collect_interval);
+  stateful_metrics_collector(const std::string& ofname,
+                             bool collect_cum,
+                             uint collect_interval);
 
   void reset(void) override;
-  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
   void reset_after_timestep(void) override;
 
-  size_t n_collectors(void) const { return m_count_stats.n_collectors; }
-  size_t n_foragers(void) const { return m_count_stats.n_foragers; }
-  size_t n_generalists(void) const { return m_count_stats.n_generalists; }
-
  private:
-  struct task_count_stats {
-    size_t n_collectors;
-    size_t n_foragers;
-    size_t n_generalists;
-    size_t n_cum_collectors;
-    size_t n_cum_foragers;
-    size_t n_cum_generalists;
+  struct stats {
+    size_t n_acquiring_block;
+    size_t n_vectoring_to_block;
+
+    size_t n_cum_acquiring_block;
+    size_t n_cum_vectoring_to_block;
   };
-  struct task_interface_stats {
-    size_t cum_collector_delay;
-    size_t cum_forager_delay;
-  };
+
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct task_count_stats m_count_stats;
-  struct task_interface_stats m_int_stats;
+  struct stats m_stats;
 };
 
-NS_END(collectors, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_TASK_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_ */

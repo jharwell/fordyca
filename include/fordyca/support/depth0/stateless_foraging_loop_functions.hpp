@@ -34,16 +34,13 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace metrics { namespace collectors {
+namespace metrics {
 class block_metrics_collector;
 namespace fsm {
 class stateless_metrics_collector;
 class distance_metrics_collector;
-}}}
+}}
 namespace params { struct output_params; class loop_function_repository; }
-
-namespace collectors = metrics::collectors;
-namespace robot_collectors = collectors::fsm;
 
 NS_START(support, depth0);
 
@@ -78,9 +75,9 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   const std::shared_ptr<representation::arena_map>& map(void) const { return m_map; }
   std::shared_ptr<representation::arena_map>& map(void) { return m_map; }
 
-  metrics::collectors::block_metrics_collector* block_collector(void) const;
-  robot_collectors::distance_metrics_collector* distance_collector(void) const;
-  robot_collectors::stateless_metrics_collector* stateless_collector(void) const;
+  metrics::block_metrics_collector* block_collector(void) const;
+  metrics::fsm::distance_metrics_collector* distance_collector(void) const;
+  metrics::fsm::stateless_metrics_collector* stateless_collector(void) const;
 
   const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
@@ -102,14 +99,14 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
-  argos::CRange<double>                                          m_nest_x;
-  argos::CRange<double>                                          m_nest_y;
-  std::string                                                    m_output_root;
-  std::string                                                    m_metrics_path;
-  std::unique_ptr<robot_collectors::stateless_metrics_collector> m_stateless_collector;
-  std::unique_ptr<robot_collectors::distance_metrics_collector>  m_distance_collector;
-  std::unique_ptr<collectors::block_metrics_collector>           m_block_collector;
-  std::shared_ptr<representation::arena_map>                     m_map;
+  argos::CRange<double>                                      m_nest_x;
+  argos::CRange<double>                                      m_nest_y;
+  std::string                                                m_output_root;
+  std::string                                                m_metrics_path;
+  std::unique_ptr<metrics::fsm::stateless_metrics_collector> m_stateless_collector;
+  std::unique_ptr<metrics::fsm::distance_metrics_collector>  m_distance_collector;
+  std::unique_ptr<metrics::block_metrics_collector>          m_block_collector;
+  std::shared_ptr<representation::arena_map>                 m_map;
   // clang-format on
 };
 

@@ -49,7 +49,7 @@ void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 
   if (controller.display_task() && nullptr != controller.current_task()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.75),
-             controller.current_task()->task_name(),
+             controller.current_task()->name(),
              argos::CColor::BLUE);
   }
 }

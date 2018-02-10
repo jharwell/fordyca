@@ -53,9 +53,7 @@ class stateful_foraging_controller;
 }
 
 namespace metrics {
-namespace collectors {
 class block_metrics_collector;
-}
 }
 namespace tasks {
 class generalist;
@@ -84,7 +82,7 @@ class nest_block_drop
                                 fsm::block_to_nest_fsm,
                                 tasks::generalist,
                                 tasks::collector,
-                                metrics::collectors::block_metrics_collector> {
+                                metrics::block_metrics_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   representation::block* block);
@@ -95,7 +93,7 @@ class nest_block_drop
 
   /* stateless foraging */
   void visit(representation::arena_map& map) override;
-  void visit(metrics::collectors::block_metrics_collector& collector) override;
+  void visit(metrics::block_metrics_collector& collector) override;
   void visit(representation::block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(

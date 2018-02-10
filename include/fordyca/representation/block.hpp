@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
+#include "fordyca/metrics/block_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"

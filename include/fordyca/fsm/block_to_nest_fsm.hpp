@@ -28,9 +28,9 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -74,9 +74,9 @@ NS_START(fsm);
  */
 class block_to_nest_fsm
     : public base_foraging_fsm,
-      public metrics::collectible_metrics::fsm::stateless_metrics,
-      public metrics::collectible_metrics::fsm::stateful_metrics,
-      public metrics::collectible_metrics::fsm::depth1_metrics,
+      public metrics::fsm::stateless_metrics,
+      public metrics::fsm::stateful_metrics,
+      public metrics::fsm::depth1_metrics,
       public task_allocation::taskable,
       public visitor::visitable_any<block_to_nest_fsm> {
  public:

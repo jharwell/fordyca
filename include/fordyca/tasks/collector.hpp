@@ -73,7 +73,7 @@ class collector : public task_allocation::polled_task, public foraging_task {
   bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
-  bool at_task_interface(void) const override;
+  bool at_interface(void) const override;
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }

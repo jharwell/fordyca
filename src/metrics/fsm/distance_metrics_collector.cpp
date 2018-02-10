@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, fsm);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Member Functions
@@ -39,11 +39,11 @@ std::string distance_metrics_collector::csv_header_build(
     line += "robot" + std::to_string(i) + separator();
   } /* for(i..) */
 
-  return base_metric_collector::csv_header_build(header) + line;
+  return base_metrics_collector::csv_header_build(header) + line;
 } /* csv_header_build() */
 
 void distance_metrics_collector::reset(void) {
-  base_metric_collector::reset();
+  base_metrics_collector::reset();
   m_stats.clear();
   for (size_t i = 0; i < m_n_robots; ++i) {
     m_stats.emplace_back();
@@ -61,10 +61,10 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void distance_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
+    const rcppsw::metrics::base_metrics& metrics) {
   auto& m =
-      static_cast<const collectible_metrics::fsm::distance_metrics&>(metrics);
+      static_cast<const metrics::fsm::distance_metrics&>(metrics);
   m_stats[m.entity_id()].cum_distance += m.timestep_distance();
 } /* collect() */
 
-NS_END(fsm, collectors, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);

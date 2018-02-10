@@ -1,5 +1,5 @@
 /**
- * @file depth1_metrics_collector.hpp
+ * @file management_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,33 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include <vector>
+
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, fsm);
+NS_START(fordyca, metrics, tasks);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth1_metrics_collector
- * @ingroup metrics fsm
+ * @class management_metrics_collector
+ * @ingroup metrics
  *
- * @brief Collector for \ref depth1_metrics.
+ * @brief Collector for \ref metrics.
  *
- * Metrics are written out every timestep, or at the end of the specified
- * interval, depending.
+ * Collects metrics about the allocation of tasks at the level of the task
+ * executive/controller. Metrics are written out at the specified interval, or
+ * every timestep, depending.
  */
-class depth1_metrics_collector : public base_metric_collector {
+class management_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -52,35 +55,33 @@ class depth1_metrics_collector : public base_metric_collector {
    * specified interval, and written out and reset at the end of it. If
    * \c FALSE, they will be written out every timestep.
    * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   * @param n_robots # of robots in the swarm.
    */
-  depth1_metrics_collector(const std::string& ofname,
-                           bool collect_cum,
-                           uint collect_interval);
+  management_metrics_collector(const std::string& ofname,
+                 bool collect_cum,
+                 uint collect_interval);
 
   void reset(void) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
-  void reset_after_timestep(void) override;
-  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
 
  private:
-  struct stats {
-    size_t n_exploring_for_cache;
-    size_t n_vectoring_to_cache;
-    size_t n_acquiring_cache;
-    size_t n_transporting_to_cache;
-
-    size_t n_cum_exploring_for_cache;
-    size_t n_cum_vectoring_to_cache;
-    size_t n_cum_acquiring_cache;
-    size_t n_cum_transporting_to_cache;
+  struct subtask_selection_stats {
+    size_t n_foragers;
+    size_t n_collectors;
   };
 
+  struct partitioning_stats {
+    size_t n_partition;
+    size_t n_no_partition;
+  };
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct stats m_stats;
+  struct subtask_selection_stats m_sel_stats;
+  struct partitioning_stats m_partition_stats;
 };
 
-NS_END(fsm, collectors, metrics, fordyca);
+NS_END(tasks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_ */

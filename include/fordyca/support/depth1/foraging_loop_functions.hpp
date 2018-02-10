@@ -38,12 +38,14 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace metrics { namespace collectors {
-class task_collector;
+namespace metrics {
 namespace fsm {
 class depth1_metrics_collector;
-}}}
-namespace robot_collectors = metrics::collectors::fsm;
+}
+namespace tasks {
+class execution_metrics_collector;
+class management_metrics_collector;
+}}
 
 NS_START(support, depth1);
 
@@ -204,7 +206,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     if (controller.is_carrying_block()) {
       ER_NOM("%s aborted task %s while carrying block%d",
              controller.GetId().c_str(),
-             controller.current_task()->task_name().c_str(),
+             controller.current_task()->name().c_str(),
              controller.block()->id());
 
       /*
@@ -261,7 +263,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
-             controller.current_task()->task_name().c_str());
+             controller.current_task()->name().c_str());
     }
     m_cache_penalty_handler->penalty_abort<decltype(controller)>(robot);
     return true;
@@ -305,10 +307,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void handle_arena_interactions(argos::CFootBotEntity &robot);
 
   // clang-format off
-  double                                                      mc_cache_respawn_scale_factor{0.0};
-  std::unique_ptr<robot_collectors::depth1_metrics_collector> m_depth1_collector;
-  std::unique_ptr<metrics::collectors::task_collector>        m_task_collector;
-  std::shared_ptr<cache_penalty_handler>                      m_cache_penalty_handler;
+  double                                                       mc_cache_respawn_scale_factor{0.0};
+  std::unique_ptr<metrics::fsm::depth1_metrics_collector>      m_depth1_collector;
+  std::unique_ptr<metrics::tasks::execution_metrics_collector> m_task_execution_collector;
+  std::unique_ptr<metrics::tasks::management_metrics_collector> m_task_management_collector;
+  std::shared_ptr<cache_penalty_handler>                       m_cache_penalty_handler;
   // clang-format on
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file task_collector.cpp
+ * @file execution_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,22 +21,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/task_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
+#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors);
+NS_START(fordyca, metrics, tasks);
+namespace task_metrics = rcppsw::metrics::tasks;
+namespace tasks = fordyca::tasks;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-task_collector::task_collector(const std::string& ofname,
+execution_metrics_collector::execution_metrics_collector(const std::string& ofname,
                                bool collect_cum,
                                uint collect_interval)
-    : base_metric_collector(ofname, collect_cum),
+    : base_metrics_collector(ofname, collect_cum),
       m_count_stats(),
       m_int_stats() {
   if (collect_cum) {
@@ -48,9 +51,9 @@ task_collector::task_collector(const std::string& ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string task_collector::csv_header_build(const std::string& header) {
+std::string execution_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
-  std::string line = base_metric_collector::csv_header_build(header);
+  std::string line = base_metrics_collector::csv_header_build(header);
   if (collect_cum()) {
     return line +
         "collector_avg_interface_delay" + separator() +
@@ -71,40 +74,42 @@ std::string task_collector::csv_header_build(const std::string& header) {
   // clang-format on
 } /* csv_header_build() */
 
-void task_collector::reset(void) {
-  base_metric_collector::reset();
+void execution_metrics_collector::reset(void) {
+  base_metrics_collector::reset();
   reset_after_interval();
   reset_after_timestep();
 } /* reset() */
 
-void task_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::task_metrics&>(metrics);
+void execution_metrics_collector::collect(
+    const rcppsw::metrics::base_metrics& metrics) {
+  auto& m = static_cast<const task_metrics::execution_metrics&>(metrics);
+  auto& task = dynamic_cast<const rcppsw::task_allocation::logical_task&>(metrics);
+
   m_count_stats.n_collectors +=
-      static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+      static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
   m_count_stats.n_foragers +=
-      static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
+      static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
   m_count_stats.n_generalists +=
-      static_cast<uint>(m.task_name() == tasks::foraging_task::kGeneralistName);
+      static_cast<uint>(task.name() == tasks::foraging_task::kGeneralistName);
 
   if (collect_cum()) {
-    if (m.at_task_interface()) {
+    if (m.at_interface()) {
       m_int_stats.cum_collector_delay +=
-          static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+          static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
       m_int_stats.cum_forager_delay +=
-          static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
+          static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
     }
 
     m_count_stats.n_cum_collectors +=
-        static_cast<uint>(m.task_name() == tasks::foraging_task::kCollectorName);
+        static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
     m_count_stats.n_cum_foragers +=
-        static_cast<uint>(m.task_name() == tasks::foraging_task::kForagerName);
+        static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
     m_count_stats.n_cum_generalists += static_cast<uint>(
-        m.task_name() == tasks::foraging_task::kGeneralistName);
+        task.name() == fordyca::tasks::foraging_task::kGeneralistName);
   }
 } /* collect() */
 
-bool task_collector::csv_line_build(std::string& line) {
+bool execution_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
@@ -130,17 +135,17 @@ bool task_collector::csv_line_build(std::string& line) {
   return true;
 } /* store_foraging_stats() */
 
-void task_collector::reset_after_timestep(void) {
+void execution_metrics_collector::reset_after_timestep(void) {
   m_count_stats.n_collectors = 0;
   m_count_stats.n_foragers = 0;
   m_count_stats.n_generalists = 0;
 } /* reset_after_timestep() */
 
-void task_collector::reset_after_interval(void) {
+void execution_metrics_collector::reset_after_interval(void) {
   m_count_stats.n_cum_collectors = 0;
   m_count_stats.n_cum_foragers = 0;
   m_count_stats.n_cum_generalists = 0;
   m_int_stats = {0, 0};
 } /* reset_after_interval() */
 
-NS_END(collectors, metrics, fordyca);
+NS_END(metrics, fordyca, tasks);

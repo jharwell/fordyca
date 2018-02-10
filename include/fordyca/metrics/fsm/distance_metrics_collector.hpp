@@ -1,5 +1,5 @@
 /**
- * @file block_metrics_collector.hpp
+ * @file distance_metrics_collector.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,58 +18,62 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
+#include <vector>
+
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
 
+namespace collectible_metrics { namespace fsm { class distance_metrics; } }
 namespace visitor = rcppsw::patterns::visitor;
 
-NS_START(collectors);
+NS_START(fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_metrics_collector
- * @ingroup metrics
+ * @class distance_metrics_collector
+ * @ingroup metrics fsm
  *
- * @brief Collector for \ref block_metrics.
+ * @brief Collector for \ref distance_metrics.
  *
- * Metrics are written out at the specified interval.
+ * Metrics are written out every timestep.
  */
-class block_metrics_collector : public base_metric_collector,
-                                public visitor::visitable_any<block_metrics_collector> {
+class distance_metrics_collector : public rcppsw::metrics::base_metrics_collector,
+                                   public visitor::visitable_any<distance_metrics_collector> {
  public:
-  block_metrics_collector(const std::string& ofname,
-                          uint collect_interval);
+  distance_metrics_collector(const std::string& ofname, size_t n_robots) :
+      base_metrics_collector(ofname, true), m_n_robots(n_robots), m_stats() {}
 
   void reset(void) override;
-  void reset_after_interval(void) override;
-  void collect(const collectible_metrics::base_collectible_metrics& metrics) override;
-  size_t cum_collected(void) const { return m_metrics.cum_collected; }
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
-  struct block_metrics {
-    size_t cum_collected; /* aggregate across blocks, not reset each timestep*/
-    size_t cum_carries; /* aggregate across blocks, not reset each timstep */
+  struct robot_stats {
+    double cum_distance;
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
-  struct block_metrics m_metrics;
+
+  // clang-format off
+  size_t                          m_n_robots;
+  std::vector<struct robot_stats> m_stats;
+  // clang-format on
 };
 
-NS_END(collectors, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_COLLECTOR_HPP_ */

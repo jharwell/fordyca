@@ -25,7 +25,7 @@
 #include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/metrics/collectors/block_metrics_collector.hpp"
+#include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"

@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/fsm/stateless_metrics_collector.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors, fsm);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -35,7 +35,7 @@ NS_START(fordyca, metrics, collectors, fsm);
 stateless_metrics_collector::stateless_metrics_collector(const std::string& ofname,
                                                          bool collect_cum,
                                                          uint collect_interval)
-    : base_metric_collector(ofname, collect_cum), m_stats() {
+    : base_metrics_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -49,7 +49,7 @@ std::string stateless_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   if (collect_cum()) {
-    return base_metric_collector::csv_header_build(header) +
+    return base_metrics_collector::csv_header_build(header) +
         "n_exploring_for_block"  + separator() +
         "n_cum_exploring_for_block"  + separator() +
         "n_avoiding_collision" + separator() +
@@ -57,7 +57,7 @@ std::string stateless_metrics_collector::csv_header_build(
         "n_transporting_to_nest" + separator() +
         "n_cum_transporting_to_nest" + separator();
   }
-  return base_metric_collector::csv_header_build(header) +
+  return base_metrics_collector::csv_header_build(header) +
       "n_exploring_for_block"  + separator() +
       "n_avoiding_collision" + separator() +
       "n_transporting_to_nest" + separator();
@@ -65,14 +65,14 @@ std::string stateless_metrics_collector::csv_header_build(
 } /* csv_header_build() */
 
 void stateless_metrics_collector::reset(void) {
-  base_metric_collector::reset();
+  base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
 void stateless_metrics_collector::collect(
-    const collectible_metrics::base_collectible_metrics& metrics) {
+    const rcppsw::metrics::base_metrics& metrics) {
   auto& m =
-      static_cast<const collectible_metrics::fsm::stateless_metrics&>(metrics);
+      static_cast<const metrics::fsm::stateless_metrics&>(metrics);
   m_stats.n_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
   m_stats.n_transporting_to_nest +=
       static_cast<uint>(m.is_transporting_to_nest());
@@ -119,4 +119,4 @@ void stateless_metrics_collector::reset_after_interval(void) {
   m_stats.n_cum_transporting_to_nest = 0;
 } /* reset_after_interval() */
 
-NS_END(fsm, collectors, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);

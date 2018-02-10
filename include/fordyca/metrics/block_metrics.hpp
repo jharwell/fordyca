@@ -1,5 +1,5 @@
 /**
- * @file base_metric_collector.cpp
+ * @file block_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,48 +18,44 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/collectors/base_metric_collector.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectors);
+NS_START(fordyca, metrics, collectible_metrics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void base_metric_collector::csv_line_write(uint timestep) {
-  std::string line;
-  if (csv_line_build(line)) {
-    m_ofile << std::to_string(timestep) + m_separator + line << std::endl;
-  }
-} /* csv_line_write() */
+/**
+ * @class block_metrics
+ * @ingroup metrics
+ *
+ * @brief Interface defining collectible metrics on a block.
+ */
+class block_metrics : public rcppsw::metrics::base_metrics {
+ public:
+  block_metrics(void) = default;
+  ~block_metrics(void) override = default;
+  block_metrics(const block_metrics&) = default;
+  block_metrics& operator=(const block_metrics&) = default;
 
-void base_metric_collector::csv_header_write(void) {
-  std::string header = csv_header_build("");
-  m_ofile << header + "\n";
-} /* csv_header_write() */
+  /**
+   * @brief Get how many carries this object has had on its way from its
+   * original arena location back to the nest.
+   *
+   * @return # carries.
+   */
+  virtual size_t n_carries(void) const = 0;
+};
 
-std::string base_metric_collector::csv_header_build(const std::string& header) {
-  return header + "clock" + m_separator;
-} /* csv_header_build() */
+NS_END(collectible_metrics, metrics, fordyca);
 
-void base_metric_collector::reset(void) {
-  /* Open output file and truncate */
-  if (m_ofile.is_open()) {
-    m_ofile.close();
-  }
-  m_ofile.open(m_ofname.c_str(), std::ios_base::trunc | std::ios_base::out);
-  csv_header_write();
-} /* reset() */
-
-void base_metric_collector::interval_reset(void) {
-  if (m_use_interval && (m_timestep % m_interval == 0)) {
-    reset_after_interval();
-  }
-} /* interval_reset() */
-
-NS_END(collectors, metrics, fordyca);
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_ */

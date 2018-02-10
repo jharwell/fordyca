@@ -31,10 +31,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace robot_collectors = metrics::collectors::fsm;
-namespace metrics { namespace collectors { namespace fsm {
+namespace metrics { namespace fsm {
 class stateful_metrics_collector;
-}}}
+}}
 
 NS_START(support, depth0);
 
@@ -66,13 +65,13 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   void Reset(void) override;
 
  protected:
-  robot_collectors::stateful_metrics_collector* stateful_collector(void) const;
+  metrics::fsm::stateful_metrics_collector* stateful_collector(void) const;
   void pre_step_final(void) override;
 
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  std::unique_ptr<robot_collectors::stateful_metrics_collector> m_collector;
+  std::unique_ptr<metrics::fsm::stateful_metrics_collector> m_collector;
 };
 
 NS_END(depth0, support, fordyca);
