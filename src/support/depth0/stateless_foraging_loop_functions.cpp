@@ -181,6 +181,10 @@ void stateless_foraging_loop_functions::pre_step_final(void) {
   m_stateless_collector->interval_reset();
   m_stateless_collector->timestep_inc();
 
+  m_distance_collector->timestep_reset();
+  m_distance_collector->interval_reset();
+  m_distance_collector->timestep_inc();
+
   m_block_collector->timestep_reset();
   m_block_collector->interval_reset();
   m_block_collector->timestep_inc();
@@ -216,7 +220,8 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   m_distance_collector =
       rcppsw::make_unique<metrics::fsm::distance_metrics_collector>(
           m_metrics_path + "/" + p_output->metrics.distance_fname,
-          p_output->metrics.n_robots);
+          p_output->metrics.collect_cum,
+          p_output->metrics.collect_interval);
 
   m_stateless_collector->reset();
   m_distance_collector->reset();

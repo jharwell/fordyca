@@ -54,11 +54,12 @@ NS_START(fsm);
 class distance_metrics_collector : public rcppsw::metrics::base_metrics_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
-  distance_metrics_collector(const std::string& ofname, size_t n_robots) :
-      base_metrics_collector(ofname, true), m_n_robots(n_robots), m_stats() {}
-
+  explicit distance_metrics_collector(const std::string& ofname,
+                                      bool collect_cum,
+                                      uint collect_interval);
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
 
  private:
   struct robot_stats {
@@ -68,10 +69,7 @@ class distance_metrics_collector : public rcppsw::metrics::base_metrics_collecto
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
-  size_t                          m_n_robots;
-  std::vector<struct robot_stats> m_stats;
-  // clang-format on
+  struct robot_stats m_stats;
 };
 
 NS_END(fsm, metrics, fordyca);
