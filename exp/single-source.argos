@@ -91,7 +91,6 @@
           distance_fname="distance-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
-          n_robots="16"
           collect_cum="true"
           collect_interval="1000"
           />

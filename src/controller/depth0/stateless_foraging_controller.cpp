@@ -103,11 +103,10 @@ int stateless_foraging_controller::entity_id(void) const {
 
 double stateless_foraging_controller::timestep_distance(void) const {
   /*
-   * If you allow distance gathering at timesteps <= 2, you get a big jump
-   * because of the prev/current location not being set up properly yet. Might
-   * be worth fixing at some point...
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
    */
-  if (base_sensors()->tick() > 2) {
+  if (base_sensors()->tick() > 1) {
     return base_sensors()->robot_heading().Length();
   }
   return 0;

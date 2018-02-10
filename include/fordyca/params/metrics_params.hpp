@@ -48,7 +48,6 @@ struct metrics_params : public rcppsw::common::base_params {
   std::string depth1_fname{""};
   std::string task_execution_fname{""};
   std::string task_management_fname{""};
-  uint n_robots{0};
   bool collect_cum{false};
   uint collect_interval{0};
 };

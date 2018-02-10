@@ -30,41 +30,55 @@
 NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
+                                                       bool collect_cum,
+                                                       uint collect_interval) :
+    base_metrics_collector(ofname, collect_cum), m_stats() {
+  if (collect_cum) {
+    use_interval(true);
+    interval(collect_interval);
+  }
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
   std::string line;
-  for (size_t i = 0; i < m_n_robots; ++i) {
-    line += "robot" + std::to_string(i) + separator();
-  } /* for(i..) */
-
+  if (collect_cum()) {
+     line = "cum_distance";
+  }
   return base_metrics_collector::csv_header_build(header) + line;
 } /* csv_header_build() */
 
 void distance_metrics_collector::reset(void) {
   base_metrics_collector::reset();
-  m_stats.clear();
-  for (size_t i = 0; i < m_n_robots; ++i) {
-    m_stats.emplace_back();
-  } /* for(i..) */
+  reset_after_interval();
 } /* reset() */
 
 bool distance_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  for (auto s : m_stats) {
-    line += std::to_string(s.cum_distance) + separator();
-  } /* for(s..) */
-  return true;
+  if (collect_cum()) {
+    line += std::to_string(m_stats.cum_distance) + separator();
+    return true;
+  }
+  return false;
 } /* csv_line_build() */
 
 void distance_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m =
       static_cast<const metrics::fsm::distance_metrics&>(metrics);
-  m_stats[m.entity_id()].cum_distance += m.timestep_distance();
+  m_stats.cum_distance += m.timestep_distance();
 } /* collect() */
+
+void distance_metrics_collector::reset_after_interval(void) {
+  m_stats = {0};
+} /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);
