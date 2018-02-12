@@ -83,6 +83,7 @@ std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
 
 void perceived_arena_map::cache_add(
     std::unique_ptr<representation::cache>& cache) {
+  cache_remove(cache.get());
   m_caches.push_back(std::move(cache));
 } /* cache_add() */
 
