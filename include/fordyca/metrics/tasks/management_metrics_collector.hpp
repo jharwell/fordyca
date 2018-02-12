@@ -67,19 +67,25 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
  private:
   struct subtask_selection_stats {
-    size_t n_foragers;
-    size_t n_collectors;
+    uint n_foragers;
+    uint n_collectors;
   };
 
   struct partitioning_stats {
-    size_t n_partition;
-    size_t n_no_partition;
+    uint n_partition;
+    uint n_no_partition;
   };
+
+  struct allocation_stats {
+    uint n_alloc_sw;
+  };
+
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   struct subtask_selection_stats m_sel_stats;
   struct partitioning_stats m_partition_stats;
+  struct allocation_stats m_alloc_stats;
 };
 
 NS_END(tasks, metrics, fordyca);

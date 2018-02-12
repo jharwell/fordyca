@@ -121,6 +121,8 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   /* task metrics */
   bool has_aborted_task(void) const override { return m_task_aborted; }
   bool has_new_allocation(void) const override { return m_task_alloc; }
+  bool has_changed_allocation(void) const override { return m_alloc_sw; }
+
   std::string current_task_name(void) const override;
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
@@ -133,6 +135,8 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool                                               m_display_task{false};
   bool                                               m_task_aborted{false};
   bool                                               m_task_alloc{false};
+  bool                                               m_alloc_sw{false};
+  std::string                                        m_prev_task{""};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;
   std::unique_ptr<tasks::collector>                  m_collector;
