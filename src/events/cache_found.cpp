@@ -115,24 +115,38 @@ void cache_found::visit(representation::perceived_arena_map& map) {
    * If the cell is currently in a HAS_CACHE state, then that means that this
    * cell is coming back into our LOS with a block, when it contained a cache
    * the last time it was seen. Remove the cache/synchronize with reality.
+   *
+   * The density needs to be reset as well, as we are now tracking a different
+   * kind of cell entity.
    */
   if (cell.state_has_block()) {
     map.block_remove(cell.block());
   }
   m_tmp_cache = m_cache.get();
-  map.cache_add(m_cache);
 
-  if (map.pheromone_repeat_deposit() ||
-      (!map.pheromone_repeat_deposit() && !cell.state_has_cache())) {
-    /*
-     * The density of the cell for the newly discovered cache needs to be
-     * unconditionally reset, as the cell may have contained a different
-     * cache/block which no longer exists, and we need to start a new density
-     * decay count for the newly discovered cache.
-     */
-    density.reset();
-    density.pheromone_add(1.0);
+  /*
+   * If the ID of the cache we currently think resides in the cell and the ID of
+   * the one we just found that actually resides there are not the same, we need
+   * to reset the density for the cell, and start a new decay count.
+   */
+  if (cell.state_has_cache() && cell.cache()->id() != m_tmp_cache->id()) {
+      density.reset();
   }
+
+  if (map.pheromone_repeat_deposit()) {
+    density.pheromone_add(1.0);
+  } else {
+    /*
+     * Seeing a new cache on empty square or one that used to contain a block.
+     */
+    if (!cell.state_has_cache()) {
+      density.reset();
+      density.pheromone_add(1.0);
+    } else { /* Seeing a known cache again--set its relevance to the max */
+      density.pheromone_set(1.0);
+    }
+  }
+  map.cache_add(m_cache);
   cell.accept(*this);
 } /* visit() */
 

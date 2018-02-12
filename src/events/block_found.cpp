@@ -83,12 +83,38 @@ void block_found::visit(representation::perceived_arena_map& map) {
    * If the cell is currently in a HAS_CACHE state, then that means that this
    * cell is coming back into our LOS with a block, when it contained a cache
    * the last time it was seen. Remove the cache/synchronize with reality.
+   *
+   * The density needs to be reset as well, as we are now tracking a different
+   * kind of cell entity.
    */
   if (cell.state_has_cache()) {
     map.cache_remove(cell.cache());
   }
+
   m_tmp_block = m_block.get();
 
+  /*
+   * If the ID of the block we currently think resides in the cell and the ID of
+   * the one we just found that actually resides there are not the same, we need
+   * to reset the density for the cell, and start a new decay count.
+   */
+  if (cell.state_has_block() && cell.block()->id() != m_tmp_block->id()) {
+    density.reset();
+  }
+
+  if (map.pheromone_repeat_deposit()) {
+    density.pheromone_add(1.0);
+  } else {
+    /*
+     * Seeing a new block on empty square or one that used to contain a cache.
+     */
+    if (!cell.state_has_block()) {
+      density.reset();
+      density.pheromone_add(1.0);
+    } else { /* Seeing a known block again--set its relevance to the max */
+      density.pheromone_set(1.0);
+    }
+  }
   /*
    * ONLY if we actually added a block the list of known blocks do we update
    * what block the cell points to. If we do it unconditionally, we are left
@@ -96,18 +122,12 @@ void block_found::visit(representation::perceived_arena_map& map) {
    * #229.
    */
   if (map.block_add(m_block)) {
-    if (map.pheromone_repeat_deposit() ||
-        (!map.pheromone_repeat_deposit() && !cell.state_has_block())) {
-      /*
-       * The density of the cell for the newly discovered block needs to be
-       * unconditionally reset, as the cell may have contained a different
-       * cache/block which no longer exists, and we need to start a new density
-       * decay count for the newly discovered block.
-       */
-      density.reset();
-      density.pheromone_add(1.0);
-    }
-
+    /*
+     * The density of the cell for the newly discovered block needs to be
+     * reset, as the cell may have contained a different cache/block which no
+     * longer exists, and we need to start a new density decay count for the
+     * newly discovered block.
+     */
     cell.accept(*this);
   }
 } /* visit() */
