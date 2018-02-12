@@ -60,7 +60,7 @@ std::string management_metrics_collector::csv_header_build(const std::string& he
         "collector_subtask_count" + separator() +
         "partition_count"  + separator() +
         "no_partition_count"  + separator() +
-        "allocation_sw" + separator();
+        "alloc_sw_count" + separator();
   // clang-format on
 } /* csv_header_build() */
 
