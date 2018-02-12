@@ -33,7 +33,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 void block::move_out_of_sight(void) {
   real_loc(argos::CVector2(100.0, 100.0));
-  discrete_loc(discrete_coord(100, 100));
+  discrete_loc(rcppsw::math::dcoord2(100, 100));
 } /* move_out_of_sight() */
 
 std::unique_ptr<block> block::clone(void) const {

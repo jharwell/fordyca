@@ -1,5 +1,5 @@
 /**
- * @file cache_respawn_probability.hpp
+ * @file occupancy_grid_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,50 +18,39 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/math/expression.hpp"
+#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @class cache_respawn_probability
- * @ingroup expressions
- *
- * @brief Calculate the probability that loop functions should respawn a static
- * cache after it has been emptied (turned into a single block that is).
- *
- * Depends on:
- *
- * - A scaling factor > 0 that influences the probability distribution shape.
- */
-class cache_respawn_probability : public rcppsw::math::expression<double> {
- public:
-  explicit cache_respawn_probability(double scale_factor);
+void occupancy_grid_parser::parse(argos::TConfigurationNode& node) {
+  m_params = rcppsw::make_unique<struct occupancy_grid_params>();
+  argos::TConfigurationNode pnode = argos::GetNode(node, "occupancy_grid");
 
-  /**
-   * @brief Calculate the probability of respawn
-   *
-   * @param n_foragers # robots currently executing Forager task.
-   * @param n_collectors # robots currently executing Collector task.
-   */
-  double calc(size_t n_foragers, size_t n_collectors);
+  m_grid_parser.parse(argos::GetNode(pnode, "grid"));
+  m_pheromone_parser.parse(argos::GetNode(pnode, "pheromone"));
+  m_params->grid = *m_grid_parser.get_results();
+  m_params->pheromone = *m_pheromone_parser.get_results();
+} /* parse() */
 
- private:
-  const double mc_scale_factor;
-};
+void occupancy_grid_parser::show(std::ostream& stream) {
+  stream << "====================\nPerceived arena_map "
+            "params\n====================\n";
+  m_grid_parser.show(stream);
+  m_pheromone_parser.show(stream);
+} /* show() */
 
-NS_END(expressions, fordyca);
+__pure bool occupancy_grid_parser::validate(void) {
+  return m_grid_parser.validate() && m_pheromone_parser.validate();
+} /* validate() */
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_CACHE_RESPAWN_PROBABILITY_HPP_ */
+NS_END(depth0, params, fordyca);

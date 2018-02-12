@@ -35,13 +35,13 @@
                  output_dir="__current_date__"
                  />
         </output>
-        <perceived_arena_map>
+        <occupancy_grid>
           <grid resolution="0.2"
                 size="10, 5, 2"
                 />
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
-        </perceived_arena_map>
+        </occupancy_grid>
         <task estimation_alpha="0.8"
               abort_reactivity="8"
               abort_offset="4"
@@ -59,7 +59,7 @@
         <actuators>
           <wheels soft_turn_angle_max="30"
                   no_turn_angle_max="5"
-                  max_speed="5" />
+                  max_speed="10" />
         </actuators>
         <fsm
           unsuccessful_explore_dir_change="1000"
@@ -98,7 +98,7 @@
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks n_blocks="40"
+      <blocks n_blocks="20"
               dimension="0.2"
               dist_model="single_source"
               />
@@ -112,9 +112,9 @@
               />
       <nest size="0.5, 2.0" center="2, 2.5" />
     </arena_map>
-    <visualization robot_id="false"
+    <visualization robot_id="true"
                    robot_los="false"
-                   robot_task="true"
+                   robot_task="false"
                    block_id="false"
                    />
   </loop_functions>

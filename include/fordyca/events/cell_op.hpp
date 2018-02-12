@@ -34,7 +34,6 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class cell2D;
-class perceived_cell2D;
 }
 namespace fsm {
 class cell2D_fsm;
@@ -57,7 +56,6 @@ NS_START(events);
  */
 class cell_op : public visitor::visitor,
                 public visitor::visit_set<representation::cell2D,
-                                          representation::perceived_cell2D,
                                           fsm::cell2D_fsm> {
  public:
   cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}

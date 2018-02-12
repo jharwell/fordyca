@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <string>
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************

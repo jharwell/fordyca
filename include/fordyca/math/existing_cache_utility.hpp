@@ -1,5 +1,5 @@
 /**
- * @file perceived_arena_map_params.hpp
+ * @file existing_cache_utility.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,35 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_EXISTING_CACHE_UTILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_EXISTING_CACHE_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/base_params.hpp"
-#include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/depth0/pheromone_params.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, math);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct perceived_arena_map_params
- * @ingroup params depth0
+ * @class existing_cache_utility
+ * @ingroup math
+ *
+ * @brief Calculates the utility associated with an existing cache that the
+ * robot knows about.
+ *
+ * Depends on:
+ *
+ * - Distance of cache to nest (closer is better).
+ * - Distance of cache to robot's current position (closer is better).
+ * - # of blocks believed to be in the cache (more is better).
+ * - Pheromone density associated with the cache information (higher is
+ *   better).
  */
-struct perceived_arena_map_params : public rcppsw::common::base_params {
-  perceived_arena_map_params(void) : grid(), pheromone() {}
+class existing_cache_utility : public rcppsw::math::expression<double> {
+ public:
+  existing_cache_utility(const argos::CVector2& cache_loc,
+                         const argos::CVector2& nest_loc);
 
-  struct grid_params grid;
-  struct pheromone_params pheromone;
+  double calc(const argos::CVector2& rloc, double density, size_t n_blocks);
+
+ private:
+  const argos::CVector2 mc_cache_loc;
+  const argos::CVector2 mc_nest_loc;
 };
 
-NS_END(depth0, params, fordyca);
+NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_EXISTING_CACHE_UTILITY_HPP_ */

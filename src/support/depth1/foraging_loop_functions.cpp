@@ -27,7 +27,7 @@
 #include <random>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/expressions/cache_respawn_probability.hpp"
+#include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/metrics/fsm/depth1_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
@@ -223,7 +223,7 @@ void foraging_loop_functions::pre_step_final(void) {
   if (map()->has_static_cache() && map()->caches().empty()) {
     int n_foragers = m_task_execution_collector->n_foragers();
     int n_collectors = m_task_execution_collector->n_collectors();
-    expressions::cache_respawn_probability p(mc_cache_respawn_scale_factor);
+    math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_foragers, n_collectors) >=
         static_cast<double>(random()) / RAND_MAX) {
       map()->static_cache_create();

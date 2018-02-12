@@ -30,7 +30,6 @@
 #include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -44,7 +43,7 @@ class server;
 NS_START(fordyca);
 namespace params {
 namespace depth0 {
-struct perceived_arena_map_params;
+struct occupancy_grid_params;
 }
 }
 
@@ -71,8 +70,12 @@ class perceived_arena_map
  public:
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
-      const struct params::depth0::perceived_arena_map_params* c_params,
+      const struct fordyca::params::depth0::occupancy_grid_params* c_params,
       const std::string& robot_id);
+
+  bool pheromone_repeat_deposit(void) const {
+    return m_grid.pheromone_repeat_deposit();
+  }
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of and their
@@ -140,23 +143,36 @@ class perceived_arena_map
    *
    * @return The cell.
    */
-  perceived_cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  perceived_cell2D& access(const discrete_coord& c) {
-    return access(c.first, c.second);
+  template <int Index>
+  typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
+                                                                 size_t j) {
+    return m_grid.access<Index>(i, j);
   }
-  const perceived_cell2D& access(size_t i, size_t j) const {
-    return m_grid.access(i, j);
+  template <int Index>
+  const typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
+                                                                       size_t j) const {
+    return m_grid.access<Index>(i, j);
+  }
+  template <int Index>
+  typename occupancy_grid::layer_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) {
+    return m_grid.access<Index>(d);
+  }
+  template <int Index>
+  const typename occupancy_grid::layer_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) const {
+    return m_grid.access<Index>(d);
   }
 
   /**
    * @brief Update the density of all cells in the perceived arena.
    */
-  void update_density(void);
+  void update(void) { m_grid.update(); }
 
  private:
   // clang-format off
   std::shared_ptr<rcppsw::er::server> m_server;
-  perceived_occupancy_grid            m_grid;
+  occupancy_grid                      m_grid;
   // clang-format on
 
   /**

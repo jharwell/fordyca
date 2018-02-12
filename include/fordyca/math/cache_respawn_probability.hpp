@@ -1,5 +1,5 @@
 /**
- * @file perceived_arena_map_parser.hpp
+ * @file cache_respawn_probability.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,53 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/depth0/pheromone_parser.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class perceived_arena_map_parser
- * @ingroup params depth0
+ * @class cache_respawn_probability
+ * @ingroup math
  *
- * @brief Parses XML parameters for \ref perceived_arena_map into
- * \ref perceived_arena_map_params.
+ * @brief Calculate the probability that loop functions should respawn a static
+ * cache after it has been emptied (turned into a single block that is).
+ *
+ * Depends on:
+ *
+ * - A scaling factor > 0 that influences the probability distribution shape.
  */
-class perceived_arena_map_parser: public rcppsw::common::xml_param_parser {
+class cache_respawn_probability : public rcppsw::math::expression<double> {
  public:
-  perceived_arena_map_parser(void): m_params(), m_grid_parser(),
-                                    m_pheromone_parser() {}
+  explicit cache_respawn_probability(double scale_factor);
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct perceived_arena_map_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
+  /**
+   * @brief Calculate the probability of respawn
+   *
+   * @param n_foragers # robots currently executing Forager task.
+   * @param n_collectors # robots currently executing Collector task.
+   */
+  double calc(size_t n_foragers, size_t n_collectors);
 
  private:
-  std::unique_ptr<struct perceived_arena_map_params> m_params;
-  grid_parser m_grid_parser;
-  pheromone_parser m_pheromone_parser;
+  const double mc_scale_factor;
 };
 
-NS_END(depth0, params, fordyca);
+NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_PERCEIVED_ARENA_MAP_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_CACHE_RESPAWN_PROBABILITY_HPP_ */

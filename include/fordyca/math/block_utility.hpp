@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,14 +31,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class block_utility
- * @ingroup expressions
+ * @ingroup math
  *
  * @brief Calculates the utility associated with a known block, as part of a
  * robot's decision on whether or not to go and attempt to pick it up.
@@ -61,6 +61,6 @@ class block_utility : public rcppsw::math::expression<double> {
   const argos::CVector2 mc_nest_loc;
 };
 
-NS_END(expressions, fordyca);
+NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_BLOCK_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_BLOCK_UTILITY_HPP_ */

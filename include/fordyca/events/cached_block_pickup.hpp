@@ -73,7 +73,6 @@ class cached_block_pickup
   void visit(representation::arena_map& map) override;
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
   void visit(representation::cache& cache) override;

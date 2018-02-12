@@ -59,9 +59,6 @@ class cell_unknown : public cell_op {
  public:
   cell_unknown(size_t x, size_t y) : cell_op(x, y) {}
 
-  /* stateless foraging */
-  void visit(representation::perceived_cell2D& cell) override;
-
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;

@@ -87,7 +87,6 @@ class cache_block_drop
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
   void visit(representation::cache& cache) override;
-  void visit(class representation::perceived_cell2D& cell) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::forager& task) override;

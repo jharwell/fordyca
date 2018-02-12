@@ -1,5 +1,5 @@
 /**
- * @file cache_site_utility.hpp
+ * @file occupancy_grid_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,50 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_CACHE_SITE_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_CACHE_SITE_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/math/expression.hpp"
+#include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/grid_params.hpp"
+#include "fordyca/params/depth0/pheromone_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class cache_site_utility
- * @ingroup expressions
- *
- * @brief Calculates the utility associated with a new cache to a robot as part
- * of its decision process for what to do with a block once it has picked it up.
- *
- * Depends on:
- *
- * - Distance of perspective site to the nest (closer is better).
- * - Distance of perspective site to robot's current location (closer is
- * - better).
- * - Distance to nearest known cache (further is better).
+ * @struct occupancy_grid_params
+ * @ingroup params depth0
  */
-class cache_site_utility : public rcppsw::math::expression<double> {
- public:
-  cache_site_utility(const argos::CVector2& site_loc,
-                     const argos::CVector2& nest_loc);
+struct occupancy_grid_params : public rcppsw::common::base_params {
+  occupancy_grid_params(void) : grid(), pheromone() {}
 
-  double calc(const argos::CVector2& rloc, const argos::CVector2& nearest_cache);
-
- private:
-  const argos::CVector2 mc_site_loc;
-  const argos::CVector2 mc_nest_loc;
+  struct grid_params grid;
+  struct pheromone_params pheromone;
 };
 
-NS_END(expressions, fordyca);
+NS_END(depth0, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_CACHE_SITE_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_ */

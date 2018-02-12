@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/block_selector.hpp"
-#include "fordyca/expressions/block_utility.hpp"
+#include "fordyca/math/block_utility.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ representation::const_perceived_block block_selector::calc_best(
 
   ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto pair : blocks) {
-    expressions::block_utility u(pair.first->real_loc(), m_nest_loc);
+    math::block_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second);
     ER_DIAG("Utility for block%d loc=(%zu, %zu), density=%f: %f",

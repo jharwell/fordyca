@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_SUB_AREA_UTILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_SUB_AREA_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,14 +27,14 @@
 #include <algorithm>
 
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/expressions/sub_area_poa.hpp"
+#include "fordyca/math/sub_area_poa.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Class Definitions
@@ -83,6 +83,6 @@ class sub_area_utility : public rcppsw::math::expression<double> {
   sub_area_poa m_poa;
 };
 
-NS_END(expressions, fordyca);
+NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_SUB_AREA_UTILITY_HPP_ */

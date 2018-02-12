@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/expressions/existing_cache_utility.hpp"
+#include "fordyca/math/existing_cache_utility.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +52,7 @@ representation::const_perceived_cache existing_cache_selector::calc_best(
   ER_ASSERT(!existing_caches.empty(), "FATAL: no known existing caches");
 
   for (auto pair : existing_caches) {
-    expressions::existing_cache_utility u(pair.first->real_loc(), m_nest_loc);
+    math::existing_cache_utility u(pair.first->real_loc(), m_nest_loc);
 
     double utility = u.calc(robot_loc, pair.second, pair.first->n_blocks());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");

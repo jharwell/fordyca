@@ -60,7 +60,6 @@ class cache_found : public perceived_cell_op, public rcppsw::er::client {
 
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(representation::perceived_cell2D& cell) override;
 
   /* depth1 foraging */
   void visit(representation::perceived_arena_map& map) override;

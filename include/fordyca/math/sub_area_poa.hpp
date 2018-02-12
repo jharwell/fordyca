@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_utility.hpp
+ * @file sub_area_poa.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_EXISTING_CACHE_UTILITY_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_EXISTING_CACHE_UTILITY_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_SUB_AREA_POA_HPP_
+#define INCLUDE_FORDYCA_MATH_SUB_AREA_POA_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,38 +31,42 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_utility
- * @ingroup expressions
- *
- * @brief Calculates the utility associated with an existing cache that the
- * robot knows about.
+ * @brief Calculates the probability that a particular sub-area will be of
+ * interest to a robot.
  *
  * Depends on:
  *
- * - Distance of cache to nest (closer is better).
- * - Distance of cache to robot's current position (closer is better).
- * - # of blocks believed to be in the cache (more is better).
- * - Pheromone density associated with the cache information (higher is
- *   better).
+ * - Sub area distance to nest. This emphasizes sub areas that are further away,
+ *   encouraging bringing items from further away before bring items that are
+ *   closer, facilitating a general movement of items closer to the nest.
+ *
+ * - Total distance from all known caches in the subarea to nest. This
+ *   emphasizes exploiting existing caches when they exist, rather than go
+ *   exploring.
+ *
+ * - TODO: take pheromones into account?
  */
-class existing_cache_utility : public rcppsw::math::expression<double> {
+class sub_area_poa : public rcppsw::math::expression<double> {
  public:
-  existing_cache_utility(const argos::CVector2& cache_loc,
-                         const argos::CVector2& nest_loc);
+  sub_area_poa(const argos::CVector2& area_center,
+               const argos::CVector2& nest_center)
+      : mc_center(area_center), mc_nest(nest_center) {}
 
-  double calc(const argos::CVector2& rloc, double density, size_t n_blocks);
+  double calc(double caches_dist) {
+    return set_result((mc_center - mc_nest).Length() / caches_dist);
+  }
 
  private:
-  const argos::CVector2 mc_cache_loc;
-  const argos::CVector2 mc_nest_loc;
+  const argos::CVector2 mc_center;
+  const argos::CVector2 mc_nest;
 };
 
-NS_END(expressions, fordyca);
+NS_END(math, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_EXISTING_CACHE_UTILITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_SUB_AREA_POA_HPP_ */
