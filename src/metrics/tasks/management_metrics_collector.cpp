@@ -41,7 +41,8 @@ management_metrics_collector::management_metrics_collector(const std::string& of
                                uint collect_interval)
     : base_metrics_collector(ofname, collect_cum),
       m_sel_stats(),
-      m_partition_stats() {
+      m_partition_stats(),
+      m_alloc_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -58,7 +59,8 @@ std::string management_metrics_collector::csv_header_build(const std::string& he
         "forager_subtask_count" + separator() +
         "collector_subtask_count" + separator() +
         "partition_count"  + separator() +
-        "no_partition_count"  + separator();
+        "no_partition_count"  + separator() +
+        "allocation_sw" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -80,6 +82,7 @@ void management_metrics_collector::collect(
     } else {
       ++m_partition_stats.n_no_partition;
     }
+    m_alloc_stats.n_alloc_sw += static_cast<uint>(m.has_changed_allocation());
   }
 } /* collect() */
 
@@ -91,13 +94,15 @@ bool management_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_sel_stats.n_foragers) + separator() +
       std::to_string(m_sel_stats.n_collectors) + separator() +
       std::to_string(m_partition_stats.n_partition) + separator() +
-      std::to_string(m_partition_stats.n_no_partition) + separator();
+      std::to_string(m_partition_stats.n_no_partition) + separator() +
+      std::to_string(m_alloc_stats.n_alloc_sw) + separator();
   return true;
 } /* store_foraging_stats() */
 
 void management_metrics_collector::reset_after_interval(void) {
   m_sel_stats = {0, 0};
   m_partition_stats = {0, 0};
+  m_alloc_stats = {0};
 } /* reset_after_interval() */
 
 NS_END(metrics, fordyca, tasks);
