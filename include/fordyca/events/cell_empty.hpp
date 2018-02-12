@@ -65,7 +65,6 @@ class cell_empty
   void visit(representation::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(representation::perceived_arena_map& map) override;
 };
 

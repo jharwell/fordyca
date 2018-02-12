@@ -68,8 +68,8 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 
 void free_block_drop::visit(representation::block& block) {
   block.reset_index();
-  representation::discrete_coord d(cell_op::x(), cell_op::y());
-  block.real_loc(representation::discrete_to_real_coord(d, m_resolution));
+  rcppsw::math::dcoord2 d(cell_op::x(), cell_op::y());
+  block.real_loc(math::dcoord_to_rcoord(d, m_resolution));
   block.discrete_loc(d);
 } /* visit() */
 

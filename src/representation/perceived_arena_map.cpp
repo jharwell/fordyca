@@ -24,7 +24,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
+#include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "rcppsw/er/server.hpp"
@@ -33,41 +33,23 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     std::shared_ptr<rcppsw::er::server> server,
-    const struct params::depth0::perceived_arena_map_params* c_params,
+    const struct fordyca::params::depth0::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : m_server(std::move(server)),
-      m_grid(c_params->grid.resolution,
-             static_cast<size_t>(c_params->grid.upper.GetX()),
-             static_cast<size_t>(c_params->grid.upper.GetY())),
+      m_grid(m_server, c_params, robot_id),
       m_caches(),
       m_blocks() {
   deferred_client_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
-  ER_NOM("%zu x%zu/%zu x %zu @ %f resolution",
-         m_grid.xdsize(),
-         m_grid.ydsize(),
-         m_grid.xrsize(),
-         m_grid.yrsize(),
-         m_grid.resolution());
-
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      perceived_cell2D& cell = m_grid.access(i, j);
-      cell.deferred_client_init(m_server);
-      cell.pheromone_rho(c_params->pheromone.rho);
-      cell.pheromone_repeat_deposit(c_params->pheromone.repeat_deposit);
-      cell.robot_id(robot_id);
-      cell.decoratee().loc(discrete_coord(i, j));
-    } /* for(j..) */
-  }   /* for(i..) */
 }
 
 /*******************************************************************************
@@ -80,8 +62,7 @@ std::list<const_perceived_block> perceived_arena_map::perceived_blocks(
   for (auto& b : m_blocks) {
     representation::const_perceived_block p(
         b.get(),
-        m_grid.access(b->discrete_loc().first, b->discrete_loc().second)
-            .density());
+        m_grid.access<0>(b->discrete_loc()).last_result());
     pblocks.push_back(p);
   } /* for(&b..) */
   return pblocks;
@@ -94,25 +75,14 @@ std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
   for (auto& c : m_caches) {
     representation::const_perceived_cache p(
         c.get(),
-        m_grid.access(c->discrete_loc().first, c->discrete_loc().second)
-            .density());
+        m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc()).last_result());
     pcaches.push_back(p);
   } /* for(c..) */
   return pcaches;
 } /* caches() */
 
-void perceived_arena_map::update_density(void) {
-#pragma omp parallel for
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      m_grid.access(i, j).density_update();
-    } /* for(j..) */
-  }   /* for(i..) */
-} /* update_density() */
-
 void perceived_arena_map::cache_add(
     std::unique_ptr<representation::cache>& cache) {
-  cache_remove(cache.get());
   m_caches.push_back(std::move(cache));
 } /* cache_add() */
 
@@ -121,8 +91,7 @@ void perceived_arena_map::cache_remove(const cache* victim) {
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access(victim->discrete_loc().first, victim->discrete_loc().second)
-          .accept(op);
+      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
       m_caches.erase(it);
       return;
     }
@@ -190,7 +159,7 @@ bool perceived_arena_map::block_remove(const block* victim) {
       ER_VER("Remove block%d", victim->id());
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access(victim->discrete_loc().first, victim->discrete_loc().second)
+      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc())
           .accept(op);
       m_blocks.erase(it);
       return true;

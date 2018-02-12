@@ -26,11 +26,14 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::occupancy_grid;
+namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -70,20 +73,11 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
             "FATAL: Perceived cell in incorrect state after block found event");
 } /* visit() */
 
-void block_found::visit(representation::perceived_cell2D& cell) {
-  if (cell.state_has_cache()) {
-    cell.density_reset();
-  }
-  if (cell.pheromone_repeat_deposit() ||
-      (!cell.pheromone_repeat_deposit() && !cell.state_has_block())) {
-    cell.pheromone_add(1.0);
-  }
-  cell.decoratee().accept(*this);
-} /* visit() */
-
 void block_found::visit(representation::perceived_arena_map& map) {
-  representation::perceived_cell2D& cell =
-      map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell =
+      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+  swarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
 
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
@@ -102,6 +96,18 @@ void block_found::visit(representation::perceived_arena_map& map) {
    * #229.
    */
   if (map.block_add(m_block)) {
+    if (map.pheromone_repeat_deposit() ||
+        (!map.pheromone_repeat_deposit() && !cell.state_has_block())) {
+      /*
+       * The density of the cell for the newly discovered block needs to be
+       * unconditionally reset, as the cell may have contained a different
+       * cache/block which no longer exists, and we need to start a new density
+       * decay count for the newly discovered block.
+       */
+      density.reset();
+      density.pheromone_add(1.0);
+    }
+
     cell.accept(*this);
   }
 } /* visit() */

@@ -31,7 +31,6 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -39,6 +38,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -62,14 +62,10 @@ cache_block_drop::cache_block_drop(
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(representation::perceived_cell2D& cell) {
-  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not contain a cache");
-  cell.decoratee().accept(*this);
-} /* visit() */
-
 void cache_block_drop::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
+
   cell.fsm().accept(*this);
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
             "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
@@ -96,7 +92,7 @@ void cache_block_drop::visit(representation::arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::perceived_arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {

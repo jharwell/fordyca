@@ -1,5 +1,6 @@
 /**
- * @file perceived_arena_map_parser.cpp
+ * @file utils.hpp
+ * @ingroup math
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,39 +19,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_MATH_UTILS_HPP_
+#define INCLUDE_FORDYCA_MATH_UTILS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include <utility>
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, math);
 
 /*******************************************************************************
- * Member Functions
+ * Functions
  ******************************************************************************/
-void perceived_arena_map_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct perceived_arena_map_params>();
-  argos::TConfigurationNode pnode = argos::GetNode(node, "perceived_arena_map");
+/**
+ * @brief Translate real (continuous) coordinates to discrete ones using the
+ * specified resolution.
+ */
+__pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
+    const argos::CVector2& r_coord,
+    double resolution) {
+  return rcppsw::math::dcoord2(
+      static_cast<size_t>(std::round(r_coord.GetX() / resolution)),
+      static_cast<size_t>(std::round(r_coord.GetY() / resolution)));
+}
 
-  m_grid_parser.parse(argos::GetNode(pnode, "grid"));
-  m_pheromone_parser.parse(argos::GetNode(pnode, "pheromone"));
-  m_params->grid = *m_grid_parser.get_results();
-  m_params->pheromone = *m_pheromone_parser.get_results();
-} /* parse() */
+/**
+ * @brief Translate discrete coordinates to real (continuous) ones using the
+ * specified resolution.
+ */
+__pure static inline argos::CVector2 dcoord_to_rcoord(
+    const rcppsw::math::dcoord2& d_coord,
+    double resolution) {
+  return argos::CVector2(d_coord.first * resolution,
+                         d_coord.second * resolution);
+}
 
-void perceived_arena_map_parser::show(std::ostream& stream) {
-  stream << "====================\nPerceived arena_map "
-            "params\n====================\n";
-  m_grid_parser.show(stream);
-  m_pheromone_parser.show(stream);
-} /* show() */
 
-__pure bool perceived_arena_map_parser::validate(void) {
-  return m_grid_parser.validate() && m_pheromone_parser.validate();
-} /* validate() */
+NS_END(math, fordyca);
 
-NS_END(depth0, params, fordyca);
+#endif /* INCLUDE_FORDYCA_MATH_UTILS_HPP_ */

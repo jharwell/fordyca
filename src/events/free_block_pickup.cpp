@@ -41,6 +41,8 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 
+using representation::occupancy_grid;
+
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
@@ -77,7 +79,7 @@ void free_block_pickup::visit(representation::cell2D& cell) {
 
 void free_block_pickup::visit(representation::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                representation::discrete_coord(cell_op::x(), cell_op::y()),
+                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "FATAL: Coordinates for block/cell do not agree");
   argos::CVector2 old_r(m_block->real_loc().GetX(), m_block->real_loc().GetY());
   events::cell_empty op(cell_op::x(), cell_op::y());
@@ -122,16 +124,12 @@ void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
 /*******************************************************************************
  * Stateful Foraging
  ******************************************************************************/
-void free_block_pickup::visit(representation::perceived_cell2D& cell) {
-  cell.decoratee().accept(*this);
-} /* visit() */
-
 void free_block_pickup::visit(representation::perceived_arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                representation::discrete_coord(cell_op::x(), cell_op::y()),
+                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "FATAL: Coordinates for block/cell do not agree");
-  representation::perceived_cell2D& cell =
-      map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell =
+      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
 
   /*
    * @bug: This should just be an assert. However, due to #242, the fact that

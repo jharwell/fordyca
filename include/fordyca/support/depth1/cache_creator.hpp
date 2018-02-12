@@ -31,7 +31,7 @@
 #include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
-#include "fordyca/representation/occupancy_grid.hpp"
+#include "fordyca/representation/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -54,7 +54,7 @@ NS_START(fordyca, support, depth1);
 class cache_creator : public rcppsw::er::client {
  public:
   cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                representation::occupancy_grid& grid,
+                representation::arena_grid& grid,
                 double cache_size, double resolution);
 
   /**
@@ -73,11 +73,11 @@ class cache_creator : public rcppsw::er::client {
    * @param grid The arena map grid.
    * @param caches Vector of newly created caches.
    */
-  static void update_host_cells(representation::occupancy_grid& grid,
+  static void update_host_cells(representation::arena_grid& grid,
                                 std::vector<representation::cache>& caches);
 
  protected:
-  representation::occupancy_grid& grid(void) const { return m_grid; }
+  representation::arena_grid& grid(void) const { return m_grid; }
   rcppsw::er::server* server(void) const { return m_server.get(); }
   representation::cache create_single(std::list<representation::block*> blocks,
                                       const argos::CVector2& center);
@@ -86,7 +86,7 @@ class cache_creator : public rcppsw::er::client {
   // clang-format off
   double                              m_cache_size;
   double                              m_resolution;
-  representation::occupancy_grid&     m_grid;
+  representation::arena_grid&     m_grid;
   std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };

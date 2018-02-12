@@ -27,7 +27,7 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <utility>
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -95,12 +95,12 @@ class cell_entity {
    * index into an arena_map.
    *
    */
-  virtual const discrete_coord& discrete_loc(void) const {
+  virtual const rcppsw::math::dcoord2& discrete_loc(void) const {
     return m_discrete_loc;
   }
 
   virtual void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  virtual void discrete_loc(const discrete_coord& loc) { m_discrete_loc = loc; }
+  virtual void discrete_loc(const rcppsw::math::dcoord2& loc) { m_discrete_loc = loc; }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the entity
@@ -132,13 +132,13 @@ class cell_entity {
 
  private:
   // clang-format off
-  int             m_id;
-  bool            m_display_id;
-  double          m_x_dim;
-  double          m_y_dim;
-  argos::CColor   m_color;
-  argos::CVector2 m_real_loc;
-  discrete_coord  m_discrete_loc;
+  int                   m_id;
+  bool                  m_display_id;
+  double                m_x_dim;
+  double                m_y_dim;
+  argos::CColor         m_color;
+  argos::CVector2       m_real_loc;
+  rcppsw::math::dcoord2 m_discrete_loc;
   // clang-format on
 };
 

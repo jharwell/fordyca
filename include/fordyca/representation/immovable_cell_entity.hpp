@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/math/utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +59,7 @@ class immovable_cell_entity : public cell_entity {
       : cell_entity(x_dim, y_dim, color) {
     cell_entity::real_loc(loc);
     cell_entity::discrete_loc(
-        representation::real_to_discrete_coord(loc, resolution));
+        math::rcoord_to_dcoord(loc, resolution));
   }
 
   immovable_cell_entity(double dim,
@@ -74,12 +75,12 @@ class immovable_cell_entity : public cell_entity {
   const argos::CVector2& real_loc(void) const override {
     return cell_entity::real_loc();
   }
-  const discrete_coord& discrete_loc(void) const override {
+  const rcppsw::math::dcoord2& discrete_loc(void) const override {
     return cell_entity::discrete_loc();
   }
 
  private:
-  void discrete_loc(const discrete_coord&) override {}
+  void discrete_loc(const rcppsw::math::dcoord2&) override {}
   void real_loc(const argos::CVector2&) override {}
 };
 

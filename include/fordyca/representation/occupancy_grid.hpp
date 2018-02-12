@@ -25,31 +25,59 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/ds/grid2D_ptr.hpp"
-#include "rcppsw/ds/grid2D.hpp"
+#include <tuple>
+#include <string>
+
+#include "rcppsw/ds/stacked_grid.hpp"
+#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw {
-namespace er {
-class server;
-}
-}
-NS_START(fordyca, representation);
-class cell2D;
-class perceived_cell2D;
+NS_START(fordyca);
+
+namespace params { namespace depth0 {
+struct occupancy_grid_params;
+}}
+
+NS_START(representation);
 
 /*******************************************************************************
- * Type Definitions
+ * Class Definitions
  ******************************************************************************/
-using occupancy_grid =
-    rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>;
+using layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 
-/* using perceived_occupancy_grid = */
-/*     rcppsw::ds::grid2D_ptr<perceived_cell2D, std::shared_ptr<rcppsw::er::server>&>; */
+class occupancy_grid : public rcppsw::er::client,
+                       public rcppsw::ds::stacked_grid2<layer_stack> {
+ public:
+  occupancy_grid(
+      std::shared_ptr<rcppsw::er::server> server,
+      const struct params::depth0::occupancy_grid_params* c_params,
+      const std::string& robot_id);
 
-using perceived_occupancy_grid = rcppsw::ds::grid2D<perceived_cell2D>;
+  /**
+   * @brief Update the density of all cells in the grid.
+   */
+  void update(void);
+  bool pheromone_repeat_deposit(void) const {
+    return m_pheromone_repeat_deposit;
+  }
+  static constexpr uint kPheromoneLayer = 0;
+  static constexpr uint kCellLayer = 1;
+
+ private:
+  void cell_update(size_t i, size_t j);
+  void cell_init(size_t i, size_t j, double pheromone_rho);
+
+  // clang-format off
+  bool                                m_pheromone_repeat_deposit;
+  std::string                         m_robot_id;
+  static constexpr double             kEpsilon{0.0001};
+  std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format on
+};
 
 NS_END(representation, fordyca);
 

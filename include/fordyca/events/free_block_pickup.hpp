@@ -99,7 +99,6 @@ class free_block_pickup
 
   /* stateful foraging */
   void visit(representation::perceived_arena_map& map) override;
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
   void visit(
       controller::depth0::stateful_foraging_controller& controller) override;

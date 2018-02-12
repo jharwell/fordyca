@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -72,9 +72,6 @@ class free_block_drop : public cell_op,
   void visit(representation::block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
-
-  /* stateful foraging */
-  void visit(representation::perceived_cell2D&) override {}
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller&) override {}

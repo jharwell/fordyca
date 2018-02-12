@@ -45,7 +45,7 @@ NS_START(fordyca, support, depth1);
 class static_cache_creator : public cache_creator {
  public:
   static_cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                       representation::occupancy_grid& grid,
+                       representation::arena_grid& grid,
                        const argos::CVector2& center,
                        double cache_size, double resolution);
 

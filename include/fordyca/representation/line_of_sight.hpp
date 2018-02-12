@@ -27,7 +27,7 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
@@ -59,7 +59,7 @@ class cell2D;
 class line_of_sight {
  public:
   line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
-                discrete_coord center)
+                rcppsw::math::dcoord2 center)
       : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
   std::list<const block*> blocks(void) const;
@@ -85,10 +85,10 @@ class line_of_sight {
    */
   size_t xsize(void) const { return m_view.shape()[0]; }
 
-  discrete_coord abs_ll(void) const;
-  discrete_coord abs_lr(void) const;
-  discrete_coord abs_ul(void) const;
-  discrete_coord abs_ur(void) const;
+  rcppsw::math::dcoord2 abs_ll(void) const;
+  rcppsw::math::dcoord2 abs_lr(void) const;
+  rcppsw::math::dcoord2 abs_ul(void) const;
+  rcppsw::math::dcoord2 abs_ur(void) const;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
@@ -121,14 +121,14 @@ class line_of_sight {
    *
    * @return The center coordinates (discrete version).
    */
-  const discrete_coord& center(void) const { return m_center; }
+  const rcppsw::math::dcoord2& center(void) const { return m_center; }
 
  private:
   void add_caches_from_view(void);
   void add_blocks_from_view(void);
 
   // clang-format off
-  discrete_coord                 m_center;
+  rcppsw::math::dcoord2                 m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
   std::list<const cache*>        m_caches;
   // clang-format on

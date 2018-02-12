@@ -66,7 +66,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
   for (size_t i = 0; i < m_grid.xdsize(); ++i) {
     for (size_t j = 0; j < m_grid.ydsize(); ++j) {
       cell2D& cell = m_grid.access(i, j);
-      cell.loc(discrete_coord(i, j));
+      cell.loc(rcppsw::math::dcoord2(i, j));
     } /* for(j..) */
   }   /* for(i..) */
 
@@ -101,8 +101,8 @@ void arena_map::distribute_block(block* const block) {
   while (true) {
     argos::CVector2 r_coord;
     if (m_block_distributor.distribute_block(*block, &r_coord)) {
-      discrete_coord d_coord =
-          representation::real_to_discrete_coord(r_coord, m_grid.resolution());
+      rcppsw::math::dcoord2 d_coord =
+          math::rcoord_to_dcoord(r_coord, m_grid.resolution());
       cell = &m_grid.access(d_coord.first, d_coord.second);
 
       /*
@@ -154,7 +154,7 @@ void arena_map::static_cache_create(void) {
    */
   for (auto& b : m_blocks) {
     if (-1 == b.robot_index() &&
-        b.discrete_loc() != real_to_discrete_coord(argos::CVector2(x, y),
+        b.discrete_loc() != math::rcoord_to_dcoord(argos::CVector2(x, y),
                                                    m_grid.resolution())) {
       blocks.push_back(&b);
     }

@@ -33,7 +33,6 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -41,6 +40,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -72,6 +72,7 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
+  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -80,18 +81,13 @@ void cached_block_pickup::visit(representation::cache& cache) {
   cache.inc_block_pickups();
 } /* visit() */
 
-void cached_block_pickup::visit(representation::perceived_cell2D& cell) {
-  ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
-  cell.decoratee().accept(*this);
-} /* visit() */
-
 void cached_block_pickup::visit(representation::arena_map& map) {
   ER_ASSERT(m_real_cache->n_blocks() >= 2, "FATAL: < 2 blocks in cache");
   int cache_id = m_real_cache->id();
   ER_ASSERT(-1 != cache_id, "FATAL: Cache ID undefined on block pickup");
 
-  representation::discrete_coord coord = m_real_cache->discrete_loc();
-  ER_ASSERT(coord == representation::discrete_coord(cell_op::x(), cell_op::y()),
+  rcppsw::math::dcoord2 coord = m_real_cache->discrete_loc();
+  ER_ASSERT(coord == rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "FATAL: Coordinates for cache%d (%zu, %zu)/cell(%zu, %zu) do not "
             "agree",
             cache_id,
@@ -147,8 +143,8 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
-  representation::perceived_cell2D& cell =
-      map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell =
+      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
   ER_ASSERT(cell.state_has_cache(), "FATAL: Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "FATAL: perceived cache/cell disagree on # of blocks: "

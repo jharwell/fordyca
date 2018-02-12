@@ -243,9 +243,9 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
         conflict = true;
       }
       if (!conflict) {
-        representation::discrete_coord d =
-            representation::real_to_discrete_coord(controller.robot_loc(),
-                                                   map()->grid_resolution());
+        rcppsw::math::dcoord2 d =
+            math::rcoord_to_dcoord(controller.robot_loc(),
+                                             map()->grid_resolution());
         events::free_block_drop drop_op(rcppsw::er::g_server,
                                         controller.block(),
                                         d.first,
@@ -280,8 +280,8 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
     pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
             const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
-    representation::discrete_coord robot_loc =
-        representation::real_to_discrete_coord(pos, map.grid_resolution());
+    rcppsw::math::dcoord2 robot_loc =
+        math::rcoord_to_dcoord(pos, map.grid_resolution());
     auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
     std::unique_ptr<representation::line_of_sight> new_los =
         rcppsw::make_unique<representation::line_of_sight>(

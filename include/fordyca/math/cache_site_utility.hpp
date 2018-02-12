@@ -1,6 +1,5 @@
 /**
- * @file discrete_coord.hpp
- * @ingroup representation
+ * @file cache_site_utility.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,43 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include <utility>
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
- * namespaces
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, math);
 
 /*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-using discrete_coord = std::pair<size_t, size_t>;
-
-/*******************************************************************************
- * Functions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @brief Translate real (continuous) coordinates to discrete ones using the
- * specified resolution.
+ * @class cache_site_utility
+ * @ingroup math
+ *
+ * @brief Calculates the utility associated with a new cache to a robot as part
+ * of its decision process for what to do with a block once it has picked it up.
+ *
+ * Depends on:
+ *
+ * - Distance of perspective site to the nest (closer is better).
+ * - Distance of perspective site to robot's current location (closer is
+ * - better).
+ * - Distance to nearest known cache (further is better).
  */
-discrete_coord real_to_discrete_coord(const argos::CVector2& r_coord,
-                                      double resolution);
+class cache_site_utility : public rcppsw::math::expression<double> {
+ public:
+  cache_site_utility(const argos::CVector2& site_loc,
+                     const argos::CVector2& nest_loc);
 
-/**
- * @brief Translate discrete coordinates to real (continuous) ones using the
- * specified resolution.
- */
-argos::CVector2 discrete_to_real_coord(const discrete_coord& d_coord,
-                                       double resolution);
+  double calc(const argos::CVector2& rloc, const argos::CVector2& nearest_cache);
 
-NS_END(representation, fordyca);
+ private:
+  const argos::CVector2 mc_site_loc;
+  const argos::CVector2 mc_nest_loc;
+};
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_DISCRETE_COORD_HPP_ */
+NS_END(math, fordyca);
+
+#endif /* INCLUDE_FORDYCA_MATH_CACHE_SITE_UTILITY_HPP_ */

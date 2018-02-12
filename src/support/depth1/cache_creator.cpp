@@ -35,7 +35,7 @@ NS_START(fordyca, support, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                             representation::occupancy_grid& grid,
+                             representation::arena_grid& grid,
                              double cache_size,
                              double resolution)
     : client(server),
@@ -58,8 +58,8 @@ representation::cache cache_creator::create_single(
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  representation::discrete_coord d =
-      representation::real_to_discrete_coord(center, m_resolution);
+  rcppsw::math::dcoord2 d =
+      math::rcoord_to_dcoord(center, m_resolution);
   representation::cell2D& cell = m_grid.access(d.first, d.second);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
@@ -100,7 +100,7 @@ representation::cache cache_creator::create_single(
       m_cache_size, m_grid.resolution(), center, blocks_list, -1);
 } /* create_single() */
 
-void cache_creator::update_host_cells(representation::occupancy_grid& grid,
+void cache_creator::update_host_cells(representation::arena_grid& grid,
                                       std::vector<representation::cache>& caches) {
   for (auto& cache : caches) {
     grid.access(cache.discrete_loc().first, cache.discrete_loc().second)

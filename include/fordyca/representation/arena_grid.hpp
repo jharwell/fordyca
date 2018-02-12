@@ -1,5 +1,6 @@
 /**
- * @file discrete_coord.cpp
+ * @file arena_grid.hpp
+ * @ingroup representation
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,30 +19,28 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace er {class server; }}
 NS_START(fordyca, representation);
+class cell2D;
 
 /*******************************************************************************
- *  Functions
+ * Type Definitions
  ******************************************************************************/
-__pure discrete_coord real_to_discrete_coord(const argos::CVector2& r_coord,
-                                      double resolution) {
-  return discrete_coord(
-      static_cast<size_t>(std::round(r_coord.GetX() / resolution)),
-      static_cast<size_t>(std::round(r_coord.GetY() / resolution)));
-} /* real_to_discrete_coord() */
+using arena_grid =
+    rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>;
 
-__pure argos::CVector2 discrete_to_real_coord(const discrete_coord& d_coord,
-                                       double resolution) {
-  return argos::CVector2(d_coord.first * resolution,
-                         d_coord.second * resolution);
-} /* real_to_discrete_coord() */
 
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_ */

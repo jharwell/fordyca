@@ -33,7 +33,7 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
+#include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
@@ -52,6 +52,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -103,7 +104,7 @@ void stateful_foraging_controller::ControlStep(void) {
    * loop.
    */
   process_los(stateful_sensors()->los());
-  m_map->update_density();
+  m_map->update();
 
   if (is_carrying_block()) {
     actuators()->set_speed_throttle(true);
@@ -136,8 +137,8 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      static_cast<const struct params::depth0::perceived_arena_map_params*>(
-          param_repo.get_params("perceived_arena_map")),
+      static_cast<const struct params::depth0::occupancy_grid_params*>(
+          param_repo.get_params("occupancy_grid")),
       GetId());
 
   base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
@@ -185,20 +186,20 @@ void stateful_foraging_controller::process_los(
    */
   for (size_t i = 0; i < los->xsize(); ++i) {
     for (size_t j = 0; j < los->ysize(); ++j) {
-      representation::discrete_coord d = los->cell(i, j).loc();
+      rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (!los->cell(i, j).state_has_block() &&
-          map()->access(d).state_has_block()) {
+          map()->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
         ER_DIAG("Correct block%d discrepency at (%zu, %zu)",
-                map()->access(d).block()->id(),
+                map()->access<occupancy_grid::kCellLayer>(d).block()->id(),
                 d.first,
                 d.second);
-        map()->block_remove(map()->access(d).block());
+        map()->block_remove(map()->access<occupancy_grid::kCellLayer>(d).block());
       }
     } /* for(j..) */
   }   /* for(i..) */
 
   for (auto block : los->blocks()) {
-    if (!m_map->access(block->discrete_loc()).state_has_block()) {
+    if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc()).state_has_block()) {
       ER_NOM("Discovered block%d at (%zu, %zu)",
              block->id(),
              block->discrete_loc().first,

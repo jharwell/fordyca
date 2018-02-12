@@ -1,5 +1,5 @@
 /**
- * @file sub_area_poa.hpp
+ * @file occupancy_grid_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,55 +18,53 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_POA_HPP_
-#define INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_POA_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/expression.hpp"
+#include "fordyca/params/depth0/occupancy_grid_params.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/depth0/pheromone_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @brief Calculates the probability that a particular sub-area will be of
- * interest to a robot.
+ * @class occupancy_grid_parser
+ * @ingroup params depth0
  *
- * Depends on:
- *
- * - Sub area distance to nest. This emphasizes sub areas that are further away,
- *   encouraging bringing items from further away before bring items that are
- *   closer, facilitating a general movement of items closer to the nest.
- *
- * - Total distance from all known caches in the subarea to nest. This
- *   emphasizes exploiting existing caches when they exist, rather than go
- *   exploring.
- *
- * - TODO: take pheromones into account?
+ * @brief Parses XML parameters for \ref occupancy_grid into
+ * \ref occupancy_grid_params.
  */
-class sub_area_poa : public rcppsw::math::expression<double> {
+class occupancy_grid_parser: public rcppsw::common::xml_param_parser {
  public:
-  sub_area_poa(const argos::CVector2& area_center,
-               const argos::CVector2& nest_center)
-      : mc_center(area_center), mc_nest(nest_center) {}
+  occupancy_grid_parser(void): m_params(), m_grid_parser(),
+                                    m_pheromone_parser() {}
 
-  double calc(double caches_dist) {
-    return set_result((mc_center - mc_nest).Length() / caches_dist);
+  void parse(argos::TConfigurationNode& node) override;
+  const struct occupancy_grid_params* get_results(void) override {
+    return m_params.get();
   }
+  void show(std::ostream& stream) override;
+  bool validate(void) override;
 
  private:
-  const argos::CVector2 mc_center;
-  const argos::CVector2 mc_nest;
+  std::unique_ptr<struct occupancy_grid_params> m_params;
+  grid_parser m_grid_parser;
+  pheromone_parser m_pheromone_parser;
 };
 
-NS_END(expressions, fordyca);
+NS_END(depth0, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EXPRESSIONS_SUB_AREA_POA_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_ */

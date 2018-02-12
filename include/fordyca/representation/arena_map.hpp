@@ -29,10 +29,10 @@
 #include "fordyca/params/depth1/cache_params.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cache.hpp"
-#include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,7 +87,7 @@ class arena_map : public rcppsw::er::client,
   bool cache_removed(void) const { return m_cache_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  cell2D& access(const discrete_coord& coord) {
+  cell2D& access(const rcppsw::math::dcoord2& coord) {
     return access(coord.first, coord.second);
   }
 
@@ -187,7 +187,7 @@ class arena_map : public rcppsw::er::client,
   std::vector<cache>                        m_caches;
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
-  occupancy_grid                            m_grid;
+  rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;
   // clang-format on
 };
 

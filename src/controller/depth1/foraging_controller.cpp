@@ -52,6 +52,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -73,7 +74,7 @@ void foraging_controller::ControlStep(void) {
    * should be hidden from our awareness.
    */
   process_los(depth0::stateful_foraging_controller::los());
-  map()->update_density();
+  map()->update();
 
   m_task_aborted = false;
   m_task_alloc = false;
@@ -199,14 +200,14 @@ void foraging_controller::process_los(
    */
   for (size_t i = 0; i < c_los->xsize(); ++i) {
     for (size_t j = 0; j < c_los->ysize(); ++j) {
-      representation::discrete_coord d = c_los->cell(i, j).loc();
+      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
-          map()->access(d).state_has_cache()) {
+          map()->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
         ER_DIAG("Correct cache%d discrepency at (%zu, %zu)",
-                map()->access(d).cache()->id(),
+                map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
                 d.first,
                 d.second);
-        map()->cache_remove(map()->access(d).cache());
+        map()->cache_remove(map()->access<occupancy_grid::kCellLayer>(d).cache());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -217,7 +218,7 @@ void foraging_controller::process_los(
      * (i.e. different # of blocks in it), and so you need to always process
      * caches in the LOS, even if you already know about them.
      */
-    if (!map()->access(cache->discrete_loc()).state_has_cache()) {
+    if (!map()->access<occupancy_grid::kCellLayer>(cache->discrete_loc()).state_has_cache()) {
       ER_NOM("Discovered cache%d at (%zu, %zu): %zu blocks",
              cache->id(),
              cache->discrete_loc().first,
