@@ -167,9 +167,10 @@ void foraging_controller::task_abort_cleanup(
 } /* task_abort_cleanup() */
 
 void foraging_controller::task_alloc_notify(
-    task_allocation::executable_task* const) {
+    task_allocation::executable_task* const task) {
   m_task_alloc = true;
-  if (nullptr == current_task() || current_task() != m_executive->last_task()) {
+  if (nullptr == current_task() ||
+      task->name() != m_executive->last_task()->name()) {
     m_alloc_sw = true;
   }
 } /* task_alloc_notify() */
