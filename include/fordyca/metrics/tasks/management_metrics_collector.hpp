@@ -78,6 +78,7 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
   struct allocation_stats {
     uint n_alloc_sw;
+    uint n_abort;
   };
 
   std::string csv_header_build(const std::string& header) override;
