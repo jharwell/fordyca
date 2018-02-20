@@ -81,12 +81,25 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
     uint n_abort;
   };
 
+  struct finish_stats {
+    uint n_completed;
+    uint n_forager_completed;
+    uint n_collector_completed;
+    uint n_generalist_completed;
+
+    uint cum_collector_exec_time;
+    uint cum_forager_exec_time;
+    uint cum_generalist_exec_time;
+    uint cum_task_exec_time;
+  };
+
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   struct subtask_selection_stats m_sel_stats;
   struct partitioning_stats m_partition_stats;
   struct allocation_stats m_alloc_stats;
+  struct finish_stats m_finish_stats;
 };
 
 NS_END(tasks, metrics, fordyca);
