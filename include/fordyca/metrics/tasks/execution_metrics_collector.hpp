@@ -65,21 +65,22 @@ class execution_metrics_collector : public rcppsw::metrics::base_metrics_collect
   void reset_after_timestep(void) override;
 
   size_t n_collectors(void) const { return m_count_stats.n_collectors; }
-  size_t n_foragers(void) const { return m_count_stats.n_foragers; }
-  size_t n_generalists(void) const { return m_count_stats.n_generalists; }
+  uint n_foragers(void) const { return m_count_stats.n_foragers; }
+  uint n_generalists(void) const { return m_count_stats.n_generalists; }
 
  private:
   struct count_stats {
-    size_t n_collectors;
-    size_t n_foragers;
-    size_t n_generalists;
-    size_t n_cum_collectors;
-    size_t n_cum_foragers;
-    size_t n_cum_generalists;
+    uint n_collectors;
+    uint n_foragers;
+    uint n_generalists;
+
+    uint n_cum_collectors;
+    uint n_cum_foragers;
+    uint n_cum_generalists;
   };
   struct interface_stats {
-    size_t cum_collector_delay;
-    size_t cum_forager_delay;
+    uint cum_collector_delay;
+    uint cum_forager_delay;
   };
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;

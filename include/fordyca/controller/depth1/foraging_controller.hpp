@@ -29,6 +29,7 @@
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "rcppsw/metrics/tasks/allocation_metrics.hpp"
+#include "fordyca/controller/depth1/task_metrics_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -101,12 +102,6 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void process_los(const representation::line_of_sight* c_los) override;
 
   /**
-   * @brief \c TRUE iff the robot aborted its current task, and only on the
-   * timestep in which the task was aborted.
-   */
-  bool task_aborted(void) const { return m_task_aborted; }
-
-  /**
    * @brief Set whether or not a robot is supposed to display the task it is
    * currently working on above itself during simulation.
    */
@@ -119,10 +114,11 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool display_task(void) const { return m_display_task; }
 
   /* task metrics */
-  bool has_aborted_task(void) const override { return m_task_aborted; }
-  bool has_new_allocation(void) const override { return m_task_alloc; }
-  bool has_changed_allocation(void) const override { return m_alloc_sw; }
-
+  bool has_aborted_task(void) const override { return m_metric_store.task_aborted; }
+  bool has_new_allocation(void) const override { return m_metric_store.task_alloc; }
+  bool has_changed_allocation(void) const override { return m_metric_store.alloc_sw; }
+  bool has_finished_task(void) const override { return m_metric_store.task_finish; }
+  double last_task_exec_time(void) const override { return m_metric_store.last_task_exec_time; }
   std::string current_task_name(void) const override;
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
@@ -130,12 +126,11 @@ class foraging_controller : public depth0::stateful_foraging_controller,
  private:
   void task_abort_cleanup(task_allocation::executable_task*);
   void task_alloc_notify(task_allocation::executable_task*);
+  void task_finish_notify(task_allocation::executable_task*);
 
   // clang-format off
+  struct task_metrics_store                          m_metric_store;
   bool                                               m_display_task{false};
-  bool                                               m_task_aborted{false};
-  bool                                               m_task_alloc{false};
-  bool                                               m_alloc_sw{false};
   std::string                                        m_prev_task{""};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
   std::unique_ptr<tasks::forager>                    m_forager;

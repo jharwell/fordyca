@@ -59,6 +59,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
+      m_metric_store(),
       m_executive(),
       m_forager(),
       m_collector(),
@@ -76,9 +77,7 @@ void foraging_controller::ControlStep(void) {
   process_los(depth0::stateful_foraging_controller::los());
   map()->update();
 
-  m_task_aborted = false;
-  m_task_alloc = false;
-  m_alloc_sw = false;
+  m_metric_store.reset();
 
   if (is_carrying_block()) {
     actuators()->set_speed_throttle(true);
@@ -153,6 +152,9 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_executive->task_alloc_notify(std::bind(
       &foraging_controller::task_alloc_notify, this, std::placeholders::_1));
 
+  m_executive->task_finish_notify(std::bind(
+      &foraging_controller::task_finish_notify, this, std::placeholders::_1));
+
   if (p->init_random_estimates) {
     m_generalist->init_random(2000, 4000);
     m_forager->init_random(1000, 2000);
@@ -160,20 +162,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   }
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
-
-void foraging_controller::task_abort_cleanup(
-    task_allocation::executable_task* const) {
-  m_task_aborted = true;
-} /* task_abort_cleanup() */
-
-void foraging_controller::task_alloc_notify(
-    task_allocation::executable_task* const task) {
-  m_task_alloc = true;
-  if (nullptr == current_task() ||
-      task->name() != m_executive->last_task()->name()) {
-    m_alloc_sw = true;
-  }
-} /* task_alloc_notify() */
 
 __pure tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
@@ -255,6 +243,29 @@ bool foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
+ * Executive Callbacks
+ ******************************************************************************/
+void foraging_controller::task_abort_cleanup(
+    task_allocation::executable_task* const) {
+  m_metric_store.task_aborted = true;
+} /* task_abort_cleanup() */
+
+void foraging_controller::task_alloc_notify(
+    task_allocation::executable_task* const task) {
+  m_metric_store.task_alloc = true;
+  if (nullptr == current_task() ||
+      task->name() != m_executive->last_task()->name()) {
+    m_metric_store.alloc_sw = true;
+  }
+} /* task_alloc_notify() */
+
+void foraging_controller::task_finish_notify(
+    task_allocation::executable_task* const task) {
+  m_metric_store.last_task_exec_time = task->exec_time();
+  m_metric_store.task_finish = true;
+} /* task_finish_notify() */
+
+/*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 bool foraging_controller::employed_partitioning(void) const {
@@ -296,6 +307,7 @@ std::string foraging_controller::current_task_name(void) const {
  */
 using namespace argos;
 using depth1_foraging_controller = foraging_controller;
+
 REGISTER_CONTROLLER(depth1_foraging_controller,
                     "depth1_foraging_controller"); // NOLINT
 

@@ -193,7 +193,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   bool handle_task_abort(argos::CFootBotEntity& robot) {
     auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
-    if (!controller.task_aborted()) {
+    if (!controller.has_aborted_task()) {
       return false;
     }
 
