@@ -32,6 +32,7 @@
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/representation/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -142,7 +143,7 @@ void acquire_cache_fsm::init(void) {
 } /* init() */
 
 bool acquire_cache_fsm::acquire_known_cache(
-    std::list<representation::const_perceived_cache> caches) {
+    std::list<representation::perceived_cache> caches) {
   /*
    * If we don't know of any caches and we are not current vectoring towards
    * one, then there is no way we can acquire a known cache, so bail out.
@@ -159,14 +160,15 @@ bool acquire_cache_fsm::acquire_known_cache(
     if (!m_vector_fsm.task_running()) {
       controller::depth1::existing_cache_selector selector(m_server,
                                                            mc_nest_center);
-      auto best = selector.calc_best(caches, m_sensors->robot_loc());
+      representation::perceived_cache best = selector.calc_best(caches,
+                                                                m_sensors->robot_loc());
       ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
-             best.first->id(),
-             best.first->discrete_loc().first,
-             best.first->discrete_loc().second,
-             best.second);
+             best.ent->id(),
+             best.ent->discrete_loc().first,
+             best.ent->discrete_loc().second,
+             best.density.last_result());
       tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               best.first->real_loc());
+                               best.ent->real_loc());
       m_explore_fsm.task_reset();
       m_vector_fsm.task_reset();
       m_vector_fsm.task_start(&v);

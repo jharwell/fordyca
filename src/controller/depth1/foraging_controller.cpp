@@ -39,7 +39,7 @@
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/forager.hpp"
@@ -212,7 +212,7 @@ void foraging_controller::process_los(
      * caches in the LOS, even if you already know about them.
      */
     if (!map()->access<occupancy_grid::kCellLayer>(cache->discrete_loc()).state_has_cache()) {
-      ER_NOM("Discovered cache%d at (%zu, %zu): %zu blocks",
+      ER_NOM("Discovered cache%d at (%zu, %zu): %u blocks",
              cache->id(),
              cache->discrete_loc().first,
              cache->discrete_loc().second,

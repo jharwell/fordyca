@@ -34,6 +34,7 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class cache_metrics
  * @ingroup metrics
@@ -49,21 +50,34 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
   cache_metrics& operator=(const cache_metrics&) = default;
 
   /**
-   * @brief Get the # of blocks in the cache
+   * @brief Get the # of blocks currently in the cache (independent of any
+   * calls to \ref reset_metrics()).
    */
-  virtual size_t n_blocks(void) const = 0;
+  virtual uint n_blocks(void) const = 0;
 
   /**
-   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
-   * that have been picked up from the cache.
+   * @brief Get the # of blocks that have been picked up from the cache since
+   * the last call to \ref reset_metrics().
    */
-  virtual size_t n_block_pickups(void) const = 0;
+  virtual uint n_block_pickups(void) const = 0;
 
   /**
-   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
-   * that have been dropped in the cache
+   * @brief Get the # of blocks that have been dropped in the cache since the
+   * last call to \ref reset_metrics().
    */
-  virtual size_t n_block_drops(void) const = 0;
+  virtual uint n_block_drops(void) const = 0;
+
+  /**
+   * @brief Get the cumulative duration of all penalties served for the cache
+   * since the last call to \ref reset_metrics().
+   */
+  virtual uint penalties_served(void) const = 0;
+
+  /**
+   * @brief Reset all gathered metrics to their initial state after some
+   * interval of time has passed.
+   */
+  virtual void reset_metrics(void) = 0;
 };
 
 NS_END(collectible_metrics, metrics, fordyca);

@@ -48,9 +48,9 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::vector<representation::cache> static_cache_creator::create_all(
+std::vector<representation::arena_cache> static_cache_creator::create_all(
     std::vector<representation::block*>& blocks) {
-  std::vector<representation::cache> caches;
+  std::vector<representation::arena_cache> caches;
 
   ER_ASSERT(blocks.size() >= 2,
             "FATAL: Cannot create static cache from <= 2 blocks");

@@ -60,8 +60,8 @@ class block_selector: public rcppsw::er::client {
    *
    * @return A pointer to the "best" block, along with its utility value.
    */
-  representation::const_perceived_block calc_best(
-      const std::list<representation::const_perceived_block>& blocks,
+  representation::perceived_block calc_best(
+      const std::list<representation::perceived_block>& blocks,
       argos::CVector2 robot_loc);
 
  private:

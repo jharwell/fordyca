@@ -49,7 +49,7 @@ class static_cache_creator : public cache_creator {
                        const argos::CVector2& center,
                        double cache_size, double resolution);
 
-  std::vector<representation::cache> create_all(
+  std::vector<representation::arena_cache> create_all(
     std::vector<representation::block*>& blocks) override;
 
  private:

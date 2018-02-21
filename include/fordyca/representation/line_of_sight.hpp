@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 class block;
-class cache;
+class base_cache;
 class cell2D;
 
 /*******************************************************************************
@@ -63,7 +63,7 @@ class line_of_sight {
       : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
   std::list<const block*> blocks(void) const;
-  std::list<const cache*> caches(void) const;
+  std::list<const base_cache*> caches(void) const;
 
   /**
    * @brief Add a cache to the LOS, beyond those that currently exist in the
@@ -76,7 +76,7 @@ class line_of_sight {
    * a cache that they do not currently track in their \ref perceived_arena_map,
    * which is bad.
    */
-  void cache_add(const cache* cache);
+  void cache_add(const base_cache* cache);
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -128,9 +128,9 @@ class line_of_sight {
   void add_blocks_from_view(void);
 
   // clang-format off
-  rcppsw::math::dcoord2                 m_center;
+  rcppsw::math::dcoord2          m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
-  std::list<const cache*>        m_caches;
+  std::list<const base_cache*>   m_caches;
   // clang-format on
 };
 

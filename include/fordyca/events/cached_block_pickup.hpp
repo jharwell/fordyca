@@ -35,7 +35,7 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class cache;
+class arena_cache;
 }
 namespace tasks {
 class collector;
@@ -59,10 +59,10 @@ class cached_block_pickup
     : public cell_op,
       public rcppsw::er::client,
       public block_pickup_event,
-      public visitor::visit_set<tasks::collector, representation::cache> {
+      public visitor::visit_set<tasks::collector, representation::arena_cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                      representation::cache* cache,
+                      representation::arena_cache* cache,
                       size_t robot_index);
   ~cached_block_pickup(void) override { client::rmmod(); }
 
@@ -75,7 +75,7 @@ class cached_block_pickup
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
-  void visit(representation::cache& cache) override;
+  void visit(representation::arena_cache& cache) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(tasks::collector& task) override;
@@ -83,7 +83,7 @@ class cached_block_pickup
  private:
   // clang-format off
   size_t                              m_robot_index;
-  representation::cache*              m_real_cache;
+  representation::arena_cache*        m_real_cache;
 
   /**
    * @brief The block that will be picked up by the robot.

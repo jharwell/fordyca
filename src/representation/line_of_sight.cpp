@@ -23,7 +23,7 @@
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -49,15 +49,15 @@ std::list<const block*> line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-std::list<const cache*> line_of_sight::caches(void) const {
-  std::list<const cache*> caches = m_caches;
+std::list<const base_cache*> line_of_sight::caches(void) const {
+  std::list<const base_cache*> caches = m_caches;
 
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_cache()) {
-        assert(dynamic_cast<const cache*>(cell->entity()));
+        assert(dynamic_cast<const base_cache*>(cell->entity()));
         caches.push_back(cell->cache());
       }
     } /* for(j..) */
@@ -65,7 +65,7 @@ std::list<const cache*> line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-void line_of_sight::cache_add(const cache* cache) {
+void line_of_sight::cache_add(const base_cache* cache) {
   auto los_caches = caches();
   if (los_caches.end() ==
       std::find(los_caches.begin(), los_caches.end(), cache)) {

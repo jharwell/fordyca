@@ -37,7 +37,7 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class perceived_arena_map;
-class cache;
+class arena_cache;
 }
 namespace fsm {
 namespace depth1 {
@@ -69,11 +69,11 @@ class cache_block_drop
       public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
                                 tasks::forager,
                                 representation::perceived_arena_map,
-                                representation::cache> {
+                                representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                    representation::block* block,
-                   representation::cache* cache,
+                   representation::arena_cache* cache,
                    double resolution);
   ~cache_block_drop(void) override { client::rmmod(); }
 
@@ -86,7 +86,7 @@ class cache_block_drop
   void visit(representation::arena_map& map) override;
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
-  void visit(representation::cache& cache) override;
+  void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::forager& task) override;
@@ -95,7 +95,7 @@ class cache_block_drop
   // clang-format off
   double                              m_resolution;
   representation::block*              m_block;
-  representation::cache*              m_cache;
+  representation::arena_cache*        m_cache;
   std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };

@@ -46,7 +46,7 @@ class dynamic_cache_creator : public depth1::cache_creator {
    *
    * @return The list of current caches.
    */
-  std::vector<representation::cache> create_all(
+  std::vector<representation::arena_cache> create_all(
     std::vector<representation::block*>& blocks) override;
 
  private:

@@ -1,5 +1,5 @@
 /**
- * @file cell2D.cpp
+ * @file base_cache.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,10 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,30 +29,41 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+int base_cache::m_next_id = 0;
+
+/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
-    : m_loc(), m_fsm(server) {
-  m_fsm.init();
-}
+base_cache::base_cache(double dimension,
+             double resolution,
+             argos::CVector2 center,
+             std::vector<block*>& blocks,
+             int id)
+    : immovable_cell_entity(dimension, argos::CColor::GRAY40, center, resolution),
 
-cell2D::cell2D(void) : m_loc(), m_fsm() {
-  m_fsm.init();
+      m_blocks(blocks) {
+  if (-1 == id) {
+    this->id(m_next_id++);
+  } else {
+    this->id(id);
+  }
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure const representation::block* cell2D::block(void) const {
-  return dynamic_cast<representation::block*>(m_entity);
-} /* block() */
+void base_cache::block_remove(block* block) {
+  m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
+} /* block_remove() */
 
-__pure representation::block* cell2D::block(void) {
-  return dynamic_cast<representation::block*>(m_entity);
-} /* block() */
+std::unique_ptr<base_cache> base_cache::clone(void) const {
+  return rcppsw::make_unique<base_cache>(cell_entity::xsize(),
+                                         resolution(),
+                                         real_loc(),
+                                         const_cast<std::vector<block*>&>(blocks()),
+                                         id());
+} /* clone() */
 
-__pure representation::base_cache* cell2D::cache(void) const {
-  return dynamic_cast<representation::base_cache*>(m_entity);
-} /* cache() */
-
-NS_END(representation, fordyca);
+NS_END(fordyca, representation);

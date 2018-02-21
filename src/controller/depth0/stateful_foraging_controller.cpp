@@ -40,7 +40,7 @@
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/generalist.hpp"

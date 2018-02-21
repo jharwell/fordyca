@@ -1,5 +1,5 @@
 /**
- * @file cache.hpp
+ * @file base_cache.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CACHE_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CACHE_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_BASE_CACHE_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_BASE_CACHE_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,11 +28,9 @@
 #include <utility>
 #include <vector>
 
-#include "fordyca/metrics/cache_metrics.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,19 +43,17 @@ NS_START(fordyca, representation);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache
+ * @class base_cache
  * @ingroup representation
  *
- * @brief A representation of a cache within the arena map. Caches do not have
- * state, and if/when a cache becomes empty, it needs to be deleted by an
+ * @brief Base class for representating a cache within the arena. Caches do not
+ * have state, and if/when a cache becomes empty, it needs to be deleted by an
  * enclosing class. Caches have both real (where they actually live in the
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class cache : public immovable_cell_entity,
-              public metrics::collectible_metrics::cache_metrics,
-              public rcppsw::patterns::visitor::visitable_any<cache>,
-              public prototype::clonable<cache> {
+class base_cache : public immovable_cell_entity,
+                   public prototype::clonable<base_cache> {
  public:
   /**
    * @param dimension The size of the cache. Does not have to be a multiple of
@@ -69,25 +65,15 @@ class cache : public immovable_cell_entity,
    * will generate a new ID, or any positive # to use the same ID as an existing
    * cache (used when cloning a cache into a robot's perceived arena map).
    */
-  cache(double dimension,
-        double resolution,
-        argos::CVector2 center,
-        std::vector<block*>& blocks,
-        int id);
+  base_cache(double dimension,
+             double resolution,
+             argos::CVector2 center,
+             std::vector<block*>& blocks,
+             int id);
 
-  __pure bool operator==(const cache& other) const {
+  __pure bool operator==(const base_cache& other) const {
     return this->discrete_loc() == other.discrete_loc();
   }
-
-  /* metrics */
-  size_t n_blocks(void) const override { return m_blocks.size(); }
-  size_t n_block_pickups(void) const override { return m_n_block_pickups; }
-  size_t n_block_drops(void) const override { return m_n_block_drops; }
-
-  void inc_block_pickups(void) { ++m_n_block_pickups; }
-  void inc_block_drops(void) { ++m_n_block_drops; }
-
-  std::unique_ptr<cache> clone(void) const override;
 
   /**
    * @brief \c TRUE iff the cache contains the specified block.
@@ -96,11 +82,13 @@ class cache : public immovable_cell_entity,
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
+  uint n_blocks(void) const { return blocks().size(); }
 
   /**
    * @brief Get a list of the blocks currently in the cache.
    */
   std::vector<block*>& blocks(void) { return m_blocks; }
+  const std::vector<block*>& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Add a new block to the cache's list of blocks.
@@ -122,16 +110,15 @@ class cache : public immovable_cell_entity,
    */
   block* block_get(void) { return m_blocks.front(); }
 
+  std::unique_ptr<base_cache> clone(void) const override;
+
  private:
   // clang-format off
   static int          m_next_id;
-  double              m_resolution;
-  size_t              m_n_block_pickups;
-  size_t              m_n_block_drops;
   std::vector<block*> m_blocks;
   // clang-format on
 };
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_CACHE_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRSENTATION_BASE_CACHE_HPP_ */

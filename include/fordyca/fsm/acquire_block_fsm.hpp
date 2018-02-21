@@ -141,7 +141,7 @@ class acquire_block_fsm
    * that the robot maintains leads to...interesting behavior.
    */
   bool acquire_known_block(
-      std::list<representation::const_perceived_block> blocks);
+      std::list<representation::perceived_block> blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);

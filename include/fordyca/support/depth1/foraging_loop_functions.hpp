@@ -295,7 +295,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   bool block_drop_overlap_with_cache(const representation::block* block,
-                                     const representation::cache& cache,
+                                     const representation::arena_cache& cache,
                                      const argos::CVector2& drop_loc);
   bool block_drop_overlap_with_nest(const representation::block* block,
                                     const argos::CVector2& drop_loc);

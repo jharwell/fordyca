@@ -1,5 +1,5 @@
 /**
- * @file cache.cpp
+ * @file arena_cache.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,43 +29,23 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-int cache::m_next_id = 0;
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache::cache(double dimension,
-             double resolution,
-             argos::CVector2 center,
-             std::vector<block*>& blocks,
-             int id)
-    : immovable_cell_entity(dimension, argos::CColor::GRAY40, center, resolution),
-      m_resolution(resolution),
-      m_n_block_pickups(),
-      m_n_block_drops(),
-      m_blocks(blocks) {
-  if (-1 == id) {
-    this->id(m_next_id++);
-  } else {
-    this->id(id);
-  }
-}
+arena_cache::arena_cache(double dimension,
+                         double resolution,
+                         argos::CVector2 center,
+                         std::vector<block*>& blocks,
+                         int id)
+    : base_cache(dimension, resolution, center,
+                 blocks, id) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache::block_remove(block* block) {
-  m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
-} /* block_remove() */
-
-std::unique_ptr<cache> cache::clone(void) const {
-  return rcppsw::make_unique<cache>(cell_entity::xsize(),
-                                    m_resolution,
-                                    real_loc(),
-                                    const_cast<std::vector<block*>&>(m_blocks),
-                                    id());
-} /* clone() */
+void arena_cache::reset_metrics(void) {
+  m_n_block_pickups = 0;
+  m_n_block_drops = 0;
+  m_penalty_count = 0;
+} /* reset_metrics() */
 
 NS_END(fordyca, representation);

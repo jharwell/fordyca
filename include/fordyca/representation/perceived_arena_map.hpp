@@ -83,7 +83,7 @@ class perceived_arena_map
    *
    * @return The list of perceived blocks.
    */
-  std::list<const_perceived_block> perceived_blocks(void) const;
+  std::list<perceived_block> perceived_blocks(void) const;
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of.
@@ -96,12 +96,12 @@ class perceived_arena_map
    *
    * @return The list of perceived cache.
    */
-  std::list<const_perceived_cache> perceived_caches(void) const;
+  std::list<perceived_cache> perceived_caches(void) const;
 
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::unique_ptr<representation::cache>>& caches(void) {
+  std::list<std::unique_ptr<base_cache>>& caches(void) {
     return m_caches;
   }
 
@@ -110,13 +110,13 @@ class perceived_arena_map
    *
    * @param cache Cache to add.
    */
-  void cache_add(std::unique_ptr<representation::cache>& cache);
+  void cache_add(std::unique_ptr<base_cache>& cache);
 
   /**
    * @brief Remove a cache from the list of perceived caches, and update its
    * cell to be empty.
    */
-  void cache_remove(const cache* victim);
+  void cache_remove(const base_cache* victim);
 
   /*
    * @brief Add a free block to the list of known blocks.
@@ -125,7 +125,7 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(std::unique_ptr<representation::block>& block);
+  bool block_add(std::unique_ptr<block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
@@ -181,7 +181,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<representation::cache>> m_caches;
+  std::list<std::unique_ptr<base_cache>> m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -189,7 +189,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<representation::block>> m_blocks;
+  std::list<std::unique_ptr<block>> m_blocks;
 };
 
 NS_END(representation, fordyca);

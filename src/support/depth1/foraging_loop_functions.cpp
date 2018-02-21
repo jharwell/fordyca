@@ -230,7 +230,7 @@ void foraging_loop_functions::pre_step_final(void) {
       representation::cell2D& cell =
           map()->access(map()->caches()[0].discrete_loc());
       ER_ASSERT(map()->caches()[0].n_blocks() == cell.block_count(),
-                "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+                "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                 map()->caches()[0].n_blocks(),
                 cell.block_count());
       floor()->SetChanged();
@@ -259,7 +259,7 @@ void foraging_loop_functions::pre_step_final(void) {
 
 __const bool foraging_loop_functions::block_drop_overlap_with_cache(
     const representation::block* block,
-    const representation::cache& cache,
+    const representation::arena_cache& cache,
     const argos::CVector2& drop_loc) {
   return (cache.contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
           cache.contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||

@@ -27,18 +27,32 @@
  ******************************************************************************/
 #include <utility>
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
-class cache;
+class base_cache;
 
 /*******************************************************************************
- * Type Definitions
+ * Struct Definitions
  ******************************************************************************/
-using perceived_cache = std::pair<cache*, double>;
-using const_perceived_cache = std::pair<const cache*, double>;
+/**
+ * @struct perceived_cache
+ * @ingroup representation
+ *
+ * @brief A representation of a "virtual" cache in the arena, which has a
+ * pheromone density/relevance associated with it.
+ */
+struct perceived_cache {
+  perceived_cache(void) : ent(nullptr), density() {}
+  perceived_cache(base_cache *c, const rcppsw::swarm::pheromone_density& d)
+      : ent(c), density(d) {}
+
+  base_cache* ent;
+  rcppsw::swarm::pheromone_density density;
+};
 
 NS_END(representation, fordyca);
 

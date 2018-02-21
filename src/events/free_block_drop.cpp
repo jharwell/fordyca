@@ -88,7 +88,10 @@ void free_block_drop::visit(representation::arena_map& map) {
    * This was a terrible bug to track down.
    */
   if (cell.state_has_cache()) {
-    cache_block_drop op(m_server, m_block, cell.cache(), m_resolution);
+    cache_block_drop op(m_server,
+                        m_block,
+                        dynamic_cast<representation::arena_cache*>(cell.cache()),
+                        m_resolution);
     map.accept(op);
   } else if (cell.state_has_block()) {
     map.distribute_block(m_block);
