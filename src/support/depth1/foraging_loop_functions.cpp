@@ -28,6 +28,7 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
+#include "fordyca/metrics/cache_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/depth1_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
@@ -53,6 +54,7 @@ foraging_loop_functions::foraging_loop_functions(void)
     : m_depth1_collector(),
       m_task_execution_collector(),
       m_task_management_collector(),
+      m_cache_collector(),
       m_cache_penalty_handler() {}
 
 foraging_loop_functions::~foraging_loop_functions(void) = default;
@@ -186,6 +188,12 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void foraging_loop_functions::PreStep() {
+  /* Get metrics from caches */
+  for (auto &c : map()->caches()) {
+    m_cache_collector->collect(c);
+    c.reset_metrics();
+  } /* for(&c..) */
+
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -230,7 +238,7 @@ void foraging_loop_functions::pre_step_final(void) {
       representation::cell2D& cell =
           map()->access(map()->caches()[0].discrete_loc());
       ER_ASSERT(map()->caches()[0].n_blocks() == cell.block_count(),
-                "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+                "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                 map()->caches()[0].n_blocks(),
                 cell.block_count());
       floor()->SetChanged();
@@ -255,11 +263,15 @@ void foraging_loop_functions::pre_step_final(void) {
   m_task_management_collector->timestep_reset();
   m_task_management_collector->interval_reset();
   m_task_management_collector->timestep_inc();
+  m_cache_collector->csv_line_write(GetSpace().GetSimulationClock());
+  m_cache_collector->timestep_reset();
+  m_cache_collector->interval_reset();
+  m_cache_collector->timestep_inc();
 } /* pre_step_final() */
 
 __const bool foraging_loop_functions::block_drop_overlap_with_cache(
     const representation::block* block,
-    const representation::cache& cache,
+    const representation::arena_cache& cache,
     const argos::CVector2& drop_loc) {
   return (cache.contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
           cache.contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
@@ -326,6 +338,13 @@ void foraging_loop_functions::metric_collecting_init(
       output_p->metrics.collect_cum,
       output_p->metrics.collect_interval);
   m_task_management_collector->reset();
+
+  m_cache_collector =
+      rcppsw::make_unique<metrics::cache_metrics_collector>(
+          metrics_path() + "/" + output_p->metrics.cache_fname,
+          output_p->metrics.collect_cum,
+          output_p->metrics.collect_interval);
+  m_cache_collector->reset();
 } /* metric_collecting_init() */
 
 /*

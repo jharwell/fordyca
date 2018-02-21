@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/occupancy_grid.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
 #include "fordyca/events/cell_unknown.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
 

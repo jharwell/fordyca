@@ -34,6 +34,7 @@ NS_START(fordyca, metrics, collectible_metrics);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class cache_metrics
  * @ingroup metrics
@@ -49,21 +50,48 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
   cache_metrics& operator=(const cache_metrics&) = default;
 
   /**
-   * @brief Get the # of blocks in the cache
+   * @brief Get the # of blocks currently in the cache (independent of any
+   * calls to \ref reset_metrics()).
    */
-  virtual size_t n_blocks(void) const = 0;
+  virtual uint n_blocks(void) const = 0;
 
   /**
-   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
-   * that have been picked up from the cache.
+   * @brief Should return the # of blocks a given cache has had picked up from
+   * it this timestep.
+   *
+   * This is currently always 1, due to limitations/shortcuts taken with the
+   * block pickup events.
    */
-  virtual size_t n_block_pickups(void) const = 0;
+  virtual uint total_block_pickups(void) const = 0;
 
   /**
-   * @brief Get the # of blocks (cumulatively during the lifetime of the cache)
-   * that have been dropped in the cache
+   * @brief Should return the # of blocks a given cache has had dropped in it
+   * this timestep.
+   *
+   * This is currently always 1, due to limitations/shortcuts taken with the
+   * block drop events.
    */
-  virtual size_t n_block_drops(void) const = 0;
+  virtual uint total_block_drops(void) const = 0;
+
+  /**
+   * @brief Should return the cumulative duration of penalties that all robots that
+   * have satisfied the cache penalty on this timestep.
+   *
+   * Currently this will only be for 1 robot, due to limitations/shortcuts taken
+   * with the block drop/pickup events.
+   */
+  virtual uint total_penalties_served(void) const = 0;
+
+  /**
+   * @brief Get the ID of the cache for use in metric collection.
+   */
+  virtual uint cache_id(void) const = 0;
+
+  /**
+   * @brief Reset all gathered metrics to their initial state after some
+   * interval of time has passed.
+   */
+  virtual void reset_metrics(void) = 0;
 };
 
 NS_END(collectible_metrics, metrics, fordyca);

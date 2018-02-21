@@ -39,6 +39,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class block
  * @ingroup representation
@@ -63,7 +64,12 @@ class block : public cell_entity,
   }
 
   /* metrics */
-  size_t n_carries(void) const override { return m_carries; }
+  /**
+   * @brief Reset the metrics (# carries) for the block after it is dropped in
+   * the nest.
+   */
+  void reset_metrics(void) override { m_carries = 0; }
+  uint n_carries(void) const override { return m_carries; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -83,11 +89,6 @@ class block : public cell_entity,
    * in the arena when it is being carried by robot.
    */
   void move_out_of_sight(void);
-
-  /**
-   * @brief Reset the # carries for the block after it is dropped in the nest.
-   */
-  void reset_carries(void) { m_carries = 0; }
 
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block

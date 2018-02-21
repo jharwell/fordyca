@@ -144,7 +144,7 @@ void acquire_block_fsm::init(void) {
 } /* init() */
 
 bool acquire_block_fsm::acquire_known_block(
-    std::list<representation::const_perceived_block> blocks) {
+    std::list<representation::perceived_block> blocks) {
   /*
    * If we don't know of any blocks and we are not current vectoring towards
    * one, then there is no way we can acquire a known block, so bail out.
@@ -159,15 +159,16 @@ bool acquire_block_fsm::acquire_known_block(
      * vectoring toward any of them.
      */
     controller::depth0::block_selector selector(m_server, mc_nest_center);
-    auto best = selector.calc_best(blocks, m_sensors->robot_loc());
+    representation::perceived_block best = selector.calc_best(blocks,
+                                                              m_sensors->robot_loc());
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
-           best.first->id(),
-           best.first->discrete_loc().first,
-           best.first->discrete_loc().second,
-           best.second);
+           best.ent->id(),
+           best.ent->discrete_loc().first,
+           best.ent->discrete_loc().second,
+           best.density.last_result());
     tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
-                             best.first->real_loc());
-    m_best_block = const_cast<representation::block*>(best.first);
+                             best.ent->real_loc());
+    m_best_block = best.ent;
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);

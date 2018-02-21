@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
@@ -59,11 +59,10 @@ class existing_cache_selector: public rcppsw::er::client {
    * not faded into an unknown state), compute which is the "best", for use in
    * deciding which cache to go to and attempt to pickup from.
    *
-   * @return A pointer to the "best" existing cache, along with its utility
-   * value.
+   * @return The "best" existing cache.
    */
-  representation::const_perceived_cache calc_best(
-      const std::list<representation::const_perceived_cache>& existing_caches,
+  representation::perceived_cache calc_best(
+      const std::list<representation::perceived_cache>& existing_caches,
       argos::CVector2 robot_loc);
 
  private:

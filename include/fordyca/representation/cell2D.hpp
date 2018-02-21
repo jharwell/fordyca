@@ -41,7 +41,7 @@ class server;
 NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;
-class cache;
+class base_cache;
 class block;
 class cell_entity;
 
@@ -118,7 +118,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  representation::cache* cache(void) const;
+  representation::base_cache* cache(void) const;
 
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 

@@ -24,7 +24,7 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -38,7 +38,7 @@ namespace swarm = rcppsw::swarm;
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         std::unique_ptr<representation::cache> cache)
+                         std::unique_ptr<representation::base_cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),
       client(server),
@@ -86,7 +86,7 @@ void cache_found::visit(representation::perceived_arena_map& map) {
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
-   *
+n   *
    * We can have blocks/caches overlapping (in terms of physical extent, not in
    * terms of cells), if we previously saw some of the leftover blocks when a
    * cache is destroyed, and left the area before a new cache could be

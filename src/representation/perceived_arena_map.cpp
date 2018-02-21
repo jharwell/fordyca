@@ -26,7 +26,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -55,39 +55,35 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const_perceived_block> perceived_arena_map::perceived_blocks(
+std::list<perceived_block> perceived_arena_map::perceived_blocks(
     void) const {
-  std::list<const_perceived_block> pblocks;
+  std::list<perceived_block> pblocks;
 
   for (auto& b : m_blocks) {
-    representation::const_perceived_block p(
-        b.get(),
-        m_grid.access<0>(b->discrete_loc()).last_result());
-    pblocks.push_back(p);
+    pblocks.push_back(representation::perceived_block(b.get(),
+                                                      m_grid.access<0>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
 
-std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
-    void) const {
-  std::list<const_perceived_cache> pcaches;
+std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
+  std::list<perceived_cache> pcaches;
 
   for (auto& c : m_caches) {
-    representation::const_perceived_cache p(
+    pcaches.push_back(representation::perceived_cache(
         c.get(),
-        m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc()).last_result());
-    pcaches.push_back(p);
+        m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */
 
 void perceived_arena_map::cache_add(
-    std::unique_ptr<representation::cache>& cache) {
+    std::unique_ptr<base_cache>& cache) {
   cache_remove(cache.get());
   m_caches.push_back(std::move(cache));
 } /* cache_add() */
 
-void perceived_arena_map::cache_remove(const cache* victim) {
+void perceived_arena_map::cache_remove(const base_cache* victim) {
   for (auto it = m_caches.begin(); it != m_caches.end(); ++it) {
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
@@ -100,7 +96,7 @@ void perceived_arena_map::cache_remove(const cache* victim) {
 } /* cache_remove() */
 
 bool perceived_arena_map::block_add(
-    std::unique_ptr<representation::block>& block) {
+    std::unique_ptr<block>& block) {
   auto it1 =
       std::find_if(m_blocks.begin(),
                    m_blocks.end(),

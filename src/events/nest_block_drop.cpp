@@ -69,7 +69,7 @@ void nest_block_drop::visit(metrics::block_metrics_collector& collector) {
  ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
   block.reset_index();
-  block.reset_carries();
+  block.reset_metrics();
 } /* visit() */
 
 void nest_block_drop::visit(

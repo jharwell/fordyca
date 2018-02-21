@@ -53,7 +53,12 @@ class block_metrics : public rcppsw::metrics::base_metrics {
    *
    * @return # carries.
    */
-  virtual size_t n_carries(void) const = 0;
+  virtual uint n_carries(void) const = 0;
+
+  /**
+   * @brief Reset gathered metrics to their initial state.
+   */
+  virtual void reset_metrics(void) = 0;
 };
 
 NS_END(collectible_metrics, metrics, fordyca);

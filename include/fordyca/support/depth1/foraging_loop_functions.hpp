@@ -39,6 +39,7 @@
 NS_START(fordyca);
 
 namespace metrics {
+class cache_metrics_collector;
 namespace fsm {
 class depth1_metrics_collector;
 }
@@ -115,6 +116,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
       events::cached_block_pickup pickup_op(rcppsw::er::g_server,
                                             &map()->caches()[p.cache_id()],
                                             utils::robot_id(robot));
+      map()->caches()[cache_id].penalty_served(p.penalty());
 
       /*
        * Map must be called before controller for proper cache block decrement!
@@ -143,11 +145,11 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
               "FATAL: Controller not waiting for cache block drop");
 
     /*
-     * If a forager enters a cache that only contains 2 blocks on the
-     * same/successive/close together timesteps as a collector, then the
-     * collector will get a block just fine. The second robot, however, may not
-     * be able to drop its block in the cache, depending on if the arena has
-     * decided to re-create the static cache yet.
+     * If two collector robots enter a cache that only contains 2 blocks on the
+     * same/successive/close together timesteps, then the first robot to serve
+     * their penalty will get a block just fine. The second robot, however, may
+     * not, depending on if the arena has decided to re-create the static cache
+     * yet.
      *
      * This results in a \ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
@@ -167,6 +169,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
                                        controller.block(),
                                        &map()->caches()[cache_id],
                                        map()->grid_resolution());
+      map()->caches()[cache_id].penalty_served(p.penalty());
 
       /* Update arena map state due to a cache drop */
       map()->accept(drop_op);
@@ -295,7 +298,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   bool block_drop_overlap_with_cache(const representation::block* block,
-                                     const representation::cache& cache,
+                                     const representation::arena_cache& cache,
                                      const argos::CVector2& drop_loc);
   bool block_drop_overlap_with_nest(const representation::block* block,
                                     const argos::CVector2& drop_loc);
@@ -311,6 +314,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   std::unique_ptr<metrics::fsm::depth1_metrics_collector>      m_depth1_collector;
   std::unique_ptr<metrics::tasks::execution_metrics_collector> m_task_execution_collector;
   std::unique_ptr<metrics::tasks::management_metrics_collector> m_task_management_collector;
+  std::unique_ptr<metrics::cache_metrics_collector>            m_cache_collector;
   std::shared_ptr<cache_penalty_handler>                       m_cache_penalty_handler;
   // clang-format on
 };

@@ -46,7 +46,7 @@ using representation::occupancy_grid;
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<rcppsw::er::server>& server,
     representation::block* block,
-    representation::cache* cache,
+    representation::arena_cache* cache,
     double resolution)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
       client(server),
@@ -68,7 +68,7 @@ void cache_block_drop::visit(representation::cell2D& cell) {
 
   cell.fsm().accept(*this);
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
-            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+            "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
             m_cache->n_blocks(),
             cell.block_count());
 } /* visit() */
@@ -84,7 +84,7 @@ void cache_block_drop::visit(representation::arena_map& map) {
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access(cell_op::x(), cell_op::y()).accept(*this);
-  ER_NOM("arena_map: fb%d dropped block%d in cache%d [%zu blocks total]",
+  ER_NOM("arena_map: fb%d dropped block%d in cache%d [%u blocks total]",
          index,
          m_block->id(),
          m_cache->id(),
@@ -101,9 +101,9 @@ void cache_block_drop::visit(representation::block& block) {
   block.accept(e);
 } /* visit() */
 
-void cache_block_drop::visit(representation::cache& cache) {
+void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.block_add(m_block);
-  cache.inc_block_drops();
+  cache.has_block_drop();
 } /* visit() */
 
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {

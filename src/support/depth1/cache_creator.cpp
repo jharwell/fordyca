@@ -51,7 +51,7 @@ cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::cache cache_creator::create_single(
+representation::arena_cache cache_creator::create_single(
     std::list<representation::block*> blocks,
     const argos::CVector2& center) {
   /*
@@ -96,12 +96,12 @@ representation::cache cache_creator::create_single(
          blocks.size());
 
   std::vector<representation::block*> blocks_list(blocks.begin(), blocks.end());
-  return representation::cache(
+  return representation::arena_cache(
       m_cache_size, m_grid.resolution(), center, blocks_list, -1);
 } /* create_single() */
 
 void cache_creator::update_host_cells(representation::arena_grid& grid,
-                                      std::vector<representation::cache>& caches) {
+                                      std::vector<representation::arena_cache>& caches) {
   for (auto& cache : caches) {
     grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
         .entity(&cache);

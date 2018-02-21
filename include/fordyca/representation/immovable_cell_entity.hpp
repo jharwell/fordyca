@@ -56,10 +56,11 @@ class immovable_cell_entity : public cell_entity {
                         argos::CColor color,
                         const argos::CVector2& loc,
                         double resolution)
-      : cell_entity(x_dim, y_dim, color) {
+      : cell_entity(x_dim, y_dim, color),
+        m_resolution(resolution) {
     cell_entity::real_loc(loc);
     cell_entity::discrete_loc(
-        math::rcoord_to_dcoord(loc, resolution));
+        math::rcoord_to_dcoord(loc, m_resolution));
   }
 
   immovable_cell_entity(double dim,
@@ -79,9 +80,14 @@ class immovable_cell_entity : public cell_entity {
     return cell_entity::discrete_loc();
   }
 
+ protected:
+  double resolution(void) const { return m_resolution; }
+
  private:
   void discrete_loc(const rcppsw::math::dcoord2&) override {}
   void real_loc(const argos::CVector2&) override {}
+
+  double m_resolution{0.0};
 };
 
 NS_END(representation, fordyca);

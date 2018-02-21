@@ -31,7 +31,7 @@
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
@@ -47,7 +47,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
     const std::shared_ptr<rcppsw::er::server>& server,
-    representation::cache* cache,
+    representation::arena_cache* cache,
     size_t robot_index)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
       client(server),
@@ -73,12 +73,16 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
+  if (nullptr != m_orphan_block) {
+    cell.entity(m_orphan_block);
+    ER_DIAG("Cell gets orphan block%d", m_orphan_block->id());
+  }
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(representation::cache& cache) {
+void cached_block_pickup::visit(representation::arena_cache& cache) {
   cache.block_remove(m_pickup_block);
-  cache.inc_block_pickups();
+  cache.has_block_pickup();
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {
@@ -98,7 +102,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 
   representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
-            "FATAL: Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+            "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
             m_real_cache->n_blocks(),
             cell.block_count());
 
@@ -109,14 +113,14 @@ void cached_block_pickup::visit(representation::arena_map& map) {
    * a block.
    */
   if (m_real_cache->n_blocks() > 2) {
-    m_real_cache->block_remove(m_pickup_block);
+    m_real_cache->accept(*this);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(),
               cell_op::y());
   } else {
-    m_real_cache->block_remove(m_pickup_block);
+    m_real_cache->accept(*this);
     m_orphan_block = m_real_cache->block_get();
     cell.accept(*this);
 
@@ -124,8 +128,6 @@ void cached_block_pickup::visit(representation::arena_map& map) {
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(),
               cell_op::y());
-    cell.entity(m_orphan_block);
-    ER_DIAG("Cell gets orphan block%d", m_orphan_block->id());
 
     map.cache_remove(*m_real_cache);
     map.cache_removed(true);
@@ -133,7 +135,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   }
   m_pickup_block->accept(*this);
   ER_NOM(
-      "arena_map: fb%zu: block%d from cache%d @(%zu, %zu) [%zu blocks remain]",
+      "arena_map: fb%zu: block%d from cache%d @(%zu, %zu) [%u blocks remain]",
       m_robot_index,
       m_pickup_block->id(),
       cache_id,
@@ -148,10 +150,10 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   ER_ASSERT(cell.state_has_cache(), "FATAL: Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "FATAL: perceived cache/cell disagree on # of blocks: "
-            "cache=%zu/cell/%zu",
+            "cache=%u/cell/%zu",
             cell.cache()->n_blocks(),
             cell.block_count());
-  auto* pcache = const_cast<representation::cache*>(cell.cache());
+  auto* pcache = const_cast<representation::base_cache*>(cell.cache());
 
   ER_ASSERT(pcache->contains_block(m_pickup_block),
             "FATAL: perceived cache does not contain ref to block to be picked "
@@ -165,7 +167,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
               cell_op::x(),
               cell_op::y());
     ER_NOM(
-        "perceived_arena_map: fb%zu: block%d from cache%d@(%zu, %zu) [%zu "
+        "perceived_arena_map: fb%zu: block%d from cache%d@(%zu, %zu) [%u "
         "blocks remain]",
         m_robot_index,
         m_pickup_block->id(),

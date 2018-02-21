@@ -45,9 +45,9 @@ dynamic_cache_creator::dynamic_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::vector<representation::cache> dynamic_cache_creator::create_all(
+std::vector<representation::arena_cache> dynamic_cache_creator::create_all(
     std::vector<representation::block*>& blocks) {
-  std::vector<representation::cache> caches;
+  std::vector<representation::arena_cache> caches;
 
   ER_NOM("Dynamically creating caches: %zu free blocks", blocks.size());
 

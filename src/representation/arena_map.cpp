@@ -188,7 +188,7 @@ void arena_map::distribute_blocks(void) {
   }   /* for(i..) */
 } /* distribute_blocks() */
 
-void arena_map::cache_remove(cache& victim) {
+void arena_map::cache_remove(arena_cache& victim) {
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
 

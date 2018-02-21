@@ -134,7 +134,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * acquiring a cache, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_cache(std::list<representation::const_perceived_cache> caches);
+  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
 
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);

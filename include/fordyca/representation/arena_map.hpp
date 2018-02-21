@@ -28,7 +28,7 @@
 
 #include "fordyca/params/depth1/cache_params.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -72,16 +72,28 @@ class arena_map : public rcppsw::er::client,
   std::vector<block>& blocks(void) { return m_blocks; }
 
   /**
-   * @brief Get the list of all the caches currently present in the arena.
+   * @brief Get the list of all the caches currently present in the arena and
+   * active.
    */
-  std::vector<cache>& caches(void) { return m_caches; }
+  std::vector<arena_cache>& caches(void) { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
    *
+   * After calling this function the victim cache is no longer active in the
+   * arena. However, it is not yet deleted, as it may be needed to gather
+   * metrics from (needed to capture block pickup from a cache with only 2
+   * blocks).
+   *
    * @param victim The cache to remove.
    */
-  void cache_remove(cache& victim);
+  void cache_remove(arena_cache& victim);
+
+  /**
+   * @brief Delete all caches that have been previously "removed", but not yet
+   * deleted.
+   */
+  void delete_caches(void);
 
   void cache_removed(bool b) { m_cache_removed = b; }
   bool cache_removed(void) const { return m_cache_removed; }
@@ -184,7 +196,7 @@ class arena_map : public rcppsw::er::client,
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2                     mc_nest_center;
   std::vector<block>                        m_blocks;
-  std::vector<cache>                        m_caches;
+  std::vector<arena_cache>                  m_caches;
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
   rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;

@@ -91,6 +91,7 @@
           distance_fname="distance-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
+          cache_fname="cache-stats.csv"
           collect_cum="true"
           collect_interval="1000"
           />

@@ -30,40 +30,92 @@
 NS_START(fordyca, metrics);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+cache_metrics_collector::cache_metrics_collector(const std::string& ofname,
+                                                 bool collect_cum,
+                                                 uint collect_interval) :
+    base_metrics_collector(ofname, collect_cum),
+    m_stats(),
+    m_cache_ids() {
+  use_interval(true);
+  interval(collect_interval);
+}
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string cache_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "total_blocks" + separator() +
-      "total_pickups" + separator() +
-      "total_drops"  + separator();
+      "avg_blocks" + separator() +
+      "avg_pickups" + separator() +
+      "avg_drops"  + separator() +
+      "avg_penalty"  + separator();
   // clang-format on
 } /* csv_header_build() */
 
 void cache_metrics_collector::reset(void) {
   base_metrics_collector::reset();
-  m_stats = {0, 0, 0};
+  reset_after_interval();
 } /* reset() */
 
 bool cache_metrics_collector::csv_line_build(std::string& line) {
-  if (!m_new_data) {
+  if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line = std::to_string(m_stats.total_blocks) + separator() +
-         std::to_string(m_stats.total_pickups) + separator() +
-         std::to_string(m_stats.total_drops) + separator();
-  m_new_data = false;
+  /*
+   * Because # blocks is always non-zero and collected every timestep, we need
+   * to account for that in the avg # blocks across all caches. This is not
+   * necessary for the rest of the reported metrics.
+   */
+  line += (!m_cache_ids.empty()) ?
+          std::to_string(static_cast<double>(m_stats.n_blocks) /
+                         (m_cache_ids.size() * interval()))
+          : "0";
+  line += separator();
+
+  line += (!m_cache_ids.empty()) ?
+          std::to_string(static_cast<double>(m_stats.n_pickups) /
+                         (m_cache_ids.size()))
+          : "0";
+  line += separator();
+
+  line += (!m_cache_ids.empty()) ?
+          std::to_string(static_cast<double>(m_stats.n_drops) /
+                         (m_cache_ids.size()))
+          : "0";
+  line += separator();
+
+  line += (!m_cache_ids.empty()) ?
+          std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
+                         (m_penalty_count))
+          : "0";
+  line += separator();
+
   return true;
 } /* csv_line_build() */
 
 void cache_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = static_cast<const collectible_metrics::cache_metrics&>(metrics);
-  m_stats.total_blocks += m.n_blocks();
-  m_stats.total_pickups += m.n_block_pickups();
-  m_stats.total_drops += m.n_block_drops();
-  m_new_data = true;
+  m_stats.n_blocks += m.n_blocks();
+  m_cache_ids.insert(m.cache_id());
+  m_stats.n_pickups += m.total_block_pickups();
+  m_stats.n_drops += m.total_block_drops();
+  if (m.total_penalties_served() > 0) {
+    m_stats.n_penalty_steps += m.total_penalties_served();
+    ++m_penalty_count;
+  }
 } /* collect() */
+
+void cache_metrics_collector::reset_after_interval(void) {
+  m_stats.n_blocks = 0;
+  m_stats.n_pickups = 0;
+  m_stats.n_drops = 0;
+  m_stats.n_penalty_steps = 0;
+  m_penalty_count = 0;
+  m_cache_ids.clear();
+} /* reset_after_interval() */
 
 NS_END(metrics, fordyca);
