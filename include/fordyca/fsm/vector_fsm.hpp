@@ -163,7 +163,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  constexpr static uint kCOLLISION_RECOVERY_TIME = 50;
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 20;
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.

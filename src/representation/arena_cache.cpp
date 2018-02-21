@@ -43,8 +43,8 @@ arena_cache::arena_cache(double dimension,
  * Member Functions
  ******************************************************************************/
 void arena_cache::reset_metrics(void) {
-  m_n_block_pickups = 0;
-  m_n_block_drops = 0;
+  m_block_pickups = 0;
+  m_block_drops = 0;
   m_penalty_count = 0;
 } /* reset_metrics() */
 

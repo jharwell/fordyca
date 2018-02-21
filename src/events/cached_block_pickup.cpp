@@ -73,12 +73,16 @@ void cached_block_pickup::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "FATAL: Cell does not have coordinates");
   ER_ASSERT(cell.state_has_cache(), "FATAL: cell does not have cache");
+  if (nullptr != m_orphan_block) {
+    cell.entity(m_orphan_block);
+    ER_DIAG("Cell gets orphan block%d", m_orphan_block->id());
+  }
   cell.fsm().accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_cache& cache) {
   cache.block_remove(m_pickup_block);
-  cache.inc_block_pickups();
+  cache.has_block_pickup();
 } /* visit() */
 
 void cached_block_pickup::visit(representation::arena_map& map) {
@@ -109,14 +113,14 @@ void cached_block_pickup::visit(representation::arena_map& map) {
    * a block.
    */
   if (m_real_cache->n_blocks() > 2) {
-    m_real_cache->block_remove(m_pickup_block);
+    m_real_cache->accept(*this);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
               "FATAL: cell@(%zu, %zu) with >= 2 blocks does not have cache",
               cell_op::x(),
               cell_op::y());
   } else {
-    m_real_cache->block_remove(m_pickup_block);
+    m_real_cache->accept(*this);
     m_orphan_block = m_real_cache->block_get();
     cell.accept(*this);
 
@@ -124,8 +128,6 @@ void cached_block_pickup::visit(representation::arena_map& map) {
               "FATAL: cell@(%zu, %zu) with 1 block has cache",
               cell_op::x(),
               cell_op::y());
-    cell.entity(m_orphan_block);
-    ER_DIAG("Cell gets orphan block%d", m_orphan_block->id());
 
     map.cache_remove(*m_real_cache);
     map.cache_removed(true);

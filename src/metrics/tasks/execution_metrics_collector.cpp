@@ -101,20 +101,20 @@ bool execution_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-    double avg = m_int_stats.cum_collector_delay /
-                 (m_count_stats.n_cum_collectors/static_cast<double>(interval()));
-    line = std::to_string(avg) + separator();
-    avg = m_int_stats.cum_forager_delay /
-          (m_count_stats.n_cum_foragers/static_cast<double>(interval()));
+  double avg = m_int_stats.cum_collector_delay /
+               (m_count_stats.n_cum_collectors/static_cast<double>(interval()));
+  line = std::to_string(avg) + separator();
+  avg = m_int_stats.cum_forager_delay /
+        (m_count_stats.n_cum_foragers/static_cast<double>(interval()));
 
-    line += std::to_string(avg) + separator() +
-            std::to_string(m_count_stats.n_collectors) + separator() +
-            std::to_string(m_count_stats.n_cum_collectors) + separator() +
-            std::to_string(m_count_stats.n_foragers) + separator() +
-            std::to_string(m_count_stats.n_cum_foragers) + separator() +
-            std::to_string(m_count_stats.n_generalists) + separator() +
-            std::to_string(m_count_stats.n_cum_generalists) + separator();
-    return true;
+  line += std::to_string(avg) + separator() +
+          std::to_string(m_count_stats.n_collectors) + separator() +
+          std::to_string(m_count_stats.n_cum_collectors) + separator() +
+          std::to_string(m_count_stats.n_foragers) + separator() +
+          std::to_string(m_count_stats.n_cum_foragers) + separator() +
+          std::to_string(m_count_stats.n_generalists) + separator() +
+          std::to_string(m_count_stats.n_cum_generalists) + separator();
+  return true;
 } /* store_foraging_stats() */
 
 void execution_metrics_collector::reset_after_timestep(void) {

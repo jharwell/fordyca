@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -58,8 +58,8 @@ class block_metrics_collector : public rcppsw::metrics::base_metrics_collector,
 
  private:
   struct block_metrics {
-    size_t cum_collected; /* aggregate across blocks, not reset each timestep*/
-    size_t cum_carries; /* aggregate across blocks, not reset each timstep */
+    uint cum_collected; /* aggregate across blocks, not reset each timestep*/
+    uint cum_carries; /* aggregate across blocks, not reset each timstep */
   };
 
   std::string csv_header_build(const std::string& header) override;
@@ -69,4 +69,4 @@ class block_metrics_collector : public rcppsw::metrics::base_metrics_collector,
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_COLLECTORS_BLOCK_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_COLLECTOR_HPP_ */

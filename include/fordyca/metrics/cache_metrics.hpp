@@ -56,22 +56,36 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
   virtual uint n_blocks(void) const = 0;
 
   /**
-   * @brief Get the # of blocks that have been picked up from the cache since
-   * the last call to \ref reset_metrics().
+   * @brief Should return the # of blocks a given cache has had picked up from
+   * it this timestep.
+   *
+   * This is currently always 1, due to limitations/shortcuts taken with the
+   * block pickup events.
    */
-  virtual uint n_block_pickups(void) const = 0;
+  virtual uint total_block_pickups(void) const = 0;
 
   /**
-   * @brief Get the # of blocks that have been dropped in the cache since the
-   * last call to \ref reset_metrics().
+   * @brief Should return the # of blocks a given cache has had dropped in it
+   * this timestep.
+   *
+   * This is currently always 1, due to limitations/shortcuts taken with the
+   * block drop events.
    */
-  virtual uint n_block_drops(void) const = 0;
+  virtual uint total_block_drops(void) const = 0;
 
   /**
-   * @brief Get the cumulative duration of all penalties served for the cache
-   * since the last call to \ref reset_metrics().
+   * @brief Should return the cumulative duration of penalties that all robots that
+   * have satisfied the cache penalty on this timestep.
+   *
+   * Currently this will only be for 1 robot, due to limitations/shortcuts taken
+   * with the block drop/pickup events.
    */
-  virtual uint penalties_served(void) const = 0;
+  virtual uint total_penalties_served(void) const = 0;
+
+  /**
+   * @brief Get the ID of the cache for use in metric collection.
+   */
+  virtual uint cache_id(void) const = 0;
 
   /**
    * @brief Reset all gathered metrics to their initial state after some

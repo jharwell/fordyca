@@ -60,18 +60,20 @@ class arena_cache : public base_cache,
 
   /* metrics */
   uint n_blocks(void) const override { return base_cache::n_blocks(); }
-  uint n_block_pickups(void) const override { return m_n_block_pickups; }
-  uint n_block_drops(void) const override { return m_n_block_drops; }
-  uint penalties_served(void) const override { return m_penalty_count; }
+  uint total_block_pickups(void) const override { return m_block_pickups; }
+  uint total_block_drops(void) const override { return m_block_drops; }
+  uint total_penalties_served(void) const override { return m_penalty_count; }
   void reset_metrics(void) override;
+  uint cache_id(void) const override { return id(); }
 
-  void inc_block_pickups(void) { ++m_n_block_pickups; }
-  void inc_block_drops(void) { ++m_n_block_drops; }
+  void has_block_pickup(void) { m_block_pickups = 1; }
+  void has_block_drop(void) { m_block_drops = 1; }
+  void penalty_served(uint duration) { m_penalty_count += duration; }
 
  private:
   // clang-format off
-  uint   m_n_block_pickups{0};
-  uint   m_n_block_drops{0};
+  uint   m_block_pickups{0};
+  uint   m_block_drops{0};
   uint   m_penalty_count{0};
   // clang-format on
 };

@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <set>
+
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -44,31 +46,42 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * @brief Collector for \ref cache_metrics.
  *
- * Metrics are not output every timestep, but only on timesteps in which a
- * cache-related event occurs (pickup from/drop in).
+ * Metrics are output at the specified interval.
  */
 class cache_metrics_collector : public rcppsw::metrics::base_metrics_collector,
                                 public visitor::visitable_any<cache_metrics_collector> {
  public:
-  explicit cache_metrics_collector(const std::string& ofname):
-      base_metrics_collector(ofname, false), m_new_data(false), m_stats() {}
+  cache_metrics_collector(const std::string& ofname,
+                                   bool collect_cum,
+                          uint collect_interval);
 
   void reset(void) override;
+  void reset_after_interval(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
+  /**
+   * @brief All stats are cumulative within an interval.
+   */
   struct stats {
-    size_t total_blocks;
-    size_t total_pickups;
-    size_t total_drops;
+    uint n_blocks;
+    uint n_pickups;
+    uint n_drops;
+    uint n_penalty_steps;
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   // clang-format off
-  bool         m_new_data;
-  struct stats m_stats;
+  uint           m_penalty_count{0};
+  struct stats   m_stats;
+
+  /**
+   * IDs of the caches that had events in the current interval, for use in
+   * averaging statistics.
+   */
+  std::set<uint> m_cache_ids;
   // clang-format on
 };
 

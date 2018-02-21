@@ -103,7 +103,7 @@ void cache_block_drop::visit(representation::block& block) {
 
 void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.block_add(m_block);
-  cache.inc_block_drops();
+  cache.has_block_drop();
 } /* visit() */
 
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
