@@ -28,18 +28,12 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/base_foraging_loop_functions.hpp"
+#include "rcppsw/metrics/collector_group.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace metrics {
-class block_metrics_collector;
-namespace fsm {
-class stateless_metrics_collector;
-class distance_metrics_collector;
-}}
 namespace params { struct output_params; class loop_function_repository; }
 
 NS_START(support, depth0);
@@ -63,21 +57,16 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   stateless_foraging_loop_functions(void);
   ~stateless_foraging_loop_functions(void) override;
 
-  stateless_foraging_loop_functions(const stateless_foraging_loop_functions& s) = delete;
-  stateless_foraging_loop_functions& operator=(const stateless_foraging_loop_functions& s) = delete;
-
   void Init(argos::TConfigurationNode& node) override;
   void Reset() override;
   void Destroy() override;
   void PreStep() override;
 
  protected:
-  const std::shared_ptr<representation::arena_map>& map(void) const { return m_map; }
-  std::shared_ptr<representation::arena_map>& map(void) { return m_map; }
+  const std::shared_ptr<representation::arena_map>& arena_map(void) const { return m_arena_map; }
+  std::shared_ptr<representation::arena_map>& arena_map(void) { return m_arena_map; }
 
-  metrics::block_metrics_collector* block_collector(void) const;
-  metrics::fsm::distance_metrics_collector* distance_collector(void) const;
-  metrics::fsm::stateless_metrics_collector* stateless_collector(void) const;
+  rcppsw::metrics::collector_group& collector_group(void) { return m_collector_group; }
 
   const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
   const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
@@ -99,14 +88,13 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
-  argos::CRange<double>                                      m_nest_x;
-  argos::CRange<double>                                      m_nest_y;
-  std::string                                                m_output_root;
-  std::string                                                m_metrics_path;
-  std::unique_ptr<metrics::fsm::stateless_metrics_collector> m_stateless_collector;
-  std::unique_ptr<metrics::fsm::distance_metrics_collector>  m_distance_collector;
-  std::unique_ptr<metrics::block_metrics_collector>          m_block_collector;
-  std::shared_ptr<representation::arena_map>                 m_map;
+  argos::CRange<double>                      m_nest_x;
+  argos::CRange<double>                      m_nest_y;
+  std::string                                m_output_root;
+  std::string                                m_metrics_path;
+
+  rcppsw::metrics::collector_group           m_collector_group;
+  std::shared_ptr<representation::arena_map> m_arena_map;
   // clang-format on
 };
 

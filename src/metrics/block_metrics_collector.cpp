@@ -76,7 +76,7 @@ bool block_metrics_collector::csv_line_build(std::string& line) {
 
 void block_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const collectible_metrics::block_metrics&>(metrics);
+  auto& m = dynamic_cast<const metrics::block_metrics&>(metrics);
   m_metrics.cum_carries += m.n_carries();
   ++m_metrics.cum_collected;
 } /* collect() */

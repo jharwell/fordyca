@@ -98,7 +98,7 @@ bool cache_metrics_collector::csv_line_build(std::string& line) {
 
 void cache_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const collectible_metrics::cache_metrics&>(metrics);
+  auto& m = static_cast<const metrics::cache_metrics&>(metrics);
   m_stats.n_blocks += m.n_blocks();
   m_cache_ids.insert(m.cache_id());
   m_stats.n_pickups += m.total_block_pickups();

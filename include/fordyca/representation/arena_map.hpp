@@ -155,7 +155,7 @@ class arena_map : public rcppsw::er::client,
    * @return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
-  int robot_on_block(const argos::CVector2& pos);
+  int robot_on_block(const argos::CVector2& pos) const;
 
   /**
    * @brief Determine if a robot is currently on top of a cache (i.e. if the
@@ -174,7 +174,7 @@ class arena_map : public rcppsw::er::client,
    * @return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
-  int robot_on_cache(const argos::CVector2& pos);
+  int robot_on_cache(const argos::CVector2& pos) const;
 
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.

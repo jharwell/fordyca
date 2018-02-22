@@ -35,25 +35,19 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "rcppsw/er/server.hpp"
-
 #include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/support/depth0/arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-stateful_foraging_loop_functions::stateful_foraging_loop_functions(void)
-    : m_collector() {}
-stateful_foraging_loop_functions::~stateful_foraging_loop_functions(void) {}
+using interactor = arena_interactor<controller::depth0::stateful_foraging_controller>;
 
 /*******************************************************************************
  * Member Functions
@@ -69,11 +63,12 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   auto* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
-  m_collector.reset(new metrics::fsm::stateful_metrics_collector(
+  collector_group().add_collector<metrics::fsm::stateful_metrics_collector>(
+      "fsm::stateful",
       metrics_path() + "/" + p_output->metrics.stateful_fname,
       p_output->metrics.collect_cum,
-      p_output->metrics.collect_interval));
-  m_collector->reset();
+      p_output->metrics.collect_interval);
+  collector_group().reset_all();
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -87,7 +82,7 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
 
     controller.display_los(l_params->display_robot_los);
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-        robot, *map());
+        robot, *arena_map());
   } /* for(entity..) */
   ER_NOM("stateful_foraging loop functions initialization finished");
 }
@@ -99,27 +94,26 @@ void stateful_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  distance_collector()->collect(
+  collector_group().collect_from("fsm::distance",
       static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    stateless_collector()->collect(
+    collector_group().collect_from(
+        "fsm::stateful",
         static_cast<metrics::fsm::stateless_metrics&>(*controller.current_task()));
-    m_collector->collect(static_cast<metrics::fsm::stateful_metrics&>(*controller.current_task()));
   }
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
   utils::set_robot_los<controller::depth0::stateful_foraging_controller>(robot,
-                                                                         *map());
+                                                                         *arena_map());
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
-  if (controller.is_carrying_block()) {
-    handle_nest_block_drop<controller::depth0::stateful_foraging_controller>(
-        robot, *map(), *block_collector());
-  } else { /* The foot-bot has no block item */
-    handle_free_block_pickup<controller::depth0::stateful_foraging_controller>(
-        robot, *map());
-  }
+  /* Now watch it react to the environment */
+  interactor(rcppsw::er::g_server,
+             arena_map(),
+             floor())(controller,
+                      static_cast<metrics::block_metrics_collector&>(
+                          *collector_group()["block"]));
 } /* pre_step_iter() */
 
 argos::CColor stateful_foraging_loop_functions::GetFloorColor(
@@ -130,33 +124,14 @@ argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     return argos::CColor::GRAY70;
   }
 
-  for (size_t i = 0; i < map()->blocks().size(); ++i) {
-    if (map()->blocks()[i].contains_point(plane_pos)) {
+  for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {
+    if (arena_map()->blocks()[i].contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */
 
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
-
-void stateful_foraging_loop_functions::Destroy(void) {
-  stateless_foraging_loop_functions::Destroy();
-  m_collector->finalize();
-}
-
-void stateful_foraging_loop_functions::Reset(void) {
-  stateless_foraging_loop_functions::Reset();
-  m_collector->reset();
-}
-
-void stateful_foraging_loop_functions::pre_step_final(void) {
-  stateless_foraging_loop_functions::pre_step_final();
-
-  m_collector->csv_line_write(GetSpace().GetSimulationClock());
-  m_collector->timestep_reset();
-  m_collector->interval_reset();
-  m_collector->timestep_inc();
-} /* pre_step_final() */
 
 void stateful_foraging_loop_functions::PreStep() {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -166,10 +141,6 @@ void stateful_foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
-
-__pure metrics::fsm::stateful_metrics_collector* stateful_foraging_loop_functions::stateful_collector(void) const {
-  return m_collector.get();
-} /* depth0_collector() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
