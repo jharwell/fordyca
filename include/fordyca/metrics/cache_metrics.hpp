@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, collectible_metrics);
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
  * Class Definitions
@@ -94,6 +94,6 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
   virtual void reset_metrics(void) = 0;
 };
 
-NS_END(collectible_metrics, metrics, fordyca);
+NS_END(metrics, fordyca);
 
 #endif /* INCLUDE_FORDYCA_METRICS_CACHE_METRICS_HPP_ */

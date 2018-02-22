@@ -49,7 +49,7 @@ NS_START(fordyca, representation);
  * collect metrics about their usage.
  */
 class arena_cache : public base_cache,
-                    public metrics::collectible_metrics::cache_metrics,
+                    public metrics::cache_metrics,
                     public rcppsw::patterns::visitor::visitable_any<arena_cache> {
  public:
   arena_cache(double dimension,
