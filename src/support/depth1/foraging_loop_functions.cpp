@@ -217,28 +217,6 @@ void foraging_loop_functions::pre_step_final(void) {
   collector_group().timestep_inc_all();
 } /* pre_step_final() */
 
-__pure bool foraging_loop_functions::block_drop_overlap_with_nest(
-    const representation::block* block,
-    const argos::CVector2& drop_loc) {
-  return (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(
-              drop_loc.GetX() + block->xsize()) ||
-          nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(
-              drop_loc.GetX() - block->xsize()) ||
-          nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(
-              drop_loc.GetY() + block->ysize()) ||
-          nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetY() -
-                                                               block->ysize()));
-} /* block_drop_overlap_with_nest() */
-
-__pure bool foraging_loop_functions::block_drop_near_arena_boundary(
-    const representation::block* block,
-    const argos::CVector2& drop_loc) {
-  return (drop_loc.GetX() <= block->xsize() * 2  ||
-          drop_loc.GetX() >= arena_map()->xrsize() - block->xsize() * 2  ||
-          drop_loc.GetY() <= block->ysize() * 2 ||
-          drop_loc.GetY() >= arena_map()->yrsize() - block->ysize() * 2);
-} /* block_drop_overlap_with_nest() */
-
 void foraging_loop_functions::cache_handling_init(
     const struct params::arena_map_params* arenap) {
   /*
