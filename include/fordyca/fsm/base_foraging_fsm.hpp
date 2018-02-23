@@ -183,8 +183,8 @@ class base_foraging_fsm : public state_machine::hfsm {
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_new_direction);
 
   /**
-   * @brief Simple state for entry into the "wait for signal" state, used to change
-   * LED color for visualization purposes.
+   * @brief Simple state for entry into the "wait for signal" state, used to
+   * change LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
