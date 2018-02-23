@@ -58,7 +58,7 @@ vector_fsm::vector_fsm(
       m_collision_rec_count(0),
       m_goal_data(),
       m_ang_pid(4.0,
-                0.0,
+                0,
                 0,
                 1,
                 -this->actuators()->max_wheel_speed() * 0.50,
@@ -83,8 +83,16 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
-  if (ST_NEW_DIRECTION == last_state()) {
+  /*
+   * If we came from the NEW_DIRECTION_STATE, then we got there from this
+   * function, and have just finished changing our direction due to a frequent
+   * collision. As such, we need to go into collision recovery, and zoom in our
+   * new direction away from whatever is causing the problem. See #243.
+   */
+  if (ST_NEW_DIRECTION == previous_state()) {
+    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
     internal_event(ST_COLLISION_RECOVERY);
+    return controller::foraging_signal::HANDLED;
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
@@ -173,15 +181,17 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
 
   ang_speed = m_ang_pid.calculate(0, -angle_diff);
-  lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+
   /*
    * With left turns the robot tends to circle blocks when they get close.
-   * Decrease the linear speed when they get close to prevent this. 4.0 and
-   * 0.25 were chosen empiracally, perhaps something more intelligent/precise
-   * would be better.
+   * Decrease the PID loop input false (i.e. so it is closer to the 0 value the
+   * loop is trying to get it to). See #231.
    */
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() < 0.25)
-    lin_speed /= 4.0;
+  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() < kMAX_ARRIVAL_TOL) {
+    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff*5.0));
+  } else {
+    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+  }
 
   ER_VER("target: (%f, %f)@%f",
          m_goal_data.loc.GetX(),

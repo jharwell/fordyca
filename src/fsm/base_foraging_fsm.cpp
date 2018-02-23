@@ -172,7 +172,6 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    */
   if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
       m_new_dir_count >= kDIR_CHANGE_MAX_STEPS) {
-    m_new_dir_count = 0;
     internal_event(previous_state());
   }
   ++m_new_dir_count;
