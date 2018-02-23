@@ -168,11 +168,20 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   double angle_to_goal =
       std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
                  m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
+
   double angle_diff = angle_to_goal - heading.Angle().GetValue();
   angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
 
   ang_speed = m_ang_pid.calculate(0, -angle_diff);
   lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+  /*
+   * With left turns the robot tends to circle blocks when they get close.
+   * Decrease the linear speed when they get close to prevent this. 4.0 and
+   * 0.25 were chosen empiracally, perhaps something more intelligent/precise
+   * would be better.
+   */
+  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() < 0.25)
+    lin_speed /= 4.0;
 
   ER_VER("target: (%f, %f)@%f",
          m_goal_data.loc.GetX(),
@@ -189,6 +198,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
          heading.Angle().GetValue(),
          ang_speed,
          lin_speed);
+
   actuators()->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }

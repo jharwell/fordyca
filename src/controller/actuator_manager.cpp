@@ -161,11 +161,11 @@ void actuator_manager::set_wheel_speeds(double speed1,
 
 void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
   if (ang_speed < 0) {
-    m_rwheel_speed = lin_speed + ang_speed;
-    m_lwheel_speed = lin_speed;
-  } else {
-    m_lwheel_speed = lin_speed + ang_speed;
     m_rwheel_speed = lin_speed;
+    m_lwheel_speed = lin_speed + std::fabs(ang_speed);
+  } else {
+    m_lwheel_speed = lin_speed;
+    m_rwheel_speed = lin_speed + ang_speed;
   }
 
   m_lwheel_speed = clamp_wheel_speed(m_lwheel_speed);
