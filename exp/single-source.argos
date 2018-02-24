@@ -93,7 +93,7 @@
           task_management_fname="task-management-stats.csv"
           cache_fname="cache-stats.csv"
           collect_cum="true"
-          collect_interval="1000"
+          collect_interval="10000"
           />
     </output>
     <arena_map>

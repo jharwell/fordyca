@@ -1,0 +1,536 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ControlStep	controller/depth0/stateful_foraging_controller.cpp	/^void stateful_foraging_controller::ControlStep(void) {$/;"	f	class:stateful_foraging_controller
+ControlStep	controller/depth0/stateless_foraging_controller.cpp	/^void stateless_foraging_controller::ControlStep(void) {$/;"	f	class:stateless_foraging_controller
+ControlStep	controller/depth1/foraging_controller.cpp	/^void foraging_controller::ControlStep(void) {$/;"	f	class:foraging_controller
+Destroy	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::Destroy(void) {$/;"	f	class:stateful_foraging_loop_functions
+Destroy	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::Destroy() {$/;"	f	class:stateless_foraging_loop_functions
+Destroy	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::Destroy() {$/;"	f	class:foraging_loop_functions
+Draw	support/depth0/stateful_foraging_qt_user_functions.cpp	/^void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {$/;"	f	class:stateful_foraging_qt_user_functions
+Draw	support/depth0/stateless_foraging_qt_user_functions.cpp	/^void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {$/;"	f	class:stateless_foraging_qt_user_functions
+Draw	support/depth1/foraging_qt_user_functions.cpp	/^void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {$/;"	f	class:foraging_qt_user_functions
+FSM_ENTRY_DEFINE_ND	fsm/vector_fsm.cpp	/^FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {$/;"	f
+FSM_ENTRY_DEFINE_ND	fsm/vector_fsm.cpp	/^FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {$/;"	f
+FSM_ENTRY_DEFINE_ND	fsm/vector_fsm.cpp	/^FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {$/;"	f
+FSM_STATE_DEFINE	controller/actuator_manager.cpp	/^FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {$/;"	f
+FSM_STATE_DEFINE	controller/actuator_manager.cpp	/^FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {$/;"	f
+FSM_STATE_DEFINE	controller/actuator_manager.cpp	/^FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {$/;"	f
+FSM_STATE_DEFINE	fsm/cell2D_fsm.cpp	/^FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {$/;"	f
+FSM_STATE_DEFINE	fsm/vector_fsm.cpp	/^FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {$/;"	f
+FSM_STATE_DEFINE	fsm/vector_fsm.cpp	/^FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/cell2D_fsm.cpp	/^FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/cell2D_fsm.cpp	/^FSM_STATE_DEFINE_ND(cell2D_fsm, state_empty) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/cell2D_fsm.cpp	/^FSM_STATE_DEFINE_ND(cell2D_fsm, state_unknown) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/depth0/stateful_foraging_fsm.cpp	/^__const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/vector_fsm.cpp	/^FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/vector_fsm.cpp	/^FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {$/;"	f
+FSM_STATE_DEFINE_ND	fsm/vector_fsm.cpp	/^__const FSM_STATE_DEFINE_ND(vector_fsm, start) {$/;"	f
+GetFloorColor	support/depth0/stateful_foraging_loop_functions.cpp	/^argos::CColor stateful_foraging_loop_functions::GetFloorColor($/;"	f	class:stateful_foraging_loop_functions
+GetFloorColor	support/depth0/stateless_foraging_loop_functions.cpp	/^argos::CColor stateless_foraging_loop_functions::GetFloorColor($/;"	f	class:stateless_foraging_loop_functions
+GetFloorColor	support/depth1/foraging_loop_functions.cpp	/^argos::CColor foraging_loop_functions::GetFloorColor($/;"	f	class:foraging_loop_functions
+HFSM_ENTRY_DEFINE_ND	fsm/base_explore_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {$/;"	f
+HFSM_ENTRY_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {$/;"	f
+HFSM_ENTRY_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {$/;"	f
+HFSM_ENTRY_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {$/;"	f
+HFSM_ENTRY_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {$/;"	f
+HFSM_ENTRY_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {$/;"	f
+HFSM_EXIT_DEFINE	fsm/acquire_block_fsm.cpp	/^HFSM_EXIT_DEFINE(acquire_block_fsm, exit_acquire_block) {$/;"	f
+HFSM_EXIT_DEFINE	fsm/depth1/acquire_cache_fsm.cpp	/^HFSM_EXIT_DEFINE(acquire_cache_fsm, exit_acquire_cache) {$/;"	f
+HFSM_STATE_DEFINE	fsm/base_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/base_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/base_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(base_foraging_fsm,$/;"	f
+HFSM_STATE_DEFINE	fsm/block_to_nest_fsm.cpp	/^HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/block_to_nest_fsm.cpp	/^HFSM_STATE_DEFINE(block_to_nest_fsm,$/;"	f
+HFSM_STATE_DEFINE	fsm/depth0/stateful_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/depth0/stateful_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(stateful_foraging_fsm,$/;"	f
+HFSM_STATE_DEFINE	fsm/depth0/stateless_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/depth0/stateless_foraging_fsm.cpp	/^HFSM_STATE_DEFINE(stateless_foraging_fsm,$/;"	f
+HFSM_STATE_DEFINE	fsm/depth1/block_to_cache_fsm.cpp	/^HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {$/;"	f
+HFSM_STATE_DEFINE	fsm/depth1/block_to_cache_fsm.cpp	/^HFSM_STATE_DEFINE(block_to_cache_fsm,$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/acquire_block_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_block_fsm, acquire_block) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/acquire_block_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/acquire_block_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_block_fsm, start) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/base_foraging_fsm.cpp	/^HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/block_to_nest_fsm.cpp	/^HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/block_to_nest_fsm.cpp	/^HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/block_to_nest_fsm.cpp	/^__const HFSM_STATE_DEFINE_ND(block_to_nest_fsm, finished) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth0/stateless_foraging_fsm.cpp	/^HFSM_STATE_DEFINE_ND(stateless_foraging_fsm,$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/acquire_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_cache_fsm, acquire_cache) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/acquire_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/acquire_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/block_to_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(block_to_cache_fsm, acquire_free_block) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/block_to_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(block_to_cache_fsm, transport_to_cache) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/block_to_cache_fsm.cpp	/^__const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/explore_for_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/explore_for_cache_fsm.cpp	/^HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, start) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/depth1/explore_for_cache_fsm.cpp	/^__const HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, finished) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/explore_for_block_fsm.cpp	/^HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/explore_for_block_fsm.cpp	/^HFSM_STATE_DEFINE_ND(explore_for_block_fsm, start) {$/;"	f
+HFSM_STATE_DEFINE_ND	fsm/explore_for_block_fsm.cpp	/^__const HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {$/;"	f
+Init	controller/base_foraging_controller.cpp	/^void base_foraging_controller::Init(argos::TConfigurationNode& node) {$/;"	f	class:base_foraging_controller
+Init	controller/depth0/stateful_foraging_controller.cpp	/^void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {$/;"	f	class:stateful_foraging_controller
+Init	controller/depth0/stateless_foraging_controller.cpp	/^void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {$/;"	f	class:stateless_foraging_controller
+Init	controller/depth1/foraging_controller.cpp	/^void foraging_controller::Init(argos::TConfigurationNode& node) {$/;"	f	class:foraging_controller
+Init	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {$/;"	f	class:stateful_foraging_loop_functions
+Init	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {$/;"	f	class:stateless_foraging_loop_functions
+Init	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::Init(argos::TConfigurationNode& node) {$/;"	f	class:foraging_loop_functions
+PreStep	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::PreStep() {$/;"	f	class:stateful_foraging_loop_functions
+PreStep	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::PreStep() {$/;"	f	class:stateless_foraging_loop_functions
+PreStep	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::PreStep() {$/;"	f	class:foraging_loop_functions
+Reset	controller/base_foraging_controller.cpp	/^void base_foraging_controller::Reset(void) {$/;"	f	class:base_foraging_controller
+Reset	controller/depth0/stateless_foraging_controller.cpp	/^void stateless_foraging_controller::Reset(void) {$/;"	f	class:stateless_foraging_controller
+Reset	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::Reset(void) {$/;"	f	class:stateful_foraging_loop_functions
+Reset	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::Reset() {$/;"	f	class:stateless_foraging_loop_functions
+Reset	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::Reset() {$/;"	f	class:foraging_loop_functions
+accept	tasks/collector.cpp	/^void collector::accept(events::cache_vanished& visitor) {$/;"	f	class:collector
+accept	tasks/collector.cpp	/^void collector::accept(events::cached_block_pickup& visitor) {$/;"	f	class:collector
+accept	tasks/collector.cpp	/^void collector::accept(events::nest_block_drop& visitor) {$/;"	f	class:collector
+accept	tasks/forager.cpp	/^void forager::accept(events::cache_block_drop& visitor) {$/;"	f	class:forager
+accept	tasks/forager.cpp	/^void forager::accept(events::cache_vanished& visitor) {$/;"	f	class:forager
+accept	tasks/forager.cpp	/^void forager::accept(events::free_block_pickup& visitor) {$/;"	f	class:forager
+accept	tasks/generalist.cpp	/^void generalist::accept(events::free_block_pickup& visitor) {$/;"	f	class:generalist
+accept	tasks/generalist.cpp	/^void generalist::accept(events::nest_block_drop& visitor) {$/;"	f	class:generalist
+acquire_any_block	fsm/acquire_block_fsm.cpp	/^bool acquire_block_fsm::acquire_any_block(void) {$/;"	f	class:acquire_block_fsm
+acquire_any_cache	fsm/depth1/acquire_cache_fsm.cpp	/^bool acquire_cache_fsm::acquire_any_cache(void) {$/;"	f	class:acquire_cache_fsm
+acquire_block_fsm	fsm/acquire_block_fsm.cpp	/^acquire_block_fsm::acquire_block_fsm($/;"	f	class:acquire_block_fsm
+acquire_cache_fsm	fsm/depth1/acquire_cache_fsm.cpp	/^acquire_cache_fsm::acquire_cache_fsm($/;"	f	class:acquire_cache_fsm
+acquire_known_block	fsm/acquire_block_fsm.cpp	/^bool acquire_block_fsm::acquire_known_block($/;"	f	class:acquire_block_fsm
+acquire_known_cache	fsm/depth1/acquire_cache_fsm.cpp	/^bool acquire_cache_fsm::acquire_known_cache($/;"	f	class:acquire_cache_fsm
+actuator_manager	controller/actuator_manager.cpp	/^actuator_manager::actuator_manager($/;"	f	class:actuator_manager
+arena_map	representation/arena_map.cpp	/^arena_map::arena_map(const struct params::arena_map_params* params)$/;"	f	class:arena_map
+arena_map_init	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::arena_map_init($/;"	f	class:stateless_foraging_loop_functions
+at_interface	tasks/collector.cpp	/^__pure bool collector::at_interface(void) const {$/;"	f	class:collector
+at_interface	tasks/forager.cpp	/^__pure bool forager::at_interface(void) const {$/;"	f	class:forager
+base_explore_fsm	fsm/base_explore_fsm.cpp	/^base_explore_fsm::base_explore_fsm($/;"	f	class:base_explore_fsm
+base_foraging_controller	controller/base_foraging_controller.cpp	/^base_foraging_controller::base_foraging_controller(void)$/;"	f	class:base_foraging_controller
+base_foraging_fsm	fsm/base_foraging_fsm.cpp	/^base_foraging_fsm::base_foraging_fsm($/;"	f	class:base_foraging_fsm
+base_foraging_sensors	controller/base_foraging_sensors.cpp	/^base_foraging_sensors::base_foraging_sensors($/;"	f	class:base_foraging_sensors
+block	representation/cell2D.cpp	/^__pure const representation::block* cell2D::block(void) const {$/;"	f	class:cell2D
+block	representation/cell2D.cpp	/^__pure representation::block* cell2D::block(void) {$/;"	f	class:cell2D
+block_acquired	controller/depth0/stateful_foraging_controller.cpp	/^bool stateful_foraging_controller::block_acquired(void) const {$/;"	f	class:stateful_foraging_controller
+block_acquired	controller/depth0/stateless_foraging_controller.cpp	/^bool stateless_foraging_controller::block_acquired(void) const {$/;"	f	class:stateless_foraging_controller
+block_acquired	controller/depth1/foraging_controller.cpp	/^bool foraging_controller::block_acquired(void) const {$/;"	f	class:foraging_controller
+block_acquired	fsm/block_to_nest_fsm.cpp	/^bool block_to_nest_fsm::block_acquired(void) const {$/;"	f	class:block_to_nest_fsm
+block_acquired	fsm/depth0/stateful_foraging_fsm.cpp	/^bool stateful_foraging_fsm::block_acquired(void) const {$/;"	f	class:stateful_foraging_fsm
+block_acquired	fsm/depth0/stateless_foraging_fsm.cpp	/^bool stateless_foraging_fsm::block_acquired(void) const {$/;"	f	class:stateless_foraging_fsm
+block_acquired	fsm/depth1/block_to_cache_fsm.cpp	/^bool block_to_cache_fsm::block_acquired(void) const {$/;"	f	class:block_to_cache_fsm
+block_acquired	tasks/forager.cpp	/^bool forager::block_acquired(void) const {$/;"	f	class:forager
+block_acquired	tasks/generalist.cpp	/^bool generalist::block_acquired(void) const {$/;"	f	class:generalist
+block_add	representation/perceived_arena_map.cpp	/^bool perceived_arena_map::block_add($/;"	f	class:perceived_arena_map
+block_collector	support/depth0/stateless_foraging_loop_functions.cpp	/^    block_collector(void) const {$/;"	f	class:stateless_foraging_loop_functions
+block_detected	controller/base_foraging_controller.cpp	/^bool base_foraging_controller::block_detected(void) const {$/;"	f	class:base_foraging_controller
+block_detected	controller/base_foraging_sensors.cpp	/^bool base_foraging_sensors::block_detected(void) {$/;"	f	class:base_foraging_sensors
+block_distributor	support/block_distributor.cpp	/^block_distributor::block_distributor(argos::CRange<double> arena_x,$/;"	f	class:block_distributor
+block_drop_near_arena_boundary	support/depth1/foraging_loop_functions.cpp	/^__pure bool foraging_loop_functions::block_drop_near_arena_boundary($/;"	f	class:foraging_loop_functions
+block_drop_overlap_with_cache	support/depth1/foraging_loop_functions.cpp	/^__const bool foraging_loop_functions::block_drop_overlap_with_cache($/;"	f	class:foraging_loop_functions
+block_drop_overlap_with_nest	support/depth1/foraging_loop_functions.cpp	/^__pure bool foraging_loop_functions::block_drop_overlap_with_nest($/;"	f	class:foraging_loop_functions
+block_found	events/block_found.cpp	/^block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:block_found
+block_metrics_collector	metrics/block_metrics_collector.cpp	/^block_metrics_collector::block_metrics_collector(const std::string& ofname,$/;"	f	class:block_metrics_collector
+block_remove	representation/cache.cpp	/^void cache::block_remove(block* block) {$/;"	f	class:cache
+block_remove	representation/perceived_arena_map.cpp	/^bool perceived_arena_map::block_remove(const block* victim) {$/;"	f	class:perceived_arena_map
+block_selector	controller/depth0/block_selector.cpp	/^block_selector::block_selector(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:block_selector
+block_to_cache_fsm	fsm/depth1/block_to_cache_fsm.cpp	/^block_to_cache_fsm::block_to_cache_fsm($/;"	f	class:block_to_cache_fsm
+block_to_nest_fsm	fsm/block_to_nest_fsm.cpp	/^block_to_nest_fsm::block_to_nest_fsm($/;"	f	class:block_to_nest_fsm
+block_utility	expressions/block_utility.cpp	/^block_utility::block_utility(const argos::CVector2& block_loc,$/;"	f	class:block_utility
+blocks	representation/line_of_sight.cpp	/^std::list<const block*> line_of_sight::blocks(void) const {$/;"	f	class:line_of_sight
+cache	representation/cache.cpp	/^cache::cache(double dimension,$/;"	f	class:cache
+cache	representation/cell2D.cpp	/^__pure representation::cache* cell2D::cache(void) const {$/;"	f	class:cell2D
+cache_acquired	controller/depth1/foraging_controller.cpp	/^bool foraging_controller::cache_acquired(void) const {$/;"	f	class:foraging_controller
+cache_acquired	fsm/block_to_nest_fsm.cpp	/^bool block_to_nest_fsm::cache_acquired(void) const {$/;"	f	class:block_to_nest_fsm
+cache_acquired	fsm/depth1/block_to_cache_fsm.cpp	/^bool block_to_cache_fsm::cache_acquired(void) const {$/;"	f	class:block_to_cache_fsm
+cache_acquired	tasks/collector.cpp	/^bool collector::cache_acquired(void) const {$/;"	f	class:collector
+cache_acquired	tasks/forager.cpp	/^bool forager::cache_acquired(void) const {$/;"	f	class:forager
+cache_add	representation/line_of_sight.cpp	/^void line_of_sight::cache_add(const cache* cache) {$/;"	f	class:line_of_sight
+cache_add	representation/perceived_arena_map.cpp	/^void perceived_arena_map::cache_add($/;"	f	class:perceived_arena_map
+cache_block_drop	events/cache_block_drop.cpp	/^cache_block_drop::cache_block_drop($/;"	f	class:cache_block_drop
+cache_creator	support/depth1/cache_creator.cpp	/^cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:cache_creator
+cache_detected	controller/depth1/foraging_sensors.cpp	/^bool foraging_sensors::cache_detected(void) {$/;"	f	class:foraging_sensors
+cache_found	events/cache_found.cpp	/^cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:cache_found
+cache_handling_init	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::cache_handling_init($/;"	f	class:foraging_loop_functions
+cache_remove	representation/arena_map.cpp	/^void arena_map::cache_remove(cache& victim) {$/;"	f	class:arena_map
+cache_remove	representation/perceived_arena_map.cpp	/^void perceived_arena_map::cache_remove(const cache* victim) {$/;"	f	class:perceived_arena_map
+cache_respawn_probability	expressions/cache_respawn_probability.cpp	/^cache_respawn_probability::cache_respawn_probability(double scale_factor)$/;"	f	class:cache_respawn_probability
+cache_site_selector	controller/depth2/cache_site_selector.cpp	/^cache_site_selector::cache_site_selector($/;"	f	class:cache_site_selector
+cache_site_utility	expressions/cache_site_utility.cpp	/^cache_site_utility::cache_site_utility(const argos::CVector2& site_loc,$/;"	f	class:cache_site_utility
+cache_vanished	events/cache_vanished.cpp	/^cache_vanished::cache_vanished(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:cache_vanished
+cached_block_pickup	events/cached_block_pickup.cpp	/^cached_block_pickup::cached_block_pickup($/;"	f	class:cached_block_pickup
+caches	representation/line_of_sight.cpp	/^std::list<const cache*> line_of_sight::caches(void) const {$/;"	f	class:line_of_sight
+calc	expressions/block_utility.cpp	/^double block_utility::calc(const argos::CVector2& rloc, double density) {$/;"	f	class:block_utility
+calc	expressions/cache_respawn_probability.cpp	/^double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {$/;"	f	class:cache_respawn_probability
+calc	expressions/cache_site_utility.cpp	/^double cache_site_utility::calc(const argos::CVector2& rloc,$/;"	f	class:cache_site_utility
+calc	expressions/existing_cache_utility.cpp	/^double existing_cache_utility::calc(const argos::CVector2& rloc,$/;"	f	class:existing_cache_utility
+calc_abort_prob	tasks/collector.cpp	/^double collector::calc_abort_prob(void) {$/;"	f	class:collector
+calc_abort_prob	tasks/forager.cpp	/^double forager::calc_abort_prob(void) {$/;"	f	class:forager
+calc_abort_prob	tasks/generalist.cpp	/^double generalist::calc_abort_prob(void) {$/;"	f	class:generalist
+calc_avoidance_force	controller/kinematics_calculator.cpp	/^argos::CVector2 kinematics_calculator::calc_avoidance_force(void) {$/;"	f	class:kinematics_calculator
+calc_best	controller/depth0/block_selector.cpp	/^representation::const_perceived_block block_selector::calc_best($/;"	f	class:block_selector
+calc_best	controller/depth1/existing_cache_selector.cpp	/^representation::const_perceived_cache existing_cache_selector::calc_best($/;"	f	class:existing_cache_selector
+calc_best	controller/depth2/cache_site_selector.cpp	/^argos::CVector2 cache_site_selector::calc_best($/;"	f	class:cache_site_selector
+calc_center	support/depth2/dynamic_cache_creator.cpp	/^argos::CVector2 dynamic_cache_creator::calc_center($/;"	f	class:dynamic_cache_creator
+calc_interface_time	tasks/collector.cpp	/^double collector::calc_interface_time(double start_time) {$/;"	f	class:collector
+calc_interface_time	tasks/forager.cpp	/^double forager::calc_interface_time(double start_time) {$/;"	f	class:forager
+calc_light_attract_force	controller/kinematics_calculator.cpp	/^argos::CVector2 kinematics_calculator::calc_light_attract_force(void) {$/;"	f	class:kinematics_calculator
+calc_light_repel_force	controller/kinematics_calculator.cpp	/^argos::CVector2 kinematics_calculator::calc_light_repel_force(void) {$/;"	f	class:kinematics_calculator
+calc_vector_to_goal	fsm/vector_fsm.cpp	/^__pure argos::CVector2 vector_fsm::calc_vector_to_goal($/;"	f	class:vector_fsm
+cell	representation/line_of_sight.cpp	/^__pure cell2D& line_of_sight::cell(size_t i, size_t j) const {$/;"	f	class:line_of_sight
+cell2D	representation/cell2D.cpp	/^cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)$/;"	f	class:cell2D
+cell2D	representation/cell2D.cpp	/^cell2D::cell2D(void) : m_loc(), m_fsm() {$/;"	f	class:cell2D
+cell2D_fsm	fsm/cell2D_fsm.cpp	/^cell2D_fsm::cell2D_fsm(const std::shared_ptr<rcppsw::er::server>& server)$/;"	f	class:cell2D_fsm
+cell2D_fsm	fsm/cell2D_fsm.cpp	/^cell2D_fsm::cell2D_fsm(void)$/;"	f	class:cell2D_fsm
+cell_init	representation/occupancy_grid.cpp	/^void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {$/;"	f	class:occupancy_grid
+cell_update	representation/occupancy_grid.cpp	/^void occupancy_grid::cell_update(size_t i, size_t j) {$/;"	f	class:occupancy_grid
+clamp_wheel_speed	controller/actuator_manager.cpp	/^__pure double actuator_manager::clamp_wheel_speed(double desired) {$/;"	f	class:actuator_manager
+clone	representation/block.cpp	/^std::unique_ptr<block> block::clone(void) const {$/;"	f	class:block
+clone	representation/cache.cpp	/^std::unique_ptr<cache> cache::clone(void) const {$/;"	f	class:cache
+collect	metrics/block_metrics_collector.cpp	/^void block_metrics_collector::collect($/;"	f	class:block_metrics_collector
+collect	metrics/cache_metrics_collector.cpp	/^void cache_metrics_collector::collect($/;"	f	class:cache_metrics_collector
+collect	metrics/fsm/depth1_metrics_collector.cpp	/^void depth1_metrics_collector::collect($/;"	f	class:depth1_metrics_collector
+collect	metrics/fsm/distance_metrics_collector.cpp	/^void distance_metrics_collector::collect($/;"	f	class:distance_metrics_collector
+collect	metrics/fsm/stateful_metrics_collector.cpp	/^void stateful_metrics_collector::collect($/;"	f	class:stateful_metrics_collector
+collect	metrics/fsm/stateless_metrics_collector.cpp	/^void stateless_metrics_collector::collect($/;"	f	class:stateless_metrics_collector
+collect	metrics/tasks/execution_metrics_collector.cpp	/^void execution_metrics_collector::collect($/;"	f	class:execution_metrics_collector
+collect	metrics/tasks/management_metrics_collector.cpp	/^void management_metrics_collector::collect($/;"	f	class:management_metrics_collector
+collector	tasks/collector.cpp	/^collector::collector(const struct task_allocation::task_params* const params,$/;"	f	class:collector
+contains_point	representation/cell_entity.cpp	/^__const bool cell_entity::contains_point(const argos::CVector2& point) const {$/;"	f	class:cell_entity
+create_all	support/depth1/static_cache_creator.cpp	/^std::vector<representation::cache> static_cache_creator::create_all($/;"	f	class:static_cache_creator
+create_all	support/depth2/dynamic_cache_creator.cpp	/^std::vector<representation::cache> dynamic_cache_creator::create_all($/;"	f	class:dynamic_cache_creator
+create_single	support/depth1/cache_creator.cpp	/^representation::cache cache_creator::create_single($/;"	f	class:cache_creator
+csv_header_build	metrics/block_metrics_collector.cpp	/^std::string block_metrics_collector::csv_header_build(const std::string& header) {$/;"	f	class:block_metrics_collector
+csv_header_build	metrics/cache_metrics_collector.cpp	/^std::string cache_metrics_collector::csv_header_build(const std::string& header) {$/;"	f	class:cache_metrics_collector
+csv_header_build	metrics/fsm/depth1_metrics_collector.cpp	/^std::string depth1_metrics_collector::csv_header_build(const std::string& header) {$/;"	f	class:depth1_metrics_collector
+csv_header_build	metrics/fsm/distance_metrics_collector.cpp	/^std::string distance_metrics_collector::csv_header_build($/;"	f	class:distance_metrics_collector
+csv_header_build	metrics/fsm/stateful_metrics_collector.cpp	/^std::string stateful_metrics_collector::csv_header_build($/;"	f	class:stateful_metrics_collector
+csv_header_build	metrics/fsm/stateless_metrics_collector.cpp	/^std::string stateless_metrics_collector::csv_header_build($/;"	f	class:stateless_metrics_collector
+csv_header_build	metrics/tasks/execution_metrics_collector.cpp	/^std::string execution_metrics_collector::csv_header_build(const std::string& header) {$/;"	f	class:execution_metrics_collector
+csv_header_build	metrics/tasks/management_metrics_collector.cpp	/^std::string management_metrics_collector::csv_header_build(const std::string& header) {$/;"	f	class:management_metrics_collector
+csv_line_build	metrics/block_metrics_collector.cpp	/^bool block_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:block_metrics_collector
+csv_line_build	metrics/cache_metrics_collector.cpp	/^bool cache_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:cache_metrics_collector
+csv_line_build	metrics/fsm/depth1_metrics_collector.cpp	/^bool depth1_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:depth1_metrics_collector
+csv_line_build	metrics/fsm/distance_metrics_collector.cpp	/^bool distance_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:distance_metrics_collector
+csv_line_build	metrics/fsm/stateful_metrics_collector.cpp	/^bool stateful_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:stateful_metrics_collector
+csv_line_build	metrics/fsm/stateless_metrics_collector.cpp	/^bool stateless_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:stateless_metrics_collector
+csv_line_build	metrics/tasks/execution_metrics_collector.cpp	/^bool execution_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:execution_metrics_collector
+csv_line_build	metrics/tasks/management_metrics_collector.cpp	/^bool management_metrics_collector::csv_line_build(std::string& line) {$/;"	f	class:management_metrics_collector
+current_task	controller/depth0/stateful_foraging_controller.cpp	/^__pure tasks::foraging_task* stateful_foraging_controller::current_task($/;"	f	class:stateful_foraging_controller
+current_task	controller/depth1/foraging_controller.cpp	/^__pure tasks::foraging_task* foraging_controller::current_task(void) const {$/;"	f	class:foraging_controller
+current_task_name	controller/depth1/foraging_controller.cpp	/^std::string foraging_controller::current_task_name(void) const {$/;"	f	class:foraging_controller
+current_time	tasks/collector.cpp	/^__pure double collector::current_time(void) const {$/;"	f	class:collector
+current_time	tasks/forager.cpp	/^__pure double forager::current_time(void) const {$/;"	f	class:forager
+current_time	tasks/generalist.cpp	/^__pure double generalist::current_time(void) const {$/;"	f	class:generalist
+dbg_header_calc	controller/base_foraging_controller.cpp	/^std::string base_foraging_controller::dbg_header_calc(void) {$/;"	f	class:base_foraging_controller
+depth1_foraging_loop_functions	support/depth1/foraging_loop_functions.cpp	/^typedef foraging_loop_functions depth1_foraging_loop_functions;$/;"	t	file:
+depth1_foraging_qt_user_functions	support/depth1/foraging_qt_user_functions.cpp	/^typedef foraging_qt_user_functions depth1_foraging_qt_user_functions;$/;"	t	file:
+depth1_metrics_collector	metrics/fsm/depth1_metrics_collector.cpp	/^depth1_metrics_collector::depth1_metrics_collector(const std::string& ofname,$/;"	f	class:depth1_metrics_collector
+dist_in_range	support/block_distributor.cpp	/^argos::CVector2 block_distributor::dist_in_range(argos::CRange<double> x_range,$/;"	f	class:block_distributor
+dist_outside_range	support/block_distributor.cpp	/^argos::CVector2 block_distributor::dist_outside_range($/;"	f	class:block_distributor
+dist_random	support/block_distributor.cpp	/^argos::CVector2 block_distributor::dist_random($/;"	f	class:block_distributor
+dist_single_src	support/block_distributor.cpp	/^argos::CVector2 block_distributor::dist_single_src($/;"	f	class:block_distributor
+distance_collector	support/depth0/stateless_foraging_loop_functions.cpp	/^    distance_collector(void) const {$/;"	f	class:stateless_foraging_loop_functions
+distance_metrics_collector	metrics/fsm/distance_metrics_collector.cpp	/^distance_metrics_collector::distance_metrics_collector(const std::string& ofname,$/;"	f	class:distance_metrics_collector
+distribute_block	representation/arena_map.cpp	/^void arena_map::distribute_block(block* const block) {$/;"	f	class:arena_map
+distribute_block	support/block_distributor.cpp	/^bool block_distributor::distribute_block(const representation::block& block,$/;"	f	class:block_distributor
+distribute_blocks	representation/arena_map.cpp	/^void arena_map::distribute_blocks(void) {$/;"	f	class:arena_map
+dynamic_cache_creator	support/depth2/dynamic_cache_creator.cpp	/^dynamic_cache_creator::dynamic_cache_creator($/;"	f	class:dynamic_cache_creator
+employed_partitioning	controller/depth1/foraging_controller.cpp	/^bool foraging_controller::employed_partitioning(void) const {$/;"	f	class:foraging_controller
+entity_id	controller/depth0/stateless_foraging_controller.cpp	/^int stateless_foraging_controller::entity_id(void) const {$/;"	f	class:stateless_foraging_controller
+event_block_drop	fsm/cell2D_fsm.cpp	/^void cell2D_fsm::event_block_drop(void) {$/;"	f	class:cell2D_fsm
+event_block_pickup	fsm/cell2D_fsm.cpp	/^void cell2D_fsm::event_block_pickup(void) {$/;"	f	class:cell2D_fsm
+event_empty	fsm/cell2D_fsm.cpp	/^void cell2D_fsm::event_empty(void) {$/;"	f	class:cell2D_fsm
+event_unknown	fsm/cell2D_fsm.cpp	/^void cell2D_fsm::event_unknown(void) {$/;"	f	class:cell2D_fsm
+execution_metrics_collector	metrics/tasks/execution_metrics_collector.cpp	/^execution_metrics_collector::execution_metrics_collector(const std::string& ofname,$/;"	f	class:execution_metrics_collector
+existing_cache_selector	controller/depth1/existing_cache_selector.cpp	/^existing_cache_selector::existing_cache_selector($/;"	f	class:existing_cache_selector
+existing_cache_utility	expressions/existing_cache_utility.cpp	/^existing_cache_utility::existing_cache_utility(const argos::CVector2& cache_loc,$/;"	f	class:existing_cache_utility
+explore_for_block_fsm	fsm/explore_for_block_fsm.cpp	/^explore_for_block_fsm::explore_for_block_fsm($/;"	f	class:explore_for_block_fsm
+explore_for_cache_fsm	fsm/depth1/explore_for_cache_fsm.cpp	/^explore_for_cache_fsm::explore_for_cache_fsm($/;"	f	class:explore_for_cache_fsm
+find_closest_obstacle	controller/base_foraging_sensors.cpp	/^argos::CVector2 base_foraging_sensors::find_closest_obstacle(void) {$/;"	f	class:base_foraging_sensors
+forager	tasks/forager.cpp	/^forager::forager(const struct task_allocation::task_params* params,$/;"	f	class:forager
+foraging_controller	controller/depth1/foraging_controller.cpp	/^foraging_controller::foraging_controller(void)$/;"	f	class:foraging_controller
+foraging_loop_functions	support/depth1/foraging_loop_functions.cpp	/^foraging_loop_functions::foraging_loop_functions(void)$/;"	f	class:foraging_loop_functions
+foraging_qt_user_functions	support/depth1/foraging_qt_user_functions.cpp	/^foraging_qt_user_functions::foraging_qt_user_functions(void) {$/;"	f	class:foraging_qt_user_functions
+foraging_sensors	controller/depth0/foraging_sensors.cpp	/^foraging_sensors::foraging_sensors($/;"	f	class:foraging_sensors
+foraging_sensors	controller/depth1/foraging_sensors.cpp	/^foraging_sensors::foraging_sensors($/;"	f	class:foraging_sensors
+free_block_drop	events/free_block_drop.cpp	/^free_block_drop::free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:free_block_drop
+free_block_pickup	events/free_block_pickup.cpp	/^free_block_pickup::free_block_pickup($/;"	f	class:free_block_pickup
+generalist	tasks/generalist.cpp	/^generalist::generalist($/;"	f	class:generalist
+handle_arena_interactions	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::handle_arena_interactions($/;"	f	class:foraging_loop_functions
+in_nest	controller/base_foraging_controller.cpp	/^bool base_foraging_controller::in_nest(void) const {$/;"	f	class:base_foraging_controller
+in_nest	controller/base_foraging_sensors.cpp	/^bool base_foraging_sensors::in_nest(void) {$/;"	f	class:base_foraging_sensors
+init	fsm/acquire_block_fsm.cpp	/^void acquire_block_fsm::init(void) {$/;"	f	class:acquire_block_fsm
+init	fsm/base_explore_fsm.cpp	/^void base_explore_fsm::init(void) {$/;"	f	class:base_explore_fsm
+init	fsm/base_foraging_fsm.cpp	/^void base_foraging_fsm::init(void) {$/;"	f	class:base_foraging_fsm
+init	fsm/block_to_nest_fsm.cpp	/^void block_to_nest_fsm::init(void) {$/;"	f	class:block_to_nest_fsm
+init	fsm/cell2D_fsm.cpp	/^void cell2D_fsm::init(void) { state_machine::simple_fsm::init(); } \/* init() *\/$/;"	f	class:cell2D_fsm
+init	fsm/depth0/stateful_foraging_fsm.cpp	/^void stateful_foraging_fsm::init(void) {$/;"	f	class:stateful_foraging_fsm
+init	fsm/depth0/stateless_foraging_fsm.cpp	/^void stateless_foraging_fsm::init(void) {$/;"	f	class:stateless_foraging_fsm
+init	fsm/depth1/acquire_cache_fsm.cpp	/^void acquire_cache_fsm::init(void) {$/;"	f	class:acquire_cache_fsm
+init	fsm/depth1/block_to_cache_fsm.cpp	/^void block_to_cache_fsm::init(void) {$/;"	f	class:block_to_cache_fsm
+init	fsm/depth1/explore_for_cache_fsm.cpp	/^void explore_for_cache_fsm::init(void) {$/;"	f	class:explore_for_cache_fsm
+init	fsm/explore_for_block_fsm.cpp	/^void explore_for_block_fsm::init(void) {$/;"	f	class:explore_for_block_fsm
+init	fsm/vector_fsm.cpp	/^void vector_fsm::init(void) {$/;"	f	class:vector_fsm
+is_acquiring_block	fsm/acquire_block_fsm.cpp	/^bool acquire_block_fsm::is_acquiring_block(void) const {$/;"	f	class:acquire_block_fsm
+is_acquiring_block	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_acquiring_block(void) const {$/;"	f	class:block_to_nest_fsm
+is_acquiring_block	fsm/depth0/stateful_foraging_fsm.cpp	/^__pure bool stateful_foraging_fsm::is_acquiring_block(void) const {$/;"	f	class:stateful_foraging_fsm
+is_acquiring_block	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_acquiring_block(void) const {$/;"	f	class:block_to_cache_fsm
+is_acquiring_block	tasks/forager.cpp	/^bool forager::is_acquiring_block(void) const {$/;"	f	class:forager
+is_acquiring_block	tasks/generalist.cpp	/^bool generalist::is_acquiring_block(void) const {$/;"	f	class:generalist
+is_acquiring_cache	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_acquiring_cache(void) const {$/;"	f	class:block_to_nest_fsm
+is_acquiring_cache	fsm/depth1/acquire_cache_fsm.cpp	/^bool acquire_cache_fsm::is_acquiring_cache(void) const {$/;"	f	class:acquire_cache_fsm
+is_acquiring_cache	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_acquiring_cache(void) const {$/;"	f	class:block_to_cache_fsm
+is_acquiring_cache	tasks/collector.cpp	/^bool collector::is_acquiring_cache(void) const {$/;"	f	class:collector
+is_acquiring_cache	tasks/forager.cpp	/^bool forager::is_acquiring_cache(void) const {$/;"	f	class:forager
+is_avoiding_collision	fsm/acquire_block_fsm.cpp	/^__pure bool acquire_block_fsm::is_avoiding_collision(void) const {$/;"	f	class:acquire_block_fsm
+is_avoiding_collision	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_avoiding_collision(void) const {$/;"	f	class:block_to_nest_fsm
+is_avoiding_collision	fsm/depth0/stateful_foraging_fsm.cpp	/^__pure bool stateful_foraging_fsm::is_avoiding_collision(void) const {$/;"	f	class:stateful_foraging_fsm
+is_avoiding_collision	fsm/depth0/stateless_foraging_fsm.cpp	/^__pure bool stateless_foraging_fsm::is_avoiding_collision(void) const {$/;"	f	class:stateless_foraging_fsm
+is_avoiding_collision	fsm/depth1/acquire_cache_fsm.cpp	/^__pure bool acquire_cache_fsm::is_avoiding_collision(void) const {$/;"	f	class:acquire_cache_fsm
+is_avoiding_collision	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_avoiding_collision(void) const {$/;"	f	class:block_to_cache_fsm
+is_avoiding_collision	tasks/collector.cpp	/^bool collector::is_avoiding_collision(void) const {$/;"	f	class:collector
+is_avoiding_collision	tasks/forager.cpp	/^bool forager::is_avoiding_collision(void) const {$/;"	f	class:forager
+is_avoiding_collision	tasks/generalist.cpp	/^bool generalist::is_avoiding_collision(void) const {$/;"	f	class:generalist
+is_exploring_for_block	fsm/acquire_block_fsm.cpp	/^bool acquire_block_fsm::is_exploring_for_block(void) const {$/;"	f	class:acquire_block_fsm
+is_exploring_for_block	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_exploring_for_block(void) const {$/;"	f	class:block_to_nest_fsm
+is_exploring_for_block	fsm/depth0/stateful_foraging_fsm.cpp	/^__pure bool stateful_foraging_fsm::is_exploring_for_block(void) const {$/;"	f	class:stateful_foraging_fsm
+is_exploring_for_block	fsm/depth0/stateless_foraging_fsm.cpp	/^bool stateless_foraging_fsm::is_exploring_for_block(void) const {$/;"	f	class:stateless_foraging_fsm
+is_exploring_for_block	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_exploring_for_block(void) const {$/;"	f	class:block_to_cache_fsm
+is_exploring_for_block	tasks/forager.cpp	/^bool forager::is_exploring_for_block(void) const {$/;"	f	class:forager
+is_exploring_for_block	tasks/generalist.cpp	/^bool generalist::is_exploring_for_block(void) const {$/;"	f	class:generalist
+is_exploring_for_cache	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_exploring_for_cache(void) const {$/;"	f	class:block_to_nest_fsm
+is_exploring_for_cache	fsm/depth1/acquire_cache_fsm.cpp	/^bool acquire_cache_fsm::is_exploring_for_cache(void) const {$/;"	f	class:acquire_cache_fsm
+is_exploring_for_cache	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_exploring_for_cache(void) const {$/;"	f	class:block_to_cache_fsm
+is_exploring_for_cache	tasks/collector.cpp	/^bool collector::is_exploring_for_cache(void) const {$/;"	f	class:collector
+is_exploring_for_cache	tasks/forager.cpp	/^bool forager::is_exploring_for_cache(void) const {$/;"	f	class:forager
+is_transporting_to_cache	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_transporting_to_cache(void) const {$/;"	f	class:block_to_cache_fsm
+is_transporting_to_cache	tasks/forager.cpp	/^bool forager::is_transporting_to_cache(void) const {$/;"	f	class:forager
+is_transporting_to_nest	controller/depth0/stateful_foraging_controller.cpp	/^bool stateful_foraging_controller::is_transporting_to_nest(void) const {$/;"	f	class:stateful_foraging_controller
+is_transporting_to_nest	controller/depth0/stateless_foraging_controller.cpp	/^bool stateless_foraging_controller::is_transporting_to_nest(void) const {$/;"	f	class:stateless_foraging_controller
+is_transporting_to_nest	controller/depth1/foraging_controller.cpp	/^bool foraging_controller::is_transporting_to_nest(void) const {$/;"	f	class:foraging_controller
+is_transporting_to_nest	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_transporting_to_nest(void) const {$/;"	f	class:block_to_nest_fsm
+is_transporting_to_nest	fsm/depth0/stateful_foraging_fsm.cpp	/^__pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {$/;"	f	class:stateful_foraging_fsm
+is_transporting_to_nest	fsm/depth0/stateless_foraging_fsm.cpp	/^bool stateless_foraging_fsm::is_transporting_to_nest(void) const {$/;"	f	class:stateless_foraging_fsm
+is_transporting_to_nest	tasks/collector.cpp	/^bool collector::is_transporting_to_nest(void) const {$/;"	f	class:collector
+is_transporting_to_nest	tasks/generalist.cpp	/^bool generalist::is_transporting_to_nest(void) const {$/;"	f	class:generalist
+is_vectoring_to_block	fsm/acquire_block_fsm.cpp	/^bool acquire_block_fsm::is_vectoring_to_block(void) const {$/;"	f	class:acquire_block_fsm
+is_vectoring_to_block	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_vectoring_to_block(void) const {$/;"	f	class:block_to_nest_fsm
+is_vectoring_to_block	fsm/depth0/stateful_foraging_fsm.cpp	/^__pure bool stateful_foraging_fsm::is_vectoring_to_block(void) const {$/;"	f	class:stateful_foraging_fsm
+is_vectoring_to_block	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_vectoring_to_block(void) const {$/;"	f	class:block_to_cache_fsm
+is_vectoring_to_block	tasks/forager.cpp	/^bool forager::is_vectoring_to_block(void) const {$/;"	f	class:forager
+is_vectoring_to_block	tasks/generalist.cpp	/^bool generalist::is_vectoring_to_block(void) const {$/;"	f	class:generalist
+is_vectoring_to_cache	fsm/block_to_nest_fsm.cpp	/^__pure bool block_to_nest_fsm::is_vectoring_to_cache(void) const {$/;"	f	class:block_to_nest_fsm
+is_vectoring_to_cache	fsm/depth1/acquire_cache_fsm.cpp	/^bool acquire_cache_fsm::is_vectoring_to_cache(void) const {$/;"	f	class:acquire_cache_fsm
+is_vectoring_to_cache	fsm/depth1/block_to_cache_fsm.cpp	/^__pure bool block_to_cache_fsm::is_vectoring_to_cache(void) const {$/;"	f	class:block_to_cache_fsm
+is_vectoring_to_cache	tasks/collector.cpp	/^bool collector::is_vectoring_to_cache(void) const {$/;"	f	class:collector
+is_vectoring_to_cache	tasks/forager.cpp	/^bool forager::is_vectoring_to_cache(void) const {$/;"	f	class:forager
+kCollectorName	tasks/foraging_task.cpp	/^constexpr char foraging_task::kCollectorName[];$/;"	m	class:foraging_task	file:
+kForagerName	tasks/foraging_task.cpp	/^constexpr char foraging_task::kForagerName[];$/;"	m	class:foraging_task	file:
+kGeneralistName	tasks/foraging_task.cpp	/^constexpr char foraging_task::kGeneralistName[];$/;"	m	class:foraging_task	file:
+log_header_calc	controller/base_foraging_controller.cpp	/^std::string base_foraging_controller::log_header_calc(void) {$/;"	f	class:base_foraging_controller
+log_timestamp_calc	support/depth0/stateless_foraging_loop_functions.cpp	/^std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {$/;"	f	class:stateless_foraging_loop_functions
+loop_function_repository	params/loop_function_repository.cpp	/^loop_function_repository::loop_function_repository(void) {$/;"	f	class:loop_function_repository
+los	controller/depth0/stateful_foraging_controller.cpp	/^__pure const representation::line_of_sight* stateful_foraging_controller::los($/;"	f	class:stateful_foraging_controller
+los	controller/depth0/stateful_foraging_controller.cpp	/^void stateful_foraging_controller::los($/;"	f	class:stateful_foraging_controller
+m_next_id	representation/cache.cpp	/^int cache::m_next_id = 0;$/;"	m	class:cache	file:
+management_metrics_collector	metrics/tasks/management_metrics_collector.cpp	/^management_metrics_collector::management_metrics_collector(const std::string& ofname,$/;"	f	class:management_metrics_collector
+max_wheel_speed	controller/actuator_manager.cpp	/^__pure double actuator_manager::max_wheel_speed(void) const {$/;"	f	class:actuator_manager
+metric_collecting_init	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::metric_collecting_init($/;"	f	class:stateless_foraging_loop_functions
+metric_collecting_init	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::metric_collecting_init($/;"	f	class:foraging_loop_functions
+move_out_of_sight	representation/block.cpp	/^void block::move_out_of_sight(void) {$/;"	f	class:block
+nest_block_drop	events/nest_block_drop.cpp	/^nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,$/;"	f	class:nest_block_drop
+obstacle_is_threatening	controller/base_foraging_sensors.cpp	/^bool base_foraging_sensors::obstacle_is_threatening($/;"	f	class:base_foraging_sensors
+occupancy_grid	representation/occupancy_grid.cpp	/^occupancy_grid::occupancy_grid($/;"	f	class:occupancy_grid
+output_init	controller/base_foraging_controller.cpp	/^void base_foraging_controller::output_init($/;"	f	class:base_foraging_controller
+output_init	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::output_init($/;"	f	class:stateless_foraging_loop_functions
+parse	params/actuator_parser.cpp	/^void actuator_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:actuator_parser
+parse	params/arena_map_parser.cpp	/^void arena_map_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:arena_map_parser
+parse	params/block_parser.cpp	/^void block_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:block_parser
+parse	params/depth0/occupancy_grid_parser.cpp	/^void occupancy_grid_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:occupancy_grid_parser
+parse	params/depth0/pheromone_parser.cpp	/^void pheromone_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:pheromone_parser
+parse	params/depth1/cache_parser.cpp	/^void cache_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:cache_parser
+parse	params/depth1/task_parser.cpp	/^void task_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:task_parser
+parse	params/fsm_parser.cpp	/^void fsm_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:fsm_parser
+parse	params/grid_parser.cpp	/^void grid_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:grid_parser
+parse	params/loop_functions_parser.cpp	/^void loop_functions_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:loop_functions_parser
+parse	params/metrics_parser.cpp	/^void metrics_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:metrics_parser
+parse	params/output_parser.cpp	/^void output_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:output_parser
+parse	params/sensor_parser.cpp	/^void sensor_parser::parse(argos::TConfigurationNode& node) {$/;"	f	class:sensor_parser
+perceived_arena_map	representation/perceived_arena_map.cpp	/^perceived_arena_map::perceived_arena_map($/;"	f	class:perceived_arena_map
+perceived_blocks	representation/perceived_arena_map.cpp	/^std::list<const_perceived_block> perceived_arena_map::perceived_blocks($/;"	f	class:perceived_arena_map
+perceived_caches	representation/perceived_arena_map.cpp	/^std::list<const_perceived_cache> perceived_arena_map::perceived_caches($/;"	f	class:perceived_arena_map
+pre_step_final	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::pre_step_final(void) {$/;"	f	class:stateful_foraging_loop_functions
+pre_step_final	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::pre_step_final(void) {$/;"	f	class:stateless_foraging_loop_functions
+pre_step_final	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::pre_step_final(void) {$/;"	f	class:foraging_loop_functions
+pre_step_iter	support/depth0/stateful_foraging_loop_functions.cpp	/^void stateful_foraging_loop_functions::pre_step_iter($/;"	f	class:stateful_foraging_loop_functions
+pre_step_iter	support/depth0/stateless_foraging_loop_functions.cpp	/^void stateless_foraging_loop_functions::pre_step_iter($/;"	f	class:stateless_foraging_loop_functions
+pre_step_iter	support/depth1/foraging_loop_functions.cpp	/^void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {$/;"	f	class:foraging_loop_functions
+process_los	controller/depth0/stateful_foraging_controller.cpp	/^void stateful_foraging_controller::process_los($/;"	f	class:stateful_foraging_controller
+process_los	controller/depth1/foraging_controller.cpp	/^void foraging_controller::process_los($/;"	f	class:foraging_controller
+randomize_vector_angle	fsm/base_foraging_fsm.cpp	/^argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {$/;"	f	class:base_foraging_fsm
+reset	controller/actuator_manager.cpp	/^void actuator_manager::reset(void) {$/;"	f	class:actuator_manager
+reset	metrics/block_metrics_collector.cpp	/^void block_metrics_collector::reset(void) {$/;"	f	class:block_metrics_collector
+reset	metrics/cache_metrics_collector.cpp	/^void cache_metrics_collector::reset(void) {$/;"	f	class:cache_metrics_collector
+reset	metrics/fsm/depth1_metrics_collector.cpp	/^void depth1_metrics_collector::reset(void) {$/;"	f	class:depth1_metrics_collector
+reset	metrics/fsm/distance_metrics_collector.cpp	/^void distance_metrics_collector::reset(void) {$/;"	f	class:distance_metrics_collector
+reset	metrics/fsm/stateful_metrics_collector.cpp	/^void stateful_metrics_collector::reset(void) {$/;"	f	class:stateful_metrics_collector
+reset	metrics/fsm/stateless_metrics_collector.cpp	/^void stateless_metrics_collector::reset(void) {$/;"	f	class:stateless_metrics_collector
+reset	metrics/tasks/execution_metrics_collector.cpp	/^void execution_metrics_collector::reset(void) {$/;"	f	class:execution_metrics_collector
+reset	metrics/tasks/management_metrics_collector.cpp	/^void management_metrics_collector::reset(void) {$/;"	f	class:management_metrics_collector
+reset_after_interval	metrics/block_metrics_collector.cpp	/^void block_metrics_collector::reset_after_interval(void) {$/;"	f	class:block_metrics_collector
+reset_after_interval	metrics/fsm/depth1_metrics_collector.cpp	/^void depth1_metrics_collector::reset_after_interval(void) {$/;"	f	class:depth1_metrics_collector
+reset_after_interval	metrics/fsm/distance_metrics_collector.cpp	/^void distance_metrics_collector::reset_after_interval(void) {$/;"	f	class:distance_metrics_collector
+reset_after_interval	metrics/fsm/stateful_metrics_collector.cpp	/^void stateful_metrics_collector::reset_after_interval(void) {$/;"	f	class:stateful_metrics_collector
+reset_after_interval	metrics/fsm/stateless_metrics_collector.cpp	/^void stateless_metrics_collector::reset_after_interval(void) {$/;"	f	class:stateless_metrics_collector
+reset_after_interval	metrics/tasks/execution_metrics_collector.cpp	/^void execution_metrics_collector::reset_after_interval(void) {$/;"	f	class:execution_metrics_collector
+reset_after_interval	metrics/tasks/management_metrics_collector.cpp	/^void management_metrics_collector::reset_after_interval(void) {$/;"	f	class:management_metrics_collector
+reset_after_timestep	metrics/fsm/depth1_metrics_collector.cpp	/^void depth1_metrics_collector::reset_after_timestep(void) {$/;"	f	class:depth1_metrics_collector
+reset_after_timestep	metrics/fsm/stateful_metrics_collector.cpp	/^void stateful_metrics_collector::reset_after_timestep(void) {$/;"	f	class:stateful_metrics_collector
+reset_after_timestep	metrics/fsm/stateless_metrics_collector.cpp	/^void stateless_metrics_collector::reset_after_timestep(void) {$/;"	f	class:stateless_metrics_collector
+reset_after_timestep	metrics/tasks/execution_metrics_collector.cpp	/^void execution_metrics_collector::reset_after_timestep(void) {$/;"	f	class:execution_metrics_collector
+robot_id	support/loop_functions_utils.cpp	/^int robot_id(const argos::CFootBotEntity& robot) {$/;"	f
+robot_loc	controller/base_foraging_controller.cpp	/^__pure argos::CVector2 base_foraging_controller::robot_loc(void) const {$/;"	f	class:base_foraging_controller
+robot_loc	controller/base_foraging_controller.cpp	/^void base_foraging_controller::robot_loc(argos::CVector2 loc) {$/;"	f	class:base_foraging_controller
+robot_on_block	representation/arena_map.cpp	/^__pure int arena_map::robot_on_block(const argos::CVector2& pos) {$/;"	f	class:arena_map
+robot_on_block	support/loop_functions_utils.cpp	/^__pure int robot_on_block(const argos::CFootBotEntity& robot,$/;"	f
+robot_on_cache	representation/arena_map.cpp	/^__pure int arena_map::robot_on_cache(const argos::CVector2& pos) {$/;"	f	class:arena_map
+robot_on_cache	support/loop_functions_utils.cpp	/^__pure int robot_on_cache(const argos::CFootBotEntity& robot,$/;"	f
+run	fsm/base_explore_fsm.cpp	/^void base_explore_fsm::run(void) {$/;"	f	class:base_explore_fsm
+run	fsm/depth0/stateless_foraging_fsm.cpp	/^void stateless_foraging_fsm::run(void) {$/;"	f	class:stateless_foraging_fsm
+set_rel_heading	controller/actuator_manager.cpp	/^void actuator_manager::set_rel_heading(const argos::CVector2& heading,$/;"	f	class:actuator_manager
+set_speed	controller/actuator_manager.cpp	/^void actuator_manager::set_speed(double speed) {$/;"	f	class:actuator_manager
+set_wheel_speeds	controller/actuator_manager.cpp	/^void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {$/;"	f	class:actuator_manager
+set_wheel_speeds	controller/actuator_manager.cpp	/^void actuator_manager::set_wheel_speeds(double speed1,$/;"	f	class:actuator_manager
+show	params/actuator_parser.cpp	/^void actuator_parser::show(std::ostream& stream) {$/;"	f	class:actuator_parser
+show	params/arena_map_parser.cpp	/^void arena_map_parser::show(std::ostream& stream) {$/;"	f	class:arena_map_parser
+show	params/block_parser.cpp	/^void block_parser::show(std::ostream& stream) {$/;"	f	class:block_parser
+show	params/depth0/occupancy_grid_parser.cpp	/^void occupancy_grid_parser::show(std::ostream& stream) {$/;"	f	class:occupancy_grid_parser
+show	params/depth0/pheromone_parser.cpp	/^void pheromone_parser::show(std::ostream& stream) {$/;"	f	class:pheromone_parser
+show	params/depth1/cache_parser.cpp	/^void cache_parser::show(std::ostream& stream) {$/;"	f	class:cache_parser
+show	params/depth1/task_parser.cpp	/^void task_parser::show(std::ostream& stream) {$/;"	f	class:task_parser
+show	params/fsm_parser.cpp	/^void fsm_parser::show(std::ostream& stream) {$/;"	f	class:fsm_parser
+show	params/grid_parser.cpp	/^void grid_parser::show(std::ostream& stream) {$/;"	f	class:grid_parser
+show	params/loop_functions_parser.cpp	/^void loop_functions_parser::show(std::ostream& stream) {$/;"	f	class:loop_functions_parser
+show	params/metrics_parser.cpp	/^void metrics_parser::show(std::ostream& stream) {$/;"	f	class:metrics_parser
+show	params/output_parser.cpp	/^void output_parser::show(std::ostream& stream) {$/;"	f	class:output_parser
+show	params/sensor_parser.cpp	/^void sensor_parser::show(std::ostream& stream) {$/;"	f	class:sensor_parser
+single_src_xrange	support/block_distributor.cpp	/^__pure argos::CRange<double> block_distributor::single_src_xrange(void) {$/;"	f	class:block_distributor
+stateful_collector	support/depth0/stateful_foraging_loop_functions.cpp	/^__pure metrics::fsm::stateful_metrics_collector* stateful_foraging_loop_functions::stateful_collector(void) const {$/;"	f	class:stateful_foraging_loop_functions
+stateful_foraging_controller	controller/depth0/stateful_foraging_controller.cpp	/^stateful_foraging_controller::stateful_foraging_controller(void)$/;"	f	class:stateful_foraging_controller
+stateful_foraging_fsm	fsm/depth0/stateful_foraging_fsm.cpp	/^stateful_foraging_fsm::stateful_foraging_fsm($/;"	f	class:stateful_foraging_fsm
+stateful_foraging_loop_functions	support/depth0/stateful_foraging_loop_functions.cpp	/^stateful_foraging_loop_functions::stateful_foraging_loop_functions(void)$/;"	f	class:stateful_foraging_loop_functions
+stateful_foraging_qt_user_functions	support/depth0/stateful_foraging_qt_user_functions.cpp	/^stateful_foraging_qt_user_functions::stateful_foraging_qt_user_functions() {$/;"	f	class:stateful_foraging_qt_user_functions
+stateful_foraging_repository	params/depth0/stateful_foraging_repository.cpp	/^stateful_foraging_repository::stateful_foraging_repository(void) {$/;"	f	class:stateful_foraging_repository
+stateful_metrics_collector	metrics/fsm/stateful_metrics_collector.cpp	/^stateful_metrics_collector::stateful_metrics_collector(const std::string& ofname,$/;"	f	class:stateful_metrics_collector
+stateful_sensors	controller/depth0/stateful_foraging_controller.cpp	/^__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors($/;"	f	class:stateful_foraging_controller
+stateful_sensors_ref	controller/depth0/stateful_foraging_controller.cpp	/^    stateful_sensors_ref(void) const {$/;"	f	class:stateful_foraging_controller
+stateless_collector	support/depth0/stateless_foraging_loop_functions.cpp	/^    stateless_collector(void) const {$/;"	f	class:stateless_foraging_loop_functions
+stateless_foraging_controller	controller/depth0/stateless_foraging_controller.cpp	/^stateless_foraging_controller::stateless_foraging_controller(void)$/;"	f	class:stateless_foraging_controller
+stateless_foraging_fsm	fsm/depth0/stateless_foraging_fsm.cpp	/^stateless_foraging_fsm::stateless_foraging_fsm($/;"	f	class:stateless_foraging_fsm
+stateless_foraging_loop_functions	support/depth0/stateless_foraging_loop_functions.cpp	/^stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)$/;"	f	class:stateless_foraging_loop_functions
+stateless_foraging_qt_user_functions	support/depth0/stateless_foraging_qt_user_functions.cpp	/^stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {$/;"	f	class:stateless_foraging_qt_user_functions
+stateless_foraging_repository	params/depth0/stateless_foraging_repository.cpp	/^stateless_foraging_repository::stateless_foraging_repository(void) {$/;"	f	class:stateless_foraging_repository
+stateless_metrics_collector	metrics/fsm/stateless_metrics_collector.cpp	/^stateless_metrics_collector::stateless_metrics_collector(const std::string& ofname,$/;"	f	class:stateless_metrics_collector
+static_cache_create	representation/arena_map.cpp	/^void arena_map::static_cache_create(void) {$/;"	f	class:arena_map
+static_cache_creator	support/depth1/static_cache_creator.cpp	/^static_cache_creator::static_cache_creator($/;"	f	class:static_cache_creator
+subtask_selection	controller/depth1/foraging_controller.cpp	/^std::string foraging_controller::subtask_selection(void) const {$/;"	f	class:foraging_controller
+task_abort_cleanup	controller/depth1/foraging_controller.cpp	/^void foraging_controller::task_abort_cleanup($/;"	f	class:foraging_controller
+task_alloc_notify	controller/depth1/foraging_controller.cpp	/^void foraging_controller::task_alloc_notify($/;"	f	class:foraging_controller
+task_execute	fsm/acquire_block_fsm.cpp	/^void acquire_block_fsm::task_execute(void) {$/;"	f	class:acquire_block_fsm
+task_execute	fsm/block_to_nest_fsm.cpp	/^void block_to_nest_fsm::task_execute(void) {$/;"	f	class:block_to_nest_fsm
+task_execute	fsm/depth0/stateful_foraging_fsm.cpp	/^void stateful_foraging_fsm::task_execute(void) {$/;"	f	class:stateful_foraging_fsm
+task_execute	fsm/depth1/acquire_cache_fsm.cpp	/^void acquire_cache_fsm::task_execute(void) {$/;"	f	class:acquire_cache_fsm
+task_execute	fsm/depth1/block_to_cache_fsm.cpp	/^void block_to_cache_fsm::task_execute(void) {$/;"	f	class:block_to_cache_fsm
+task_execute	fsm/depth1/explore_for_cache_fsm.cpp	/^void explore_for_cache_fsm::task_execute(void) {$/;"	f	class:explore_for_cache_fsm
+task_execute	fsm/explore_for_block_fsm.cpp	/^void explore_for_block_fsm::task_execute(void) {$/;"	f	class:explore_for_block_fsm
+task_execute	fsm/vector_fsm.cpp	/^void vector_fsm::task_execute(void) {$/;"	f	class:vector_fsm
+task_repository	params/depth1/task_repository.cpp	/^task_repository::task_repository(void) { register_parser<task_parser>("task"); }$/;"	f	class:task_repository
+task_running	fsm/depth1/explore_for_cache_fsm.cpp	/^bool explore_for_cache_fsm::task_running(void) const {$/;"	f	class:explore_for_cache_fsm
+task_running	fsm/explore_for_block_fsm.cpp	/^bool explore_for_block_fsm::task_running(void) const {$/;"	f	class:explore_for_block_fsm
+task_start	fsm/block_to_nest_fsm.cpp	/^void block_to_nest_fsm::task_start($/;"	f	class:block_to_nest_fsm
+task_start	fsm/depth1/block_to_cache_fsm.cpp	/^void block_to_cache_fsm::task_start($/;"	f	class:block_to_cache_fsm
+task_start	fsm/vector_fsm.cpp	/^void vector_fsm::task_start($/;"	f	class:vector_fsm
+task_start	tasks/collector.cpp	/^void collector::task_start(const task_allocation::taskable_argument* const) {$/;"	f	class:collector
+task_start	tasks/forager.cpp	/^void forager::task_start(const task_allocation::taskable_argument* const) {$/;"	f	class:forager
+threatening_obstacle_exists	controller/base_foraging_sensors.cpp	/^bool base_foraging_sensors::threatening_obstacle_exists(void) {$/;"	f	class:base_foraging_sensors
+tick	controller/base_foraging_controller.cpp	/^void base_foraging_controller::tick(uint tick) {$/;"	f	class:base_foraging_controller
+timestep_distance	controller/depth0/stateless_foraging_controller.cpp	/^double stateless_foraging_controller::timestep_distance(void) const {$/;"	f	class:stateless_foraging_controller
+update	representation/occupancy_grid.cpp	/^void occupancy_grid::update(void) {$/;"	f	class:occupancy_grid
+update_host_cells	support/depth1/cache_creator.cpp	/^void cache_creator::update_host_cells(representation::arena_grid& grid,$/;"	f	class:cache_creator
+validate	params/actuator_parser.cpp	/^__pure bool actuator_parser::validate(void) {$/;"	f	class:actuator_parser
+validate	params/arena_map_parser.cpp	/^bool arena_map_parser::validate(void) {$/;"	f	class:arena_map_parser
+validate	params/block_parser.cpp	/^bool block_parser::validate(void) {$/;"	f	class:block_parser
+validate	params/depth0/occupancy_grid_parser.cpp	/^__pure bool occupancy_grid_parser::validate(void) {$/;"	f	class:occupancy_grid_parser
+validate	params/depth0/pheromone_parser.cpp	/^__pure bool pheromone_parser::validate(void) {$/;"	f	class:pheromone_parser
+validate	params/depth1/cache_parser.cpp	/^__pure bool cache_parser::validate(void) {$/;"	f	class:cache_parser
+validate	params/depth1/task_parser.cpp	/^__pure bool task_parser::validate(void) {$/;"	f	class:task_parser
+validate	params/fsm_parser.cpp	/^__pure bool fsm_parser::validate(void) {$/;"	f	class:fsm_parser
+validate	params/grid_parser.cpp	/^__pure bool grid_parser::validate(void) {$/;"	f	class:grid_parser
+validate	params/metrics_parser.cpp	/^__pure bool metrics_parser::validate(void) {$/;"	f	class:metrics_parser
+validate	params/output_parser.cpp	/^__pure bool output_parser::validate(void) {$/;"	f	class:output_parser
+validate	params/sensor_parser.cpp	/^__pure bool sensor_parser::validate(void) {$/;"	f	class:sensor_parser
+vector_fsm	fsm/vector_fsm.cpp	/^vector_fsm::vector_fsm($/;"	f	class:vector_fsm
+visit	events/block_found.cpp	/^void block_found::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:block_found
+visit	events/block_found.cpp	/^void block_found::visit(representation::cell2D& cell) {$/;"	f	class:block_found
+visit	events/block_found.cpp	/^void block_found::visit(representation::perceived_arena_map& map) {$/;"	f	class:block_found
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(fsm::depth1::block_to_cache_fsm& fsm) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(representation::arena_map& map) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(representation::block& block) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(representation::cache& cache) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(representation::cell2D& cell) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(representation::perceived_arena_map& map) {$/;"	f	class:cache_block_drop
+visit	events/cache_block_drop.cpp	/^void cache_block_drop::visit(tasks::forager& task) {$/;"	f	class:cache_block_drop
+visit	events/cache_found.cpp	/^void cache_found::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:cache_found
+visit	events/cache_found.cpp	/^void cache_found::visit(representation::cell2D& cell) {$/;"	f	class:cache_found
+visit	events/cache_found.cpp	/^void cache_found::visit(representation::perceived_arena_map& map) {$/;"	f	class:cache_found
+visit	events/cache_vanished.cpp	/^void cache_vanished::visit($/;"	f	class:cache_vanished
+visit	events/cache_vanished.cpp	/^void cache_vanished::visit(fsm::block_to_nest_fsm& fsm) {$/;"	f	class:cache_vanished
+visit	events/cache_vanished.cpp	/^void cache_vanished::visit(fsm::depth1::block_to_cache_fsm& fsm) {$/;"	f	class:cache_vanished
+visit	events/cache_vanished.cpp	/^void cache_vanished::visit(tasks::collector& task) {$/;"	f	class:cache_vanished
+visit	events/cache_vanished.cpp	/^void cache_vanished::visit(tasks::forager& task) {$/;"	f	class:cache_vanished
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit($/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(representation::arena_map& map) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(representation::block& block) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(representation::cache& cache) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(representation::cell2D& cell) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(representation::perceived_arena_map& map) {$/;"	f	class:cached_block_pickup
+visit	events/cached_block_pickup.cpp	/^void cached_block_pickup::visit(tasks::collector& task) {$/;"	f	class:cached_block_pickup
+visit	events/cell_empty.cpp	/^void cell_empty::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:cell_empty
+visit	events/cell_empty.cpp	/^void cell_empty::visit(representation::arena_map& map) {$/;"	f	class:cell_empty
+visit	events/cell_empty.cpp	/^void cell_empty::visit(representation::cell2D& cell) {$/;"	f	class:cell_empty
+visit	events/cell_empty.cpp	/^void cell_empty::visit(representation::perceived_arena_map& map) {$/;"	f	class:cell_empty
+visit	events/cell_unknown.cpp	/^void cell_unknown::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:cell_unknown
+visit	events/cell_unknown.cpp	/^void cell_unknown::visit(representation::cell2D& cell) {$/;"	f	class:cell_unknown
+visit	events/free_block_drop.cpp	/^void free_block_drop::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:free_block_drop
+visit	events/free_block_drop.cpp	/^void free_block_drop::visit(representation::arena_map& map) {$/;"	f	class:free_block_drop
+visit	events/free_block_drop.cpp	/^void free_block_drop::visit(representation::block& block) {$/;"	f	class:free_block_drop
+visit	events/free_block_drop.cpp	/^void free_block_drop::visit(representation::cell2D& cell) {$/;"	f	class:free_block_drop
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit($/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(representation::arena_map& map) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(representation::block& block) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(representation::cell2D& cell) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(representation::perceived_arena_map& map) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(tasks::forager& task) {$/;"	f	class:free_block_pickup
+visit	events/free_block_pickup.cpp	/^void free_block_pickup::visit(tasks::generalist& task) {$/;"	f	class:free_block_pickup
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit($/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(fsm::block_to_nest_fsm& fsm) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(fsm::depth0::stateless_foraging_fsm& fsm) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(metrics::block_metrics_collector& collector) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(representation::arena_map& map) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(representation::block& block) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(tasks::collector& task) {$/;"	f	class:nest_block_drop
+visit	events/nest_block_drop.cpp	/^void nest_block_drop::visit(tasks::generalist& task) {$/;"	f	class:nest_block_drop
+~block_found	events/block_found.cpp	/^block_found::~block_found(void) { client::rmmod(); }$/;"	f	class:block_found
+~cache_found	events/cache_found.cpp	/^cache_found::~cache_found(void) { client::rmmod(); }$/;"	f	class:cache_found
+~stateful_foraging_loop_functions	support/depth0/stateful_foraging_loop_functions.cpp	/^stateful_foraging_loop_functions::~stateful_foraging_loop_functions(void) {}$/;"	f	class:stateful_foraging_loop_functions

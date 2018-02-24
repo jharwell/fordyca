@@ -77,8 +77,6 @@ class cache_penalty_handler : public rcppsw::er::client {
   template<typename T>
   bool penalty_init(T& controller,
                     uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
@@ -95,8 +93,7 @@ class cache_penalty_handler : public rcppsw::er::client {
              utils::robot_id(controller),
              timestep,
              mc_penalty);
-      uint penalty = penalty_func(timestep);
-      //  uint penalty = mc_penalty;
+      uint penalty = mc_penalty;
 
       /*
        * Due to assertions in the \ref cache_block_pickup, if two robots enter
@@ -137,8 +134,6 @@ class cache_penalty_handler : public rcppsw::er::client {
   template<typename T>
   bool penalty_satisfied(T& controller,
                          uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_penalty& p) {
                              return p.controller() == &controller;});
@@ -175,27 +170,6 @@ class cache_penalty_handler : public rcppsw::er::client {
                            [&](const cache_penalty& p) {
                              return p.controller() == &controller; });
     return it != m_penalty_list.end();
-  }
-
-  uint sine_func(uint timestep) {
-    return (uint) (4 *(sin(timestep) + 1));
-  }
-
-  uint square_func(uint timestep) {
-    uint time_ones = timestep % 10;
-    if(time_ones >= 0 && time_ones < 5) {
-      return 0;
-    } else if(time_ones >= 5 && time_ones < 10) {
-      return 1;
-    }
-  }
-
-  uint step_func(uint timestep) {
-    return (timestep/20)
-  }
-
-  uint sawtooth_func(uint timestep){
-    return (timestep % 10);
   }
 
 

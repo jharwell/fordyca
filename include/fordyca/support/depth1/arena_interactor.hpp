@@ -97,7 +97,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
             finish_cache_block_drop(controller);
           }
         } else {
-          m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+          m_cache_penalty_handler.penalty_init<T>(controller, timestep,
+                                    m_cache_penalty_handler.sine_func);
         }
       } else { /* The foot-bot has no block item */
         handle_free_block_pickup(controller);
@@ -108,7 +109,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
             finish_cached_block_pickup(controller);
           }
         } else {
-          m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+          m_cache_penalty_handler.penalty_init<T>(controller, timestep,
+                                    m_cache_penalty_handler.sine_func);
         }
       }
   }

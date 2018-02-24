@@ -76,9 +76,7 @@ class cache_penalty_handler : public rcppsw::er::client {
    */
   template<typename T>
   bool penalty_init(T& controller,
-                    uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
+                    uint timestep, uint (*penalty_func) (uint)) {
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
@@ -137,8 +135,6 @@ class cache_penalty_handler : public rcppsw::er::client {
   template<typename T>
   bool penalty_satisfied(T& controller,
                          uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_penalty& p) {
                              return p.controller() == &controller;});

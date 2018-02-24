@@ -37,7 +37,6 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-
 /**
  * @class cache_penalty_handler
  * @ingroup support depth1
@@ -53,7 +52,7 @@ NS_START(fordyca, support, depth1);
 class cache_penalty_handler : public rcppsw::er::client {
  public:
   cache_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
-                        representation::arena_map& map,
+                        std::shared_ptr<representation::arena_map>& map,
                         uint penalty)
       : client(server), mc_penalty(penalty), m_penalty_list(), m_map(map) {
     insmod("cache_penalty_handler",
@@ -75,24 +74,24 @@ class cache_penalty_handler : public rcppsw::er::client {
    * and they should begin waiting, and \c FALSE otherwise.
    */
   template<typename T>
-  bool penalty_init(T& controller,
-                    uint timestep) {
+  bool penalty_init(argos::CFootBotEntity& robot,
+                    uint timestep, uint (*penalty_func) (uint)) {
     auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
-      int cache_id = utils::robot_on_cache(controller, m_map);
+      int cache_id = utils::robot_on_cache(robot, m_map);
       if (-1 == cache_id) {
         return false;
       }
 
       ER_ASSERT(!controller.block_detected(),
                 "FATAL: Block detected in cache?");
-      ER_ASSERT(!is_serving_penalty<T>(controller),
+      ER_ASSERT(!is_serving_penalty<T>(robot),
                 "FATAL: Robot already serving cache penalty");
 
       ER_NOM("fb%d: start=%u, duration=%u",
-             utils::robot_id(controller),
+             utils::robot_id(robot),
              timestep,
              mc_penalty);
       uint penalty = penalty_func(timestep);
@@ -135,7 +134,7 @@ class cache_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   template<typename T>
-  bool penalty_satisfied(T& controller,
+  bool penalty_satisfied(argos::CFootBotEntity& robot,
                          uint timestep) {
     auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
 
@@ -151,7 +150,8 @@ class cache_penalty_handler : public rcppsw::er::client {
   void remove(cache_penalty& victim) { return m_penalty_list.remove(victim); }
 
   template<typename T>
-  void penalty_abort(T& controller) {
+  void penalty_abort(argos::CFootBotEntity& robot) {
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     auto it = std::find_if(m_penalty_list.begin(),
                            m_penalty_list.end(),
                            [&](const cache_penalty& p) {
@@ -160,8 +160,9 @@ class cache_penalty_handler : public rcppsw::er::client {
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
-    ER_NOM("fb%d", utils::robot_id(controller));
-    ER_ASSERT(!is_serving_penalty<T>(controller),
+    ER_NOM("fb%d",
+           utils::robot_id(robot));
+    ER_ASSERT(!is_serving_penalty<T>(robot),
               "FATAL: Robot still serving penalty after abort");
   }
 
@@ -170,7 +171,9 @@ class cache_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   template<typename T>
-  bool is_serving_penalty(T& controller) {
+  bool is_serving_penalty(
+      argos::CFootBotEntity& robot) {
+    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_penalty& p) {
                              return p.controller() == &controller; });
@@ -201,9 +204,9 @@ class cache_penalty_handler : public rcppsw::er::client {
 
  private:
   // clang-format off
-  uint                       mc_penalty;
-  std::list<cache_penalty>   m_penalty_list;
-  representation::arena_map& m_map;
+  uint                                       mc_penalty;
+  std::list<cache_penalty>                   m_penalty_list;
+  std::shared_ptr<representation::arena_map> m_map;
   // clang-format on
 };
 NS_END(depth1, support, fordyca);

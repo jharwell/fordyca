@@ -71,6 +71,16 @@ class cache_penalty {
     return current_time - m_start_time >= m_penalty;
   }
 
+  /**
+   * @brief enumerated type for penalty function setting.
+
+  enum class penalty_func {
+    Step_func,
+    Sine_func,
+
+  } */
+  
+
  private:
   // clang-format off
   uint                                                m_cache_id;
