@@ -76,9 +76,7 @@ class cache_penalty_handler : public rcppsw::er::client {
    */
   template<typename T>
   bool penalty_init(T& controller,
-                    uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
+                    uint timestep, uint (*penalty_func) (uint)) {
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
@@ -137,8 +135,6 @@ class cache_penalty_handler : public rcppsw::er::client {
   template<typename T>
   bool penalty_satisfied(T& controller,
                          uint timestep) {
-    auto& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const cache_penalty& p) {
                              return p.controller() == &controller;});
@@ -177,11 +173,11 @@ class cache_penalty_handler : public rcppsw::er::client {
     return it != m_penalty_list.end();
   }
 
-  uint sine_func(uint timestep) {
+  static uint sine_func(uint timestep) {
     return (uint) (4 *(sin(timestep) + 1));
   }
 
-  uint square_func(uint timestep) {
+  static uint square_func(uint timestep) {
     uint time_ones = timestep % 10;
     if(time_ones >= 0 && time_ones < 5) {
       return 0;
@@ -190,14 +186,13 @@ class cache_penalty_handler : public rcppsw::er::client {
     }
   }
 
-  uint step_func(uint timestep) {
-    return (timestep/20)
+  static uint step_func(uint timestep) {
+    return (timestep/20);
   }
 
-  uint sawtooth_func(uint timestep){
+  static uint sawtooth_func(uint timestep){
     return (timestep % 10);
   }
-
 
  private:
   // clang-format off

@@ -98,7 +98,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
           }
         } else {
           m_cache_penalty_handler.penalty_init<T>(controller, timestep,
-                                    m_cache_penalty_handler.sine_func);
+                                      sine_func);
         }
       } else { /* The foot-bot has no block item */
         handle_free_block_pickup(controller);
@@ -110,7 +110,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
           }
         } else {
           m_cache_penalty_handler.penalty_init<T>(controller, timestep,
-                                    m_cache_penalty_handler.sine_func);
+                                      sine_func);
         }
       }
   }
@@ -308,6 +308,26 @@ class arena_interactor : public depth0::arena_interactor<T> {
     m_cache_penalty_handler.penalty_abort(controller);
     return true;
   }
+
+  static uint sine_func(uint timestep) {
+    return (uint) (4 *(sin(timestep) + 1));
+  }
+
+  static uint square_func(uint timestep) {
+    uint time_ones = timestep % 10;
+    if(time_ones >= 0 && time_ones < 5) {
+      return 0;
+    } else if(time_ones >= 5 && time_ones < 10) {
+      return 1;
+    }
+  }
+
+  static uint step_func(uint timestep) {
+    return (timestep/20);
+  }
+
+  static uint sawtooth_func(uint timestep){
+    return (timestep % 10);
 
  private:
   // clang-format off
