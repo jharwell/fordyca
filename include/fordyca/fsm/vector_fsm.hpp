@@ -169,8 +169,8 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * @brief The maximum arrival tolerance used by the FSM, for use in handling
    * speed reduction near the target so as to not overshoot it.
    */
-  constexpr static double kMAX_ARRIVAL_TOL = std::max(kBLOCK_ARRIVAL_TOL,
-                                                      kCACHE_ARRIVAL_TOL);
+  constexpr static double kMAX_ARRIVAL_TOL =
+      std::max(kBLOCK_ARRIVAL_TOL, kCACHE_ARRIVAL_TOL);
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.

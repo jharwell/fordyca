@@ -1,5 +1,5 @@
 /**
- * @file task_parser.hpp
+ * @file init_estimates_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_INIT_ESTIMATES_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_INIT_ESTIMATES_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
 
-struct task_params;
-
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class task_parser
+ * @struct exec_estimates_params
  * @ingroup params depth1
  *
- * @brief Parses XML parameters for relating to tasks into \ref task_params.
+ * @brief Parameters for initializing execution time estimates of tasks to
+ * something within a certain range, which helps to speed swarm convergence a
+ * fair bit.
  */
-class task_parser: public rcppsw::common::xml_param_parser {
- public:
-  task_parser(void) : m_params() {}
+struct exec_estimates_params : public rcppsw::common::base_params {
+  exec_estimates_params(void)
+      : generalist_range(), harvester_range(), collector_range() {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct task_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
-
- private:
-  std::unique_ptr<struct task_params> m_params;
+  bool enabled{false};
+  argos::CRange<double> generalist_range;
+  argos::CRange<double> harvester_range;
+  argos::CRange<double> collector_range;
 };
 
-NS_END(params, fordyca, depth1);
+NS_END(depth1, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_INIT_ESTIMATES_PARAMS_HPP_ */

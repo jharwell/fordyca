@@ -28,9 +28,9 @@
 #include <experimental/filesystem>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
@@ -39,16 +39,17 @@
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 namespace fs = std::experimental::filesystem;
-using interactor = arena_interactor<controller::depth0::stateless_foraging_controller>;
+using interactor =
+    arena_interactor<controller::depth0::stateless_foraging_controller>;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -152,11 +153,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
 
   /* get stats from this robot before its state changes */
   m_collector_group.collect_from(
-      "fsm::distance",
-      static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect_from(
-      "fsm::stateless",
-      static_cast<metrics::fsm::stateless_metrics&>(*controller.fsm()));
+      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
+  m_collector_group.collect_from("fsm::stateless",
+                                 static_cast<metrics::fsm::stateless_metrics&>(
+                                     *controller.fsm()));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);

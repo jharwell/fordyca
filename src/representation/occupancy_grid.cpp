@@ -45,9 +45,7 @@ occupancy_grid::occupancy_grid(
       m_robot_id(robot_id),
       m_server(std::move(server)) {
   deferred_client_init(m_server);
-  insmod("occupancy_grid",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+  insmod("occupancy_grid", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
   ER_NOM("%zu x%zu/%zu x %zu @ %f resolution",
          stacked_grid2::xdsize(),
          stacked_grid2::ydsize(),
@@ -75,7 +73,7 @@ void occupancy_grid::update(void) {
 } /* update() */
 
 void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {
-  stacked_grid2::access<kPheromoneLayer>(i,j).rho(pheromone_rho);
+  stacked_grid2::access<kPheromoneLayer>(i, j).rho(pheromone_rho);
   cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
   cell.robot_id(m_robot_id);
   cell.loc(rcppsw::math::dcoord2(i, j));
@@ -83,7 +81,8 @@ void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {
 } /* cell_init() */
 
 void occupancy_grid::cell_update(size_t i, size_t j) {
-  rcppsw::swarm::pheromone_density& density = stacked_grid2::access<kPheromoneLayer>(i, j);
+  rcppsw::swarm::pheromone_density& density =
+      stacked_grid2::access<kPheromoneLayer>(i, j);
   cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.last_result() <= 1.0,
@@ -92,11 +91,11 @@ void occupancy_grid::cell_update(size_t i, size_t j) {
 
   if (density.calc() < kEpsilon) {
     ER_VER("Relevance of cell(%zu, %zu) is within %f of 0 for %s",
-           i, j,
+           i,
+           j,
            kEpsilon,
            m_robot_id.c_str());
-    events::cell_unknown op(cell.loc().first,
-                            cell.loc().second);
+    events::cell_unknown op(cell.loc().first, cell.loc().second);
     cell.accept(op);
   }
 } /* cell_update() */

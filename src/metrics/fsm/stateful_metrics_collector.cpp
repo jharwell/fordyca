@@ -68,8 +68,7 @@ void stateful_metrics_collector::reset(void) {
 
 void stateful_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m =
-      static_cast<const metrics::fsm::stateful_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::stateful_metrics&>(metrics);
   m_stats.n_acquiring_block += static_cast<uint>(m.is_acquiring_block());
   m_stats.n_vectoring_to_block += static_cast<uint>(m.is_vectoring_to_block());
 

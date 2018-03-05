@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/task_repository.hpp"
-#include "fordyca/params/depth1/task_parser.hpp"
+#include "fordyca/params/depth1/task_allocation_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,6 +32,8 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-task_repository::task_repository(void) { register_parser<task_parser>("task"); }
+task_repository::task_repository(void) {
+  register_parser<task_allocation_parser>("task_allocation");
+}
 
 NS_END(depth1, params, fordyca);

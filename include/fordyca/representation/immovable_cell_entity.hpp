@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
 #include "fordyca/math/utils.hpp"
+#include "fordyca/representation/cell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,11 +56,9 @@ class immovable_cell_entity : public cell_entity {
                         argos::CColor color,
                         const argos::CVector2& loc,
                         double resolution)
-      : cell_entity(x_dim, y_dim, color),
-        m_resolution(resolution) {
+      : cell_entity(x_dim, y_dim, color), m_resolution(resolution) {
     cell_entity::real_loc(loc);
-    cell_entity::discrete_loc(
-        math::rcoord_to_dcoord(loc, m_resolution));
+    cell_entity::discrete_loc(math::rcoord_to_dcoord(loc, m_resolution));
   }
 
   immovable_cell_entity(double dim,

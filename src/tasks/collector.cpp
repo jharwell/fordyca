@@ -25,8 +25,8 @@
 #include "rcppsw/task_allocation/task_params.hpp"
 
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"

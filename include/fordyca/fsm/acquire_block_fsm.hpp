@@ -72,11 +72,10 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_block_fsm
-    : public base_foraging_fsm,
-      public metrics::fsm::stateless_metrics,
-      public metrics::fsm::stateful_metrics,
-      public rcppsw::task_allocation::taskable {
+class acquire_block_fsm : public base_foraging_fsm,
+                          public metrics::fsm::stateless_metrics,
+                          public metrics::fsm::stateful_metrics,
+                          public rcppsw::task_allocation::taskable {
  public:
   acquire_block_fsm(
       const struct params::fsm_params* params,
@@ -140,8 +139,7 @@ class acquire_block_fsm
    * acquiring a block, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_block(
-      std::list<representation::perceived_block> blocks);
+  bool acquire_known_block(std::list<representation::perceived_block> blocks);
 
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);

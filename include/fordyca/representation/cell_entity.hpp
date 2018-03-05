@@ -27,8 +27,8 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <utility>
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -100,7 +100,9 @@ class cell_entity {
   }
 
   virtual void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  virtual void discrete_loc(const rcppsw::math::dcoord2& loc) { m_discrete_loc = loc; }
+  virtual void discrete_loc(const rcppsw::math::dcoord2& loc) {
+    m_discrete_loc = loc;
+  }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the entity

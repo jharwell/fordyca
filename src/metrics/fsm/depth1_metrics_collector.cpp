@@ -73,8 +73,7 @@ void depth1_metrics_collector::reset(void) {
 
 void depth1_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m =
-      static_cast<const metrics::fsm::depth1_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::depth1_metrics&>(metrics);
   m_stats.n_exploring_for_cache += static_cast<uint>(m.is_exploring_for_cache());
   m_stats.n_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
   m_stats.n_vectoring_to_cache += static_cast<uint>(m.is_vectoring_to_cache());

@@ -22,8 +22,8 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************

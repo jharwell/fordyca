@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <set>
+#include <string>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,11 +48,12 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are output at the specified interval.
  */
-class cache_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                public visitor::visitable_any<cache_metrics_collector> {
+class cache_metrics_collector
+    : public rcppsw::metrics::base_metrics_collector,
+      public visitor::visitable_any<cache_metrics_collector> {
  public:
   cache_metrics_collector(const std::string& ofname,
-                                   bool collect_cum,
+                          bool collect_cum,
                           uint collect_interval);
 
   void reset(void) override;

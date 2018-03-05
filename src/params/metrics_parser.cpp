@@ -41,8 +41,12 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
   argos::GetNodeAttribute(node, "stateful_fname", m_params->stateful_fname);
   argos::GetNodeAttribute(node, "depth1_fname", m_params->depth1_fname);
   argos::GetNodeAttribute(node, "block_fname", m_params->block_fname);
-  argos::GetNodeAttribute(node, "task_execution_fname", m_params->task_execution_fname);
-  argos::GetNodeAttribute(node, "task_management_fname", m_params->task_management_fname);
+  argos::GetNodeAttribute(node,
+                          "task_execution_fname",
+                          m_params->task_execution_fname);
+  argos::GetNodeAttribute(node,
+                          "task_management_fname",
+                          m_params->task_management_fname);
   argos::GetNodeAttribute(node, "cache_fname", m_params->cache_fname);
   argos::GetNodeAttribute(node, "collect_cum", m_params->collect_cum);
   argos::GetNodeAttribute(node, "collect_interval", m_params->collect_interval);
@@ -58,8 +62,10 @@ void metrics_parser::show(std::ostream& stream) {
     stream << "distance_fname=" << m_params->distance_fname << std::endl;
     stream << "depth1_fname=" << m_params->depth1_fname << std::endl;
     stream << "block_fname=" << m_params->block_fname << std::endl;
-    stream << "task_execution_fname=" << m_params->task_execution_fname << std::endl;
-    stream << "task_management_fname=" << m_params->task_management_fname << std::endl;
+    stream << "task_execution_fname=" << m_params->task_execution_fname
+           << std::endl;
+    stream << "task_management_fname=" << m_params->task_management_fname
+           << std::endl;
     stream << "collect_cum=" << m_params->collect_cum << std::endl;
     stream << "collect_interval=" << m_params->collect_interval << std::endl;
   }

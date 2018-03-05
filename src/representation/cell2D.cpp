@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/block.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -39,9 +39,7 @@ cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
   m_fsm.init();
 }
 
-cell2D::cell2D(void) : m_loc(), m_fsm() {
-  m_fsm.init();
-}
+cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 
 /*******************************************************************************
  * Member Functions

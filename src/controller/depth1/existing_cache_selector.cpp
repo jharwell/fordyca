@@ -55,9 +55,8 @@ representation::perceived_cache existing_cache_selector::calc_best(
   for (auto& c : existing_caches) {
     math::existing_cache_utility u(c.ent->real_loc(), m_nest_loc);
 
-    double utility = u.calc(robot_loc,
-                            c.density.last_result(),
-                            c.ent->n_blocks());
+    double utility =
+        u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
     ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",
             c.ent->id(),

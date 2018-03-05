@@ -35,11 +35,11 @@
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
 #include "rcppsw/er/server.hpp"
 
@@ -90,31 +90,31 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
 
-void foraging_loop_functions::pre_step_iter(
-    argos::CFootBotEntity& robot) {
+void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect_from("fsm::distance",
-                                static_cast<metrics::fsm::distance_metrics&>(controller));
-  collector_group().collect_from("tasks::management",
-                                static_cast<rcppsw::metrics::tasks::management_metrics&>(
-                                    controller));
+  collector_group().collect_from(
+      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
+  collector_group().collect_from(
+      "tasks::management",
+      static_cast<rcppsw::metrics::tasks::management_metrics&>(controller));
 
   if (nullptr != controller.current_task()) {
-  collector_group().collect_from("fsm::stateless",
-                                static_cast<metrics::fsm::stateless_metrics&>(
-                                    *controller.current_task()));
-  collector_group().collect_from("fsm::stateful",
-                                static_cast<metrics::fsm::stateful_metrics&>(
-                                    *controller.current_task()));
-  collector_group().collect_from("fsm::depth1",
-                                static_cast<metrics::fsm::depth1_metrics&>(
-                                    *controller.current_task()));
-  collector_group().collect_from("tasks::execution",
-                                static_cast<rcppsw::metrics::tasks::execution_metrics&>(
-                                    *controller.current_task()));
+    collector_group().collect_from("fsm::stateless",
+                                   static_cast<metrics::fsm::stateless_metrics&>(
+                                       *controller.current_task()));
+    collector_group().collect_from("fsm::stateful",
+                                   static_cast<metrics::fsm::stateful_metrics&>(
+                                       *controller.current_task()));
+    collector_group().collect_from("fsm::depth1",
+                                   static_cast<metrics::fsm::depth1_metrics&>(
+                                       *controller.current_task()));
+    collector_group().collect_from(
+        "tasks::execution",
+        static_cast<rcppsw::metrics::tasks::execution_metrics&>(
+            *controller.current_task()));
   }
 
   /* send the robot its view of the world: what it sees and where it is */
@@ -126,7 +126,7 @@ void foraging_loop_functions::pre_step_iter(
   (*m_interactor)(controller,
                   GetSpace().GetSimulationClock(),
                   static_cast<metrics::block_metrics_collector&>(
-                   *collector_group()["block"]));
+                      *collector_group()["block"]));
 } /* pre_step_iter() */
 
 argos::CColor foraging_loop_functions::GetFloorColor(
@@ -158,10 +158,9 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 
 void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
-  for (auto &c : arena_map()->caches()) {
+  for (auto& c : arena_map()->caches()) {
     collector_group().collect_from("cache",
-                                  static_cast<metrics::cache_metrics&>(
-                                      c));
+                                   static_cast<metrics::cache_metrics&>(c));
     c.reset_metrics();
   } /* for(&c..) */
 

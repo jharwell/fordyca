@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************
@@ -37,8 +37,8 @@ namespace tasks = fordyca::tasks;
  * Constructors/Destructor
  ******************************************************************************/
 execution_metrics_collector::execution_metrics_collector(const std::string& ofname,
-                               bool collect_cum,
-                               uint collect_interval)
+                                                         bool collect_cum,
+                                                         uint collect_interval)
     : base_metrics_collector(ofname, collect_cum),
       m_count_stats(),
       m_int_stats() {
@@ -49,7 +49,8 @@ execution_metrics_collector::execution_metrics_collector(const std::string& ofna
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string execution_metrics_collector::csv_header_build(const std::string& header) {
+std::string execution_metrics_collector::csv_header_build(
+    const std::string& header) {
   // clang-format off
   std::string line = base_metrics_collector::csv_header_build(header);
   return line +
@@ -73,7 +74,8 @@ void execution_metrics_collector::reset(void) {
 void execution_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = static_cast<const task_metrics::execution_metrics&>(metrics);
-  auto& task = dynamic_cast<const rcppsw::task_allocation::logical_task&>(metrics);
+  auto& task =
+      dynamic_cast<const rcppsw::task_allocation::logical_task&>(metrics);
 
   m_count_stats.n_collectors +=
       static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
@@ -101,11 +103,12 @@ bool execution_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  double avg = m_int_stats.cum_collector_delay /
-               (m_count_stats.n_cum_collectors/static_cast<double>(interval()));
+  double avg =
+      m_int_stats.cum_collector_delay /
+      (m_count_stats.n_cum_collectors / static_cast<double>(interval()));
   line = std::to_string(avg) + separator();
   avg = m_int_stats.cum_harvester_delay /
-        (m_count_stats.n_cum_harvesters/static_cast<double>(interval()));
+        (m_count_stats.n_cum_harvesters / static_cast<double>(interval()));
 
   line += std::to_string(avg) + separator() +
           std::to_string(m_count_stats.n_collectors) + separator() +

@@ -25,8 +25,8 @@
 
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/block.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -55,13 +55,12 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<perceived_block> perceived_arena_map::perceived_blocks(
-    void) const {
+std::list<perceived_block> perceived_arena_map::perceived_blocks(void) const {
   std::list<perceived_block> pblocks;
 
   for (auto& b : m_blocks) {
-    pblocks.push_back(representation::perceived_block(b.get(),
-                                                      m_grid.access<0>(b->discrete_loc())));
+    pblocks.push_back(representation::perceived_block(
+        b.get(), m_grid.access<0>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
@@ -77,8 +76,7 @@ std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
   return pcaches;
 } /* caches() */
 
-void perceived_arena_map::cache_add(
-    std::unique_ptr<base_cache>& cache) {
+void perceived_arena_map::cache_add(std::unique_ptr<base_cache>& cache) {
   cache_remove(cache.get());
   m_caches.push_back(std::move(cache));
 } /* cache_add() */
@@ -95,8 +93,7 @@ void perceived_arena_map::cache_remove(const base_cache* victim) {
   } /* for(it..) */
 } /* cache_remove() */
 
-bool perceived_arena_map::block_add(
-    std::unique_ptr<block>& block) {
+bool perceived_arena_map::block_add(std::unique_ptr<block>& block) {
   auto it1 =
       std::find_if(m_blocks.begin(),
                    m_blocks.end(),
@@ -156,8 +153,7 @@ bool perceived_arena_map::block_remove(const block* victim) {
       ER_VER("Remove block%d", victim->id());
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc())
-          .accept(op);
+      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
       m_blocks.erase(it);
       return true;
     }

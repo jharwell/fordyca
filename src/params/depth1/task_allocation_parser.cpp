@@ -1,6 +1,5 @@
 /**
- * @file perceived_block.hpp
- * @ingroup representation
+ * @file task_allocation_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,42 +18,39 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_BLOCK_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_BLOCK_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-
-class block;
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Type Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @struct perceived_block
- * @ingroup representation
- *
- * @brief A representation of a "virtual" block in the arena, which has a
- * pheromone density/relevance associated with it.
- */
-struct perceived_block {
-  perceived_block(void) : ent(nullptr), density() {}
-  perceived_block(block* b, const rcppsw::swarm::pheromone_density& d)
-      : ent(b), density(d) {}
+void task_allocation_parser::parse(argos::TConfigurationNode& node) {
+  argos::TConfigurationNode task_node = argos::GetNode(node, "task_allocation");
 
-  block* ent;
-  rcppsw::swarm::pheromone_density density;
-};
+  m_exec_parser.parse(argos::GetNode(task_node, "executive"));
+  m_estimate_parser.parse(argos::GetNode(task_node, "init_estimates"));
+  m_params = rcppsw::make_unique<struct task_allocation_params>();
+  m_params->executive = *m_exec_parser.get_results();
+  m_params->exec_estimates = *m_estimate_parser.get_results();
+} /* parse() */
 
-NS_END(representation, fordyca);
+void task_allocation_parser::show(std::ostream& stream) {
+  stream
+      << "====================\nTask allocation params\n====================\n";
+  m_exec_parser.show(stream);
+  m_estimate_parser.show(stream);
+} /* show() */
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_BLOCK_HPP_ */
+__pure bool task_allocation_parser::validate(void) {
+  return m_exec_parser.validate() && m_estimate_parser.validate();
+} /* validate() */
+
+NS_END(depth1, params, fordyca);

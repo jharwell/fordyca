@@ -40,7 +40,8 @@ int robot_on_block(const controller::base_foraging_controller& controller,
 __pure int robot_on_block(argos::CFootBotEntity& robot,
                           const representation::arena_map& map) {
   return robot_on_block(dynamic_cast<controller::base_foraging_controller&>(
-      robot.GetControllableEntity().GetController()), map);
+                            robot.GetControllableEntity().GetController()),
+                        map);
 } /* robot_on_block() */
 
 int robot_id(argos::CFootBotEntity& robot) {
@@ -61,7 +62,8 @@ int robot_on_cache(const controller::base_foraging_controller& controller,
 __pure int robot_on_cache(argos::CFootBotEntity& robot,
                           const representation::arena_map& map) {
   return robot_on_cache(dynamic_cast<controller::base_foraging_controller&>(
-      robot.GetControllableEntity().GetController()), map);
+                            robot.GetControllableEntity().GetController()),
+                        map);
 }
 
 __const bool block_drop_overlap_with_cache(
@@ -74,27 +76,25 @@ __const bool block_drop_overlap_with_cache(
           cache.contains_point(drop_loc - argos::CVector2(0, block->ysize())));
 } /* block_drop_overlap_with_cache() */
 
-__pure bool block_drop_near_arena_boundary(
-    const representation::arena_map& map,
-    const representation::block* block,
-    const argos::CVector2& drop_loc) {
-  return (drop_loc.GetX() <= block->xsize() * 2  ||
-          drop_loc.GetX() >= map.xrsize() - block->xsize() * 2  ||
+__pure bool block_drop_near_arena_boundary(const representation::arena_map& map,
+                                           const representation::block* block,
+                                           const argos::CVector2& drop_loc) {
+  return (drop_loc.GetX() <= block->xsize() * 2 ||
+          drop_loc.GetX() >= map.xrsize() - block->xsize() * 2 ||
           drop_loc.GetY() <= block->ysize() * 2 ||
           drop_loc.GetY() >= map.yrsize() - block->ysize() * 2);
 } /* block_drop_overlap_with_nest() */
 
-__pure bool block_drop_overlap_with_nest(
-    const representation::block* block,
-    const argos::CRange<double>& xrange,
-    const argos::CRange<double>& yrange,
-    const argos::CVector2& drop_loc) {
-  return (xrange.WithinMinBoundIncludedMaxBoundIncluded(
-      drop_loc.GetX() + block->xsize()) ||
-          xrange.WithinMinBoundIncludedMaxBoundIncluded(
-              drop_loc.GetX() - block->xsize()) ||
-          yrange.WithinMinBoundIncludedMaxBoundIncluded(
-              drop_loc.GetY() + block->ysize()) ||
+__pure bool block_drop_overlap_with_nest(const representation::block* block,
+                                         const argos::CRange<double>& xrange,
+                                         const argos::CRange<double>& yrange,
+                                         const argos::CVector2& drop_loc) {
+  return (xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() +
+                                                        block->xsize()) ||
+          xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() -
+                                                        block->xsize()) ||
+          yrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetY() +
+                                                        block->ysize()) ||
           yrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetY() -
                                                         block->ysize()));
 } /* block_drop_overlap_with_nest() */

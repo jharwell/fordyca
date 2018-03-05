@@ -34,10 +34,8 @@ NS_START(fordyca, metrics);
  ******************************************************************************/
 cache_metrics_collector::cache_metrics_collector(const std::string& ofname,
                                                  bool collect_cum,
-                                                 uint collect_interval) :
-    base_metrics_collector(ofname, collect_cum),
-    m_stats(),
-    m_cache_ids() {
+                                                 uint collect_interval)
+    : base_metrics_collector(ofname, collect_cum), m_stats(), m_cache_ids() {
   use_interval(true);
   interval(collect_interval);
 }
@@ -69,28 +67,28 @@ bool cache_metrics_collector::csv_line_build(std::string& line) {
    * to account for that in the avg # blocks across all caches. This is not
    * necessary for the rest of the reported metrics.
    */
-  line += (!m_cache_ids.empty()) ?
-          std::to_string(static_cast<double>(m_stats.n_blocks) /
-                         (m_cache_ids.size() * interval()))
-          : "0";
+  line += (!m_cache_ids.empty())
+              ? std::to_string(static_cast<double>(m_stats.n_blocks) /
+                               (m_cache_ids.size() * interval()))
+              : "0";
   line += separator();
 
-  line += (!m_cache_ids.empty()) ?
-          std::to_string(static_cast<double>(m_stats.n_pickups) /
-                         (m_cache_ids.size()))
-          : "0";
+  line += (!m_cache_ids.empty())
+              ? std::to_string(static_cast<double>(m_stats.n_pickups) /
+                               (m_cache_ids.size()))
+              : "0";
   line += separator();
 
-  line += (!m_cache_ids.empty()) ?
-          std::to_string(static_cast<double>(m_stats.n_drops) /
-                         (m_cache_ids.size()))
-          : "0";
+  line += (!m_cache_ids.empty())
+              ? std::to_string(static_cast<double>(m_stats.n_drops) /
+                               (m_cache_ids.size()))
+              : "0";
   line += separator();
 
-  line += (!m_cache_ids.empty()) ?
-          std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
-                         (m_penalty_count))
-          : "0";
+  line += (!m_cache_ids.empty())
+              ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
+                               (m_penalty_count))
+              : "0";
   line += separator();
 
   return true;

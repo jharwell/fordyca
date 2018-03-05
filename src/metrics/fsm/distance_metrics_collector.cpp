@@ -34,8 +34,8 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
                                                        bool collect_cum,
-                                                       uint collect_interval) :
-    base_metrics_collector(ofname, collect_cum), m_stats() {
+                                                       uint collect_interval)
+    : base_metrics_collector(ofname, collect_cum), m_stats() {
   if (collect_cum) {
     use_interval(true);
     interval(collect_interval);
@@ -49,7 +49,7 @@ std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
   std::string line;
   if (collect_cum()) {
-     line = "cum_distance";
+    line = "cum_distance";
   }
   return base_metrics_collector::csv_header_build(header) + line;
 } /* csv_header_build() */
@@ -72,8 +72,7 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
 
 void distance_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m =
-      static_cast<const metrics::fsm::distance_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::distance_metrics&>(metrics);
   m_stats.cum_distance += m.timestep_distance();
 } /* collect() */
 

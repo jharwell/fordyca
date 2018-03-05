@@ -32,9 +32,9 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/harvester.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/harvester.hpp"
 
 /*******************************************************************************
  * Namespaces

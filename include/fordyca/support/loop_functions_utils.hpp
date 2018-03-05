@@ -37,7 +37,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller { class base_foraging_controller; }
+namespace controller {
+class base_foraging_controller;
+}
 
 NS_START(support, utils);
 
@@ -140,7 +142,6 @@ void set_robot_los(argos::CFootBotEntity& robot,
           map.subgrid(robot_loc.first, robot_loc.second, 2), robot_loc);
   controller.los(new_los);
 }
-
 
 NS_END(utils, support, fordyca);
 
