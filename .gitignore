@@ -57,3 +57,7 @@ docs/latex
 *.csv
 output
 reports
+
+# Tags
+.tag*
+tags

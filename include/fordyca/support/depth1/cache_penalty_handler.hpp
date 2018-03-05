@@ -28,6 +28,7 @@
 
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/support/depth1/cache_penalty_generator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,7 +77,8 @@ class cache_penalty_handler : public rcppsw::er::client {
    */
   template<typename T>
   bool penalty_init(T& controller,
-                    uint timestep, uint (*penalty_func) (uint)) {
+                    uint timestep, uint (cache_penalty_generator::*penalty_func)
+                                                                      (uint)) {
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
@@ -173,25 +175,6 @@ class cache_penalty_handler : public rcppsw::er::client {
     return it != m_penalty_list.end();
   }
 
-  static uint sine_func(uint timestep) {
-    return (uint) (4 *(sin(timestep) + 1));
-  }
-
-  static uint square_func(uint timestep) {
-    uint time_ones = timestep % 10;
-    if(time_ones >= 0 && time_ones < 5) {
-      return 0;
-    } else if(time_ones >= 5 && time_ones < 10) {
-      return 1;
-    }
-  }
-
-  static uint step_func(uint timestep) {
-    return (timestep/20);
-  }
-
-  static uint sawtooth_func(uint timestep){
-    return (timestep % 10);
   }
 
  private:

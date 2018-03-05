@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth1/cache_penalty_handler.hpp"
+#include "fordyca/support/depth1/cache_penalty_generator.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -64,11 +65,14 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    argos::CFloorEntity* floor_in,
                    const argos::CRange<double>& nest_xrange,
                    const argos::CRange<double>& nest_yrange,
-                   uint cache_usage_penalty)
+                   uint cache_usage_penalty, char* pen_func, int amp, int per,
+                   int phase, int square, int step, int saw)
       : depth0::arena_interactor<T>(server, map_in, floor_in),
       m_nest_xrange(nest_xrange),
       m_nest_yrange(nest_yrange),
-    m_cache_penalty_handler(server, *map_in, cache_usage_penalty) {}
+    m_cache_penalty_handler(server, *map_in, cache_usage_penalty),
+    // new class object for generating temporal penalty function
+    m_cache_penalty_generator(pen_func, amp, per, phase, square, step, saw) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
@@ -98,7 +102,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
           }
         } else {
           m_cache_penalty_handler.penalty_init<T>(controller, timestep,
-                                      sine_func);
+                                      m_cache_penalty_generator.penalty_func);
         }
       } else { /* The foot-bot has no block item */
         handle_free_block_pickup(controller);
@@ -110,7 +114,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
           }
         } else {
           m_cache_penalty_handler.penalty_init<T>(controller, timestep,
-                                      sine_func);
+                                      m_cache_penalty_generator.penalty_func);
         }
       }
   }
@@ -309,31 +313,12 @@ class arena_interactor : public depth0::arena_interactor<T> {
     return true;
   }
 
-  static uint sine_func(uint timestep) {
-    return (uint) (4 *(sin(timestep) + 1));
-  }
-
-  static uint square_func(uint timestep) {
-    uint time_ones = timestep % 10;
-    if(time_ones >= 0 && time_ones < 5) {
-      return 0;
-    } else if(time_ones >= 5 && time_ones < 10) {
-      return 1;
-    }
-  }
-
-  static uint step_func(uint timestep) {
-    return (timestep/20);
-  }
-
-  static uint sawtooth_func(uint timestep){
-    return (timestep % 10);
-
  private:
   // clang-format off
   const argos::CRange<double>& m_nest_xrange;
   const argos::CRange<double>& m_nest_yrange;
   cache_penalty_handler        m_cache_penalty_handler;
+  cache_penalty_generator      m_cache_penalty_generator;
   // clang-format on
 };
 
