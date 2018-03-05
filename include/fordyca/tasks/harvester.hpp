@@ -1,5 +1,5 @@
 /**
- * @file forager.hpp
+ * @file harvester.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_FORAGER_HPP_
-#define INCLUDE_FORDYCA_TASKS_FORAGER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_
+#define INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,15 +39,15 @@ namespace task_allocation = rcppsw::task_allocation;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class forager
+ * @class harvester
  * @ingroup tasks
  *
  * @brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
  */
-class forager : public task_allocation::polled_task, public foraging_task {
+class harvester : public task_allocation::polled_task, public foraging_task {
  public:
-  forager(const struct task_allocation::task_params* params,
+  harvester(const struct task_allocation::task_params* params,
           std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
@@ -92,4 +92,4 @@ class forager : public task_allocation::polled_task, public foraging_task {
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_FORAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_ */

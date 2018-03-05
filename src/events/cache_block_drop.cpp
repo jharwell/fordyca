@@ -31,7 +31,7 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/forager.hpp"
+#include "fordyca/tasks/harvester.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
@@ -116,7 +116,7 @@ void cache_block_drop::visit(controller::depth1::foraging_controller& controller
          m_cache->id());
 } /* visit() */
 
-void cache_block_drop::visit(tasks::forager& task) {
+void cache_block_drop::visit(tasks::harvester& task) {
   static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 

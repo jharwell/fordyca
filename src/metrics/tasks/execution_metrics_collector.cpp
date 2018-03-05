@@ -54,11 +54,11 @@ std::string execution_metrics_collector::csv_header_build(const std::string& hea
   std::string line = base_metrics_collector::csv_header_build(header);
   return line +
       "collector_avg_interface_delay" + separator() +
-      "forager_avg_interface_delay" + separator() +
+      "harvester_avg_interface_delay" + separator() +
       "n_collectors"  + separator() +
       "n_cum_collectors"  + separator() +
-      "n_foragers" + separator() +
-      "n_cum_foragers" + separator() +
+      "n_harvesters" + separator() +
+      "n_cum_harvesters" + separator() +
       "n_generalists" + separator() +
       "n_cum_generalists" + separator();
   // clang-format on
@@ -77,22 +77,22 @@ void execution_metrics_collector::collect(
 
   m_count_stats.n_collectors +=
       static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
-  m_count_stats.n_foragers +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
+  m_count_stats.n_harvesters +=
+      static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
   m_count_stats.n_generalists +=
       static_cast<uint>(task.name() == tasks::foraging_task::kGeneralistName);
 
   if (m.at_interface()) {
     m_int_stats.cum_collector_delay +=
         static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
-    m_int_stats.cum_forager_delay +=
-        static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
+    m_int_stats.cum_harvester_delay +=
+        static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
   }
 
   m_count_stats.n_cum_collectors +=
       static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
-  m_count_stats.n_cum_foragers +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kForagerName);
+  m_count_stats.n_cum_harvesters +=
+      static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
   m_count_stats.n_cum_generalists += static_cast<uint>(
       task.name() == fordyca::tasks::foraging_task::kGeneralistName);
 } /* collect() */
@@ -104,14 +104,14 @@ bool execution_metrics_collector::csv_line_build(std::string& line) {
   double avg = m_int_stats.cum_collector_delay /
                (m_count_stats.n_cum_collectors/static_cast<double>(interval()));
   line = std::to_string(avg) + separator();
-  avg = m_int_stats.cum_forager_delay /
-        (m_count_stats.n_cum_foragers/static_cast<double>(interval()));
+  avg = m_int_stats.cum_harvester_delay /
+        (m_count_stats.n_cum_harvesters/static_cast<double>(interval()));
 
   line += std::to_string(avg) + separator() +
           std::to_string(m_count_stats.n_collectors) + separator() +
           std::to_string(m_count_stats.n_cum_collectors) + separator() +
-          std::to_string(m_count_stats.n_foragers) + separator() +
-          std::to_string(m_count_stats.n_cum_foragers) + separator() +
+          std::to_string(m_count_stats.n_harvesters) + separator() +
+          std::to_string(m_count_stats.n_cum_harvesters) + separator() +
           std::to_string(m_count_stats.n_generalists) + separator() +
           std::to_string(m_count_stats.n_cum_generalists) + separator();
   return true;
@@ -119,13 +119,13 @@ bool execution_metrics_collector::csv_line_build(std::string& line) {
 
 void execution_metrics_collector::reset_after_timestep(void) {
   m_count_stats.n_collectors = 0;
-  m_count_stats.n_foragers = 0;
+  m_count_stats.n_harvesters = 0;
   m_count_stats.n_generalists = 0;
 } /* reset_after_timestep() */
 
 void execution_metrics_collector::reset_after_interval(void) {
   m_count_stats.n_cum_collectors = 0;
-  m_count_stats.n_cum_foragers = 0;
+  m_count_stats.n_cum_harvesters = 0;
   m_count_stats.n_cum_generalists = 0;
   m_int_stats = {0, 0};
 } /* reset_after_interval() */

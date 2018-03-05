@@ -67,7 +67,7 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
  private:
   struct subtask_selection_stats {
-    uint n_foragers;
+    uint n_harvesters;
     uint n_collectors;
   };
 
@@ -83,12 +83,12 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
   struct finish_stats {
     uint n_completed;
-    uint n_forager_completed;
+    uint n_harvester_completed;
     uint n_collector_completed;
     uint n_generalist_completed;
 
     uint cum_collector_exec_time;
-    uint cum_forager_exec_time;
+    uint cum_harvester_exec_time;
     uint cum_generalist_exec_time;
     uint cum_task_exec_time;
   };

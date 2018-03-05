@@ -113,8 +113,8 @@
               />
       <nest size="0.5, 2.0" center="2, 2.5" />
     </arena_map>
-    <visualization robot_id="true"
-                   robot_los="false"
+    <visualization robot_id="false"
+                   robot_los="true"
                    robot_task="true"
                    block_id="false"
                    />

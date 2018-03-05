@@ -57,7 +57,7 @@ std::string management_metrics_collector::csv_header_build(const std::string& he
   // clang-format off
   std::string line = base_metrics_collector::csv_header_build(header);
     return line +
-        "forager_subtask_count" + separator() +
+        "harvester_subtask_count" + separator() +
         "collector_subtask_count" + separator() +
         "partition_count"  + separator() +
         "no_partition_count"  + separator() +
@@ -67,11 +67,11 @@ std::string management_metrics_collector::csv_header_build(const std::string& he
 
         "task_complete_count" + separator() +
         "collector_complete_count" + separator() +
-        "forager_complete_count" + separator() +
+        "harvester_complete_count" + separator() +
         "generalist_complete_count" + separator() +
 
         "avg_collector_exec_time" + separator() +
-        "avg_forager_exec_time" + separator() +
+        "avg_harvester_exec_time" + separator() +
         "avg_generalist_exec_time" + separator() +
         "avg_task_exec_time" + separator();
   // clang-format on
@@ -90,8 +90,8 @@ void management_metrics_collector::collect(
       ++m_partition_stats.n_partition;
       m_sel_stats.n_collectors +=
           static_cast<uint>(m.current_task_name() == tasks::foraging_task::kCollectorName);
-      m_sel_stats.n_foragers +=
-          static_cast<uint>(m.current_task_name() == tasks::foraging_task::kForagerName);
+      m_sel_stats.n_harvesters +=
+          static_cast<uint>(m.current_task_name() == tasks::foraging_task::kHarvesterName);
     } else {
       ++m_partition_stats.n_no_partition;
     }
@@ -109,9 +109,9 @@ void management_metrics_collector::collect(
     if (m.current_task_name() == tasks::foraging_task::kCollectorName) {
       m_finish_stats.cum_collector_exec_time += m.last_task_exec_time();
       ++m_finish_stats.n_collector_completed;
-    } else if (m.current_task_name() == tasks::foraging_task::kForagerName) {
-      m_finish_stats.cum_forager_exec_time += m.last_task_exec_time();
-      ++m_finish_stats.n_forager_completed;
+    } else if (m.current_task_name() == tasks::foraging_task::kHarvesterName) {
+      m_finish_stats.cum_harvester_exec_time += m.last_task_exec_time();
+      ++m_finish_stats.n_harvester_completed;
     } else if (m.current_task_name() == tasks::foraging_task::kGeneralistName) {
       m_finish_stats.cum_generalist_exec_time += m.last_task_exec_time();
       ++m_finish_stats.n_generalist_completed;
@@ -124,7 +124,7 @@ bool management_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
 
-  line = std::to_string(m_sel_stats.n_foragers) + separator() +
+  line = std::to_string(m_sel_stats.n_harvesters) + separator() +
       std::to_string(m_sel_stats.n_collectors) + separator() +
       std::to_string(m_partition_stats.n_partition) + separator() +
       std::to_string(m_partition_stats.n_no_partition) + separator() +
@@ -133,7 +133,7 @@ bool management_metrics_collector::csv_line_build(std::string& line) {
 
   line += std::to_string(m_finish_stats.n_completed) + separator();
   line += std::to_string(m_finish_stats.n_collector_completed) + separator();
-  line += std::to_string(m_finish_stats.n_forager_completed) + separator();
+  line += std::to_string(m_finish_stats.n_harvester_completed) + separator();
   line += std::to_string(m_finish_stats.n_generalist_completed) + separator();
 
   double avg = (m_finish_stats.n_collector_completed > 0) ?
@@ -141,8 +141,8 @@ bool management_metrics_collector::csv_line_build(std::string& line) {
         : 0;
   line += std::to_string(avg) + separator();
 
-  avg = (m_finish_stats.n_forager_completed > 0) ?
-        m_finish_stats.cum_forager_exec_time / m_finish_stats.n_forager_completed
+  avg = (m_finish_stats.n_harvester_completed > 0) ?
+        m_finish_stats.cum_harvester_exec_time / m_finish_stats.n_harvester_completed
         : 0;
   line += std::to_string(avg) + separator();
 

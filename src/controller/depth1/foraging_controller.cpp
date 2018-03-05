@@ -42,7 +42,7 @@
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/forager.hpp"
+#include "fordyca/tasks/harvester.hpp"
 #include "fordyca/tasks/generalist.hpp"
 
 #include "rcppsw/er/server.hpp"
@@ -61,7 +61,7 @@ foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
       m_metric_store(),
       m_executive(),
-      m_forager(),
+      m_harvester(),
       m_collector(),
       m_generalist() {}
 
@@ -116,14 +116,14 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::map_ref());
   m_collector = rcppsw::make_unique<tasks::collector>(&p->tasks, collector_fsm);
 
-  std::unique_ptr<task_allocation::taskable> forager_fsm =
+  std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_forager = rcppsw::make_unique<tasks::forager>(&p->tasks, forager_fsm);
+  m_harvester = rcppsw::make_unique<tasks::harvester>(&p->tasks, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
@@ -135,12 +135,12 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_generalist =
       rcppsw::make_unique<tasks::generalist>(&p->tasks, generalist_fsm);
 
-  m_generalist->partition1(m_forager.get());
+  m_generalist->partition1(m_harvester.get());
   m_generalist->partition2(m_collector.get());
   m_generalist->parent(m_generalist.get());
   m_generalist->set_partitionable();
 
-  m_forager->parent(m_generalist.get());
+  m_harvester->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
@@ -157,7 +157,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
 
   if (p->init_random_estimates) {
     m_generalist->init_random(2000, 4000);
-    m_forager->init_random(1000, 2000);
+    m_harvester->init_random(1000, 2000);
     m_collector->init_random(1000, 2000);
   }
   ER_NOM("depth1 controller initialization finished");
