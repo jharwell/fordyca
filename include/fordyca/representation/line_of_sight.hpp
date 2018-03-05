@@ -27,8 +27,8 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

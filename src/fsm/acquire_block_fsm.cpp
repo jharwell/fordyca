@@ -159,8 +159,8 @@ bool acquire_block_fsm::acquire_known_block(
      * vectoring toward any of them.
      */
     controller::depth0::block_selector selector(m_server, mc_nest_center);
-    representation::perceived_block best = selector.calc_best(blocks,
-                                                              m_sensors->robot_loc());
+    representation::perceived_block best =
+        selector.calc_best(blocks, m_sensors->robot_loc());
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
            best.ent->id(),
            best.ent->discrete_loc().first,

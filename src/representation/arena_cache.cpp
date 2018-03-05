@@ -36,8 +36,7 @@ arena_cache::arena_cache(double dimension,
                          argos::CVector2 center,
                          std::vector<block*>& blocks,
                          int id)
-    : base_cache(dimension, resolution, center,
-                 blocks, id) {}
+    : base_cache(dimension, resolution, center, blocks, id) {}
 
 /*******************************************************************************
  * Member Functions

@@ -27,12 +27,12 @@
 #include <vector>
 
 #include "fordyca/params/depth1/cache_params.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
+#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/ds/grid2D_ptr.hpp"
 
 /*******************************************************************************
  * Namespaces

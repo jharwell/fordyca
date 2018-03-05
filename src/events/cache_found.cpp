@@ -130,7 +130,7 @@ n   *
    * to reset the density for the cell, and start a new decay count.
    */
   if (cell.state_has_cache() && cell.cache()->id() != m_tmp_cache->id()) {
-      density.reset();
+    density.reset();
   }
 
   if (map.pheromone_repeat_deposit()) {

@@ -48,7 +48,7 @@ namespace task_allocation = rcppsw::task_allocation;
 class harvester : public task_allocation::polled_task, public foraging_task {
  public:
   harvester(const struct task_allocation::task_params* params,
-          std::unique_ptr<task_allocation::taskable>& mechanism);
+            std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
   void accept(events::cache_block_drop& visitor) override;

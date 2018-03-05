@@ -39,8 +39,7 @@ NS_START(fordyca, events);
  ******************************************************************************/
 cache_vanished::cache_vanished(const std::shared_ptr<rcppsw::er::server>& server,
                                uint cache_id)
-    : client(server),
-      m_cache_id(cache_id) {
+    : client(server), m_cache_id(cache_id) {
   client::insmod("cache_vanished",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -49,8 +48,7 @@ cache_vanished::cache_vanished(const std::shared_ptr<rcppsw::er::server>& server
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_vanished::visit(
-    controller::depth1::foraging_controller& controller) {
+void cache_vanished::visit(controller::depth1::foraging_controller& controller) {
   ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
          controller.GetId().c_str(),
          m_cache_id);

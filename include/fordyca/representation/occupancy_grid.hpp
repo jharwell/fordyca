@@ -25,22 +25,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <tuple>
 #include <string>
+#include <tuple>
 
+#include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { namespace depth0 {
+namespace params {
+namespace depth0 {
 struct occupancy_grid_params;
-}}
+}
+}
 
 NS_START(representation);
 
@@ -52,10 +54,9 @@ using layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 class occupancy_grid : public rcppsw::er::client,
                        public rcppsw::ds::stacked_grid2<layer_stack> {
  public:
-  occupancy_grid(
-      std::shared_ptr<rcppsw::er::server> server,
-      const struct params::depth0::occupancy_grid_params* c_params,
-      const std::string& robot_id);
+  occupancy_grid(std::shared_ptr<rcppsw::er::server> server,
+                 const struct params::depth0::occupancy_grid_params* c_params,
+                 const std::string& robot_id);
 
   /**
    * @brief Update the density of all cells in the grid.

@@ -29,8 +29,8 @@
 #include "fordyca/metrics/fsm/depth1_metrics.hpp"
 #include "fordyca/metrics/fsm/stateful_metrics.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************

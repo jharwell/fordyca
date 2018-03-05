@@ -31,8 +31,8 @@
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -160,8 +160,8 @@ bool acquire_cache_fsm::acquire_known_cache(
     if (!m_vector_fsm.task_running()) {
       controller::depth1::existing_cache_selector selector(m_server,
                                                            mc_nest_center);
-      representation::perceived_cache best = selector.calc_best(caches,
-                                                                m_sensors->robot_loc());
+      representation::perceived_cache best =
+          selector.calc_best(caches, m_sensors->robot_loc());
       ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
              best.ent->id(),
              best.ent->discrete_loc().first,

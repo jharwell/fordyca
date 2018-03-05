@@ -101,9 +101,7 @@ class perceived_arena_map
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::unique_ptr<base_cache>>& caches(void) {
-    return m_caches;
-  }
+  std::list<std::unique_ptr<base_cache>>& caches(void) { return m_caches; }
 
   /**
    * @brief Add a cache to the list of perceived caches.
@@ -149,8 +147,9 @@ class perceived_arena_map
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
-                                                                       size_t j) const {
+  const typename occupancy_grid::layer_type<Index>::value_type& access(
+      size_t i,
+      size_t j) const {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>

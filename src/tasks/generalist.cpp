@@ -28,7 +28,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
  * Namespaces

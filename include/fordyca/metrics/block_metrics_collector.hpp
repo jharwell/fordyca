@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,11 +45,11 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are written out at the specified interval.
  */
-class block_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                public visitor::visitable_any<block_metrics_collector> {
+class block_metrics_collector
+    : public rcppsw::metrics::base_metrics_collector,
+      public visitor::visitable_any<block_metrics_collector> {
  public:
-  block_metrics_collector(const std::string& ofname,
-                          uint collect_interval);
+  block_metrics_collector(const std::string& ofname, uint collect_interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
@@ -59,7 +59,7 @@ class block_metrics_collector : public rcppsw::metrics::base_metrics_collector,
  private:
   struct block_metrics {
     uint cum_collected; /* aggregate across blocks, not reset each timestep*/
-    uint cum_carries; /* aggregate across blocks, not reset each timstep */
+    uint cum_carries;   /* aggregate across blocks, not reset each timstep */
   };
 
   std::string csv_header_build(const std::string& header) override;

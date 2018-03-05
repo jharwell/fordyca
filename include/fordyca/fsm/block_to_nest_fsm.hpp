@@ -72,13 +72,12 @@ NS_START(fsm);
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class block_to_nest_fsm
-    : public base_foraging_fsm,
-      public metrics::fsm::stateless_metrics,
-      public metrics::fsm::stateful_metrics,
-      public metrics::fsm::depth1_metrics,
-      public task_allocation::taskable,
-      public visitor::visitable_any<block_to_nest_fsm> {
+class block_to_nest_fsm : public base_foraging_fsm,
+                          public metrics::fsm::stateless_metrics,
+                          public metrics::fsm::stateful_metrics,
+                          public metrics::fsm::depth1_metrics,
+                          public task_allocation::taskable,
+                          public visitor::visitable_any<block_to_nest_fsm> {
  public:
   block_to_nest_fsm(
       const struct params::fsm_params* params,

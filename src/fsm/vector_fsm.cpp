@@ -187,8 +187,9 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
    * Decrease the PID loop input false (i.e. so it is closer to the 0 value the
    * loop is trying to get it to). See #231.
    */
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() < kMAX_ARRIVAL_TOL) {
-    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff*5.0));
+  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <
+      kMAX_ARRIVAL_TOL) {
+    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff * 5.0));
   } else {
     lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
   }

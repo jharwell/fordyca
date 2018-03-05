@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,7 +68,7 @@ stateless_foraging_fsm::stateless_foraging_fsm(
                                                nullptr,
                                                &entry_leaving_nest,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr)} {
@@ -100,8 +100,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(stateless_foraging_fsm,
-                     acquire_block) {
+HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
     actuators()->stop_wheels();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);

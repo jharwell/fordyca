@@ -37,10 +37,13 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
 class foraging_controller;
-}}
+}
+}
 namespace fsm {
 class block_to_nest_fsm;
-namespace depth1 { class block_to_cache_fsm; }
+namespace depth1 {
+class block_to_cache_fsm;
+}
 }
 namespace tasks {
 class collector;
@@ -82,7 +85,7 @@ class cache_vanished
   void visit(controller::depth1::foraging_controller& controller) override;
 
  private:
-  uint                              m_cache_id;
+  uint m_cache_id;
 };
 
 NS_END(events, fordyca);

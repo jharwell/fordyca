@@ -71,8 +71,7 @@ void stateless_metrics_collector::reset(void) {
 
 void stateless_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m =
-      static_cast<const metrics::fsm::stateless_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::stateless_metrics&>(metrics);
   m_stats.n_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
   m_stats.n_transporting_to_nest +=
       static_cast<uint>(m.is_transporting_to_nest());

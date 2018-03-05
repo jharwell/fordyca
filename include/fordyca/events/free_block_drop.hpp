@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces

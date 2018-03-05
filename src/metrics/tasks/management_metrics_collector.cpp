@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -36,9 +36,10 @@ namespace tasks = fordyca::tasks;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-management_metrics_collector::management_metrics_collector(const std::string& ofname,
-                               bool collect_cum,
-                               uint collect_interval)
+management_metrics_collector::management_metrics_collector(
+    const std::string& ofname,
+    bool collect_cum,
+    uint collect_interval)
     : base_metrics_collector(ofname, collect_cum),
       m_sel_stats(),
       m_partition_stats(),
@@ -53,7 +54,8 @@ management_metrics_collector::management_metrics_collector(const std::string& of
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string management_metrics_collector::csv_header_build(const std::string& header) {
+std::string management_metrics_collector::csv_header_build(
+    const std::string& header) {
   // clang-format off
   std::string line = base_metrics_collector::csv_header_build(header);
     return line +
@@ -88,10 +90,10 @@ void management_metrics_collector::collect(
   if (m.has_new_allocation()) {
     if (m.employed_partitioning()) {
       ++m_partition_stats.n_partition;
-      m_sel_stats.n_collectors +=
-          static_cast<uint>(m.current_task_name() == tasks::foraging_task::kCollectorName);
-      m_sel_stats.n_harvesters +=
-          static_cast<uint>(m.current_task_name() == tasks::foraging_task::kHarvesterName);
+      m_sel_stats.n_collectors += static_cast<uint>(
+          m.current_task_name() == tasks::foraging_task::kCollectorName);
+      m_sel_stats.n_harvesters += static_cast<uint>(
+          m.current_task_name() == tasks::foraging_task::kHarvesterName);
     } else {
       ++m_partition_stats.n_no_partition;
     }
@@ -125,35 +127,38 @@ bool management_metrics_collector::csv_line_build(std::string& line) {
   }
 
   line = std::to_string(m_sel_stats.n_harvesters) + separator() +
-      std::to_string(m_sel_stats.n_collectors) + separator() +
-      std::to_string(m_partition_stats.n_partition) + separator() +
-      std::to_string(m_partition_stats.n_no_partition) + separator() +
-      std::to_string(m_alloc_stats.n_alloc_sw) + separator() +
-      std::to_string(m_alloc_stats.n_abort) + separator();
+         std::to_string(m_sel_stats.n_collectors) + separator() +
+         std::to_string(m_partition_stats.n_partition) + separator() +
+         std::to_string(m_partition_stats.n_no_partition) + separator() +
+         std::to_string(m_alloc_stats.n_alloc_sw) + separator() +
+         std::to_string(m_alloc_stats.n_abort) + separator();
 
   line += std::to_string(m_finish_stats.n_completed) + separator();
   line += std::to_string(m_finish_stats.n_collector_completed) + separator();
   line += std::to_string(m_finish_stats.n_harvester_completed) + separator();
   line += std::to_string(m_finish_stats.n_generalist_completed) + separator();
 
-  double avg = (m_finish_stats.n_collector_completed > 0) ?
-        m_finish_stats.cum_collector_exec_time / m_finish_stats.n_collector_completed
-        : 0;
+  double avg = (m_finish_stats.n_collector_completed > 0)
+                   ? m_finish_stats.cum_collector_exec_time /
+                         m_finish_stats.n_collector_completed
+                   : 0;
   line += std::to_string(avg) + separator();
 
-  avg = (m_finish_stats.n_harvester_completed > 0) ?
-        m_finish_stats.cum_harvester_exec_time / m_finish_stats.n_harvester_completed
-        : 0;
+  avg = (m_finish_stats.n_harvester_completed > 0)
+            ? m_finish_stats.cum_harvester_exec_time /
+                  m_finish_stats.n_harvester_completed
+            : 0;
   line += std::to_string(avg) + separator();
 
-  avg = (m_finish_stats.n_generalist_completed > 0) ?
-        m_finish_stats.cum_generalist_exec_time / m_finish_stats.n_generalist_completed
-        : 0;
+  avg = (m_finish_stats.n_generalist_completed > 0)
+            ? m_finish_stats.cum_generalist_exec_time /
+                  m_finish_stats.n_generalist_completed
+            : 0;
   line += std::to_string(avg) + separator();
 
-  avg = (m_finish_stats.n_completed > 0) ?
-        m_finish_stats.cum_task_exec_time / m_finish_stats.n_completed
-        : 0;
+  avg = (m_finish_stats.n_completed > 0)
+            ? m_finish_stats.cum_task_exec_time / m_finish_stats.n_completed
+            : 0;
   line += std::to_string(avg) + separator();
   return true;
 } /* store_foraging_stats() */
