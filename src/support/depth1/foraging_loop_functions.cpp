@@ -190,10 +190,10 @@ void foraging_loop_functions::pre_step_final(void) {
   if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
     auto& collector = static_cast<metrics::tasks::execution_metrics_collector&>(
         *collector_group()["tasks::execution"]);
-    int n_foragers = collector.n_foragers();
+    int n_harvesters = collector.n_harvesters();
     int n_collectors = collector.n_collectors();
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
-    if (p.calc(n_foragers, n_collectors) >=
+    if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(random()) / RAND_MAX) {
       arena_map()->static_cache_create();
       representation::cell2D& cell =

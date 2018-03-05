@@ -44,7 +44,7 @@ namespace depth1 { class block_to_cache_fsm; }
 }
 namespace tasks {
 class collector;
-class forager;
+class harvester;
 }
 NS_START(events);
 
@@ -63,7 +63,7 @@ class cache_vanished
     : public rcppsw::er::client,
       public visitor::visit_set<controller::depth1::foraging_controller,
                                 tasks::collector,
-                                tasks::forager,
+                                tasks::harvester,
                                 fsm::block_to_nest_fsm,
                                 fsm::depth1::block_to_cache_fsm> {
  public:
@@ -78,7 +78,7 @@ class cache_vanished
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::collector& task) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
   void visit(controller::depth1::foraging_controller& controller) override;
 
  private:

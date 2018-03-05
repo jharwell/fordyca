@@ -72,7 +72,7 @@ class foraging_task
                                             events::cache_vanished> {
  public:
   static constexpr char kCollectorName[] = "Collector";
-  static constexpr char kForagerName[] = "Forager";
+  static constexpr char kHarvesterName[] = "Harvester";
   static constexpr char kGeneralistName[] = "Generalist";
 
   explicit foraging_task(const std::string& name) : mc_name(name) {}

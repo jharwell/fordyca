@@ -32,7 +32,7 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/forager.hpp"
+#include "fordyca/tasks/harvester.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
 
@@ -180,7 +180,7 @@ void free_block_pickup::visit(tasks::generalist& task) {
       ->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(tasks::forager& task) {
+void free_block_pickup::visit(tasks::harvester& task) {
   static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 

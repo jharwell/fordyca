@@ -27,7 +27,7 @@
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 
 #include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/forager.hpp"
+#include "fordyca/tasks/harvester.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +61,7 @@ void cache_vanished::visit(tasks::collector& task) {
   static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_vanished::visit(tasks::forager& task) {
+void cache_vanished::visit(tasks::harvester& task) {
   static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 

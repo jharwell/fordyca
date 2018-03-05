@@ -45,7 +45,7 @@ class block_to_cache_fsm;
 }
 }
 namespace tasks {
-class forager;
+class harvester;
 }
 
 NS_START(events);
@@ -67,7 +67,7 @@ class cache_block_drop
       public rcppsw::er::client,
       public block_drop_event,
       public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
-                                tasks::forager,
+                                tasks::harvester,
                                 representation::perceived_arena_map,
                                 representation::arena_cache> {
  public:
@@ -89,7 +89,7 @@ class cache_block_drop
   void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
   // clang-format off

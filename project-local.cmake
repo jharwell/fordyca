@@ -35,9 +35,6 @@ link_directories(/usr/lib/argos3 ${rcppsw_LINK_DIRS})
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 add_dependencies(${target} rcsw rcppsw)
 
-# Use the actual .a files rather than rcppsw/rcsw project names to force
-# recompilation of fordyca when a source file within one of those libraries
-# changes.
 target_link_libraries(${target}
   rcppsw
   rcsw
@@ -45,7 +42,4 @@ target_link_libraries(${target}
   argos3plugin_simulator_footbot
   argos3plugin_simulator_genericrobot
   stdc++fs
-  Qt5::Widgets
-  Qt5::Gui
-  Qt5::Core
   )

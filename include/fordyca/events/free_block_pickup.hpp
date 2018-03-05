@@ -53,7 +53,7 @@ class stateful_foraging_controller;
 
 namespace tasks {
 class generalist;
-class forager;
+class harvester;
 }
 
 NS_START(events);
@@ -78,7 +78,7 @@ class free_block_pickup
                                 fsm::depth0::stateful_foraging_fsm,
                                 fsm::depth1::block_to_cache_fsm,
                                 tasks::generalist,
-                                tasks::forager> {
+                                tasks::harvester> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                     representation::block* block,
@@ -108,7 +108,7 @@ class free_block_pickup
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
   // clang-format off
