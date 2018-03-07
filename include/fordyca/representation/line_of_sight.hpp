@@ -124,9 +124,6 @@ class line_of_sight {
   const rcppsw::math::dcoord2& center(void) const { return m_center; }
 
  private:
-  void add_caches_from_view(void);
-  void add_blocks_from_view(void);
-
   // clang-format off
   rcppsw::math::dcoord2          m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
