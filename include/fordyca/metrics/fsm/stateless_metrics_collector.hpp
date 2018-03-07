@@ -48,14 +48,10 @@ class stateless_metrics_collector : public rcppsw::metrics::base_metrics_collect
  public:
   /**
    * @param ofname Output file name.
-   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
-   * specified interval, and written out and reset at the end of it. If
-   * \c FALSE, they will be written out every timestep.
-   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   * @param interval Collection interval.
    */
-  stateless_metrics_collector(const std::string& ofname, bool
-                              collect_cum,
-                              uint collect_interval);
+  stateless_metrics_collector(const std::string& ofname,
+                              uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;

@@ -33,21 +33,14 @@ NS_START(fordyca, metrics, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 depth1_metrics_collector::depth1_metrics_collector(const std::string& ofname,
-                                                   bool collect_cum,
-                                                   uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum), m_stats() {
-  if (collect_cum) {
-    use_interval(true);
-    interval(collect_interval);
-  }
-}
+                                                   uint interval)
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
-  if (collect_cum()) {
   return base_metrics_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +
       "n_cum_acquiring_cache" + separator() +
@@ -57,12 +50,6 @@ std::string depth1_metrics_collector::csv_header_build(const std::string& header
       "n_cum_exploring_for_cache" + separator() +
       "n_transporting_to_cache" + separator() +
       "n_cum_transporting_to_cache" + separator();
-  }
-  return base_metrics_collector::csv_header_build(header) +
-      "n_acquiring_cache" + separator() +
-      "n_vectoring_to_cache" + separator() +
-      "n_exploring_for_cache" + separator() +
-      "n_transporting_to_cache" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -80,36 +67,27 @@ void depth1_metrics_collector::collect(
   m_stats.n_transporting_to_cache +=
       static_cast<uint>(m.is_transporting_to_cache());
 
-  if (collect_cum()) {
-    m_stats.n_cum_exploring_for_cache +=
-        static_cast<uint>(m.is_exploring_for_cache());
-    m_stats.n_cum_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
-    m_stats.n_cum_vectoring_to_cache +=
-        static_cast<uint>(m.is_vectoring_to_cache());
-    m_stats.n_cum_transporting_to_cache +=
-        static_cast<uint>(m.is_transporting_to_cache());
-  }
+  m_stats.n_cum_exploring_for_cache +=
+      static_cast<uint>(m.is_exploring_for_cache());
+  m_stats.n_cum_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
+  m_stats.n_cum_vectoring_to_cache +=
+      static_cast<uint>(m.is_vectoring_to_cache());
+  m_stats.n_cum_transporting_to_cache +=
+      static_cast<uint>(m.is_transporting_to_cache());
 } /* collect() */
 
 bool depth1_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  if (collect_cum()) {
-    line = std::to_string(m_stats.n_acquiring_cache) + separator() +
-           std::to_string(m_stats.n_cum_acquiring_cache) + separator() +
-           std::to_string(m_stats.n_vectoring_to_cache) + separator() +
-           std::to_string(m_stats.n_cum_vectoring_to_cache) + separator() +
-           std::to_string(m_stats.n_exploring_for_cache) + separator() +
-           std::to_string(m_stats.n_cum_exploring_for_cache) + separator() +
-           std::to_string(m_stats.n_transporting_to_cache) + separator() +
-           std::to_string(m_stats.n_cum_transporting_to_cache) + separator();
-  } else {
-    line = std::to_string(m_stats.n_acquiring_cache) + separator() +
-           std::to_string(m_stats.n_vectoring_to_cache) + separator() +
-           std::to_string(m_stats.n_exploring_for_cache) + separator() +
-           std::to_string(m_stats.n_transporting_to_cache) + separator();
-  }
+  line = std::to_string(m_stats.n_acquiring_cache) + separator() +
+         std::to_string(m_stats.n_cum_acquiring_cache) + separator() +
+         std::to_string(m_stats.n_vectoring_to_cache) + separator() +
+         std::to_string(m_stats.n_cum_vectoring_to_cache) + separator() +
+         std::to_string(m_stats.n_exploring_for_cache) + separator() +
+         std::to_string(m_stats.n_cum_exploring_for_cache) + separator() +
+         std::to_string(m_stats.n_transporting_to_cache) + separator() +
+         std::to_string(m_stats.n_cum_transporting_to_cache) + separator();
   return true;
 } /* store_foraging_stats() */
 

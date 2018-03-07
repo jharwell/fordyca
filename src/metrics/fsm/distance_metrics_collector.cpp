@@ -33,14 +33,8 @@ NS_START(fordyca, metrics, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
-                                                       bool collect_cum,
-                                                       uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum), m_stats() {
-  if (collect_cum) {
-    use_interval(true);
-    interval(collect_interval);
-  }
-}
+                                                       uint interval)
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
@@ -48,9 +42,7 @@ distance_metrics_collector::distance_metrics_collector(const std::string& ofname
 std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
   std::string line;
-  if (collect_cum()) {
-    line = "cum_distance";
-  }
+  line = "cum_distance";
   return base_metrics_collector::csv_header_build(header) + line;
 } /* csv_header_build() */
 
@@ -63,11 +55,8 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  if (collect_cum()) {
-    line += std::to_string(m_stats.cum_distance) + separator();
-    return true;
-  }
-  return false;
+  line += std::to_string(m_stats.cum_distance) + separator();
+  return true;
 } /* csv_line_build() */
 
 void distance_metrics_collector::collect(

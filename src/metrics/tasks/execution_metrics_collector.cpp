@@ -37,14 +37,10 @@ namespace tasks = fordyca::tasks;
  * Constructors/Destructor
  ******************************************************************************/
 execution_metrics_collector::execution_metrics_collector(const std::string& ofname,
-                                                         bool collect_cum,
-                                                         uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum),
+                                                         uint interval)
+    : base_metrics_collector(ofname, interval),
       m_count_stats(),
-      m_int_stats() {
-  use_interval(true);
-  interval(collect_interval);
-}
+      m_int_stats() {}
 
 /*******************************************************************************
  * Member Functions

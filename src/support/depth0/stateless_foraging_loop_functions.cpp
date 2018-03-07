@@ -194,20 +194,18 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   }
   fs::create_directories(m_metrics_path);
 
-  m_collector_group.add_collector<metrics::fsm::stateless_metrics_collector>(
+  m_collector_group.register_collector<metrics::fsm::stateless_metrics_collector>(
       "fsm::stateless",
       m_metrics_path + "/" + p_output->metrics.stateless_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
-  m_collector_group.add_collector<metrics::block_metrics_collector>(
+  m_collector_group.register_collector<metrics::block_metrics_collector>(
       "block",
       m_metrics_path + "/" + p_output->metrics.block_fname,
       p_output->metrics.collect_interval);
 
-  m_collector_group.add_collector<metrics::fsm::distance_metrics_collector>(
+  m_collector_group.register_collector<metrics::fsm::distance_metrics_collector>(
       "fsm::distance",
       m_metrics_path + "/" + p_output->metrics.distance_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
 
   m_collector_group.reset_all();

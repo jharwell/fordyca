@@ -231,28 +231,24 @@ void foraging_loop_functions::cache_handling_init(
 
 void foraging_loop_functions::metric_collecting_init(
     const struct params::output_params* output_p) {
-  collector_group().add_collector<metrics::fsm::depth1_metrics_collector>(
+  collector_group().register_collector<metrics::fsm::depth1_metrics_collector>(
       "fsm::depth1",
       metrics_path() + "/" + output_p->metrics.depth1_fname,
-      output_p->metrics.collect_cum,
       output_p->metrics.collect_interval);
 
-  collector_group().add_collector<metrics::tasks::execution_metrics_collector>(
+  collector_group().register_collector<metrics::tasks::execution_metrics_collector>(
       "tasks::execution",
       metrics_path() + "/" + output_p->metrics.task_execution_fname,
-      output_p->metrics.collect_cum,
       output_p->metrics.collect_interval);
 
-  collector_group().add_collector<metrics::tasks::management_metrics_collector>(
+  collector_group().register_collector<metrics::tasks::management_metrics_collector>(
       "tasks::management",
       metrics_path() + "/" + output_p->metrics.task_management_fname,
-      output_p->metrics.collect_cum,
       output_p->metrics.collect_interval);
 
-  collector_group().add_collector<metrics::cache_metrics_collector>(
+  collector_group().register_collector<metrics::cache_metrics_collector>(
       "cache",
       metrics_path() + "/" + output_p->metrics.cache_fname,
-      output_p->metrics.collect_cum,
       output_p->metrics.collect_interval);
   collector_group().reset_all();
 } /* metric_collecting_init() */

@@ -33,22 +33,14 @@ NS_START(fordyca, metrics);
  * Constructors/Destructor
  ******************************************************************************/
 block_metrics_collector::block_metrics_collector(const std::string& ofname,
-                                                 uint collect_interval)
-    : base_metrics_collector(ofname, true), m_metrics() {
-  use_interval(true);
-  interval(collect_interval);
-}
+                                                 uint interval)
+    : base_metrics_collector(ofname, interval), m_metrics() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string block_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
-  if (collect_cum()) {
-    return base_metrics_collector::csv_header_build(header) +
-        "avg_carries" + separator() +
-        "cum_collected" + separator();
-  }
   return base_metrics_collector::csv_header_build(header) +
       "block_carries" + separator();
   // clang-format on
