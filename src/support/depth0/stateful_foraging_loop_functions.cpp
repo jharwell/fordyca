@@ -64,10 +64,9 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   auto* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
-  collector_group().add_collector<metrics::fsm::stateful_metrics_collector>(
+  collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
       "fsm::stateful",
       metrics_path() + "/" + p_output->metrics.stateful_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
   collector_group().reset_all();
 

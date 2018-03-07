@@ -38,18 +38,12 @@ namespace tasks = fordyca::tasks;
  ******************************************************************************/
 management_metrics_collector::management_metrics_collector(
     const std::string& ofname,
-    bool collect_cum,
-    uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum),
+    uint interval)
+    : base_metrics_collector(ofname, interval),
       m_sel_stats(),
       m_partition_stats(),
       m_alloc_stats(),
-      m_finish_stats() {
-  if (collect_cum) {
-    use_interval(true);
-    interval(collect_interval);
-  }
-}
+      m_finish_stats() {}
 
 /*******************************************************************************
  * Member Functions

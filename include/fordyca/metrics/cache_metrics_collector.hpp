@@ -52,9 +52,13 @@ class cache_metrics_collector
     : public rcppsw::metrics::base_metrics_collector,
       public visitor::visitable_any<cache_metrics_collector> {
  public:
+
+  /**
+   * @param ofname Output file name.
+   * @param interval Collection interval.
+   */
   cache_metrics_collector(const std::string& ofname,
-                          bool collect_cum,
-                          uint collect_interval);
+                          uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;

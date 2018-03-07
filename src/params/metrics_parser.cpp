@@ -48,13 +48,12 @@ void metrics_parser::parse(argos::TConfigurationNode& node) {
                           "task_management_fname",
                           m_params->task_management_fname);
   argos::GetNodeAttribute(node, "cache_fname", m_params->cache_fname);
-  argos::GetNodeAttribute(node, "collect_cum", m_params->collect_cum);
   argos::GetNodeAttribute(node, "collect_interval", m_params->collect_interval);
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) {
   stream << "====================\nMetrics params\n====================\n";
-  if (m_params) {
+  if (nullptr != m_params) {
     stream << "output_dir=" << m_params->output_dir << std::endl;
 
     stream << "stateless_fname=" << m_params->stateless_fname << std::endl;
@@ -66,7 +65,6 @@ void metrics_parser::show(std::ostream& stream) {
            << std::endl;
     stream << "task_management_fname=" << m_params->task_management_fname
            << std::endl;
-    stream << "collect_cum=" << m_params->collect_cum << std::endl;
     stream << "collect_interval=" << m_params->collect_interval << std::endl;
   }
 } /* show() */

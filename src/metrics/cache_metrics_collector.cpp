@@ -33,12 +33,8 @@ NS_START(fordyca, metrics);
  * Constructors/Destructor
  ******************************************************************************/
 cache_metrics_collector::cache_metrics_collector(const std::string& ofname,
-                                                 bool collect_cum,
-                                                 uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum), m_stats(), m_cache_ids() {
-  use_interval(true);
-  interval(collect_interval);
-}
+                                                 uint interval)
+    : base_metrics_collector(ofname, interval), m_stats(), m_cache_ids() {}
 
 /*******************************************************************************
  * Member Functions

@@ -33,14 +33,8 @@ NS_START(fordyca, metrics, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_metrics_collector::stateful_metrics_collector(const std::string& ofname,
-                                                       bool collect_cum,
-                                                       uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum), m_stats() {
-  if (collect_cum) {
-    use_interval(true);
-    interval(collect_interval);
-  }
-}
+                                                       uint interval)
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
@@ -48,16 +42,11 @@ stateful_metrics_collector::stateful_metrics_collector(const std::string& ofname
 std::string stateful_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
-  if (collect_cum()) {
   return base_metrics_collector::csv_header_build(header) +
       "n_acquiring_block"  + separator() +
       "n_cum_acquiring_block"  + separator() +
       "n_vectoring_to_block"  + separator() +
       "n_cum_vectoring_to_block"  + separator();
-  }
-  return base_metrics_collector::csv_header_build(header) +
-      "n_acquiring_block"  + separator() +
-      "n_vectoring_to_block"  + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -81,15 +70,10 @@ bool stateful_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  if (collect_cum()) {
-    line = std::to_string(m_stats.n_acquiring_block) + separator() +
-           std::to_string(m_stats.n_cum_acquiring_block) + separator() +
-           std::to_string(m_stats.n_vectoring_to_block) + separator() +
-           std::to_string(m_stats.n_cum_vectoring_to_block) + separator();
-  } else {
-    line = std::to_string(m_stats.n_acquiring_block) + separator() +
-           std::to_string(m_stats.n_vectoring_to_block) + separator();
-  }
+  line = std::to_string(m_stats.n_acquiring_block) + separator() +
+         std::to_string(m_stats.n_cum_acquiring_block) + separator() +
+         std::to_string(m_stats.n_vectoring_to_block) + separator() +
+         std::to_string(m_stats.n_cum_vectoring_to_block) + separator();
   return true;
 } /* csv_line_build() */
 

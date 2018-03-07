@@ -49,7 +49,11 @@ class block_metrics_collector
     : public rcppsw::metrics::base_metrics_collector,
       public visitor::visitable_any<block_metrics_collector> {
  public:
-  block_metrics_collector(const std::string& ofname, uint collect_interval);
+  /**
+   * @param ofname Output file name.
+   * @param interval Collection interval.
+   */
+  block_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
