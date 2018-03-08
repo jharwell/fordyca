@@ -47,10 +47,11 @@ class base_cache;
  */
 struct perceived_cache {
   perceived_cache(void) : ent(nullptr), density() {}
-  perceived_cache(base_cache* c, const rcppsw::swarm::pheromone_density& d)
+  perceived_cache(const std::shared_ptr<base_cache>& c,
+                  const rcppsw::swarm::pheromone_density& d)
       : ent(c), density(d) {}
 
-  base_cache* ent;
+  std::shared_ptr<base_cache> ent;
   rcppsw::swarm::pheromone_density density;
 };
 

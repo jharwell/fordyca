@@ -30,9 +30,9 @@
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
-#include "rcppsw/ds/grid2D_ptr.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/representation/arena_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,6 +62,9 @@ class arena_cache;
 class arena_map : public rcppsw::er::client,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
+  using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
+  using block_vector = std::vector<std::shared_ptr<block>>;
+
   explicit arena_map(const struct params::arena_map_params* params);
 
   /**
@@ -70,13 +73,13 @@ class arena_map : public rcppsw::er::client,
    * Some blocks may not be visible on the arena_map, as they are being carried
    * by robots.
    */
-  std::vector<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
+  block_vector& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get the list of all the caches currently present in the arena and
    * active.
    */
-  std::vector<std::shared_ptr<arena_cache>>& caches(void) { return m_caches; }
+  cache_vector& caches(void) { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
@@ -196,11 +199,11 @@ class arena_map : public rcppsw::er::client,
   bool                                      m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2                     mc_nest_center;
-  std::vector<std::shared_ptr<block>>       m_blocks;
-  std::vector<std::shared_ptr<arena_cache>> m_caches;
+  block_vector                              m_blocks;
+  cache_vector                              m_caches;
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
-  rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;
+  arena_grid                                m_grid;
   // clang-format on
 };
 
