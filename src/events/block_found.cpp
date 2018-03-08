@@ -43,8 +43,7 @@ block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
     : perceived_cell_op(block->discrete_loc().first,
                         block->discrete_loc().second),
       client(server),
-      m_block(std::move(block)),
-      m_tmp_block(nullptr) {
+      m_block(std::move(block)) {
   client::insmod("block_found",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -56,8 +55,8 @@ block_found::~block_found(void) { client::rmmod(); }
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(representation::cell2D& cell) {
-  ER_ASSERT(nullptr != m_tmp_block, "FATAL: nullptr block?");
-  cell.entity(m_tmp_block);
+  ER_ASSERT(nullptr != m_block, "FATAL: nullptr block?");
+  cell.entity(m_block);
   cell.fsm().accept(*this);
 } /* visit() */
 
@@ -91,14 +90,12 @@ void block_found::visit(representation::perceived_arena_map& map) {
     map.cache_remove(cell.cache());
   }
 
-  m_tmp_block = m_block.get();
-
   /*
    * If the ID of the block we currently think resides in the cell and the ID of
    * the one we just found that actually resides there are not the same, we need
    * to reset the density for the cell, and start a new decay count.
    */
-  if (cell.state_has_block() && cell.block()->id() != m_tmp_block->id()) {
+  if (cell.state_has_block() && cell.block()->id() != m_block->id()) {
     density.reset();
   }
 

@@ -29,9 +29,10 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Global Variables
+ * Static Members
  ******************************************************************************/
 int base_cache::m_next_id = 0;
+constexpr uint base_cache::kMinBlocks;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -39,7 +40,7 @@ int base_cache::m_next_id = 0;
 base_cache::base_cache(double dimension,
                        double resolution,
                        argos::CVector2 center,
-                       std::vector<block*>& blocks,
+                       const std::vector<std::shared_ptr<block>>& blocks,
                        int id)
     : immovable_cell_entity(dimension, argos::CColor::GRAY40, center, resolution),
 
@@ -54,7 +55,7 @@ base_cache::base_cache(double dimension,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_cache::block_remove(block* block) {
+void base_cache::block_remove(const std::shared_ptr<block>& block) {
   m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
 } /* block_remove() */
 
@@ -62,8 +63,7 @@ std::unique_ptr<base_cache> base_cache::clone(void) const {
   return rcppsw::make_unique<base_cache>(cell_entity::xsize(),
                                          resolution(),
                                          real_loc(),
-                                         const_cast<std::vector<block*>&>(
-                                             blocks()),
+                                         blocks(),
                                          id());
 } /* clone() */
 

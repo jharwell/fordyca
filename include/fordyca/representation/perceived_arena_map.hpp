@@ -88,7 +88,7 @@ class perceived_arena_map
   /**
    * @brief Get a list of all blocks the robot is currently aware of.
    */
-  std::list<std::unique_ptr<block>>& blocks(void) { return m_blocks; }
+  std::list<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get a list of all cache the robot is currently aware of and their
@@ -101,20 +101,20 @@ class perceived_arena_map
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::unique_ptr<base_cache>>& caches(void) { return m_caches; }
+  std::list<std::shared_ptr<base_cache>>& caches(void) { return m_caches; }
 
   /**
    * @brief Add a cache to the list of perceived caches.
    *
    * @param cache Cache to add.
    */
-  void cache_add(std::unique_ptr<base_cache>& cache);
+  void cache_add(const std::shared_ptr<base_cache>& cache);
 
   /**
    * @brief Remove a cache from the list of perceived caches, and update its
    * cell to be empty.
    */
-  void cache_remove(const base_cache* victim);
+  void cache_remove(const std::shared_ptr<base_cache>& victim);
 
   /*
    * @brief Add a free block to the list of known blocks.
@@ -123,13 +123,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(std::unique_ptr<block>& block);
+  bool block_add(const std::shared_ptr<block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const block* victim);
+  bool block_remove(const std::shared_ptr<block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -180,7 +180,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<base_cache>> m_caches;
+  std::list<std::shared_ptr<base_cache>> m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -188,7 +188,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<block>> m_blocks;
+  std::list<std::shared_ptr<block>> m_blocks;
 };
 
 NS_END(representation, fordyca);

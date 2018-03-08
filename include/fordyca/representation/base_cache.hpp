@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <cassert>
 
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
@@ -56,6 +57,12 @@ class base_cache : public immovable_cell_entity,
                    public prototype::clonable<base_cache> {
  public:
   /**
+   * @brief The minimum # of blocks required for a cache to exist (less than
+   * this and you just have a bunch of blocks)
+   */
+  static constexpr uint kMinBlocks = 2;
+
+  /**
    * @param dimension The size of the cache. Does not have to be a multiple of
    * the arena resolution, but doing so makes it easier.
    * @param resolution The arena resolution.
@@ -68,7 +75,7 @@ class base_cache : public immovable_cell_entity,
   base_cache(double dimension,
              double resolution,
              argos::CVector2 center,
-             std::vector<block*>& blocks,
+             const std::vector<std::shared_ptr<block>>& blocks,
              int id);
 
   __pure bool operator==(const base_cache& other) const {
@@ -78,7 +85,7 @@ class base_cache : public immovable_cell_entity,
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    */
-  __pure bool contains_block(const block* c_block) const {
+  __pure bool contains_block(const std::shared_ptr<block> c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
@@ -87,35 +94,36 @@ class base_cache : public immovable_cell_entity,
   /**
    * @brief Get a list of the blocks currently in the cache.
    */
-  std::vector<block*>& blocks(void) { return m_blocks; }
-  const std::vector<block*>& blocks(void) const { return m_blocks; }
+  std::vector<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
+  const std::vector<std::shared_ptr<block>>& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Add a new block to the cache's list of blocks.
    *
    * Does not update the block's location.
    */
-  void block_add(block* block) { m_blocks.push_back(block); }
+  void block_add(const std::shared_ptr<block>& block) { m_blocks.push_back(block); }
 
   /**
    * @brief Remove a block from the cache's list of blocks.
    *
    * Does not update the block's location.
    */
-  void block_remove(block* block);
+  void block_remove(const std::shared_ptr<block>& block);
 
   /**
    * @brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
-  block* block_get(void) { return m_blocks.front(); }
+  std::shared_ptr<block> block_get(void) { return m_blocks.front(); }
 
   std::unique_ptr<base_cache> clone(void) const override;
 
  private:
   // clang-format off
   static int          m_next_id;
-  std::vector<block*> m_blocks;
+
+  std::vector<std::shared_ptr<block>> m_blocks;
   // clang-format on
 };
 

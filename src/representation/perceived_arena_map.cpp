@@ -76,12 +76,12 @@ std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
   return pcaches;
 } /* caches() */
 
-void perceived_arena_map::cache_add(std::unique_ptr<base_cache>& cache) {
-  cache_remove(cache.get());
-  m_caches.push_back(std::move(cache));
+void perceived_arena_map::cache_add(const std::shared_ptr<base_cache>& cache) {
+  cache_remove(cache);
+  m_caches.push_back(cache);
 } /* cache_add() */
 
-void perceived_arena_map::cache_remove(const base_cache* victim) {
+void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim) {
   for (auto it = m_caches.begin(); it != m_caches.end(); ++it) {
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
@@ -93,18 +93,18 @@ void perceived_arena_map::cache_remove(const base_cache* victim) {
   } /* for(it..) */
 } /* cache_remove() */
 
-bool perceived_arena_map::block_add(std::unique_ptr<block>& block) {
+bool perceived_arena_map::block_add(const std::shared_ptr<block>& block_in) {
   auto it1 =
       std::find_if(m_blocks.begin(),
                    m_blocks.end(),
-                   [&block](const std::unique_ptr<representation::block>& b) {
-                     return b->id() == block->id();
+                   [&block_in](const std::shared_ptr<representation::block>& b) {
+                     return b->id() == block_in->id();
                    });
   auto it2 =
       std::find_if(m_blocks.begin(),
                    m_blocks.end(),
-                   [&block](const std::unique_ptr<representation::block>& b) {
-                     return b->discrete_loc() == block->discrete_loc();
+                   [&block_in](const std::shared_ptr<representation::block>& b) {
+                     return b->discrete_loc() == block_in->discrete_loc();
                    });
 
   if (m_blocks.end() != it1) { /* block is known */
@@ -112,16 +112,16 @@ bool perceived_arena_map::block_add(std::unique_ptr<block>& block) {
      * Unless a given block's location has changed, there is no need to update
      * the state of the world.
      */
-    if (block->discrete_loc() != (*it1)->discrete_loc()) {
+    if (block_in->discrete_loc() != (*it1)->discrete_loc()) {
       ER_VER("block%d has moved: (%zu, %zu) -> (%zu, %zu)",
-             block->id(),
+             block_in->id(),
              (*it1)->discrete_loc().first,
              (*it1)->discrete_loc().second,
-             block->discrete_loc().first,
-             block->discrete_loc().second);
-      int id = block->id();
-      block_remove((*it1).get());
-      m_blocks.push_back(std::move(block));
+             block_in->discrete_loc().first,
+             block_in->discrete_loc().second);
+      int id = block_in->id();
+      block_remove(*it1);
+      m_blocks.push_back(block_in);
       ER_VER("Add block%d (n_blocks=%zu)", id, m_blocks.size());
       return true;
     }
@@ -134,20 +134,19 @@ bool perceived_arena_map::block_add(std::unique_ptr<block>& block) {
     if (it2 != m_blocks.end()) {
       ER_VER("Remove old block%d@(%zu, %zu): new block%d found there",
              (*it2)->id(),
-             block->discrete_loc().first,
-             block->discrete_loc().second,
-             block->id());
-      block_remove((*it2).get());
+             block_in->discrete_loc().first,
+             block_in->discrete_loc().second,
+             block_in->id());
+      block_remove(*it2);
     }
-    int id = block->id();
-    m_blocks.push_back(std::move(block));
-    ER_VER("Add block%d (n_blocks=%zu)", id, m_blocks.size());
+    m_blocks.push_back(block_in);
+    ER_VER("Add block%d (n_blocks=%zu)", block_in->id(), m_blocks.size());
     return true;
   }
   return false;
 } /* block_add() */
 
-bool perceived_arena_map::block_remove(const block* victim) {
+bool perceived_arena_map::block_remove(const std::shared_ptr<block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
       ER_VER("Remove block%d", victim->id());

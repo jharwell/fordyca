@@ -72,8 +72,8 @@ class cache_block_drop
                                 representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   representation::block* block,
-                   representation::arena_cache* cache,
+                   const std::shared_ptr<representation::block>& block,
+                   const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
   ~cache_block_drop(void) override { client::rmmod(); }
 
@@ -93,10 +93,10 @@ class cache_block_drop
 
  private:
   // clang-format off
-  double                              m_resolution;
-  representation::block*              m_block;
-  representation::arena_cache*        m_cache;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  double                                       m_resolution;
+  std::shared_ptr<representation::block>       m_block;
+  std::shared_ptr<representation::arena_cache> m_cache;
+  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

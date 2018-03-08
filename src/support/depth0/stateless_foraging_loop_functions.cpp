@@ -137,8 +137,8 @@ argos::CColor stateless_foraging_loop_functions::GetFloorColor(
   }
 
   for (auto& block : arena_map()->blocks()) {
-    if (block.contains_point(plane_pos)) {
-      return block.color();
+    if (block->contains_point(plane_pos)) {
+      return block->color();
     }
   } /* for(&block..) */
 
@@ -221,7 +221,7 @@ void stateless_foraging_loop_functions::arena_map_init(
   m_arena_map.reset(new representation::arena_map(arena_params));
   m_arena_map->distribute_blocks();
   for (auto& block : m_arena_map->blocks()) {
-    block.display_id(l_params->display_block_id);
+    block->display_id(l_params->display_block_id);
   } /* for(&block..) */
 } /* arena_map_init() */
 

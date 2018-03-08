@@ -98,8 +98,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(cell_entity* entity) { m_entity = entity; }
-  const cell_entity* entity(void) const { return m_entity; }
+  void entity(const std::shared_ptr<cell_entity>& entity) { m_entity = entity; }
+  const std::shared_ptr<cell_entity>& entity(void) const { return m_entity; }
   void loc(rcppsw::math::dcoord2 loc) { m_loc = loc; }
   rcppsw::math::dcoord2 loc(void) const { return m_loc; }
 
@@ -109,8 +109,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const representation::block* block(void) const;
-  representation::block* block(void);
+  const std::shared_ptr<representation::block> block(void) const;
+  std::shared_ptr<representation::block> block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -118,16 +118,17 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  representation::base_cache* cache(void) const;
+  const std::shared_ptr<representation::base_cache> cache(void) const;
+  std::shared_ptr<representation::base_cache> cache(void);
 
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
   // clang-format off
-  std::string     m_robot_id{""};
-  cell_entity*    m_entity{nullptr};
-  rcppsw::math::dcoord2  m_loc;
-  fsm::cell2D_fsm m_fsm;
+  std::string                  m_robot_id{""};
+  std::shared_ptr<cell_entity> m_entity{nullptr};
+  rcppsw::math::dcoord2        m_loc;
+  fsm::cell2D_fsm              m_fsm;
   // clang-format on
 };
 

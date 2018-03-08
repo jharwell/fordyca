@@ -81,8 +81,8 @@ class free_block_pickup
                                 tasks::harvester> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                    representation::block* block,
-                    size_t robot_index);
+                    const std::shared_ptr<representation::block>& block,
+                    uint robot_index);
   ~free_block_pickup(void) override { client::rmmod(); }
 
   free_block_pickup(const free_block_pickup& op) = delete;
@@ -112,9 +112,9 @@ class free_block_pickup
 
  private:
   // clang-format off
-  size_t                              m_robot_index;
-  representation::block*              m_block;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  uint                                   m_robot_index;
+  std::shared_ptr<representation::block> m_block;
+  std::shared_ptr<rcppsw::er::server>    m_server;
   // clang-format on
 };
 
