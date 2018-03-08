@@ -142,14 +142,14 @@ argos::CColor foraging_loop_functions::GetFloorColor(
    * so that you don't have blocks renderin inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
-    if (cache.contains_point(plane_pos)) {
-      return cache.color();
+    if (cache->contains_point(plane_pos)) {
+      return cache->color();
     }
   } /* for(&cache..) */
 
   for (auto& block : arena_map()->blocks()) {
-    if (block.contains_point(plane_pos)) {
-      return block.color();
+    if (block->contains_point(plane_pos)) {
+      return block->color();
     }
   } /* for(&block..) */
 
@@ -160,8 +160,8 @@ void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
     collector_group().collect_from("cache",
-                                   static_cast<metrics::cache_metrics&>(c));
-    c.reset_metrics();
+                                   static_cast<metrics::cache_metrics&>(*c));
+    c->reset_metrics();
   } /* for(&c..) */
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -196,10 +196,10 @@ void foraging_loop_functions::pre_step_final(void) {
         static_cast<double>(random()) / RAND_MAX) {
       arena_map()->static_cache_create();
       representation::cell2D& cell =
-          arena_map()->access(arena_map()->caches()[0].discrete_loc());
-      ER_ASSERT(arena_map()->caches()[0].n_blocks() == cell.block_count(),
+          arena_map()->access(arena_map()->caches()[0]->discrete_loc());
+      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
                 "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
-                arena_map()->caches()[0].n_blocks(),
+                arena_map()->caches()[0]->n_blocks(),
                 cell.block_count());
       floor()->SetChanged();
     }

@@ -51,8 +51,8 @@ cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::arena_cache cache_creator::create_single(
-    std::list<representation::block*> blocks,
+std::unique_ptr<representation::arena_cache> cache_creator::create_single(
+    block_list blocks,
     const argos::CVector2& center) {
   /*
    * The cell that will be the location of the new cache may already contain a
@@ -94,17 +94,16 @@ representation::arena_cache cache_creator::create_single(
          d.second,
          blocks.size());
 
-  std::vector<representation::block*> blocks_list(blocks.begin(), blocks.end());
-  return representation::arena_cache(
-      m_cache_size, m_grid.resolution(), center, blocks_list, -1);
+  block_vector block_vec(blocks.begin(), blocks.end());
+  return rcppsw::make_unique<representation::arena_cache>(
+      m_cache_size, m_grid.resolution(), center, block_vec, -1);
 } /* create_single() */
 
-void cache_creator::update_host_cells(
-    representation::arena_grid& grid,
-    std::vector<representation::arena_cache>& caches) {
+void cache_creator::update_host_cells(representation::arena_grid& grid,
+                                      cache_vector& caches) {
   for (auto& cache : caches) {
-    grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
-        .entity(&cache);
+    grid.access(cache->discrete_loc().first, cache->discrete_loc().second)
+        .entity(cache);
   } /* for(cache..) */
 } /* update_host_cells() */
 

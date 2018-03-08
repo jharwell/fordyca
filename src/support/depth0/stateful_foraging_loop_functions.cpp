@@ -125,7 +125,7 @@ argos::CColor stateful_foraging_loop_functions::GetFloorColor(
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {
-    if (arena_map()->blocks()[i].contains_point(plane_pos)) {
+    if (arena_map()->blocks()[i]->contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */

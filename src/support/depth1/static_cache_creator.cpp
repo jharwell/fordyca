@@ -48,9 +48,9 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::vector<representation::arena_cache> static_cache_creator::create_all(
-    std::vector<representation::block*>& blocks) {
-  std::vector<representation::arena_cache> caches;
+cache_creator::cache_vector static_cache_creator::create_all(
+    block_vector& blocks) {
+  std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
   ER_ASSERT(blocks.size() >= 2,
             "FATAL: Cannot create static cache from <= 2 blocks");
@@ -58,12 +58,14 @@ std::vector<representation::arena_cache> static_cache_creator::create_all(
          m_center.GetX(),
          m_center.GetY(),
          blocks.size());
-  std::list<representation::block*> starter_blocks;
+  block_list starter_blocks;
   for (auto b : blocks) {
     starter_blocks.push_back(b);
   } /* for(i..) */
 
-  caches.push_back(cache_creator::create_single(starter_blocks, m_center));
+  auto cache = cache_creator::create_single(starter_blocks, m_center);
+  auto cache_p = std::shared_ptr<representation::arena_cache>(std::move(cache));
+  caches.push_back(cache_p);
   return caches;
 } /* create() */
 

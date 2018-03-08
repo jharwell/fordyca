@@ -44,16 +44,20 @@ cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure const representation::block* cell2D::block(void) const {
-  return dynamic_cast<representation::block*>(m_entity);
+__pure const std::shared_ptr<representation::block> cell2D::block(void) const {
+  return std::dynamic_pointer_cast<representation::block>(m_entity);
 } /* block() */
 
-__pure representation::block* cell2D::block(void) {
-  return dynamic_cast<representation::block*>(m_entity);
+__pure std::shared_ptr<representation::block> cell2D::block(void) {
+  return std::dynamic_pointer_cast<representation::block>(m_entity);
 } /* block() */
 
-__pure representation::base_cache* cell2D::cache(void) const {
-  return dynamic_cast<representation::base_cache*>(m_entity);
+__pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+} /* cache() */
+
+__pure const std::shared_ptr<representation::base_cache> cell2D::cache(void) const {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
 } /* cache() */
 
 NS_END(representation, fordyca);

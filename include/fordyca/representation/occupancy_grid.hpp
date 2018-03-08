@@ -65,8 +65,8 @@ class occupancy_grid : public rcppsw::er::client,
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;
   }
-  static constexpr uint kPheromoneLayer = 0;
-  static constexpr uint kCellLayer = 1;
+  constexpr static uint kPheromoneLayer = 0;
+  constexpr static uint kCellLayer = 1;
 
  private:
   void cell_update(size_t i, size_t j);

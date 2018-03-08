@@ -46,6 +46,7 @@ struct arena_map_params;
 NS_START(representation);
 
 class cell2D;
+class arena_cache;
 
 /*******************************************************************************
  * Class Definitions
@@ -69,13 +70,13 @@ class arena_map : public rcppsw::er::client,
    * Some blocks may not be visible on the arena_map, as they are being carried
    * by robots.
    */
-  std::vector<block>& blocks(void) { return m_blocks; }
+  std::vector<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get the list of all the caches currently present in the arena and
    * active.
    */
-  std::vector<arena_cache>& caches(void) { return m_caches; }
+  std::vector<std::shared_ptr<arena_cache>>& caches(void) { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
@@ -87,7 +88,7 @@ class arena_map : public rcppsw::er::client,
    *
    * @param victim The cache to remove.
    */
-  void cache_remove(arena_cache& victim);
+  void cache_remove(const std::shared_ptr<arena_cache>& victim);
 
   /**
    * @brief Delete all caches that have been previously "removed", but not yet
@@ -119,7 +120,7 @@ class arena_map : public rcppsw::er::client,
    *
    * @param block The block to distribute.
    */
-  void distribute_block(block* block);
+  void distribute_block(const std::shared_ptr<block>& block);
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
@@ -195,8 +196,8 @@ class arena_map : public rcppsw::er::client,
   bool                                      m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2                     mc_nest_center;
-  std::vector<block>                        m_blocks;
-  std::vector<arena_cache>                  m_caches;
+  std::vector<std::shared_ptr<block>>       m_blocks;
+  std::vector<std::shared_ptr<arena_cache>> m_caches;
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
   rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> m_grid;

@@ -48,8 +48,8 @@ using representation::occupancy_grid;
  ******************************************************************************/
 free_block_pickup::free_block_pickup(
     const std::shared_ptr<rcppsw::er::server>& server,
-    representation::block* block,
-    size_t robot_index)
+    const std::shared_ptr<representation::block>& block,
+    uint robot_index)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
       client(server),
       m_robot_index(robot_index),
@@ -70,7 +70,7 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void free_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
-  ER_NOM("cell2D: fb%zu block%d from (%zu, %zu)",
+  ER_NOM("cell2D: fb%u block%d from (%zu, %zu)",
          m_robot_index,
          m_block->id(),
          m_block->discrete_loc().first,
@@ -85,7 +85,7 @@ void free_block_pickup::visit(representation::arena_map& map) {
   events::cell_empty op(cell_op::x(), cell_op::y());
   map.accept(op);
   m_block->accept(*this);
-  ER_NOM("arena_map: fb%zu: block%d from (%f, %f) -> (%zu, %zu)",
+  ER_NOM("arena_map: fb%u: block%d from (%f, %f) -> (%zu, %zu)",
          m_robot_index,
          m_block->id(),
          old_r.GetX(),
@@ -104,7 +104,7 @@ void free_block_pickup::visit(representation::block& block) {
 
   /* Move block out of sight */
   block.move_out_of_sight();
-  ER_NOM("block: block%d is now carried by fb%zu", m_block->id(), m_robot_index);
+  ER_NOM("block: block%d is now carried by fb%u", m_block->id(), m_robot_index);
 } /* visit() */
 
 void free_block_pickup::visit(

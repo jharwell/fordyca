@@ -86,7 +86,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
       int block = utils::robot_on_block(robot, map);
       if (-1 != block) {
         events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &map.blocks()[block],
+                                            map.blocks()[block],
                                             utils::robot_id(robot));
         controller.visitor::template visitable_any<T>::accept(pickup_op);
         map.accept(pickup_op);

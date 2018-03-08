@@ -85,7 +85,7 @@ class nest_block_drop
                                 metrics::block_metrics_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  representation::block* block);
+                  const std::shared_ptr<representation::block>& block);
   ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -113,10 +113,10 @@ class nest_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
-  representation::block* m_block;
+  std::shared_ptr<representation::block> m_block;
 };
 
 NS_END(events, fordyca);

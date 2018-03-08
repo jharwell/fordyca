@@ -48,7 +48,7 @@ class immovable_cell_entity : public cell_entity {
    * @param x_dim X dimension of the entity.
    * @param y_dim Y dimension of the entity.
    * @param color Color of the entity.
-   * @param loc The entity's permant (for its lifetime) location in the arena.
+   * @param loc The entity's permanent (for its lifetime) location in the arena.
    * @param resolution The resolution of the arena's discretization.
    */
   immovable_cell_entity(double x_dim,

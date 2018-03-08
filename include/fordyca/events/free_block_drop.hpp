@@ -58,7 +58,7 @@ class free_block_drop : public cell_op,
                         public block_drop_event {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  representation::block* block,
+                  const std::shared_ptr<representation::block>& block,
                   size_t x,
                   size_t y,
                   double resolution);
@@ -79,13 +79,13 @@ class free_block_drop : public cell_op,
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
   // clang-format off
-  double                              m_resolution;
-  representation::block*              m_block;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  double                                 m_resolution;
+  std::shared_ptr<representation::block> m_block;
+  std::shared_ptr<rcppsw::er::server>    m_server;
   // clang-format on
 };
 
