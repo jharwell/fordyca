@@ -68,6 +68,11 @@ class perceived_arena_map
     : public rcppsw::er::client,
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
+  using cache_list = std::list<std::shared_ptr<base_cache>>;
+  using block_list = std::list<std::shared_ptr<block>>;
+  using perceived_cache_list = std::list<perceived_cache>;
+  using perceived_block_list = std::list<perceived_block>;
+
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
       const struct fordyca::params::depth0::occupancy_grid_params* c_params,
@@ -83,12 +88,12 @@ class perceived_arena_map
    *
    * @return The list of perceived blocks.
    */
-  std::list<perceived_block> perceived_blocks(void) const;
+  perceived_block_list perceived_blocks(void) const;
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of.
    */
-  std::list<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
+  block_list& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get a list of all cache the robot is currently aware of and their
@@ -96,12 +101,12 @@ class perceived_arena_map
    *
    * @return The list of perceived cache.
    */
-  std::list<perceived_cache> perceived_caches(void) const;
+  perceived_cache_list perceived_caches(void) const;
 
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::shared_ptr<base_cache>>& caches(void) { return m_caches; }
+  cache_list& caches(void) { return m_caches; }
 
   /**
    * @brief Add a cache to the list of perceived caches.
@@ -180,7 +185,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::shared_ptr<base_cache>> m_caches;
+  cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -188,7 +193,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::shared_ptr<block>> m_blocks;
+  block_list m_blocks;
 };
 
 NS_END(representation, fordyca);

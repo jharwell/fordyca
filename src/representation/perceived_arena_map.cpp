@@ -55,23 +55,22 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<perceived_block> perceived_arena_map::perceived_blocks(void) const {
-  std::list<perceived_block> pblocks;
+perceived_arena_map::perceived_block_list perceived_arena_map::perceived_blocks(void) const {
+  perceived_block_list pblocks;
 
   for (auto& b : m_blocks) {
-    pblocks.push_back(representation::perceived_block(
-        b.get(), m_grid.access<0>(b->discrete_loc())));
+    pblocks.push_back(perceived_block(b,
+                                      m_grid.access<occupancy_grid::kPheromoneLayer>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
 
-std::list<perceived_cache> perceived_arena_map::perceived_caches(void) const {
-  std::list<perceived_cache> pcaches;
+perceived_arena_map::perceived_cache_list perceived_arena_map::perceived_caches(void) const {
+  perceived_cache_list pcaches;
 
   for (auto& c : m_caches) {
-    pcaches.push_back(representation::perceived_cache(
-        c.get(),
-        m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc())));
+    pcaches.push_back(perceived_cache(c,
+                                      m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */

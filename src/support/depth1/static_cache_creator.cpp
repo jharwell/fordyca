@@ -24,11 +24,13 @@
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using representation::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -52,8 +54,9 @@ cache_creator::cache_vector static_cache_creator::create_all(
     block_vector& blocks) {
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
-  ER_ASSERT(blocks.size() >= 2,
-            "FATAL: Cannot create static cache from <= 2 blocks");
+  ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
+            "FATAL: Cannot create static cache from <= %u blocks",
+            base_cache::kMinBlocks);
   ER_NOM("Creating static cache @(%f, %f) from %zu free blocks",
          m_center.GetX(),
          m_center.GetY(),

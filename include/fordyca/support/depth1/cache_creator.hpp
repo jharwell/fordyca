@@ -29,15 +29,15 @@
 #include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/representation/real_coord.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca);
+namespace representation { class arena_cache; class block; }
+NS_START(support, depth1);
 
 /*******************************************************************************
  * Class Definitions

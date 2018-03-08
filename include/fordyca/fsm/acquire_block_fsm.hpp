@@ -159,7 +159,7 @@ class acquire_block_fsm : public base_foraging_fsm,
 
   // clang-format off
   const argos::CVector2                                      mc_nest_center;
-  representation::block*                                     m_best_block;
+  std::shared_ptr<representation::block>                     m_best_block{nullptr};
   argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<representation::perceived_arena_map>       m_map;
   std::shared_ptr<rcppsw::er::server>                        m_server;
