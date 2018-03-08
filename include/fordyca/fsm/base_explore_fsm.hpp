@@ -26,15 +26,18 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 
-#include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { class base_foraging_sensors; class actuator_manager; }
+namespace controller {
+class base_foraging_sensors;
+class actuator_manager;
+}
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -55,11 +58,12 @@ NS_START(fsm);
 class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
-  base_explore_fsm(double unsuccessful_dir_change_thresh,
-                   const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-                   const std::shared_ptr<controller::actuator_manager>& actuators,
-                   uint8_t max_states);
+  base_explore_fsm(
+      uint unsuccessful_dir_change_thresh,
+      const std::shared_ptr<rcppsw::er::server>& server,
+      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+      const std::shared_ptr<controller::actuator_manager>& actuators,
+      uint8_t max_states);
 
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
@@ -94,7 +98,9 @@ class base_explore_fsm : public base_foraging_fsm,
    * @brief Get the # of timesteps the robot has spent unsuccessfully looking
    * for a block.
    */
-  size_t explore_time(void) const { return m_state.time_exploring_unsuccessfully; }
+  size_t explore_time(void) const {
+    return m_state.time_exploring_unsuccessfully;
+  }
 
  private:
   struct fsm_state {
@@ -102,26 +108,12 @@ class base_explore_fsm : public base_foraging_fsm,
   };
 
   /**
-   * @brief Robots entering this state will randomly change their exploration
-   * direction to the specified direction. All signals are ignored in this
-   * state. Once the direction change has been accomplished, the robot will
-   * transition back to its previous state.
-   */
-  HFSM_STATE_DECLARE(base_explore_fsm, new_direction, state_machine::event_data);
-
-  /**
-   * @brief Simple state for entry into the new direction state, used to change
-   * LED color for visualization purposes.
-   */
-  HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_new_direction);
-
-  /**
    * @brief Simple state for entry in the main exploration state, used to change
    * LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_explore);
 
-  struct fsm_state      m_state;
+  struct fsm_state m_state;
 };
 
 NS_END(fsm, fordyca);

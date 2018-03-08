@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/sensor_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -43,12 +43,14 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters relating to sensors into \ref sensor_params.
  */
-class sensor_parser: public rcppsw::common::xml_param_parser {
+class sensor_parser : public rcppsw::common::xml_param_parser {
  public:
   sensor_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct sensor_params* get_results(void) override { return m_params.get(); }
+  const struct sensor_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

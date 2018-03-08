@@ -24,12 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include <string>
+
+#include "fordyca/metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +43,7 @@ class cached_block_pickup;
 class cache_block_drop;
 class free_block_pickup;
 class nest_block_drop;
+class cache_vanished;
 }
 
 namespace visitor = rcppsw::patterns::visitor;
@@ -56,17 +59,23 @@ NS_START(tasks);
  *
  * @brief Interface specifying the visit set for all foraging tasks in FORDYCA.
  */
-class foraging_task : public metrics::collectible_metrics::fsm::stateless_metrics,
-                      public metrics::collectible_metrics::fsm::stateful_metrics,
-                      public metrics::collectible_metrics::fsm::depth1_metrics,
-                      public metrics::collectible_metrics::task_metrics,
-                      public visitor::polymorphic_visitable<foraging_task,
-                                                            events::cached_block_pickup,
-                                                            events::cache_block_drop,
-                                                            events::free_block_pickup,
-                                                            events::nest_block_drop> {
+class foraging_task
+    : public rcppsw::metrics::tasks::execution_metrics,
+      public metrics::fsm::stateless_metrics,
+      public metrics::fsm::stateful_metrics,
+      public metrics::fsm::depth1_metrics,
+      public visitor::polymorphic_visitable<foraging_task,
+                                            events::cached_block_pickup,
+                                            events::cache_block_drop,
+                                            events::free_block_pickup,
+                                            events::nest_block_drop,
+                                            events::cache_vanished> {
  public:
-  foraging_task(void) = default;
+  static constexpr char kCollectorName[] = "Collector";
+  static constexpr char kHarvesterName[] = "Harvester";
+  static constexpr char kGeneralistName[] = "Generalist";
+
+  explicit foraging_task(const std::string& name) : mc_name(name) {}
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the
@@ -79,6 +88,11 @@ class foraging_task : public metrics::collectible_metrics::fsm::stateless_metric
    * block pickup signal from the arena.
    */
   virtual bool block_acquired(void) const = 0;
+
+  std::string name(void) const { return mc_name; }
+
+ private:
+  const std::string mc_name;
 };
 
 NS_END(tasks, fordyca);

@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
-#include "rcppsw/er/client.hpp"
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,9 +35,18 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class perceived_arena_map; class cache; }
-namespace fsm { namespace depth1 { class block_to_cache_fsm; }}
-namespace tasks { class forager; }
+namespace representation {
+class perceived_arena_map;
+class arena_cache;
+}
+namespace fsm {
+namespace depth1 {
+class block_to_cache_fsm;
+}
+}
+namespace tasks {
+class harvester;
+}
 
 NS_START(events);
 
@@ -53,18 +62,20 @@ NS_START(events);
  * The cache usuage penalty, if there is one, is not assessed during the event,
  * but at a higher level.
  */
-class cache_block_drop : public cell_op,
-                         public rcppsw::er::client,
-                         public block_drop_event,
-                         public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
-                                                   tasks::forager,
-                                                   representation::perceived_arena_map,
-                                                   representation::cache> {
+class cache_block_drop
+    : public cell_op,
+      public rcppsw::er::client,
+      public block_drop_event,
+      public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
+                                tasks::harvester,
+                                representation::perceived_arena_map,
+                                representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   representation::block* block, representation::cache* cache,
+                   const std::shared_ptr<representation::block>& block,
+                   const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
-  ~cache_block_drop(void) { client::rmmod(); }
+  ~cache_block_drop(void) override { client::rmmod(); }
 
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;
@@ -75,17 +86,18 @@ class cache_block_drop : public cell_op,
   void visit(representation::arena_map& map) override;
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
-  void visit(representation::cache& cache) override;
-  void visit(class representation::perceived_cell2D& cell) override;
+  void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
-  double m_resolution;
-  representation::block* m_block;
-  representation::cache* m_cache;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format off
+  double                                       m_resolution;
+  std::shared_ptr<representation::block>       m_block;
+  std::shared_ptr<representation::arena_cache> m_cache;
+  std::shared_ptr<rcppsw::er::server>          m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

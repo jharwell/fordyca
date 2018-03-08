@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -32,8 +33,13 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class block; class line_of_sight; }
-namespace params { struct output_params; }
+namespace representation {
+class block;
+class line_of_sight;
+}
+namespace params {
+struct output_params;
+}
 
 NS_START(controller);
 
@@ -60,23 +66,12 @@ class base_foraging_controller : public argos::CCI_Controller,
   ~base_foraging_controller(void) override = default;
 
   base_foraging_controller(const base_foraging_controller& other) = delete;
-  base_foraging_controller& operator=(const base_foraging_controller& other) = delete;
+  base_foraging_controller& operator=(const base_foraging_controller& other) =
+      delete;
 
   /* CCI_Controller overrides */
   void Init(argos::TConfigurationNode& node) override;
   void Reset(void) override;
-
-  /**
-   * @brief Set whether or not a robot is supposed to display it's LOS as a
-   * square of the appropriate size during simulation.
-   */
-  void display_los(bool display_los) { m_display_los = display_los; }
-
-  /**
-   * @brief If \c TRUE, then the robot should display its approximate LOS as a
-   * circle on the ground during simulation.
-   */
-  bool display_los(void) const { return m_display_los; }
 
   /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
@@ -97,15 +92,6 @@ class base_foraging_controller : public argos::CCI_Controller,
   bool in_nest(void) const;
 
   /**
-   * @brief Get the current LOS for the robot.
-   *
-   * By default this returns nullptr. It is only here so that it this class can
-   * be used as the robot controller handle when rendering QT graphics
-   * overlays.
-   */
-  virtual const representation::line_of_sight* los(void) const { return nullptr; }
-
-  /**
    * @brief Return if the robot is currently carrying a block.
    */
   bool is_carrying_block(void) const { return nullptr != m_block; }
@@ -114,12 +100,12 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(representation::block* block) { m_block = block; }
+  void block(const std::shared_ptr<representation::block>& block) { m_block = block; }
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -142,29 +128,63 @@ class base_foraging_controller : public argos::CCI_Controller,
    */
   void tick(uint tick);
 
+  /**
+   * @brief Set the current location of the robot.
+   *
+   * This is a hack, as real world robot's would have to do their own
+   * localization. This is far superior to that, in terms of ease of
+   * programming. Plus it helps me focus in on my actual research. Ideally,
+   * robots would calculate this from sensor values, rather than it being set by
+   * the loop functions.
+   */
+  void robot_loc(argos::CVector2 loc);
+  argos::CVector2 robot_loc(void) const;
+
  protected:
-  const std::shared_ptr<actuator_manager>& actuators(void) const { return m_actuators; }
-  const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
+  const std::shared_ptr<actuator_manager>& actuators(void) const {
+    return m_actuators;
+  }
+  const std::shared_ptr<rcppsw::er::server>& server(void) const {
+    return m_server;
+  }
   const std::shared_ptr<base_foraging_sensors>& sensors_ref(void) const {
     return m_sensors;
   }
   base_foraging_sensors* base_sensors(void) const { return m_sensors.get(); }
-  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const { return m_sensors; }
+  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const {
+    return m_sensors;
+  }
   void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
     m_sensors = sensors;
   }
 
+  /**
+   * @brief Get the amount a robot's speed will be throttled when carrying a
+   * block.
+   */
+  double speed_throttle_block_carry(void) const {
+    return m_speed_throttle_block_carry;
+  }
+
+  /**
+   * @brief Interface for defining how loop functions can determine if a robot
+   * is currently transporting a block to the nest.
+   */
+  virtual bool is_transporting_to_nest(void) const = 0;
+
  private:
-  void output_init(const struct params::output_params* const params);
+  void output_init(const struct params::output_params* params);
   std::string log_header_calc(void);
   std::string dbg_header_calc(void);
 
-  bool                                   m_display_los;
-  bool                                   m_display_id;
-  representation::block*                 m_block;
+  // clang-format off
+  bool                                   m_display_id{false};
+  double                                 m_speed_throttle_block_carry{0.0};
+  std::shared_ptr<representation::block> m_block{nullptr};
   std::shared_ptr<actuator_manager>      m_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::er::server>    m_server;
+  // clang-format on
 };
 
 NS_END(fordyca, controller);

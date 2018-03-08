@@ -28,14 +28,14 @@
 #include <list>
 #include <utility>
 #include "rcppsw/ds/grid2D_ptr.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
 class block;
-class cache;
+class base_cache;
 class cell2D;
 
 /*******************************************************************************
@@ -58,26 +58,42 @@ class cell2D;
  */
 class line_of_sight {
  public:
-  line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
-                discrete_coord center) :
-      m_center(std::move(center)), m_view(c_view) {}
+  using block_list = std::list<std::shared_ptr<block>>;
+  using const_block_list = std::list<std::shared_ptr<const block>>;
+  using cache_list = std::list<std::shared_ptr<base_cache>>;
+  using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
 
-  std::list<const representation::block*> blocks(void) const;
-  std::list<const representation::cache*> caches(void) const;
+  line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
+                rcppsw::math::dcoord2 center)
+      : m_center(std::move(center)), m_view(c_view), m_caches() {}
+
+  const_block_list blocks(void) const;
+  const_cache_list caches(void) const;
+
+  /**
+   * @brief Add a cache to the LOS, beyond those whose host cell currently falls
+   * in the LOS (i.e. partial cache overlap)
+   */
+  void cache_add(const std::shared_ptr<base_cache>& cache);
 
   /**
    * @brief Get the size of the X dimension for a LOS.
    *
    * @return The X dimension.
    */
-  size_t sizex(void) const { return m_view.shape()[0]; }
+  size_t xsize(void) const { return m_view.shape()[0]; }
+
+  rcppsw::math::dcoord2 abs_ll(void) const;
+  rcppsw::math::dcoord2 abs_lr(void) const;
+  rcppsw::math::dcoord2 abs_ul(void) const;
+  rcppsw::math::dcoord2 abs_ur(void) const;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
    *
    * @return The Y dimension.
    */
-  size_t sizey(void) const { return m_view.shape()[1]; }
+  size_t ysize(void) const { return m_view.shape()[1]; }
 
   /**
    * @brief Get the # elements in a LOS.
@@ -99,26 +115,18 @@ class line_of_sight {
   cell2D& cell(size_t i, size_t j) const;
 
   /**
-   * @brief Translate the relative coordinates within a LOS to an absolute
-   * coordinate that can be used to index into the arena_map.
-   *
-   * @param i The relative X coord within the LOS.
-   * @param j The relative Y coord with the LOS.
-   *
-   * @return The absolute (X, Y) coordinates.
-   */
-  discrete_coord cell_abs_coord(size_t i, size_t j) const;
-
-  /**
    * @brief Get the coordinates for the center of the LOS.
    *
    * @return The center coordinates (discrete version).
    */
-  const discrete_coord& center(void) const { return m_center; }
+  const rcppsw::math::dcoord2& center(void) const { return m_center; }
 
  private:
-  discrete_coord                 m_center;
+  // clang-format off
+  rcppsw::math::dcoord2          m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
+  const_cache_list               m_caches;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

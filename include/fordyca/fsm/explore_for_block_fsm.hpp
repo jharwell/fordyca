@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/fsm/base_explore_fsm.hpp"
 
@@ -71,14 +71,17 @@ class explore_for_block_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_block_fsm(double unsuccessful_dir_change_thresh,
-                   const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-                   const std::shared_ptr<controller::actuator_manager>& actuators);
+  explore_for_block_fsm(
+      uint unsuccessful_dir_change_thresh,
+      const std::shared_ptr<rcppsw::er::server>& server,
+      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+      const std::shared_ptr<controller::actuator_manager>& actuators);
 
   /* taskable overrides */
   void task_execute(void) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
 

@@ -28,6 +28,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "rcppsw/er/server.hpp"
+#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,71 +39,84 @@ NS_START(fordyca, tasks);
  * Constructors/Destructor
  ******************************************************************************/
 generalist::generalist(
-    const struct task_allocation::partitionable_task_params *const c_params,
-    std::unique_ptr<task_allocation::taskable> &mechanism)
+    const struct task_allocation::partitionable_task_params* const params,
+    std::unique_ptr<task_allocation::taskable>& mechanism)
     : partitionable_polled_task(rcppsw::er::g_server,
-                                "generalist",
-                                c_params,
-                                mechanism) {}
+                                kGeneralistName,
+                                params,
+                                mechanism),
+      foraging_task(kGeneralistName),
+      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double generalist::current_time(void) const {
-  return dynamic_cast<fsm::depth0::stateful_foraging_fsm *>(
+__pure double generalist::current_time(void) const {
+  return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
 bool generalist::block_acquired(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->block_acquired();
 } /* cache_acquired() */
 
+double generalist::calc_abort_prob(void) {
+  /*
+   * Generalists always have a small chance of aborting their task when not at a
+   * task interface. Not strictly necessary at least for now, but it IS
+   * necessary for foragers and so it seems like a good idea to add this to all
+   * tasks.
+   */
+  return m_abort_prob.calc(executable_task::exec_time(),
+                           executable_task::exec_estimate());
+} /* calc_abort_prob() */
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::nest_block_drop &visitor) {
+void generalist::accept(events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::free_block_pickup &visitor) {
+void generalist::accept(events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Stateless Metrics
  ******************************************************************************/
 bool generalist::is_exploring_for_block(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->is_exploring_for_block();
 } /* is_exploring_for_block() */
 
 bool generalist::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 bool generalist::is_transporting_to_nest(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->is_transporting_to_nest();
 } /* is_tranpsorting_to_nest() */
 
 /*******************************************************************************
- * Depth0 Diagnostics
+ * Stateful Metrics
  ******************************************************************************/
 bool generalist::is_acquiring_block(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->is_acquiring_block();
 } /* is_acquiring_block() */
 
 bool generalist::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm *>(
+  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->is_vectoring_to_block();
 } /* is_vectoring_to_block() */

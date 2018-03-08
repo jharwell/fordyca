@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void fsm_parser::parse(argos::TConfigurationNode &node) {
+void fsm_parser::parse(argos::TConfigurationNode& node) {
   argos::TConfigurationNode fsm_node = argos::GetNode(node, "fsm");
 
   m_params = rcppsw::make_unique<fsm_params>();
@@ -43,6 +43,10 @@ void fsm_parser::parse(argos::TConfigurationNode &node) {
   argos::GetNodeAttribute(fsm_node,
                           "frequent_collision_thresh",
                           m_params->times.frequent_collision_thresh);
+  argos::GetNodeAttribute(fsm_node,
+                          "speed_throttle_block_carry",
+                          m_params->speed_throttling.block_carry);
+
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
   res = parser.parse(fsm_node.GetAttribute("nest"));
@@ -50,21 +54,21 @@ void fsm_parser::parse(argos::TConfigurationNode &node) {
                             std::atof(res[1].c_str()));
 } /* parse() */
 
-void fsm_parser::show(std::ostream &stream) {
+void fsm_parser::show(std::ostream& stream) {
   stream << "====================\nFSM params\n====================\n";
   stream << "times.unsuccessful_explore_dir_change="
          << m_params->times.unsuccessful_explore_dir_change << std::endl;
   stream << "times.frequent_collision_thresh="
          << m_params->times.frequent_collision_thresh << std::endl;
+  stream << "speed_throttling.block_carry="
+         << m_params->speed_throttling.block_carry << std::endl;
   stream << "nest_center=" << m_params->nest_center << std::endl;
 } /* show() */
 
-bool fsm_parser::validate(void) {
-  if (!(m_params->nest_center.GetX() > 0) ||
-      !(m_params->nest_center.GetY() > 0)) {
-    return false;
-  }
-  return true;
+__pure bool fsm_parser::validate(void) {
+  return (m_params->nest_center.GetX() > 0) &&
+         (m_params->nest_center.GetY() > 0) &&
+         (m_params->speed_throttling.block_carry < 1.0);
 } /* validate() */
 
 NS_END(params, fordyca);

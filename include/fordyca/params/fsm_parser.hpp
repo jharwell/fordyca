@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to robot controller FSMs into
  * \ref fsm_params.
  */
-class fsm_parser: public rcppsw::common::xml_param_parser {
+class fsm_parser : public rcppsw::common::xml_param_parser {
  public:
   fsm_parser(void) : m_params() {}
 

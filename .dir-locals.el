@@ -2,7 +2,7 @@
 ;;; For more information see (info "(emacs) Directory Variables")
 
 ((c++-mode
-  (flycheck-gcc-language-standard . "c++11")
+  (flycheck-gcc-language-standard . "c++14")
   (eval progn
         (require 'rtags-init)
         (require 'irony-mode-init)
@@ -19,8 +19,8 @@
           (setq flycheck-gcc-include-path includes-list)
           (add-to-list 'flycheck-clang-args "-fPIC")
           (add-to-list 'flycheck-gcc-args "-fPIC")
-          (add-to-list 'flycheck-clang-args "-std=c++11")
-          (add-to-list 'flycheck-gcc-args "-std=c++11")
+          (add-to-list 'flycheck-clang-args "-std=c++14")
+          (add-to-list 'flycheck-gcc-args "-std=c++14")
           (setq compile-command
                 (concat "make -C"
                         (concat

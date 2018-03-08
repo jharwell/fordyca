@@ -13,43 +13,63 @@ following programs:
 
 - cmake
 - make
-- g++
-- cppcheck (static analysis)
-- clang-check3.8 (syntax checking/static analysis )
-- clang-format-4.0 (automatic code formatting)
-- clang-tidy-4.0 (static analysis/automated checking of naming conventions)
+- gcc
+- g++ A version that supports C++11 is required. A version that supports OpenMP
+  is highly recommended, otherwise simulations of large numbers of robots will
+  be (much) slower.
+
+You will also need recent versions of the following libraries:
+
+- boost (1.58 is known to work; older versions may also work). Install all boost
+  libraries via:
+
+        sudo  apt-get install libboost-all-dev
+
+- Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
+
+        sudo apt-get install qtbase5-dev
 
 In addition, you will possibly want to install these programs:
 
 - ccache (will make compiling a lot faster)
-- icpc (additional syntax checking)
+- icpc (additional syntax checking; comes from Intel Parallel Studio, which is ~14GB)
 - ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
 
-1. After cloning this repo, you will also need to clone the following repos:
+After cloning this repo, you will need to:
 
-  - https://github.com/jharwell/rcppsw (Reusable C++ software)
-  - https://github.com/jharwell/rcsw (Reusable C software)
-  - https://github.com/jharwell/devel (dotfiles, project config, templates)
+1. Pull in the cmake config:
 
-  Before you can build anything, you will need to define some environment
-  variables:
+        git submodule update --init --recursive
 
-  - `rcsw` - Set to the path to wherever you cloned the `rcsw` repo.
+2. Clone `rcsw` https://github.com/jharwell/rcsw (Reusable C software) somewhere
+   and link it into `ext/rcsw`.
 
-  - `rcppsw` - Set to the path to wherever you cloned the `rcppsw` repo.
+3. Clone `rcppsw` https://github.com/jharwell/rcppsw (Reusable C++ software)
+   somewhere and link it into `ext/rcppsw`.
 
-  - `develroot` - Set to the path to wherever you cloned the `devel` repo.
+3. Then you can build via:
 
-2. Adjust symlinks, as describe in the RCPPSW [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
-
-3. Verify you can build `rcsw`, `rcppsw`, and `fordyca` (in that order), by
-   doing:
-
-        cd /path/to/repo
         mkdir build && cd build
         cmake ..
         make
 
-## Development Guide
+# Troubleshooting
 
-See the development guide in RCPPSW: [README](https://github.com/jharwell/rcppsw/blob/master/README.md).
+- If you are having trouble building, try:
+
+  1. Updating the cmake submodule:
+
+          git submodule update
+
+  2. Updating rcppsw and rcsw, and possibly their cmake submodules
+  
+  If the problem perists, open an issue.
+
+- If you are getting a segfault when running ARGoS, verify that if you are
+  running with Qt visualizations that the threadcount is 0 (Qt5 cannot run with
+  multiple threads without segfaulting).
+
+## Contributing
+
+We use the same contributing guidelines as RCPPSW, whose guide can be found
+[here](https://github.com/jharwell/rcppsw/blob/master/docs/CONTRIBUTING.md).

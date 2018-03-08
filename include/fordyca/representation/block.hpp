@@ -24,13 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <cassert>
-#include <utility>
-
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "fordyca/metrics/block_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
-#include "fordyca/metrics/collectible_metrics/block_metrics.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,6 +39,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class block
  * @ingroup representation
@@ -52,20 +50,31 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public metrics::collectible_metrics::block_metrics,
+              public metrics::block_metrics,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
-  explicit block(double dimension) :
-      cell_entity(dimension, dimension, argos::CColor::BLACK),
-      m_robot_index(-1), m_carries(0) {}
+  explicit block(double dimension)
+      : cell_entity(dimension, argos::CColor::BLACK, -1),
+        m_robot_index(-1),
+        m_carries(0) {}
 
-  __pure bool operator==(const block &other) const {
-    return this->id() == other.id();
+  block(double dimension, int id)
+      : cell_entity(dimension, argos::CColor::BLACK, id),
+        m_robot_index(-1),
+        m_carries(0) {}
+
+  __pure bool operator==(const block& other) const {
+    return (this->id() == other.id());
   }
 
   /* metrics */
-  size_t n_carries(void) const override { return m_carries; }
+  /**
+   * @brief Reset the metrics (# carries) for the block after it is dropped in
+   * the nest.
+   */
+  void reset_metrics(void) override { m_carries = 0; }
+  uint n_carries(void) const override { return m_carries; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -87,11 +96,6 @@ class block : public cell_entity,
   void move_out_of_sight(void);
 
   /**
-   * @brief Reset the # carries for the block after it is dropped in the nest.
-   */
-  void reset_carries(void) { m_carries = 0; }
-
-  /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *
    * @return The robot index, or -1 if no robot is currently carrying this block.
@@ -100,14 +104,11 @@ class block : public cell_entity,
   void robot_index(int robot_index) { m_robot_index = robot_index; }
 
  private:
+  // clang-format off
   int    m_robot_index;
   size_t m_carries;
+  // clang-format on
 };
-
-/*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-using perceived_block = std::pair<const block*, double>;
 
 NS_END(representation, fordyca);
 

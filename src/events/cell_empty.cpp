@@ -26,36 +26,32 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/representation/perceived_cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_empty::visit(representation::perceived_cell2D &cell) {
-  cell.decoratee().accept(*this);
-  cell.density_reset();
-} /* visit() */
-
-void cell_empty::visit(representation::cell2D &cell) {
+void cell_empty::visit(representation::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_empty::visit(fsm::cell2D_fsm &fsm) {
+void cell_empty::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_empty();
 } /* visit() */
 
-void cell_empty::visit(representation::arena_map &map) {
+void cell_empty::visit(representation::arena_map& map) {
   map.access(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
-void cell_empty::visit(representation::perceived_arena_map &map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+void cell_empty::visit(representation::perceived_arena_map& map) {
+  map.access<occupancy_grid::kPheromoneLayer>(x(), y()).reset();
+  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

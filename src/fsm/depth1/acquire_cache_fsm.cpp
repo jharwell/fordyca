@@ -31,6 +31,7 @@
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -43,11 +44,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_fsm::acquire_cache_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<const representation::perceived_arena_map> &map)
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
+    std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -60,7 +61,7 @@ acquire_cache_fsm::acquire_cache_fsm(
       exit_acquire_cache(),
       mc_nest_center(params->nest_center),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_map(map),
+      m_map(std::move(map)),
       m_server(server),
       m_sensors(sensors),
       m_vector_fsm(params->times.frequent_collision_thresh,
@@ -73,12 +74,11 @@ acquire_cache_fsm::acquire_cache_fsm(
                     actuators),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache,
-                                               NULL,
-                                               NULL,
+                                               nullptr,
+                                               nullptr,
                                                &exit_acquire_cache),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE,
-                              &acquire_cache);
+  m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE, &acquire_cache);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 /*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
-bool acquire_cache_fsm::is_avoiding_collision(void) const {
+__pure bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
@@ -144,8 +144,15 @@ void acquire_cache_fsm::init(void) {
 
 bool acquire_cache_fsm::acquire_known_cache(
     std::list<representation::perceived_cache> caches) {
+  /*
+   * If we don't know of any caches and we are not current vectoring towards
+   * one, then there is no way we can acquire a known cache, so bail out.
+   */
+  if (caches.empty() && !m_vector_fsm.task_running()) {
+    return false;
+  }
 
-    if (!caches.empty() && !m_vector_fsm.task_running()) {
+  if (!caches.empty() && !m_vector_fsm.task_running()) {
     /*
      * If we get here, we must know of some caches, but not be currently
      * vectoring toward any of them.
@@ -153,14 +160,15 @@ bool acquire_cache_fsm::acquire_known_cache(
     if (!m_vector_fsm.task_running()) {
       controller::depth1::existing_cache_selector selector(m_server,
                                                            mc_nest_center);
-      auto best = selector.calc_best(caches, m_sensors->robot_loc());
+      representation::perceived_cache best =
+          selector.calc_best(caches, m_sensors->robot_loc());
       ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
-             best.first->id(),
-             best.first->discrete_loc().first,
-             best.first->discrete_loc().second,
-             best.second);
+             best.ent->id(),
+             best.ent->discrete_loc().first,
+             best.ent->discrete_loc().second,
+             best.density.last_result());
       tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               best.first->real_loc());
+                               best.ent->real_loc());
       m_explore_fsm.task_reset();
       m_vector_fsm.task_reset();
       m_vector_fsm.task_start(&v);

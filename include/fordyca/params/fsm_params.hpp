@@ -44,7 +44,7 @@ struct threshold_times {
    * The number of exploration steps without finding block after which the
    * footboot will randomly change direction.
    */
-  size_t unsuccessful_explore_dir_change;
+  uint unsuccessful_explore_dir_change;
 
   /*
    * The number of time steps between two successive collisions that will be
@@ -55,12 +55,21 @@ struct threshold_times {
 };
 
 /**
+ * @struct speed_throttling
+ * @ingroup params
+ */
+struct speed_throttling {
+  double block_carry{0.0};
+};
+
+/**
  * @struct fsm_params
  * @ingroup params
  */
 struct fsm_params : public rcppsw::common::base_params {
-  fsm_params(void) : times(), nest_center() {}
+  fsm_params(void) : times(), speed_throttling(), nest_center() {}
   struct threshold_times times;
+  struct speed_throttling speed_throttling;
   argos::CVector2 nest_center;
 };
 

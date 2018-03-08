@@ -1,11 +1,5 @@
 <?xml version="1.0" ?>
 
-<!-- *************************************************** -->
-<!-- * A fully commented XML is diffusion_1.xml. Refer * -->
-<!-- * to it to have full information about what       * -->
-<!-- * these options mean.                             * -->
-<!-- *************************************************** -->
-
 <argos-configuration>
 
   <!-- ************************* -->
@@ -13,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="0"
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -41,36 +35,47 @@
                  output_dir="__current_date__"
                  />
         </output>
-        <perceived_arena_map>
+        <occupancy_grid>
           <grid resolution="0.2"
-                size="20, 5, 2"
+                size="10, 5, 2"
                 />
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
-        </perceived_arena_map>
-        <task estimation_alpha="0.8"
+        </occupancy_grid>
+        <task_allocation>
+          <executive
+              estimation_alpha="0.8"
               abort_reactivity="8"
               abort_offset="4"
               partition_reactivity="0.5"
               partition_offset="2"
-              init_random_estimates="true"
-              subtask_selection_method="brutschy2014"
+              subtask_selection_method="harwell2018"
               partition_method="pini2011"
               always_partition="true"
-              never_partition="false"/>
+              never_partition="false"
+              />
+          <init_estimates
+              enabled="true"
+              generalist_range="2000:4000"
+              collector_range="1000:2000"
+              harvester_range="1000:2000"
+              />
+        </task_allocation>
         <sensors>
-          <diffusion go_straight_angle_range="-5:5"
-                     delta="0.01" />
+          <proximity go_straight_angle_range="-5:5"
+                    delta="0.001" />
         </sensors>
         <actuators>
           <wheels soft_turn_angle_max="30"
                   no_turn_angle_max="5"
                   max_speed="10" />
         </actuators>
-        <fsm unsuccessful_explore_dir_change="1000"
-             frequent_collision_thresh="100"
-             nest="2.0, 2.5"
-             />
+        <fsm
+          unsuccessful_explore_dir_change="1000"
+          frequent_collision_thresh="300"
+          nest="2.0, 2.5"
+          speed_throttle_block_carry="0.1"
+          />
       </params>
     </depth1_foraging_controller>
 
@@ -93,15 +98,15 @@
           depth1_fname="depth1-stats.csv"
           block_fname="block-stats.csv"
           distance_fname="distance-stats.csv"
-          task_fname="task-stats.csv"
-          n_robots="20"
-          collect_cum="true"
-          collect_interval="750"
+          task_execution_fname="task-execution-stats.csv"
+          task_management_fname="task-management-stats.csv"
+          cache_fname="cache-stats.csv"
+          collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
-            size="20, 5, 2"/>
+            size="10, 5, 2"/>
       <blocks n_blocks="20"
               dimension="0.2"
               dist_model="single_source"
@@ -111,49 +116,63 @@
               static_size="2"
               static_respawn_scale_factor="0.05"
               dimension="0.8"
-              min_dist="0.6"
+              min_dist="0.8"
               usage_penalty="10"
               />
-      <nest size="0.5, 0.5" center="2, 2.5" />
+      <nest size="0.5, 2.0" center="2, 2.5" />
     </arena_map>
     <visualization robot_id="true"
-                   robot_los="true"
-                   block_id="true"
+                   robot_los="false"
+                   robot_task="true"
+                   block_id="false"
                    />
   </loop_functions>
 
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="20, 5, 2" center="10,2.5,1">
+  <arena size="10, 5, 2" center="5,2.5,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="20,0.1,0.5" movable="false">
-      <body position="10,5,0" orientation="0,0,0" />
+    <box id="wall_north" size="10,0.1,0.5" movable="false">
+      <body position="5,5,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="20,0.1,0.5" movable="false">
-      <body position="10,0,0" orientation="0,0,0" />
+    <box id="wall_south" size="10,0.1,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0" />
     </box>
     <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="20,2.5,0" orientation="0,0,0" />
+      <body position="10,2.5,0" orientation="0,0,0" />
     </box>
     <box id="wall_west" size="0.1,5,0.5" movable="false">
       <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
     <light id="light_1"
+           position="2,1.25,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_2"
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
+    <light id="light_3"
+           position="2,3.75,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+
     <distribute>
-      <position method="uniform" min="1,1,0" max="18,4,0" />
+      <position method="uniform" min="1,1,0" max="9,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="10" max_trials="100">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -184,8 +203,8 @@
     <qt-opengl>
       <camera>
         <placement idx="0"
-                   position="10,2.5,6"
-                   look_at="10,2.5,0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />

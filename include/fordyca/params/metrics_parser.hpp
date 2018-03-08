@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
+#include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
-#include "fordyca/params/metrics_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,12 +45,14 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters related to metric collection into
  * \ref metrics_params.
  */
-class metrics_parser: public rcppsw::common::xml_param_parser {
+class metrics_parser : public rcppsw::common::xml_param_parser {
  public:
-  metrics_parser(void): m_params() {}
+  metrics_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct metrics_params* get_results(void) override { return m_params.get(); }
+  const struct metrics_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

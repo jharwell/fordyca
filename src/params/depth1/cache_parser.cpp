@@ -32,7 +32,7 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_parser::parse(argos::TConfigurationNode &node) {
+void cache_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<struct cache_params>();
 
   argos::GetNodeAttribute(node, "dimension", m_params->dimension);
@@ -46,7 +46,7 @@ void cache_parser::parse(argos::TConfigurationNode &node) {
                           m_params->static_respawn_scale_factor);
 } /* parse() */
 
-void cache_parser::show(std::ostream &stream) {
+void cache_parser::show(std::ostream& stream) {
   stream << "====================\nCache params\n====================\n";
   stream << "dimension=" << m_params->dimension << std::endl;
   stream << "min_dist=" << m_params->min_dist << std::endl;
@@ -58,7 +58,7 @@ void cache_parser::show(std::ostream &stream) {
          << m_params->static_respawn_scale_factor << std::endl;
 } /* show() */
 
-bool cache_parser::validate(void) {
+__pure bool cache_parser::validate(void) {
   if (m_params->dimension <= 0.0) {
     return false;
   }

@@ -39,10 +39,10 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 explore_for_block_fsm::explore_for_block_fsm(
-    double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::base_foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators)
+    uint unsuccessful_dir_change_thresh,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators)
     : base_explore_fsm(unsuccessful_dir_change_thresh,
                        server,
                        sensors,
@@ -58,15 +58,15 @@ explore_for_block_fsm::explore_for_block_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
-          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, NULL, &entry_explore, NULL),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
           HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                      NULL,
+                                      nullptr,
                                       &entry_collision_avoidance,
-                                      NULL),
+                                      nullptr),
           HFSM_STATE_MAP_ENTRY_EX_ALL(&new_direction,
-                                      NULL,
+                                      nullptr,
                                       &entry_new_direction,
-                                      NULL),
+                                      nullptr),
           HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_block_fsm",
          rcppsw::er::er_lvl::DIAG,
@@ -78,7 +78,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {
+__const HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
@@ -90,7 +90,6 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
     explore_time_reset();
   }
   if (base_foraging_fsm::base_sensors()->block_detected()) {
-    ER_DIAG("Block detected");
     internal_event(ST_FINISHED);
   }
 
@@ -104,14 +103,19 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   if (base_sensors()->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
     ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-           force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
+            force.GetX(),
+            force.GetY(),
+            force.Angle().GetValue(),
+            force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
+    return controller::foraging_signal::HANDLED;
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
     argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
                                          argos::CRadians(1.0));
     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
     internal_event(ST_NEW_DIRECTION,
                    rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
+    return controller::foraging_signal::HANDLED;
   }
   /*
    * No obstacles nearby--all ahead full!

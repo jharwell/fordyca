@@ -31,7 +31,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class arena_map; class perceived_arena_map; }
+namespace representation {
+class arena_map;
+class perceived_arena_map;
+}
 
 NS_START(events);
 
@@ -49,9 +52,10 @@ NS_START(events);
  * square that the block was on is now  (probably) empty. It might not be if in
  * the same timestep a new cache is created on that same cell.
  */
-class cell_empty : public cell_op,
-                   public visitor::can_visit<representation::arena_map>,
-                   public visitor::can_visit<representation::perceived_arena_map> {
+class cell_empty
+    : public cell_op,
+      public visitor::can_visit<representation::arena_map>,
+      public visitor::can_visit<representation::perceived_arena_map> {
  public:
   cell_empty(size_t x, size_t y) : cell_op(x, y) {}
 
@@ -61,7 +65,6 @@ class cell_empty : public cell_op,
   void visit(representation::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(representation::perceived_arena_map& map) override;
 };
 

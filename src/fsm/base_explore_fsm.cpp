@@ -39,15 +39,16 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(
-    double unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::base_foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
+    uint unsuccessful_dir_change_thresh,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
     uint8_t max_states)
-    : base_foraging_fsm(unsuccessful_dir_change_thresh, server, sensors,
-                        actuators, max_states),
-      HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-      entry_new_direction(),
+    : base_foraging_fsm(unsuccessful_dir_change_thresh,
+                        server,
+                        sensors,
+                        actuators,
+                        max_states),
       entry_explore(),
       m_state() {
   insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);

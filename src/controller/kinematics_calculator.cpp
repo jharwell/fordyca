@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/controller/kinematics_calculator.hpp"
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
-#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/base_foraging_sensors.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ argos::CVector2 kinematics_calculator::calc_light_attract_force(void) {
   } /* for(r..) */
 
   return argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_ATTRACT *
-      mc_actuators->max_wheel_speed();
+         mc_actuators->max_wheel_speed();
 } /* calc_light_attract_force() */
 
 argos::CVector2 kinematics_calculator::calc_light_repel_force(void) {
@@ -66,8 +66,8 @@ argos::CVector2 kinematics_calculator::calc_light_repel_force(void) {
     accum += argos::CVector2(r.Value, r.Angle);
   } /* for(r..) */
 
-  return argos::CVector2(1.0, -accum.Angle()) * kSCALE_LIGHT_FORCE_REPEL *
-      mc_actuators->max_wheel_speed();
+  return -argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_REPEL *
+         mc_actuators->max_wheel_speed();
 } /* calc_light_repel_force() */
 
 NS_END(controller, fordyca);

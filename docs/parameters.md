@@ -7,12 +7,13 @@ below. Unless otherwise stated, all parameters must be present in the XML file.
 
 The following root XML tags are defined:
 
-- `output` - Paramaters for simulation outputs.
+- `output` - Paramaters for simulation outputs across all runs.
 
-- `perceived_arena_map` - Parameters pertaining to a robots discretization of
-                          the continuous world into a grid.
+- `occupancy_grid` - Parameters pertaining to a robotas discretization of the
+                     continuous world into a grid, and the objects it tracks
+                     within the grid.
 
-- `task` - Parameters pertaining to task allocation variables/methods.
+- `task_allocation` - Parameters pertaining to task allocation variables/methods.
 
 - `sensors` -  Parameters for robot sensors.
 
@@ -28,23 +29,21 @@ The following root XML tags are defined:
                     different simulation runs will be placed.
 
   - `output_dir` - The output directory for the current simulation under
-                   `output_root`. If you put the special field `__current_date__`
-                   here, the simulation will get a unique output directory in the
-                   form YYYY-MM-DD:HH-MM.
+                   `output_root`. If you put the special field
+                   `__current_date__` here, the simulation will get a unique
+                   output directory in the form YYYY-MM-DD:HH-MM.
 
-### `perceived_arena_map`
+### `occupancy_grid`
 
 #### `pheromone`
 
 - `rho` How fast the relevance of information about a particular cell within a
-        robot's 2D map of the world loses relevance. Each timestep, the
-        relevance value of the cell is decremented by this value, starting the
-        timestep after the robot obtains information about the actual state of
-        the cell by driving over/near it.
+        robot's 2D map of the world loses relevance.
 
 - `repeat_deposit` - If TRUE, then repeated pheromone deposits for cells
                      containing blocks/caches a robot already knows about will
-                     be enabled. `rho` should be possibly be updated accordingly.
+                     be enabled. `rho` should be possibly be updated
+                     accordingly.
 
 #### `grid`
 
@@ -56,7 +55,9 @@ The following root XML tags are defined:
            passed to the loop functions; much easier to duplicate than to deal
            with searching through an XML tree in C++.
 
-### `task`
+### `task_allocation`
+
+#### `executive`
 
 - `estimation_alpha` - Parameter for exponential weighting of a moving estimate
                        of the true execution time of a task.
@@ -79,25 +80,49 @@ The following root XML tags are defined:
                        is considered to be acceptable for continuing to
                        partition/not partition the task.
 
-- `init_random_estimates` - If `true`, then all estimates of task execution
-                            times are initialized randomly, rather than with
-                            zero, in order to avoid any possibly weird behavior
-                            on system startup.
-
 - `subtask_selection_method` - If `random`, then if a robot choosing to employ
                                partitioning for a given task it will select one
                                of the subtasks randomly. If `brutcshy2014`, then
                                it will use the method described in the
-                               corresponding paper.
+                               corresponding paper, which using estimates of
+                               waiting time at the task interface for
+                               selection. If `harwell2018`, it will use the same
+                               method as `brutcshy2014`, but use estimates of
+                               overall execution time as input instead.
 
 - `partition_method` - If `pini2011`, then robots will use the method described
                        in the corresponding paper to determine if a task should
                        be partitioned or not when deciding on their next task
                        allocation.
 
+- `always_partition` - If `true`, then robots will always choose to partition a
+                       task, given the chance. Has no effect if `false`.
+
+- `never_partition` - If `true`, then robots will never choose to partition a
+                       task, given the chance. Has no effect if `false`.
+
+#### `init_estimates`
+
+- `enabled` - If `true`, then all estimates of task execution times are
+              initialized randomly within the specified ranges, rather than with
+              zero, in order to avoid any possibly weird behavior on system
+              startup. Has no effect if `false`.
+
+- `generalist_range` - Takes a pair like so: `100:200` specifying the range of
+  the uniform random distribution over which a robots' initial estimation of the
+  duration of the generalist task will be drawn.
+
+- `collector_range` - Takes a pair like so: `100:200` specifying the range of
+  the uniform random distribution over which a robots' initial estimation of the
+  duration of the collector task will be drawn.
+
+- `harvester_range` - Takes a pair like so: `100:200` specifying the range of
+  the uniform random distribution over which a robots' initial estimation of the
+  duration of the harvester task will be drawn.
+
 ### `sensors`
 
-#### `diffusion`
+#### `proximity`
 
 - `go_straight_angle_range` - The angle range to the left/right of center (90
                               degrees on a unit circle) in which obstacles are
@@ -156,6 +181,9 @@ The following root XML tags are defined:
            passed to the loop functions, but it was easier to do it this way
            rather than muck about with XML tree traversal.
 
+- `speed_throttle_block_carry` - The percentage (specified between 0 and 1) by
+  which a robot's speed will be decreased when it is carrying a block.
+
 ## Loop Functions
 
 The following root XML tags are defined:
@@ -163,12 +191,6 @@ The following root XML tags are defined:
 - `output` - Parameters relating to logging simulation metrics/results.
 
 - `arena_map` - Parameters relating to discretization of the arena.
-
-- `blocks` - Parameters relating to blocks/block distribution.
-
-- `caches` - Parameters relating to caches.
-
-- `nest` - Parameters relating to the nest.
 
 - `visualization` - Parameters for simulation visualizations, for help in
                     debugging.
@@ -192,8 +214,11 @@ The following root XML tags are defined:
 
 #### `metrics`
 
+- `output_dir` - Name of directory within the output directory for the
+  simulation run that metrics will be placed in.
+
 - `stateless_fname` - The filename that statistics collected for the
-                      `stateless_foraging_controller` and all loggically derived
+                      `stateless_foraging_controller` and all logically derived
                       controllers will be logged to.
 
 - `stateful_fname` - The filename that statistics collected for the
@@ -210,17 +235,19 @@ The following root XML tags are defined:
 - `distance_fname` - Filename for logging statistics for how far all robots have
                      cumulatively traveled.
 
-- `task_fname` - Filename for logging the task allocation distribution as it
-                 changes over time.
+- `task_execution_fname` - Filename for logging metrics about partitioning,
+                           etc. collected from tasks as they are executed.
 
-- `n_robots` - The number of robots in the simulation.
+- `task_management_fname` - Filename for logging metrics collected at the "meta"
+                            level of task allocation: how often tasks are
+                            aborted, etc.
 
-- `collect_cum` - If TRUE, then cumulative statistics should be collected, in
-                  addition to per-timestep/per-occurrence.
+- `cache_fname` - Filename that metrics collected from caches in the arena will
+                  be collected in.
 
-- `collect_interval` - If `collect_cum` is TRUE, then this is the timestep
-                       interval after which cumulative statistics will be
-                       reset.
+- `collect_interval` - The timestep interval after which statistics will be
+                       reset. Gathering statistics on a single timestep of a
+                       long simulation is generally not useful; hence this field.
 
 ### `arena_map`
 
@@ -274,18 +301,18 @@ The following root XML tags are defined:
 - `dimension` - The dimension of the cache. Should be greater than the dimension
                 for blocks.
 
-- `min_dist` - The minimum distance between two blocks to be considered for cache
-               creation from said blocks.
+- `min_dist` - The minimum distance between two blocks to be considered for
+               cache creation from said blocks.
 
-- `usage_penalty` - How many timesteps a robot picking up a block from/dropping a
-                  block into a cache will have to wait before the operation will
-                  be allowed to proceed. Used to model the cost of actually
+- `usage_penalty` - How many timesteps a robot picking up a block from/dropping
+                  a block into a cache will have to wait before the operation
+                  will be allowed to proceed? Used to model the cost of actually
                   picking up/dropping physical blocks.
 
 #### `nest`
 
-- `size` - The size of the nest. Must be specified in a tuple like so: `0.5,
-           0.5`. Note the space--parsing does not work if it is omitted.
+- `size` - The size of the nest. Must be specified in a tuple like so:
+  `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
 
 - `center` - Location for center of the nest (nest is a square).  Must be
              specified in a tuple like so: `1.5, 1.5`. Note the space--parsing
@@ -302,3 +329,6 @@ The following root XML tags are defined:
 
 - `block_id` - Set to `true` or `false`. If true, each block's id displayed
                above it during simulation.
+
+- `task_id` - Set to `true` or `false`. If `true`, the current task each robot
+              is executing is displayed above it.

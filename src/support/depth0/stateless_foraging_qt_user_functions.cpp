@@ -35,47 +35,40 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {
-  RegisterUserFunction<stateless_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(
+  RegisterUserFunction<stateless_foraging_qt_user_functions, argos::CFootBotEntity>(
       &stateless_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_qt_user_functions::Draw(
-    argos::CFootBotEntity &c_entity) {
-  controller::base_foraging_controller &controller =
-      dynamic_cast<controller::base_foraging_controller &>(
+void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  auto& controller =
+      dynamic_cast<controller::depth0::stateless_foraging_controller&>(
           c_entity.GetControllableEntity().GetController());
 
+  if (controller.display_id()) {
+    DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());
+  }
+
   if (controller.is_carrying_block()) {
-    /*
-     * Box dimensions should ideally be read from .argos file, but there does
-     * not appear to be a simple way to do that, so just hardcode it. Not that
-     * bad of a hack, as this is only for visualization.
-     */
     DrawBox(argos::CVector3(0.0, 0.0, 0.3),
             argos::CQuaternion(),
-            argos::CVector3(0.2, 0.2, 0.2),
+            argos::CVector3(controller.block()->xsize(),
+                            controller.block()->ysize(),
+                            controller.block()->xsize()), /* assuming a cube */
             argos::CColor::BLACK);
-    std::string text;
     if (controller.block()->display_id()) {
-      text = c_entity.GetId() + "/" + +"b" +
-             std::to_string(controller.block()->id());
-    } else {
-      text = c_entity.GetId();
-    }
-    DrawText(argos::CVector3(0.0, 0.0, 0.5), text.c_str(), argos::CColor::RED);
-  } else {
-    if (controller.display_id()) {
-      DrawText(argos::CVector3(0.0, 0.0, 0.3), c_entity.GetId().c_str());
+      DrawText(argos::CVector3(0.0, 0.0, 0.5),
+               std::string(controller.GetId().size() + 3, ' ') + "[b" +
+                   std::to_string(controller.block()->id()) + "]",
+               argos::CColor::GREEN);
     }
   }
 }
 
 using namespace argos;
 REGISTER_QTOPENGL_USER_FUNCTIONS(stateless_foraging_qt_user_functions,
-                                 "stateless_foraging_qt_user_functions");
+                                 "stateless_foraging_qt_user_functions"); // NOLINT
 
 NS_END(depth0, support, fordyca);

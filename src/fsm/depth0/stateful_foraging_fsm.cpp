@@ -36,11 +36,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateful_foraging_fsm::stateful_foraging_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<representation::perceived_arena_map> &map)
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -63,10 +63,10 @@ stateful_foraging_fsm::stateful_foraging_fsm(
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                               NULL,
+                                               nullptr,
                                                &entry_leaving_nest,
-                                               NULL),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 
@@ -133,26 +133,26 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 /*******************************************************************************
  * Base Diagnostics
  ******************************************************************************/
-bool stateful_foraging_fsm::is_exploring_for_block(void) const {
+__pure bool stateful_foraging_fsm::is_exploring_for_block(void) const {
   return m_block_fsm.is_exploring_for_block();
 } /* is_exploring_for_block() */
 
-bool stateful_foraging_fsm::is_avoiding_collision(void) const {
+__pure bool stateful_foraging_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
+__pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
   return m_block_fsm.is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
  * Depth0 Diagnostics
  ******************************************************************************/
-bool stateful_foraging_fsm::is_acquiring_block(void) const {
+__pure bool stateful_foraging_fsm::is_acquiring_block(void) const {
   return m_block_fsm.is_acquiring_block();
 } /* is_acquiring_block() */
 
-bool stateful_foraging_fsm::is_vectoring_to_block(void) const {
+__pure bool stateful_foraging_fsm::is_vectoring_to_block(void) const {
   return m_block_fsm.is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 

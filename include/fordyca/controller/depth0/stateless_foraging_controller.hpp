@@ -26,8 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/distance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +37,6 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
-namespace rmetrics = metrics::collectible_metrics::fsm;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,26 +49,23 @@ namespace rmetrics = metrics::collectible_metrics::fsm;
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class stateless_foraging_controller : public base_foraging_controller,
-                                      public rmetrics::stateless_metrics,
-                                      public rmetrics::distance_metrics,
+                                      public metrics::fsm::distance_metrics,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);
+  ~stateless_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& t_node) override;
+  void Init(argos::TConfigurationNode& node) override;
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_transporting_to_nest(void) const override;
-  bool is_avoiding_collision(void) const override;
-
   /* distance metrics */
-  size_t entity_id(void) const override;
+  int entity_id(void) const override;
   double timestep_distance(void) const override;
 
+  bool is_transporting_to_nest(void) const override;
+  bool block_acquired(void) const;
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:

@@ -24,18 +24,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include <string>
+
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
+#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er { class server; }}
+namespace rcppsw {
+namespace er {
+class server;
+}
+}
 NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;
-class cache;
+class base_cache;
 class block;
 class cell_entity;
 
@@ -52,9 +58,13 @@ class cell_entity;
 class cell2D : public visitor::visitable_any<cell2D> {
  public:
   explicit cell2D(const std::shared_ptr<rcppsw::er::server>& server);
+  cell2D(void);
 
-  cell2D(const cell2D& other) = delete;
+  cell2D(const cell2D& other) = default;
   cell2D& operator=(const cell2D& other) = delete;
+
+  void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
+  const std::string& robot_id(void) const { return m_robot_id; }
 
   /* state inquiry */
 
@@ -88,10 +98,10 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(cell_entity* entity) { m_entity = entity; }
-  const cell_entity* entity(void) const { return m_entity; }
-  void loc(discrete_coord loc) { m_loc = loc; }
-  discrete_coord loc(void) const { return m_loc; }
+  void entity(const std::shared_ptr<cell_entity>& entity) { m_entity = entity; }
+  const std::shared_ptr<cell_entity>& entity(void) const { return m_entity; }
+  void loc(rcppsw::math::dcoord2 loc) { m_loc = loc; }
+  rcppsw::math::dcoord2 loc(void) const { return m_loc; }
 
   /**
    * @brief Get the block entity associated with this cell.
@@ -99,8 +109,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const representation::block* block(void) const;
-  representation::block* block(void);
+  const std::shared_ptr<representation::block> block(void) const;
+  std::shared_ptr<representation::block> block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -108,14 +118,18 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  representation::cache* cache(void) const;
+  const std::shared_ptr<representation::base_cache> cache(void) const;
+  std::shared_ptr<representation::base_cache> cache(void);
 
   fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
-  cell_entity*    m_entity;
-  discrete_coord  m_loc;
-  fsm::cell2D_fsm m_fsm;
+  // clang-format off
+  std::string                  m_robot_id{""};
+  std::shared_ptr<cell_entity> m_entity{nullptr};
+  rcppsw::math::dcoord2        m_loc;
+  fsm::cell2D_fsm              m_fsm;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

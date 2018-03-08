@@ -33,10 +33,10 @@ NS_START(fordyca, controller, depth0);
  ******************************************************************************/
 foraging_sensors::foraging_sensors(
     const struct params::sensor_params* c_params,
-    argos::CCI_RangeAndBearingSensor *const rabs,
-    argos::CCI_FootBotProximitySensor *const proximity,
-    argos::CCI_FootBotLightSensor *const light,
-    argos::CCI_FootBotMotorGroundSensor *const ground)
+    argos::CCI_RangeAndBearingSensor* const rabs,
+    argos::CCI_FootBotProximitySensor* const proximity,
+    argos::CCI_FootBotLightSensor* const light,
+    argos::CCI_FootBotMotorGroundSensor* const ground)
     : base_foraging_sensors(c_params, rabs, proximity, light, ground),
       m_los(nullptr) {}
 

@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/actuator_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/common/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -49,7 +49,9 @@ class actuator_parser : public rcppsw::common::xml_param_parser {
   actuator_parser(void) : m_params() {}
 
   void parse(argos::TConfigurationNode& node) override;
-  const struct actuator_params* get_results(void) override { return m_params.get(); }
+  const struct actuator_params* get_results(void) override {
+    return m_params.get();
+  }
   void show(std::ostream& stream) override;
   bool validate(void) override;
 

@@ -54,6 +54,7 @@ base_foraging_fsm::base_foraging_fsm(
       entry_collision_avoidance(),
       entry_leaving_nest(),
       entry_new_direction(),
+      entry_wait_for_signal(),
       mc_dir_change_thresh(unsuccessful_dir_change_thresh),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
@@ -63,8 +64,8 @@ base_foraging_fsm::base_foraging_fsm(
 
 base_foraging_fsm::base_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    std::shared_ptr<controller::base_foraging_sensors> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators,
+    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
     uint8_t max_states)
     : base_foraging_fsm(0, server, sensors, actuators, max_states) {}
 
@@ -122,11 +123,17 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   if (current_state() != last_state()) {
-    ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
+    ER_DIAG("Executing ST_COLLISION_AVOIDANCE");
   }
 
   if (m_sensors->threatening_obstacle_exists()) {
-    m_actuators->set_rel_heading(m_kinematics.calc_avoidance_force());
+    argos::CVector2 force = kinematics().calc_avoidance_force();
+    ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+           force.GetX(),
+           force.GetY(),
+           force.Angle().GetValue(),
+           force.Length());
+    m_actuators->set_rel_heading(force);
   } else {
     internal_event(previous_state());
   }
@@ -140,11 +147,11 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * The new direction is only passed the first time this state is entered, so
    * save it. After that, a standard HFSM signal is passed we which ignore.
    */
-  auto *dir_data = dynamic_cast<const new_direction_data *>(data);
+  auto* dir_data = dynamic_cast<const new_direction_data*>(data);
   if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
     m_new_dir_count = 0;
-    ER_DIAG("Change direction: %f -> %f\n",
+    ER_DIAG("Change direction: %f -> %f",
             current_dir.GetValue(),
             m_new_dir.GetValue());
   }
@@ -156,17 +163,18 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    */
   actuators()->set_rel_heading(
       argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
-                      (current_dir - m_new_dir)), true);
+                      (current_dir - m_new_dir)),
+      true);
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
    * to also help limit excessive spinning. See #191.
    */
   if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
-      m_new_dir_count >= kDIR_CHANGE_MAX_STEPS ) {
-    m_new_dir_count = 0;
+      m_new_dir_count >= kDIR_CHANGE_MAX_STEPS) {
     internal_event(previous_state());
   }
+  ++m_new_dir_count;
   return controller::foraging_signal::HANDLED;
 }
 
@@ -185,6 +193,9 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(argos::CColor::CYAN);
 }
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
+  actuators()->leds_set_color(argos::CColor::WHITE);
+}
 
 /*******************************************************************************
  * General Member Functions
@@ -194,8 +205,7 @@ void base_foraging_fsm::init(void) {
   hfsm::init();
 } /* init() */
 
-argos::CVector2 base_foraging_fsm::randomize_vector_angle(
-    argos::CVector2 vector) {
+argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
   vector.Rotate(m_rng->Uniform(range));

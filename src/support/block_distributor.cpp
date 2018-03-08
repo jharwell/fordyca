@@ -37,7 +37,7 @@ block_distributor::block_distributor(argos::CRange<double> arena_x,
                                      argos::CRange<double> arena_y,
                                      argos::CRange<double> nest_x,
                                      argos::CRange<double> nest_y,
-                                     const struct params::block_params *params)
+                                     const struct params::block_params* params)
     : m_dist_model(params->dist_model),
       m_arena_x(arena_x),
       m_arena_y(arena_y),
@@ -48,8 +48,8 @@ block_distributor::block_distributor(argos::CRange<double> arena_x,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool block_distributor::distribute_block(const representation::block &block,
-                                         argos::CVector2 *const coord) {
+bool block_distributor::distribute_block(const representation::block& block,
+                                         argos::CVector2* const coord) {
   if (m_dist_model == "random") {
     *coord = dist_random(block);
     return true;
@@ -61,23 +61,24 @@ bool block_distributor::distribute_block(const representation::block &block,
 } /* distribute_block() */
 
 argos::CVector2 block_distributor::dist_random(
-    const representation::block &block) {
+    const representation::block& block) {
   return dist_outside_range(block.xsize(), m_nest_x, m_nest_y);
 } /* dist_random() */
 
-argos::CRange<double> block_distributor::single_src_xrange(void) {
+__pure argos::CRange<double> block_distributor::single_src_xrange(void) {
   return argos::CRange<double>(m_arena_x.GetMax() * 0.9 - 0.75,
                                m_arena_x.GetMax() * 0.9);
 } /* single_src_xrange() */
 
 argos::CVector2 block_distributor::dist_single_src(
-    const representation::block &block) {
+    const representation::block& block) {
   /*
    * Find the 90% point between the nest and the source along the X (horizontal)
    * direction, and put all the blocks around there.
    */
-  argos::CRange<double> y_range(m_nest_y.GetMin() - 1.0,
-                                m_nest_y.GetMax() + 1.0);
+  argos::CRange<double> y_range(std::max(1.0, m_nest_y.GetMin() - 1.0),
+                                std::min(m_arena_y.GetMax() - 1.0,
+                                         m_nest_y.GetMax() + 1.0));
   argos::CRange<double> x_range = single_src_xrange();
   x_range.Set(x_range.GetMin() - block.xsize(),
               x_range.GetMax() + block.xsize());

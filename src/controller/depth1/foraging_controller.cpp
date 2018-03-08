@@ -28,21 +28,23 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
+#include "fordyca/controller/actuator_manager.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
+#include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/harvester.hpp"
+
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 
@@ -50,14 +52,16 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
+      m_metric_store(),
       m_executive(),
-      m_forager(),
+      m_harvester(),
       m_collector(),
       m_generalist() {}
 
@@ -66,17 +70,24 @@ foraging_controller::foraging_controller(void)
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
   /*
-   * Update the perceived arena map with the current line-of-sight, and update
-   * the relevance of information within it. Then, you can run the main FSM
-   * loop.
+   * Update the perceived arena map with the current line-of-sight, update
+   * the relevance of information (density) within it, and fix any blocks that
+   * should be hidden from our awareness.
    */
   process_los(depth0::stateful_foraging_controller::los());
-  depth0::stateful_foraging_controller::map()->update_density();
-  m_task_aborted = false;
+  map()->update();
+
+  m_metric_store.reset();
+
+  if (is_carrying_block()) {
+    actuators()->set_speed_throttle(true);
+  } else {
+    actuators()->set_speed_throttle(false);
+  }
   m_executive->run();
 } /* ControlStep() */
 
-void foraging_controller::Init(argos::TConfigurationNode &node) {
+void foraging_controller::Init(argos::TConfigurationNode& node) {
   params::depth1::task_repository task_repo;
   params::depth0::stateful_foraging_repository fsm_repo;
 
@@ -92,87 +103,113 @@ void foraging_controller::Init(argos::TConfigurationNode &node) {
             "FATAL: Not all task parameters were validated");
 
   ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_params *p =
-      static_cast<const params::depth1::task_params *>(
-          task_repo.get_params("task"));
+  const params::depth1::task_allocation_params* p =
+      static_cast<const params::depth1::task_allocation_params*>(
+          task_repo.get_params("task_allocation"));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_collector = rcppsw::make_unique<tasks::collector>(&p->tasks, collector_fsm);
+  m_collector =
+      rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
-  std::unique_ptr<task_allocation::taskable> forager_fsm =
+  std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_forager = rcppsw::make_unique<tasks::forager>(&p->tasks, forager_fsm);
+  m_harvester =
+      rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          static_cast<const params::fsm_params *>(fsm_repo.get_params("fsm")),
+          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist = rcppsw::make_unique<tasks::generalist>(&p->tasks,
-                                                        generalist_fsm);
+  m_generalist =
+      rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
 
-  m_generalist->partition1(m_forager.get());
+  m_generalist->partition1(m_harvester.get());
   m_generalist->partition2(m_collector.get());
   m_generalist->parent(m_generalist.get());
   m_generalist->set_partitionable();
 
-  m_forager->parent(m_generalist.get());
+  m_harvester->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
-      base_foraging_controller::server(),
-      m_generalist.get());
+      base_foraging_controller::server(), m_generalist.get());
 
   m_executive->task_abort_cleanup(std::bind(
       &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
 
-  if (p->init_random_estimates) {
-    m_generalist->init_random(500, 1000);
-    m_forager->init_random(100, 500);
-    m_collector->init_random(100, 500);
+  m_executive->task_alloc_notify(std::bind(
+      &foraging_controller::task_alloc_notify, this, std::placeholders::_1));
+
+  m_executive->task_finish_notify(std::bind(
+      &foraging_controller::task_finish_notify, this, std::placeholders::_1));
+
+  if (p->exec_estimates.enabled) {
+    m_generalist->init_random(p->exec_estimates.generalist_range.GetMin(),
+                              p->exec_estimates.generalist_range.GetMax());
+    m_harvester->init_random(p->exec_estimates.harvester_range.GetMin(),
+                             p->exec_estimates.harvester_range.GetMax());
+    m_collector->init_random(p->exec_estimates.collector_range.GetMin(),
+                             p->exec_estimates.collector_range.GetMax());
   }
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 
-void foraging_controller::task_abort_cleanup(
-    task_allocation::executable_task *const) {
-  m_task_aborted = true;
-} /* task_abort_cleanup() */
-
-tasks::foraging_task *foraging_controller::current_task(void) const {
-  return dynamic_cast<tasks::foraging_task *>(m_executive->current_task());
+__pure tasks::foraging_task* foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 bool foraging_controller::cache_acquired(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->cache_acquired();
   }
   return false;
 } /* cache_detected() */
 
 bool foraging_controller::block_acquired(void) const {
-  if (current_task()) {
+  if (nullptr != current_task()) {
     return current_task()->block_acquired();
   }
   return false;
 } /* block_detected() */
 
 void foraging_controller::process_los(
-    const representation::line_of_sight *const c_los) {
+    const representation::line_of_sight* const c_los) {
   depth0::stateful_foraging_controller::process_los(c_los);
+
+  /*
+   * If the robot thinks that a cell contains a cache, because the cell had one
+   * the last time it passed nearby, but when coming near the cell a second time
+   * the cell does not contain a cache, then the cache was depleted between then
+   * and now, and it needs to update its internal representation accordingly.
+   */
+  for (size_t i = 0; i < c_los->xsize(); ++i) {
+    for (size_t j = 0; j < c_los->ysize(); ++j) {
+      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      if (!c_los->cell(i, j).state_has_cache() &&
+          map()->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+        ER_DIAG("Correct cache%d discrepency at (%zu, %zu)",
+                map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
+                d.first,
+                d.second);
+        map()->cache_remove(
+            map()->access<occupancy_grid::kCellLayer>(d).cache());
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
 
   for (auto cache : c_los->caches()) {
     /*
@@ -180,62 +217,31 @@ void foraging_controller::process_los(
      * (i.e. different # of blocks in it), and so you need to always process
      * caches in the LOS, even if you already know about them.
      */
-    if (!map()->access(cache->discrete_loc()).state_has_cache()) {
-      ER_NOM("Discovered cache%d at (%zu, %zu)",
+    if (!map()
+             ->access<occupancy_grid::kCellLayer>(cache->discrete_loc())
+             .state_has_cache()) {
+      ER_NOM("Discovered cache%d at (%zu, %zu): %u blocks",
              cache->id(),
              cache->discrete_loc().first,
-             cache->discrete_loc().second);
+             cache->discrete_loc().second,
+             cache->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't
      * want to just pass that into the robot's arena_map, as keeping them in
      * sync is not possible in all situations.
      *
-     * For example if a block executing the collector task picks up a block and
+     * For example, if a block executing the collector task picks up a block and
      * tries to compute the best cache to bring it to, only to have one or more
      * of its cache references be invalid due to other robots causing caches to
      * be created/destroyed.
      *
      * Cloning is definitely necessary here.
      */
-    std::unique_ptr<representation::cache> clone = cache->clone();
-    events::cache_found op(base_foraging_controller::server(), clone.get());
+    events::cache_found op(base_foraging_controller::server(), cache->clone());
     map()->accept(op);
-    clone.reset();
   } /* for(cache..) */
 } /* process_los() */
-
-/*******************************************************************************
- * Distance Diagnostics
- ******************************************************************************/
-double foraging_controller::timestep_distance(void) const {
-  /*
-   * If you allow distance gathering at timesteps <= 2, you get a big jump
-   * because of the prev/current location not being set up properly yet. Might
-   * be worth fixing at some point...
-   */
-  if (base_sensors()->tick() > 2) {
-    return base_sensors()->robot_heading().Length();
-  }
-  return 0;
-} /* timestep_distance() */
-
-/*******************************************************************************
- * Stateless Diagnostics
- ******************************************************************************/
-bool foraging_controller::is_exploring_for_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_exploring_for_block();
-  }
-  return false;
-} /* is_exploring_for_block() */
-
-bool foraging_controller::is_avoiding_collision(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_avoiding_collision();
-  }
-  return false;
-} /* is_avoiding_collision() */
 
 bool foraging_controller::is_transporting_to_nest(void) const {
   if (nullptr != current_task()) {
@@ -245,60 +251,61 @@ bool foraging_controller::is_transporting_to_nest(void) const {
 } /* is_transporting_to_nest() */
 
 /*******************************************************************************
- * Stateful Diagnostics
+ * Executive Callbacks
  ******************************************************************************/
-bool foraging_controller::is_acquiring_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_acquiring_block();
-  }
-  return false;
-} /* is_exploring() */
+void foraging_controller::task_abort_cleanup(
+    task_allocation::executable_task* const) {
+  m_metric_store.task_aborted = true;
+} /* task_abort_cleanup() */
 
-bool foraging_controller::is_vectoring_to_block(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_vectoring_to_block();
+void foraging_controller::task_alloc_notify(
+    task_allocation::executable_task* const task) {
+  m_metric_store.task_alloc = true;
+  if (nullptr == current_task() ||
+      task->name() != m_executive->last_task()->name()) {
+    m_metric_store.alloc_sw = true;
   }
-  return false;
-} /* is_vectoring_to_block() */
+} /* task_alloc_notify() */
+
+void foraging_controller::task_finish_notify(
+    task_allocation::executable_task* const task) {
+  m_metric_store.last_task_exec_time = task->exec_time();
+  m_metric_store.task_finish = true;
+} /* task_finish_notify() */
 
 /*******************************************************************************
- * Depth1 Diagnostics
+ * Task Metrics
  ******************************************************************************/
-bool foraging_controller::is_exploring_for_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_exploring_for_cache();
-  }
-  return false;
-} /* is_exploring_for_cache() */
+bool foraging_controller::employed_partitioning(void) const {
+  ER_ASSERT(nullptr != current_task(),
+            "FATAL: Have not yet employed partitioning?");
 
-bool foraging_controller::is_vectoring_to_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_vectoring_to_cache();
-  }
-  return false;
-} /* is_vectoring_to_cache() */
+  auto* task = dynamic_cast<task_allocation::executable_task*>(current_task());
+  task_allocation::partitionable_task* p = nullptr;
 
-bool foraging_controller::is_acquiring_cache(void) const {
-  if (current_task()) {
-    return current_task()->is_acquiring_cache();
+  if (!task->is_partitionable()) {
+    p = dynamic_cast<task_allocation::partitionable_task*>(task->parent());
   } else {
-    return false;
+    p = dynamic_cast<task_allocation::partitionable_task*>(task);
   }
-} /* is_acquring_to_cache() */
+  ER_ASSERT(nullptr != p, "FATAL: Not an executable task?");
+  return p->employed_partitioning();
+} /* employed_partitioning() */
 
-bool foraging_controller::is_transporting_to_cache(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_transporting_to_cache();
-  }
-  return false;
-} /* is_transporting_to_cache() */
+std::string foraging_controller::subtask_selection(void) const {
+  ER_ASSERT(nullptr != current_task(),
+            "FATAL: Have not yet selected a subtask?");
+  /*
+   * If we get into this function, then employed_partitioning() must have
+   * returned TRUE, so we can just return the name of the current task, which
+   * MUST be a subtask.
+   */
+  return current_task_name();
+} /* subtask_selection() */
 
-std::string foraging_controller::task_name(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->task_name();
-  }
-  return "";
-} /* task_name() */
+std::string foraging_controller::current_task_name(void) const {
+  return dynamic_cast<task_allocation::logical_task*>(current_task())->name();
+} /* current_task_name() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
@@ -308,6 +315,8 @@ std::string foraging_controller::task_name(void) const {
  */
 using namespace argos;
 using depth1_foraging_controller = foraging_controller;
-REGISTER_CONTROLLER(depth1_foraging_controller, "depth1_foraging_controller");
+
+REGISTER_CONTROLLER(depth1_foraging_controller,
+                    "depth1_foraging_controller"); // NOLINT
 
 NS_END(depth1, controller, fordyca);

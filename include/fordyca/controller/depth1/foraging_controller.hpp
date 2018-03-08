@@ -27,8 +27,9 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
+#include "rcppsw/metrics/tasks/management_metrics.hpp"
+#include "rcppsw/metrics/tasks/allocation_metrics.hpp"
+#include "fordyca/controller/depth1/task_metrics_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,13 +44,14 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 namespace tasks {
-class forager;
+class harvester;
 class collector;
 class generalist;
 class foraging_task;
 }
 
 NS_START(controller, depth1);
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -58,12 +60,11 @@ NS_START(controller, depth1);
  * @ingroup controller depth1
  *
  * @brief A foraging controller that switches between \ref generalist,
- * \ref forager, and \ref collector tasks, according to dynamic changes in the
+ * \ref harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public metrics::collectible_metrics::fsm::depth1_metrics,
-                            public metrics::collectible_metrics::task_metrics,
+                            public rcppsw::metrics::tasks::management_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
@@ -73,25 +74,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void ControlStep(void) override;
 
   tasks::foraging_task* current_task(void) const;
-
-  /* distance metrics */
-  double timestep_distance(void) const override;
-
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
-
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* depth1 metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override;
-  std::string task_name(void) const override;
 
   /**
    * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has
@@ -119,19 +102,41 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void process_los(const representation::line_of_sight* c_los) override;
 
   /**
-   * @brief \c TRUE iff the robot aborted its current task, and only on the
-   * timestep in which the task was aborted.
+   * @brief Set whether or not a robot is supposed to display the task it is
+   * currently working on above itself during simulation.
    */
-  bool task_aborted(void) const { return m_task_aborted; }
+  void display_task(bool display_task) { m_display_task = display_task; }
+
+  /**
+   * @brief If \c TRUE, then the robot should display the task it is currently
+   * working on above itself during simulation.
+   */
+  bool display_task(void) const { return m_display_task; }
+
+  /* task metrics */
+  bool has_aborted_task(void) const override { return m_metric_store.task_aborted; }
+  bool has_new_allocation(void) const override { return m_metric_store.task_alloc; }
+  bool has_changed_allocation(void) const override { return m_metric_store.alloc_sw; }
+  bool has_finished_task(void) const override { return m_metric_store.task_finish; }
+  double last_task_exec_time(void) const override { return m_metric_store.last_task_exec_time; }
+  std::string current_task_name(void) const override;
+  bool employed_partitioning(void) const override;
+  std::string subtask_selection(void) const override;
 
  private:
-  void task_abort_cleanup(__unused task_allocation::executable_task*);
+  void task_abort_cleanup(task_allocation::executable_task*);
+  void task_alloc_notify(task_allocation::executable_task*);
+  void task_finish_notify(task_allocation::executable_task*);
 
-  bool                                               m_task_aborted{false};
+  // clang-format off
+  struct task_metrics_store                          m_metric_store;
+  bool                                               m_display_task{false};
+  std::string                                        m_prev_task{""};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::forager>                    m_forager;
+  std::unique_ptr<tasks::harvester>                  m_harvester;
   std::unique_ptr<tasks::collector>                  m_collector;
   std::unique_ptr<tasks::generalist>                 m_generalist;
+  // clang-format on
 };
 
 NS_END(depth1, controller, fordyca);

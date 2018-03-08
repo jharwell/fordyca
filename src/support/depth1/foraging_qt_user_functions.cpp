@@ -22,11 +22,37 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
+#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_qt_user_functions::foraging_qt_user_functions(void) {
+  RegisterUserFunction<foraging_qt_user_functions, argos::CFootBotEntity>(
+      &foraging_qt_user_functions::Draw);
+}
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  stateful_foraging_qt_user_functions::Draw(c_entity);
+
+  auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
+      c_entity.GetControllableEntity().GetController());
+
+  if (controller.display_task() && nullptr != controller.current_task()) {
+    DrawText(argos::CVector3(0.0, 0.0, 0.75),
+             controller.current_task()->name(),
+             argos::CColor::BLUE);
+  }
+}
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
@@ -37,6 +63,6 @@ NS_START(fordyca, support, depth1);
 using namespace argos;
 typedef foraging_qt_user_functions depth1_foraging_qt_user_functions;
 REGISTER_QTOPENGL_USER_FUNCTIONS(foraging_qt_user_functions,
-                                 "depth1_foraging_qt_user_functions")
+                                 "depth1_foraging_qt_user_functions"); // NOLINT
 
 NS_END(support, fordyca, depth1);

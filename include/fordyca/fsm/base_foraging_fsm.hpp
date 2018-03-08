@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-#include "rcppsw/patterns/state_machine/hfsm.hpp"
-#include "fordyca/fsm/new_direction_data.hpp"
+#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/controller/kinematics_calculator.hpp"
+#include "fordyca/fsm/new_direction_data.hpp"
+#include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,13 +63,13 @@ class base_foraging_fsm : public state_machine::hfsm {
                     std::shared_ptr<controller::actuator_manager> actuators,
                     uint8_t max_states);
 
-  base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                    std::shared_ptr<controller::base_foraging_sensors> sensors,
-                    std::shared_ptr<controller::actuator_manager> actuators,
-                    uint8_t max_states);
+  base_foraging_fsm(
+      const std::shared_ptr<rcppsw::er::server>& server,
+      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+      const std::shared_ptr<controller::actuator_manager>& actuators,
+      uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
-
 
   base_foraging_fsm(const base_foraging_fsm& fsm) = delete;
   base_foraging_fsm& operator=(const base_foraging_fsm& fsm) = delete;
@@ -88,7 +88,9 @@ class base_foraging_fsm : public state_machine::hfsm {
    * tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  controller::base_foraging_sensors*  base_sensors(void) const { return m_sensors.get(); }
+  controller::base_foraging_sensors* base_sensors(void) const {
+    return m_sensors.get();
+  }
 
  protected:
   double dir_change_thresh(void) const { return mc_dir_change_thresh; }
@@ -101,8 +103,10 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @return The same vector, but with a new angle.
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
-  controller::actuator_manager*  actuators(void) const { return m_actuators.get(); }
-  controller::kinematics_calculator&  kinematics(void) { return m_kinematics; }
+  controller::actuator_manager* actuators(void) const {
+    return m_actuators.get();
+  }
+  controller::kinematics_calculator& kinematics(void) { return m_kinematics; }
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -114,7 +118,8 @@ class base_foraging_fsm : public state_machine::hfsm {
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, transport_to_nest,
+  HFSM_STATE_DECLARE(base_foraging_fsm,
+                     transport_to_nest,
                      state_machine::event_data);
 
   /**
@@ -128,8 +133,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * \ref foraging_signal::LEFT_NEST signal is returned to the
    * parent state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, state_machine::event_data);
 
   /**
    * @brief Robots entering this state perform collision avoidance.
@@ -152,9 +156,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * state. Once the direction change has been accomplished, the robot will
    * transition back to its previous state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm,
-                     new_direction,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, state_machine::event_data);
 
   /**
    * @brief A simple entry state for returning to nest, used to set LED colors
@@ -180,6 +182,11 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_new_direction);
 
+  /**
+   * @brief Simple state for entry into the "wait for signal" state, used to
+   * change LED color for visualization purposes.
+   */
+  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
  private:
   /**
@@ -203,13 +210,15 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
-  const double          mc_dir_change_thresh;
-  uint                  m_new_dir_count{0};
-  argos::CRadians       m_new_dir;
+  // clang-format off
+  const double                                       mc_dir_change_thresh;
+  uint                                               m_new_dir_count{0};
+  argos::CRadians                                    m_new_dir;
   argos::CRandom::CRNG*                              m_rng;
   std::shared_ptr<controller::base_foraging_sensors> m_sensors;
   std::shared_ptr<controller::actuator_manager>      m_actuators;
   controller::kinematics_calculator                  m_kinematics;
+  // clang-format on
 };
 
 NS_END(fsm, fordyca);

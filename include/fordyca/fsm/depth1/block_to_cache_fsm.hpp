@@ -30,9 +30,9 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,9 +65,9 @@ NS_START(fsm, depth1);
  * complete.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
-                           public metrics::collectible_metrics::fsm::stateless_metrics,
-                           public metrics::collectible_metrics::fsm::stateful_metrics,
-                           public metrics::collectible_metrics::fsm::depth1_metrics,
+                           public metrics::fsm::stateless_metrics,
+                           public metrics::fsm::stateful_metrics,
+                           public metrics::fsm::depth1_metrics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<block_to_cache_fsm> {
  public:
@@ -156,6 +156,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   /* inherited states */
   HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to cache states */
   HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::event_data);
@@ -166,7 +167,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(block_to_cache_fsm, wait_for_cache_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(block_to_cache_fsm, finished);
-  HFSM_ENTRY_DECLARE_ND(block_to_cache_fsm, entry_wait_for_pickup);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -178,10 +178,13 @@ class block_to_cache_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
+  // clang-format off
   uint                                                  m_pickup_count;
   std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   acquire_cache_fsm                                     m_cache_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

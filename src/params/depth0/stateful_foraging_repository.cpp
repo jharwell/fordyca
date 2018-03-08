@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_parser.hpp"
+#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
 #include "fordyca/params/sensor_parser.hpp"
 
@@ -39,7 +39,7 @@ stateful_foraging_repository::stateful_foraging_repository(void) {
   register_parser<actuator_parser>("actuators");
   register_parser<sensor_parser>("sensors");
   register_parser<fsm_parser>("fsm");
-  register_parser<perceived_arena_map_parser>("perceived_arena_map");
+  register_parser<occupancy_grid_parser>("occupancy_grid");
 }
 
 NS_END(depth0, params, fordyca);

@@ -25,9 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
  * Namespaces

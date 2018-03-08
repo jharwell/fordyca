@@ -1,0 +1,213 @@
+<?xml version="1.0" ?>
+
+<!-- *************************************************** -->
+<!-- * A fully commented XML is diffusion_1.xml. Refer * -->
+<!-- * to it to have full information about what       * -->
+<!-- * these options mean.                             * -->
+<!-- *************************************************** -->
+
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="__0__"
+                ticks_per_second="5"
+                random_seed="123" />
+  </framework>
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <__controller___controller id="ffc"
+                                library="build/lib/libfordyca">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <range_and_bearing implementation="default" />
+      </actuators>
+      <sensors>
+        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_light implementation="rot_z_only" show_rays="false" />
+        <footbot_motor_ground implementation="rot_z_only" />
+        <range_and_bearing implementation="medium" medium="rab" />
+      </sensors>
+      <params>
+        <output>
+          <robot output_root="output"
+                 output_dir="__current_date__"
+                 />
+        </output>
+        <perceived_arena_map>
+          <grid resolution="0.2"
+                size="20, 5, 2"
+                />
+          <pheromone rho="0.00001"
+                     repeat_deposit="false"/>
+        </perceived_arena_map>
+        <task estimation_alpha="0.8"
+              abort_reactivity="8"
+              abort_offset="4"
+              partition_reactivity="0.5"
+              partition_offset="2"
+              init_random_estimates="true"
+              subtask_selection_method="harwell2018"
+              partition_method="pini2011"
+              always_partition="__0__"
+              never_partition="false"/>
+        <sensors>
+          <proximity go_straight_angle_range="-5:5"
+                    delta="0.01" />
+        </sensors>
+        <actuators>
+          <wheels soft_turn_angle_max="30"
+                  no_turn_angle_max="5"
+                  max_speed="5" />
+        </actuators>
+        <fsm
+          unsuccessful_explore_dir_change="1000"
+          frequent_collision_thresh="100"
+          nest="2.0, 2.5"
+          speed_throttle_block_carry="__0__"
+          />
+      </params>
+    </__controller___controller>
+
+  </controllers>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions library="build/lib/libfordyca"
+                  label="__controller___loop_functions">
+    <output>
+      <sim sim_log_fname="sim.log"
+           output_root="output"
+           output_dir="__current_date__"
+           />
+      <metrics
+          output_dir="metrics"
+          stateless_fname="stateless-stats.csv"
+          stateful_fname="stateful-stats.csv"
+          depth1_fname="depth1-stats.csv"
+          block_fname="block-stats.csv"
+          distance_fname="distance-stats.csv"
+          task_fname="task-stats.csv"
+          n_robots="__0__"
+          collect_cum="true"
+          collect_interval="1000"
+          />
+    </output>
+    <arena_map>
+      <grid resolution="0.2"
+            size="20, 5, 2"/>
+      <blocks n_blocks="40"
+              dimension="0.2"
+              dist_model="single_source"
+              />
+      <caches create_static="true"
+              create_dynamic="false"
+              static_size="2"
+              static_respawn_scale_factor="0.05"
+              dimension="0.8"
+              min_dist="0.6"
+              usage_penalty="__0__"
+              />
+      <nest size="0.5, 2.0" center="2, 2.5" />
+    </arena_map>
+        <visualization robot_id="true"
+                   robot_los="true"
+                   robot_task="true"
+                   block_id="false"
+                   />
+
+  </loop_functions>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="20, 5, 2" center="10,2.5,1">
+
+    <floor id="floor"
+           source="loop_functions"
+           pixels_per_meter="50" />
+
+    <box id="wall_north" size="20,0.1,0.5" movable="false">
+      <body position="10,5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="20,0.1,0.5" movable="false">
+      <body position="10,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.1,5,0.5" movable="false">
+      <body position="20,2.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.1,5,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0" />
+    </box>
+
+    <light id="light_1"
+           position="2,1.25,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_2"
+           position="2,2.5,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_3"
+           position="2,3.75,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    
+    <distribute>
+      <position method="uniform" min="1,1,0" max="18,4,0" />
+      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <entity quantity="__0__" max_trials="1000">
+        <foot-bot id="fb">
+          <controller config="ffc" />
+        </foot-bot>
+      </entity>
+    </distribute>
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <range_and_bearing id="rab" />
+    <led id="leds" />
+  </media>
+
+    <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="__controller___qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
+
+</argos-configuration>

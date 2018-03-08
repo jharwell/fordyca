@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <argos3/core/utility/math/range.h>
-#include "rcppsw/common/base_params.hpp"
+#include <string>
 #include "fordyca/params/arena_map_params.hpp"
+#include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,6 +46,7 @@ struct loop_functions_params : public rcppsw::common::base_params {
 
   bool display_robot_id{false};
   bool display_robot_los{false};
+  bool display_robot_task{false};
   bool display_block_id{false};
   struct arena_map_params arena_map;
 };

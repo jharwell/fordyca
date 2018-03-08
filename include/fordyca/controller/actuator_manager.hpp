@@ -24,12 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/math/vector2.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "fordyca/params/actuator_params.hpp"
+#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +53,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * - argos::CCI_LEDsActuator
  * - argos::CCI_RangeAndBearingActuator
  */
-class actuator_manager: public state_machine::simple_fsm {
+class actuator_manager : public state_machine::simple_fsm {
  public:
   actuator_manager(const struct params::actuator_params* c_params,
                    argos::CCI_DifferentialSteeringActuator* wheels,
@@ -95,6 +95,25 @@ class actuator_manager: public state_machine::simple_fsm {
   double max_wheel_speed(void) const;
 
   /**
+   * @brief Set the percentage of the overall maxmimum speed that robots will be
+   * able to attain (i.e. set a temporary new maximum) when throttling is
+   * currently enabled.
+   */
+  void set_throttle_percent(double percent) { m_throttle_percent = percent; }
+
+  /**
+   * @brief Set whether or not temporary throttling of overall maximum speed is
+   * enabled.
+   */
+  void set_speed_throttle(bool en) { m_throttle = en; }
+
+  /**
+   * @brief Get whether or not temporary throttling of overall maximum speed is
+   * currently enabled.
+   */
+  bool get_speed_throttle(void) { return m_throttle; }
+
+  /**
    * @brief Stop the robot.
    */
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0, 0.0); }
@@ -108,10 +127,10 @@ class actuator_manager: public state_machine::simple_fsm {
    * @brief Direct control over the linear/angular speeds of the wheels.
    *
    * This provides an alternative interface much more precise rather than just
-   * saying "go in this direction now" than you get with \ref
-   * set_rel_heading(). However, it is also more difficult to use. Note that if
-   * lin_speed + ang_speed is greater than the specified parameter value for max
-   * wheel speed for either wheel it will saturate.
+   * saying "go in this direction now" than you get with \ref set_rel_heading().
+   * However, it is also more difficult to use. Note that if lin_speed +
+   * ang_speed is greater than the specified parameter value for max wheel speed
+   * for either wheel it will saturate.
    *
    * @param lin_speed The desired linear speed.
    * @param ang_speed The desired angular speed.
@@ -129,13 +148,23 @@ class actuator_manager: public state_machine::simple_fsm {
    */
   void set_wheel_speeds(double speed1, double speed2, argos::CRadians heading);
 
+  /**
+   * @brief Clamp the desired speed to a maximum (maximum will be either the
+   * global maximum or the throttled maximum).
+   *
+   * @param desired The desired wheel speed.
+   *
+   * @return The clamped speed.
+   */
+  double clamp_wheel_speed(double desired);
+
   /*
    * @enum The robot can be in three different turning states.
    */
   enum fsm_states {
-    ST_NO_TURN,     /// Go straight
-    ST_SOFT_TURN,   /// Both wheels rotating forward at slightly different speeds
-    ST_HARD_TURN,   /// Wheels are turning with opposite & max speeds
+    ST_NO_TURN,   /// Go straight
+    ST_SOFT_TURN, /// Both wheels rotating forward at slightly different speeds
+    ST_HARD_TURN, /// Wheels are turning with opposite & max speeds
     ST_MAX_STATES
   };
 
@@ -144,8 +173,8 @@ class actuator_manager: public state_machine::simple_fsm {
    * desired heading change into wheel speeds.
    */
   struct turn_data : public state_machine::event_data {
-    turn_data(argos::CVector2 heading_, bool force_hard_) :
-        heading(heading_), force_hard(force_hard_) {}
+    turn_data(argos::CVector2 heading_, bool force_hard_)
+        : heading(heading_), force_hard(force_hard_) {}
 
     argos::CVector2 heading;
     bool force_hard;
@@ -170,20 +199,24 @@ class actuator_manager: public state_machine::simple_fsm {
    */
   FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
-    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP) {
-      FSM_STATE_MAP_ENTRY(&no_turn),
-          FSM_STATE_MAP_ENTRY(&soft_turn),
-          FSM_STATE_MAP_ENTRY(&hard_turn),
-          };
+    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
+        FSM_STATE_MAP_ENTRY(&no_turn),
+        FSM_STATE_MAP_ENTRY(&soft_turn),
+        FSM_STATE_MAP_ENTRY(&hard_turn),
+    };
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
-  double m_lwheel_speed{0.0};
-  double m_rwheel_speed{0.0};
+  // clang-format off
+  bool                                     m_throttle{false};
+  double                                   m_throttle_percent{0.0};
+  double                                   m_lwheel_speed{0.0};
+  double                                   m_rwheel_speed{0.0};
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
   argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
   argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
   const struct params::actuator_params     mc_params;
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

@@ -1,1 +1,1 @@
-/home/jharwell/devel/cmake/project.cmake
+cmake/project.cmake

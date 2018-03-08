@@ -37,11 +37,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 block_to_cache_fsm::block_to_cache_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth1::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<representation::perceived_arena_map> &map)
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -50,13 +50,13 @@ block_to_cache_fsm::block_to_cache_fsm(
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_collision_avoidance(),
+      entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(transport_to_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      entry_wait_for_pickup(),
       m_pickup_count(0),
       m_sensors(sensors),
       m_block_fsm(params,
@@ -69,19 +69,21 @@ block_to_cache_fsm::block_to_cache_fsm(
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                               NULL,
-                                               &entry_wait_for_pickup,
-                                               NULL),
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&transport_to_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_drop,
-                                               NULL,
-                                               &entry_wait_for_pickup,
-                                               NULL),
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                               NULL,
+                                               nullptr,
                                                &entry_collision_avoidance,
-                                               NULL),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+  insmod("block_to_cache_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
+}
 
 HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
   if (state_machine::event_type::NORMAL == data->type()) {
@@ -89,11 +91,8 @@ HFSM_STATE_DEFINE(block_to_cache_fsm, start, state_machine::event_data) {
       internal_event(ST_ACQUIRE_FREE_BLOCK);
       return controller::foraging_signal::HANDLED;
     }
-  } else if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::COLLISION_IMMINENT == data->signal()) {
-      internal_event(ST_COLLISION_AVOIDANCE);
-      return controller::foraging_signal::HANDLED;
-    }
+  } else {
+    ER_FATAL_SENTINEL("FATAL: Cannot handle child signals");
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -121,6 +120,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
                   wait_for_block_pickup,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    ER_DIAG("Block pickup signal received");
     m_block_fsm.task_reset();
     m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_CACHE);
@@ -129,8 +129,7 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
    * It is possible that robots can be waiting in this wait indefinitely for a
    * block pickup signal that will never come if they got here by "detecting" a
    * block by sprawling across multiple blocks (i.e. all ground sensors did not
-   * detect the same block). This is only a problem for generalists, who
-   * cannot/do not abort their tasks.
+   * detect the same block).
    *
    * In that case, the timeout here will cause the robot to try again, and
    * because of the decaying relevance of cells, it will eventually pick a
@@ -151,13 +150,13 @@ HFSM_STATE_DEFINE(block_to_cache_fsm,
                   wait_for_cache_drop,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    ER_DIAG("Block drop signal received");
     internal_event(ST_FINISHED);
+  } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
+    m_cache_fsm.task_reset();
+    internal_event(ST_TRANSPORT_TO_CACHE);
   }
   return controller::foraging_signal::HANDLED;
-}
-
-HFSM_ENTRY_DEFINE_ND(block_to_cache_fsm, entry_wait_for_pickup) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::WHITE);
 }
 
 __const HFSM_STATE_DEFINE_ND(block_to_cache_fsm, finished) {
@@ -226,8 +225,8 @@ bool block_to_cache_fsm::block_acquired(void) const {
 } /* block_acquired() */
 
 void block_to_cache_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument *const arg) {
-  auto* a = dynamic_cast<const tasks::foraging_signal_argument *const>(arg);
+    const rcppsw::task_allocation::taskable_argument* const arg) {
+  auto* a = dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   inject_event(a->signal(), state_machine::event_type::NORMAL);
 

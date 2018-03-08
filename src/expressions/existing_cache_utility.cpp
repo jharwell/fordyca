@@ -21,25 +21,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/expressions/existing_cache_utility.hpp"
+#include "fordyca/math/existing_cache_utility.hpp"
 #include <cmath>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-existing_cache_utility::existing_cache_utility(const argos::CVector2 &cache_loc,
-                                               const argos::CVector2 &nest_loc)
+existing_cache_utility::existing_cache_utility(const argos::CVector2& cache_loc,
+                                               const argos::CVector2& nest_loc)
     : mc_cache_loc(cache_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double existing_cache_utility::calc(const argos::CVector2 &rloc,
+double existing_cache_utility::calc(const argos::CVector2& rloc,
                                     double density,
                                     size_t n_blocks) {
   return set_result(

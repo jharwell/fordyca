@@ -31,6 +31,7 @@
 #include "fordyca/controller/depth0/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -43,11 +44,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_block_fsm::acquire_block_fsm(
-    const struct params::fsm_params *params,
-    const std::shared_ptr<rcppsw::er::server> &server,
-    const std::shared_ptr<controller::depth0::foraging_sensors> &sensors,
-    const std::shared_ptr<controller::actuator_manager> &actuators,
-    const std::shared_ptr<representation::perceived_arena_map> &map)
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::actuator_manager>& actuators,
+    std::shared_ptr<representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
@@ -61,7 +62,7 @@ acquire_block_fsm::acquire_block_fsm(
       mc_nest_center(params->nest_center),
       m_best_block(nullptr),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_map(map),
+      m_map(std::move(map)),
       m_server(server),
       m_sensors(sensors),
       m_vector_fsm(params->times.frequent_collision_thresh,
@@ -74,8 +75,8 @@ acquire_block_fsm::acquire_block_fsm(
                     actuators),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block,
-                                               NULL,
-                                               NULL,
+                                               nullptr,
+                                               nullptr,
                                                &exit_acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   client::insmod("acquire_block_fsm",
@@ -117,7 +118,7 @@ bool acquire_block_fsm::is_exploring_for_block(void) const {
   return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running());
 } /* is_exploring_for_block() */
 
-bool acquire_block_fsm::is_avoiding_collision(void) const {
+__pure bool acquire_block_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
@@ -144,6 +145,13 @@ void acquire_block_fsm::init(void) {
 
 bool acquire_block_fsm::acquire_known_block(
     std::list<representation::perceived_block> blocks) {
+  /*
+   * If we don't know of any blocks and we are not current vectoring towards
+   * one, then there is no way we can acquire a known block, so bail out.
+   */
+  if (blocks.empty() && !m_vector_fsm.task_running()) {
+    return false;
+  }
 
   if (!blocks.empty() && !m_vector_fsm.task_running()) {
     /*
@@ -151,15 +159,16 @@ bool acquire_block_fsm::acquire_known_block(
      * vectoring toward any of them.
      */
     controller::depth0::block_selector selector(m_server, mc_nest_center);
-    auto best = selector.calc_best(blocks, m_sensors->robot_loc());
+    representation::perceived_block best =
+        selector.calc_best(blocks, m_sensors->robot_loc());
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
-           best.first->id(),
-           best.first->discrete_loc().first,
-           best.first->discrete_loc().second,
-           best.second);
+           best.ent->id(),
+           best.ent->discrete_loc().first,
+           best.ent->discrete_loc().second,
+           best.density.last_result());
     tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
-                             best.first->real_loc());
-    m_best_block = const_cast<representation::block*>(best.first);
+                             best.ent->real_loc());
+    m_best_block = best.ent;
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
     m_vector_fsm.task_start(&v);
@@ -176,7 +185,6 @@ bool acquire_block_fsm::acquire_known_block(
       return true;
     }
     ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-    m_map->block_remove(*m_best_block);
     return false;
   }
   return false;

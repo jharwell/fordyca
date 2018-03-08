@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -34,24 +34,30 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(const std::shared_ptr<rcppsw::er::server> &server)
-    : m_entity(nullptr), m_loc(), m_fsm(server) {
+cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
+    : m_loc(), m_fsm(server) {
   m_fsm.init();
 }
+
+cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const representation::block *cell2D::block(void) const {
-  return dynamic_cast<representation::block *>(m_entity);
+__pure const std::shared_ptr<representation::block> cell2D::block(void) const {
+  return std::dynamic_pointer_cast<representation::block>(m_entity);
 } /* block() */
 
-representation::block *cell2D::block(void) {
-  return dynamic_cast<representation::block *>(m_entity);
+__pure std::shared_ptr<representation::block> cell2D::block(void) {
+  return std::dynamic_pointer_cast<representation::block>(m_entity);
 } /* block() */
 
-representation::cache *cell2D::cache(void) const {
-  return dynamic_cast<representation::cache *>(m_entity);
+__pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+} /* cache() */
+
+__pure const std::shared_ptr<representation::base_cache> cell2D::cache(void) const {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
 } /* cache() */
 
 NS_END(representation, fordyca);

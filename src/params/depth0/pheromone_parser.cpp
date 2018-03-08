@@ -31,23 +31,20 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void pheromone_parser::parse(argos::TConfigurationNode &node) {
+void pheromone_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<struct pheromone_params>();
   m_params->rho = std::atof(node.GetAttribute("rho").c_str());
   argos::GetNodeAttribute(node, "repeat_deposit", m_params->repeat_deposit);
 } /* parse() */
 
-void pheromone_parser::show(std::ostream &stream) {
+void pheromone_parser::show(std::ostream& stream) {
   stream << "====================\nPheromone params\n====================\n";
   stream << "rho=" << m_params->rho << std::endl;
   stream << "repeat_deposit=" << m_params->repeat_deposit << std::endl;
 } /* show() */
 
-bool pheromone_parser::validate(void) {
-  if (m_params->rho <= 0.0) {
-    return false;
-  }
-  return true;
+__pure bool pheromone_parser::validate(void) {
+  return m_params->rho > 0.0;
 } /* validate() */
 
 NS_END(depth0, params, fordyca);

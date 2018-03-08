@@ -21,24 +21,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/expressions/block_utility.hpp"
+#include "fordyca/math/block_utility.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, expressions);
+NS_START(fordyca, math);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_utility::block_utility(const argos::CVector2 &block_loc,
-                             const argos::CVector2 &nest_loc)
+block_utility::block_utility(const argos::CVector2& block_loc,
+                             const argos::CVector2& nest_loc)
     : mc_block_loc(block_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double block_utility::calc(const argos::CVector2 &rloc, double density) {
+double block_utility::calc(const argos::CVector2& rloc, double density) {
   return set_result(
       ((mc_block_loc - mc_nest_loc).Length() / (mc_block_loc - rloc).Length()) *
       std::exp(density));

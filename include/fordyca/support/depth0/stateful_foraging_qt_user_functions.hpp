@@ -43,7 +43,7 @@ class stateful_foraging_qt_user_functions : public stateless_foraging_qt_user_fu
  public:
   stateful_foraging_qt_user_functions(void);
 
-  virtual ~stateful_foraging_qt_user_functions() {}
+  ~stateful_foraging_qt_user_functions(void) override = default;
 
   void Draw(argos::CFootBotEntity& c_entity) override;
 };

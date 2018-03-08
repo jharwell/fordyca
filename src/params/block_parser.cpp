@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_parser::parse(argos::TConfigurationNode &node) {
+void block_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<struct block_params>();
 
   argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
@@ -40,7 +40,7 @@ void block_parser::parse(argos::TConfigurationNode &node) {
   argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
 } /* parse() */
 
-void block_parser::show(std::ostream &stream) {
+void block_parser::show(std::ostream& stream) {
   stream << "====================\nBlock params\n====================\n";
   stream << "n_blocks=" << m_params->n_blocks << std::endl;
   stream << "dimension=" << m_params->dimension << std::endl;
@@ -48,11 +48,8 @@ void block_parser::show(std::ostream &stream) {
 } /* show() */
 
 bool block_parser::validate(void) {
-  if (0 == m_params->n_blocks || 0.0 == m_params->dimension ||
-      "" == m_params->dist_model) {
-    return false;
-  }
-  return true;
+  return !(0 == m_params->n_blocks || m_params->dimension <= 0.0 ||
+           "" == m_params->dist_model);
 } /* validate() */
 
 NS_END(params, fordyca);

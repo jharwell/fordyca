@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,18 +53,23 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::collectible_metrics::fsm::stateless_metrics,
+                               public metrics::fsm::stateless_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const struct params::fsm_params* params,
                          const std::shared_ptr<rcppsw::er::server>& server,
-                         std::shared_ptr<controller::base_foraging_sensors> sensors,
-                         std::shared_ptr<controller::actuator_manager> actuators);
+                         const std::shared_ptr<controller::base_foraging_sensors>& sensors,
+                         const std::shared_ptr<controller::actuator_manager>& actuators);
+
+  stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
+  stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
   /* base metrics */
   bool is_exploring_for_block(void) const override;
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
+
+  bool block_acquired(void) const;
 
   /**
    * @brief (Re)-initialize the FSM.
@@ -83,7 +88,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_ACQUIRE_BLOCK,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_COLLISION_AVOIDANCE,
+    ST_WAIT_FOR_BLOCK_PICKUP,
     ST_MAX_STATES
   };
 
@@ -92,15 +97,15 @@ class stateless_foraging_fsm : public base_foraging_fsm,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
 
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* stateless fsm states */
   HFSM_STATE_DECLARE(stateless_foraging_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE(stateless_foraging_fsm, acquire_block,
+  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
                      state_machine::event_data);
 
   /**
@@ -113,11 +118,11 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   return (&mc_state_map[index]);
   }
 
-  stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
-  stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
-
+  // clang-format off
   argos::CRandom::CRNG* m_rng;
   explore_for_block_fsm m_explore_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

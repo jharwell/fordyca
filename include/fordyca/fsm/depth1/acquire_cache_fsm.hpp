@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <utility>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
 
@@ -35,9 +34,9 @@
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/depth1_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,9 +66,9 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                          public metrics::collectible_metrics::fsm::stateless_metrics,
-                          public metrics::collectible_metrics::fsm::stateful_metrics,
-                          public metrics::collectible_metrics::fsm::depth1_metrics,
+                          public metrics::fsm::stateless_metrics,
+                          public metrics::fsm::stateful_metrics,
+                          public metrics::fsm::depth1_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(
@@ -77,7 +76,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
       const std::shared_ptr<controller::actuator_manager>& actuators,
-      const std::shared_ptr<const representation::perceived_arena_map>& map);
+      std::shared_ptr<const representation::perceived_arena_map> map);
 
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
   acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
@@ -90,19 +89,19 @@ class acquire_cache_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
 
   /* base metrics */
-  bool is_exploring_for_block(void) const override { return false; };
+  bool is_exploring_for_block(void) const override { return false; }
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override { return false; }
 
   /* depth0 metrics */
-  bool is_acquiring_block(void) const override { return false; };
-  bool is_vectoring_to_block(void) const override { return false; };
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
 
   /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override { return false; };
+  bool is_transporting_to_cache(void) const override { return false; }
 
   /**
    * @brief Reset the FSM
@@ -153,6 +152,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
+  // clang-format off
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
@@ -160,6 +160,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
   std::shared_ptr<controller::depth1::foraging_sensors>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_cache_fsm                                      m_explore_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

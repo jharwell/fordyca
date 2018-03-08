@@ -26,24 +26,27 @@
  ******************************************************************************/
 #include <vector>
 
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
-#include "fordyca/params/depth1/cache_params.hpp"
-#include "fordyca/representation/cache.hpp"
-#include "fordyca/representation/occupancy_grid.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/representation/arena_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct arena_map_params; }
+namespace params {
+struct arena_map_params;
+}
 
 NS_START(representation);
 
 class cell2D;
+class arena_cache;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,9 +59,12 @@ class cell2D;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map: public rcppsw::er::client,
-                 public rcppsw::patterns::visitor::visitable_any<arena_map> {
+class arena_map : public rcppsw::er::client,
+                  public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
+  using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
+  using block_vector = std::vector<std::shared_ptr<block>>;
+
   explicit arena_map(const struct params::arena_map_params* params);
 
   /**
@@ -67,30 +73,49 @@ class arena_map: public rcppsw::er::client,
    * Some blocks may not be visible on the arena_map, as they are being carried
    * by robots.
    */
-  std::vector<block>& blocks(void) { return m_blocks; }
+  block_vector& blocks(void) { return m_blocks; }
 
   /**
-   * @brief Get the list of all the caches currently present in the arena.
+   * @brief Get the list of all the caches currently present in the arena and
+   * active.
    */
-  std::vector<cache>& caches(void) { return m_caches; }
+  cache_vector& caches(void) { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
    *
+   * After calling this function the victim cache is no longer active in the
+   * arena. However, it is not yet deleted, as it may be needed to gather
+   * metrics from (needed to capture block pickup from a cache with only 2
+   * blocks).
+   *
    * @param victim The cache to remove.
    */
-  void cache_remove(cache& victim);
+  void cache_remove(const std::shared_ptr<arena_cache>& victim);
+
+  /**
+   * @brief Delete all caches that have been previously "removed", but not yet
+   * deleted.
+   */
+  void delete_caches(void);
 
   void cache_removed(bool b) { m_cache_removed = b; }
   bool cache_removed(void) const { return m_cache_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  cell2D& access(const discrete_coord& coord) { return access(coord.first, coord.second); }
+  cell2D& access(const rcppsw::math::dcoord2& coord) {
+    return access(coord.first, coord.second);
+  }
 
   /**
    * @brief Distribute all blocks in the arena.
    */
   void distribute_blocks(void);
+
+  size_t xdsize(void) const { return m_grid.xdsize(); }
+  size_t ydsize(void) const { return m_grid.ydsize(); }
+  size_t xrsize(void) const { return m_grid.xrsize(); }
+  size_t yrsize(void) const { return m_grid.yrsize(); }
 
   /**
    * @brief Distribute a particular block in the arena, according to whatever
@@ -98,7 +123,7 @@ class arena_map: public rcppsw::er::client,
    *
    * @param block The block to distribute.
    */
-  void distribute_block(block* block);
+  void distribute_block(const std::shared_ptr<block>& block);
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
@@ -134,7 +159,7 @@ class arena_map: public rcppsw::er::client,
    * @return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
-  int robot_on_block(const argos::CVector2& pos);
+  int robot_on_block(const argos::CVector2& pos) const;
 
   /**
    * @brief Determine if a robot is currently on top of a cache (i.e. if the
@@ -153,7 +178,7 @@ class arena_map: public rcppsw::er::client,
    * @return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
-  int robot_on_cache(const argos::CVector2& pos);
+  int robot_on_cache(const argos::CVector2& pos) const;
 
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.
@@ -170,14 +195,16 @@ class arena_map: public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
 
  private:
+  // clang-format off
   bool                                      m_cache_removed;
   const struct params::depth1::cache_params mc_cache_params;
   const argos::CVector2                     mc_nest_center;
-  std::vector<block>                        m_blocks;
-  std::vector<cache>                        m_caches;
+  block_vector                              m_blocks;
+  cache_vector                              m_caches;
   support::block_distributor                m_block_distributor;
   std::shared_ptr<rcppsw::er::server>       m_server;
-  occupancy_grid                            m_grid;
+  arena_grid                                m_grid;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

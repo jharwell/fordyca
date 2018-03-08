@@ -26,25 +26,14 @@
  ******************************************************************************/
 #include <list>
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
-#include "fordyca/support/depth1/cache_usage_penalty.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/support/depth1/cache_penalty_handler.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/support/depth1/arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace metrics { namespace collectors {
-class task_collector;
-namespace fsm {
-class depth1_metrics_collector;
-}}}
-namespace robot_collectors = metrics::collectors::fsm;
-
-NS_START(support, depth1);
-
-class cache_usage_penalty;
+NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
  * Classes
@@ -62,149 +51,69 @@ class cache_usage_penalty;
  */
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
-  foraging_loop_functions(void);
-  virtual ~foraging_loop_functions(void);
+  foraging_loop_functions(void) = default;
+  ~foraging_loop_functions(void) override = default;
 
   void Init(argos::TConfigurationNode& node) override;
   void PreStep() override;
-  void Destroy(void) override;
   void Reset(void) override;
 
- protected:
   /**
-   * @brief Check if a robot has acquired a cache, and is trying to pickup from
-   * a cache, then creates a \ref cache_usage_penalty object and associates it
-   * with the robot.
+   * @brief Set the LOS of a robot in the arena, INCLUDING handling caches whose
+   * extent overlaps the LOS but whose host cell is not in the LOS (see #244).
    */
   template<typename T>
-  bool init_cache_usage_penalty(
-      argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
+  void set_robot_los(argos::CFootBotEntity& robot,
+                     representation::arena_map& map) {
+    argos::CVector2 pos;
+    pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+            const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
 
-    if (controller.cache_acquired()) {
-      ER_ASSERT(!controller.block_detected(), "FATAL: Block detected in cache?");
-
-      /* Check whether the foot-bot is actually on a cache */
-      int cache = utils::robot_on_cache(robot, *map());
-      if (-1 != cache) {
-        ER_NOM("fb%d incurring cache usage penalty: start=%u, duration=%u",
-               utils::robot_id(robot), GetSpace().GetSimulationClock(), mc_cache_penalty);
-        m_penalty_list.push_back(new cache_usage_penalty(&controller,
-                                                         cache,
-                                                         mc_cache_penalty,
-                                                         GetSpace().GetSimulationClock()));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @brief Determine if a robot has satisfied the \ref cache_usage_penalty yet.
-   */
-  template<typename T>
-  bool cache_usage_penalty_satisfied(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
-                           [&](const cache_usage_penalty* p) {
-                             return p->controller() == &controller;});
-    if (it != m_penalty_list.end()) {
-      return (*it)->penalty_satisfied(GetSpace().GetSimulationClock());
-    }
-
-    return false;
-  }
-
-  /**
-   * @brief Called after a robot has satisfied the cache usage penalty, and
-   * actually performs the handshaking between the cache, the arena, and the
-   * robot for block pickup.
-   */
-  template<typename T>
-  void finish_cached_block_pickup(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-    cache_usage_penalty* p = m_penalty_list.front();
-    ER_ASSERT(p->controller() == &controller,
-              "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.cache_acquired(),
-              "FATAL: Controller not waiting for cached block pickup");
-    events::cached_block_pickup pickup_op(rcppsw::er::g_server,
-                                          &map()->caches()[p->cache_id()],
-                                          utils::robot_id(robot));
-    m_penalty_list.remove(p);
-    ER_ASSERT(!robot_serving_cache_penalty<T>(robot),
-              "FATAL: Multiple instances of same controller serving cache penalty");
+    rcppsw::math::dcoord2 robot_loc =
+        math::rcoord_to_dcoord(pos, map.grid_resolution());
+    auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+    std::unique_ptr<representation::line_of_sight> new_los =
+        rcppsw::make_unique<representation::line_of_sight>(
+            map.subgrid(robot_loc.first, robot_loc.second, 2),
+            robot_loc);
 
     /*
-     * Map must be called before controller for proper cache block decrement!
+     * [JRH]: TODO: Once caches are arena entities, then this make not be
+     * necessary.
      */
-    map()->accept(pickup_op);
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
-    floor()->SetChanged();
-  }
+    for (auto &c : map.caches()) {
+      argos::CVector2 ll = math::dcoord_to_rcoord(new_los->abs_ll(),
+                                                  map.grid_resolution());
+      argos::CVector2 lr = math::dcoord_to_rcoord(new_los->abs_lr(),
+                                                  map.grid_resolution());
+      argos::CVector2 ul = math::dcoord_to_rcoord(new_los->abs_ul(),
+                                                  map.grid_resolution());
+      argos::CVector2 ur = math::dcoord_to_rcoord(new_los->abs_ur(),
+                                                  map.grid_resolution());
+      if (c->contains_point(ll) || c->contains_point(lr) ||
+          c->contains_point(ul) || c->contains_point(ur)) {
+        ER_VER("Add partially overlapping cache to %s LOS",
+                controller.GetId().c_str());
+        new_los->cache_add(c);
+      }
+    } /* for(&c..) */
 
-  /**
-   * @brief If \c TRUE, then the specified robot is currently serving a cache
-   * penalty.
-   */
-  template<typename T>
-  bool robot_serving_cache_penalty(
-      argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
-                           [&](const cache_usage_penalty* p) {
-                             return p->controller() == &controller;});
-    return it != m_penalty_list.end();
-  }
-
-  /**
-   * @brief Handles handshaking between cache, robot, and arena if the robot is
-   * has acquired a cache and is looking to drop an object in it.
-   */
-  template<typename T>
-  bool handle_cache_block_drop(argos::CFootBotEntity& robot) {
-    T& controller = static_cast<T&>(robot.GetControllableEntity().GetController());
-
-    /* Check whether the foot-bot is actually on a cache */
-    int cache = utils::robot_on_cache(robot, *map());
-    if (-1 != cache) {
-      cache_usage_penalty* p = m_penalty_list.front();
-      ER_ASSERT(p->controller() == &controller,
-                "FATAL: Out of order cache penalty handling");
-      ER_ASSERT(controller.cache_acquired(),
-                "FATAL: Controller not waiting for cache block drop");
-
-      m_penalty_list.remove(p);
-      ER_ASSERT(!robot_serving_cache_penalty<T>(robot),
-                "FATAL: Multiple instances of same controller serving cache penalty");
-
-      events::cache_block_drop drop_op(rcppsw::er::g_server,
-                                       controller.block(),
-                                       &map()->caches()[cache],
-                                       map()->grid_resolution());
-
-      /* Update arena map state due to a cache drop */
-      map()->accept(drop_op);
-      controller.visitor::template visitable_any<T>::accept(drop_op);
-      return true;
-    }
-    return false;
+    controller.los(new_los);
   }
 
  private:
+  using interactor = arena_interactor<controller::depth1::foraging_controller>;
+
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  void metric_collecting_init(const struct params::output_params *output_p);
+  void cache_handling_init(const struct params::arena_map_params *arenap);
 
-  foraging_loop_functions(const foraging_loop_functions& s) = delete;
-  foraging_loop_functions& operator=(const foraging_loop_functions& s) = delete;
-
-  uint                                                        mc_cache_penalty;
-  double                                                      mc_cache_respawn_scale_factor;
-  std::unique_ptr<robot_collectors::depth1_metrics_collector> m_depth1_collector;
-  std::unique_ptr<metrics::collectors::task_collector>        m_task_collector;
-  std::list<cache_usage_penalty*>                             m_penalty_list;
+  // clang-format off
+  double                      mc_cache_respawn_scale_factor{0.0};
+  std::unique_ptr<interactor> m_interactor{nullptr};
+  // clang-format on
 };
 
 NS_END(depth1, support, fordyca);

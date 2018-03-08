@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/task_allocation/polled_task.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -48,30 +47,33 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class collector : public task_allocation::polled_task, public foraging_task {
  public:
-  collector(const struct task_allocation::task_params* const params,
+  collector(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::cached_block_pickup &visitor) override;
-  void accept(events::nest_block_drop &visitor) override;
-  void accept(__unused events::cache_block_drop &) override {};
-  void accept(__unused events::free_block_pickup &) override {};
+  void accept(events::cached_block_pickup& visitor) override;
+  void accept(events::nest_block_drop& visitor) override;
+  void accept(events::cache_vanished& visitor) override;
+  void accept(events::cache_block_drop&) override {}
+  void accept(events::free_block_pickup&) override {}
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override { return false; };
+  /* stateless metrics */
+  bool is_exploring_for_block(void) const override { return false; }
   bool is_avoiding_collision(void) const override;
   bool is_transporting_to_nest(void) const override;
 
-  /* depth0 metrics */
-  bool is_acquiring_block(void) const override { return false; };
-  bool is_vectoring_to_block(void) const override { return false; };
+  /* stateful metrics */
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
 
   /* depth1 metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_transporting_to_cache(void) const override { return false; }
-  std::string task_name(void) const override { return "collector"; };
+
+  /* task metrics */
+  bool at_interface(void) const override;
 
   bool cache_acquired(void) const override;
   bool block_acquired(void) const override { return false; }
@@ -82,8 +84,10 @@ class collector : public task_allocation::polled_task, public foraging_task {
   double calc_interface_time(double start_time) override;
 
  private:
-  bool m_interface_sw;
+  // clang-format off
+  bool                               m_interface_complete{false};
   task_allocation::abort_probability m_abort_prob;
+  // clang-format on
 };
 
 NS_END(tasks, fordyca);

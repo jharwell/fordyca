@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/events/block_drop_event.hpp"
-#include "fordyca/representation/discrete_coord.hpp"
+#include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +58,9 @@ class free_block_drop : public cell_op,
                         public block_drop_event {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  representation::block* block, size_t x, size_t y,
+                  const std::shared_ptr<representation::block>& block,
+                  size_t x,
+                  size_t y,
                   double resolution);
   ~free_block_drop(void) override { client::rmmod(); }
 
@@ -71,21 +73,20 @@ class free_block_drop : public cell_op,
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
 
-  /* stateful foraging */
-  void visit(representation::perceived_cell2D&) override {}
-
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
-  double m_resolution;
-  representation::block* m_block;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format off
+  double                                 m_resolution;
+  std::shared_ptr<representation::block> m_block;
+  std::shared_ptr<rcppsw::er::server>    m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

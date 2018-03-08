@@ -34,6 +34,7 @@
 #include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/params/actuator_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
+#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "rcppsw/er/server.hpp"
@@ -49,21 +50,16 @@ namespace fs = std::experimental::filesystem;
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
     : client(),
-      m_display_los(false),
-      m_display_id(false),
-      m_block(nullptr),
       m_actuators(),
       m_sensors(),
       m_server(std::make_shared<rcppsw::er::server>()) {
   /*
    * Initially, all robots use the RCPPSW er_server to log parameters.
    */
-  client::deferred_init(m_server);
+  client::deferred_client_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
-  client::insmod("controller",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
+  client::insmod("controller", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -77,30 +73,45 @@ bool base_foraging_controller::block_detected(void) const {
   return m_sensors->block_detected();
 } /* block_detected() */
 
-void base_foraging_controller::Init(argos::TConfigurationNode &node) {
+void base_foraging_controller::robot_loc(argos::CVector2 loc) {
+  m_sensors->robot_loc(loc);
+}
+
+__pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
+  return m_sensors->robot_loc();
+}
+
+void base_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing base foraging controller");
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
-  const struct params::output_params *params =
-      static_cast<const struct params::output_params *>(
+  const struct params::output_params* params =
+      static_cast<const struct params::output_params*>(
           param_repo.get_params("output"));
-
   param_repo.show_all(client::server_handle()->log_stream());
   output_init(params);
 
   m_actuators = std::make_shared<actuator_manager>(
-      static_cast<const struct params::actuator_params *>(
+      static_cast<const struct params::actuator_params*>(
           param_repo.get_params("actuators")),
       GetActuator<argos::CCI_DifferentialSteeringActuator>(
           "differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
 
+  auto* fsm_params = static_cast<const struct params::fsm_params*>(
+      param_repo.get_params("fsm"));
+
+  m_speed_throttle_block_carry = fsm_params->speed_throttling.block_carry;
+  if (m_speed_throttle_block_carry > 0) {
+    actuators()->set_throttle_percent(m_speed_throttle_block_carry);
+  }
+
   m_sensors = std::make_shared<base_foraging_sensors>(
-      static_cast<const struct params::sensor_params *>(
+      static_cast<const struct params::sensor_params*>(
           param_repo.get_params("sensors")),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
@@ -117,14 +128,12 @@ void base_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void base_foraging_controller::output_init(
-    const struct params::output_params *const params) {
+    const struct params::output_params* const params) {
   std::string output_root;
   if ("__current_date__" == params->output_dir) {
-    boost::posix_time::ptime now =
-        boost::posix_time::second_clock::local_time();
-    output_root = params->output_root + "/" +
-                  std::to_string(now.date().year()) + "-" +
-                  std::to_string(now.date().month()) + "-" +
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    output_root = params->output_root + "/" + std::to_string(now.date().year()) +
+                  "-" + std::to_string(now.date().month()) + "-" +
                   std::to_string(now.date().day()) + ":" +
                   std::to_string(now.time_of_day().hours()) + "-" +
                   std::to_string(now.time_of_day().minutes());

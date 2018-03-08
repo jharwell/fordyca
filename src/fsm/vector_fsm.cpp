@@ -58,7 +58,7 @@ vector_fsm::vector_fsm(
       m_collision_rec_count(0),
       m_goal_data(),
       m_ang_pid(4.0,
-                0.0,
+                0,
                 0,
                 1,
                 -this->actuators()->max_wheel_speed() * 0.50,
@@ -75,7 +75,7 @@ vector_fsm::vector_fsm(
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE_ND(vector_fsm, start) {
+__const FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
@@ -83,8 +83,16 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
   if (ST_COLLISION_AVOIDANCE != last_state()) {
     ER_DIAG("Executing ST_COLLIISION_AVOIDANCE");
   }
-  if (ST_NEW_DIRECTION == last_state()) {
+  /*
+   * If we came from the NEW_DIRECTION_STATE, then we got there from this
+   * function, and have just finished changing our direction due to a frequent
+   * collision. As such, we need to go into collision recovery, and zoom in our
+   * new direction away from whatever is causing the problem. See #243.
+   */
+  if (ST_NEW_DIRECTION == previous_state()) {
+    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
     internal_event(ST_COLLISION_RECOVERY);
+    return controller::foraging_signal::HANDLED;
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
@@ -93,7 +101,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time,
               base_sensors()->tick());
-     argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
+      argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
@@ -137,7 +145,10 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   if (base_sensors()->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
     ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(), force.GetY(), force.Angle().GetValue(), force.Length());
+            force.GetX(),
+            force.GetY(),
+            force.Angle().GetValue(),
+            force.Length());
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 
@@ -165,11 +176,23 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   double angle_to_goal =
       std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
                  m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
+
   double angle_diff = angle_to_goal - heading.Angle().GetValue();
-  angle_diff = atan2(std::sin(angle_diff), std::cos(angle_diff));
+  angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
 
   ang_speed = m_ang_pid.calculate(0, -angle_diff);
-  lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+
+  /*
+   * With left turns the robot tends to circle blocks when they get close.
+   * Decrease the PID loop input false (i.e. so it is closer to the 0 value the
+   * loop is trying to get it to). See #231.
+   */
+  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <
+      kMAX_ARRIVAL_TOL) {
+    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff * 5.0));
+  } else {
+    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+  }
 
   ER_VER("target: (%f, %f)@%f",
          m_goal_data.loc.GetX(),
@@ -186,6 +209,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
          heading.Angle().GetValue(),
          ang_speed,
          lin_speed);
+
   actuators()->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }
@@ -216,7 +240,7 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
  * General Member Functions
  ******************************************************************************/
 void vector_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument *const c_arg) {
+    const rcppsw::task_allocation::taskable_argument* const c_arg) {
   static const uint8_t kTRANSITIONS[] = {
       ST_VECTOR,                            /* start */
       ST_VECTOR,                            /* vector */
@@ -225,7 +249,7 @@ void vector_fsm::task_start(
       controller::foraging_signal::IGNORED, /* new direction */
       controller::foraging_signal::IGNORED, /* arrived */
   };
-  auto *const a = dynamic_cast<const tasks::vector_argument *>(c_arg);
+  auto* const a = dynamic_cast<const tasks::vector_argument*>(c_arg);
   ER_ASSERT(nullptr != a, "FATAL: bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
@@ -243,7 +267,8 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-argos::CVector2 vector_fsm::calc_vector_to_goal(const argos::CVector2 &goal) {
+__pure argos::CVector2 vector_fsm::calc_vector_to_goal(
+    const argos::CVector2& goal) {
   return goal - base_sensors()->robot_loc();
 } /* calc_vector_to_goal() */
 

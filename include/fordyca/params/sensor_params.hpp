@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
 #include <argos3/core/utility/math/angles.h>
+#include <argos3/core/utility/math/range.h>
 #include "rcppsw/common/base_params.hpp"
 
 /*******************************************************************************
@@ -37,12 +37,12 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct obstacle_params
+ * @struct proximity_params
  * @ingroup params
  */
-struct obstacle_params {
-  obstacle_params(void) :
-      go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
+struct proximity_params {
+  proximity_params(void)
+      : go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
   /*
    * Maximum tolerance for the proximity reading between the robot and the
@@ -60,9 +60,9 @@ struct obstacle_params {
  * @ingroup params
  */
 struct sensor_params : public rcppsw::common::base_params {
-  sensor_params(void) : diffusion() {}
+  sensor_params(void) : proximity() {}
 
-  struct obstacle_params diffusion;
+  struct proximity_params proximity;
 };
 
 NS_END(params, fordyca);

@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/events/block_pickup_event.hpp"
+#include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,16 +36,25 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
-namespace depth0 { class stateless_foraging_fsm; class stateful_foraging_fsm; }
-namespace depth1 { class block_to_cache_fsm; }
+namespace depth0 {
+class stateless_foraging_fsm;
+class stateful_foraging_fsm;
+}
+namespace depth1 {
+class block_to_cache_fsm;
+}
 }
 namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}}
+}
+}
 
-namespace tasks { class generalist; class forager; }
+namespace tasks {
+class generalist;
+class harvester;
+}
 
 NS_START(events);
 
@@ -59,20 +68,22 @@ NS_START(events);
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
-class free_block_pickup : public cell_op,
-                          public rcppsw::er::client,
-                          public block_pickup_event,
-                          public visitor::visit_set<controller::depth0::stateless_foraging_controller,
-                                                    controller::depth0::stateful_foraging_controller,
-                                                    fsm::depth0::stateless_foraging_fsm,
-                                                    fsm::depth0::stateful_foraging_fsm,
-                                                    fsm::depth1::block_to_cache_fsm,
-                                                    tasks::generalist,
-                                                    tasks::forager> {
+class free_block_pickup
+    : public cell_op,
+      public rcppsw::er::client,
+      public block_pickup_event,
+      public visitor::visit_set<controller::depth0::stateless_foraging_controller,
+                                controller::depth0::stateful_foraging_controller,
+                                fsm::depth0::stateless_foraging_fsm,
+                                fsm::depth0::stateful_foraging_fsm,
+                                fsm::depth1::block_to_cache_fsm,
+                                tasks::generalist,
+                                tasks::harvester> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                    representation::block* block, size_t robot_index);
-  ~free_block_pickup(void) { client::rmmod(); }
+                    const std::shared_ptr<representation::block>& block,
+                    uint robot_index);
+  ~free_block_pickup(void) override { client::rmmod(); }
 
   free_block_pickup(const free_block_pickup& op) = delete;
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
@@ -82,26 +93,29 @@ class free_block_pickup : public cell_op,
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::block& block) override;
-  void visit(controller::depth0::stateless_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateless_foraging_controller& controller) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
 
   /* stateful foraging */
   void visit(representation::perceived_arena_map& map) override;
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
-  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateful_foraging_controller& controller) override;
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
-  size_t m_robot_index;
-  representation::block* m_block;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  // clang-format off
+  uint                                   m_robot_index;
+  std::shared_ptr<representation::block> m_block;
+  std::shared_ptr<rcppsw::er::server>    m_server;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

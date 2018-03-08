@@ -32,7 +32,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void output_parser::parse(argos::TConfigurationNode &node) {
+void output_parser::parse(argos::TConfigurationNode& node) {
   m_params = rcppsw::make_unique<output_params>();
   std::vector<std::string> res, res2;
   argos::TConfigurationNode onode = argos::GetNode(node, "output");
@@ -54,7 +54,7 @@ void output_parser::parse(argos::TConfigurationNode &node) {
   }
 } /* parse() */
 
-void output_parser::show(std::ostream &stream) {
+void output_parser::show(std::ostream& stream) {
   stream << "====================\nOutput params\n====================\n";
   m_metrics_parser.show(stream);
   stream << "output_root=" << m_params->output_root << std::endl;
@@ -62,8 +62,8 @@ void output_parser::show(std::ostream &stream) {
   stream << "sim_log_fname=" << m_params->sim_log_fname << std::endl;
 } /* show() */
 
-bool output_parser::validate(void) {
-  if (m_metrics_parser.get_results()) {
+__pure bool output_parser::validate(void) {
+  if (nullptr != m_metrics_parser.get_results()) {
     return m_metrics_parser.validate();
   }
   return true;

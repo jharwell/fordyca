@@ -34,26 +34,26 @@ NS_START(fordyca, controller, depth1);
  ******************************************************************************/
 foraging_sensors::foraging_sensors(
     const struct params::sensor_params* c_params,
-    argos::CCI_RangeAndBearingSensor *const rabs,
-    argos::CCI_FootBotProximitySensor *const proximity,
-    argos::CCI_FootBotLightSensor *const light,
-    argos::CCI_FootBotMotorGroundSensor *const ground) :
-    depth0::foraging_sensors(c_params, rabs, proximity, light, ground) {}
+    argos::CCI_RangeAndBearingSensor* const rabs,
+    argos::CCI_FootBotProximitySensor* const proximity,
+    argos::CCI_FootBotLightSensor* const light,
+    argos::CCI_FootBotMotorGroundSensor* const ground)
+    : depth0::foraging_sensors(c_params, rabs, proximity, light, ground) {}
 
 bool foraging_sensors::cache_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
       base_foraging_sensors::ground()->GetReadings();
-  int sum = 0;
 
   /*
    * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
    * are a relatively dark gray, so the sensor should return something in the
    * range specified below.
    */
-  sum += readings[0].Value > 0.30 && readings[0].Value < 0.50;
-  sum += readings[1].Value > 0.30 && readings[1].Value < 0.50;
-  sum += readings[2].Value > 0.30 && readings[2].Value < 0.50;
-  sum += readings[3].Value > 0.30 && readings[3].Value < 0.50;
+  int sum = 0;
+  sum += static_cast<int>(readings[0].Value > 0.30 && readings[0].Value < 0.50);
+  sum += static_cast<int>(readings[1].Value > 0.30 && readings[1].Value < 0.50);
+  sum += static_cast<int>(readings[2].Value > 0.30 && readings[2].Value < 0.50);
+  sum += static_cast<int>(readings[3].Value > 0.30 && readings[3].Value < 0.50);
 
   return sum >= 3;
 } /* block_detected() */

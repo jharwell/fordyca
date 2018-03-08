@@ -50,9 +50,11 @@ compile_commands.json
 build
 docs/html
 docs/latex
+ext
 
 # Runtime
 *.txt
 .gdb_history
 *.csv
 output
+reports

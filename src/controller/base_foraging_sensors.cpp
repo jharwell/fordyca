@@ -42,10 +42,10 @@ NS_START(fordyca, controller);
 base_foraging_sensors::base_foraging_sensors(
     double diffusion_delta,
     argos::CRange<argos::CRadians> go_straight_angle_range,
-    argos::CCI_RangeAndBearingSensor *const rabs,
-    argos::CCI_FootBotProximitySensor *const proximity,
-    argos::CCI_FootBotLightSensor *const light,
-    argos::CCI_FootBotMotorGroundSensor *const ground)
+    argos::CCI_RangeAndBearingSensor* const rabs,
+    argos::CCI_FootBotProximitySensor* const proximity,
+    argos::CCI_FootBotLightSensor* const light,
+    argos::CCI_FootBotMotorGroundSensor* const ground)
     : m_tick(0),
       mc_obstacle_delta(diffusion_delta),
       m_robot_loc(),
@@ -57,20 +57,23 @@ base_foraging_sensors::base_foraging_sensors(
       m_ground(ground) {}
 
 base_foraging_sensors::base_foraging_sensors(
-    const struct params::sensor_params *params,
-    argos::CCI_RangeAndBearingSensor *const rabs,
-    argos::CCI_FootBotProximitySensor *const proximity,
-    argos::CCI_FootBotLightSensor *const light,
-    argos::CCI_FootBotMotorGroundSensor *const ground) :
-    base_foraging_sensors(params->diffusion.delta,
-                          params->diffusion.go_straight_angle_range,
-                          rabs, proximity, light, ground) {}
+    const struct params::sensor_params* params,
+    argos::CCI_RangeAndBearingSensor* const rabs,
+    argos::CCI_FootBotProximitySensor* const proximity,
+    argos::CCI_FootBotLightSensor* const light,
+    argos::CCI_FootBotMotorGroundSensor* const ground)
+    : base_foraging_sensors(params->proximity.delta,
+                            params->proximity.go_straight_angle_range,
+                            rabs,
+                            proximity,
+                            light,
+                            ground) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool base_foraging_sensors::in_nest(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
       m_ground->GetReadings();
   /*
    * The nest is a relatively light gray, so the sensors will return something
@@ -80,10 +83,10 @@ bool base_foraging_sensors::in_nest(void) {
    * is on a black area.
    */
   int sum = 0;
-  sum += readings[0].Value > 0.60 && readings[0].Value < 0.80;
-  sum += readings[1].Value > 0.60 && readings[1].Value < 0.80;
-  sum += readings[2].Value > 0.60 && readings[2].Value < 0.80;
-  sum += readings[3].Value > 0.60 && readings[3].Value < 0.80;
+  sum += static_cast<int>(readings[0].Value > 0.60 && readings[0].Value < 0.80);
+  sum += static_cast<int>(readings[1].Value > 0.60 && readings[1].Value < 0.80);
+  sum += static_cast<int>(readings[2].Value > 0.60 && readings[2].Value < 0.80);
+  sum += static_cast<int>(readings[3].Value > 0.60 && readings[3].Value < 0.80);
 
   return sum >= 3;
 } /* in_nest() */
@@ -101,7 +104,7 @@ argos::CVector2 base_foraging_sensors::find_closest_obstacle(void) {
     argos::CVector2 obstacle(r.Value, r.Angle);
     if (obstacle_is_threatening(obstacle)) {
       if ((robot_loc() - obstacle).Length() < closest.Length() ||
-          closest.Length() == 0) {
+          closest.Length() <= 0.0) {
         closest = obstacle;
       }
     }
@@ -114,7 +117,7 @@ bool base_foraging_sensors::threatening_obstacle_exists(void) {
 } /* threatening_obstacle_exists() */
 
 bool base_foraging_sensors::block_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings &readings =
+  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
       m_ground->GetReadings();
   int sum = 0;
 
@@ -128,10 +131,10 @@ bool base_foraging_sensors::block_detected(void) {
    *
    * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
-  sum += readings[0].Value < 0.05;
-  sum += readings[1].Value < 0.05;
-  sum += readings[2].Value < 0.05;
-  sum += readings[3].Value < 0.05;
+  sum += static_cast<int>(readings[0].Value < 0.05);
+  sum += static_cast<int>(readings[1].Value < 0.05);
+  sum += static_cast<int>(readings[2].Value < 0.05);
+  sum += static_cast<int>(readings[3].Value < 0.05);
 
   return 4 == sum;
 } /* block_detected() */

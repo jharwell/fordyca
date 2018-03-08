@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/stateful_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -41,7 +41,6 @@ namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
-namespace rmetrics = metrics::collectible_metrics::fsm;
 
 namespace controller {
 namespace depth0 { class foraging_sensors; }
@@ -67,8 +66,8 @@ NS_START(fsm, depth0);
  * complete.
  */
 class stateful_foraging_fsm : public base_foraging_fsm,
-                              public rmetrics::stateless_metrics,
-                              public rmetrics::stateful_metrics,
+                              public metrics::fsm::stateless_metrics,
+                              public metrics::fsm::stateful_metrics,
                               public task_allocation::taskable,
                               public visitor::visitable_any<depth0::stateful_foraging_fsm> {
  public:
@@ -138,9 +137,12 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
+  // clang-format off
   bool                                                  m_task_running;
   std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
   block_to_nest_fsm                                     m_block_fsm;
+  // clang-format on
+
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
