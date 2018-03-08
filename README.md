@@ -55,10 +55,14 @@ After cloning this repo, you will need to:
 
 # Troubleshooting
 
-- If you are having trouble building, try updating the cmake submodule:
+- If you are having trouble building, try:
 
-        git submodule update
+  1. Updating the cmake submodule:
 
+          git submodule update
+
+  2. Updating rcppsw and rcsw, and possibly their cmake submodules
+  
   If the problem perists, open an issue.
 
 - If you are getting a segfault when running ARGoS, verify that if you are
