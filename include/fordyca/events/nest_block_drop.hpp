@@ -39,18 +39,16 @@ namespace fsm {
 namespace depth0 {
 class stateless_foraging_fsm;
 class stateful_foraging_fsm;
-}
+} // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
 }
 class block_to_nest_fsm;
-}
-namespace controller {
-namespace depth0 {
+} // namespace fsm
+namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-}
+}} // namespace controller::depth0
 
 namespace metrics {
 class block_metrics_collector;
@@ -58,7 +56,7 @@ class block_metrics_collector;
 namespace tasks {
 class generalist;
 class collector;
-}
+} // namespace tasks
 
 NS_START(events);
 

@@ -36,17 +36,15 @@ namespace fsm {
 class block_to_nest_fsm;
 }
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-namespace depth1 {
+namespace controller { namespace depth1 {
 class foraging_controller;
-}
-}
+}} // namespace controller::depth1
 
 namespace representation {
 class arena_map;
 class perceived_arena_map;
 class block;
-}
+} // namespace representation
 
 NS_START(events);
 

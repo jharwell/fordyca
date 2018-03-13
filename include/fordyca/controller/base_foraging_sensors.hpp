@@ -36,7 +36,7 @@ class CCI_RangeAndBearingSensor;
 class CCI_FootBotProximitySensor;
 class CCI_FootBotLightSensor;
 class CCI_FootBotMotorGroundSensor;
-}
+} // namespace argos
 NS_START(fordyca);
 
 namespace params {

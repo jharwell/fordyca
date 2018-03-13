@@ -64,7 +64,8 @@ class vector_argument : public task_allocation::taskable_argument {
  * @ingroup tasks
  *
  * @brief An argument that can be passed to a
- * \ref rcppsw::task_allocation::taskable::task_start() function which contains a foraging signal,
+ * \ref rcppsw::task_allocation::taskable::task_start() function which contains
+ * a foraging signal,
  * for use in specifying initial conditions/commands for certain state machines.
  */
 class foraging_signal_argument : public task_allocation::taskable_argument {

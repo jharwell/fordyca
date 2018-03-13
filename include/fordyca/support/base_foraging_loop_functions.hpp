@@ -103,7 +103,8 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * @brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    *
-   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
+   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c
+   * FALSE
    * otherwise.
    */
   template <typename T>

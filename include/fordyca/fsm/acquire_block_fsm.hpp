@@ -47,14 +47,14 @@ struct fsm_params;
 namespace representation {
 class perceived_arena_map;
 class block;
-}
+} // namespace representation
 
 namespace controller {
 namespace depth0 {
 class foraging_sensors;
 }
 class actuator_manager;
-}
+} // namespace controller
 
 NS_START(fsm);
 
