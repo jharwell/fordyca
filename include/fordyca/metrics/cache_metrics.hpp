@@ -74,7 +74,8 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
   virtual uint total_block_drops(void) const = 0;
 
   /**
-   * @brief Should return the cumulative duration of penalties that all robots that
+   * @brief Should return the cumulative duration of penalties that all robots
+   * that
    * have satisfied the cache penalty on this timestep.
    *
    * Currently this will only be for 1 robot, due to limitations/shortcuts taken

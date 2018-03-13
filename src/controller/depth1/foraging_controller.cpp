@@ -76,7 +76,6 @@ void foraging_controller::ControlStep(void) {
    */
   process_los(depth0::stateful_foraging_controller::los());
   map()->update();
-
   m_metric_store.reset();
 
   if (is_carrying_block()) {

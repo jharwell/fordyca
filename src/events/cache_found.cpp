@@ -31,8 +31,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
 using representation::base_cache;
+using representation::occupancy_grid;
 namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
@@ -80,13 +80,15 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
    * As such, we need to make sure that we ALWAYS put the cell in the correct
    * state by sending it enough block drops. (see #323).
    */
-  for (size_t i = fsm.block_count(); i < std::max(base_cache::kMinBlocks,
-                                                  m_cache->n_blocks()); ++i) {
+  for (size_t i = fsm.block_count();
+       i < std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       ++i) {
     fsm.event_block_drop();
   } /* for(i..) */
 
-  for (size_t i = fsm.block_count(); i > std::max(base_cache::kMinBlocks,
-                                                  m_cache->n_blocks()); --i) {
+  for (size_t i = fsm.block_count();
+       i > std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       --i) {
     fsm.event_block_pickup();
   } /* for(i..) */
 } /* visit() */

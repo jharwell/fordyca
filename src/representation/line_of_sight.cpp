@@ -84,15 +84,15 @@ rcppsw::math::dcoord2 line_of_sight::abs_ll(void) const {
 } /* abs_ll() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
-  return cell(0, ysize()-1).loc();
+  return cell(0, ysize() - 1).loc();
 } /* abs_ul() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
-  return cell(0, ysize()-1).loc();
+  return cell(0, ysize() - 1).loc();
 } /* abs_lr() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {
-  return cell(xsize()-1, ysize()-1).loc();
+  return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 
 NS_END(representation, fordyca);

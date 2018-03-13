@@ -38,7 +38,7 @@ NS_START(fordyca);
 namespace controller {
 class base_foraging_sensors;
 class actuator_manager;
-}
+} // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
 NS_START(fsm);
 

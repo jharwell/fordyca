@@ -70,25 +70,28 @@ __const bool block_drop_overlap_with_cache(
     const std::shared_ptr<representation::block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     const argos::CVector2& drop_loc) {
-  return (cache->contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
-          cache->contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
-          cache->contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
-          cache->contains_point(drop_loc - argos::CVector2(0, block->ysize())));
+  return (
+      cache->contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
+      cache->contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
+      cache->contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
+      cache->contains_point(drop_loc - argos::CVector2(0, block->ysize())));
 } /* block_drop_overlap_with_cache() */
 
-__pure bool block_drop_near_arena_boundary(const representation::arena_map& map,
-                                           const std::shared_ptr<representation::block>& block,
-                                           const argos::CVector2& drop_loc) {
+__pure bool block_drop_near_arena_boundary(
+    const representation::arena_map& map,
+    const std::shared_ptr<representation::block>& block,
+    const argos::CVector2& drop_loc) {
   return (drop_loc.GetX() <= block->xsize() * 2 ||
           drop_loc.GetX() >= map.xrsize() - block->xsize() * 2 ||
           drop_loc.GetY() <= block->ysize() * 2 ||
           drop_loc.GetY() >= map.yrsize() - block->ysize() * 2);
 } /* block_drop_overlap_with_nest() */
 
-__pure bool block_drop_overlap_with_nest(const std::shared_ptr<representation::block>& block,
-                                         const argos::CRange<double>& xrange,
-                                         const argos::CRange<double>& yrange,
-                                         const argos::CVector2& drop_loc) {
+__pure bool block_drop_overlap_with_nest(
+    const std::shared_ptr<representation::block>& block,
+    const argos::CRange<double>& xrange,
+    const argos::CRange<double>& yrange,
+    const argos::CVector2& drop_loc) {
   return (xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() +
                                                         block->xsize()) ||
           xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() -

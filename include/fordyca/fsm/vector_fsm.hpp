@@ -97,7 +97,8 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
 
   /**
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
-   * goal, this function must be called before vectoring to a new goal will work.
+   * goal, this function must be called before vectoring to a new goal will
+   * work.
    */
   void init(void) override;
 

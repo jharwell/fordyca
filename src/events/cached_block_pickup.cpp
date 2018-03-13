@@ -40,8 +40,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
 using representation::base_cache;
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -135,14 +135,13 @@ void cached_block_pickup::visit(representation::arena_map& map) {
     map.cache_removed(true);
   }
   m_pickup_block->accept(*this);
-  ER_NOM(
-      "arena_map: fb%u: block%d from cache%d @(%zu, %zu) [%u blocks remain]",
-      m_robot_index,
-      m_pickup_block->id(),
-      cache_id,
-      cell_op::x(),
-      cell_op::y(),
-      (m_real_cache) ? m_real_cache->n_blocks() : 1);
+  ER_NOM("arena_map: fb%u: block%d from cache%d @(%zu, %zu) [%u blocks remain]",
+         m_robot_index,
+         m_pickup_block->id(),
+         cache_id,
+         cell_op::x(),
+         cell_op::y(),
+         (m_real_cache) ? m_real_cache->n_blocks() : 1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {

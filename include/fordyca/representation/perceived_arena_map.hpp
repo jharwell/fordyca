@@ -34,18 +34,14 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw {
-namespace er {
+namespace rcppsw { namespace er {
 class server;
-}
-}
+}} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params {
-namespace depth0 {
+namespace params { namespace depth0 {
 struct occupancy_grid_params;
-}
-}
+}} // namespace params::depth0
 
 NS_START(representation);
 class line_of_sight;
