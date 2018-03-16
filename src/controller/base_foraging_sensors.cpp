@@ -91,7 +91,7 @@ bool base_foraging_sensors::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-bool base_foraging_sensors::obstacle_is_threatening(
+__pure bool base_foraging_sensors::obstacle_is_threatening(
     const argos::CVector2& obstacle) {
   return obstacle.Length() >= mc_obstacle_delta;
 } /* obstacle_is_threatening() */

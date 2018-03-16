@@ -89,7 +89,7 @@ void occupancy_grid::cell_update(size_t i, size_t j) {
               "FATAL: Repeat pheromone deposit detected");
   }
 
-  if (density.calc() < kEpsilon) {
+  if (density.calc() < kEpsilon && cell.state_is_known()) {
     ER_VER("Relevance of cell(%zu, %zu) is within %f of 0 for %s",
            i,
            j,
