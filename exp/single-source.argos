@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+
 <argos-configuration>
 
   <!-- ************************* -->
@@ -229,7 +230,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
+      <user_functions label="depth1_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
