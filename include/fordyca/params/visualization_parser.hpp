@@ -1,5 +1,5 @@
 /**
- * @file output_parser.hpp
+ * @file visualization_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,16 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_VISUALIZATION_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_VISUALIZATION_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/metrics_parser.hpp"
-#include "fordyca/params/output_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
@@ -40,38 +39,34 @@ NS_START(fordyca, params);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class output_parser
+ * @class visualization_parser
  * @ingroup params
  *
- * @brief Parses XML parameters relating to simulation output into
- * \ref output_params.
+ * @brief Parses XML parameters relating to visualization in loop functions into
+ * \ref visualization_params.
  */
-class output_parser : public rcppsw::params::xml_param_parser {
+class visualization_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit output_parser(uint level)
-      : xml_param_parser(level),
-        m_metrics_parser(level + 1) {}
+  explicit visualization_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief The root tag that all output loop functions parameters should lie
-   * under in the XML tree.
+   * @brief The root tag that all visualization loop functions parameters should
+   * lie under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "output";
+  static constexpr char kXMLRoot[] = "visualization";
 
   void show(std::ostream& stream) const override;
-  bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct output_params* parse_results(void) const override {
+  const struct visualization_params* parse_results(void) const override {
     return &m_params;
   }
 
  private:
-  struct output_params m_params{};
-  metrics_parser m_metrics_parser;
+  struct visualization_params m_params{};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_VISUALIZATION_PARSER_HPP_ */

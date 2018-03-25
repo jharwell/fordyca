@@ -70,7 +70,7 @@ class base_foraging_controller : public argos::CCI_Controller,
       delete;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void Reset(void) override;
 
   /**

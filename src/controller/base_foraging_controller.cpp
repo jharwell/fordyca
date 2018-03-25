@@ -81,7 +81,7 @@ __pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
   return m_sensors->robot_loc();
 }
 
-void base_foraging_controller::Init(argos::TConfigurationNode& node) {
+void base_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing base foraging controller");
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
@@ -89,21 +89,18 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
             "FATAL: Not all parameters were validated");
 
   const struct params::output_params* params =
-      static_cast<const struct params::output_params*>(
-          param_repo.get_params("output"));
-  param_repo.show_all(client::server_handle()->log_stream());
+          param_repo.parse_results<struct params::output_params>("output");
+  client::server_handle()->log_stream() << param_repo;
   output_init(params);
 
   m_actuators = std::make_shared<actuator_manager>(
-      static_cast<const struct params::actuator_params*>(
-          param_repo.get_params("actuators")),
+      param_repo.parse_results<struct params::actuator_params>("actuators"),
       GetActuator<argos::CCI_DifferentialSteeringActuator>(
           "differential_steering"),
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
 
-  auto* fsm_params = static_cast<const struct params::fsm_params*>(
-      param_repo.get_params("fsm"));
+  auto* fsm_params = param_repo.parse_results<const struct params::fsm_params>("fsm");
 
   m_speed_throttle_block_carry = fsm_params->speed_throttling.block_carry;
   if (m_speed_throttle_block_carry > 0) {
@@ -111,8 +108,7 @@ void base_foraging_controller::Init(argos::TConfigurationNode& node) {
   }
 
   m_sensors = std::make_shared<base_foraging_sensors>(
-      static_cast<const struct params::sensor_params*>(
-          param_repo.get_params("sensors")),
+      param_repo.parse_results<struct params::sensor_params>("sensors"),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),

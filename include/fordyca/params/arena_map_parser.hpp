@@ -31,7 +31,7 @@
 #include "fordyca/params/depth1/cache_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,20 +47,31 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
  */
-class arena_map_parser : public rcppsw::common::xml_param_parser {
+class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  arena_map_parser(void)
-      : m_params(), m_grid_parser(), m_block_parser(), m_cache_parser() {}
+  explicit arena_map_parser(uint level)
+      : xml_param_parser(level),
+        m_grid_parser(level + 1),
+        m_block_parser(level + 1),
+        m_cache_parser(level + 1) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct arena_map_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all arena map parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "arena_map";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct arena_map_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct arena_map_params> m_params;
+  struct arena_map_params m_params{};
   grid_parser m_grid_parser;
   block_parser m_block_parser;
   depth1::cache_parser m_cache_parser;

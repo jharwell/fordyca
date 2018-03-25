@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -30,26 +32,31 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char exec_estimates_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exec_estimates_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct exec_estimates_params>();
+void exec_estimates_parser::parse(const ticpp::Element& node) {
+  ticpp::Element enode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
 
-  argos::GetNodeAttribute(node, "enabled", m_params->enabled);
-  if (m_params->enabled) {
-    argos::GetNodeAttribute(node, "generalist_range", m_params->generalist_range);
-    argos::GetNodeAttribute(node, "harvester_range", m_params->harvester_range);
-    argos::GetNodeAttribute(node, "collector_range", m_params->collector_range);
+  XML_PARSE_PARAM(enode, m_params, enabled);
+  if (m_params.enabled) {
+    XML_PARSE_PARAM(enode, m_params, generalist_range);
+    XML_PARSE_PARAM(enode, m_params, harvester_range);
+    XML_PARSE_PARAM(enode, m_params, collector_range);
   }
 } /* parse() */
 
-void exec_estimates_parser::show(std::ostream& stream) {
-  stream
-      << "====================\nExec estimates params\n====================\n";
-  stream << "enabled=" << m_params->enabled << std::endl;
-  stream << "generalist_range=" << m_params->generalist_range << std::endl;
-  stream << "harvester_range=" << m_params->harvester_range << std::endl;
-  stream << "collector_range=" << m_params->collector_range << std::endl;
+void exec_estimates_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << XML_PARAM_STR(m_params, enabled) << std::endl
+         << XML_PARAM_STR(m_params, generalist_range) << std::endl
+         << XML_PARAM_STR(m_params, harvester_range) << std::endl
+         << XML_PARAM_STR(m_params, collector_range) << std::endl;
 } /* show() */
 
 NS_END(depth1, params, fordyca);

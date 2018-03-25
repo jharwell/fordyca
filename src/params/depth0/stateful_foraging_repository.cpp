@@ -36,10 +36,14 @@ NS_START(fordyca, params, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_repository::stateful_foraging_repository(void) {
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-  register_parser<occupancy_grid_parser>("occupancy_grid");
+  register_parser<actuator_parser>(actuator_parser::kXMLRoot,
+                                   actuator_parser::kHeader1);
+  register_parser<sensor_parser>(sensor_parser::kXMLRoot,
+                                 actuator_parser::kHeader1);
+  register_parser<fsm_parser>(fsm_parser::kXMLRoot,
+                              actuator_parser::kHeader1);
+  register_parser<occupancy_grid_parser>(occupancy_grid_parser::kXMLRoot,
+                                         actuator_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

@@ -69,7 +69,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   stateful_foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
   bool block_acquired(void) const;

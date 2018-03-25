@@ -117,6 +117,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
                    rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     return controller::foraging_signal::HANDLED;
   }
+
   /*
    * No obstacles nearby--all ahead full!
    */

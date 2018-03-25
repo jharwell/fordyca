@@ -1,5 +1,5 @@
 /**
- * @file loop_functions_params.hpp
+ * @file wheel_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,16 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_WHEEL_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_WHEEL_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include <string>
-#include "fordyca/params/arena_map_params.hpp"
-#include "rcppsw/common/base_params.hpp"
+#include <argos3/core/utility/math/angles.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,19 +36,15 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct loop_functions_params
+ * @struct wheel_params
  * @ingroup params
  */
-struct loop_functions_params : public rcppsw::common::base_params {
-  loop_functions_params(void) : arena_map() {}
-
-  bool display_robot_id{false};
-  bool display_robot_los{false};
-  bool display_robot_task{false};
-  bool display_block_id{false};
-  struct arena_map_params arena_map;
+struct wheel_params : public rcppsw::params::base_params {
+  argos::CRadians soft_turn_max{};
+  argos::CRadians no_turn_max{};
+  double max_speed{0.0};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_WHEEL_PARAMS_HPP_ */

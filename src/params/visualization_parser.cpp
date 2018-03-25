@@ -1,5 +1,5 @@
 /**
- * @file output_parser.hpp
+ * @file visualization_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,18 +18,12 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "fordyca/params/metrics_parser.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/visualization_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,41 +31,28 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @class output_parser
- * @ingroup params
- *
- * @brief Parses XML parameters relating to simulation output into
- * \ref output_params.
- */
-class output_parser : public rcppsw::params::xml_param_parser {
- public:
-  explicit output_parser(uint level)
-      : xml_param_parser(level),
-        m_metrics_parser(level + 1) {}
+constexpr char visualization_parser::kXMLRoot[];
 
-  /**
-   * @brief The root tag that all output loop functions parameters should lie
-   * under in the XML tree.
-   */
-  static constexpr char kXMLRoot[] = "output";
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void visualization_parser::parse(const ticpp::Element& node) {
+  ticpp::Element vnode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
+  XML_PARSE_PARAM(vnode, m_params, robot_id);
+  XML_PARSE_PARAM(vnode, m_params, robot_los);
+  XML_PARSE_PARAM(vnode, m_params, robot_task);
+  XML_PARSE_PARAM(vnode, m_params, block_id);
+} /* parse() */
 
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
-  void parse(const ticpp::Element& node) override;
-
-  std::string xml_root(void) const override { return kXMLRoot; }
-  const struct output_params* parse_results(void) const override {
-    return &m_params;
-  }
-
- private:
-  struct output_params m_params{};
-  metrics_parser m_metrics_parser;
-};
+void visualization_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << XML_PARAM_STR(m_params, robot_id) << std::endl
+         << XML_PARAM_STR(m_params, robot_los) << std::endl
+         << XML_PARAM_STR(m_params, robot_task) << std::endl
+         << XML_PARAM_STR(m_params, block_id) << std::endl;
+} /* show() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_OUTPUT_PARSER_HPP_ */

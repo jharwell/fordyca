@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "fordyca/params/depth1/cache_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -30,42 +32,44 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char cache_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct cache_params>();
-
-  argos::GetNodeAttribute(node, "dimension", m_params->dimension);
-  argos::GetNodeAttribute(node, "min_dist", m_params->min_dist);
-  argos::GetNodeAttribute(node, "static_size", m_params->static_size);
-  argos::GetNodeAttribute(node, "usage_penalty", m_params->usage_penalty);
-  argos::GetNodeAttribute(node, "create_static", m_params->create_static);
-  argos::GetNodeAttribute(node, "create_dynamic", m_params->create_dynamic);
-  argos::GetNodeAttribute(node,
-                          "static_respawn_scale_factor",
-                          m_params->static_respawn_scale_factor);
+void cache_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
+  XML_PARSE_PARAM(bnode, m_params, dimension);
+  XML_PARSE_PARAM(bnode, m_params, min_dist);
+  XML_PARSE_PARAM(bnode, m_params, static_size);
+  XML_PARSE_PARAM(bnode, m_params, usage_penalty);
+  XML_PARSE_PARAM(bnode, m_params, create_static);
+  XML_PARSE_PARAM(bnode, m_params, create_dynamic);
+  XML_PARSE_PARAM(bnode, m_params, static_respawn_scale_factor);
 } /* parse() */
 
-void cache_parser::show(std::ostream& stream) {
-  stream << "====================\nCache params\n====================\n";
-  stream << "dimension=" << m_params->dimension << std::endl;
-  stream << "min_dist=" << m_params->min_dist << std::endl;
-  stream << "static_size=" << m_params->static_size << std::endl;
-  stream << "usage_penalty=" << m_params->usage_penalty << std::endl;
-  stream << "create_static=" << m_params->create_static << std::endl;
-  stream << "create_dynamic=" << m_params->create_dynamic << std::endl;
-  stream << "static_respawn_scale_factor="
-         << m_params->static_respawn_scale_factor << std::endl;
+void cache_parser::show(std::ostream& stream) const {
+  stream << emit_header() << std::endl
+         << XML_PARAM_STR(m_params, dimension) << std::endl
+         << XML_PARAM_STR(m_params, min_dist) << std::endl
+         << XML_PARAM_STR(m_params, static_size) << std::endl
+         << XML_PARAM_STR(m_params, usage_penalty) << std::endl
+         << XML_PARAM_STR(m_params, create_static) << std::endl
+         << XML_PARAM_STR(m_params, create_dynamic) << std::endl
+         << XML_PARAM_STR(m_params, static_respawn_scale_factor) << std::endl;
 } /* show() */
 
-__pure bool cache_parser::validate(void) {
-  if (m_params->dimension <= 0.0) {
+__pure bool cache_parser::validate(void) const {
+  if (m_params.dimension <= 0.0) {
     return false;
   }
-  if (m_params->create_static && 0 == m_params->static_size) {
+  if (m_params.create_static && 0 == m_params.static_size) {
     return false;
   }
-  if (m_params->static_respawn_scale_factor <= 0.0) {
+  if (m_params.static_respawn_scale_factor <= 0.0) {
     return false;
   }
   return true;

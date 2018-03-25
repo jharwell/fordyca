@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/range.h>
 
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 #include "fordyca/params/depth1/exec_estimates_params.hpp"
 
@@ -42,7 +42,7 @@ NS_START(fordyca, params, depth1);
  * @struct task_allocation_params
  * @ingroup params depth1
  */
-struct task_allocation_params : public rcppsw::common::base_params {
+struct task_allocation_params : public rcppsw::params::base_params {
   task_allocation_params(void) : executive(), exec_estimates() {}
 
   struct rcppsw::task_allocation::partitionable_task_params executive;

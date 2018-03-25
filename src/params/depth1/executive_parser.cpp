@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "fordyca/params/depth1/executive_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -30,47 +32,46 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char executive_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void executive_parser::parse(argos::TConfigurationNode& node) {
-  m_params =
-      rcppsw::make_unique<struct task_allocation::partitionable_task_params>();
+void executive_parser::parse(const ticpp::Element& node) {
+  ticpp::Element enode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
 
-  argos::GetNodeAttribute(node, "estimation_alpha", m_params->estimation_alpha);
-  argos::GetNodeAttribute(node, "abort_reactivity", m_params->abort_reactivity);
-  argos::GetNodeAttribute(node, "abort_offset", m_params->abort_offset);
-  argos::GetNodeAttribute(node,
-                          "partition_reactivity",
-                          m_params->partition_reactivity);
-  argos::GetNodeAttribute(node, "partition_offset", m_params->partition_offset);
-  argos::GetNodeAttribute(node,
-                          "subtask_selection_method",
-                          m_params->subtask_selection_method);
-  argos::GetNodeAttribute(node, "partition_method", m_params->partition_method);
-  argos::GetNodeAttribute(node, "always_partition", m_params->always_partition);
-  argos::GetNodeAttribute(node, "never_partition", m_params->never_partition);
+  XML_PARSE_PARAM(enode, m_params, estimation_alpha);
+  XML_PARSE_PARAM(enode, m_params, abort_reactivity);
+  XML_PARSE_PARAM(enode, m_params, abort_offset);
+  XML_PARSE_PARAM(enode, m_params, partition_reactivity);
+  XML_PARSE_PARAM(enode, m_params, partition_offset);
+  XML_PARSE_PARAM(enode, m_params, subtask_selection_method);
+  XML_PARSE_PARAM(enode, m_params, partition_method);
+  XML_PARSE_PARAM(enode, m_params, always_partition);
+  XML_PARSE_PARAM(enode, m_params, never_partition);
 } /* parse() */
 
-void executive_parser::show(std::ostream& stream) {
-  stream << "====================\nExecutive params\n====================\n";
-  stream << "estimation_alpha=" << m_params->estimation_alpha << std::endl;
-  stream << "abort_reactivity=" << m_params->abort_reactivity << std::endl;
-  stream << "abort_offset=" << m_params->abort_offset << std::endl;
-  stream << "partition_reactivity=" << m_params->partition_reactivity
-         << std::endl;
-  stream << "partition_offset=" << m_params->partition_offset << std::endl;
-  stream << "subtask_selection_method=" << m_params->subtask_selection_method
-         << std::endl;
-  stream << "partition_method=" << m_params->partition_method << std::endl;
-  stream << "always_partition=" << m_params->always_partition << std::endl;
-  stream << "never_partition=" << m_params->never_partition << std::endl;
+void executive_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << XML_PARAM_STR(m_params, estimation_alpha) << std::endl
+         << XML_PARAM_STR(m_params, abort_reactivity) << std::endl
+         << XML_PARAM_STR(m_params, abort_offset) << std::endl
+         << XML_PARAM_STR(m_params, partition_reactivity) << std::endl
+         << XML_PARAM_STR(m_params, partition_offset) << std::endl
+         << XML_PARAM_STR(m_params, subtask_selection_method) << std::endl
+         << XML_PARAM_STR(m_params, partition_method) << std::endl
+         << XML_PARAM_STR(m_params, always_partition) << std::endl
+         << XML_PARAM_STR(m_params, never_partition) << std::endl;
 } /* show() */
 
-__pure bool executive_parser::validate(void) {
-  return !(m_params->estimation_alpha <= 0.0 ||
-           m_params->abort_reactivity <= 0.0 || m_params->abort_offset <= 0.0 ||
-           m_params->partition_reactivity <= 0.0 ||
-           m_params->partition_offset <= 0.0);
+__pure bool executive_parser::validate(void) const {
+  return !(m_params.estimation_alpha <= 0.0 ||
+           m_params.abort_reactivity <= 0.0 || m_params.abort_offset <= 0.0 ||
+           m_params.partition_reactivity <= 0.0 ||
+           m_params.partition_offset <= 0.0);
 } /* validate() */
 
 NS_END(depth1, params, fordyca);

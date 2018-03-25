@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
@@ -46,18 +46,27 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Parses XML parameters for relating to the task executive and the tasks
  * it runs.
  */
-class executive_parser: public rcppsw::common::xml_param_parser {
+class executive_parser: public rcppsw::params::xml_param_parser {
  public:
-  executive_parser(void) : m_params() {}
-  void parse(argos::TConfigurationNode& node) override;
-  const struct task_allocation::partitionable_task_params* get_results(void) override {
-    return m_params.get();
+  explicit executive_parser(uint level) : xml_param_parser(level) {}
+
+  /**
+   * @brief The root tag that all task executive parameters should lie under in
+   * the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "task_allocation";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct task_allocation::partitionable_task_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct task_allocation::partitionable_task_params> m_params;
+  struct task_allocation::partitionable_task_params m_params{};
 };
 
 NS_END(params, fordyca, depth1);

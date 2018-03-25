@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/sensor_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -29,32 +30,35 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char sensor_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void sensor_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode diff_node =
-      argos::GetNode(argos::GetNode(node, "sensors"), "proximity");
-  m_params = rcppsw::make_unique<struct sensor_params>();
+void sensor_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
+  ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
-  argos::GetNodeAttribute(diff_node,
-                          "go_straight_angle_range",
-                          m_params->proximity.go_straight_angle_range);
-  argos::GetNodeAttribute(diff_node, "delta", m_params->proximity.delta);
+  XML_PARSE_PARAM(pnode, m_params.proximity, go_straight_angle_range);
+  XML_PARSE_PARAM(pnode, m_params.proximity, delta);
 } /* parse() */
 
-void sensor_parser::show(std::ostream& stream) {
-  stream << "====================\nSensor params\n====================\n";
-  stream << "delta=" << m_params->proximity.delta << std::endl;
-  stream << "go_straight_angle_range="
-         << m_params->proximity.go_straight_angle_range << std::endl;
+void sensor_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << XML_PARAM_STR(m_params.proximity,
+                          go_straight_angle_range) << std::endl
+         << XML_PARAM_STR(m_params.proximity, delta) << std::endl;
 } /* show() */
 
-__pure bool sensor_parser::validate(void) {
-  if (!(m_params->proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
+__pure bool sensor_parser::validate(void) const {
+  if (!(m_params.proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
         0)) {
     return false;
   }
-  if (m_params->proximity.delta <= 0) {
+  if (m_params.proximity.delta <= 0) {
     return false;
   }
   return true;

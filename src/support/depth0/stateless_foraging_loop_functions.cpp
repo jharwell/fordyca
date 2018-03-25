@@ -36,7 +36,7 @@
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
@@ -71,7 +71,7 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   base_foraging_loop_functions::Init(node);
 
   rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
@@ -82,23 +82,19 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   params::loop_function_repository repo;
   repo.parse_all(node);
 
-  auto* p_output = static_cast<const struct params::output_params*>(
-      repo.get_params("output"));
-  auto* p_arena = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"));
+  auto* p_output = repo.parse_results<const struct params::output_params>("output");
+  auto* p_arena = repo.parse_results<const struct params::arena_map_params>("arena_map");
 
   output_init(p_output);
 
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
                                        p_output->sim_log_fname);
-  repo.show_all(rcppsw::er::g_server->log_stream());
+  rcppsw::er::g_server->log_stream() << repo;
 
   /* setup logging timestamp calculator */
   rcppsw::er::g_server->log_ts_calculator(
       std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
 
-  auto* l_params = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"));
   m_nest_x = p_arena->nest_x;
   m_nest_y = p_arena->nest_y;
 
@@ -114,7 +110,8 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = static_cast<controller::base_foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_id(l_params->display_robot_id);
+    controller.display_id(repo.parse_results<params::visualization_params>(
+        "loop_functions")->robot_id);
   } /* for(&robot..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
 }
@@ -213,15 +210,15 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
-  auto* arena_params = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"));
-  auto* l_params = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"));
+  auto* aparams =
+      repo.parse_results<struct params::arena_map_params>("arena_map");
+  auto* vparams =
+      repo.parse_results<struct params::visualization_params>("visualization");
 
-  m_arena_map.reset(new representation::arena_map(arena_params));
+  m_arena_map.reset(new representation::arena_map(aparams));
   m_arena_map->distribute_blocks();
   for (auto& block : m_arena_map->blocks()) {
-    block->display_id(l_params->display_block_id);
+    block->display_id(vparams->block_id);
   } /* for(&block..) */
 } /* arena_map_init() */
 

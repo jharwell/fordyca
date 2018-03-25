@@ -25,7 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/angles.h>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/wheel_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,26 +36,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-/**
- * @struct wheel_params
- * @ingroup params
- */
-struct wheel_params {
-  wheel_params(void) : soft_turn_max(), no_turn_max() {}
-
-  argos::CRadians soft_turn_max;
-  argos::CRadians no_turn_max;
-  double max_speed{0.0};
-};
 
 /**
  * @struct actuator_params
  * @ingroup params
  */
-struct actuator_params : public rcppsw::common::base_params {
-  actuator_params(void) : wheels() {}
-
-  struct wheel_params wheels;
+struct actuator_params : public rcppsw::params::base_params {
+  struct wheel_params wheels{};
 };
 
 NS_END(params, fordyca);

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/params/metrics_params.hpp"
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  * @struct output_params
  * @ingroup params
  */
-struct output_params : public rcppsw::common::base_params {
+struct output_params : public rcppsw::params::base_params {
   output_params(void) : metrics() {}
 
   std::string output_root{""};

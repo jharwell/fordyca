@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 
 /*******************************************************************************
@@ -39,9 +39,7 @@ NS_START(fordyca, params, depth0);
  * @struct pheromone_params
  * @ingroup params depth0
  */
-struct pheromone_params : public rcppsw::common::base_params {
-  pheromone_params(void) = default;
-
+struct pheromone_params : public rcppsw::params::base_params {
   double rho{0.0};
   bool repeat_deposit{false};
 };

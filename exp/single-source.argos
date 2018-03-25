@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -77,7 +77,7 @@
           speed_throttle_block_carry="0.1"
           />
       </params>
-    </depth1_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -85,7 +85,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim sim_log_fname="sim.log"
            output_root="output"
@@ -209,7 +209,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
+      <user_functions label="random_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

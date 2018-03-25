@@ -1,5 +1,5 @@
 /**
- * @file occupancy_grid_parser.cpp
+ * @file wheel_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,39 +21,56 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
+#include "fordyca/params/wheel_parser.hpp"
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char occupancy_grid_parser::kXMLRoot[];
+constexpr char wheel_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void occupancy_grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode = argos::GetNode(const_cast<ticpp::Element&>(node),
+void wheel_parser::parse(const ticpp::Element& node) {
+  ticpp::Element wnode = argos::GetNode(const_cast<ticpp::Element&>(node),
                                         kXMLRoot);
-  m_grid_parser.parse(onode);
-  m_pheromone_parser.parse(onode);
-  m_params.grid = *m_grid_parser.parse_results();
-  m_params.pheromone = *m_pheromone_parser.parse_results();
+
+  XML_PARSE_PARAM(wnode, m_params, max_speed);
+  XML_PARSE_PARAM(wnode, m_params, soft_turn_max);
+  XML_PARSE_PARAM(wnode, m_params, no_turn_max);
+
+  argos::CDegrees angle;
+  argos::GetNodeAttribute(wnode, "soft_turn_max", angle);
+  m_params.soft_turn_max = argos::ToRadians(angle);
+
+  argos::GetNodeAttribute(wnode, "no_turn_max", angle);
+  m_params.no_turn_max = argos::ToRadians(angle);
 } /* parse() */
 
-void occupancy_grid_parser::show(std::ostream& stream) const {
+void wheel_parser::show(std::ostream& stream) const {
   stream << emit_header()
-         << m_grid_parser
-         << m_pheromone_parser;
+         << XML_PARAM_STR(m_params.wheels, soft_turn_max) << std::endl
+         << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
+         << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
 } /* show() */
 
-__pure bool occupancy_grid_parser::validate(void) const {
-  return m_grid_parser.validate() && m_pheromone_parser.validate();
+__pure bool wheel_parser::validate(void) const {
+  if (!(m_params.soft_turn_max.GetValue() > 0)) {
+    return false;
+  }
+  if (!(m_params.no_turn_max.GetValue() > 0)) {
+    return false;
+  }
+  if (!(m_params.no_turn_max < m_params.soft_turn_max)) {
+    return false;
+  }
+  return true;
 } /* validate() */
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);

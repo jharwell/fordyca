@@ -1,5 +1,5 @@
 /**
- * @file loop_functions_parser.hpp
+ * @file wheel_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,17 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_WHEEL_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_WHEEL_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
-#include "fordyca/params/loop_functions_params.hpp"
+#include "fordyca/params/wheel_params.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,27 +38,36 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
- * @class loop_functions_parser
+ * @class wheel_parser
  * @ingroup params
  *
- * @brief Parses XML parameters relating to loop functions into
- * \ref loop_functions_params.
+ * @brief Parses XML parameters relating to the wheels into \ref wheel_params.
  */
-class loop_functions_parser : public rcppsw::common::xml_param_parser {
+class wheel_parser : public rcppsw::params::xml_param_parser {
  public:
-  loop_functions_parser(void) : m_params() {}
+  /**
+   * @brief The root tag that all wheel parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "wheels";
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct loop_functions_params* get_results(void) override {
-    return m_params.get();
+  explicit wheel_parser(uint level) : xml_param_parser(level) {}
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct wheel_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
 
  private:
-  std::unique_ptr<struct loop_functions_params> m_params;
+  struct wheel_params m_params{};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_WHEEL_PARSER_HPP_ */

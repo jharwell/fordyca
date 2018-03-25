@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/angles.h>
 #include <argos3/core/utility/math/range.h>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,7 +59,7 @@ struct proximity_params {
  * @struct sensor_params
  * @ingroup params
  */
-struct sensor_params : public rcppsw::common::base_params {
+struct sensor_params : public rcppsw::params::base_params {
   sensor_params(void) : proximity() {}
 
   struct proximity_params proximity;

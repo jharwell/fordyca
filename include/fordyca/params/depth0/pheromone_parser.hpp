@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/depth0/pheromone_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,19 +45,27 @@ NS_START(fordyca, params, depth0);
  * @brief Parses XML parameters relating to pheromones into
  * \ref pheromone_params.
  */
-class pheromone_parser: public rcppsw::common::xml_param_parser {
+class pheromone_parser: public rcppsw::params::xml_param_parser {
  public:
-  pheromone_parser(void): m_params() {}
+  explicit pheromone_parser(uint level) : xml_param_parser(level) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct pheromone_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all pheromone parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "pheromone";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct pheromone_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct pheromone_params> m_params;
+  struct pheromone_params m_params{};
 };
 
 NS_END(depth0, params, fordyca);

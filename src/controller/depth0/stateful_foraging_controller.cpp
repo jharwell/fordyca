@@ -115,7 +115,7 @@ void stateful_foraging_controller::ControlStep(void) {
   m_executive->run();
 } /* ControlStep() */
 
-void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateful_foraging_controller::Init(ticpp::Element& node) {
   params::depth0::stateful_foraging_repository param_repo;
   params::depth1::task_repository task_repo;
 
@@ -128,8 +128,9 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
   ER_NOM("Initializing stateful_foraging controller");
   param_repo.parse_all(node);
   task_repo.parse_all(node);
-  param_repo.show_all(server_handle()->log_stream());
-  task_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << param_repo;
+  server_handle()->log_stream() << task_repo;
+
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
   ER_ASSERT(task_repo.validate_all(),
@@ -137,25 +138,21 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
 
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      static_cast<const struct params::depth0::occupancy_grid_params*>(
-          param_repo.get_params("occupancy_grid")),
+      param_repo.parse_results<params::depth0::occupancy_grid_params>("occupancy_grid"),
       GetId());
 
   base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
-      static_cast<const struct params::sensor_params*>(
-          param_repo.get_params("sensors")),
+      param_repo.parse_results<struct params::sensor_params>("sensors"),
       GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
       GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
       GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
       GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
 
   const params::fsm_params* fsm_params =
-      static_cast<const struct params::fsm_params*>(
-          param_repo.get_params("fsm"));
+      param_repo.parse_results<struct params::fsm_params>("fsm");
 
   const params::depth1::task_allocation_params* task_params =
-      static_cast<const params::depth1::task_allocation_params*>(
-          task_repo.get_params("task_allocation"));
+      param_repo.parse_results<params::depth1::task_allocation_params>("task_allocation");
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(

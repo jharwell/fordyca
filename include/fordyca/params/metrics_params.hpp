@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ NS_START(fordyca, params);
  * @struct metrics_params
  * @ingroup params
  */
-struct metrics_params : public rcppsw::common::base_params {
+struct metrics_params : public rcppsw::params::base_params {
   std::string output_dir{""};
   std::string block_fname{""};
   std::string stateless_fname{""};

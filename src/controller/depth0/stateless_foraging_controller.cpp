@@ -50,20 +50,19 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateless_foraging controller");
 
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
-  param_repo.show_all(client::server_handle()->log_stream());
+  client::server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      static_cast<const struct params::fsm_params*>(
-          param_repo.get_params("fsm")),
+      param_repo.parse_results<const struct params::fsm_params>("fsm"),
       base_foraging_controller::server(),
       base_foraging_controller::base_sensors_ref(),
       base_foraging_controller::actuators());

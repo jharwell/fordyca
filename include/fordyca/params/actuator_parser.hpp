@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
+
 #include "fordyca/params/actuator_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/params/wheel_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,6 +37,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class actuator_parser
  * @ingroup params
@@ -44,19 +45,30 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for \ref actuator_manager into
  * \ref actuator_params.
  */
-class actuator_parser : public rcppsw::common::xml_param_parser {
+class actuator_parser : public rcppsw::params::xml_param_parser {
  public:
-  actuator_parser(void) : m_params() {}
+  explicit actuator_parser(uint level)
+      : xml_param_parser(level),
+        m_wheels(level + 1) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct actuator_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all actuator parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "actuators";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct actuator_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct actuator_params> m_params;
+  struct actuator_params m_params{};
+  wheel_parser m_wheels;
 };
 
 NS_END(params, fordyca);

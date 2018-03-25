@@ -86,15 +86,15 @@ void foraging_controller::ControlStep(void) {
   m_executive->run();
 } /* ControlStep() */
 
-void foraging_controller::Init(argos::TConfigurationNode& node) {
+void foraging_controller::Init(ticpp::Element& node) {
   params::depth1::task_repository task_repo;
   params::depth0::stateful_foraging_repository fsm_repo;
 
   depth0::stateful_foraging_controller::Init(node);
   task_repo.parse_all(node);
-  task_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << task_repo;
   fsm_repo.parse_all(node);
-  fsm_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << fsm_repo;
 
   ER_ASSERT(task_repo.validate_all(),
             "FATAL: Not all FSM parameters were validated");
@@ -102,13 +102,11 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
             "FATAL: Not all task parameters were validated");
 
   ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_allocation_params* p =
-      static_cast<const params::depth1::task_allocation_params*>(
-          task_repo.get_params("task_allocation"));
+  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>("task_allocation");
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
@@ -118,7 +116,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
@@ -128,7 +126,7 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),

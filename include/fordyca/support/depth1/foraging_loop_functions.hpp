@@ -54,7 +54,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   foraging_loop_functions(void) = default;
   ~foraging_loop_functions(void) override = default;
 
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void PreStep() override;
   void Reset(void) override;
 

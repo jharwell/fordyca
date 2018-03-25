@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/output_parser.hpp"
+
+#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -30,43 +32,39 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char output_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void output_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<output_params>();
+void output_parser::parse(const ticpp::Element& node) {
+  ticpp::Element onode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
   std::vector<std::string> res, res2;
-  argos::TConfigurationNode onode = argos::GetNode(node, "output");
 
-  if (nullptr != onode.FirstChild("metrics", false)) {
-    m_metrics_parser.parse(argos::GetNode(onode, "metrics"));
-    m_params->metrics = *m_metrics_parser.get_results();
-  }
+  m_metrics_parser.parse(onode);
+  m_params.metrics = *m_metrics_parser.parse_results();
 
-  if (nullptr != onode.FirstChild("sim", false)) {
-    argos::TConfigurationNode snode = argos::GetNode(onode, "sim");
-    argos::GetNodeAttribute(snode, "output_root", m_params->output_root);
-    argos::GetNodeAttribute(snode, "output_dir", m_params->output_dir);
-    argos::GetNodeAttribute(snode, "sim_log_fname", m_params->sim_log_fname);
-  } else if (nullptr != onode.FirstChild("robot", false)) {
-    argos::TConfigurationNode rnode = argos::GetNode(onode, "robot");
-    argos::GetNodeAttribute(rnode, "output_root", m_params->output_root);
-    argos::GetNodeAttribute(rnode, "output_dir", m_params->output_dir);
-  }
+  ticpp::Element snode = argos::GetNode(onode, "sim");
+  XML_PARSE_PARAM(snode, m_params, output_root);
+  XML_PARSE_PARAM(snode, m_params, output_dir);
+  XML_PARSE_PARAM(snode, m_params, output_root);
+  XML_PARSE_PARAM(snode, m_params, sim_log_fname);
 } /* parse() */
 
-void output_parser::show(std::ostream& stream) {
-  stream << "====================\nOutput params\n====================\n";
-  m_metrics_parser.show(stream);
-  stream << "output_root=" << m_params->output_root << std::endl;
-  stream << "output_dir=" << m_params->output_dir << std::endl;
-  stream << "sim_log_fname=" << m_params->sim_log_fname << std::endl;
+void output_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << m_metrics_parser
+         << XML_PARAM_STR(m_params, output_root) << std::endl
+         << XML_PARAM_STR(m_params, output_dir) << std::endl
+         << XML_PARAM_STR(m_params, output_root) << std::endl
+         << XML_PARAM_STR(m_params, sim_log_fname) << std::endl;
 } /* show() */
 
-__pure bool output_parser::validate(void) {
-  if (nullptr != m_metrics_parser.get_results()) {
-    return m_metrics_parser.validate();
-  }
-  return true;
+__pure bool output_parser::validate(void) const {
+  return m_metrics_parser.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/actuator_parser.hpp"
 
 /*******************************************************************************
@@ -29,34 +30,32 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char actuator_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node =
-      argos::GetNode(argos::GetNode(node, "actuators"), "wheels");
-
-  m_params = rcppsw::make_unique<struct actuator_params>();
-
-  argos::CDegrees angle;
-  argos::GetNodeAttribute(wheel_node, "soft_turn_angle_max", angle);
-  m_params->wheels.soft_turn_max = ToRadians(angle);
-  argos::GetNodeAttribute(wheel_node, "no_turn_angle_max", angle);
-  m_params->wheels.no_turn_max = ToRadians(angle);
-  argos::GetNodeAttribute(wheel_node, "max_speed", m_params->wheels.max_speed);
+void actuator_parser::parse(const ticpp::Element& node) {
+  ticpp::Element anode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
+  m_wheels.parse(anode);
+  m_params.wheels = *m_wheels.parse_results();
 } /* parse() */
 
-void actuator_parser::show(std::ostream& stream) {
-  stream << "====================\nActuator params\n====================\n";
-  stream << "soft_turn_max=" << m_params->wheels.soft_turn_max << std::endl;
-  stream << "no_turn_max=" << m_params->wheels.no_turn_max << std::endl;
-  stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
+void actuator_parser::show(std::ostream& stream) const {
+  stream << emit_header()
+         << XML_PARAM_STR(m_params.wheels, soft_turn_max) << std::endl
+         << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
+         << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
 } /* show() */
 
-__pure bool actuator_parser::validate(void) {
-  if (!(m_params->wheels.soft_turn_max.GetValue() > 0)) {
+__pure bool actuator_parser::validate(void) const {
+  if (!(m_params.wheels.soft_turn_max.GetValue() > 0)) {
     return false;
   }
-  if (!(m_params->wheels.no_turn_max.GetValue() > 0)) {
+  if (!(m_params.wheels.no_turn_max.GetValue() > 0)) {
     return false;
   }
   return true;

@@ -50,7 +50,7 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   stateful_foraging_loop_functions(void) = default;
   ~stateful_foraging_loop_functions(void) override = default;
 
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void PreStep(void) override;
 
  private:
