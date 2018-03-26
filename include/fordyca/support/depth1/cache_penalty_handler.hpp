@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include <memory>
+#include <list>
 
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
@@ -77,7 +79,7 @@ class cache_penalty_handler : public rcppsw::er::client {
    */
   template<typename T>
   bool penalty_init(T& controller,
-                    uint timestep, uint (cache_penalty_generator::*penalty_func)
+                    uint timestep, uint(cache_penalty_generator::*penalty_func)
                                                                       (uint)) {
     if (controller.cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
@@ -175,8 +177,6 @@ class cache_penalty_handler : public rcppsw::er::client {
     return it != m_penalty_list.end();
   }
 
-  }
-
  private:
   // clang-format off
   uint                       mc_penalty;
@@ -186,4 +186,4 @@ class cache_penalty_handler : public rcppsw::er::client {
 };
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HANDLER_HPP_ */
+#endif  // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HANDLER_HPP_

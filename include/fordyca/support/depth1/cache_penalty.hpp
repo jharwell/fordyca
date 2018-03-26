@@ -56,7 +56,8 @@ class cache_penalty {
                                          mc_controller(controller) {}
 
   uint cache_id(void) const { return m_cache_id; }
-  const controller::depth1::foraging_controller* controller(void) const { return mc_controller; }
+  const controller::depth1::foraging_controller* controller(void) const {
+                                                        return mc_controller; }
   uint start_time(void) const { return m_start_time; }
   uint penalty(void) const { return m_penalty; }
 
@@ -79,7 +80,7 @@ class cache_penalty {
     Sine_func,
 
   } */
-  
+
 
  private:
   // clang-format off
@@ -92,4 +93,4 @@ class cache_penalty {
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HPP_ */
+#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_HPP_

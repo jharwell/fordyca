@@ -324,4 +324,4 @@ class arena_interactor : public depth0::arena_interactor<T> {
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ARENA_INTERACTOR_HPP_ */
+#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_ARENA_INTERACTOR_HPP_
