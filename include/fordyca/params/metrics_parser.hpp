@@ -65,7 +65,7 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct metrics_params m_params{};
+  struct metrics_params m_params {};
 };
 
 NS_END(params, fordyca);

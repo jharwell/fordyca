@@ -26,7 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <string>
+#include "rcppsw/control/kinematics2D.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/controller/throttling_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,6 +48,7 @@ NS_START(controller);
 
 class actuator_manager;
 class base_foraging_sensors;
+namespace control = rcppsw::control;
 
 /*******************************************************************************
  * Class Definitions
@@ -143,29 +147,32 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<actuator_manager>& actuators(void) const {
+  const std::shared_ptr<actuator_manager> actuators(void) const {
     return m_actuators;
   }
-  const std::shared_ptr<rcppsw::er::server>& server(void) const {
+  const std::shared_ptr<rcppsw::er::server> server(void) const {
     return m_server;
   }
-  const std::shared_ptr<base_foraging_sensors>& sensors_ref(void) const {
-    return m_sensors;
-  }
-  base_foraging_sensors* base_sensors(void) const { return m_sensors.get(); }
-  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const {
+
+  std::shared_ptr<base_foraging_sensors> base_sensors(void) const {
     return m_sensors;
   }
   void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
     m_sensors = sensors;
   }
 
-  /**
-   * @brief Get the amount a robot's speed will be throttled when carrying a
-   * block.
-   */
-  double speed_throttle_block_carry(void) const {
-    return m_speed_throttle_block_carry;
+  const std::shared_ptr<control::kinematics2D> kinematics(void) const {
+    return m_kinematics;
+  }
+  std::shared_ptr<control::kinematics2D> kinematics(void) {
+    return m_kinematics;
+  }
+
+  const std::shared_ptr<throttling_handler> throttling(void) const {
+    return m_throttling;
+  }
+  std::shared_ptr<throttling_handler> throttling(void) {
+    return m_throttling;
   }
 
   /**
@@ -176,19 +183,20 @@ class base_foraging_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
-  std::string log_header_calc(void);
-  std::string dbg_header_calc(void);
+  std::string log_header_calc(void) const;
+  std::string dbg_header_calc(void) const;
 
   // clang-format off
   bool                                   m_display_id{false};
-  double                                 m_speed_throttle_block_carry{0.0};
   std::shared_ptr<representation::block> m_block{nullptr};
-  std::shared_ptr<actuator_manager>      m_actuators;
-  std::shared_ptr<base_foraging_sensors> m_sensors;
+  std::shared_ptr<actuator_manager>      m_actuators{nullptr};
+  std::shared_ptr<base_foraging_sensors> m_sensors{nullptr};
   std::shared_ptr<rcppsw::er::server>    m_server;
+  std::shared_ptr<control::kinematics2D> m_kinematics{nullptr};
+  std::shared_ptr<throttling_handler>    m_throttling{nullptr};
   // clang-format on
 };
 
-NS_END(fordyca, controller);
+NS_END(controller, fordyca);
 
 #endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_CONTROLLER_HPP_ */

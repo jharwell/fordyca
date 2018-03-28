@@ -38,8 +38,8 @@ constexpr char task_allocation_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void task_allocation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element tnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_exec_parser.parse(tnode);
   m_estimate_parser.parse(tnode);
@@ -48,10 +48,7 @@ void task_allocation_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void task_allocation_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << m_exec_parser
-         << m_estimate_parser
-         << std::endl;
+  stream << build_header() << m_exec_parser << m_estimate_parser << std::endl;
 } /* show() */
 
 __pure bool task_allocation_parser::validate(void) const {

@@ -40,16 +40,15 @@ constexpr char block_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   XML_PARSE_PARAM(bnode, m_params, n_blocks);
   XML_PARSE_PARAM(bnode, m_params, dimension);
   XML_PARSE_PARAM(bnode, m_params, dist_model);
 } /* parse() */
 
 void block_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, n_blocks) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, n_blocks) << std::endl
          << XML_PARAM_STR(m_params, dimension) << std::endl
          << XML_PARAM_STR(m_params, dist_model) << std::endl;
 } /* show() */

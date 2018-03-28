@@ -38,8 +38,8 @@ constexpr char occupancy_grid_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void occupancy_grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element onode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_grid_parser.parse(onode);
   m_pheromone_parser.parse(onode);
   m_params.grid = *m_grid_parser.parse_results();
@@ -47,9 +47,7 @@ void occupancy_grid_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void occupancy_grid_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << m_grid_parser
-         << m_pheromone_parser;
+  stream << build_header() << m_grid_parser << m_pheromone_parser;
 } /* show() */
 
 __pure bool occupancy_grid_parser::validate(void) const {

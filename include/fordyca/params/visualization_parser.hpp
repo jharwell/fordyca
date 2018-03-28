@@ -64,7 +64,7 @@ class visualization_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct visualization_params m_params{};
+  struct visualization_params m_params {};
 };
 
 NS_END(params, fordyca);

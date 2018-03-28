@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "fordyca/params/actuator_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -38,15 +38,15 @@ constexpr char actuator_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void actuator_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element anode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_wheels.parse(anode);
   m_params.wheels = *m_wheels.parse_results();
 } /* parse() */
 
 void actuator_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params.wheels, soft_turn_max) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params.wheels, soft_turn_max)
+         << std::endl
          << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
          << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
 } /* show() */

@@ -36,8 +36,8 @@
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
@@ -65,7 +65,8 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   cache_handling_init(arenap);
 
   /* initialize stat collecting */
-  metric_collecting_init(repo.parse_results<struct params::output_params>("output"));
+  metric_collecting_init(
+      repo.parse_results<struct params::output_params>("output"));
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -81,8 +82,9 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(repo.parse_results<params::visualization_params>(
-        "visualization")->robot_task);
+    controller.display_task(
+        repo.parse_results<params::visualization_params>("visualization")
+            ->robot_task);
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }

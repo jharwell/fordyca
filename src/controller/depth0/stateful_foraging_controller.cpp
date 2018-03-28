@@ -88,15 +88,11 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(
-    void) const {
-  return static_cast<depth1::foraging_sensors*>(base_sensors());
+__pure std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::
+    stateful_sensors(void) const {
+  return std::static_pointer_cast<depth1::foraging_sensors>(base_sensors());
 }
 
-std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::
-    stateful_sensors_ref(void) const {
-  return std::static_pointer_cast<depth1::foraging_sensors>(base_sensors_ref());
-}
 void stateful_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
@@ -106,11 +102,8 @@ void stateful_foraging_controller::ControlStep(void) {
   process_los(stateful_sensors()->los());
   m_map->update();
 
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  throttling()->carrying_block(is_carrying_block());
+  throttling()->update();
 
   m_executive->run();
 } /* ControlStep() */
@@ -138,7 +131,8 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
 
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      param_repo.parse_results<params::depth0::occupancy_grid_params>("occupancy_grid"),
+      param_repo.parse_results<params::depth0::occupancy_grid_params>(
+          "occupancy_grid"),
       GetId());
 
   base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
@@ -152,15 +146,16 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::fsm_params>("fsm");
 
   const params::depth1::task_allocation_params* task_params =
-      param_repo.parse_results<params::depth1::task_allocation_params>("task_allocation");
+      param_repo.parse_results<params::depth1::task_allocation_params>(
+          "task_allocation");
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_params,
           base_foraging_controller::server(),
-          stateful_sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors(),
           base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map());
   m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->executive,
                                                         generalist_fsm);
   m_generalist->parent(m_generalist.get());

@@ -60,10 +60,12 @@ class fsm_parser : public rcppsw::params::xml_param_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct fsm_params* parse_results(void) const override { return &m_params; }
+  const struct fsm_params* parse_results(void) const override {
+    return &m_params;
+  }
 
  private:
-  struct fsm_params m_params{};
+  struct fsm_params m_params {};
 };
 
 NS_END(params, fordyca);

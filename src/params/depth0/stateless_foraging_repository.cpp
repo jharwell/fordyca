@@ -26,24 +26,28 @@
 #include "fordyca/params/fsm_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/sensor_parser.hpp"
+#include "rcppsw/control/kinematics2D_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth0);
+namespace control = rcppsw::control;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_repository::stateless_foraging_repository(void) {
+  register_parser<control::kinematics2D_xml_parser>(
+      control::kinematics2D_xml_parser::kXMLRoot,
+      control::kinematics2D_xml_parser::kHeader1);
   register_parser<output_parser>(output_parser::kXMLRoot,
                                  output_parser::kHeader1);
   register_parser<actuator_parser>(actuator_parser::kXMLRoot,
                                    actuator_parser::kHeader1);
   register_parser<sensor_parser>(sensor_parser::kXMLRoot,
                                  sensor_parser::kHeader1);
-  register_parser<fsm_parser>(output_parser::kXMLRoot,
-                              fsm_parser::kHeader1);
+  register_parser<fsm_parser>(output_parser::kXMLRoot, fsm_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

@@ -67,8 +67,8 @@ struct speed_throttling {
  * @ingroup params
  */
 struct fsm_params : public rcppsw::params::base_params {
-  struct threshold_times times{};
-  struct speed_throttling speed_throttling{};
+  struct threshold_times times {};
+  struct speed_throttling speed_throttling {};
   argos::CVector2 nest_center{};
 };
 

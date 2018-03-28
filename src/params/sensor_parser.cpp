@@ -38,8 +38,8 @@ constexpr char sensor_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void sensor_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
   XML_PARSE_PARAM(pnode, m_params.proximity, go_straight_angle_range);
@@ -47,9 +47,9 @@ void sensor_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void sensor_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params.proximity,
-                          go_straight_angle_range) << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params.proximity, go_straight_angle_range)
+         << std::endl
          << XML_PARAM_STR(m_params.proximity, delta) << std::endl;
 } /* show() */
 

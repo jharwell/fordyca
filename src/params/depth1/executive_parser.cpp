@@ -40,8 +40,8 @@ constexpr char executive_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void executive_parser::parse(const ticpp::Element& node) {
-  ticpp::Element enode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element enode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   XML_PARSE_PARAM(enode, m_params, estimation_alpha);
   XML_PARSE_PARAM(enode, m_params, abort_reactivity);
@@ -55,8 +55,8 @@ void executive_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void executive_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, estimation_alpha) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, estimation_alpha)
+         << std::endl
          << XML_PARAM_STR(m_params, abort_reactivity) << std::endl
          << XML_PARAM_STR(m_params, abort_offset) << std::endl
          << XML_PARAM_STR(m_params, partition_reactivity) << std::endl

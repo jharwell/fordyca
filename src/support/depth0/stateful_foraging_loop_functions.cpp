@@ -63,7 +63,8 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   rcppsw::er::g_server->log_stream() << repo;
 
   /* initialize stat collecting */
-  auto* p_output = repo.parse_results<const struct params::output_params>("output");
+  auto* p_output =
+      repo.parse_results<const struct params::output_params>("output");
   collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
       "fsm::stateful",
       metrics_path() + "/" + p_output->metrics.stateful_fname,

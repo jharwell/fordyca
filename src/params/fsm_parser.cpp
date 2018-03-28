@@ -41,8 +41,8 @@ constexpr char fsm_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void fsm_parser::parse(const ticpp::Element& node) {
-  ticpp::Element fnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element fnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   XML_PARSE_PARAM(fnode, m_params.times, unsuccessful_explore_dir_change);
   XML_PARSE_PARAM(fnode, m_params.times, frequent_collision_thresh);
   XML_PARSE_PARAM(fnode, m_params.times, unsuccessful_explore_dir_change);
@@ -51,17 +51,17 @@ void fsm_parser::parse(const ticpp::Element& node) {
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
   res = parser.parse(fnode.GetAttribute("nest"));
-  m_params.nest_center.Set(std::atof(res[0].c_str()),
-                           std::atof(res[1].c_str()));
+  m_params.nest_center.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) const {
-  stream << emit_header() << std::endl
-         << XML_PARAM_STR(m_params.times,
-                          unsuccessful_explore_dir_change) << std::endl
-         << XML_PARAM_STR(m_params.times, frequent_collision_thresh) << std::endl
-         << XML_PARAM_STR(m_params.times,
-                          unsuccessful_explore_dir_change) << std::endl
+  stream << build_header() << std::endl
+         << XML_PARAM_STR(m_params.times, unsuccessful_explore_dir_change)
+         << std::endl
+         << XML_PARAM_STR(m_params.times, frequent_collision_thresh)
+         << std::endl
+         << XML_PARAM_STR(m_params.times, unsuccessful_explore_dir_change)
+         << std::endl
          << XML_PARAM_STR(m_params.speed_throttling, block_carry) << std::endl
          << m_params.nest_center << std::endl;
 } /* show() */
@@ -69,7 +69,7 @@ void fsm_parser::show(std::ostream& stream) const {
 __pure bool fsm_parser::validate(void) const {
   return (m_params.nest_center.GetX() > 0) &&
          (m_params.nest_center.GetY() > 0) &&
-      (IS_BETWEEN(m_params.speed_throttling.block_carry, 0, 1.0));
+         (IS_BETWEEN(m_params.speed_throttling.block_carry, 0, 1.0));
 } /* validate() */
 
 NS_END(params, fordyca);

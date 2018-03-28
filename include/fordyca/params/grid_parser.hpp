@@ -65,7 +65,7 @@ class grid_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct grid_params m_params{};
+  struct grid_params m_params {};
 };
 
 NS_END(params, fordyca);

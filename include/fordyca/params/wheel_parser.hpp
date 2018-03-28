@@ -65,7 +65,7 @@ class wheel_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct wheel_params m_params{};
+  struct wheel_params m_params {};
 };
 
 NS_END(params, fordyca);

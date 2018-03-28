@@ -97,11 +97,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   const representation::line_of_sight* los(void) const;
 
-  std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
-    return m_map;
-  }
-  depth1::foraging_sensors* stateful_sensors(void) const;
-  std::shared_ptr<depth1::foraging_sensors> stateful_sensors_ref(void) const;
+  std::shared_ptr<depth1::foraging_sensors> stateful_sensors(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -115,7 +111,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  representation::perceived_arena_map* map(void) const { return m_map.get(); }
+  std::shared_ptr<representation::perceived_arena_map> map(void) const { return m_map; }
   bool is_transporting_to_nest(void) const override;
 
  private:

@@ -48,8 +48,7 @@ NS_START(fordyca, params);
 class actuator_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit actuator_parser(uint level)
-      : xml_param_parser(level),
-        m_wheels(level + 1) {}
+      : xml_param_parser(level), m_wheels(level + 1) {}
 
   /**
    * @brief The root tag that all actuator parameters should lie under in the
@@ -67,7 +66,7 @@ class actuator_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct actuator_params m_params{};
+  struct actuator_params m_params {};
   wheel_parser m_wheels;
 };
 

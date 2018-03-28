@@ -40,8 +40,8 @@ constexpr char exec_estimates_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void exec_estimates_parser::parse(const ticpp::Element& node) {
-  ticpp::Element enode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element enode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   XML_PARSE_PARAM(enode, m_params, enabled);
   if (m_params.enabled) {
@@ -52,8 +52,7 @@ void exec_estimates_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void exec_estimates_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, enabled) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, enabled) << std::endl
          << XML_PARAM_STR(m_params, generalist_range) << std::endl
          << XML_PARAM_STR(m_params, harvester_range) << std::endl
          << XML_PARAM_STR(m_params, collector_range) << std::endl;

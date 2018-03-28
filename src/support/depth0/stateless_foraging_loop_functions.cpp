@@ -36,8 +36,8 @@
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
@@ -82,8 +82,10 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo;
   repo.parse_all(node);
 
-  auto* p_output = repo.parse_results<const struct params::output_params>("output");
-  auto* p_arena = repo.parse_results<const struct params::arena_map_params>("arena_map");
+  auto* p_output =
+      repo.parse_results<const struct params::output_params>("output");
+  auto* p_arena =
+      repo.parse_results<const struct params::arena_map_params>("arena_map");
 
   output_init(p_output);
 
@@ -110,8 +112,9 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = static_cast<controller::base_foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_id(repo.parse_results<params::visualization_params>(
-        "loop_functions")->robot_id);
+    controller.display_id(
+        repo.parse_results<params::visualization_params>("loop_functions")
+            ->robot_id);
   } /* for(&robot..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
 }

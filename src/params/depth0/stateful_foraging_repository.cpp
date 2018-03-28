@@ -40,8 +40,7 @@ stateful_foraging_repository::stateful_foraging_repository(void) {
                                    actuator_parser::kHeader1);
   register_parser<sensor_parser>(sensor_parser::kXMLRoot,
                                  actuator_parser::kHeader1);
-  register_parser<fsm_parser>(fsm_parser::kXMLRoot,
-                              actuator_parser::kHeader1);
+  register_parser<fsm_parser>(fsm_parser::kXMLRoot, actuator_parser::kHeader1);
   register_parser<occupancy_grid_parser>(occupancy_grid_parser::kXMLRoot,
                                          actuator_parser::kHeader1);
 }

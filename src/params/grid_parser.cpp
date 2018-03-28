@@ -40,8 +40,8 @@ constexpr char grid_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element gnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element gnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res;
 
   rcppsw::utils::line_parser parser(' ');
@@ -53,8 +53,7 @@ void grid_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void grid_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, resolution) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, resolution) << std::endl
          << m_params.lower << std::endl
          << m_params.upper << std::endl;
 } /* show() */

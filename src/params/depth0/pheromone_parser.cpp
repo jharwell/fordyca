@@ -38,15 +38,14 @@ constexpr char pheromone_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void pheromone_parser::parse(const ticpp::Element& node) {
-  ticpp::Element pnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element pnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params.rho = std::atof(node.GetAttribute("rho").c_str());
   XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
 } /* parse() */
 
 void pheromone_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, rho) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, rho) << std::endl
          << XML_PARAM_STR(m_params, repeat_deposit) << std::endl;
 } /* show() */
 

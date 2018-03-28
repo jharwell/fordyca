@@ -78,11 +78,9 @@ void foraging_controller::ControlStep(void) {
   map()->update();
   m_metric_store.reset();
 
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  throttling()->carrying_block(is_carrying_block());
+  throttling()->update();
+
   m_executive->run();
 } /* ControlStep() */
 
@@ -102,15 +100,16 @@ void foraging_controller::Init(ticpp::Element& node) {
             "FATAL: Not all task parameters were validated");
 
   ER_NOM("Initializing depth1 controller");
-  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>("task_allocation");
+  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>(
+      "task_allocation");
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors(),
           base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map());
   m_collector =
       rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
@@ -118,9 +117,9 @@ void foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors(),
           base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map());
   m_harvester =
       rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
 
@@ -128,9 +127,9 @@ void foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
+          depth0::stateful_foraging_controller::stateful_sensors(),
           base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          depth0::stateful_foraging_controller::map());
   m_generalist =
       rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
 

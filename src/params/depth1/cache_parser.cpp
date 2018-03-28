@@ -40,8 +40,8 @@ constexpr char cache_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void cache_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   XML_PARSE_PARAM(bnode, m_params, dimension);
   XML_PARSE_PARAM(bnode, m_params, min_dist);
   XML_PARSE_PARAM(bnode, m_params, static_size);
@@ -52,7 +52,7 @@ void cache_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void cache_parser::show(std::ostream& stream) const {
-  stream << emit_header() << std::endl
+  stream << build_header() << std::endl
          << XML_PARAM_STR(m_params, dimension) << std::endl
          << XML_PARAM_STR(m_params, min_dist) << std::endl
          << XML_PARAM_STR(m_params, static_size) << std::endl

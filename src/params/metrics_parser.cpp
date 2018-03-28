@@ -39,8 +39,8 @@ constexpr char metrics_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
-  ticpp::Element mnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element mnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   XML_PARSE_PARAM(mnode, m_params, output_dir);
   XML_PARSE_PARAM(mnode, m_params, stateless_fname);
   XML_PARSE_PARAM(mnode, m_params, distance_fname);
@@ -55,8 +55,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params, output_dir) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, output_dir) << std::endl
          << XML_PARAM_STR(m_params, stateless_fname) << std::endl
          << XML_PARAM_STR(m_params, distance_fname) << std::endl
          << XML_PARAM_STR(m_params, stateful_fname) << std::endl

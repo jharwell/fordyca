@@ -37,6 +37,7 @@
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
+#include "rcppsw/control/kinematics2D_params.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -49,10 +50,7 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
-    : client(),
-      m_actuators(),
-      m_sensors(),
-      m_server(std::make_shared<rcppsw::er::server>()) {
+    : m_server(std::make_shared<rcppsw::er::server>()) {
   /*
    * Initially, all robots use the RCPPSW er_server to log parameters.
    */
@@ -89,7 +87,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
             "FATAL: Not all parameters were validated");
 
   const struct params::output_params* params =
-          param_repo.parse_results<struct params::output_params>("output");
+      param_repo.parse_results<struct params::output_params>("output");
   client::server_handle()->log_stream() << param_repo;
   output_init(params);
 
@@ -100,12 +98,17 @@ void base_foraging_controller::Init(ticpp::Element& node) {
       GetActuator<argos::CCI_LEDsActuator>("leds"),
       GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
 
-  auto* fsm_params = param_repo.parse_results<const struct params::fsm_params>("fsm");
 
-  m_speed_throttle_block_carry = fsm_params->speed_throttling.block_carry;
-  if (m_speed_throttle_block_carry > 0) {
-    actuators()->set_throttle_percent(m_speed_throttle_block_carry);
-  }
+  /* initialize kinematics */
+  /* m_kinematics = std::make_shared<control::kinematics2D>(*this, */
+  /*     param_repo.parse_results<control::kinematics2D_params>("kinematics")); */
+
+  /* initialize throttling */
+  auto* fsm_params =
+      param_repo.parse_results<const struct params::fsm_params>("fsm");
+  m_throttling = std::make_shared<throttling_handler>(
+      fsm_params->speed_throttling.block_carry,
+      actuators());
 
   m_sensors = std::make_shared<base_foraging_sensors>(
       param_repo.parse_results<struct params::sensor_params>("sensors"),
@@ -151,11 +154,11 @@ void base_foraging_controller::output_init(
                                           ".log");
 } /* output_init() */
 
-std::string base_foraging_controller::log_header_calc(void) {
+std::string base_foraging_controller::log_header_calc(void) const {
   return "[t=" + std::to_string(m_sensors->tick()) + "," + this->GetId() + "]";
 } /* log_header_calc() */
 
-std::string base_foraging_controller::dbg_header_calc(void) {
+std::string base_foraging_controller::dbg_header_calc(void) const {
   return this->GetId();
 } /* dbg_header_calc() */
 

@@ -38,8 +38,8 @@ constexpr char wheel_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void wheel_parser::parse(const ticpp::Element& node) {
-  ticpp::Element wnode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element wnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   XML_PARSE_PARAM(wnode, m_params, max_speed);
   XML_PARSE_PARAM(wnode, m_params, soft_turn_max);
@@ -54,8 +54,8 @@ void wheel_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void wheel_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << XML_PARAM_STR(m_params.wheels, soft_turn_max) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params.wheels, soft_turn_max)
+         << std::endl
          << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
          << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
 } /* show() */

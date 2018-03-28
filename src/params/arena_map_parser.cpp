@@ -38,8 +38,8 @@ constexpr char arena_map_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode = argos::GetNode(const_cast<ticpp::Element&>(node),
-                                        kXMLRoot);
+  ticpp::Element anode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_grid_parser.parse(anode);
   m_params.grid = *m_grid_parser.parse_results();
@@ -59,16 +59,13 @@ void arena_map_parser::parse(const ticpp::Element& node) {
   m_params.nest_center =
       argos::CVector2(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
   m_params.nest_x.Set(std::atof(res[0].c_str()) - std::atof(res2[0].c_str()),
-                       std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
+                      std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
   m_params.nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
-                       std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
+                      std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << emit_header()
-         << m_grid_parser
-         << m_block_parser
-         << m_cache_parser
+  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
          << "nest_x=" << m_params.nest_x << std::endl
          << "nest_y=" << m_params.nest_y << std::endl
          << "nest_center=" << m_params.nest_center << std::endl;
@@ -79,8 +76,7 @@ bool arena_map_parser::validate(void) const {
       !m_cache_parser.validate()) {
     return false;
   }
-  if (!(m_params.nest_center.GetX() > 0) ||
-      !(m_params.nest_center.GetY() > 0)) {
+  if (!(m_params.nest_center.GetX() > 0) || !(m_params.nest_center.GetY() > 0)) {
     return false;
   }
   if (!(m_params.nest_x.GetMin() > 0) || !(m_params.nest_x.GetMax() > 0)) {

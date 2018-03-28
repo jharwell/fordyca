@@ -65,7 +65,7 @@ class block_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct block_params m_params{};
+  struct block_params m_params {};
 };
 
 NS_END(params, fordyca);

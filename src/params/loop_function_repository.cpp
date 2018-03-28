@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/visualization_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/visualization_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,8 +39,9 @@ loop_function_repository::loop_function_repository(void) {
                                  rcppsw::params::xml_param_parser::kHeader1);
   register_parser<arena_map_parser>(arena_map_parser::kXMLRoot,
                                     rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<visualization_parser>(visualization_parser::kXMLRoot,
-                                         rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<visualization_parser>(
+      visualization_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

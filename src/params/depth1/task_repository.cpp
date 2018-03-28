@@ -33,8 +33,9 @@ NS_START(fordyca, params, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 task_repository::task_repository(void) {
-  register_parser<task_allocation_parser>(task_allocation_parser::kXMLRoot,
-                                          rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<task_allocation_parser>(
+      task_allocation_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(depth1, params, fordyca);

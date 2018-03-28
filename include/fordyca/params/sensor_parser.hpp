@@ -64,7 +64,7 @@ class sensor_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct sensor_params m_params{};
+  struct sensor_params m_params {};
 };
 
 NS_END(params, fordyca);

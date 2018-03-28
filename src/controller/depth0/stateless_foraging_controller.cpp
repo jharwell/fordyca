@@ -64,7 +64,7 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       param_repo.parse_results<const struct params::fsm_params>("fsm"),
       base_foraging_controller::server(),
-      base_foraging_controller::base_sensors_ref(),
+      base_foraging_controller::base_sensors(),
       base_foraging_controller::actuators());
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
@@ -77,11 +77,8 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  throttling()->carrying_block(is_carrying_block());
+  throttling()->update();
   m_fsm->run();
 } /* ControlStep() */
 
