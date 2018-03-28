@@ -58,4 +58,8 @@ void actuation_subsystem::set_rel_heading(const argos::CVector2& heading,
   m_fsm.set_rel_heading(heading, force_hard_turn);
 }
 
+void actuation_subsystem::leds_set_color(const argos::CColor& color) {
+  m_actuators.leds->SetAllColors(color);
+} /* leds_set_color() */
+
 NS_END(controller, fordyca);

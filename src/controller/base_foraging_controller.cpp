@@ -26,6 +26,10 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
 #include <fstream>

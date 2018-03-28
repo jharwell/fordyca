@@ -45,6 +45,17 @@ NS_START(controller);
  * Class Definitions
  ******************************************************************************/
 
+/**
+ * @class saa_subsystem
+ * @ingroup controller
+ *
+ * @brief Sensing and Actuation subsystem for the robot. Does not do much other
+ * than wrap the two components.
+ *
+ * Implementing the BOID interface is only possible at this level, as it
+ * requires elements of both sensing and actuation, and is needed to used the
+ * kinematics calculator.
+ */
 class saa_subsystem : public rcppsw::control::boid {
  public:
   saa_subsystem(const struct params::actuation_params* aparams,
@@ -58,11 +69,6 @@ class saa_subsystem : public rcppsw::control::boid {
         m_actuation->differential_drive()->current_speed(),
         m_actuation->differential_drive()->current_speed());
   }
-
-  void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
-    m_sensing = sensing;
-  }
-
   double max_velocity(void) const override {
     return m_actuation->differential_drive()->max_speed();
   }
@@ -76,6 +82,10 @@ class saa_subsystem : public rcppsw::control::boid {
   std::shared_ptr<const base_sensing_subsystem> sensing(void) const {
     return m_sensing;
   }
+  void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
+    m_sensing = sensing;
+  }
+
   std::shared_ptr<base_sensing_subsystem> sensing(void) { return m_sensing; }
 
   std::shared_ptr<const actuation_subsystem> actuation(void) const {
@@ -87,9 +97,9 @@ class saa_subsystem : public rcppsw::control::boid {
 
  private:
   // clang-format off
-  control::kinematics2D                           m_kinematics;
+  control::kinematics2D                            m_kinematics;
   std::shared_ptr<controller::actuation_subsystem> m_actuation;
-  std::shared_ptr<base_sensing_subsystem>         m_sensing;
+  std::shared_ptr<base_sensing_subsystem>          m_sensing;
   // clang-format on
 };
 

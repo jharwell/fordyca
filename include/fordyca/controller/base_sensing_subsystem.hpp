@@ -37,6 +37,7 @@ class CCI_FootBotProximitySensor;
 class CCI_FootBotLightSensor;
 class CCI_FootBotMotorGroundSensor;
 } // namespace argos
+
 NS_START(fordyca);
 
 namespace params {
@@ -52,8 +53,9 @@ NS_START(controller);
  * @class base_sensing_subsystem
  * @ingroup controller
  *
- * @brief The base sensor class for all sensors used by the different foraging
- * controllers. Contains common functionality to all sensors.
+ * @brief The base sensing subsystem for all sensors used by the different
+ * foraging controllers.  Contains common sensor functionality for all
+ * controllers.
  */
 class base_sensing_subsystem {
  public:
@@ -73,14 +75,26 @@ class base_sensing_subsystem {
   base_sensing_subsystem(const struct params::sensing_params* params,
                          const struct sensor_list* list);
 
-  base_sensing_subsystem(double diffusion_delta,
+  base_sensing_subsystem(double proximity_delta,
                          argos::CRange<argos::CRadians> go_straight_angle_range,
                          const struct sensor_list* list);
 
   base_sensing_subsystem(const base_sensing_subsystem& fsm) = default;
   base_sensing_subsystem& operator=(const base_sensing_subsystem& fsm) = delete;
 
+  /**
+   * @brief Get the list of sensors that the subsystem is managing.
+   */
   const sensor_list& sensor_list(void) const { return m_sensors; }
+
+  argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_sensors.rabs; }
+  argos::CCI_FootBotProximitySensor* proximity(void) const {
+    return m_sensors.proximity;
+  }
+  argos::CCI_FootBotLightSensor* light(void) const { return m_sensors.light; }
+  argos::CCI_FootBotMotorGroundSensor* ground(void) const {
+    return m_sensors.ground;
+  }
 
   /**
    * @brief If \c TRUE, a block has *possibly* been detected.
@@ -138,16 +152,6 @@ class base_sensing_subsystem {
    * @return The heading angle.
    */
   argos::CRadians heading_angle(void) const { return robot_heading().Angle(); }
-
-  argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_sensors.rabs; }
-  argos::CCI_FootBotProximitySensor* proximity(void) const {
-    return m_sensors.proximity;
-  }
-  argos::CCI_FootBotLightSensor* light(void) const { return m_sensors.light; }
-  argos::CCI_FootBotMotorGroundSensor* ground(void) const {
-    return m_sensors.ground;
-  }
-  double diffusion_delta(void) const { return mc_obstacle_delta; }
 
   /**
    * @brief Figure out if a threatening obstacle exists near to the robot's

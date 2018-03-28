@@ -40,11 +40,11 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 base_sensing_subsystem::base_sensing_subsystem(
-    double diffusion_delta,
+    double proximity_delta,
     argos::CRange<argos::CRadians> go_straight_angle_range,
     const struct sensor_list* const list)
     : m_tick(0),
-      mc_obstacle_delta(diffusion_delta),
+      mc_obstacle_delta(proximity_delta),
       m_position(),
       m_prev_position(),
       mc_go_straight_angle_range(go_straight_angle_range),

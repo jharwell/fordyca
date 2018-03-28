@@ -38,7 +38,7 @@ NS_START(fordyca, controller, depth1);
  * @class sensing_subsystem
  * @ingroup controller depth1
  *
- * @brief The sensors used by the depth1 foraging controller.
+ * @brief The sensing subsystem used by the depth1 foraging controller.
  */
 class sensing_subsystem: public depth0::sensing_subsystem {
  public:
