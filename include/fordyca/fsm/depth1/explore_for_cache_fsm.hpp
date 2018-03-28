@@ -78,7 +78,7 @@ class explore_for_cache_fsm : public base_explore_fsm {
   explore_for_cache_fsm(uint unsuccessful_dir_change_thresh,
                         const std::shared_ptr<rcppsw::er::server>& server,
                         const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-                        const std::shared_ptr<controller::actuator_manager>& actuators);
+                        const std::shared_ptr<controller::actuation_subsystem>& actuators);
 
   explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
   explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;

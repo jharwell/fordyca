@@ -25,8 +25,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
@@ -41,8 +41,8 @@ NS_START(fordyca, fsm);
 base_explore_fsm::base_explore_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators,
     uint8_t max_states)
     : base_foraging_fsm(unsuccessful_dir_change_thresh,
                         server,

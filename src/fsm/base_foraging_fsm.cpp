@@ -25,8 +25,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 
@@ -42,8 +42,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 base_foraging_fsm::base_foraging_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    std::shared_ptr<controller::base_foraging_sensors> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators,
+    std::shared_ptr<controller::base_sensing_subsystem> sensors,
+    std::shared_ptr<controller::actuation_subsystem> actuators,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
@@ -64,8 +64,8 @@ base_foraging_fsm::base_foraging_fsm(
 
 base_foraging_fsm::base_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators,
     uint8_t max_states)
     : base_foraging_fsm(0, server, sensors, actuators, max_states) {}
 
@@ -162,7 +162,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * overshoot. See #191.
    */
   actuators()->set_rel_heading(
-      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
+      argos::CVector2(base_foraging_fsm::actuators()->differential_drive()->max_speed() * 0.1,
                       (current_dir - m_new_dir)),
       true);
 

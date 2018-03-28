@@ -1,5 +1,5 @@
 /**
- * @file sensor_params.hpp
+ * @file sensing_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,15 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/angles.h>
-#include <argos3/core/utility/math/range.h>
-#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/sensing_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -34,37 +30,38 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @struct proximity_params
- * @ingroup params
- */
-struct proximity_params {
-  proximity_params(void)
-      : go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
+constexpr char sensing_parser::kXMLRoot[];
 
-  /*
-   * Maximum tolerance for the proximity reading between the robot and the
-   * closest obstacle.  The proximity reading is 0 when nothing is detected and
-   * grows exponentially to 1 when the obstacle is touching the robot.
-   */
-  double delta{0.0};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void sensing_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
-  /* Angle tolerance range to go straight. */
-  argos::CRange<argos::CRadians> go_straight_angle_range;
-};
+  XML_PARSE_PARAM(pnode, m_params.proximity, go_straight_angle_range);
+  XML_PARSE_PARAM(pnode, m_params.proximity, delta);
+} /* parse() */
 
-/**
- * @struct sensor_params
- * @ingroup params
- */
-struct sensor_params : public rcppsw::params::base_params {
-  sensor_params(void) : proximity() {}
+void sensing_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params.proximity, go_straight_angle_range)
+         << std::endl
+         << XML_PARAM_STR(m_params.proximity, delta) << std::endl;
+} /* show() */
 
-  struct proximity_params proximity;
-};
+__pure bool sensing_parser::validate(void) const {
+  if (!(m_params.proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
+        0)) {
+    return false;
+  }
+  if (m_params.proximity.delta <= 0) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_SENSOR_PARAMS_HPP_ */

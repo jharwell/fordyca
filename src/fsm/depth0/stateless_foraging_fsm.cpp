@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
@@ -38,8 +38,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateless_foraging_fsm::stateless_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators)
+    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators)
     : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
                         server,
                         sensors,
@@ -102,7 +102,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    actuators()->stop_wheels();
+    actuators()->differential_drive()->stop_wheels();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();

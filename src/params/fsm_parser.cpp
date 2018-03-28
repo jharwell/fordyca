@@ -46,7 +46,6 @@ void fsm_parser::parse(const ticpp::Element& node) {
   XML_PARSE_PARAM(fnode, m_params.times, unsuccessful_explore_dir_change);
   XML_PARSE_PARAM(fnode, m_params.times, frequent_collision_thresh);
   XML_PARSE_PARAM(fnode, m_params.times, unsuccessful_explore_dir_change);
-  XML_PARSE_PARAM(fnode, m_params.speed_throttling, block_carry);
 
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
@@ -68,8 +67,7 @@ void fsm_parser::show(std::ostream& stream) const {
 
 __pure bool fsm_parser::validate(void) const {
   return (m_params.nest_center.GetX() > 0) &&
-         (m_params.nest_center.GetY() > 0) &&
-         (IS_BETWEEN(m_params.speed_throttling.block_carry, 0, 1.0));
+         (m_params.nest_center.GetY() > 0);
 } /* validate() */
 
 NS_END(params, fordyca);

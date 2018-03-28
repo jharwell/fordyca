@@ -77,8 +77,8 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
 
   vector_fsm(uint frequent_collision_thresh,
              const std::shared_ptr<rcppsw::er::server>& server,
-             const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-             const std::shared_ptr<controller::actuator_manager>& actuators);
+             const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+             const std::shared_ptr<controller::actuation_subsystem>& actuators);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;

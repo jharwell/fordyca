@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -42,14 +42,11 @@ NS_START(fordyca, controller, depth0);
  * @brief The sensors used by depth0 (\ref stateless_foraging_controller,
  * \ref stateful_foraging_controller) controllers.
  */
-class foraging_sensors : public base_foraging_sensors {
+class foraging_sensors : public base_sensing_subsystem {
  public:
   foraging_sensors(
-      const struct params::sensor_params* c_params,
-      argos::CCI_RangeAndBearingSensor* rabs,
-      argos::CCI_FootBotProximitySensor* proximity,
-      argos::CCI_FootBotLightSensor* light,
-      argos::CCI_FootBotMotorGroundSensor* ground);
+      const struct params::sensing_params* c_params,
+      const struct base_sensing_subsystem::sensor_list * list);
 
   foraging_sensors(const foraging_sensors& sensors) = delete;
   foraging_sensors& operator=(const foraging_sensors& fsm) = delete;

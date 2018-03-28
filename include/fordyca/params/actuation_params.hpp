@@ -1,5 +1,5 @@
 /**
- * @file actuator_params.hpp
+ * @file actuation_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,6 +27,8 @@
 #include <argos3/core/utility/math/angles.h>
 #include "fordyca/params/wheel_params.hpp"
 #include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/kinematics2D_params.hpp"
+#include "fordyca/params/throttling_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,13 +40,15 @@ NS_START(fordyca, params);
  ******************************************************************************/
 
 /**
- * @struct actuator_params
+ * @struct actuation_params
  * @ingroup params
  */
-struct actuator_params : public rcppsw::params::base_params {
+struct actuation_params : public rcppsw::params::base_params {
   struct wheel_params wheels {};
+  struct rcppsw::control::kinematics2D_params kinematics {};
+  struct throttling_params throttling {};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_ */

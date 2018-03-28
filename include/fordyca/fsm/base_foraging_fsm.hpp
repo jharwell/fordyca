@@ -36,8 +36,8 @@
 NS_START(fordyca);
 
 namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
+class base_sensing_subsystem;
+class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
 NS_START(fsm);
@@ -59,14 +59,14 @@ class base_foraging_fsm : public state_machine::hfsm {
  public:
   base_foraging_fsm(uint unsuccessful_dir_change_thresh,
                     const std::shared_ptr<rcppsw::er::server>& server,
-                    std::shared_ptr<controller::base_foraging_sensors> sensors,
-                    std::shared_ptr<controller::actuator_manager> actuators,
+                    std::shared_ptr<controller::base_sensing_subsystem> sensors,
+                    std::shared_ptr<controller::actuation_subsystem> actuators,
                     uint8_t max_states);
 
   base_foraging_fsm(
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+      const std::shared_ptr<controller::actuation_subsystem>& actuators,
       uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
@@ -80,7 +80,7 @@ class base_foraging_fsm : public state_machine::hfsm {
   void init(void) override;
 
   /**
-   * @brief Get a reference to the \ref base_foraging_sensors.
+   * @brief Get a reference to the \ref base_sensing_subsystem.
    *
    * Classes needing to reference these sensors should use this function rather
    * than maintaining their own std::shared_ptr copy of things, as that can
@@ -88,7 +88,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  controller::base_foraging_sensors* base_sensors(void) const {
+  controller::base_sensing_subsystem* base_sensors(void) const {
     return m_sensors.get();
   }
 
@@ -103,7 +103,7 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @return The same vector, but with a new angle.
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
-  controller::actuator_manager* actuators(void) const {
+  controller::actuation_subsystem* actuators(void) const {
     return m_actuators.get();
   }
   controller::kinematics_calculator& kinematics(void) { return m_kinematics; }
@@ -215,8 +215,8 @@ class base_foraging_fsm : public state_machine::hfsm {
   uint                                               m_new_dir_count{0};
   argos::CRadians                                    m_new_dir;
   argos::CRandom::CRNG*                              m_rng;
-  std::shared_ptr<controller::base_foraging_sensors> m_sensors;
-  std::shared_ptr<controller::actuator_manager>      m_actuators;
+  std::shared_ptr<controller::base_sensing_subsystem> m_sensors;
+  std::shared_ptr<controller::actuation_subsystem>      m_actuators;
   controller::kinematics_calculator                  m_kinematics;
   // clang-format on
 };

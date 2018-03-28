@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file sensing_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,32 +18,55 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
+#include <string>
+
+#include "fordyca/params/sensing_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
-namespace control = rcppsw::control;
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>(output_parser::kXMLRoot,
-                                 output_parser::kHeader1);
-  register_parser<actuation_parser>(actuation_parser::kXMLRoot,
-                                   actuation_parser::kHeader1);
-  register_parser<sensing_parser>(sensing_parser::kXMLRoot,
-                                 sensing_parser::kHeader1);
-  register_parser<fsm_parser>(output_parser::kXMLRoot, fsm_parser::kHeader1);
-}
+/**
+ * @class sensing_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to sensings into \ref sensing_params.
+ */
+class sensing_parser : public rcppsw::params::xml_param_parser {
+ public:
+  explicit sensing_parser(uint level) : xml_param_parser(level) {}
 
-NS_END(depth0, params, fordyca);
+  /**
+   * @brief The root tag that all robot sensing parameters should lie under in
+   * the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "sensings";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct sensing_params* parse_results(void) const override {
+    return &m_params;
+  }
+
+ private:
+  struct sensing_params m_params {};
+};
+
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_ */

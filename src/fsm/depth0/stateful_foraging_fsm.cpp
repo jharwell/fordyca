@@ -39,12 +39,12 @@ stateful_foraging_fsm::stateful_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators,
     const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
-          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          std::static_pointer_cast<controller::base_sensing_subsystem>(sensors),
           actuators,
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),

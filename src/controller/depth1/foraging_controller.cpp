@@ -28,7 +28,7 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
@@ -38,12 +38,13 @@
 #include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/harvester.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
@@ -78,8 +79,8 @@ void foraging_controller::ControlStep(void) {
   map()->update();
   m_metric_store.reset();
 
-  throttling()->carrying_block(is_carrying_block());
-  throttling()->update();
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
 
   m_executive->run();
 } /* ControlStep() */
@@ -108,7 +109,7 @@ void foraging_controller::Init(ticpp::Element& node) {
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors(),
-          base_foraging_controller::actuators(),
+          base_foraging_controller::saa_subsystem()->actuation(),
           depth0::stateful_foraging_controller::map());
   m_collector =
       rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
@@ -118,7 +119,7 @@ void foraging_controller::Init(ticpp::Element& node) {
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors(),
-          base_foraging_controller::actuators(),
+          base_foraging_controller::saa_subsystem()->actuation(),
           depth0::stateful_foraging_controller::map());
   m_harvester =
       rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
@@ -128,7 +129,7 @@ void foraging_controller::Init(ticpp::Element& node) {
           fsm_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors(),
-          base_foraging_controller::actuators(),
+          base_foraging_controller::saa_subsystem()->actuation(),
           depth0::stateful_foraging_controller::map());
   m_generalist =
       rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);

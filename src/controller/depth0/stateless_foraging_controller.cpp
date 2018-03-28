@@ -24,15 +24,16 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,8 +65,8 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       param_repo.parse_results<const struct params::fsm_params>("fsm"),
       base_foraging_controller::server(),
-      base_foraging_controller::base_sensors(),
-      base_foraging_controller::actuators());
+      base_foraging_controller::saa_subsystem()->sensing(),
+      base_foraging_controller::saa_subsystem()->actuation());
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 
@@ -77,8 +78,8 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
-  throttling()->carrying_block(is_carrying_block());
-  throttling()->update();
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
   m_fsm->run();
 } /* ControlStep() */
 
@@ -102,8 +103,8 @@ double stateless_foraging_controller::timestep_distance(void) const {
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
-  if (base_sensors()->tick() > 1) {
-    return base_sensors()->robot_heading().Length();
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->sensing()->robot_heading().Length();
   }
   return 0;
 } /* timestep_distance() */

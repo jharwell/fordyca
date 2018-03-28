@@ -26,7 +26,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
 
-#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
@@ -47,12 +47,12 @@ acquire_cache_fsm::acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators,
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
-          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
+          std::static_pointer_cast<controller::base_sensing_subsystem>(sensors),
           actuators,
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -161,7 +161,7 @@ bool acquire_cache_fsm::acquire_known_cache(
       controller::depth1::existing_cache_selector selector(m_server,
                                                            mc_nest_center);
       representation::perceived_cache best =
-          selector.calc_best(caches, m_sensors->robot_loc());
+          selector.calc_best(caches, m_sensors->position());
       ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
              best.ent->id(),
              best.ent->discrete_loc().first,

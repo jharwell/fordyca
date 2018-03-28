@@ -47,7 +47,7 @@ namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class cache; }
 namespace controller {
 namespace depth1 {class foraging_sensors; }
-class actuator_manager;
+class actuation_subsystem;
 }
 
 NS_START(fsm, depth1);
@@ -75,7 +75,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::actuation_subsystem>& actuators,
       std::shared_ptr<const representation::perceived_arena_map> map);
 
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;

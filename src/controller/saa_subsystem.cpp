@@ -1,7 +1,7 @@
 /**
- * @file actuator_parser.cpp
+ * @file saa_subsystem.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,44 +21,27 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/actuator_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Global Variables
+ * Constructors/Destructors
  ******************************************************************************/
-constexpr char actuator_parser::kXMLRoot[];
+saa_subsystem::saa_subsystem(
+    const struct params::actuation_params* const aparams,
+    const struct params::sensing_params* const sparams,
+    struct actuation_subsystem::actuator_list* const actuator_list,
+    struct base_sensing_subsystem::sensor_list* const sensor_list)
+    : m_kinematics(*this, &aparams->kinematics),
+      m_actuation(std::make_shared<actuation_subsystem>(aparams, actuator_list)),
+      m_sensing(std::make_shared<base_sensing_subsystem>(sparams, sensor_list)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_wheels.parse(anode);
-  m_params.wheels = *m_wheels.parse_results();
-} /* parse() */
 
-void actuator_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params.wheels, soft_turn_max)
-         << std::endl
-         << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
-         << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
-} /* show() */
-
-__pure bool actuator_parser::validate(void) const {
-  if (!(m_params.wheels.soft_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  if (!(m_params.wheels.no_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  return true;
-} /* validate() */
-
-NS_END(params, fordyca);
+NS_END(controller, fordyca);

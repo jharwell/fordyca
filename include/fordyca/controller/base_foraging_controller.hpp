@@ -27,9 +27,7 @@
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <string>
-#include "rcppsw/control/kinematics2D.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/controller/throttling_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,9 +44,7 @@ struct output_params;
 
 NS_START(controller);
 
-class actuator_manager;
-class base_foraging_sensors;
-namespace control = rcppsw::control;
+class saa_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -147,32 +143,14 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<actuator_manager> actuators(void) const {
-    return m_actuators;
+  const std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) const {
+    return m_saa;
+  }
+  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
+    return m_saa;
   }
   const std::shared_ptr<rcppsw::er::server> server(void) const {
     return m_server;
-  }
-
-  std::shared_ptr<base_foraging_sensors> base_sensors(void) const {
-    return m_sensors;
-  }
-  void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
-    m_sensors = sensors;
-  }
-
-  const std::shared_ptr<control::kinematics2D> kinematics(void) const {
-    return m_kinematics;
-  }
-  std::shared_ptr<control::kinematics2D> kinematics(void) {
-    return m_kinematics;
-  }
-
-  const std::shared_ptr<throttling_handler> throttling(void) const {
-    return m_throttling;
-  }
-  std::shared_ptr<throttling_handler> throttling(void) {
-    return m_throttling;
   }
 
   /**
@@ -187,13 +165,10 @@ class base_foraging_controller : public argos::CCI_Controller,
   std::string dbg_header_calc(void) const;
 
   // clang-format off
-  bool                                   m_display_id{false};
-  std::shared_ptr<representation::block> m_block{nullptr};
-  std::shared_ptr<actuator_manager>      m_actuators{nullptr};
-  std::shared_ptr<base_foraging_sensors> m_sensors{nullptr};
-  std::shared_ptr<rcppsw::er::server>    m_server;
-  std::shared_ptr<control::kinematics2D> m_kinematics{nullptr};
-  std::shared_ptr<throttling_handler>    m_throttling{nullptr};
+  bool                                       m_display_id{false};
+  std::shared_ptr<representation::block>     m_block{nullptr};
+  std::shared_ptr<controller::saa_subsystem> m_saa{nullptr};
+  std::shared_ptr<rcppsw::er::server>        m_server;
   // clang-format on
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file sensor_parser.cpp
+ * @file actuation_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/sensor_parser.hpp"
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include "fordyca/params/actuation_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,33 +32,36 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char sensor_parser::kXMLRoot[];
+constexpr char actuation_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void sensor_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  ticpp::Element pnode = argos::GetNode(bnode, "proximity");
-
-  XML_PARSE_PARAM(pnode, m_params.proximity, go_straight_angle_range);
-  XML_PARSE_PARAM(pnode, m_params.proximity, delta);
+void actuation_parser::parse(const ticpp::Element& node) {
+  ticpp::Element anode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                        kXMLRoot);
+  m_wheels.parse(anode);
+  m_kinematics.parse(anode);
+  m_params.wheels = *m_wheels.parse_results();
+  m_params.kinematics = *m_kinematics.parse_results();
+  XML_PARSE_PARAM(anode, m_params.throttling, block_carry);
 } /* parse() */
 
-void sensor_parser::show(std::ostream& stream) const {
+void actuation_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << XML_PARAM_STR(m_params.proximity, go_straight_angle_range)
-         << std::endl
-         << XML_PARAM_STR(m_params.proximity, delta) << std::endl;
+         << m_wheels
+         << m_kinematics
+         << XML_PARAM_STR(m_params.throttling, block_carry) << std::endl;
 } /* show() */
 
-__pure bool sensor_parser::validate(void) const {
-  if (!(m_params.proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
-        0)) {
+__pure bool actuation_parser::validate(void) const {
+  if (!(m_params.wheels.soft_turn_max.GetValue() > 0)) {
     return false;
   }
-  if (m_params.proximity.delta <= 0) {
+  if (!(m_params.wheels.no_turn_max.GetValue() > 0)) {
+    return false;
+  }
+  if (!(IS_BETWEEN(m_params.throttling.block_carry, 0, 1.0))) {
     return false;
   }
   return true;

@@ -1,5 +1,5 @@
 /**
- * @file sensor_parser.hpp
+ * @file sensing_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,17 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/params/sensor_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
+#include <argos3/core/utility/math/angles.h>
+#include <argos3/core/utility/math/range.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,37 +34,37 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class sensor_parser
+ * @struct proximity_params
  * @ingroup params
- *
- * @brief Parses XML parameters relating to sensors into \ref sensor_params.
  */
-class sensor_parser : public rcppsw::params::xml_param_parser {
- public:
-  explicit sensor_parser(uint level) : xml_param_parser(level) {}
+struct proximity_params {
+  proximity_params(void)
+      : go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
-  /**
-   * @brief The root tag that all robot sensor parameters should lie under in
-   * the XML tree.
+  /*
+   * Maximum tolerance for the proximity reading between the robot and the
+   * closest obstacle.  The proximity reading is 0 when nothing is detected and
+   * grows exponentially to 1 when the obstacle is touching the robot.
    */
-  static constexpr char kXMLRoot[] = "sensors";
+  double delta{0.0};
 
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
-  void parse(const ticpp::Element& node) override;
+  /* Angle tolerance range to go straight. */
+  argos::CRange<argos::CRadians> go_straight_angle_range;
+};
 
-  std::string xml_root(void) const override { return kXMLRoot; }
-  const struct sensor_params* parse_results(void) const override {
-    return &m_params;
-  }
+/**
+ * @struct sensing_params
+ * @ingroup params
+ */
+struct sensing_params : public rcppsw::params::base_params {
+  sensing_params(void) : proximity() {}
 
- private:
-  struct sensor_params m_params {};
+  struct proximity_params proximity;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_ */

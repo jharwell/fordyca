@@ -1,7 +1,7 @@
 /**
- * @file actuator_manager.hpp
+ * @file differential_drive_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,23 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DIFFERENTIAL_DRIVE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DIFFERENTIAL_DRIVE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/wheel_params.hpp"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+namespace controller { class throttling_handler; }
+
+NS_START(fsm);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 
@@ -42,35 +43,26 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class actuator_manager
- * @ingroup controller
+ * @class differential_drive_fsm
+ * @ingroup fsm
  *
- * @brief Handles the control of all actuators on the robot.
- *
- * Currently, that is:
- *
- * - argos::CCI_DifferentSteeringActuator
- * - argos::CCI_LEDsActuator
- * - argos::CCI_RangeAndBearingActuator
+ * @brief Handles the control of the differential drive for the robot.
  */
-class actuator_manager : public state_machine::simple_fsm {
+class differential_drive_fsm : public state_machine::simple_fsm {
  public:
-  actuator_manager(const struct params::actuator_params* c_params,
-                   argos::CCI_DifferentialSteeringActuator* wheels,
-                   argos::CCI_LEDsActuator* leds,
-                   argos::CCI_RangeAndBearingActuator* raba);
-
-  actuator_manager(const actuator_manager& fsm) = delete;
-  actuator_manager& operator=(const actuator_manager& fsm) = delete;
 
   /**
-   * @brief Set the color of the robot's LEDs.
+   * @brief Initialize the FSM.
    *
-   * @param color The new color.
+   * @param c_params Subsystem parameters.
+   * @param list List of handles to actuator devices.
    */
-  void leds_set_color(const argos::CColor& color) {
-    m_leds->SetAllColors(color);
-  }
+  differential_drive_fsm(const struct params::wheel_params* c_params,
+                         argos::CCI_DifferentialSteeringActuator* wheels,
+                         controller::throttling_handler* throttling);
+
+  differential_drive_fsm(const differential_drive_fsm& fsm) = delete;
+  differential_drive_fsm& operator=(const differential_drive_fsm& fsm) = delete;
 
   /*
    * @brief Gets a direction vector as input and transforms it into wheel
@@ -90,36 +82,12 @@ class actuator_manager : public state_machine::simple_fsm {
   void set_speed(double speed);
 
   /**
-   * @brief Get the max wheel speed.
-   */
-  double max_wheel_speed(void) const;
-
-  /**
-   * @brief Set the percentage of the overall maxmimum speed that robots will be
-   * able to attain (i.e. set a temporary new maximum) when throttling is
-   * currently enabled.
-   */
-  void set_throttle_percent(double percent) { m_throttle_percent = percent; }
-
-  /**
-   * @brief Set whether or not temporary throttling of overall maximum speed is
-   * enabled.
-   */
-  void set_speed_throttle(bool en) { m_throttle = en; }
-
-  /**
-   * @brief Get whether or not temporary throttling of overall maximum speed is
-   * currently enabled.
-   */
-  bool get_speed_throttle(void) { return m_throttle; }
-
-  /**
    * @brief Stop the robot.
    */
   void stop_wheels(void) { m_wheels->SetLinearVelocity(0.0, 0.0); }
 
   /**
-   * @brief Reset the actuators, including stopping the robot.
+   * @brief Reset the actuations, including stopping the robot.
    */
   void reset(void);
 
@@ -136,6 +104,12 @@ class actuator_manager : public state_machine::simple_fsm {
    * @param ang_speed The desired angular speed.
    */
   void set_wheel_speeds(double lin_speed, double ang_speed);
+
+  /**
+   * @brief Get the max wheel speed.
+   */
+  double max_speed(void) const { return mc_params.max_speed; }
+  double current_speed(void) const { return (m_lwheel_speed + m_rwheel_speed) / 2; }
 
  private:
   /**
@@ -183,21 +157,21 @@ class actuator_manager : public state_machine::simple_fsm {
   /**
    * @brief Robots in this state will continue forward without turning.
    */
-  FSM_STATE_DECLARE(actuator_manager, no_turn, turn_data);
+  FSM_STATE_DECLARE(differential_drive_fsm, no_turn, turn_data);
 
   /**
    * @brief Robots in this state will execute a gradual turn in the desired
    * heading direction. Threshold for this type of turn is controlled by
    * parameters.
    */
-  FSM_STATE_DECLARE(actuator_manager, soft_turn, turn_data);
+  FSM_STATE_DECLARE(differential_drive_fsm, soft_turn, turn_data);
 
   /**
    * @brief Robots in this state will execute an in-place turn (a spin really)
    * in the direction of the desired heading. Threshold for this type of turn
    * is controlled by parameters.
    */
-  FSM_STATE_DECLARE(actuator_manager, hard_turn, turn_data);
+  FSM_STATE_DECLARE(differential_drive_fsm, hard_turn, turn_data);
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
     FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
         FSM_STATE_MAP_ENTRY(&no_turn),
@@ -208,17 +182,14 @@ class actuator_manager : public state_machine::simple_fsm {
     return &kSTATE_MAP[index];
   }
   // clang-format off
-  bool                                     m_throttle{false};
-  double                                   m_throttle_percent{0.0};
   double                                   m_lwheel_speed{0.0};
   double                                   m_rwheel_speed{0.0};
   argos::CCI_DifferentialSteeringActuator* m_wheels;  /* differential steering */
-  argos::CCI_LEDsActuator*                 m_leds;    /* LEDs  */
-  argos::CCI_RangeAndBearingActuator*      m_raba;    /* Range and bearing */
-  const struct params::actuator_params     mc_params;
+  controller::throttling_handler*          m_throttling;
+  const struct params::wheel_params          mc_params;
   // clang-format on
 };
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_MANAGER_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DIFFERENTIAL_DRIVE_FSM_HPP_ */

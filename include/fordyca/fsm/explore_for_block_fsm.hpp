@@ -74,8 +74,8 @@ class explore_for_block_fsm : public base_explore_fsm {
   explore_for_block_fsm(
       uint unsuccessful_dir_change_thresh,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators);
+      const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+      const std::shared_ptr<controller::actuation_subsystem>& actuators);
 
   /* taskable overrides */
   void task_execute(void) override;

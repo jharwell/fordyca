@@ -1,7 +1,7 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file throttling_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,32 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_THROTTLING_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_THROTTLING_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
-namespace control = rcppsw::control;
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>(output_parser::kXMLRoot,
-                                 output_parser::kHeader1);
-  register_parser<actuation_parser>(actuation_parser::kXMLRoot,
-                                   actuation_parser::kHeader1);
-  register_parser<sensing_parser>(sensing_parser::kXMLRoot,
-                                 sensing_parser::kHeader1);
-  register_parser<fsm_parser>(output_parser::kXMLRoot, fsm_parser::kHeader1);
-}
+/**
+ * @struct throttling_params
+ * @ingroup params
+ */
+struct throttling_params {
+  double block_carry{0.0};
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_THROTTLING_PARAMS_HPP_ */

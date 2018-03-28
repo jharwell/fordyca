@@ -25,8 +25,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,8 +40,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 vector_fsm::vector_fsm(
     uint frequent_collision_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators)
+    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
+    const std::shared_ptr<controller::actuation_subsystem>& actuators)
     : base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
@@ -61,14 +61,14 @@ vector_fsm::vector_fsm(
                 0,
                 0,
                 1,
-                -this->actuators()->max_wheel_speed() * 0.50,
-                this->actuators()->max_wheel_speed() * 0.50),
+                -this->actuators()->differential_drive()->max_speed() * 0.50,
+                this->actuators()->differential_drive()->max_speed() * 0.50),
       m_lin_pid(3.0,
                 0,
                 0,
                 1,
-                this->actuators()->max_wheel_speed() * 0.1,
-                this->actuators()->max_wheel_speed() * 0.7) {
+                this->actuators()->differential_drive()->max_speed() * 0.1,
+                this->actuators()->differential_drive()->max_speed() * 0.7) {
   insmod("vector_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -90,7 +90,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
    * new direction away from whatever is causing the problem. See #243.
    */
   if (ST_NEW_DIRECTION == previous_state()) {
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
+    actuators()->differential_drive()->set_speed(
+        actuators()->differential_drive()->max_speed() * 0.7);
     internal_event(ST_COLLISION_RECOVERY);
     return controller::foraging_signal::HANDLED;
   }
@@ -112,7 +113,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
+    actuators()->differential_drive()->set_speed(
+        actuators()->differential_drive()->max_speed() * 0.7);
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -152,7 +154,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <=
+  if ((m_goal_data.loc - base_sensors()->position()).Length() <=
       m_goal_data.tolerance) {
     m_ang_pid.reset();
     m_lin_pid.reset();
@@ -174,8 +176,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
    * timesteps.
    */
   double angle_to_goal =
-      std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
-                 m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
+      std::atan2(m_goal_data.loc.GetY() - base_sensors()->position().GetY(),
+                 m_goal_data.loc.GetX() - base_sensors()->position().GetX());
 
   double angle_diff = angle_to_goal - heading.Angle().GetValue();
   angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
@@ -187,7 +189,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
    * Decrease the PID loop input false (i.e. so it is closer to the 0 value the
    * loop is trying to get it to). See #231.
    */
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <
+  if ((m_goal_data.loc - base_sensors()->position()).Length() <
       kMAX_ARRIVAL_TOL) {
     lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff * 5.0));
   } else {
@@ -210,7 +212,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
          ang_speed,
          lin_speed);
 
-  actuators()->set_wheel_speeds(lin_speed, ang_speed);
+  actuators()->differential_drive()->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }
 
@@ -269,7 +271,7 @@ void vector_fsm::init(void) {
 
 __pure argos::CVector2 vector_fsm::calc_vector_to_goal(
     const argos::CVector2& goal) {
-  return goal - base_sensors()->robot_loc();
+  return goal - base_sensors()->position();
 } /* calc_vector_to_goal() */
 
 NS_END(fsm, fordyca);

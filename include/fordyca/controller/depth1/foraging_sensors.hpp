@@ -43,11 +43,8 @@ NS_START(fordyca, controller, depth1);
 class foraging_sensors: public depth0::foraging_sensors {
  public:
   foraging_sensors(
-      const struct params::sensor_params* c_params,
-      argos::CCI_RangeAndBearingSensor* rabs,
-      argos::CCI_FootBotProximitySensor* proximity,
-      argos::CCI_FootBotLightSensor* light,
-      argos::CCI_FootBotMotorGroundSensor* ground);
+      const struct params::sensing_params* c_params,
+      const struct base_sensing_subsystem::sensor_list* list);
 
   foraging_sensors(const foraging_sensors& fsm) = delete;
   foraging_sensors& operator=(const foraging_sensors& fsm) = delete;

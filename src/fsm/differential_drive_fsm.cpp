@@ -1,5 +1,5 @@
 /**
- * @file actuator_manager.cpp
+ * @file differential_drive_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,43 +19,37 @@
  */
 
 /*******************************************************************************
- * Includes
+ * Includesp
  ******************************************************************************/
-#include "fordyca/controller/actuator_manager.hpp"
-#include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/fsm/differential_drive_fsm.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/controller/throttling_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-actuator_manager::actuator_manager(
-    const struct params::actuator_params* c_params,
+differential_drive_fsm::differential_drive_fsm(
+    const struct params::wheel_params* c_params,
     argos::CCI_DifferentialSteeringActuator* wheels,
-    argos::CCI_LEDsActuator* leds,
-    argos::CCI_RangeAndBearingActuator* raba)
-    : state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
+    controller::throttling_handler* const throttling)
+    : state_machine::simple_fsm(ST_MAX_STATES),
       no_turn(),
       soft_turn(),
       hard_turn(),
       m_wheels(wheels),
-      m_leds(leds),
-      m_raba(raba),
+      m_throttling(throttling),
       mc_params(*c_params) {}
 
 /*******************************************************************************
  * Events
  ******************************************************************************/
-void actuator_manager::set_rel_heading(const argos::CVector2& heading,
-                                       bool force_hard_turn) {
+void differential_drive_fsm::set_rel_heading(const argos::CVector2& heading,
+                                             bool force_hard_turn) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
       ST_NO_TURN,   /* no turn */
       ST_SOFT_TURN, /* slow turn */
@@ -69,12 +63,12 @@ void actuator_manager::set_rel_heading(const argos::CVector2& heading,
 /*******************************************************************************
  * States
  ******************************************************************************/
-FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
+FSM_STATE_DEFINE(differential_drive_fsm, no_turn, turn_data) {
   if (data->force_hard || argos::Abs(data->heading.Angle().SignedNormalize()) >
-                              mc_params.wheels.soft_turn_max) {
+                              mc_params.soft_turn_max) {
     internal_event(ST_HARD_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) >
-             mc_params.wheels.no_turn_max) {
+             mc_params.no_turn_max) {
     internal_event(ST_SOFT_TURN);
   }
   set_wheel_speeds(data->heading.Length(),
@@ -82,20 +76,20 @@ FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
                    data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
+FSM_STATE_DEFINE(differential_drive_fsm, soft_turn, turn_data) {
   if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-      mc_params.wheels.no_turn_max) {
+      mc_params.no_turn_max) {
     internal_event(ST_NO_TURN);
   } else if (data->force_hard ||
              argos::Abs(data->heading.Angle().SignedNormalize()) >
-                 mc_params.wheels.soft_turn_max) {
+                 mc_params.soft_turn_max) {
     internal_event(ST_HARD_TURN);
   }
 
   /* Both wheels go straight, but one is faster than the other */
   double speed_factor =
-      (mc_params.wheels.soft_turn_max - argos::Abs(data->heading.Angle())) /
-      mc_params.wheels.soft_turn_max;
+      (mc_params.soft_turn_max - argos::Abs(data->heading.Angle())) /
+      mc_params.soft_turn_max;
   double speed1 =
       data->heading.Length() - data->heading.Length() * (1.0 - speed_factor);
   double speed2 =
@@ -103,19 +97,19 @@ FSM_STATE_DEFINE(actuator_manager, soft_turn, turn_data) {
   set_wheel_speeds(speed1, speed2, data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
-FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
+FSM_STATE_DEFINE(differential_drive_fsm, hard_turn, turn_data) {
   if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-          mc_params.wheels.no_turn_max &&
+          mc_params.no_turn_max &&
       !data->force_hard) {
     internal_event(ST_NO_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
-                 mc_params.wheels.soft_turn_max &&
+                 mc_params.soft_turn_max &&
              !data->force_hard) {
     internal_event(ST_SOFT_TURN);
   }
 
-  set_wheel_speeds(-mc_params.wheels.max_speed,
-                   mc_params.wheels.max_speed,
+  set_wheel_speeds(-mc_params.max_speed,
+                   mc_params.max_speed,
                    data->heading.Angle());
   return state_machine::event_signal::HANDLED;
 }
@@ -123,23 +117,19 @@ FSM_STATE_DEFINE(actuator_manager, hard_turn, turn_data) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure double actuator_manager::clamp_wheel_speed(double desired) {
-  double max_speed;
-  if (m_throttle) {
-    max_speed = mc_params.wheels.max_speed * (1.0 - m_throttle_percent);
-  } else {
-    max_speed = mc_params.wheels.max_speed;
-  }
+__pure double differential_drive_fsm::clamp_wheel_speed(double desired) {
+  double max_speed = mc_params.max_speed *
+                     (1.0 - m_throttling->block_carry());
   return std::min(desired, max_speed);
 } /* clamp_wheel_speed() */
 
-void actuator_manager::set_speed(double speed) {
+void differential_drive_fsm::set_speed(double speed) {
   m_lwheel_speed = clamp_wheel_speed(speed);
   m_rwheel_speed = clamp_wheel_speed(speed);
   m_wheels->SetLinearVelocity(m_lwheel_speed, m_rwheel_speed);
 } /* set_speed() */
 
-void actuator_manager::set_wheel_speeds(double speed1,
+void differential_drive_fsm::set_wheel_speeds(double speed1,
                                         double speed2,
                                         argos::CRadians heading) {
   if (heading > argos::CRadians::ZERO) {
@@ -158,7 +148,8 @@ void actuator_manager::set_wheel_speeds(double speed1,
   m_wheels->SetLinearVelocity(m_lwheel_speed, m_rwheel_speed);
 } /* set_wheel_speeds() */
 
-void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
+void differential_drive_fsm::set_wheel_speeds(double lin_speed,
+                                              double ang_speed) {
   if (ang_speed < 0) {
     m_rwheel_speed = lin_speed;
     m_lwheel_speed = lin_speed + std::fabs(ang_speed);
@@ -172,14 +163,9 @@ void actuator_manager::set_wheel_speeds(double lin_speed, double ang_speed) {
   m_wheels->SetLinearVelocity(m_lwheel_speed, m_rwheel_speed);
 } /* set_wheel_speeds() */
 
-void actuator_manager::reset(void) {
-  m_raba->ClearData();
+void differential_drive_fsm::reset(void) {
   stop_wheels();
   state_machine::simple_fsm::init();
 } /* reset() */
 
-__pure double actuator_manager::max_wheel_speed(void) const {
-  return mc_params.wheels.max_speed;
-} /* max_wheel_speed() */
-
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);

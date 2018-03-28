@@ -25,7 +25,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
@@ -42,7 +42,7 @@ explore_for_cache_fsm::explore_for_cache_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators)
+    const std::shared_ptr<controller::actuation_subsystem>& actuators)
     : base_explore_fsm(unsuccessful_dir_change_thresh,
                        server,
                        sensors,
@@ -123,7 +123,7 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
    * No obstacles nearby--all ahead full!
    */
   actuators()->set_rel_heading(argos::CVector2::X *
-                               actuators()->max_wheel_speed());
+                               actuators()->differential_drive()->max_speed());
   return controller::foraging_signal::HANDLED;
 }
 

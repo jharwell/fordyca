@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file throttling_handler.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,29 +21,32 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/controller/throttling_handler.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/params/throttling_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
-namespace control = rcppsw::control;
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(void) {
-  register_parser<output_parser>(output_parser::kXMLRoot,
-                                 output_parser::kHeader1);
-  register_parser<actuation_parser>(actuation_parser::kXMLRoot,
-                                   actuation_parser::kHeader1);
-  register_parser<sensing_parser>(sensing_parser::kXMLRoot,
-                                 sensing_parser::kHeader1);
-  register_parser<fsm_parser>(output_parser::kXMLRoot, fsm_parser::kHeader1);
-}
+throttling_handler::throttling_handler(
+    const struct params::throttling_params * const params)
+    : m_block_carry(params->block_carry) {}
 
-NS_END(depth0, params, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void throttling_handler::update(void) {
+  if (m_carrying_block) {
+    m_block_current = m_block_carry;
+  } else {
+    m_block_current = 0;
+  }
+} /* update() */
+
+
+NS_END(controller, fordyca);

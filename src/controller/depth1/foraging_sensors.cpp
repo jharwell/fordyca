@@ -33,16 +33,13 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_sensors::foraging_sensors(
-    const struct params::sensor_params* c_params,
-    argos::CCI_RangeAndBearingSensor* const rabs,
-    argos::CCI_FootBotProximitySensor* const proximity,
-    argos::CCI_FootBotLightSensor* const light,
-    argos::CCI_FootBotMotorGroundSensor* const ground)
-    : depth0::foraging_sensors(c_params, rabs, proximity, light, ground) {}
+    const struct params::sensing_params* c_params,
+    const struct base_sensing_subsystem::sensor_list* const list)
+    : depth0::foraging_sensors(c_params, list) {}
 
 bool foraging_sensors::cache_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      base_foraging_sensors::ground()->GetReadings();
+      base_sensing_subsystem::ground()->GetReadings();
 
   /*
    * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches

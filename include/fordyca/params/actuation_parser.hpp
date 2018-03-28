@@ -1,7 +1,7 @@
 /**
- * @file actuator_parser.hpp
+ * @file actuation_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,16 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATION_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ACTUATION_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/wheel_parser.hpp"
+#include "rcppsw/control/kinematics2D_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,37 +40,42 @@ NS_START(fordyca, params);
  ******************************************************************************/
 
 /**
- * @class actuator_parser
+ * @class actuation_parser
  * @ingroup params
  *
- * @brief Parses XML parameters for \ref actuator_manager into
- * \ref actuator_params.
+ * @brief Parses XML parameters for \ref actuation_subsystem into
+ * \ref actuation_params.
  */
-class actuator_parser : public rcppsw::params::xml_param_parser {
+class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit actuator_parser(uint level)
-      : xml_param_parser(level), m_wheels(level + 1) {}
+  explicit actuation_parser(uint level)
+      : xml_param_parser(level),
+        m_wheels(level + 1),
+        m_kinematics(level + 1) {}
 
   /**
-   * @brief The root tag that all actuator parameters should lie under in the
+   * @brief The root tag that all actuation parameters should lie under in the
    * XML tree.
    */
-  static constexpr char kXMLRoot[] = "actuators";
+  static constexpr char kXMLRoot[] = "actuations";
 
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct actuator_params* parse_results(void) const override {
+  const struct actuation_params* parse_results(void) const override {
     return &m_params;
   }
 
  private:
-  struct actuator_params m_params {};
-  wheel_parser m_wheels;
+  // clang-format off
+  struct actuation_params                  m_params{};
+  wheel_parser                             m_wheels;
+  rcppsw::control::kinematics2D_xml_parser m_kinematics;
+  // clang-format on
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATION_PARSER_HPP_ */
