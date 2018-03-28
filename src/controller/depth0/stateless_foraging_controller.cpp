@@ -26,6 +26,7 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
@@ -33,7 +34,6 @@
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "rcppsw/er/server.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

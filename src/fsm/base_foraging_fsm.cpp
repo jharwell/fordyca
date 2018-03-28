@@ -162,8 +162,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * overshoot. See #191.
    */
   actuators()->set_rel_heading(
-      argos::CVector2(base_foraging_fsm::actuators()->differential_drive()->max_speed() * 0.1,
-                      (current_dir - m_new_dir)),
+      argos::CVector2(
+          base_foraging_fsm::actuators()->differential_drive()->max_speed() *
+              0.1,
+          (current_dir - m_new_dir)),
       true);
 
   /*

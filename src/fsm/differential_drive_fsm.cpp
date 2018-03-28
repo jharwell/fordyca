@@ -22,8 +22,8 @@
  * Includesp
  ******************************************************************************/
 #include "fordyca/fsm/differential_drive_fsm.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/controller/throttling_handler.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -118,8 +118,7 @@ FSM_STATE_DEFINE(differential_drive_fsm, hard_turn, turn_data) {
  * Member Functions
  ******************************************************************************/
 __pure double differential_drive_fsm::clamp_wheel_speed(double desired) {
-  double max_speed = mc_params.max_speed *
-                     (1.0 - m_throttling->block_carry());
+  double max_speed = mc_params.max_speed * (1.0 - m_throttling->block_carry());
   return std::min(desired, max_speed);
 } /* clamp_wheel_speed() */
 
@@ -130,8 +129,8 @@ void differential_drive_fsm::set_speed(double speed) {
 } /* set_speed() */
 
 void differential_drive_fsm::set_wheel_speeds(double speed1,
-                                        double speed2,
-                                        argos::CRadians heading) {
+                                              double speed2,
+                                              argos::CRadians heading) {
   if (heading > argos::CRadians::ZERO) {
     /* Turn Left */
     m_lwheel_speed = speed1;

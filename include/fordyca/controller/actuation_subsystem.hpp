@@ -28,9 +28,9 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include "fordyca/params/actuation_params.hpp"
 #include "fordyca/controller/throttling_handler.hpp"
 #include "fordyca/fsm/differential_drive_fsm.hpp"
+#include "fordyca/params/actuation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +70,7 @@ class actuation_subsystem {
    * @param list List of handles to actuator devices.
    */
   actuation_subsystem(const struct params::actuation_params* c_params,
-                      struct actuator_list * list);
+                      struct actuator_list* list);
 
   actuation_subsystem(const actuation_subsystem& fsm) = delete;
   actuation_subsystem& operator=(const actuation_subsystem& fsm) = delete;
@@ -84,7 +84,9 @@ class actuation_subsystem {
     m_actuators.leds->SetAllColors(color);
   }
 
-  const fsm::differential_drive_fsm* differential_drive(void) const { return &m_fsm; }
+  const fsm::differential_drive_fsm* differential_drive(void) const {
+    return &m_fsm;
+  }
   fsm::differential_drive_fsm* differential_drive(void) { return &m_fsm; }
   void set_rel_heading(const argos::CVector2& heading,
                        bool force_hard_turn = false);

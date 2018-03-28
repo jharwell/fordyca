@@ -38,7 +38,8 @@ saa_subsystem::saa_subsystem(
     struct base_sensing_subsystem::sensor_list* const sensor_list)
     : m_kinematics(*this, &aparams->kinematics),
       m_actuation(std::make_shared<actuation_subsystem>(aparams, actuator_list)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams, sensor_list)) {}
+      m_sensing(std::make_shared<base_sensing_subsystem>(sparams, sensor_list)) {
+}
 
 /*******************************************************************************
  * Member Functions

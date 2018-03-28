@@ -37,9 +37,9 @@ NS_START(fordyca, params, depth0);
  ******************************************************************************/
 stateful_foraging_repository::stateful_foraging_repository(void) {
   register_parser<actuation_parser>(actuation_parser::kXMLRoot,
-                                   actuation_parser::kHeader1);
+                                    actuation_parser::kHeader1);
   register_parser<sensing_parser>(sensing_parser::kXMLRoot,
-                                 sensing_parser::kHeader1);
+                                  sensing_parser::kHeader1);
   register_parser<fsm_parser>(fsm_parser::kXMLRoot, fsm_parser::kHeader1);
   register_parser<occupancy_grid_parser>(occupancy_grid_parser::kXMLRoot,
                                          occupancy_grid_parser::kHeader1);

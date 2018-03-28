@@ -28,7 +28,7 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -46,7 +46,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_cache_fsm::acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
     const std::shared_ptr<controller::actuation_subsystem>& actuators,
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(

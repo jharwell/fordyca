@@ -1,5 +1,5 @@
 /**
- * @file depth1/foraging_sensors.cpp
+ * @file depth1/sensing_subsystem.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,11 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_SENSING_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_SENSING_SUBSYSTEM_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,29 +32,32 @@
 NS_START(fordyca, controller, depth1);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-foraging_sensors::foraging_sensors(
-    const struct params::sensing_params* c_params,
-    const struct base_sensing_subsystem::sensor_list* const list)
-    : depth0::foraging_sensors(c_params, list) {}
+/**
+ * @class sensing_subsystem
+ * @ingroup controller depth1
+ *
+ * @brief The sensors used by the depth1 foraging controller.
+ */
+class sensing_subsystem: public depth0::sensing_subsystem {
+ public:
+  sensing_subsystem(
+      const struct params::sensing_params* c_params,
+      const struct base_sensing_subsystem::sensor_list* list);
 
-bool foraging_sensors::cache_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      base_sensing_subsystem::ground()->GetReadings();
+  sensing_subsystem(const sensing_subsystem& fsm) = delete;
+  sensing_subsystem& operator=(const sensing_subsystem& fsm) = delete;
 
-  /*
-   * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
-   * are a relatively dark gray, so the sensor should return something in the
-   * range specified below.
+  /**
+   * @brief If \c TRUE, a cache has *possibly* been detected.
+   *
+   * Only possibly, because there are some false positives, such as the first
+   * timestep, before ARGoS has finished initializing things.
    */
-  int sum = 0;
-  sum += static_cast<int>(readings[0].Value > 0.30 && readings[0].Value < 0.50);
-  sum += static_cast<int>(readings[1].Value > 0.30 && readings[1].Value < 0.50);
-  sum += static_cast<int>(readings[2].Value > 0.30 && readings[2].Value < 0.50);
-  sum += static_cast<int>(readings[3].Value > 0.30 && readings[3].Value < 0.50);
-
-  return sum >= 3;
-} /* block_detected() */
+  bool cache_detected(void);
+};
 
 NS_END(depth1, controller, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_SENSING_SUBSYSTEM_HPP_ */

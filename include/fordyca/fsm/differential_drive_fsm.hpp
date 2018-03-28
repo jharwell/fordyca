@@ -33,7 +33,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller { class throttling_handler; }
+namespace controller {
+class throttling_handler;
+}
 
 NS_START(fsm);
 
@@ -50,7 +52,6 @@ namespace state_machine = rcppsw::patterns::state_machine;
  */
 class differential_drive_fsm : public state_machine::simple_fsm {
  public:
-
   /**
    * @brief Initialize the FSM.
    *
@@ -109,7 +110,9 @@ class differential_drive_fsm : public state_machine::simple_fsm {
    * @brief Get the max wheel speed.
    */
   double max_speed(void) const { return mc_params.max_speed; }
-  double current_speed(void) const { return (m_lwheel_speed + m_rwheel_speed) / 2; }
+  double current_speed(void) const {
+    return (m_lwheel_speed + m_rwheel_speed) / 2;
+  }
 
  private:
   /**

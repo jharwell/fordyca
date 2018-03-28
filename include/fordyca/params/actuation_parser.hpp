@@ -49,9 +49,7 @@ NS_START(fordyca, params);
 class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit actuation_parser(uint level)
-      : xml_param_parser(level),
-        m_wheels(level + 1),
-        m_kinematics(level + 1) {}
+      : xml_param_parser(level), m_wheels(level + 1), m_kinematics(level + 1) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the

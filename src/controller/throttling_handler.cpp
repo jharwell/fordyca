@@ -34,7 +34,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 throttling_handler::throttling_handler(
-    const struct params::throttling_params * const params)
+    const struct params::throttling_params* const params)
     : m_block_carry(params->block_carry) {}
 
 /*******************************************************************************
@@ -47,6 +47,5 @@ void throttling_handler::update(void) {
     m_block_current = 0;
   }
 } /* update() */
-
 
 NS_END(controller, fordyca);

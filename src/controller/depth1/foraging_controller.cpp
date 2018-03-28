@@ -29,7 +29,8 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -44,7 +45,6 @@
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/harvester.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"

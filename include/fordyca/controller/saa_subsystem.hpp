@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/control/kinematics2D.hpp"
 
 /*******************************************************************************
@@ -34,7 +34,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct actuation_params; struct sensing_params; }
+namespace params {
+struct actuation_params;
+struct sensing_params;
+} // namespace params
 
 NS_START(controller);
 
@@ -44,11 +47,10 @@ NS_START(controller);
 
 class saa_subsystem : public rcppsw::control::boid {
  public:
-  saa_subsystem(
-      const struct params::actuation_params* aparams,
-      const struct params::sensing_params* sparams,
-      struct actuation_subsystem::actuator_list* actuator_list,
-      struct base_sensing_subsystem::sensor_list* sensor_list);
+  saa_subsystem(const struct params::actuation_params* aparams,
+                const struct params::sensing_params* sparams,
+                struct actuation_subsystem::actuator_list* actuator_list,
+                struct base_sensing_subsystem::sensor_list* sensor_list);
 
   /* BOID interface */
   argos::CVector2 velocity(void) const override {
@@ -57,21 +59,31 @@ class saa_subsystem : public rcppsw::control::boid {
         m_actuation->differential_drive()->current_speed());
   }
 
-  void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) { m_sensing = sensing; }
+  void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
+    m_sensing = sensing;
+  }
 
   double max_velocity(void) const override {
     return m_actuation->differential_drive()->max_speed();
   }
-  argos::CVector2 position(void) const override { return m_sensing->position(); }
+  argos::CVector2 position(void) const override {
+    return m_sensing->position();
+  }
 
   const control::kinematics2D& kinematics(void) const { return m_kinematics; }
   control::kinematics2D& kinematics(void) { return m_kinematics; }
 
-  std::shared_ptr<const base_sensing_subsystem> sensing(void) const { return m_sensing; }
+  std::shared_ptr<const base_sensing_subsystem> sensing(void) const {
+    return m_sensing;
+  }
   std::shared_ptr<base_sensing_subsystem> sensing(void) { return m_sensing; }
 
-  std::shared_ptr<const actuation_subsystem> actuation(void) const { return m_actuation; }
-  std::shared_ptr<controller::actuation_subsystem> actuation(void) { return m_actuation; }
+  std::shared_ptr<const actuation_subsystem> actuation(void) const {
+    return m_actuation;
+  }
+  std::shared_ptr<controller::actuation_subsystem> actuation(void) {
+    return m_actuation;
+  }
 
  private:
   // clang-format off

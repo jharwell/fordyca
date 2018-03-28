@@ -51,7 +51,7 @@ class block;
 
 namespace controller {
 namespace depth0 {
-class foraging_sensors;
+class sensing_subsystem;
 }
 class actuation_subsystem;
 } // namespace controller
@@ -80,7 +80,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   acquire_block_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
+      const std::shared_ptr<controller::depth0::sensing_subsystem>& sensors,
       const std::shared_ptr<controller::actuation_subsystem>& actuators,
       std::shared_ptr<representation::perceived_arena_map> map);
 
@@ -163,7 +163,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<representation::perceived_arena_map>       m_map;
   std::shared_ptr<rcppsw::er::server>                        m_server;
-  std::shared_ptr<controller::depth0::foraging_sensors>      m_sensors;
+  std::shared_ptr<controller::depth0::sensing_subsystem>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_block_fsm                                      m_explore_fsm;
   // clang-format on

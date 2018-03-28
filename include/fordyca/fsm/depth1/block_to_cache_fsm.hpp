@@ -44,7 +44,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
 namespace controller {
-namespace depth1{ class foraging_sensors; };
+namespace depth1{ class sensing_subsystem; };
 class actuation_subsystem;
 }
 
@@ -74,7 +74,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   block_to_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+      const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
       const std::shared_ptr<controller::actuation_subsystem>& actuators,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
@@ -113,7 +113,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth1::foraging_sensors* depth1_sensors(void) const { return m_sensors.get(); }
+  controller::depth1::sensing_subsystem* depth1_sensors(void) const { return m_sensors.get(); }
 
  protected:
   enum fsm_states {
@@ -180,7 +180,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
 
   // clang-format off
   uint                                                  m_pickup_count;
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
+  std::shared_ptr<controller::depth1::sensing_subsystem> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   acquire_cache_fsm                                     m_cache_fsm;
   // clang-format on

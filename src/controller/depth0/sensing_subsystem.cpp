@@ -1,5 +1,5 @@
 /**
- * @file depth1/foraging_sensors.hpp
+ * @file depth0/sensing_subsystem.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,46 +18,22 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
+NS_START(fordyca, controller, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class foraging_sensors
- * @ingroup controller depth1
- *
- * @brief The sensors used by the depth1 foraging controller.
- */
-class foraging_sensors: public depth0::foraging_sensors {
- public:
-  foraging_sensors(
-      const struct params::sensing_params* c_params,
-      const struct base_sensing_subsystem::sensor_list* list);
+sensing_subsystem::sensing_subsystem(
+    const struct params::sensing_params* c_params,
+    const struct base_sensing_subsystem::sensor_list* list)
+    : base_sensing_subsystem(c_params, list), m_los(nullptr) {}
 
-  foraging_sensors(const foraging_sensors& fsm) = delete;
-  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
-
-  /**
-   * @brief If \c TRUE, a cache has *possibly* been detected.
-   *
-   * Only possibly, because there are some false positives, such as the first
-   * timestep, before ARGoS has finished initializing things.
-   */
-  bool cache_detected(void);
-};
-
-NS_END(depth1, controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_ */
+NS_END(depth0, controller, fordyca);

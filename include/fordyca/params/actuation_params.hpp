@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/angles.h>
-#include "fordyca/params/wheel_params.hpp"
-#include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/kinematics2D_params.hpp"
 #include "fordyca/params/throttling_params.hpp"
+#include "fordyca/params/wheel_params.hpp"
+#include "rcppsw/control/kinematics2D_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces

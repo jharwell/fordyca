@@ -31,7 +31,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct throttling_params; }
+namespace params {
+struct throttling_params;
+}
 
 NS_START(controller);
 class actuation_subsystem;
@@ -47,7 +49,7 @@ class actuation_subsystem;
  */
 class throttling_handler {
  public:
-  explicit throttling_handler(const struct params::throttling_params * params);
+  explicit throttling_handler(const struct params::throttling_params* params);
 
   /**
    * @brief Get the current amount of throttling (a percentage between 0 and 1)
@@ -58,7 +60,9 @@ class throttling_handler {
   /**
    * @brief Set the current block carry state.
    */
-  void carrying_block(bool carrying_block) { m_carrying_block = carrying_block; }
+  void carrying_block(bool carrying_block) {
+    m_carrying_block = carrying_block;
+  }
 
   /**
    * @brief Update the actuators in accordance with the current throttling

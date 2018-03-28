@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { namespace depth1 {class foraging_sensors; }}
+namespace controller { namespace depth1 {class sensing_subsystem; }}
 
 NS_START(fsm, depth1);
 
@@ -77,7 +77,7 @@ class explore_for_cache_fsm : public base_explore_fsm {
 
   explore_for_cache_fsm(uint unsuccessful_dir_change_thresh,
                         const std::shared_ptr<rcppsw::er::server>& server,
-                        const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+                        const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
                         const std::shared_ptr<controller::actuation_subsystem>& actuators);
 
   explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
@@ -136,7 +136,7 @@ class explore_for_cache_fsm : public base_explore_fsm {
     return &mc_state_map[index];
   }
 
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
+  std::shared_ptr<controller::depth1::sensing_subsystem> m_sensors;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

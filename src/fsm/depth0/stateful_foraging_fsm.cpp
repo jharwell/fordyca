@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateful_foraging_fsm::stateful_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
+    const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
     const std::shared_ptr<controller::actuation_subsystem>& actuators,
     const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
@@ -56,7 +56,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
       m_sensors(sensors),
       m_block_fsm(params,
                   server,
-                  std::static_pointer_cast<controller::depth1::foraging_sensors>(
+                  std::static_pointer_cast<controller::depth1::sensing_subsystem>(
                       sensors),
                   actuators,
                   map),

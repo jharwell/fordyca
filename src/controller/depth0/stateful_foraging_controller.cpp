@@ -29,7 +29,8 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -47,7 +48,6 @@
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -89,9 +89,10 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::
+__pure std::shared_ptr<depth1::sensing_subsystem> stateful_foraging_controller::
     stateful_sensors(void) const {
-  return std::static_pointer_cast<depth1::foraging_sensors>(saa_subsystem()->sensing());
+  return std::static_pointer_cast<depth1::sensing_subsystem>(
+      saa_subsystem()->sensing());
 }
 
 void stateful_foraging_controller::ControlStep(void) {
@@ -136,7 +137,7 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
           "occupancy_grid"),
       GetId());
 
-  saa_subsystem()->sensing(std::make_shared<depth1::foraging_sensors>(
+  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
       param_repo.parse_results<struct params::sensing_params>("sensors"),
       &saa_subsystem()->sensing()->sensor_list()));
 

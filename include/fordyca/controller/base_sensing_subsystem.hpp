@@ -127,7 +127,9 @@ class base_sensing_subsystem {
    * @brief Get the robot's heading, which is computed from the previous 2
    * calculated (ahem set) robot positions.
    */
-  argos::CVector2 robot_heading(void) const { return m_position - m_prev_position; }
+  argos::CVector2 robot_heading(void) const {
+    return m_position - m_prev_position;
+  }
 
   /**
    * @brief Get the angle of the current robot's heading. A shortcut to help
@@ -142,7 +144,9 @@ class base_sensing_subsystem {
     return m_sensors.proximity;
   }
   argos::CCI_FootBotLightSensor* light(void) const { return m_sensors.light; }
-  argos::CCI_FootBotMotorGroundSensor* ground(void) const { return m_sensors.ground; }
+  argos::CCI_FootBotMotorGroundSensor* ground(void) const {
+    return m_sensors.ground;
+  }
   double diffusion_delta(void) const { return mc_obstacle_delta; }
 
   /**
