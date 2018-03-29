@@ -65,10 +65,12 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
+  stream << build_header()
+         << m_grid_parser << m_block_parser << m_cache_parser
          << "nest_x=" << m_params.nest_x << std::endl
          << "nest_y=" << m_params.nest_y << std::endl
-         << "nest_center=" << m_params.nest_center << std::endl;
+         << "nest_center=" << m_params.nest_center << std::endl
+         << build_footer();
 } /* show() */
 
 bool arena_map_parser::validate(void) const {

@@ -50,7 +50,8 @@ void sensing_parser::show(std::ostream& stream) const {
   stream << build_header()
          << XML_PARAM_STR(m_params.proximity, go_straight_angle_range)
          << std::endl
-         << XML_PARAM_STR(m_params.proximity, delta) << std::endl;
+         << XML_PARAM_STR(m_params.proximity, delta) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool sensing_parser::validate(void) const {

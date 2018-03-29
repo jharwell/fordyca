@@ -48,9 +48,11 @@ void block_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void block_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, n_blocks) << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params, n_blocks) << std::endl
          << XML_PARAM_STR(m_params, dimension) << std::endl
-         << XML_PARAM_STR(m_params, dist_model) << std::endl;
+         << XML_PARAM_STR(m_params, dist_model) << std::endl
+         << build_footer();
 } /* show() */
 
 bool block_parser::validate(void) const {

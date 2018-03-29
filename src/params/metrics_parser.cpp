@@ -52,10 +52,18 @@ void metrics_parser::parse(const ticpp::Element& node) {
   XML_PARSE_PARAM(mnode, m_params, task_management_fname);
   XML_PARSE_PARAM(mnode, m_params, cache_fname);
   XML_PARSE_PARAM(mnode, m_params, collect_interval);
+
+  m_parsed = true;
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, output_dir) << std::endl
+  stream << build_header();
+  if (!m_parsed) {
+    stream << "<<  Not Parsed >>" << std::endl
+    << build_footer();
+    return;
+  }
+  stream << XML_PARAM_STR(m_params, output_dir) << std::endl
          << XML_PARAM_STR(m_params, stateless_fname) << std::endl
          << XML_PARAM_STR(m_params, distance_fname) << std::endl
          << XML_PARAM_STR(m_params, stateful_fname) << std::endl
@@ -65,11 +73,15 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, task_management_fname) << std::endl
          << XML_PARAM_STR(m_params, task_management_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_fname) << std::endl
-         << XML_PARAM_STR(m_params, collect_interval) << std::endl;
+         << XML_PARAM_STR(m_params, collect_interval) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool metrics_parser::validate(void) const {
-  return (0 != m_params.collect_interval);
+  if (m_parsed) {
+    return (0 != m_params.collect_interval);
+  }
+  return true;
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -44,22 +44,29 @@ void output_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res, res2;
 
-  m_metrics_parser.parse(onode);
-  m_params.metrics = *m_metrics_parser.parse_results();
+  /* only present for loop functions */
+  if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
+    m_metrics_parser.parse(onode);
+    m_params.metrics = *m_metrics_parser.parse_results();
+  }
 
   ticpp::Element snode = argos::GetNode(onode, "sim");
   XML_PARSE_PARAM(snode, m_params, output_root);
   XML_PARSE_PARAM(snode, m_params, output_dir);
-  XML_PARSE_PARAM(snode, m_params, output_root);
-  XML_PARSE_PARAM(snode, m_params, sim_log_fname);
+
+  /* only present for loop functions */
+  if (snode.HasAttribute("log_fname")) {
+    XML_PARSE_PARAM(snode, m_params, log_fname);
+  }
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_metrics_parser
+  stream << build_header()
+         << m_metrics_parser
          << XML_PARAM_STR(m_params, output_root) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
-         << XML_PARAM_STR(m_params, output_root) << std::endl
-         << XML_PARAM_STR(m_params, sim_log_fname) << std::endl;
+         << XML_PARAM_STR(m_params, log_fname) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool output_parser::validate(void) const {

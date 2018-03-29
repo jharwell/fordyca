@@ -42,27 +42,21 @@ void actuation_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_wheels.parse(anode);
   m_kinematics.parse(anode);
+  m_throttling.parse(anode);
   m_params.wheels = *m_wheels.parse_results();
   m_params.kinematics = *m_kinematics.parse_results();
-  XML_PARSE_PARAM(anode, m_params.throttling, block_carry);
+  m_params.throttling = *m_throttling.parse_results();
 } /* parse() */
 
 void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_wheels << m_kinematics
-         << XML_PARAM_STR(m_params.throttling, block_carry) << std::endl;
+  stream << build_header()
+         << m_wheels << m_kinematics << m_throttling
+         << build_footer();
 } /* show() */
 
 __pure bool actuation_parser::validate(void) const {
-  if (!(m_params.wheels.soft_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  if (!(m_params.wheels.no_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  if (!(IS_BETWEEN(m_params.throttling.block_carry, 0, 1.0))) {
-    return false;
-  }
-  return true;
+  return m_wheels.validate() && m_kinematics.validate() &&
+      m_throttling.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

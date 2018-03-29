@@ -43,7 +43,7 @@ stateless_foraging_repository::stateless_foraging_repository(void) {
                                     actuation_parser::kHeader1);
   register_parser<sensing_parser>(sensing_parser::kXMLRoot,
                                   sensing_parser::kHeader1);
-  register_parser<fsm_parser>(output_parser::kXMLRoot, fsm_parser::kHeader1);
+  register_parser<fsm_parser>(fsm_parser::kXMLRoot, fsm_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

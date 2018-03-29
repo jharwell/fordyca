@@ -1,5 +1,4 @@
 <?xml version="1.0" ?>
-
 <argos-configuration>
 
   <!-- ************************* -->
@@ -31,9 +30,9 @@
       </sensors>
       <params>
         <output>
-          <robot output_root="output"
-                 output_dir="__current_date__"
-                 />
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
@@ -61,20 +60,32 @@
               harvester_range="1000:2000"
               />
         </task_allocation>
-        <sensors>
+        <sensing>
           <proximity go_straight_angle_range="-5:5"
                     delta="0.001" />
-        </sensors>
-        <actuators>
-          <wheels soft_turn_angle_max="30"
-                  no_turn_angle_max="5"
+        </sensing>
+        <actuation>
+          <throttling
+              block_carry="0.1"/>
+          <kinematics2D>
+            <avoidance_force lookahead="0.5"
+                             max="10"/>
+            <arrival_force slowing_radius="0.5"
+                           max="10"/>
+            <polar_force max="10"/>
+            <wander_force circle_distance="2.0"
+                           circle_radius="1.0"
+                           max_angle_delta="2"/>
+          </kinematics2D>
+
+          <wheels soft_turn_max="30"
+                  no_turn_max="5"
                   max_speed="10" />
-        </actuators>
+        </actuation>
         <fsm
           unsuccessful_explore_dir_change="1000"
           frequent_collision_thresh="300"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.1"
           />
       </params>
     </stateless_foraging_controller>
@@ -87,7 +98,7 @@
   <loop_functions library="build/lib/libfordyca"
                   label="stateless_foraging_loop_functions">
     <output>
-      <sim sim_log_fname="sim.log"
+      <sim log_fname="sim.log"
            output_root="output"
            output_dir="__current_date__"
            />
@@ -209,7 +220,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="random_foraging_qt_user_functions" />
+      <user_functions label="stateless_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

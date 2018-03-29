@@ -52,7 +52,7 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
    * @brief The root tag that all robot sensing parameters should lie under in
    * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "sensings";
+  static constexpr char kXMLRoot[] = "sensing";
 
   void show(std::ostream& stream) const override;
   bool validate(void) const override;

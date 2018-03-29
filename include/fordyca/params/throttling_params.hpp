@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -39,7 +38,7 @@ NS_START(fordyca, params);
  * @struct throttling_params
  * @ingroup params
  */
-struct throttling_params {
+struct throttling_params : rcppsw::params::base_params {
   double block_carry{0.0};
 };
 

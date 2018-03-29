@@ -55,8 +55,8 @@ void executive_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void executive_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, estimation_alpha)
-         << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params, estimation_alpha) << std::endl
          << XML_PARAM_STR(m_params, abort_reactivity) << std::endl
          << XML_PARAM_STR(m_params, abort_offset) << std::endl
          << XML_PARAM_STR(m_params, partition_reactivity) << std::endl
@@ -64,7 +64,8 @@ void executive_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, subtask_selection_method) << std::endl
          << XML_PARAM_STR(m_params, partition_method) << std::endl
          << XML_PARAM_STR(m_params, always_partition) << std::endl
-         << XML_PARAM_STR(m_params, never_partition) << std::endl;
+         << XML_PARAM_STR(m_params, never_partition) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool executive_parser::validate(void) const {

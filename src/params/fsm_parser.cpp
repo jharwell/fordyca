@@ -54,15 +54,15 @@ void fsm_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) const {
-  stream << build_header() << std::endl
+  stream << build_header()
          << XML_PARAM_STR(m_params.times, unsuccessful_explore_dir_change)
          << std::endl
          << XML_PARAM_STR(m_params.times, frequent_collision_thresh)
          << std::endl
          << XML_PARAM_STR(m_params.times, unsuccessful_explore_dir_change)
          << std::endl
-         << XML_PARAM_STR(m_params.speed_throttling, block_carry) << std::endl
-         << m_params.nest_center << std::endl;
+         << "nest_center=" << m_params.nest_center << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool fsm_parser::validate(void) const {

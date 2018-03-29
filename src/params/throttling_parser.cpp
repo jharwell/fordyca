@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid_parser.cpp
+ * @file throttling_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,39 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
 #include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/throttling_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char occupancy_grid_parser::kXMLRoot[];
+constexpr char throttling_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void occupancy_grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode =
+void throttling_parser::parse(const ticpp::Element& node) {
+  ticpp::Element tnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_grid_parser.parse(onode);
-  m_pheromone_parser.parse(onode);
-  m_params.grid = *m_grid_parser.parse_results();
-  m_params.pheromone = *m_pheromone_parser.parse_results();
+  XML_PARSE_PARAM(tnode, m_params, block_carry);
 } /* parse() */
 
-void occupancy_grid_parser::show(std::ostream& stream) const {
+void throttling_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << m_grid_parser << m_pheromone_parser
+         << XML_PARAM_STR(m_params, block_carry) << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool occupancy_grid_parser::validate(void) const {
-  return m_grid_parser.validate() && m_pheromone_parser.validate();
+bool throttling_parser::validate(void) const {
+  return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
 } /* validate() */
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);

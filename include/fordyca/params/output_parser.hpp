@@ -44,7 +44,9 @@ NS_START(fordyca, params);
  * @ingroup params
  *
  * @brief Parses XML parameters relating to simulation output into
- * \ref output_params.
+ * \ref output_params. This parser is used by both loop functions and robots,
+ * and so its logic is slighly more complex in order to handle the needs of
+ * both.
  */
 class output_parser : public rcppsw::params::xml_param_parser {
  public:

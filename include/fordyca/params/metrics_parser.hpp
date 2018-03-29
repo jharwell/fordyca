@@ -65,6 +65,7 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
+  bool m_parsed{false};
   struct metrics_params m_params {};
 };
 

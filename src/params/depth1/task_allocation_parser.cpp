@@ -48,7 +48,9 @@ void task_allocation_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void task_allocation_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_exec_parser << m_estimate_parser << std::endl;
+  stream << build_header()
+         << m_exec_parser << m_estimate_parser << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool task_allocation_parser::validate(void) const {

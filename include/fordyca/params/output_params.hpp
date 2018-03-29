@@ -45,7 +45,7 @@ struct output_params : public rcppsw::params::base_params {
 
   std::string output_root{""};
   std::string output_dir{""};
-  std::string sim_log_fname{""};
+  std::string log_fname{""};
   struct metrics_params metrics;
 };
 

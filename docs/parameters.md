@@ -15,9 +15,9 @@ The following root XML tags are defined:
 
 - `task_allocation` - Parameters pertaining to task allocation variables/methods.
 
-- `sensors` -  Parameters for robot sensors.
+- `sensing` -  Parameters for robot sensors.
 
-- `actuators` - Parameters for robot actuators.
+- `actuation` - Parameters for robot actuators.
 
 - `fsm` - Parameters for state machine controlling a robot's actions.
 
@@ -120,7 +120,7 @@ The following root XML tags are defined:
   the uniform random distribution over which a robots' initial estimation of the
   duration of the harvester task will be drawn.
 
-### `sensors`
+### `sensing`
 
 #### `proximity`
 
@@ -134,28 +134,52 @@ The following root XML tags are defined:
 - `delta` - The longest distance away from the robot obstacles will be
             considered.
 
-### `actuators`
+### `actuation`
+
+#### `throttling`
+
+- `block_carry` - The percentage (specified between 0 and 1) by which a robot's
+  speed will be decreased when it is carrying a block.
+
+#### `kinematics2D`
+
+##### `avoidance_force`
+
+- `lookahead` - How far ahead of the robot to look for obstacles.
+
+- `max` - Max value for the force.
+
+##### `arrival_force`
+
+- `slowing_radius` - Radius around target inside which robots will slow down
+  linearly to not overshoot their target.
+
+- `max` - Max value for the force.
+
+##### `polar_force`
+
+- `max` - Max value for the force.
+
+##### `wander_force`
+
+- `circle_distance`
+
+- `circle_radius`
+
+- `max_angle_delta`
 
 #### `wheels`
 
-- `hard_turn_angle_threshold` - If actuators are told to change to a heading
-                                within a difference greater than the one
-                                specified by this parameter to the current
-                                heading, then a hard turn is executed (turn in
-                                place/opposite wheel speeds).
+- `soft_turn_max` - If actuators are told to change to a heading within a
+                    difference greater than the one specified by this parameter
+                    to the current heading, a hard turn is executed (spin in
+                    place). Otherwise, if it is greater than `no_turn_max`, a
+                    soft turn is executed (keep moving forward and turn
+                    gradually).
 
-- `soft_turn_angle_threshold` - If actuators are told to change to a heading
-                                within a difference greater than the one
-                                specified by this parameter to the current
-                                heading, but less than
-                                `hard_turn_angle_threshold`, then a soft turn
-                                is executed (keep moving forward and turn
-                                gradually).
-
-- `no_turn_angle_threshold` - If actuators are told to change to a heading
-                              within a difference less than the one specified
-                              by this parameter to the current heading, the
-                              heading change is ignored.
+- `no_turn_max` - If actuators are told to change to a heading within a
+                  difference less than the one specified by this parameter to
+                  the current heading, the heading change is ignored.
 
 - `max_speed` - The maximimum speed of the robot.
 
@@ -181,8 +205,6 @@ The following root XML tags are defined:
            passed to the loop functions, but it was easier to do it this way
            rather than muck about with XML tree traversal.
 
-- `speed_throttle_block_carry` - The percentage (specified between 0 and 1) by
-  which a robot's speed will be decreased when it is carrying a block.
 
 ## Loop Functions
 

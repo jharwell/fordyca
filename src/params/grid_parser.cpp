@@ -43,19 +43,20 @@ void grid_parser::parse(const ticpp::Element& node) {
   ticpp::Element gnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res;
-
   rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(node.GetAttribute("size"));
+  res = parser.parse(gnode.GetAttribute("size"));
 
-  m_params.resolution = std::atof(node.GetAttribute("resolution").c_str());
+  m_params.resolution = std::atof(gnode.GetAttribute("resolution").c_str());
   m_params.lower.Set(0, 0);
   m_params.upper.Set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
 } /* parse() */
 
 void grid_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, resolution) << std::endl
-         << m_params.lower << std::endl
-         << m_params.upper << std::endl;
+  stream << build_header()
+         << XML_PARAM_STR(m_params, resolution) << std::endl
+         << "lower=" << m_params.lower << std::endl
+         << "upper=" << m_params.upper << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool grid_parser::validate(void) const {

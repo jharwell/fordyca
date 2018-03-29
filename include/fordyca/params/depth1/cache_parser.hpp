@@ -52,7 +52,7 @@ class cache_parser: public rcppsw::params::xml_param_parser {
    * @brief The root tag that all cache parameters should lie under in the
    * XML tree.
    */
-  static constexpr char kXMLRoot[] = "cache";
+  static constexpr char kXMLRoot[] = "caches";
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;

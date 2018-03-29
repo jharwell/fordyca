@@ -28,6 +28,7 @@
 
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/wheel_parser.hpp"
+#include "fordyca/params/throttling_parser.hpp"
 #include "rcppsw/control/kinematics2D_xml_parser.hpp"
 
 /*******************************************************************************
@@ -49,13 +50,16 @@ NS_START(fordyca, params);
 class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit actuation_parser(uint level)
-      : xml_param_parser(level), m_wheels(level + 1), m_kinematics(level + 1) {}
+      : xml_param_parser(level),
+        m_wheels(level + 1),
+        m_kinematics(level + 1),
+        m_throttling(level + 1) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the
    * XML tree.
    */
-  static constexpr char kXMLRoot[] = "actuations";
+  static constexpr char kXMLRoot[] = "actuation";
 
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
@@ -71,6 +75,7 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   struct actuation_params                  m_params{};
   wheel_parser                             m_wheels;
   rcppsw::control::kinematics2D_xml_parser m_kinematics;
+  throttling_parser                        m_throttling;
   // clang-format on
 };
 

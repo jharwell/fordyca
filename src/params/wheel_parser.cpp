@@ -54,10 +54,11 @@ void wheel_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void wheel_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params.wheels, soft_turn_max)
-         << std::endl
-         << XML_PARAM_STR(m_params.wheels, no_turn_max) << std::endl
-         << XML_PARAM_STR(m_params.wheels, max_speed) << std::endl;
+  stream << build_header()
+         << XML_PARAM_STR(m_params, soft_turn_max) << std::endl
+         << XML_PARAM_STR(m_params, no_turn_max) << std::endl
+         << XML_PARAM_STR(m_params, max_speed) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool wheel_parser::validate(void) const {

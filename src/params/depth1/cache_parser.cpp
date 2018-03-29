@@ -59,7 +59,8 @@ void cache_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, usage_penalty) << std::endl
          << XML_PARAM_STR(m_params, create_static) << std::endl
          << XML_PARAM_STR(m_params, create_dynamic) << std::endl
-         << XML_PARAM_STR(m_params, static_respawn_scale_factor) << std::endl;
+         << XML_PARAM_STR(m_params, static_respawn_scale_factor) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool cache_parser::validate(void) const {

@@ -52,10 +52,12 @@ void exec_estimates_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void exec_estimates_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, enabled) << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params, enabled) << std::endl
          << XML_PARAM_STR(m_params, generalist_range) << std::endl
          << XML_PARAM_STR(m_params, harvester_range) << std::endl
-         << XML_PARAM_STR(m_params, collector_range) << std::endl;
+         << XML_PARAM_STR(m_params, collector_range) << std::endl
+         << build_footer();
 } /* show() */
 
 NS_END(depth1, params, fordyca);

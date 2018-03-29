@@ -45,8 +45,10 @@ void pheromone_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void pheromone_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, rho) << std::endl
-         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl;
+  stream << build_header()
+         << XML_PARAM_STR(m_params, rho) << std::endl
+         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl
+         << build_footer();
 } /* show() */
 
 __pure bool pheromone_parser::validate(void) const {

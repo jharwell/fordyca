@@ -37,7 +37,7 @@ differential_drive_fsm::differential_drive_fsm(
     const struct params::wheel_params* c_params,
     argos::CCI_DifferentialSteeringActuator* wheels,
     controller::throttling_handler* const throttling)
-    : state_machine::simple_fsm(ST_MAX_STATES),
+    : state_machine::simple_fsm(rcppsw::er::g_server, ST_MAX_STATES),
       no_turn(),
       soft_turn(),
       hard_turn(),
