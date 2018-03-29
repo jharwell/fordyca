@@ -32,7 +32,7 @@ NS_START(fordyca, tasks);
  * Constant Definitions
  ******************************************************************************/
 constexpr char foraging_task::kCollectorName[];
-constexpr char foraging_task::kForagerName[];
+constexpr char foraging_task::kHarvesterName[];
 constexpr char foraging_task::kGeneralistName[];
 
 NS_END(tasks, fordyca);

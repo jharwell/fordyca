@@ -49,7 +49,6 @@ struct metrics_params : public rcppsw::common::base_params {
   std::string task_execution_fname{""};
   std::string task_management_fname{""};
   std::string cache_fname{""};
-  bool collect_cum{false};
   uint collect_interval{0};
 };
 

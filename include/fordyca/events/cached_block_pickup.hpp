@@ -62,7 +62,7 @@ class cached_block_pickup
       public visitor::visit_set<tasks::collector, representation::arena_cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                      representation::arena_cache* cache,
+                      const std::shared_ptr<representation::arena_cache>& cache,
                       size_t robot_index);
   ~cached_block_pickup(void) override { client::rmmod(); }
 
@@ -82,20 +82,20 @@ class cached_block_pickup
 
  private:
   // clang-format off
-  size_t                              m_robot_index;
-  representation::arena_cache*        m_real_cache;
+  uint                                         m_robot_index;
+  std::shared_ptr<representation::arena_cache> m_real_cache;
 
   /**
    * @brief The block that will be picked up by the robot.
    */
-  representation::block*              m_pickup_block{nullptr};
+  std::shared_ptr<representation::block>       m_pickup_block{nullptr};
 
   /**
    * @brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  representation::block*              m_orphan_block{nullptr};
-  std::shared_ptr<rcppsw::er::server> m_server;
+  std::shared_ptr<representation::block>       m_orphan_block{nullptr};
+  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

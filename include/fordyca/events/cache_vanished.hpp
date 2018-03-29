@@ -34,18 +34,19 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-namespace depth1 {
+namespace controller { namespace depth1 {
 class foraging_controller;
-}}
+}} // namespace controller::depth1
 namespace fsm {
 class block_to_nest_fsm;
-namespace depth1 { class block_to_cache_fsm; }
+namespace depth1 {
+class block_to_cache_fsm;
 }
+} // namespace fsm
 namespace tasks {
 class collector;
-class forager;
-}
+class harvester;
+} // namespace tasks
 NS_START(events);
 
 /*******************************************************************************
@@ -63,7 +64,7 @@ class cache_vanished
     : public rcppsw::er::client,
       public visitor::visit_set<controller::depth1::foraging_controller,
                                 tasks::collector,
-                                tasks::forager,
+                                tasks::harvester,
                                 fsm::block_to_nest_fsm,
                                 fsm::depth1::block_to_cache_fsm> {
  public:
@@ -78,11 +79,11 @@ class cache_vanished
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(tasks::collector& task) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
   void visit(controller::depth1::foraging_controller& controller) override;
 
  private:
-  uint                              m_cache_id;
+  uint m_cache_id;
 };
 
 NS_END(events, fordyca);

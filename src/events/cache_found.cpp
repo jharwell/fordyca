@@ -31,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::base_cache;
 using representation::occupancy_grid;
 namespace swarm = rcppsw::swarm;
 
@@ -54,7 +55,7 @@ cache_found::~cache_found(void) { client::rmmod(); }
  * Depth1 Foraging
  ******************************************************************************/
 void cache_found::visit(representation::cell2D& cell) {
-  cell.entity(m_tmp_cache);
+  cell.entity(m_cache);
   cell.fsm().accept(*this);
   ER_ASSERT(cell.state_has_cache(),
             "FATAL: Cell does not have cache after cache found event");
@@ -68,12 +69,26 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
    * cell, then other robots have picked up blocks from the cache since the last
    * time we saw it. In either case, synchronize the cell with the reality of
    * the cache we have just observed.
+   *
+   * It is also possible that a robot picks up 2nd to last block in a cache,
+   * effectively removing it from its memory. If the cache reappears the same
+   * timestep because another robot/the arena did something, then the robot will
+   * think that the cache only has 1 block remaining (it has been deleted, but
+   * because we are using shared ptrs, it will not actually be deallocated until
+   * after the cell that refers to it is update (this class does said update)).
+   *
+   * As such, we need to make sure that we ALWAYS put the cell in the correct
+   * state by sending it enough block drops. (see #323).
    */
-  for (size_t i = fsm.block_count(); i < m_tmp_cache->n_blocks(); ++i) {
+  for (size_t i = fsm.block_count();
+       i < std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       ++i) {
     fsm.event_block_drop();
   } /* for(i..) */
 
-  for (size_t i = fsm.block_count(); i > m_tmp_cache->n_blocks(); --i) {
+  for (size_t i = fsm.block_count();
+       i > std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       --i) {
     fsm.event_block_pickup();
   } /* for(i..) */
 } /* visit() */
@@ -86,7 +101,7 @@ void cache_found::visit(representation::perceived_arena_map& map) {
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
-n   *
+   *
    * We can have blocks/caches overlapping (in terms of physical extent, not in
    * terms of cells), if we previously saw some of the leftover blocks when a
    * cache is destroyed, and left the area before a new cache could be
@@ -122,15 +137,14 @@ n   *
   if (cell.state_has_block()) {
     map.block_remove(cell.block());
   }
-  m_tmp_cache = m_cache.get();
 
   /*
    * If the ID of the cache we currently think resides in the cell and the ID of
    * the one we just found that actually resides there are not the same, we need
    * to reset the density for the cell, and start a new decay count.
    */
-  if (cell.state_has_cache() && cell.cache()->id() != m_tmp_cache->id()) {
-      density.reset();
+  if (cell.state_has_cache() && cell.cache()->id() != m_cache->id()) {
+    density.reset();
   }
 
   if (map.pheromone_repeat_deposit()) {

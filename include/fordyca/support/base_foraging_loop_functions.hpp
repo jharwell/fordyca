@@ -86,7 +86,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
       int block = utils::robot_on_block(robot, map);
       if (-1 != block) {
         events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &map.blocks()[block],
+                                            map.blocks()[block],
                                             utils::robot_id(robot));
         controller.visitor::template visitable_any<T>::accept(pickup_op);
         map.accept(pickup_op);
@@ -103,14 +103,14 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * @brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    *
-   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
+   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c
+   * FALSE
    * otherwise.
    */
   template <typename T>
-  bool handle_nest_block_drop(
-      argos::CFootBotEntity& robot,
-      representation::arena_map& map,
-      metrics::block_metrics_collector& block_collector) {
+  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
+                              representation::arena_map& map,
+                              metrics::block_metrics_collector& block_collector) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {

@@ -35,15 +35,15 @@
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
+#include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/harvester.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
@@ -61,7 +61,7 @@ foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
       m_metric_store(),
       m_executive(),
-      m_forager(),
+      m_harvester(),
       m_collector(),
       m_generalist() {}
 
@@ -76,7 +76,6 @@ void foraging_controller::ControlStep(void) {
    */
   process_los(depth0::stateful_foraging_controller::los());
   map()->update();
-
   m_metric_store.reset();
 
   if (is_carrying_block()) {
@@ -103,9 +102,9 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
             "FATAL: Not all task parameters were validated");
 
   ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_params* p =
-      static_cast<const params::depth1::task_params*>(
-          task_repo.get_params("task"));
+  const params::depth1::task_allocation_params* p =
+      static_cast<const params::depth1::task_allocation_params*>(
+          task_repo.get_params("task_allocation"));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
@@ -114,16 +113,18 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_collector = rcppsw::make_unique<tasks::collector>(&p->tasks, collector_fsm);
+  m_collector =
+      rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
-  std::unique_ptr<task_allocation::taskable> forager_fsm =
+  std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
           base_foraging_controller::server(),
           depth0::stateful_foraging_controller::stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_forager = rcppsw::make_unique<tasks::forager>(&p->tasks, forager_fsm);
+  m_harvester =
+      rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
@@ -133,14 +134,14 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
   m_generalist =
-      rcppsw::make_unique<tasks::generalist>(&p->tasks, generalist_fsm);
+      rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
 
-  m_generalist->partition1(m_forager.get());
+  m_generalist->partition1(m_harvester.get());
   m_generalist->partition2(m_collector.get());
   m_generalist->parent(m_generalist.get());
   m_generalist->set_partitionable();
 
-  m_forager->parent(m_generalist.get());
+  m_harvester->parent(m_generalist.get());
   m_collector->parent(m_generalist.get());
 
   m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
@@ -155,10 +156,13 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
   m_executive->task_finish_notify(std::bind(
       &foraging_controller::task_finish_notify, this, std::placeholders::_1));
 
-  if (p->init_random_estimates) {
-    m_generalist->init_random(2000, 4000);
-    m_forager->init_random(1000, 2000);
-    m_collector->init_random(1000, 2000);
+  if (p->exec_estimates.enabled) {
+    m_generalist->init_random(p->exec_estimates.generalist_range.GetMin(),
+                              p->exec_estimates.generalist_range.GetMax());
+    m_harvester->init_random(p->exec_estimates.harvester_range.GetMin(),
+                             p->exec_estimates.harvester_range.GetMax());
+    m_collector->init_random(p->exec_estimates.collector_range.GetMin(),
+                             p->exec_estimates.collector_range.GetMax());
   }
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
@@ -200,7 +204,8 @@ void foraging_controller::process_los(
                 map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
                 d.first,
                 d.second);
-        map()->cache_remove(map()->access<occupancy_grid::kCellLayer>(d).cache());
+        map()->cache_remove(
+            map()->access<occupancy_grid::kCellLayer>(d).cache());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -211,7 +216,9 @@ void foraging_controller::process_los(
      * (i.e. different # of blocks in it), and so you need to always process
      * caches in the LOS, even if you already know about them.
      */
-    if (!map()->access<occupancy_grid::kCellLayer>(cache->discrete_loc()).state_has_cache()) {
+    if (!map()
+             ->access<occupancy_grid::kCellLayer>(cache->discrete_loc())
+             .state_has_cache()) {
       ER_NOM("Discovered cache%d at (%zu, %zu): %u blocks",
              cache->id(),
              cache->discrete_loc().first,

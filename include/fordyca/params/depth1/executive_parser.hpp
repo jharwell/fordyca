@@ -1,6 +1,5 @@
 /**
- * @file perceived_cache.hpp
- * @ingroup representation
+ * @file executive_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,42 +18,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-class base_cache;
+NS_START(fordyca, params, depth1);
+namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
- * Struct Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct perceived_cache
- * @ingroup representation
+ * @class executive_parser
+ * @ingroup params depth1
  *
- * @brief A representation of a "virtual" cache in the arena, which has a
- * pheromone density/relevance associated with it.
+ * @brief Parses XML parameters for relating to the task executive and the tasks
+ * it runs.
  */
-struct perceived_cache {
-  perceived_cache(void) : ent(nullptr), density() {}
-  perceived_cache(const std::shared_ptr<base_cache>& c,
-                  const rcppsw::swarm::pheromone_density& d)
-      : ent(c), density(d) {}
+class executive_parser: public rcppsw::common::xml_param_parser {
+ public:
+  executive_parser(void) : m_params() {}
+  void parse(argos::TConfigurationNode& node) override;
+  const struct task_allocation::partitionable_task_params* get_results(void) override {
+    return m_params.get();
+  }
+  void show(std::ostream& stream) override;
+  bool validate(void) override;
 
-  std::shared_ptr<base_cache> ent;
-  rcppsw::swarm::pheromone_density density;
+ private:
+  std::unique_ptr<struct task_allocation::partitionable_task_params> m_params;
 };
 
-NS_END(representation, fordyca);
+NS_END(params, fordyca, depth1);
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_CACHE_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_ */

@@ -42,16 +42,25 @@
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
-        <task estimation_alpha="0.8"
+        <task_allocation>
+          <executive
+              estimation_alpha="0.8"
               abort_reactivity="8"
               abort_offset="4"
               partition_reactivity="0.5"
               partition_offset="2"
-              init_random_estimates="true"
               subtask_selection_method="harwell2018"
               partition_method="pini2011"
               always_partition="true"
-              never_partition="false"/>
+              never_partition="false"
+              />
+          <init_estimates
+              enabled="true"
+              generalist_range="2000:4000"
+              collector_range="1000:2000"
+              harvester_range="1000:2000"
+              />
+        </task_allocation>
         <sensors>
           <proximity go_straight_angle_range="-5:5"
                     delta="0.001" />
@@ -92,8 +101,7 @@
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
           cache_fname="cache-stats.csv"
-          collect_cum="true"
-          collect_interval="10000"
+          collect_interval="1000"
           />
     </output>
     <arena_map>

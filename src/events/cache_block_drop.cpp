@@ -27,12 +27,13 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/forager.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/harvester.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,8 +46,8 @@ using representation::occupancy_grid;
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<rcppsw::er::server>& server,
-    representation::block* block,
-    representation::arena_cache* cache,
+    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::arena_cache>& cache,
     double resolution)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
       client(server),
@@ -96,8 +97,11 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::block& block) {
-  events::free_block_drop e(
-      m_server, &block, cell_op::x(), cell_op::y(), m_resolution);
+  events::free_block_drop e(m_server,
+                            m_block, /* OK because we only have 1 block */
+                            cell_op::x(),
+                            cell_op::y(),
+                            m_resolution);
   block.accept(e);
 } /* visit() */
 
@@ -116,7 +120,7 @@ void cache_block_drop::visit(controller::depth1::foraging_controller& controller
          m_cache->id());
 } /* visit() */
 
-void cache_block_drop::visit(tasks::forager& task) {
+void cache_block_drop::visit(tasks::harvester& task) {
   static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 

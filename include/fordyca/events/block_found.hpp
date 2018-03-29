@@ -71,8 +71,7 @@ class block_found : public perceived_cell_op, public rcppsw::er::client {
 
  private:
   // clang-format off
-  std::unique_ptr<representation::block> m_block;
-  representation::block*                 m_tmp_block;
+  std::shared_ptr<representation::block> m_block;
   // clang-format on
 };
 

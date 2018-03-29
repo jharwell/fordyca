@@ -30,7 +30,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er {class server; }}
+namespace rcppsw { namespace er {
+class server;
+}} // namespace rcppsw::er
 NS_START(fordyca, representation);
 class cell2D;
 
@@ -39,7 +41,6 @@ class cell2D;
  ******************************************************************************/
 using arena_grid =
     rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>;
-
 
 NS_END(representation, fordyca);
 

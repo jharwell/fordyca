@@ -215,7 +215,8 @@ void block_to_nest_fsm::init(void) {
 
 void block_to_nest_fsm::task_start(
     const rcppsw::task_allocation::taskable_argument* const arg) {
-  const auto* a = dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
+  const auto* a =
+      dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
   ER_ASSERT(a, "FATAL: bad argument passed");
   inject_event(a->signal(), state_machine::event_type::NORMAL);
 }

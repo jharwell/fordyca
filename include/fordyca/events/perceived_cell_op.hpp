@@ -40,7 +40,7 @@ class stateful_foraging_controller;
 namespace depth1 {
 class foraging_controller;
 }
-}
+} // namespace controller
 
 namespace representation {
 class perceived_arena_map;

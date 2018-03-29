@@ -55,7 +55,12 @@ class block : public cell_entity,
               public prototype::clonable<block> {
  public:
   explicit block(double dimension)
-      : cell_entity(dimension, argos::CColor::BLACK),
+      : cell_entity(dimension, argos::CColor::BLACK, -1),
+        m_robot_index(-1),
+        m_carries(0) {}
+
+  block(double dimension, int id)
+      : cell_entity(dimension, argos::CColor::BLACK, id),
         m_robot_index(-1),
         m_carries(0) {}
 
@@ -93,7 +98,8 @@ class block : public cell_entity,
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *
-   * @return The robot index, or -1 if no robot is currently carrying this block.
+   * @return The robot index, or -1 if no robot is currently carrying this
+   * block.
    */
   int robot_index(void) const { return m_robot_index; }
   void robot_index(int robot_index) { m_robot_index = robot_index; }

@@ -24,6 +24,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "rcppsw/er/server.hpp"
@@ -40,7 +41,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
       mc_cache_params(params->cache),
       mc_nest_center(params->nest_center),
-      m_blocks(params->block.n_blocks, block(params->block.dimension)),
+      m_blocks(params->block.n_blocks),
       m_caches(),
       m_block_distributor(argos::CRange<double>(params->grid.lower.GetX(),
                                                 params->grid.upper.GetX()),
@@ -71,7 +72,8 @@ arena_map::arena_map(const struct params::arena_map_params* params)
   }   /* for(i..) */
 
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    m_blocks[i].id(static_cast<int>(i));
+    m_blocks[i] =
+        std::make_shared<block>(params->block.dimension, static_cast<int>(i));
   } /* for(i..) */
 }
 
@@ -80,7 +82,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
  ******************************************************************************/
 __pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    if (m_blocks[i].contains_point(pos)) {
+    if (m_blocks[i]->contains_point(pos)) {
       return static_cast<int>(i);
     }
   } /* for(i..) */
@@ -89,14 +91,14 @@ __pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
 
 __pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_caches.size(); ++i) {
-    if (m_caches[i].contains_point(pos)) {
+    if (m_caches[i]->contains_point(pos)) {
       return static_cast<int>(i);
     }
   } /* for(i..) */
   return -1;
 } /* robot_on_cache() */
 
-void arena_map::distribute_block(block* const block) {
+void arena_map::distribute_block(const std::shared_ptr<block>& block) {
   cell2D* cell = nullptr;
   while (true) {
     argos::CVector2 r_coord;
@@ -125,7 +127,7 @@ void arena_map::distribute_block(block* const block) {
          block->real_loc().GetY(),
          block->discrete_loc().first,
          block->discrete_loc().second,
-         static_cast<const void*>(cell->block()));
+         reinterpret_cast<void*>(cell->block().get()));
 } /* distribute_block() */
 
 void arena_map::static_cache_create(void) {
@@ -142,7 +144,7 @@ void arena_map::static_cache_create(void) {
                                           mc_cache_params.dimension,
                                           m_grid.resolution());
 
-  std::vector<representation::block*> blocks;
+  std::vector<std::shared_ptr<representation::block>> blocks;
 
   /*
    * Only blocks that are not:
@@ -153,10 +155,10 @@ void arena_map::static_cache_create(void) {
    * are eligible for being used to re-create the static cache.
    */
   for (auto& b : m_blocks) {
-    if (-1 == b.robot_index() &&
-        b.discrete_loc() != math::rcoord_to_dcoord(argos::CVector2(x, y),
-                                                   m_grid.resolution())) {
-      blocks.push_back(&b);
+    if (-1 == b->robot_index() &&
+        b->discrete_loc() != math::rcoord_to_dcoord(argos::CVector2(x, y),
+                                                    m_grid.resolution())) {
+      blocks.push_back(b);
     }
     if (blocks.size() >= mc_cache_params.static_size) {
       break;
@@ -169,7 +171,7 @@ void arena_map::static_cache_create(void) {
 
 void arena_map::distribute_blocks(void) {
   for (auto& b : m_blocks) {
-    distribute_block(&b);
+    distribute_block(b);
   } /* for(b..) */
 
   /*
@@ -188,7 +190,7 @@ void arena_map::distribute_blocks(void) {
   }   /* for(i..) */
 } /* distribute_blocks() */
 
-void arena_map::cache_remove(arena_cache& victim) {
+void arena_map::cache_remove(const std::shared_ptr<arena_cache>& victim) {
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
 } /* cache_remove() */
 

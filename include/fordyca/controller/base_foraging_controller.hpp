@@ -36,7 +36,7 @@ NS_START(fordyca);
 namespace representation {
 class block;
 class line_of_sight;
-}
+} // namespace representation
 namespace params {
 struct output_params;
 }
@@ -100,12 +100,14 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(representation::block* block) { m_block = block; }
+  void block(const std::shared_ptr<representation::block>& block) {
+    m_block = block;
+  }
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -180,7 +182,7 @@ class base_foraging_controller : public argos::CCI_Controller,
   // clang-format off
   bool                                   m_display_id{false};
   double                                 m_speed_throttle_block_carry{0.0};
-  representation::block*                 m_block{nullptr};
+  std::shared_ptr<representation::block> m_block{nullptr};
   std::shared_ptr<actuator_manager>      m_actuators;
   std::shared_ptr<base_foraging_sensors> m_sensors;
   std::shared_ptr<rcppsw::er::server>    m_server;

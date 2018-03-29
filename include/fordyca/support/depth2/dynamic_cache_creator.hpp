@@ -46,11 +46,10 @@ class dynamic_cache_creator : public depth1::cache_creator {
    *
    * @return The list of current caches.
    */
-  std::vector<representation::arena_cache> create_all(
-    std::vector<representation::block*>& blocks) override;
+  cache_vector create_all(block_vector& blocks) override;
 
  private:
-  argos::CVector2 calc_center(std::list<representation::block*> blocks);
+  argos::CVector2 calc_center(const block_list& blocks);
 
   double m_min_dist;
 };

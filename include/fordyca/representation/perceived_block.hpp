@@ -48,10 +48,11 @@ class block;
  */
 struct perceived_block {
   perceived_block(void) : ent(nullptr), density() {}
-  perceived_block(block *b, const rcppsw::swarm::pheromone_density& d)
+  perceived_block(const std::shared_ptr<block>& b,
+                  const rcppsw::swarm::pheromone_density& d)
       : ent(b), density(d) {}
 
-  block* ent;
+  std::shared_ptr<block> ent;
   rcppsw::swarm::pheromone_density density;
 };
 

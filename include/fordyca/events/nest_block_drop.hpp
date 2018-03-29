@@ -39,18 +39,16 @@ namespace fsm {
 namespace depth0 {
 class stateless_foraging_fsm;
 class stateful_foraging_fsm;
-}
+} // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
 }
 class block_to_nest_fsm;
-}
-namespace controller {
-namespace depth0 {
+} // namespace fsm
+namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-}
+}} // namespace controller::depth0
 
 namespace metrics {
 class block_metrics_collector;
@@ -58,7 +56,7 @@ class block_metrics_collector;
 namespace tasks {
 class generalist;
 class collector;
-}
+} // namespace tasks
 
 NS_START(events);
 
@@ -85,7 +83,7 @@ class nest_block_drop
                                 metrics::block_metrics_collector> {
  public:
   nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  representation::block* block);
+                  const std::shared_ptr<representation::block>& block);
   ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -113,10 +111,10 @@ class nest_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  representation::block* block(void) const { return m_block; }
+  std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
-  representation::block* m_block;
+  std::shared_ptr<representation::block> m_block;
 };
 
 NS_END(events, fordyca);

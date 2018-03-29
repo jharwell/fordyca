@@ -29,25 +29,26 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using interactor = arena_interactor<controller::depth0::stateful_foraging_controller>;
+using interactor =
+    arena_interactor<controller::depth0::stateful_foraging_controller>;
 
 /*******************************************************************************
  * Member Functions
@@ -63,10 +64,9 @@ void stateful_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   auto* p_output = static_cast<const struct params::output_params*>(
       repo.get_params("output"));
-  collector_group().add_collector<metrics::fsm::stateful_metrics_collector>(
+  collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
       "fsm::stateful",
       metrics_path() + "/" + p_output->metrics.stateful_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
   collector_group().reset_all();
 
@@ -94,18 +94,18 @@ void stateful_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect_from("fsm::distance",
-      static_cast<metrics::fsm::distance_metrics&>(controller));
+  collector_group().collect_from(
+      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    collector_group().collect_from(
-        "fsm::stateful",
-        static_cast<metrics::fsm::stateless_metrics&>(*controller.current_task()));
+    collector_group().collect_from("fsm::stateful",
+                                   static_cast<metrics::fsm::stateless_metrics&>(
+                                       *controller.current_task()));
   }
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(robot,
-                                                                         *arena_map());
+  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
+      robot, *arena_map());
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
@@ -125,7 +125,7 @@ argos::CColor stateful_foraging_loop_functions::GetFloorColor(
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {
-    if (arena_map()->blocks()[i].contains_point(plane_pos)) {
+    if (arena_map()->blocks()[i]->contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */

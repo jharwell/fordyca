@@ -129,11 +129,11 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   if (m_sensors->threatening_obstacle_exists()) {
     argos::CVector2 force = kinematics().calc_avoidance_force();
     ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(),
-            force.GetY(),
-            force.Angle().GetValue(),
-            force.Length());
-  m_actuators->set_rel_heading(force);
+           force.GetX(),
+           force.GetY(),
+           force.Angle().GetValue(),
+           force.Length());
+    m_actuators->set_rel_heading(force);
   } else {
     internal_event(previous_state());
   }

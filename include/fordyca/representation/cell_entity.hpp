@@ -27,8 +27,8 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <utility>
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,10 @@ NS_START(fordyca, representation);
 class cell_entity {
  public:
   cell_entity(double x_dim, double y_dim, argos::CColor color)
-      : m_id(-1),
+      : cell_entity{x_dim, y_dim, color, -1} {}
+
+  cell_entity(double x_dim, double y_dim, argos::CColor color, int id)
+      : m_id(id),
         m_display_id(false),
         m_x_dim(x_dim),
         m_y_dim(y_dim),
@@ -57,6 +60,8 @@ class cell_entity {
         m_discrete_loc() {}
 
   cell_entity(double dim, argos::CColor color) : cell_entity(dim, dim, color) {}
+  cell_entity(double dim, argos::CColor color, int id)
+      : cell_entity(dim, dim, color, id) {}
 
   cell_entity(const cell_entity& other) = default;
   cell_entity& operator=(const cell_entity& other) = default;
@@ -100,10 +105,13 @@ class cell_entity {
   }
 
   virtual void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  virtual void discrete_loc(const rcppsw::math::dcoord2& loc) { m_discrete_loc = loc; }
+  virtual void discrete_loc(const rcppsw::math::dcoord2& loc) {
+    m_discrete_loc = loc;
+  }
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the entity
+   * @brief Determine if a real-valued point lies within the extent of the
+   * entity
    * for:
    *
    * 1. Visualization purposes.

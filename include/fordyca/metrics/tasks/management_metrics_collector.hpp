@@ -51,15 +51,9 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
  public:
   /**
    * @param ofname Output file name.
-   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
-   * specified interval, and written out and reset at the end of it. If
-   * \c FALSE, they will be written out every timestep.
-   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
-   * @param n_robots # of robots in the swarm.
+   * @param interval Collection interval.
    */
-  management_metrics_collector(const std::string& ofname,
-                 bool collect_cum,
-                 uint collect_interval);
+  management_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
@@ -67,7 +61,7 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
  private:
   struct subtask_selection_stats {
-    uint n_foragers;
+    uint n_harvesters;
     uint n_collectors;
   };
 
@@ -83,12 +77,12 @@ class management_metrics_collector : public rcppsw::metrics::base_metrics_collec
 
   struct finish_stats {
     uint n_completed;
-    uint n_forager_completed;
+    uint n_harvester_completed;
     uint n_collector_completed;
     uint n_generalist_completed;
 
     uint cum_collector_exec_time;
-    uint cum_forager_exec_time;
+    uint cum_harvester_exec_time;
     uint cum_generalist_exec_time;
     uint cum_task_exec_time;
   };

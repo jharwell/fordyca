@@ -1,6 +1,5 @@
 /**
- * @file perceived_cache.hpp
- * @ingroup representation
+ * @file exec_estimates_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,42 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/params/depth1/exec_estimates_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-class base_cache;
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Struct Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct perceived_cache
- * @ingroup representation
+ * @class exec_estimates_parser
+ * @ingroup params depth1
  *
- * @brief A representation of a "virtual" cache in the arena, which has a
- * pheromone density/relevance associated with it.
+ * @brief Parses XML parameters used for estimation of task execution at the
+ * start of simulation.
  */
-struct perceived_cache {
-  perceived_cache(void) : ent(nullptr), density() {}
-  perceived_cache(const std::shared_ptr<base_cache>& c,
-                  const rcppsw::swarm::pheromone_density& d)
-      : ent(c), density(d) {}
+class exec_estimates_parser: public rcppsw::common::xml_param_parser {
+ public:
+  exec_estimates_parser(void) : m_params() {}
+  void parse(argos::TConfigurationNode& node) override;
+  const struct exec_estimates_params* get_results(void) override {
+    return m_params.get();
+  }
+  void show(std::ostream& stream) override;
 
-  std::shared_ptr<base_cache> ent;
-  rcppsw::swarm::pheromone_density density;
+ private:
+  std::unique_ptr<struct exec_estimates_params> m_params;
 };
 
-NS_END(representation, fordyca);
+NS_END(params, fordyca, depth1);
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_CACHE_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_ */

@@ -70,9 +70,8 @@ void actuator_manager::set_rel_heading(const argos::CVector2& heading,
  * States
  ******************************************************************************/
 FSM_STATE_DEFINE(actuator_manager, no_turn, turn_data) {
-  if (data->force_hard ||
-      argos::Abs(data->heading.Angle().SignedNormalize()) >
-          mc_params.wheels.soft_turn_max) {
+  if (data->force_hard || argos::Abs(data->heading.Angle().SignedNormalize()) >
+                              mc_params.wheels.soft_turn_max) {
     internal_event(ST_HARD_TURN);
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) >
              mc_params.wheels.no_turn_max) {

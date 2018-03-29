@@ -1,6 +1,5 @@
 /**
- * @file perceived_cache.hpp
- * @ingroup representation
+ * @file exec_estimates_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,42 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_CACHE_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-class base_cache;
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Struct Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @struct perceived_cache
- * @ingroup representation
- *
- * @brief A representation of a "virtual" cache in the arena, which has a
- * pheromone density/relevance associated with it.
- */
-struct perceived_cache {
-  perceived_cache(void) : ent(nullptr), density() {}
-  perceived_cache(const std::shared_ptr<base_cache>& c,
-                  const rcppsw::swarm::pheromone_density& d)
-      : ent(c), density(d) {}
+void exec_estimates_parser::parse(argos::TConfigurationNode& node) {
+  m_params = rcppsw::make_unique<struct exec_estimates_params>();
 
-  std::shared_ptr<base_cache> ent;
-  rcppsw::swarm::pheromone_density density;
-};
+  argos::GetNodeAttribute(node, "enabled", m_params->enabled);
+  if (m_params->enabled) {
+    argos::GetNodeAttribute(node, "generalist_range", m_params->generalist_range);
+    argos::GetNodeAttribute(node, "harvester_range", m_params->harvester_range);
+    argos::GetNodeAttribute(node, "collector_range", m_params->collector_range);
+  }
+} /* parse() */
 
-NS_END(representation, fordyca);
+void exec_estimates_parser::show(std::ostream& stream) {
+  stream
+      << "====================\nExec estimates params\n====================\n";
+  stream << "enabled=" << m_params->enabled << std::endl;
+  stream << "generalist_range=" << m_params->generalist_range << std::endl;
+  stream << "harvester_range=" << m_params->harvester_range << std::endl;
+  stream << "collector_range=" << m_params->collector_range << std::endl;
+} /* show() */
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_PERCEIVED_CACHE_HPP_ */
+NS_END(depth1, params, fordyca);

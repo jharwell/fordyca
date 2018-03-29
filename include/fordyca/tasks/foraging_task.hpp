@@ -29,8 +29,8 @@
 #include "fordyca/metrics/fsm/depth1_metrics.hpp"
 #include "fordyca/metrics/fsm/stateful_metrics.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -44,7 +44,7 @@ class cache_block_drop;
 class free_block_pickup;
 class nest_block_drop;
 class cache_vanished;
-}
+} // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -72,7 +72,7 @@ class foraging_task
                                             events::cache_vanished> {
  public:
   static constexpr char kCollectorName[] = "Collector";
-  static constexpr char kForagerName[] = "Forager";
+  static constexpr char kHarvesterName[] = "Harvester";
   static constexpr char kGeneralistName[] = "Generalist";
 
   explicit foraging_task(const std::string& name) : mc_name(name) {}

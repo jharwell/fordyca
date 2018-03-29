@@ -54,9 +54,12 @@ NS_START(fsm);
 class distance_metrics_collector : public rcppsw::metrics::base_metrics_collector,
                                    public visitor::visitable_any<distance_metrics_collector> {
  public:
-  explicit distance_metrics_collector(const std::string& ofname,
-                                      bool collect_cum,
-                                      uint collect_interval);
+  /**
+   * @param ofname The output file name.
+   * @param interval Collection interval.
+   */
+  distance_metrics_collector(const std::string& ofname, uint interval);
+
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;

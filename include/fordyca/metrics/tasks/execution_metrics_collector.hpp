@@ -50,14 +50,9 @@ class execution_metrics_collector : public rcppsw::metrics::base_metrics_collect
  public:
   /**
    * @param ofname Output file name.
-   * @param collect_cum If \c TRUE, then metrics will be accumulated during the
-   * specified interval, and written out and reset at the end of it. If
-   * \c FALSE, they will be written out every timestep.
-   * @param collect_interval The interval. Ignored if collect_cum is \c FALSE.
+   * @param interval Collection interval.
    */
-  execution_metrics_collector(const std::string& ofname,
-                 bool collect_cum,
-                 uint collect_interval);
+  execution_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
@@ -65,22 +60,22 @@ class execution_metrics_collector : public rcppsw::metrics::base_metrics_collect
   void reset_after_timestep(void) override;
 
   size_t n_collectors(void) const { return m_count_stats.n_collectors; }
-  uint n_foragers(void) const { return m_count_stats.n_foragers; }
+  uint n_harvesters(void) const { return m_count_stats.n_harvesters; }
   uint n_generalists(void) const { return m_count_stats.n_generalists; }
 
  private:
   struct count_stats {
     uint n_collectors;
-    uint n_foragers;
+    uint n_harvesters;
     uint n_generalists;
 
     uint n_cum_collectors;
-    uint n_cum_foragers;
+    uint n_cum_harvesters;
     uint n_cum_generalists;
   };
   struct interface_stats {
     uint cum_collector_delay;
-    uint cum_forager_delay;
+    uint cum_harvester_delay;
   };
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;

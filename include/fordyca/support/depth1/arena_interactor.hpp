@@ -158,9 +158,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
       controller.visitor::template visitable_any<T>::accept(vanished);
     } else {
       events::cached_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &map()->caches()[p.cache_id()],
+                                            map()->caches()[p.cache_id()],
                                             utils::robot_id(controller));
-      map()->caches()[cache_id].penalty_served(p.penalty());
+      map()->caches()[cache_id]->penalty_served(p.penalty());
 
       /*
        * Map must be called before controller for proper cache block decrement!
@@ -208,9 +208,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
     } else {
       events::cache_block_drop drop_op(rcppsw::er::g_server,
                                        controller.block(),
-                                       &map()->caches()[cache_id],
+                                       map()->caches()[cache_id],
                                        map()->grid_resolution());
-      map()->caches()[cache_id].penalty_served(p.penalty());
+      map()->caches()[cache_id]->penalty_served(p.penalty());
 
       /* Update arena map state due to a cache drop */
       map()->accept(drop_op);

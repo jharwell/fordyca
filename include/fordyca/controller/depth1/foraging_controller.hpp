@@ -44,7 +44,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 namespace tasks {
-class forager;
+class harvester;
 class collector;
 class generalist;
 class foraging_task;
@@ -60,7 +60,7 @@ NS_START(controller, depth1);
  * @ingroup controller depth1
  *
  * @brief A foraging controller that switches between \ref generalist,
- * \ref forager, and \ref collector tasks, according to dynamic changes in the
+ * \ref harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
@@ -133,7 +133,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool                                               m_display_task{false};
   std::string                                        m_prev_task{""};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::forager>                    m_forager;
+  std::unique_ptr<tasks::harvester>                  m_harvester;
   std::unique_ptr<tasks::collector>                  m_collector;
   std::unique_ptr<tasks::generalist>                 m_generalist;
   // clang-format on

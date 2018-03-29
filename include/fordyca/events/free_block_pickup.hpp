@@ -39,22 +39,20 @@ namespace fsm {
 namespace depth0 {
 class stateless_foraging_fsm;
 class stateful_foraging_fsm;
-}
+} // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
 }
-}
-namespace controller {
-namespace depth0 {
+} // namespace fsm
+namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-}
+}} // namespace controller::depth0
 
 namespace tasks {
 class generalist;
-class forager;
-}
+class harvester;
+} // namespace tasks
 
 NS_START(events);
 
@@ -78,11 +76,11 @@ class free_block_pickup
                                 fsm::depth0::stateful_foraging_fsm,
                                 fsm::depth1::block_to_cache_fsm,
                                 tasks::generalist,
-                                tasks::forager> {
+                                tasks::harvester> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                    representation::block* block,
-                    size_t robot_index);
+                    const std::shared_ptr<representation::block>& block,
+                    uint robot_index);
   ~free_block_pickup(void) override { client::rmmod(); }
 
   free_block_pickup(const free_block_pickup& op) = delete;
@@ -108,13 +106,13 @@ class free_block_pickup
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
   void visit(fsm::block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
   // clang-format off
-  size_t                              m_robot_index;
-  representation::block*              m_block;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  uint                                   m_robot_index;
+  std::shared_ptr<representation::block> m_block;
+  std::shared_ptr<rcppsw::er::server>    m_server;
   // clang-format on
 };
 

@@ -24,6 +24,8 @@
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,14 +47,14 @@ dynamic_cache_creator::dynamic_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::vector<representation::arena_cache> dynamic_cache_creator::create_all(
-    std::vector<representation::block*>& blocks) {
-  std::vector<representation::arena_cache> caches;
+depth1::cache_creator::cache_vector dynamic_cache_creator::create_all(
+    block_vector& blocks) {
+  cache_vector caches;
 
   ER_NOM("Dynamically creating caches: %zu free blocks", blocks.size());
 
   for (size_t i = 0; i < blocks.size() - 1; ++i) {
-    std::list<representation::block*> starter_blocks;
+    block_list starter_blocks;
     for (size_t j = i + 1; j < blocks.size(); ++j) {
       if ((blocks[i]->real_loc() - blocks[j]->real_loc()).Length() <=
           m_min_dist) {
@@ -79,8 +81,7 @@ std::vector<representation::arena_cache> dynamic_cache_creator::create_all(
   return caches;
 } /* create() */
 
-argos::CVector2 dynamic_cache_creator::calc_center(
-    std::list<representation::block*> blocks) {
+argos::CVector2 dynamic_cache_creator::calc_center(const block_list& blocks) {
   double x = 0;
   double y = 0;
   for (auto block : blocks) {

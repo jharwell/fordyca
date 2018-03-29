@@ -25,13 +25,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <tuple>
 #include <string>
+#include <tuple>
 
+#include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca);
 
 namespace params { namespace depth0 {
 struct occupancy_grid_params;
-}}
+}} // namespace params::depth0
 
 NS_START(representation);
 
@@ -52,10 +52,9 @@ using layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 class occupancy_grid : public rcppsw::er::client,
                        public rcppsw::ds::stacked_grid2<layer_stack> {
  public:
-  occupancy_grid(
-      std::shared_ptr<rcppsw::er::server> server,
-      const struct params::depth0::occupancy_grid_params* c_params,
-      const std::string& robot_id);
+  occupancy_grid(std::shared_ptr<rcppsw::er::server> server,
+                 const struct params::depth0::occupancy_grid_params* c_params,
+                 const std::string& robot_id);
 
   /**
    * @brief Update the density of all cells in the grid.
@@ -64,8 +63,8 @@ class occupancy_grid : public rcppsw::er::client,
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;
   }
-  static constexpr uint kPheromoneLayer = 0;
-  static constexpr uint kCellLayer = 1;
+  constexpr static uint kPheromoneLayer = 0;
+  constexpr static uint kCellLayer = 1;
 
  private:
   void cell_update(size_t i, size_t j);

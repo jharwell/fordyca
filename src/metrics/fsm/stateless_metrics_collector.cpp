@@ -33,14 +33,8 @@ NS_START(fordyca, metrics, fsm);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_metrics_collector::stateless_metrics_collector(const std::string& ofname,
-                                                         bool collect_cum,
-                                                         uint collect_interval)
-    : base_metrics_collector(ofname, collect_cum), m_stats() {
-  if (collect_cum) {
-    use_interval(true);
-    interval(collect_interval);
-  }
-}
+                                                         uint interval)
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
@@ -48,19 +42,13 @@ stateless_metrics_collector::stateless_metrics_collector(const std::string& ofna
 std::string stateless_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
-  if (collect_cum()) {
-    return base_metrics_collector::csv_header_build(header) +
-        "n_exploring_for_block"  + separator() +
-        "n_cum_exploring_for_block"  + separator() +
-        "n_avoiding_collision" + separator() +
-        "n_cum_avoiding_collision" + separator() +
-        "n_transporting_to_nest" + separator() +
-        "n_cum_transporting_to_nest" + separator();
-  }
   return base_metrics_collector::csv_header_build(header) +
       "n_exploring_for_block"  + separator() +
+      "n_cum_exploring_for_block"  + separator() +
       "n_avoiding_collision" + separator() +
-      "n_transporting_to_nest" + separator();
+      "n_cum_avoiding_collision" + separator() +
+      "n_transporting_to_nest" + separator() +
+      "n_cum_transporting_to_nest" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -71,39 +59,30 @@ void stateless_metrics_collector::reset(void) {
 
 void stateless_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m =
-      static_cast<const metrics::fsm::stateless_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::stateless_metrics&>(metrics);
   m_stats.n_exploring_for_block += static_cast<uint>(m.is_exploring_for_block());
   m_stats.n_transporting_to_nest +=
       static_cast<uint>(m.is_transporting_to_nest());
   m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
 
-  if (collect_cum()) {
-    m_stats.n_cum_exploring_for_block +=
-        static_cast<uint>(m.is_exploring_for_block());
-    m_stats.n_cum_transporting_to_nest +=
-        static_cast<uint>(m.is_transporting_to_nest());
-    m_stats.n_cum_avoiding_collision +=
-        static_cast<uint>(m.is_avoiding_collision());
-  }
+  m_stats.n_cum_exploring_for_block +=
+      static_cast<uint>(m.is_exploring_for_block());
+  m_stats.n_cum_transporting_to_nest +=
+      static_cast<uint>(m.is_transporting_to_nest());
+  m_stats.n_cum_avoiding_collision +=
+      static_cast<uint>(m.is_avoiding_collision());
 } /* collect() */
 
 bool stateless_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  if (collect_cum()) {
-    line = std::to_string(m_stats.n_exploring_for_block) + separator() +
-           std::to_string(m_stats.n_cum_exploring_for_block) + separator() +
-           std::to_string(m_stats.n_avoiding_collision) + separator() +
-           std::to_string(m_stats.n_cum_avoiding_collision) + separator() +
-           std::to_string(m_stats.n_transporting_to_nest) + separator() +
-           std::to_string(m_stats.n_cum_transporting_to_nest) + separator();
-  } else {
-    line = std::to_string(m_stats.n_exploring_for_block) + separator() +
-           std::to_string(m_stats.n_avoiding_collision) + separator() +
-           std::to_string(m_stats.n_transporting_to_nest) + separator();
-  }
+  line = std::to_string(m_stats.n_exploring_for_block) + separator() +
+         std::to_string(m_stats.n_cum_exploring_for_block) + separator() +
+         std::to_string(m_stats.n_avoiding_collision) + separator() +
+         std::to_string(m_stats.n_cum_avoiding_collision) + separator() +
+         std::to_string(m_stats.n_transporting_to_nest) + separator() +
+         std::to_string(m_stats.n_cum_transporting_to_nest) + separator();
   return true;
 } /* store_foraging_stats() */
 

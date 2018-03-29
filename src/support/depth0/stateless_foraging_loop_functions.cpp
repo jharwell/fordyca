@@ -28,9 +28,9 @@
 #include <experimental/filesystem>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
@@ -39,16 +39,17 @@
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/tasks/foraging_task.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 namespace fs = std::experimental::filesystem;
-using interactor = arena_interactor<controller::depth0::stateless_foraging_controller>;
+using interactor =
+    arena_interactor<controller::depth0::stateless_foraging_controller>;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -136,8 +137,8 @@ argos::CColor stateless_foraging_loop_functions::GetFloorColor(
   }
 
   for (auto& block : arena_map()->blocks()) {
-    if (block.contains_point(plane_pos)) {
-      return block.color();
+    if (block->contains_point(plane_pos)) {
+      return block->color();
     }
   } /* for(&block..) */
 
@@ -152,11 +153,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
 
   /* get stats from this robot before its state changes */
   m_collector_group.collect_from(
-      "fsm::distance",
-      static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect_from(
-      "fsm::stateless",
-      static_cast<metrics::fsm::stateless_metrics&>(*controller.fsm()));
+      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
+  m_collector_group.collect_from("fsm::stateless",
+                                 static_cast<metrics::fsm::stateless_metrics&>(
+                                     *controller.fsm()));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -194,20 +194,18 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   }
   fs::create_directories(m_metrics_path);
 
-  m_collector_group.add_collector<metrics::fsm::stateless_metrics_collector>(
+  m_collector_group.register_collector<metrics::fsm::stateless_metrics_collector>(
       "fsm::stateless",
       m_metrics_path + "/" + p_output->metrics.stateless_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
-  m_collector_group.add_collector<metrics::block_metrics_collector>(
+  m_collector_group.register_collector<metrics::block_metrics_collector>(
       "block",
       m_metrics_path + "/" + p_output->metrics.block_fname,
       p_output->metrics.collect_interval);
 
-  m_collector_group.add_collector<metrics::fsm::distance_metrics_collector>(
+  m_collector_group.register_collector<metrics::fsm::distance_metrics_collector>(
       "fsm::distance",
       m_metrics_path + "/" + p_output->metrics.distance_fname,
-      p_output->metrics.collect_cum,
       p_output->metrics.collect_interval);
 
   m_collector_group.reset_all();
@@ -223,7 +221,7 @@ void stateless_foraging_loop_functions::arena_map_init(
   m_arena_map.reset(new representation::arena_map(arena_params));
   m_arena_map->distribute_blocks();
   for (auto& block : m_arena_map->blocks()) {
-    block.display_id(l_params->display_block_id);
+    block->display_id(l_params->display_block_id);
   } /* for(&block..) */
 } /* arena_map_init() */
 

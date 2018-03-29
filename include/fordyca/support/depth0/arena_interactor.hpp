@@ -98,7 +98,7 @@ class arena_interactor : public rcppsw::er::client {
       int block = utils::robot_on_block(controller, *m_map);
       if (-1 != block) {
         events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                            &m_map->blocks()[block],
+                                            m_map->blocks()[block],
                                             utils::robot_id(controller));
         controller.visitor::template visitable_any<T>::accept(pickup_op);
         m_map->accept(pickup_op);

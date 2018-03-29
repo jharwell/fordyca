@@ -34,18 +34,14 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw {
-namespace er {
+namespace rcppsw { namespace er {
 class server;
-}
-}
+}} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params {
-namespace depth0 {
+namespace params { namespace depth0 {
 struct occupancy_grid_params;
-}
-}
+}} // namespace params::depth0
 
 NS_START(representation);
 class line_of_sight;
@@ -68,6 +64,11 @@ class perceived_arena_map
     : public rcppsw::er::client,
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
+  using cache_list = std::list<std::shared_ptr<base_cache>>;
+  using block_list = std::list<std::shared_ptr<block>>;
+  using perceived_cache_list = std::list<perceived_cache>;
+  using perceived_block_list = std::list<perceived_block>;
+
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
       const struct fordyca::params::depth0::occupancy_grid_params* c_params,
@@ -83,12 +84,12 @@ class perceived_arena_map
    *
    * @return The list of perceived blocks.
    */
-  std::list<perceived_block> perceived_blocks(void) const;
+  perceived_block_list perceived_blocks(void) const;
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of.
    */
-  std::list<std::unique_ptr<block>>& blocks(void) { return m_blocks; }
+  block_list& blocks(void) { return m_blocks; }
 
   /**
    * @brief Get a list of all cache the robot is currently aware of and their
@@ -96,27 +97,25 @@ class perceived_arena_map
    *
    * @return The list of perceived cache.
    */
-  std::list<perceived_cache> perceived_caches(void) const;
+  perceived_cache_list perceived_caches(void) const;
 
   /**
    * @brief Get a list of all caches the robot is currently aware of.
    */
-  std::list<std::unique_ptr<base_cache>>& caches(void) {
-    return m_caches;
-  }
+  cache_list& caches(void) { return m_caches; }
 
   /**
    * @brief Add a cache to the list of perceived caches.
    *
    * @param cache Cache to add.
    */
-  void cache_add(std::unique_ptr<base_cache>& cache);
+  void cache_add(const std::shared_ptr<base_cache>& cache);
 
   /**
    * @brief Remove a cache from the list of perceived caches, and update its
    * cell to be empty.
    */
-  void cache_remove(const base_cache* victim);
+  void cache_remove(const std::shared_ptr<base_cache>& victim);
 
   /*
    * @brief Add a free block to the list of known blocks.
@@ -125,13 +124,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(std::unique_ptr<block>& block);
+  bool block_add(const std::shared_ptr<block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const block* victim);
+  bool block_remove(const std::shared_ptr<block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -149,8 +148,9 @@ class perceived_arena_map
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
-                                                                       size_t j) const {
+  const typename occupancy_grid::layer_type<Index>::value_type& access(
+      size_t i,
+      size_t j) const {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
@@ -181,7 +181,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<base_cache>> m_caches;
+  cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -189,7 +189,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  std::list<std::unique_ptr<block>> m_blocks;
+  block_list m_blocks;
 };
 
 NS_END(representation, fordyca);

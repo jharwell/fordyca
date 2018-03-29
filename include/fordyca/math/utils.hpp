@@ -60,7 +60,6 @@ __pure static inline argos::CVector2 dcoord_to_rcoord(
                          d_coord.second * resolution);
 }
 
-
 NS_END(math, fordyca);
 
 #endif /* INCLUDE_FORDYCA_MATH_UTILS_HPP_ */

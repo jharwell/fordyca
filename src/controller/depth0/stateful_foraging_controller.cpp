@@ -35,12 +35,12 @@
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth1/task_params.hpp"
+#include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensor_params.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/generalist.hpp"
@@ -153,9 +153,9 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
       static_cast<const struct params::fsm_params*>(
           param_repo.get_params("fsm"));
 
-  const params::depth1::task_params* task_params =
-      static_cast<const params::depth1::task_params*>(
-          task_repo.get_params("task"));
+  const params::depth1::task_allocation_params* task_params =
+      static_cast<const params::depth1::task_allocation_params*>(
+          task_repo.get_params("task_allocation"));
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
@@ -164,7 +164,7 @@ void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
           stateful_sensors_ref(),
           base_foraging_controller::actuators(),
           depth0::stateful_foraging_controller::map_ref());
-  m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->tasks,
+  m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->executive,
                                                         generalist_fsm);
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
@@ -193,13 +193,15 @@ void stateful_foraging_controller::process_los(
                 map()->access<occupancy_grid::kCellLayer>(d).block()->id(),
                 d.first,
                 d.second);
-        map()->block_remove(map()->access<occupancy_grid::kCellLayer>(d).block());
+        map()->block_remove(
+            map()->access<occupancy_grid::kCellLayer>(d).block());
       }
     } /* for(j..) */
   }   /* for(i..) */
 
   for (auto block : los->blocks()) {
-    if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc()).state_has_block()) {
+    if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
+             .state_has_block()) {
       ER_NOM("Discovered block%d at (%zu, %zu)",
              block->id(),
              block->discrete_loc().first,

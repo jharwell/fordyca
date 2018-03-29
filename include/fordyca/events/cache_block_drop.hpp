@@ -38,14 +38,12 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class perceived_arena_map;
 class arena_cache;
-}
-namespace fsm {
-namespace depth1 {
+} // namespace representation
+namespace fsm { namespace depth1 {
 class block_to_cache_fsm;
-}
-}
+}} // namespace fsm::depth1
 namespace tasks {
-class forager;
+class harvester;
 }
 
 NS_START(events);
@@ -67,13 +65,13 @@ class cache_block_drop
       public rcppsw::er::client,
       public block_drop_event,
       public visitor::visit_set<fsm::depth1::block_to_cache_fsm,
-                                tasks::forager,
+                                tasks::harvester,
                                 representation::perceived_arena_map,
                                 representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   representation::block* block,
-                   representation::arena_cache* cache,
+                   const std::shared_ptr<representation::block>& block,
+                   const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
   ~cache_block_drop(void) override { client::rmmod(); }
 
@@ -89,14 +87,14 @@ class cache_block_drop
   void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
-  void visit(tasks::forager& task) override;
+  void visit(tasks::harvester& task) override;
 
  private:
   // clang-format off
-  double                              m_resolution;
-  representation::block*              m_block;
-  representation::arena_cache*        m_cache;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  double                                       m_resolution;
+  std::shared_ptr<representation::block>       m_block;
+  std::shared_ptr<representation::arena_cache> m_cache;
+  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

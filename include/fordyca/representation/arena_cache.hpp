@@ -48,14 +48,15 @@ NS_START(fordyca, representation);
  * from \ref perceived_cache objects because they handle cache penalties and can
  * collect metrics about their usage.
  */
-class arena_cache : public base_cache,
-                    public metrics::cache_metrics,
-                    public rcppsw::patterns::visitor::visitable_any<arena_cache> {
+class arena_cache
+    : public base_cache,
+      public metrics::cache_metrics,
+      public rcppsw::patterns::visitor::visitable_any<arena_cache> {
  public:
   arena_cache(double dimension,
               double resolution,
               argos::CVector2 center,
-              std::vector<block*>& blocks,
+              const std::vector<std::shared_ptr<block>>& blocks,
               int id);
 
   /* metrics */
