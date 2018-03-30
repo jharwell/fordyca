@@ -26,6 +26,12 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/support/depth1/penalty_function.hpp"
+/*******************************************************************************
+ * Namespaces
+ ******************************************************************************/
+NS_START(fordyca, support, depth1);
+
  /*******************************************************************************
   * Classes
   ******************************************************************************/
@@ -42,28 +48,28 @@
 
 class cache_penalty_generator {
  public:
-    cache_penalty_generator(const char* pen_func, int amp, int per,
+    cache_penalty_generator(enum penalty_function pen_func, int amp, int per,
                             int phase, int square, int step, int saw)
         : amplitude(amp), period(per), phase_shift(phase),
           square_length(square), step_length(step), saw_length(saw) {
       switch (pen_func) {
         case kSine:
-            penalty_func = &sine_func;
+            penalty_func = &cache_penalty_generator::sine_func;
             break;
         case kSquare:
-            penalty_func = &square_func;
+            penalty_func = &cache_penalty_generator::square_func;
             break;
         case kStep:
-            penalty_func = &step_func;
+            penalty_func = &cache_penalty_generator::step_func;
             break;
         case kSaw:
-            penalty_func = &sawtooth_func;
+            penalty_func = &cache_penalty_generator::sawtooth_func;
             break;
         default:
+            printf("Invalid Penalty Function Option\n");
             assert(0);  // terminate program if not usable penalty function
       }
     }
-
 
     /**
      * @brief the function pointer for temporal function
@@ -78,17 +84,13 @@ class cache_penalty_generator {
     int square_length;
     int step_length;
     int saw_length;
-    const std::string kSquare = "square";
-    const std::string kSine = "sine";
-    const std::string kStep = "step";
-    const std::string kSaw = "saw";
 
     /**
      * @brief sine temporal penalty function
      *
      * @param timestep The current timestep.
      */
-    static uint sine_func(uint timestep) {
+    uint sine_func(uint timestep) {
       return (uint) (amplitude *(sin(timestep) + phase_shift));
     }
     /**
@@ -96,7 +98,7 @@ class cache_penalty_generator {
      *
      * @param timestep The current timestep.
      */
-    static uint square_func(uint timestep) {
+    uint square_func(uint timestep) {
       uint time_ones = timestep % square_length;
       if (time_ones >= 0 && time_ones < (square_length/2)) {
         return 0;
@@ -109,7 +111,7 @@ class cache_penalty_generator {
      *
      * @param timestep The current timestep.
      */
-     static uint step_func(uint timestep) {
+    uint step_func(uint timestep) {
       return (timestep/step_length);
      }
      /**
@@ -117,9 +119,10 @@ class cache_penalty_generator {
       *
       * @param timestep The current timestep.
       */
-    static uint sawtooth_func(uint timestep) {
+    uint sawtooth_func(uint timestep) {
       return (timestep % saw_length);
     }
 };
+NS_END(depth1, support, fordyca);
 
 #endif  // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_PENALTY_GENERATOR_HPP_

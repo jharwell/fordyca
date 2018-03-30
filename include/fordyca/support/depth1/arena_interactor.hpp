@@ -27,6 +27,7 @@
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth1/cache_penalty_handler.hpp"
 #include "fordyca/support/depth1/cache_penalty_generator.hpp"
+#include "fordyca/support/depth1/penalty_function.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -65,12 +66,13 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    argos::CFloorEntity* floor_in,
                    const argos::CRange<double>& nest_xrange,
                    const argos::CRange<double>& nest_yrange,
-                   uint cache_usage_penalty, char* pen_func, int amp, int per,
-                   int phase, int square, int step, int saw)
+                   uint cache_usage_penalty, enum penalty_function pen_func,
+                   int amp, int per, int phase, int square, int step, int saw)
       : depth0::arena_interactor<T>(server, map_in, floor_in),
       m_nest_xrange(nest_xrange),
       m_nest_yrange(nest_yrange),
-    m_cache_penalty_handler(server, *map_in, cache_usage_penalty),
+    m_cache_penalty_handler(server, *map_in, cache_usage_penalty, pen_func, amp,
+       per, phase, square, step, saw),
     // new class object for generating temporal penalty function
     m_cache_penalty_generator(pen_func, amp, per, phase, square, step, saw) {}
 

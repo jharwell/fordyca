@@ -1,5 +1,5 @@
 /**
- * @file foraging_qt_user_functions.cpp
+ * @file foraging_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth1/foraging_loop_functions.hpp"
+#include <argos3/core/simulator/simulator.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <random>
+
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/metrics/cache_metrics_collector.hpp"
@@ -45,17 +49,46 @@
 NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-foraging_qt_user_functions::foraging_qt_user_functions(void) {
-  RegisterUserFunction<foraging_qt_user_functions, argos::CFootBotEntity>(
-      &foraging_qt_user_functions::Draw);
-}
-
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+  depth0::stateful_foraging_loop_functions::Init(node);
+
+  ER_NOM("Initializing depth1_foraging loop functions");
+  params::loop_function_repository repo;
+
+  repo.parse_all(node);
+
+  auto* arenap = static_cast<const struct params::arena_map_params*>(
+      repo.get_params("arena_map"));
+  /* initialize cache handling and create initial cache */
+  cache_handling_init(arenap);
+
+  /* initialize stat collecting */
+  metric_collecting_init(static_cast<const struct params::output_params*>(
+      repo.get_params("output")));
+
+  /* intitialize robot interactions with environment */
+  m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                                 arena_map(),
+                                                 floor(),
+                                                 nest_xrange(),
+                                                 nest_yrange(),
+                                                 arenap->cache.usage_penalty);
+
+  /* configure robots */
+  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    argos::CFootBotEntity& robot =
+        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
+        robot.GetControllableEntity().GetController());
+    auto* l_params = static_cast<const struct params::loop_functions_params*>(
+        repo.get_params("loop_functions"));
+
+    controller.display_task(l_params->display_robot_task);
+  } /* for(&entity..) */
+  ER_NOM("depth1_foraging loop functions initialization finished");
+}
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
@@ -96,11 +129,12 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
                       *collector_group()["block"]));
 } /* pre_step_iter() */
 
-
-  if (controller.display_task() && nullptr != controller.current_task()) {
-    DrawText(argos::CVector3(0.0, 0.0, 0.75),
-             controller.current_task()->name(),
-             argos::CColor::BLUE);
+argos::CColor foraging_loop_functions::GetFloorColor(
+    const argos::CVector2& plane_pos) {
+  /* The nest is a light gray */
+  if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
+      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
+    return argos::CColor::GRAY70;
   }
 
   /*
@@ -221,7 +255,6 @@ void foraging_loop_functions::metric_collecting_init(
   collector_group().reset_all();
 } /* metric_collecting_init() */
 
-
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different
@@ -229,8 +262,8 @@ void foraging_loop_functions::metric_collecting_init(
  * error.
  */
 using namespace argos;
-typedef foraging_qt_user_functions depth1_foraging_qt_user_functions;
-REGISTER_QTOPENGL_USER_FUNCTIONS(foraging_qt_user_functions,
-                                 "depth1_foraging_qt_user_functions"); // NOLINT
+typedef foraging_loop_functions depth1_foraging_loop_functions;
+REGISTER_LOOP_FUNCTIONS(depth1_foraging_loop_functions,
+                        "depth1_foraging_loop_functions");
 
-NS_END(support, fordyca, depth1);
+NS_END(depth1, support, fordyca);

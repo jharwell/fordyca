@@ -31,6 +31,7 @@
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/support/depth1/cache_penalty_generator.hpp"
+#include "fordyca/support/depth1/penalty_function.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,8 +58,11 @@ class cache_penalty_handler : public rcppsw::er::client {
  public:
   cache_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
                         representation::arena_map& map,
-                        uint penalty)
-      : client(server), mc_penalty(penalty), m_penalty_list(), m_map(map) {
+                        uint penalty, enum penalty_function pen_func,
+                        int amp, int per, int phase, int square, int step,
+                        int saw)
+      : client(server), mc_penalty(penalty), m_penalty_list(), m_map(map),
+      m_cache_penalty_generator(pen_func, amp, per, phase, square, step, saw) {
     insmod("cache_penalty_handler",
            rcppsw::er::er_lvl::DIAG,
            rcppsw::er::er_lvl::NOM);
@@ -97,7 +101,7 @@ class cache_penalty_handler : public rcppsw::er::client {
              utils::robot_id(controller),
              timestep,
              mc_penalty);
-      uint penalty = penalty_func(timestep);
+      uint penalty = (m_cache_penalty_generator.*penalty_func)(timestep);
       //  uint penalty = mc_penalty;
 
       /*
@@ -182,6 +186,7 @@ class cache_penalty_handler : public rcppsw::er::client {
   uint                       mc_penalty;
   std::list<cache_penalty>   m_penalty_list;
   representation::arena_map& m_map;
+  cache_penalty_generator    m_cache_penalty_generator;
   // clang-format on
 };
 NS_END(depth1, support, fordyca);
