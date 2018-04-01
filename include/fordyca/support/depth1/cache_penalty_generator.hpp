@@ -50,7 +50,7 @@ class cache_penalty_generator {
  public:
     cache_penalty_generator(enum penalty_function pen_func, int amp, int per,
                             int phase, int square, int step, int saw)
-        : amplitude(amp), period(per), phase_shift(phase),
+        : penalty_func(NULL), amplitude(amp), period(per), phase_shift(phase),
           square_length(square), step_length(step), saw_length(saw) {
       switch (pen_func) {
         case kSine:
@@ -91,7 +91,7 @@ class cache_penalty_generator {
      * @param timestep The current timestep.
      */
     uint sine_func(uint timestep) {
-      return (uint) (amplitude *(sin(timestep) + phase_shift));
+      return static_cast<uint>(amplitude *(sin(timestep) + phase_shift));
     }
     /**
      * @brief square temporal penalty function
@@ -100,9 +100,10 @@ class cache_penalty_generator {
      */
     uint square_func(uint timestep) {
       uint time_ones = timestep % square_length;
-      if (time_ones >= 0 && time_ones < (square_length/2)) {
+      if (time_ones < static_cast<uint>(square_length/2)) {
         return 0;
-      } else if (time_ones >= (square_length/2) && time_ones < square_length) {
+      } else if (time_ones >= static_cast<uint>(square_length/2)
+                            && time_ones < static_cast<uint>(square_length)) {
         return 1;
       }
      }
