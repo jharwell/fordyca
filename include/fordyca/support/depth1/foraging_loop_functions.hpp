@@ -29,6 +29,7 @@
 #include "fordyca/support/depth1/cache_penalty_handler.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
+#include "fordyca/params/depth1/penalty_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -113,6 +114,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   // clang-format off
   double                      mc_cache_respawn_scale_factor{0.0};
   std::unique_ptr<interactor> m_interactor{nullptr};
+  struct penalty_params       penalty;
   // clang-format on
 };
 

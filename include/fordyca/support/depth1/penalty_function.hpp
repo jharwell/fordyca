@@ -29,7 +29,8 @@ enum penalty_function {
   kSine,
   kSquare,
   kStep,
-  kSaw
+  kSaw,
+  kNull
 };
 
 NS_END(depth1, support, fordyca);

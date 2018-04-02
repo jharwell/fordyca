@@ -74,7 +74,8 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
                                                  floor(),
                                                  nest_xrange(),
                                                  nest_yrange(),
-                                                 arenap->cache.usage_penalty);
+                                                 arenap->cache.usage_penalty,
+                                                 penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
