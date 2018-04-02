@@ -39,11 +39,13 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 actuation_subsystem::actuation_subsystem(
     const struct params::actuation_params* c_params,
-    struct actuator_list* const list)
+    struct actuator_list* const list,
+    steering_force2D& steering)
     : mc_params(*c_params),
       m_actuators(*list),
       m_throttling(&c_params->throttling),
-      m_fsm(&c_params->wheels, m_actuators.wheels, &m_throttling) {}
+      m_fsm(&c_params->wheels, m_actuators.wheels, &m_throttling),
+      m_steering(steering) {}
 
 void actuation_subsystem::reset(void) {
   m_actuators.raba->ClearData();

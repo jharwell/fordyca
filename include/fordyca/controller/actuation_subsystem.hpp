@@ -30,6 +30,7 @@
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/controller/throttling_handler.hpp"
 #include "fordyca/fsm/differential_drive_fsm.hpp"
+#include "fordyca/controller/steering_force2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,12 +74,17 @@ class actuation_subsystem {
    *
    * @param c_params Subsystem parameters.
    * @param list List of handles to actuator devices.
+   * @param steering Handle for steering force calculator.
    */
   actuation_subsystem(const struct params::actuation_params* c_params,
-                      struct actuator_list * list);
+                      struct actuator_list * list,
+                      steering_force2D& steering);
 
   actuation_subsystem(const actuation_subsystem& fsm) = delete;
   actuation_subsystem& operator=(const actuation_subsystem& fsm) = delete;
+
+  steering_force2D& steering_force(void) { return m_steering; }
+  const steering_force2D& steering_force(void) const { return m_steering; }
 
   /**
    * @brief Set the color of the robot's LEDs.
@@ -114,6 +120,7 @@ class actuation_subsystem {
   struct actuator_list                     m_actuators;
   throttling_handler                       m_throttling;
   fsm::differential_drive_fsm              m_fsm;
+  steering_force2D&                       m_steering;
   // clang-format on
 };
 

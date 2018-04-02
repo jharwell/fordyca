@@ -46,8 +46,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_cache_fsm::acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
@@ -63,15 +62,12 @@ acquire_cache_fsm::acquire_cache_fsm(
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_map(std::move(map)),
       m_server(server),
-      m_sensors(sensors),
       m_vector_fsm(params->times.frequent_collision_thresh,
                    server,
-                   sensors,
-                   actuators),
+                   saa),
       m_explore_fsm(params->times.unsuccessful_explore_dir_change,
                     server,
-                    sensors,
-                    actuators),
+                    saa),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache,
                                                nullptr,
@@ -161,7 +157,7 @@ bool acquire_cache_fsm::acquire_known_cache(
       controller::depth1::existing_cache_selector selector(m_server,
                                                            mc_nest_center);
       representation::perceived_cache best =
-          selector.calc_best(caches, m_sensors->position());
+          selector.calc_best(caches, base_sensors()->position());
       ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
              best.ent->id(),
              best.ent->discrete_loc().first,
@@ -182,7 +178,10 @@ bool acquire_cache_fsm::acquire_known_cache(
 
   if (m_vector_fsm.task_finished()) {
     m_vector_fsm.task_reset();
-    if (m_sensors->cache_detected()) {
+
+    auto sensors =
+        std::static_pointer_cast<controller::depth1::sensing_subsystem>(base_sensors());
+    if (sensors->cache_detected()) {
       return true;
     }
     ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");

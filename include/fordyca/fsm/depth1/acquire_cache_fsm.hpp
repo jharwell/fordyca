@@ -45,10 +45,6 @@ NS_START(fordyca);
 
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class cache; }
-namespace controller {
-namespace depth1 {class sensing_subsystem; }
-class actuation_subsystem;
-}
 
 NS_START(fsm, depth1);
 
@@ -74,8 +70,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   acquire_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-      const std::shared_ptr<controller::actuation_subsystem>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& actuators,
       std::shared_ptr<const representation::perceived_arena_map> map);
 
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
@@ -157,7 +152,6 @@ class acquire_cache_fsm : public base_foraging_fsm,
   argos::CRandom::CRNG*                                      m_rng;
   std::shared_ptr<const representation::perceived_arena_map> m_map;
   std::shared_ptr<rcppsw::er::server>                        m_server;
-  std::shared_ptr<controller::depth1::sensing_subsystem>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_cache_fsm                                      m_explore_fsm;
   // clang-format on

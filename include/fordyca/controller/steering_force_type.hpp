@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file steering_force_type.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,10 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/control/steering_force_type.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,22 +33,26 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Type Definitions
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+/**
+ * @brief List of steering forces available within the class
+ */
+class steering_force_type : public rcppsw::control::steering_force_type {
+ public:
+  enum {
+  /**
+   * Force pushing robots towards light.
+   */
+  kPhototaxis = rcppsw::control::steering_force_type::kExternalForces,
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
+  /**
+   * Force pushing robots away from light.
+   */
+  kAntiphototaxis
+  };
+};
 
 NS_END(controller, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_ */

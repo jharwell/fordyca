@@ -21,42 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/actuation_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
 
-/*******************************************************************************
- * Namespaces
- ******************************************************************************/
-NS_START(fordyca, params);
-
-/*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char actuation_parser::kXMLRoot[];
-
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void actuation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_wheels.parse(anode);
-  m_kinematics.parse(anode);
-  m_throttling.parse(anode);
-  m_params.wheels = *m_wheels.parse_results();
-  m_params.kinematics = *m_kinematics.parse_results();
-  m_params.throttling = *m_throttling.parse_results();
-} /* parse() */
-
-void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_wheels << m_kinematics << m_throttling
-         << build_footer();
-} /* show() */
-
-__pure bool actuation_parser::validate(void) const {
-  return m_wheels.validate() && m_kinematics.validate() &&
-      m_throttling.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

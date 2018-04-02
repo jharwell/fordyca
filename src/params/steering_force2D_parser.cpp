@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file steering_force2D_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,30 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/steering_force2D_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-
-/*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void steering_force2D_parser::parse(const ticpp::Element& node) {
+  steering_force2D_xml_parser::parse(node);
+  static_cast<control::steering_force2D_params&>(m_params) =
+      *steering_force2D_xml_parser::parse_results();
 
-NS_END(controller, fordyca);
+  ticpp::Element snode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_phototaxis.parse(snode);
+  m_params.phototaxis = *m_phototaxis.parse_results();
+} /* parse() */
+
+void steering_force2D_parser::show(std::ostream& stream) const {
+  steering_force2D_xml_parser::show(stream);
+  stream << m_phototaxis
+         << build_footer();
+} /* show() */
+
+bool steering_force2D_parser::validate(void) const {
+  return steering_force2D_xml_parser::validate() && m_phototaxis.validate();
+} /* validate() */
+
+NS_END(params, fordyca);

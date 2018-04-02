@@ -39,14 +39,12 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_cache_fsm::block_to_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
-          std::static_pointer_cast<controller::base_sensing_subsystem>(sensors),
-          actuators,
+          saa,
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_collision_avoidance(),
@@ -58,14 +56,11 @@ block_to_cache_fsm::block_to_cache_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_cache_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       m_pickup_count(0),
-      m_sensors(sensors),
       m_block_fsm(params,
                   server,
-                  std::static_pointer_cast<controller::depth0::sensing_subsystem>(
-                      sensors),
-                  actuators,
+                  saa,
                   map),
-      m_cache_fsm(params, server, sensors, actuators, map),
+      m_cache_fsm(params, server, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,

@@ -27,7 +27,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/control/kinematics2D.hpp"
+#include "fordyca/controller/steering_force2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,19 +76,19 @@ class saa_subsystem : public rcppsw::control::boid {
     return m_sensing->position();
   }
 
-  const control::kinematics2D& kinematics(void) const { return m_kinematics; }
-  control::kinematics2D& kinematics(void) { return m_kinematics; }
+  const steering_force2D& steering(void) const { return m_steering; }
+  steering_force2D& steering(void) { return m_steering; }
 
-  std::shared_ptr<const base_sensing_subsystem> sensing(void) const {
-    return m_sensing;
-  }
   void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
     m_sensing = sensing;
   }
 
   std::shared_ptr<base_sensing_subsystem> sensing(void) { return m_sensing; }
+  const std::shared_ptr<const base_sensing_subsystem> sensing(void) const {
+    return m_sensing;
+  }
 
-  std::shared_ptr<const actuation_subsystem> actuation(void) const {
+  const std::shared_ptr<const actuation_subsystem> actuation(void) const {
     return m_actuation;
   }
   std::shared_ptr<controller::actuation_subsystem> actuation(void) {
@@ -97,9 +97,9 @@ class saa_subsystem : public rcppsw::control::boid {
 
  private:
   // clang-format off
-  control::kinematics2D                            m_kinematics;
   std::shared_ptr<controller::actuation_subsystem> m_actuation;
   std::shared_ptr<base_sensing_subsystem>          m_sensing;
+  steering_force2D                                 m_steering;
   // clang-format on
 };
 

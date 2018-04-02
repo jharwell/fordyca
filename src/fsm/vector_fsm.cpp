@@ -40,9 +40,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 vector_fsm::vector_fsm(
     uint frequent_collision_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators)
-    : base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+    const std::shared_ptr<controller::saa_subsystem>& saa)
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),

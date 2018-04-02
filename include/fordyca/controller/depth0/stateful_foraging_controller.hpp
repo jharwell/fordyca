@@ -43,7 +43,7 @@ namespace representation { class perceived_arena_map; }
 
 NS_START(controller);
 namespace visitor = rcppsw::patterns::visitor;
-namespace depth1 { class sensing_subsystem; }
+namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
 namespace task_allocation = rcppsw::task_allocation;
@@ -97,7 +97,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   const representation::line_of_sight* los(void) const;
 
-  std::shared_ptr<depth1::sensing_subsystem> stateful_sensors(void) const;
+  std::shared_ptr<depth0::sensing_subsystem> stateful_sensors(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a

@@ -29,7 +29,7 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -89,9 +89,9 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure std::shared_ptr<depth1::sensing_subsystem> stateful_foraging_controller::
+__pure std::shared_ptr<depth0::sensing_subsystem> stateful_foraging_controller::
     stateful_sensors(void) const {
-  return std::static_pointer_cast<depth1::sensing_subsystem>(
+  return std::static_pointer_cast<depth0::sensing_subsystem>(
       saa_subsystem()->sensing());
 }
 
@@ -137,7 +137,7 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
           "occupancy_grid"),
       GetId());
 
-  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
+  saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
       param_repo.parse_results<struct params::sensing_params>("sensors"),
       &saa_subsystem()->sensing()->sensor_list()));
 
@@ -152,8 +152,7 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_params,
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors(),
-          base_foraging_controller::saa_subsystem()->actuation(),
+          base_foraging_controller::saa_subsystem(),
           depth0::stateful_foraging_controller::map());
   m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->executive,
                                                         generalist_fsm);

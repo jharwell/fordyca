@@ -38,12 +38,10 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateless_foraging_fsm::stateless_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators)
+    const std::shared_ptr<controller::saa_subsystem>& saa)
     : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
                         server,
-                        sensors,
-                        actuators,
+                        saa,
                         ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -56,8 +54,7 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_explore_fsm(params->times.unsuccessful_explore_dir_change,
                     server,
-                    sensors,
-                    actuators),
+                    saa),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,

@@ -77,8 +77,7 @@ class explore_for_cache_fsm : public base_explore_fsm {
 
   explore_for_cache_fsm(uint unsuccessful_dir_change_thresh,
                         const std::shared_ptr<rcppsw::er::server>& server,
-                        const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-                        const std::shared_ptr<controller::actuation_subsystem>& actuators);
+                        const std::shared_ptr<controller::saa_subsystem>& saa);
 
   explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
   explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;
@@ -136,7 +135,6 @@ class explore_for_cache_fsm : public base_explore_fsm {
     return &mc_state_map[index];
   }
 
-  std::shared_ptr<controller::depth1::sensing_subsystem> m_sensors;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file phototaxis_force_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,33 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_PHOTOTAXIS_FORCE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PHOTOTAXIS_FORCE_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Structure Definitions
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+/**
+ * @struct phototaxis_force_params
+ * @ingroup params
+ */
+struct phototaxis_force_params : public rcppsw::params::base_params {
+  double max;
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
+NS_END(params, fordyca);
 
-NS_END(controller, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_PHOTOTAXIS_FORCE_PARAMS_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file phototaxis_force_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,30 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/phototaxis_force_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Global Variables
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+constexpr char phototaxis_force_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void phototaxis_force_parser::parse(const ticpp::Element& node) {
+  ticpp::Element pnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  XML_PARSE_PARAM(pnode, m_params, max);
+} /* parse() */
 
-NS_END(controller, fordyca);
+void phototaxis_force_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, max) << std::endl
+         << build_footer();
+} /* show() */
+
+bool phototaxis_force_parser::validate(void) const {
+  return m_params.max >= 0;
+} /* validate() */
+
+NS_END(params, fordyca);

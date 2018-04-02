@@ -25,8 +25,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
@@ -41,12 +40,10 @@ NS_START(fordyca, fsm);
 explore_for_block_fsm::explore_for_block_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators)
+    const std::shared_ptr<controller::saa_subsystem>& saa)
     : base_explore_fsm(unsuccessful_dir_change_thresh,
                        server,
-                       sensors,
-                       actuators,
+                       saa,
                        ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
@@ -94,35 +91,40 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   }
 
   base_explore_fsm::explore_time_inc();
+  actuators()->wander();
+  bool obs_threat = base_sensors()->threatening_obstacle_exists();
+  argos::CVector2 obs = base_sensors()->find_closest_obstacle();
+  actuators()->avoidance(obs_threat, obs);
+  argos::CVector2 force = actuators()->steering_force();
 
-  /*
-   * Check for nearby obstacles, and if so go into obstacle avoidance. Time
-   * spent in collision avoidance still counts towards the direction change
-   * threshold.
-   */
-  if (base_sensors()->threatening_obstacle_exists()) {
-    argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
+  if (obs_threat) {
+    ER_DIAG("Found threatening obstacle: (%f, %f), steering force=(%f, %f)@%f [%f]",
+            obs.GetX(),
+            obs.GetY(),
             force.GetX(),
             force.GetY(),
             force.Angle().GetValue(),
             force.Length());
-    internal_event(ST_COLLISION_AVOIDANCE);
-    return controller::foraging_signal::HANDLED;
-  } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
-    argos::CRange<argos::CRadians> range(argos::CRadians(0.50),
-                                         argos::CRadians(1.0));
-    argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
-    internal_event(ST_NEW_DIRECTION,
-                   rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
-    return controller::foraging_signal::HANDLED;
-  }
+  } else {
+      ER_DIAG("No threatening obstacle found: steering force=(%f, %f)@%f [%f]",
+              force.GetX(),
+              force.GetY(),
+              force.Angle().GetValue(),
+              force.Length());
+    }
+  /*   internal_event(ST_COLLISION_AVOIDANCE); */
+  /*   return controller::foraging_signal::HANDLED; */
+  /* } else if (explore_time() > base_explore_fsm::dir_change_thresh()) { */
+  /*   argos::CRange<argos::CRadians> range(argos::CRadians(0.50), */
+  /*                                        argos::CRadians(1.0)); */
+  /*   argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X); */
+  /*   internal_event(ST_NEW_DIRECTION, */
+  /*                  rcppsw::make_unique<new_direction_data>(new_dir.Angle())); */
+  /*   return controller::foraging_signal::HANDLED; */
+  /* } */
 
-  /*
-   * No obstacles nearby--all ahead full!
-   */
-  actuators()->set_rel_heading(argos::CVector2::X *
-                               actuators()->differential_drive()->max_speed());
+  actuators()->set_rel_heading(actuators()->steering_force().calculate());
+  actuators()->steering_force().reset()
   return controller::foraging_signal::HANDLED;
 }
 

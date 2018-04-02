@@ -41,13 +41,11 @@ NS_START(fordyca, fsm);
 base_explore_fsm::base_explore_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     uint8_t max_states)
     : base_foraging_fsm(unsuccessful_dir_change_thresh,
                         server,
-                        sensors,
-                        actuators,
+                        saa,
                         max_states),
       entry_explore(),
       m_state() {

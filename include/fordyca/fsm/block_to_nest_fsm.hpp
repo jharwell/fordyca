@@ -82,8 +82,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-      const std::shared_ptr<controller::actuation_subsystem>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
   block_to_nest_fsm(const block_to_nest_fsm& fsm) = delete;
@@ -229,7 +228,6 @@ class block_to_nest_fsm : public base_foraging_fsm,
 
   // clang-format off
   uint                                                  m_pickup_count{0};
-  std::shared_ptr<controller::depth1::sensing_subsystem> m_sensors;
   acquire_block_fsm                                     m_block_fsm;
   depth1::acquire_cache_fsm                             m_cache_fsm;
   // clang-format on

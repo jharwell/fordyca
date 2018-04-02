@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file steering_force2D.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/steering_force2D.hpp"
+#include "fordyca/params/steering_force2D_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,20 +32,22 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+steering_force2D::steering_force2D(
+    control::boid& entity,
+    const params::steering_force2D_params* const params,
+    const base_sensing_subsystem& sensors)
+    : control::steering_force2D(entity, params),
+    m_phototaxis_force(&params->phototaxis, sensors) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void steering_force2D::phototaxis(void) {
+  accum_force(m_phototaxis_force());
+} /* phototaxis() */
+
+void steering_force2D::anti_phototaxis(void) {
+  accum_force(-m_phototaxis_force());
+} /* anti_phototaxis() */
 
 NS_END(controller, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file saa_subsystem.cpp
+ * @file phototaxis_force.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,33 +18,47 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+namespace params { struct phototaxis_force_params; }
+
+NS_START(controller);
+class base_sensing_subsystem;
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Class Definitions
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
+/**
+ * @class phototaxis_force
+ * @ingroup controller
+ *
+ * @brief A force pushing the robot away from light sources.
+ */
+class phototaxis_force {
+ public:
+  explicit phototaxis_force(const struct params::phototaxis_force_params* params,
+                            const base_sensing_subsystem& sensors);
+
+  argos::CVector2 operator()(void);
+
+  // clang-format off
+  double                        m_max;
+  const base_sensing_subsystem& m_sensors;
+  // clang-format on
+};
 
 NS_END(controller, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_ */

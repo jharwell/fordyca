@@ -76,7 +76,7 @@ class differential_drive_fsm : public state_machine::simple_fsm {
    * @param force_hard_turn Whether or not a hard turn should be performed,
    * regardless of the angle difference. If this is not passed, then a hard turn
    * is performed only when the heading change is sufficiently different from
-   * the current heading (as determined by paremeters).
+   * the current heading (as determined by parameters).
    */
   void set_rel_heading(const argos::CVector2& heading,
                        bool force_hard_turn = false);

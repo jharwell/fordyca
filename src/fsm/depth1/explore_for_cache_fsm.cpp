@@ -41,12 +41,10 @@ NS_START(fordyca, fsm, depth1);
 explore_for_cache_fsm::explore_for_cache_fsm(
     uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::sensing_subsystem>& sensors,
-    const std::shared_ptr<controller::actuation_subsystem>& actuators)
+    const std::shared_ptr<controller::saa_subsystem>& saa)
     : base_explore_fsm(unsuccessful_dir_change_thresh,
                        server,
-                       sensors,
-                       actuators,
+                       saa,
                        ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
@@ -56,7 +54,6 @@ explore_for_cache_fsm::explore_for_cache_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_sensors(sensors),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
           HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),

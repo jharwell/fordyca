@@ -1,7 +1,7 @@
 /**
- * @file saa_subsystem.cpp
+ * @file phototaxis_force.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/phototaxis_force.hpp"
+#include "fordyca/params/phototaxis_force_params.hpp"
+#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,22 +32,24 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Constructors/Destructor
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+phototaxis_force::phototaxis_force(
+    const struct params::phototaxis_force_params* params,
+    const base_sensing_subsystem& sensors)
+    : m_max(params->max), m_sensors(sensors) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+argos::CVector2 phototaxis_force::operator()(void) {
+  argos::CVector2 accum;
+
+  for (auto& r : m_sensors.light()->GetReadings()) {
+    accum += argos::CVector2(r.Value, r.Angle);
+  } /* for(r..) */
+
+  return accum.Normalize() * m_max;
+} /* operator()() */
 
 NS_END(controller, fordyca);

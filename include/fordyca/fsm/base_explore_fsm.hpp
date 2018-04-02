@@ -34,10 +34,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-class base_sensing_subsystem;
-class actuation_subsystem;
-} // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -61,8 +57,7 @@ class base_explore_fsm : public base_foraging_fsm,
   base_explore_fsm(
       uint unsuccessful_dir_change_thresh,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_sensing_subsystem>& sensors,
-      const std::shared_ptr<controller::actuation_subsystem>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       uint8_t max_states);
 
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
