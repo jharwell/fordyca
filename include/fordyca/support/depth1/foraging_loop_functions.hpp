@@ -114,7 +114,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   // clang-format off
   double                      mc_cache_respawn_scale_factor{0.0};
   std::unique_ptr<interactor> m_interactor{nullptr};
-  struct penalty_params       penalty;
   // clang-format on
 };
 

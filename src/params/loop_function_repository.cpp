@@ -25,6 +25,7 @@
 #include "fordyca/params/arena_map_parser.hpp"
 #include "fordyca/params/loop_functions_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/depth1/penalty_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,6 +39,7 @@ loop_function_repository::loop_function_repository(void) {
   register_parser<output_parser>("output");
   register_parser<arena_map_parser>("arena_map");
   register_parser<loop_functions_parser>("loop_functions");
+  register_parser<penalty_parser>("penalty");
 }
 
 NS_END(params, fordyca);

@@ -38,6 +38,7 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/depth1/penalty_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
@@ -67,6 +68,9 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   /* initialize stat collecting */
   metric_collecting_init(static_cast<const struct params::output_params*>(
       repo.get_params("output")));
+
+  auto* penalty = static_cast<const struct params::penalty_params*>(
+      repo.get_params("penalty"));
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,

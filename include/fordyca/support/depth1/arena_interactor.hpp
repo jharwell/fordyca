@@ -32,6 +32,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/params/depth1/penalty_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,15 +67,18 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    argos::CFloorEntity* floor_in,
                    const argos::CRange<double>& nest_xrange,
                    const argos::CRange<double>& nest_yrange,
-                   uint cache_usage_penalty, enum penalty_function pen_func,
-                   int amp, int per, int phase, int square, int step, int saw)
+                   uint cache_usage_penalty,
+                   const struct params::penalty_params* penalty)
       : depth0::arena_interactor<T>(server, map_in, floor_in),
       m_nest_xrange(nest_xrange),
       m_nest_yrange(nest_yrange),
-    m_cache_penalty_handler(server, *map_in, cache_usage_penalty, pen_func, amp,
-       per, phase, square, step, saw),
+    m_cache_penalty_handler(server, *map_in, cache_usage_penalty,
+      penalty->pen_func, penalty->amp, penalty->per, penalty->phase,
+                              penalty->square, penalty->step, penalty->saw),
     // new class object for generating temporal penalty function
-    m_cache_penalty_generator(pen_func, amp, per, phase, square, step, saw) {}
+    m_cache_penalty_generator(penalty->pen_func, penalty->amp,
+            penalty->per, penalty->phase, penalty->square, penalty->step,
+                                                           penalty->saw) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
