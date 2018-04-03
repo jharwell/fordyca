@@ -31,7 +31,7 @@
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/support/depth1/cache_penalty_generator.hpp"
-#include "fordyca/support/depth1/penalty_function.hpp"
+#include "fordyca/params/depth1/penalty_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +58,8 @@ class cache_penalty_handler : public rcppsw::er::client {
  public:
   cache_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
                         representation::arena_map& map,
-                        uint penalty, enum penalty_function pen_func,
+                        uint penalty,
+                        const params::penalty_function pen_func,
                         int amp, int per, int phase, int square, int step,
                         int saw)
       : client(server), mc_penalty(penalty), m_penalty_list(), m_map(map),

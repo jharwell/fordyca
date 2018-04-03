@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/support/depth1/penalty_function.hpp"
+#include "fordyca/params/depth1/penalty_params.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -48,21 +48,21 @@ NS_START(fordyca, support, depth1);
 
 class cache_penalty_generator {
  public:
-    cache_penalty_generator(enum penalty_function pen_func, int amp, int per,
+    cache_penalty_generator(const params::penalty_function pen_func, int amp, int per,
                             int phase, int square, int step, int saw)
         : penalty_func(NULL), amplitude(amp), period(per), phase_shift(phase),
           square_length(square), step_length(step), saw_length(saw) {
       switch (pen_func) {
-        case kSine:
+        case params::penalty_function::kSine:
             penalty_func = &cache_penalty_generator::sine_func;
             break;
-        case kSquare:
+        case params::penalty_function::kSquare:
             penalty_func = &cache_penalty_generator::square_func;
             break;
-        case kStep:
+        case params::penalty_function::kStep:
             penalty_func = &cache_penalty_generator::step_func;
             break;
-        case kSaw:
+        case params::penalty_function::kSaw:
             penalty_func = &cache_penalty_generator::sawtooth_func;
             break;
         default:

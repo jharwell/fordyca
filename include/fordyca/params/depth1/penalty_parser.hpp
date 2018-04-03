@@ -26,7 +26,7 @@
   ******************************************************************************/
  #include <argos3/core/utility/configuration/argos_configuration.h>
 
- #include "fordyca/params/penalty_params.hpp"
+ #include "fordyca/params/depth1/penalty_params.hpp"
  #include "rcppsw/common/common.hpp"
  #include "rcppsw/common/xml_param_parser.hpp"
 

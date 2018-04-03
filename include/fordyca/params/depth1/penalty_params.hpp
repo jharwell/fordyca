@@ -25,7 +25,6 @@
   * Includes
   ******************************************************************************/
  #include <string>
- #include "fordyca/support/depth1/penalty_function.hpp"
  #include "rcppsw/common/base_params.hpp"
 
  /*******************************************************************************
@@ -40,6 +39,13 @@
   * @struct penalty_params
   * @ingroup params
   */
+ enum penalty_function {
+    kSine,
+    kSquare,
+    kStep,
+    kSaw,
+    kNull
+  };
 
  struct penalty_params : public rcppsw::common::base_params {
    enum penalty_function pen_func{kNull};

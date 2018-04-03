@@ -27,7 +27,6 @@
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth1/cache_penalty_handler.hpp"
 #include "fordyca/support/depth1/cache_penalty_generator.hpp"
-#include "fordyca/support/depth1/penalty_function.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
