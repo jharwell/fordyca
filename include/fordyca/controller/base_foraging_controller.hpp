@@ -36,7 +36,7 @@ NS_START(fordyca);
 namespace representation {
 class block;
 class line_of_sight;
-}
+} // namespace representation
 namespace params {
 struct output_params;
 }
@@ -105,7 +105,9 @@ class base_foraging_controller : public argos::CCI_Controller,
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::block>& block) { m_block = block; }
+  void block(const std::shared_ptr<representation::block>& block) {
+    m_block = block;
+  }
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.

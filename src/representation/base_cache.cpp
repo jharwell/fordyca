@@ -60,11 +60,8 @@ void base_cache::block_remove(const std::shared_ptr<block>& block) {
 } /* block_remove() */
 
 std::unique_ptr<base_cache> base_cache::clone(void) const {
-  return rcppsw::make_unique<base_cache>(cell_entity::xsize(),
-                                         resolution(),
-                                         real_loc(),
-                                         blocks(),
-                                         id());
+  return rcppsw::make_unique<base_cache>(
+      cell_entity::xsize(), resolution(), real_loc(), blocks(), id());
 } /* clone() */
 
 NS_END(fordyca, representation);

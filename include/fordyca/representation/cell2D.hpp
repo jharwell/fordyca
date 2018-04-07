@@ -33,11 +33,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw {
-namespace er {
+namespace rcppsw { namespace er {
 class server;
-}
-}
+}} // namespace rcppsw::er
 NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;

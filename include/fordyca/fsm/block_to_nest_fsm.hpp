@@ -47,11 +47,11 @@ namespace depth1 {
 class foraging_sensors;
 }
 class actuator_manager;
-}
+} // namespace controller
 namespace representation {
 class perceived_arena_map;
 class block;
-}
+} // namespace representation
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;

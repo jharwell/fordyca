@@ -38,12 +38,10 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class perceived_arena_map;
 class arena_cache;
-}
-namespace fsm {
-namespace depth1 {
+} // namespace representation
+namespace fsm { namespace depth1 {
 class block_to_cache_fsm;
-}
-}
+}} // namespace fsm::depth1
 namespace tasks {
 class harvester;
 }

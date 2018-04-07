@@ -93,8 +93,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
 HFSM_STATE_DEFINE(stateful_foraging_fsm,
                   block_to_nest,
                   state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
-            "Bad event type");
+  ER_ASSERT(state_machine::event_type::NORMAL == data->type(), "Bad event type");
 
   /* first time running FSM; transitioned from START state */
   if (!this->task_running()) {

@@ -24,9 +24,9 @@
 #include "fordyca/support/depth1/cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces

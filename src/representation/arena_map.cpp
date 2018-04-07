@@ -72,8 +72,8 @@ arena_map::arena_map(const struct params::arena_map_params* params)
   }   /* for(i..) */
 
   for (size_t i = 0; i < m_blocks.size(); ++i) {
-    m_blocks[i] = std::make_shared<block>(params->block.dimension,
-                                          static_cast<int>(i));
+    m_blocks[i] =
+        std::make_shared<block>(params->block.dimension, static_cast<int>(i));
   } /* for(i..) */
 }
 
@@ -157,7 +157,7 @@ void arena_map::static_cache_create(void) {
   for (auto& b : m_blocks) {
     if (-1 == b->robot_index() &&
         b->discrete_loc() != math::rcoord_to_dcoord(argos::CVector2(x, y),
-                                                   m_grid.resolution())) {
+                                                    m_grid.resolution())) {
       blocks.push_back(b);
     }
     if (blocks.size() >= mc_cache_params.static_size) {

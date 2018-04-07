@@ -44,7 +44,7 @@ class cache_block_drop;
 class free_block_pickup;
 class nest_block_drop;
 class cache_vanished;
-}
+} // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 

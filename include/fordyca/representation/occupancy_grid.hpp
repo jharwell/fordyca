@@ -38,11 +38,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-namespace depth0 {
+namespace params { namespace depth0 {
 struct occupancy_grid_params;
-}
-}
+}} // namespace params::depth0
 
 NS_START(representation);
 

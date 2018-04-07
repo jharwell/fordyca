@@ -110,7 +110,8 @@ class cell_entity {
   }
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the entity
+   * @brief Determine if a real-valued point lies within the extent of the
+   * entity
    * for:
    *
    * 1. Visualization purposes.

@@ -27,13 +27,13 @@
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/harvester.hpp"
-#include "fordyca/representation/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

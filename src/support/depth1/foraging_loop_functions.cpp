@@ -236,15 +236,17 @@ void foraging_loop_functions::metric_collecting_init(
       metrics_path() + "/" + output_p->metrics.depth1_fname,
       output_p->metrics.collect_interval);
 
-  collector_group().register_collector<metrics::tasks::execution_metrics_collector>(
-      "tasks::execution",
-      metrics_path() + "/" + output_p->metrics.task_execution_fname,
-      output_p->metrics.collect_interval);
+  collector_group()
+      .register_collector<metrics::tasks::execution_metrics_collector>(
+          "tasks::execution",
+          metrics_path() + "/" + output_p->metrics.task_execution_fname,
+          output_p->metrics.collect_interval);
 
-  collector_group().register_collector<metrics::tasks::management_metrics_collector>(
-      "tasks::management",
-      metrics_path() + "/" + output_p->metrics.task_management_fname,
-      output_p->metrics.collect_interval);
+  collector_group()
+      .register_collector<metrics::tasks::management_metrics_collector>(
+          "tasks::management",
+          metrics_path() + "/" + output_p->metrics.task_management_fname,
+          output_p->metrics.collect_interval);
 
   collector_group().register_collector<metrics::cache_metrics_collector>(
       "cache",
