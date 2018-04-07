@@ -31,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth0);
-namespace control = rcppsw::control;
 
 /*******************************************************************************
  * Constructors/Destructor

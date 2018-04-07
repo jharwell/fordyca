@@ -31,6 +31,7 @@
 #include "fordyca/controller/throttling_handler.hpp"
 #include "fordyca/fsm/differential_drive_fsm.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
+#include "fordyca/controller/footbot_differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +45,6 @@ class CCI_RangeAndBearingActuator;
 NS_START(fordyca, controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
-namespace control = rcppsw::control;
 
 /*******************************************************************************
  * Class Definitions
@@ -76,15 +76,10 @@ class actuation_subsystem {
    * @param list List of handles to actuator devices.
    * @param steering Handle for steering force calculator.
    */
-  actuation_subsystem(const struct params::actuation_params* c_params,
-                      struct actuator_list * list,
-                      steering_force2D& steering);
-
-  actuation_subsystem(const actuation_subsystem& fsm) = delete;
-  actuation_subsystem& operator=(const actuation_subsystem& fsm) = delete;
-
-  steering_force2D& steering_force(void) { return m_steering; }
-  const steering_force2D& steering_force(void) const { return m_steering; }
+  actuation_subsystem(
+      const std::shared_ptr<rcppsw::er::server>& server,
+      const struct params::actuation_params* c_params,
+      struct actuator_list * list);
 
   /**
    * @brief Set the color of the robot's LEDs.
@@ -93,8 +88,9 @@ class actuation_subsystem {
    */
   void leds_set_color(const argos::CColor& color);
 
-  const fsm::differential_drive_fsm* differential_drive(void) const { return &m_fsm; }
-  fsm::differential_drive_fsm* differential_drive(void) { return &m_fsm; }
+  footbot_differential_drive& differential_drive(void) { return m_drive; }
+  const footbot_differential_drive& differential_drive(void) const { return m_drive; }
+
   void set_rel_heading(const argos::CVector2& heading,
                        bool force_hard_turn = false);
   /**
@@ -119,8 +115,7 @@ class actuation_subsystem {
   const struct params::actuation_params    mc_params;
   struct actuator_list                     m_actuators;
   throttling_handler                       m_throttling;
-  fsm::differential_drive_fsm              m_fsm;
-  steering_force2D&                       m_steering;
+  footbot_differential_drive               m_drive;
   // clang-format on
 };
 

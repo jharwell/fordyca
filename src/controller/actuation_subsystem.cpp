@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include "fordyca/params/actuation_params.hpp"
@@ -33,23 +32,27 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+using kinematics2D::differential_drive;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 actuation_subsystem::actuation_subsystem(
+    const std::shared_ptr<rcppsw::er::server>& server,
     const struct params::actuation_params* c_params,
-    struct actuator_list* const list,
-    steering_force2D& steering)
+    struct actuator_list* const list)
     : mc_params(*c_params),
       m_actuators(*list),
       m_throttling(&c_params->throttling),
-      m_fsm(&c_params->wheels, m_actuators.wheels, &m_throttling),
-      m_steering(steering) {}
+      m_drive(server,
+              differential_drive::kCurvatureDrive,
+              c_params->wheels.max_speed,
+              m_actuators.wheels,
+              m_throttling) {}
 
 void actuation_subsystem::reset(void) {
   m_actuators.raba->ClearData();
-  m_fsm.reset();
+  m_drive.stop();
 } /* reset() */
 
 /*******************************************************************************
@@ -57,7 +60,7 @@ void actuation_subsystem::reset(void) {
  ******************************************************************************/
 void actuation_subsystem::set_rel_heading(const argos::CVector2& heading,
                                           bool force_hard_turn) {
-  m_fsm.set_rel_heading(heading, force_hard_turn);
+  /* m_fsm.set_rel_heading(heading, force_hard_turn); */
 }
 
 void actuation_subsystem::leds_set_color(const argos::CColor& color) {

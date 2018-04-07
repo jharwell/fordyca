@@ -33,6 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
+namespace kinematics = rcppsw::robotics::kinematics;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -91,14 +92,16 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   }
 
   base_explore_fsm::explore_time_inc();
-  actuators()->wander();
+  saa_subsystem()->steering_force().wander();
   bool obs_threat = base_sensors()->threatening_obstacle_exists();
   argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-  actuators()->avoidance(obs_threat, obs);
-  argos::CVector2 force = actuators()->steering_force();
+  saa_subsystem()->steering_force().avoidance(obs_threat, obs);
+  argos::CVector2 force = saa_subsystem()->steering_force().value();
+  kinematics::twist twist = saa_subsystem()->steering_force().value_as_twist();
+  saa_subsystem()->steering_force().reset();
 
   if (obs_threat) {
-    ER_DIAG("Found threatening obstacle: (%f, %f), steering force=(%f, %f)@%f [%f]",
+    ER_NOM("Found threatening obstacle: (%f, %f), steering force=(%f, %f)@%f [%f]",
             obs.GetX(),
             obs.GetY(),
             force.GetX(),
@@ -106,12 +109,13 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
             force.Angle().GetValue(),
             force.Length());
   } else {
-      ER_DIAG("No threatening obstacle found: steering force=(%f, %f)@%f [%f]",
+      ER_NOM("No threatening obstacle found: steering force=(%f, %f)@%f [%f]",
               force.GetX(),
               force.GetY(),
               force.Angle().GetValue(),
               force.Length());
-    }
+  }
+  actuators()->differential_drive().actuate(twist);
   /*   internal_event(ST_COLLISION_AVOIDANCE); */
   /*   return controller::foraging_signal::HANDLED; */
   /* } else if (explore_time() > base_explore_fsm::dir_change_thresh()) { */
@@ -123,8 +127,6 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
   /*   return controller::foraging_signal::HANDLED; */
   /* } */
 
-  actuators()->set_rel_heading(actuators()->steering_force().calculate());
-  actuators()->steering_force().reset()
   return controller::foraging_signal::HANDLED;
 }
 

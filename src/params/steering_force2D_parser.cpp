@@ -35,9 +35,9 @@ NS_START(fordyca, params);
  * Member Functions
  ******************************************************************************/
 void steering_force2D_parser::parse(const ticpp::Element& node) {
-  steering_force2D_xml_parser::parse(node);
-  static_cast<control::steering_force2D_params&>(m_params) =
-      *steering_force2D_xml_parser::parse_results();
+  force_calculator_xml_parser::parse(node);
+  static_cast<steering::force_calculator_params&>(m_params) =
+      *force_calculator_xml_parser::parse_results();
 
   ticpp::Element snode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
@@ -46,13 +46,13 @@ void steering_force2D_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void steering_force2D_parser::show(std::ostream& stream) const {
-  steering_force2D_xml_parser::show(stream);
+  force_calculator_xml_parser::show(stream);
   stream << m_phototaxis
          << build_footer();
 } /* show() */
 
 bool steering_force2D_parser::validate(void) const {
-  return steering_force2D_xml_parser::validate() && m_phototaxis.validate();
+  return force_calculator_xml_parser::validate() && m_phototaxis.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

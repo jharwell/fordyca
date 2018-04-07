@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/control/steering_force_type.hpp"
+#include "rcppsw/robotics/steering2D/force_type.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,18 +38,18 @@ NS_START(fordyca, controller);
 /**
  * @brief List of steering forces available within the class
  */
-class steering_force_type : public rcppsw::control::steering_force_type {
+class steering_force_type : public rcppsw::robotics::steering2D::force_type {
  public:
   enum {
-  /**
-   * Force pushing robots towards light.
-   */
-  kPhototaxis = rcppsw::control::steering_force_type::kExternalForces,
+    /**
+     * Force pushing robots towards light.
+     */
+    kPhototaxis = rcppsw::robotics::steering2D::force_type::kExternalForces,
 
-  /**
-   * Force pushing robots away from light.
-   */
-  kAntiphototaxis
+    /**
+     * Force pushing robots away from light.
+     */
+    kAntiphototaxis
   };
 };
 

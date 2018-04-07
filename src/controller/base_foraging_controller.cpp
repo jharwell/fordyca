@@ -52,9 +52,6 @@ namespace fs = std::experimental::filesystem;
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
     : m_server(std::make_shared<rcppsw::er::server>()) {
-  /*
-   * Initially, all robots use the RCPPSW er_server to log parameters.
-   */
   client::deferred_client_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
@@ -107,6 +104,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
     .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")
   };
   m_saa = std::make_shared<controller::saa_subsystem>(
+      m_server,
       param_repo.parse_results<struct params::actuation_params>("actuation"),
       param_repo.parse_results<struct params::sensing_params>("sensing"),
       &alist,

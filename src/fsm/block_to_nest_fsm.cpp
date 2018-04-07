@@ -100,7 +100,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
 }
 HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {
   if (m_block_fsm.task_finished()) {
-    actuators()->differential_drive()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_block_fsm.task_execute();
@@ -109,7 +109,7 @@ HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {
 }
 HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {
   if (m_cache_fsm.task_finished()) {
-    actuators()->differential_drive()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_CACHE_PICKUP);
   } else {
     m_cache_fsm.task_execute();

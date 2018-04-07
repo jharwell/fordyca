@@ -28,7 +28,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/steering_force_type.hpp"
 #include "fordyca/controller/phototaxis_force.hpp"
-#include "rcppsw/control/steering_force2D.hpp"
+#include "rcppsw/robotics/steering2D/force_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ NS_START(fordyca);
 namespace params { struct steering_force2D_params; }
 
 NS_START(controller);
-namespace control = rcppsw::control;
+namespace steering = rcppsw::robotics::steering2D;
 class base_sensing_subsystem;
 
 /*******************************************************************************
@@ -49,15 +49,16 @@ class base_sensing_subsystem;
  * @class steering_force2D
  * @ingroup controller
  *
- * @brief Extends \ref rcppsw::control::steering_force2D with steering forces
- * specific to foraging:
+ * @brief Extends \ref rcppsw::robotics::steering2D::force_calculator with
+ * steering forces specific to foraging:
  *
  * \ref kPhototaxis
  * \ref kAntiphototaxis
  */
-class steering_force2D : public control::steering_force2D {
+class steering_force2D : public steering::force_calculator {
  public:
-  steering_force2D(control::boid& entity,
+  steering_force2D(const std::shared_ptr<rcppsw::er::server>& server,
+                   steering::boid& entity,
                    const params::steering_force2D_params* params,
                    const base_sensing_subsystem& sensors);
 

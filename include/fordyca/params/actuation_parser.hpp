@@ -29,7 +29,8 @@
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/wheel_parser.hpp"
 #include "fordyca/params/throttling_parser.hpp"
-#include "rcppsw/control/kinematics2D_xml_parser.hpp"
+
+#include "fordyca/params/steering_force2D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,7 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   explicit actuation_parser(uint level)
       : xml_param_parser(level),
         m_wheels(level + 1),
-        m_kinematics(level + 1),
+        m_steering(level + 1),
         m_throttling(level + 1) {}
 
   /**
@@ -72,10 +73,10 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
 
  private:
   // clang-format off
-  struct actuation_params                  m_params{};
-  wheel_parser                             m_wheels;
-  rcppsw::control::kinematics2D_xml_parser m_kinematics;
-  throttling_parser                        m_throttling;
+  struct actuation_params m_params{};
+  wheel_parser            m_wheels;
+  steering_force2D_parser m_steering;
+  throttling_parser       m_throttling;
   // clang-format on
 };
 

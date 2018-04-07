@@ -39,6 +39,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth1);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace depth1 = controller::depth1;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -51,8 +52,7 @@ acquire_cache_fsm::acquire_cache_fsm(
     : base_foraging_fsm(
           params->times.unsuccessful_explore_dir_change,
           server,
-          std::static_pointer_cast<controller::base_sensing_subsystem>(sensors),
-          actuators,
+          saa,
           ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_cache, hfsm::top_state()),
@@ -179,8 +179,8 @@ bool acquire_cache_fsm::acquire_known_cache(
   if (m_vector_fsm.task_finished()) {
     m_vector_fsm.task_reset();
 
-    auto sensors =
-        std::static_pointer_cast<controller::depth1::sensing_subsystem>(base_sensors());
+    const auto& sensors =
+        std::static_pointer_cast<depth1::sensing_subsystem>(base_sensors());
     if (sensors->cache_detected()) {
       return true;
     }
@@ -209,7 +209,9 @@ bool acquire_cache_fsm::acquire_any_cache(void) {
     }
     m_explore_fsm.task_execute();
     if (m_explore_fsm.task_finished()) {
-      ER_ASSERT(m_sensors->cache_detected(),
+      const auto& sensors =
+          std::static_pointer_cast<depth1::sensing_subsystem>(base_sensors());
+      ER_ASSERT(sensors->cache_detected(),
                 "FATAL: No cache detected after successful exploration");
       return true;
     }

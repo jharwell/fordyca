@@ -67,18 +67,19 @@
         <actuation>
           <throttling
               block_carry="0.1"/>
-          <kinematics2D>
+          <steering_force2D>
             <avoidance_force lookahead="0.5"
                              max="10"/>
             <arrival_force slowing_radius="0.5"
                            max="10"/>
             <polar_force max="10"/>
-            <wander_force circle_distance="2.0"
-                           circle_radius="1.0"
-                           max_angle_delta="2"/>
-          </kinematics2D>
+            <wander_force circle_distance="10.0"
+                          circle_radius="1.0"
+                          max_angle_delta="10"/>
+            <phototaxis_force max="10"/>
+          </steering_force2D>
 
-          <wheels soft_turn_max="30"
+          <wheels soft_turn_max="150"
                   no_turn_max="5"
                   max_speed="10" />
         </actuation>
@@ -183,7 +184,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="9,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

@@ -32,16 +32,17 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 saa_subsystem::saa_subsystem(
+    const std::shared_ptr<rcppsw::er::server>& server,
     const struct params::actuation_params* const aparams,
     const struct params::sensing_params* const sparams,
     struct actuation_subsystem::actuator_list* const actuator_list,
     struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(aparams,
-                                                        actuator_list,
-                                                        m_steering)),
+    : m_actuation(std::make_shared<actuation_subsystem>(server,
+                                                        aparams,
+                                                        actuator_list)),
       m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
                                                          sensor_list)),
-      m_steering(*this, &aparams->steering, *m_sensing) {}
+      m_steering(server, *this, &aparams->steering, *m_sensing) {}
 
 /*******************************************************************************
  * Member Functions

@@ -99,7 +99,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    actuators()->differential_drive()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();

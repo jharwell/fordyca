@@ -25,13 +25,14 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/steering_force2D_params.hpp"
+#include "rcppsw/robotics/steering2D/force_calculator_params.hpp"
 #include "fordyca/params/phototaxis_force_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace steering = rcppsw::robotics::steering2D;
 
 /*******************************************************************************
  * Structure Definitions
@@ -40,7 +41,7 @@ NS_START(fordyca, params);
  * @struct steering_force2D_params
  * @ingroup params
  */
-struct steering_force2D_params : public rcppsw::control::steering_force2D_params {
+struct steering_force2D_params : public steering::force_calculator_params {
   struct phototaxis_force_params phototaxis{};
 };
 

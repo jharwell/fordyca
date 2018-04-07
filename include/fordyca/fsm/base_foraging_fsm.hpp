@@ -77,6 +77,21 @@ class base_foraging_fsm : public state_machine::hfsm {
    */
   void init(void) override;
 
+  /**
+   * @brief Get a reference to the \ref base_sensing_subsystem.
+   *
+   * Derived classes needing to reference these sensors should use this function
+   * rather than maintaining their own std::shared_ptr copy of things, as that
+   * can cause nasty bugs involving things set by the arena loop functions such
+   * as tick, location, etc., and that do not get propagated down the
+   * composition/inheritance hierarchy of robot controllers properly.
+   */
+  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(void) const;
+  const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
+
+  const std::shared_ptr<const controller::actuation_subsystem> actuators(void) const;
+  const std::shared_ptr<controller::actuation_subsystem> actuators(void);
+
  protected:
   double dir_change_thresh(void) const { return mc_dir_change_thresh; }
 
@@ -92,21 +107,6 @@ class base_foraging_fsm : public state_machine::hfsm {
   controller::saa_subsystem* saa_subsystem(void) const {
     return m_saa.get();
   }
-
-  /**
-   * @brief Get a reference to the \ref base_sensing_subsystem.
-   *
-   * Derived classes needing to reference these sensors should use this function
-   * rather than maintaining their own std::shared_ptr copy of things, as that
-   * can cause nasty bugs involving things set by the arena loop functions such
-   * as tick, location, etc., and that do not get propagated down the
-   * composition/inheritance hierarchy of robot controllers properly.
-   */
-  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(void) const;
-  const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
-
-  const std::shared_ptr<const controller::actuation_subsystem> actuators(void) const;
-  const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
   /**
    * @brief Robots entering this state will return to the nest.

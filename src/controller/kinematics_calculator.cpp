@@ -41,7 +41,7 @@ argos::CVector2 kinematics_calculator::calc_avoidance_force(void) {
   if (closest.Length() > 0) {
     avoidance = -closest;
     avoidance.Normalize();
-    avoidance *= kSCALE_AVOIDANCE_FORCE * mc_actuators->differential_drive()->max_speed();
+    avoidance *= kSCALE_AVOIDANCE_FORCE * mc_actuators->differential_drive().max_speed();
   } else {
     avoidance.Scale(0.0, 0.0);
   }
@@ -56,7 +56,7 @@ argos::CVector2 kinematics_calculator::calc_light_attract_force(void) {
   } /* for(r..) */
 
   return argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_ATTRACT *
-      mc_actuators->differential_drive()->max_speed();
+      mc_actuators->differential_drive().max_speed();
 } /* calc_light_attract_force() */
 
 argos::CVector2 kinematics_calculator::calc_light_repel_force(void) {
@@ -67,7 +67,7 @@ argos::CVector2 kinematics_calculator::calc_light_repel_force(void) {
   } /* for(r..) */
 
   return -argos::CVector2(1.0, accum.Angle()) * kSCALE_LIGHT_FORCE_REPEL *
-      mc_actuators->differential_drive()->max_speed();
+      mc_actuators->differential_drive().max_speed();
 } /* calc_light_repel_force() */
 
 NS_END(controller, fordyca);

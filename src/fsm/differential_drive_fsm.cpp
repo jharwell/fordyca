@@ -67,9 +67,12 @@ FSM_STATE_DEFINE(differential_drive_fsm, no_turn, turn_data) {
   if (data->force_hard || argos::Abs(data->heading.Angle().SignedNormalize()) >
                               mc_params.soft_turn_max) {
     internal_event(ST_HARD_TURN);
+    return state_machine::event_signal::HANDLED;
+
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) >
              mc_params.no_turn_max) {
     internal_event(ST_SOFT_TURN);
+    return state_machine::event_signal::HANDLED;
   }
   set_wheel_speeds(data->heading.Length(),
                    data->heading.Length(),
@@ -80,10 +83,13 @@ FSM_STATE_DEFINE(differential_drive_fsm, soft_turn, turn_data) {
   if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
       mc_params.no_turn_max) {
     internal_event(ST_NO_TURN);
+    return state_machine::event_signal::HANDLED;
+
   } else if (data->force_hard ||
              argos::Abs(data->heading.Angle().SignedNormalize()) >
                  mc_params.soft_turn_max) {
     internal_event(ST_HARD_TURN);
+    return state_machine::event_signal::HANDLED;
   }
 
   /* Both wheels go straight, but one is faster than the other */
@@ -95,6 +101,7 @@ FSM_STATE_DEFINE(differential_drive_fsm, soft_turn, turn_data) {
   double speed2 =
       data->heading.Length() + data->heading.Length() * (1.0 - speed_factor);
   set_wheel_speeds(speed1, speed2, data->heading.Angle());
+  std::cout << "SOFT TURN\n";
   return state_machine::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE(differential_drive_fsm, hard_turn, turn_data) {
@@ -102,10 +109,12 @@ FSM_STATE_DEFINE(differential_drive_fsm, hard_turn, turn_data) {
           mc_params.no_turn_max &&
       !data->force_hard) {
     internal_event(ST_NO_TURN);
+    return state_machine::event_signal::HANDLED;
   } else if (argos::Abs(data->heading.Angle().SignedNormalize()) <=
                  mc_params.soft_turn_max &&
              !data->force_hard) {
     internal_event(ST_SOFT_TURN);
+    return state_machine::event_signal::HANDLED;
   }
 
   set_wheel_speeds(-mc_params.max_speed,
@@ -144,6 +153,8 @@ void differential_drive_fsm::set_wheel_speeds(double speed1,
   /* Finally, set the wheel speeds */
   m_lwheel_speed = clamp_wheel_speed(m_lwheel_speed);
   m_rwheel_speed = clamp_wheel_speed(m_rwheel_speed);
+  std::cout <<"speeds: " << m_lwheel_speed << " " << m_rwheel_speed <<  std::endl;
+
   m_wheels->SetLinearVelocity(m_lwheel_speed, m_rwheel_speed);
 } /* set_wheel_speeds() */
 
@@ -156,7 +167,6 @@ void differential_drive_fsm::set_wheel_speeds(double lin_speed,
     m_lwheel_speed = lin_speed;
     m_rwheel_speed = lin_speed + ang_speed;
   }
-
   m_lwheel_speed = clamp_wheel_speed(m_lwheel_speed);
   m_rwheel_speed = clamp_wheel_speed(m_rwheel_speed);
   m_wheels->SetLinearVelocity(m_lwheel_speed, m_rwheel_speed);

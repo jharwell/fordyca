@@ -33,21 +33,26 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 steering_force2D::steering_force2D(
-    control::boid& entity,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    steering::boid& entity,
     const params::steering_force2D_params* const params,
     const base_sensing_subsystem& sensors)
-    : control::steering_force2D(entity, params),
+    : steering::force_calculator(server, entity, params),
     m_phototaxis_force(&params->phototaxis, sensors) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void steering_force2D::phototaxis(void) {
-  accum_force(m_phototaxis_force());
+  argos::CVector2 force = m_phototaxis_force();
+  ER_DIAG("Phototaxis force: (%f, %f)", force.GetX(), force.GetY());
+  accum_force(force);
 } /* phototaxis() */
 
 void steering_force2D::anti_phototaxis(void) {
-  accum_force(-m_phototaxis_force());
+  argos::CVector2 force = -m_phototaxis_force();
+  ER_DIAG("Anti-phototaxis force: (%f, %f)", force.GetX(), force.GetY());
+  accum_force(force);
 } /* anti_phototaxis() */
 
 NS_END(controller, fordyca);

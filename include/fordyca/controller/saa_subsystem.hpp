@@ -51,37 +51,41 @@ NS_START(controller);
  *
  * @brief Sensing and Actuation subsystem for the robot. Does not do much other
  * than wrap the two components.
- *
- * Implementing the BOID interface is only possible at this level, as it
- * requires elements of both sensing and actuation, and is needed to used the
- * kinematics calculator.
  */
-class saa_subsystem : public rcppsw::control::boid {
+class saa_subsystem : public rcppsw::robotics::steering2D::boid {
  public:
-  saa_subsystem(const struct params::actuation_params* aparams,
+  saa_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+                const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,
                 struct actuation_subsystem::actuator_list* actuator_list,
                 struct base_sensing_subsystem::sensor_list* sensor_list);
 
   /* BOID interface */
-  argos::CVector2 velocity(void) const override {
-    return m_sensing->robot_heading().Normalize().Scale(
-        m_actuation->differential_drive()->current_speed(),
-        m_actuation->differential_drive()->current_speed());
+  argos::CVector2 linear_velocity(void) const override {
+    double theta = m_sensing->robot_heading().Angle().GetValue();
+    return argos::CVector2(m_actuation->differential_drive().current_speed() *
+                           std::cos(theta),
+                           m_actuation->differential_drive().current_speed() *
+                           std::sin(theta));
   }
-  double max_velocity(void) const override {
-    return m_actuation->differential_drive()->max_speed();
+  double angular_velocity(void) const override {
+    return (m_actuation->differential_drive().right_linspeed() -
+            m_actuation->differential_drive().left_linspeed()) /
+        m_actuation->differential_drive().axle_length();
+  }
+  double max_speed(void) const override {
+    return m_actuation->differential_drive().max_speed();
   }
   argos::CVector2 position(void) const override {
     return m_sensing->position();
   }
 
-  const steering_force2D& steering(void) const { return m_steering; }
-  steering_force2D& steering(void) { return m_steering; }
-
   void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
     m_sensing = sensing;
   }
+
+  steering_force2D& steering_force(void) { return m_steering; }
+  const steering_force2D& steering_force(void) const { return m_steering; }
 
   std::shared_ptr<base_sensing_subsystem> sensing(void) { return m_sensing; }
   const std::shared_ptr<const base_sensing_subsystem> sensing(void) const {

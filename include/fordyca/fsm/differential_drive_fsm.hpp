@@ -105,13 +105,14 @@ class differential_drive_fsm : public state_machine::simple_fsm {
    * @param ang_speed The desired angular speed.
    */
   void set_wheel_speeds(double lin_speed, double ang_speed);
-
+  static constexpr double HALF_BASELINE = 0.07f; // Half the distance between wheels
+  static constexpr double WHEEL_RADIUS = 0.029112741f;
   /**
    * @brief Get the max wheel speed.
    */
   double max_speed(void) const { return mc_params.max_speed; }
   double current_speed(void) const {
-    return (m_lwheel_speed + m_rwheel_speed) / 2;
+    return (m_lwheel_speed * WHEEL_RADIUS + m_rwheel_speed * WHEEL_RADIUS) / 2;
   }
 
  private:

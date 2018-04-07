@@ -108,8 +108,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth1::sensing_subsystem* depth1_sensors(void) const { return m_sensors.get(); }
-
  protected:
   enum fsm_states {
     ST_START,
@@ -174,10 +172,9 @@ class block_to_cache_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                                                  m_pickup_count;
-  std::shared_ptr<controller::depth1::sensing_subsystem> m_sensors;
-  acquire_block_fsm                                     m_block_fsm;
-  acquire_cache_fsm                                     m_cache_fsm;
+  uint              m_pickup_count;
+  acquire_block_fsm m_block_fsm;
+  acquire_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

@@ -60,14 +60,14 @@ vector_fsm::vector_fsm(
                 0,
                 0,
                 1,
-                -this->actuators()->differential_drive()->max_speed() * 0.50,
-                this->actuators()->differential_drive()->max_speed() * 0.50),
+                -this->actuators()->differential_drive().max_speed() * 0.50,
+                this->actuators()->differential_drive().max_speed() * 0.50),
       m_lin_pid(3.0,
                 0,
                 0,
                 1,
-                this->actuators()->differential_drive()->max_speed() * 0.1,
-                this->actuators()->differential_drive()->max_speed() * 0.7) {
+                this->actuators()->differential_drive().max_speed() * 0.1,
+                this->actuators()->differential_drive().max_speed() * 0.7) {
   insmod("vector_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -89,8 +89,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
    * new direction away from whatever is causing the problem. See #243.
    */
   if (ST_NEW_DIRECTION == previous_state()) {
-    actuators()->differential_drive()->set_speed(
-        actuators()->differential_drive()->max_speed() * 0.7);
+    /* actuators()->differential_drive()->set_speed( */
+    /*     actuators()->differential_drive()->max_speed() * 0.7); */
     internal_event(ST_COLLISION_RECOVERY);
     return controller::foraging_signal::HANDLED;
   }
@@ -105,15 +105,15 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
-      actuators()->set_rel_heading(kinematics().calc_avoidance_force());
+      /* actuators()->set_rel_heading(kinematics().calc_avoidance_force()); */
     }
   } else {
     m_state.last_collision_time = base_sensors()->tick();
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
-    actuators()->differential_drive()->set_speed(
-        actuators()->differential_drive()->max_speed() * 0.7);
+    /* actuators()->differential_drive()->set_speed( */
+    /*     actuators()->differential_drive()->max_speed() * 0.7); */
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -144,12 +144,12 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
-    argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(),
-            force.GetY(),
-            force.Angle().GetValue(),
-            force.Length());
+    /* argos::CVector2 force = kinematics().calc_avoidance_force(); */
+    /* ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]", */
+    /*         force.GetX(), */
+    /*         force.GetY(), */
+    /*         force.Angle().GetValue(), */
+    /*         force.Length()); */
     internal_event(ST_COLLISION_AVOIDANCE);
   }
 
@@ -211,7 +211,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
          ang_speed,
          lin_speed);
 
-  actuators()->differential_drive()->set_wheel_speeds(lin_speed, ang_speed);
+  /* actuators()->differential_drive()->set_wheel_speeds(lin_speed, ang_speed); */
   return controller::foraging_signal::HANDLED;
 }
 

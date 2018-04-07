@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth1);
+namespace depth1 = controller::depth1;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -87,7 +88,9 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
   if (ST_NEW_DIRECTION == last_state()) {
     explore_time_reset();
   }
-  if (m_sensors->cache_detected()) {
+  const auto& sensors =
+      std::static_pointer_cast<depth1::sensing_subsystem>(base_sensors());
+  if (sensors->cache_detected()) {
     ER_DIAG("Cache detected");
     internal_event(ST_FINISHED);
   }
@@ -100,12 +103,12 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
    * threshold.
    */
   if (base_sensors()->threatening_obstacle_exists()) {
-    argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(),
-            force.GetY(),
-            force.Angle().GetValue(),
-            force.Length());
+    /* argos::CVector2 force = kinematics().calc_avoidance_force(); */
+    /* ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]", */
+    /*         force.GetX(), */
+    /*         force.GetY(), */
+    /*         force.Angle().GetValue(), */
+    /*         force.Length()); */
 
     internal_event(ST_COLLISION_AVOIDANCE);
   } else if (explore_time() > base_explore_fsm::dir_change_thresh()) {
@@ -120,7 +123,7 @@ HFSM_STATE_DEFINE_ND(explore_for_cache_fsm, explore) {
    * No obstacles nearby--all ahead full!
    */
   actuators()->set_rel_heading(argos::CVector2::X *
-                               actuators()->differential_drive()->max_speed());
+                               actuators()->differential_drive().max_speed());
   return controller::foraging_signal::HANDLED;
 }
 
