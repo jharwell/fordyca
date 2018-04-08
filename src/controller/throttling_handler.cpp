@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/throttling_handler.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/params/throttling_params.hpp"
 
 /*******************************************************************************

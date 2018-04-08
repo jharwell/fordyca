@@ -42,20 +42,20 @@ void sensing_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
-  XML_PARSE_PARAM(pnode, m_params.proximity, go_straight_angle_range);
+  XML_PARSE_PARAM(pnode, m_params.proximity, angle_range);
   XML_PARSE_PARAM(pnode, m_params.proximity, delta);
 } /* parse() */
 
 void sensing_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << XML_PARAM_STR(m_params.proximity, go_straight_angle_range)
+         << XML_PARAM_STR(m_params.proximity, angle_range)
          << std::endl
          << XML_PARAM_STR(m_params.proximity, delta) << std::endl
          << build_footer();
 } /* show() */
 
 __pure bool sensing_parser::validate(void) const {
-  if (!(m_params.proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
+  if (!(m_params.proximity.angle_range.GetSpan().GetAbsoluteValue() >
         0)) {
     return false;
   }

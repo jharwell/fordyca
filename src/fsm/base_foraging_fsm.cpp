@@ -83,8 +83,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   }
 
   m_saa->steering_force().anti_phototaxis();
-  m_saa->actuation()->set_rel_heading(m_saa->steering_force().value());
-  m_saa->steering_force().reset();
+  m_saa->apply_steering_force();
 
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
@@ -118,11 +117,8 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->steering_force().phototaxis();
-  m_saa->steering_force().avoidance(
-      m_saa->sensing()->threatening_obstacle_exists(),
-      m_saa->sensing()->find_closest_obstacle());
-  m_saa->actuation()->set_rel_heading(m_saa->steering_force().value());
-  m_saa->steering_force().reset();
+  m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
+  m_saa->apply_steering_force();
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
@@ -131,13 +127,10 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
   }
 
   if (m_saa->sensing()->threatening_obstacle_exists()) {
-    m_saa->steering_force().avoidance(
-        m_saa->sensing()->threatening_obstacle_exists(),
-        m_saa->sensing()->find_closest_obstacle());
-    m_saa->actuation()->set_rel_heading(m_saa->steering_force().value());
+    m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
 
     argos::CVector2 force = m_saa->steering_force().value();
-    m_saa->steering_force().reset();
+    m_saa->apply_steering_force();
     ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
            force.GetX(),
            force.GetY(),

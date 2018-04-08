@@ -40,22 +40,14 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 base_sensing_subsystem::base_sensing_subsystem(
-    double proximity_delta,
-    argos::CRange<argos::CRadians> go_straight_angle_range,
+    const struct params::sensing_params* const params,
     const struct sensor_list* const list)
     : m_tick(0),
-      mc_obstacle_delta(proximity_delta),
+      mc_obstacle_delta(params->proximity.delta),
+      mc_obstacle_range(params->proximity.angle_range),
       m_position(),
       m_prev_position(),
-      mc_go_straight_angle_range(go_straight_angle_range),
       m_sensors(*list) {}
-
-base_sensing_subsystem::base_sensing_subsystem(
-    const struct params::sensing_params* params,
-    const struct sensor_list* const list)
-    : base_sensing_subsystem(params->proximity.delta,
-                             params->proximity.go_straight_angle_range,
-                             list) {}
 
 /*******************************************************************************
  * Member Functions
@@ -81,7 +73,8 @@ bool base_sensing_subsystem::in_nest(void) {
 
 bool base_sensing_subsystem::obstacle_is_threatening(
     const argos::CVector2& obstacle) const {
-  return obstacle.Length() >= mc_obstacle_delta;
+  return obstacle.Length() >= mc_obstacle_delta &&
+      mc_obstacle_range.WithinMinBoundIncludedMaxBoundIncluded(obstacle.Angle());
 } /* obstacle_is_threatening() */
 
 argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
@@ -92,11 +85,12 @@ argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
     argos::CVector2 obstacle(r.Value, r.Angle);
     if (obstacle_is_threatening(obstacle)) {
       if ((position() - obstacle).Length() < closest.Length() ||
-          closest.Length() <= 0.0) {
+          closest.Length() <= std::numeric_limits<double>::epsilon()) {
         closest = obstacle;
       }
     }
   } /* for(r..) */
+
   return closest;
 } /* find_closest_obstacle() */
 

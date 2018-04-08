@@ -52,7 +52,7 @@ class footbot_differential_drive : public kinematics2D::differential_drive {
                            type,
                            kWheelRadius,
                            kInterWheelDistance,
-                           max_speed / kWheelRadius),
+                           max_speed),
         mc_throttling(handler),
         m_wheels(wheels) {}
 

@@ -27,6 +27,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+namespace kinematics = rcppsw::robotics::kinematics;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -37,15 +38,47 @@ saa_subsystem::saa_subsystem(
     const struct params::sensing_params* const sparams,
     struct actuation_subsystem::actuator_list* const actuator_list,
     struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : m_actuation(std::make_shared<actuation_subsystem>(server,
+    : client(server),
+      m_actuation(std::make_shared<actuation_subsystem>(server,
                                                         aparams,
                                                         actuator_list)),
       m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
                                                          sensor_list)),
-      m_steering(server, *this, &aparams->steering, *m_sensing) {}
+      m_steering(server, *this, &aparams->steering, *m_sensing) {
+    if (ERROR == client::attmod("saa_subsystem")) {
+    client::insmod("saa_subsystem",
+                   rcppsw::er::er_lvl::DIAG,
+                   rcppsw::er::er_lvl::VER);
+  }
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void saa_subsystem::apply_steering_force(void) {
+  argos::CRadians val = (m_steering.value().Angle().SignedNormalize() -
+                         linear_velocity().Angle().SignedNormalize());
+  argos::CRange<argos::CRadians> range(argos::CRadians(-M_PI/6),
+                                       argos::CRadians(M_PI/6));
+  bool soft_turn = range.WithinMinBoundIncludedMaxBoundIncluded(val);
+  kinematics::twist twist = m_steering.value_as_twist();
 
+  ER_DIAG("linear_vel=(%f,%f)@%f [%f] steering_force=(%f,%f)@%f [%f]",
+          linear_velocity().GetX(),
+          linear_velocity().GetY(),
+          linear_velocity().Angle().GetValue(),
+          linear_velocity().Length(),
+          m_steering.value().GetX(),
+          m_steering.value().GetY(),
+          m_steering.value().Angle().GetValue(),
+          m_steering.value().Length());
+
+  ER_DIAG("Actuating with twist.linear.x=%f, twist.angular.z=%f soft_turn=%d",
+          twist.linear.x,
+          twist.angular.z,
+          soft_turn);
+    m_actuation->differential_drive().actuate(m_steering.value_as_twist(),
+                                              !soft_turn);
+  m_steering.reset();
+}
 NS_END(controller, fordyca);

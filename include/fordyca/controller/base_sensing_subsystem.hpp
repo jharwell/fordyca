@@ -75,13 +75,6 @@ class base_sensing_subsystem {
   base_sensing_subsystem(const struct params::sensing_params* params,
                          const struct sensor_list* list);
 
-  base_sensing_subsystem(double proximity_delta,
-                         argos::CRange<argos::CRadians> go_straight_angle_range,
-                         const struct sensor_list* list);
-
-  base_sensing_subsystem(const base_sensing_subsystem& fsm) = default;
-  base_sensing_subsystem& operator=(const base_sensing_subsystem& fsm) = delete;
-
   /**
    * @brief Get the list of sensors that the subsystem is managing.
    */
@@ -170,6 +163,9 @@ class base_sensing_subsystem {
    * @brief Return the closest obstacle (i.e. the most threatening).
    *
    * Should be used in conjunction with \ref threatening_obstacle_exists().
+   * Threatening obstacles are those within the specified distance to the robot,
+   * and those that fall within a specific angle range (i.e. obstacles behind
+   * the robot are ignored).
    */
   argos::CVector2 find_closest_obstacle(void) const;
 
@@ -183,9 +179,9 @@ class base_sensing_subsystem {
   // clang-format off
   uint                                        m_tick;
   const double                                mc_obstacle_delta;
+  const argos::CRange<argos::CRadians>        mc_obstacle_range;
   argos::CVector2                             m_position;
   argos::CVector2                             m_prev_position;
-  const argos::CRange<argos::CRadians>        mc_go_straight_angle_range;
   struct sensor_list                          m_sensors;
   // clang-format off
 };

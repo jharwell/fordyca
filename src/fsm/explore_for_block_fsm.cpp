@@ -93,40 +93,27 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
 
   base_explore_fsm::explore_time_inc();
   saa_subsystem()->steering_force().wander();
-  bool obs_threat = base_sensors()->threatening_obstacle_exists();
   argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-  saa_subsystem()->steering_force().avoidance(obs_threat, obs);
-  argos::CVector2 force = saa_subsystem()->steering_force().value();
-  kinematics::twist twist = saa_subsystem()->steering_force().value_as_twist();
-  saa_subsystem()->steering_force().reset();
+  saa_subsystem()->steering_force().avoidance(obs);
 
-  if (obs_threat) {
-    ER_NOM("Found threatening obstacle: (%f, %f), steering force=(%f, %f)@%f [%f]",
-            obs.GetX(),
-            obs.GetY(),
-            force.GetX(),
-            force.GetY(),
-            force.Angle().GetValue(),
-            force.Length());
+  if (base_sensors()->threatening_obstacle_exists()) {
+    ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
+           obs.GetX(),
+           obs.GetY(),
+           obs.Angle().GetValue(),
+           obs.Length());
+    saa_subsystem()->apply_steering_force();
   } else {
-      ER_NOM("No threatening obstacle found: steering force=(%f, %f)@%f [%f]",
-              force.GetX(),
-              force.GetY(),
-              force.Angle().GetValue(),
-              force.Length());
+    ER_DIAG("No threatening obstacle found");
+    argos::CVector2 force = saa_subsystem()->steering_force().value();
+      /*
+       * This can be 0 if the wander force is not active this timestep.
+       */
+      if (force.Length() >= std::numeric_limits<double>::epsilon()) {
+        saa_subsystem()->steering_force().value() *= 0.7;
+        saa_subsystem()->apply_steering_force();
+      }
   }
-  actuators()->differential_drive().actuate(twist);
-  /*   internal_event(ST_COLLISION_AVOIDANCE); */
-  /*   return controller::foraging_signal::HANDLED; */
-  /* } else if (explore_time() > base_explore_fsm::dir_change_thresh()) { */
-  /*   argos::CRange<argos::CRadians> range(argos::CRadians(0.50), */
-  /*                                        argos::CRadians(1.0)); */
-  /*   argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X); */
-  /*   internal_event(ST_NEW_DIRECTION, */
-  /*                  rcppsw::make_unique<new_direction_data>(new_dir.Angle())); */
-  /*   return controller::foraging_signal::HANDLED; */
-  /* } */
-
   return controller::foraging_signal::HANDLED;
 }
 

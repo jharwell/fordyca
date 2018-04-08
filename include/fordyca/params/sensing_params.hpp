@@ -42,7 +42,7 @@ NS_START(fordyca, params);
  */
 struct proximity_params {
   proximity_params(void)
-      : go_straight_angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
+      : angle_range(argos::CRadians(-1.0), argos::CRadians(1.0)) {}
 
   /*
    * Maximum tolerance for the proximity reading between the robot and the
@@ -52,7 +52,7 @@ struct proximity_params {
   double delta{0.0};
 
   /* Angle tolerance range to go straight. */
-  argos::CRange<argos::CRadians> go_straight_angle_range;
+  argos::CRange<argos::CRadians> angle_range;
 };
 
 /**

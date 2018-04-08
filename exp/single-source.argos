@@ -61,23 +61,25 @@
               />
         </task_allocation>
         <sensing>
-          <proximity go_straight_angle_range="-5:5"
-                    delta="0.001" />
+          <proximity angle_range="-1.047:1.047"
+                     delta="0.001" />
         </sensing>
         <actuation>
           <throttling
               block_carry="0.1"/>
-          <steering_force2D>
+          <steering2D>
             <avoidance_force lookahead="0.5"
-                             max="10"/>
+                             max="8"/>
             <arrival_force slowing_radius="0.5"
-                           max="10"/>
-            <polar_force max="10"/>
-            <wander_force circle_distance="10.0"
-                          circle_radius="1.0"
-                          max_angle_delta="10"/>
-            <phototaxis_force max="10"/>
-          </steering_force2D>
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="8.0"
+                          interval="10"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
 
           <wheels soft_turn_max="150"
                   no_turn_max="5"
@@ -183,7 +185,7 @@
 
     <distribute>
       <position method="uniform" min="1,1,0" max="9,4,0" />
-      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <orientation method="uniform" min="0,0,0" max="0,0,0" />
       <entity quantity="1" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />

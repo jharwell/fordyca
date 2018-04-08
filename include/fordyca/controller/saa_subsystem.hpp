@@ -28,6 +28,7 @@
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
+#include "rcppsw/robotics/kinematics/twist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +53,18 @@ NS_START(controller);
  * @brief Sensing and Actuation subsystem for the robot. Does not do much other
  * than wrap the two components.
  */
-class saa_subsystem : public rcppsw::robotics::steering2D::boid {
+class saa_subsystem : public rcppsw::robotics::steering2D::boid,
+                      rcppsw::er::client {
  public:
+  /**
+   * @brief If our current heading and the applied steering force differ by less
+   * than this amount, then a soft turn using the generated angular momentum is
+   * used to gradually change heading while still moving forward. Above this
+   * threshold an in-place hard-turn is used.
+   */
+
+  static constexpr double kSoftTurnThresh = M_PI/6;
+
   saa_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
                 const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,
@@ -83,6 +94,13 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid {
   void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
     m_sensing = sensing;
   }
+
+  /**
+   * @brief Apply the summed steering forces; change wheel speeds. Resets the
+   * summed forces.
+   */
+  void apply_steering_force(void);
+
 
   steering_force2D& steering_force(void) { return m_steering; }
   const steering_force2D& steering_force(void) const { return m_steering; }
