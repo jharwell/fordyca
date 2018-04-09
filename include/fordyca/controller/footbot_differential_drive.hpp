@@ -46,21 +46,22 @@ class footbot_differential_drive : public kinematics2D::differential_drive {
   footbot_differential_drive(const std::shared_ptr<rcppsw::er::server>& server,
                              kinematics2D::differential_drive::drive_type type,
                              double max_speed,
+                             argos::CRadians soft_turn_max,
                              argos::CCI_DifferentialSteeringActuator* wheels,
                              const throttling_handler& handler)
       : differential_drive(server,
                            type,
                            kWheelRadius,
                            kInterWheelDistance,
-                           max_speed),
+                           max_speed,
+                           soft_turn_max),
         mc_throttling(handler),
         m_wheels(wheels) {}
 
   footbot_differential_drive(const footbot_differential_drive& fsm) = delete;
   footbot_differential_drive& operator=(const footbot_differential_drive& fsm) = delete;
 
-
-  void set_linear_velocity(double left, double right) override {
+  void set_wheel_speeds(double left, double right) override {
     m_wheels->SetLinearVelocity((1.0 - mc_throttling.block_carry()) * left,
                                 (1.0 - mc_throttling.block_carry()) * right);
   }

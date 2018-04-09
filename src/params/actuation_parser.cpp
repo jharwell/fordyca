@@ -40,22 +40,22 @@ constexpr char actuation_parser::kXMLRoot[];
 void actuation_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_wheels.parse(anode);
+  m_differential_drive.parse(anode);
   m_steering.parse(anode);
   m_throttling.parse(anode);
-  m_params.wheels = *m_wheels.parse_results();
+  m_params.differential_drive = *m_differential_drive.parse_results();
   m_params.steering = *m_steering.parse_results();
   m_params.throttling = *m_throttling.parse_results();
 } /* parse() */
 
 void actuation_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << m_wheels << m_steering << m_throttling
+         << m_differential_drive << m_steering << m_throttling
          << build_footer();
 } /* show() */
 
 __pure bool actuation_parser::validate(void) const {
-  return m_wheels.validate() && m_steering.validate() &&
+  return m_differential_drive.validate() && m_steering.validate() &&
       m_throttling.validate();
 } /* validate() */
 

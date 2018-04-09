@@ -44,7 +44,6 @@ base_sensing_subsystem::base_sensing_subsystem(
     const struct sensor_list* const list)
     : m_tick(0),
       mc_obstacle_delta(params->proximity.delta),
-      mc_obstacle_range(params->proximity.angle_range),
       m_position(),
       m_prev_position(),
       m_sensors(*list) {}
@@ -73,8 +72,7 @@ bool base_sensing_subsystem::in_nest(void) {
 
 bool base_sensing_subsystem::obstacle_is_threatening(
     const argos::CVector2& obstacle) const {
-  return obstacle.Length() >= mc_obstacle_delta &&
-      mc_obstacle_range.WithinMinBoundIncludedMaxBoundIncluded(obstacle.Angle());
+  return obstacle.Length() >= mc_obstacle_delta;
 } /* obstacle_is_threatening() */
 
 argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {

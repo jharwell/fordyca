@@ -45,8 +45,9 @@ actuation_subsystem::actuation_subsystem(
       m_actuators(*list),
       m_throttling(&c_params->throttling),
       m_drive(server,
-              differential_drive::kCurvatureDrive,
-              c_params->wheels.max_speed,
+              differential_drive::kFSMDrive,
+              c_params->differential_drive.max_speed,
+              c_params->differential_drive.soft_turn_max,
               m_actuators.wheels,
               m_throttling) {}
 
@@ -58,11 +59,6 @@ void actuation_subsystem::reset(void) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuation_subsystem::set_rel_heading(const argos::CVector2& heading,
-                                          bool force_hard_turn) {
-  /* m_fsm.set_rel_heading(heading, force_hard_turn); */
-}
-
 void actuation_subsystem::leds_set_color(const argos::CColor& color) {
   m_actuators.leds->SetAllColors(color);
 } /* leds_set_color() */

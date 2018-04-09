@@ -29,7 +29,6 @@
 
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/controller/throttling_handler.hpp"
-#include "fordyca/fsm/differential_drive_fsm.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/footbot_differential_drive.hpp"
 

@@ -56,29 +56,20 @@ saa_subsystem::saa_subsystem(
  * Member Functions
  ******************************************************************************/
 void saa_subsystem::apply_steering_force(void) {
-  argos::CRadians val = (m_steering.value().Angle().SignedNormalize() -
-                         linear_velocity().Angle().SignedNormalize());
-  argos::CRange<argos::CRadians> range(argos::CRadians(-M_PI/6),
-                                       argos::CRadians(M_PI/6));
-  bool soft_turn = range.WithinMinBoundIncludedMaxBoundIncluded(val);
-  kinematics::twist twist = m_steering.value_as_twist();
-
-  ER_DIAG("linear_vel=(%f,%f)@%f [%f] steering_force=(%f,%f)@%f [%f]",
+  ER_DIAG("linear_vel=(%f,%f)@%f [%f] angular_vel=%f",
           linear_velocity().GetX(),
           linear_velocity().GetY(),
           linear_velocity().Angle().GetValue(),
           linear_velocity().Length(),
+          angular_velocity());
+  ER_DIAG("steering_force=(%f,%f)@%f [%f]",
           m_steering.value().GetX(),
           m_steering.value().GetY(),
           m_steering.value().Angle().GetValue(),
           m_steering.value().Length());
 
-  ER_DIAG("Actuating with twist.linear.x=%f, twist.angular.z=%f soft_turn=%d",
-          twist.linear.x,
-          twist.angular.z,
-          soft_turn);
-    m_actuation->differential_drive().actuate(m_steering.value_as_twist(),
-                                              !soft_turn);
+  m_actuation->differential_drive().fsm_drive(m_steering.value().Length(),
+                                              m_steering.value().Angle());
   m_steering.reset();
 }
 NS_END(controller, fordyca);

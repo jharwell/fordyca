@@ -56,15 +56,6 @@ NS_START(controller);
 class saa_subsystem : public rcppsw::robotics::steering2D::boid,
                       rcppsw::er::client {
  public:
-  /**
-   * @brief If our current heading and the applied steering force differ by less
-   * than this amount, then a soft turn using the generated angular momentum is
-   * used to gradually change heading while still moving forward. Above this
-   * threshold an in-place hard-turn is used.
-   */
-
-  static constexpr double kSoftTurnThresh = M_PI/6;
-
   saa_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
                 const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,
@@ -73,11 +64,8 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
 
   /* BOID interface */
   argos::CVector2 linear_velocity(void) const override {
-    double theta = m_sensing->robot_heading().Angle().GetValue();
-    return argos::CVector2(m_actuation->differential_drive().current_speed() *
-                           std::cos(theta),
-                           m_actuation->differential_drive().current_speed() *
-                           std::sin(theta));
+    return argos::CVector2(m_actuation->differential_drive().current_speed(),
+                           m_sensing->robot_heading().Angle());
   }
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -
@@ -100,7 +88,6 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
    * summed forces.
    */
   void apply_steering_force(void);
-
 
   steering_force2D& steering_force(void) { return m_steering; }
   const steering_force2D& steering_force(void) const { return m_steering; }

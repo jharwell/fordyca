@@ -44,7 +44,7 @@ steering_force2D::steering_force2D(
  * Member Functions
  ******************************************************************************/
 void steering_force2D::phototaxis(void) {
-  argos::CVector2 force = m_phototaxis_force(entity());
+  argos::CVector2 force = m_phototaxis_force();
   ER_DIAG("Phototaxis force: (%f, %f)@%f [%f]",
           force.GetX(),
           force.GetY(),
@@ -54,7 +54,7 @@ void steering_force2D::phototaxis(void) {
 } /* phototaxis() */
 
 void steering_force2D::anti_phototaxis(void) {
-  argos::CVector2 force = -m_phototaxis_force(entity());
+  argos::CVector2 force = -m_phototaxis_force();
   ER_DIAG("Anti-phototaxis force: (%f, %f)@%f [%f]",
           force.GetX(),
           force.GetY(),

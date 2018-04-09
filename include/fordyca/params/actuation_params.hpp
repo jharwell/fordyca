@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/angles.h>
 #include "fordyca/params/throttling_params.hpp"
-#include "fordyca/params/wheel_params.hpp"
+#include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
 #include "fordyca/params/steering_force2D_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 
@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace kinematics2D = rcppsw::robotics::kinematics2D;
 
 /*******************************************************************************
  * Structure Definitions
@@ -44,7 +45,7 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct actuation_params : public rcppsw::params::base_params {
-  struct wheel_params wheels {};
+  struct kinematics2D::differential_drive_params differential_drive {};
   struct steering_force2D_params steering {};
   struct throttling_params throttling {};
 };

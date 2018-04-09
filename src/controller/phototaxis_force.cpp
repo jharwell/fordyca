@@ -42,7 +42,7 @@ phototaxis_force::phototaxis_force(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-argos::CVector2 phototaxis_force::operator()(const steering::boid& entity) const {
+argos::CVector2 phototaxis_force::operator()() const {
   argos::CVector2 accum;
 
   for (auto& r : m_sensors.light()->GetReadings()) {
@@ -50,7 +50,6 @@ argos::CVector2 phototaxis_force::operator()(const steering::boid& entity) const
   } /* for(r..) */
 
   return argos::CVector2(1.0,
-                         entity.linear_velocity().Angle() -
                          accum.Angle()) * m_max;
 } /* operator()() */
 

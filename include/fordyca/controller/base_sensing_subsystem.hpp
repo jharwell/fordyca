@@ -177,12 +177,11 @@ class base_sensing_subsystem {
   bool obstacle_is_threatening(const argos::CVector2& obstacle) const;
 
   // clang-format off
-  uint                                        m_tick;
-  const double                                mc_obstacle_delta;
-  const argos::CRange<argos::CRadians>        mc_obstacle_range;
-  argos::CVector2                             m_position;
-  argos::CVector2                             m_prev_position;
-  struct sensor_list                          m_sensors;
+  uint               m_tick;
+  const double       mc_obstacle_delta;
+  argos::CVector2    m_position;
+  argos::CVector2    m_prev_position;
+  struct sensor_list m_sensors;
   // clang-format off
 };
 

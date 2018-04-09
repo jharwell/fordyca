@@ -53,7 +53,7 @@ class phototaxis_force {
   explicit phototaxis_force(const struct params::phototaxis_force_params* params,
                             const base_sensing_subsystem& sensors);
 
-  argos::CVector2 operator()(const steering::boid& entity) const;
+  argos::CVector2 operator()() const;
 
   // clang-format off
   double                        m_max;

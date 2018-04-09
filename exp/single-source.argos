@@ -61,7 +61,7 @@
               />
         </task_allocation>
         <sensing>
-          <proximity angle_range="-1.047:1.047"
+          <proximity angle_range="-1.1:1.1"
                      delta="0.001" />
         </sensing>
         <actuation>
@@ -77,13 +77,12 @@
                           circle_radius="100.0"
                           max_angle_delta="5"
                           max="8.0"
-                          interval="10"/>
+                          interval="1"/>
             <phototaxis_force max="8"/>
           </steering2D>
 
-          <wheels soft_turn_max="150"
-                  no_turn_max="5"
-                  max_speed="10" />
+          <differential_drive soft_turn_max="30"
+                              max_speed="10" />
         </actuation>
         <fsm
           unsuccessful_explore_dir_change="1000"
@@ -185,8 +184,8 @@
 
     <distribute>
       <position method="uniform" min="1,1,0" max="9,4,0" />
-      <orientation method="uniform" min="0,0,0" max="0,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
