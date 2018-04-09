@@ -63,7 +63,6 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      param_repo.parse_results<const struct params::fsm_params>("fsm"),
       base_foraging_controller::server(),
       base_foraging_controller::saa_subsystem());
   ER_NOM("stateless_foraging controller initialization finished");

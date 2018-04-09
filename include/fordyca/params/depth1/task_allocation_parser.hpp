@@ -29,13 +29,14 @@
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
-#include "fordyca/params/depth1/executive_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
+namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -71,9 +72,9 @@ class task_allocation_parser: public rcppsw::params::xml_param_parser {
 
  private:
   // clang-format off
-  struct task_allocation_params m_params{};
-  executive_parser              m_exec_parser;
-  exec_estimates_parser         m_estimate_parser;
+  struct task_allocation_params         m_params{};
+  task_allocation::executive_xml_parser m_exec_parser;
+  exec_estimates_parser                 m_estimate_parser;
   // clang-format on
 };
 

@@ -49,11 +49,7 @@ acquire_cache_fsm::acquire_cache_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
     std::shared_ptr<const representation::perceived_arena_map> map)
-    : base_foraging_fsm(
-          params->times.unsuccessful_explore_dir_change,
-          server,
-          saa,
-          ST_MAX_STATES),
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
@@ -62,12 +58,8 @@ acquire_cache_fsm::acquire_cache_fsm(
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_map(std::move(map)),
       m_server(server),
-      m_vector_fsm(params->times.frequent_collision_thresh,
-                   server,
-                   saa),
-      m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                    server,
-                    saa),
+      m_vector_fsm(server, saa),
+      m_explore_fsm(server, saa),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_cache,
                                                nullptr,
@@ -163,7 +155,7 @@ bool acquire_cache_fsm::acquire_known_cache(
              best.ent->discrete_loc().first,
              best.ent->discrete_loc().second,
              best.density.last_result());
-      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
+      tasks::vector_argument v(vector_fsm::kCacheArrivalTol,
                                best.ent->real_loc());
       m_explore_fsm.task_reset();
       m_vector_fsm.task_reset();

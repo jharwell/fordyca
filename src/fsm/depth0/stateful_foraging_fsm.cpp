@@ -39,11 +39,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
     const std::shared_ptr<representation::perceived_arena_map>& map)
-    : base_foraging_fsm(
-          params->times.unsuccessful_explore_dir_change,
-          server,
-          saa,
-          ST_MAX_STATES),
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_leaving_nest(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),

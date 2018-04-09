@@ -36,7 +36,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 phototaxis_force::phototaxis_force(
     const struct params::phototaxis_force_params* params,
-    const base_sensing_subsystem& sensors)
+    const std::shared_ptr<base_sensing_subsystem>& sensors)
     : m_max(params->max), m_sensors(sensors) {}
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ phototaxis_force::phototaxis_force(
 argos::CVector2 phototaxis_force::operator()() const {
   argos::CVector2 accum;
 
-  for (auto& r : m_sensors.light()->GetReadings()) {
+  for (auto& r : m_sensors->light()->GetReadings()) {
     accum += argos::CVector2(r.Value, r.Angle);
   } /* for(r..) */
 

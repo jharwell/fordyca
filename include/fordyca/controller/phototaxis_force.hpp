@@ -51,13 +51,13 @@ namespace steering = rcppsw::robotics::steering2D;
 class phototaxis_force {
  public:
   explicit phototaxis_force(const struct params::phototaxis_force_params* params,
-                            const base_sensing_subsystem& sensors);
+                            const std::shared_ptr<base_sensing_subsystem>& sensors);
 
   argos::CVector2 operator()() const;
 
   // clang-format off
-  double                        m_max;
-  const base_sensing_subsystem& m_sensors;
+  double                                   m_max;
+  std::shared_ptr<base_sensing_subsystem>  m_sensors;
   // clang-format on
 };
 

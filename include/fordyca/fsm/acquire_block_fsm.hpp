@@ -157,13 +157,14 @@ class acquire_block_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  const argos::CVector2                                      mc_nest_center;
-  std::shared_ptr<representation::block>                     m_best_block{nullptr};
-  argos::CRandom::CRNG*                                      m_rng;
-  std::shared_ptr<representation::perceived_arena_map>       m_map;
-  std::shared_ptr<rcppsw::er::server>                        m_server;
-  vector_fsm                                                 m_vector_fsm;
-  explore_for_block_fsm                                      m_explore_fsm;
+  bool                                                 m_vectoring{false};
+  const argos::CVector2                                mc_nest_center;
+  std::shared_ptr<representation::block>               m_best_block{nullptr};
+  argos::CRandom::CRNG*                                m_rng;
+  std::shared_ptr<representation::perceived_arena_map> m_map;
+  std::shared_ptr<rcppsw::er::server>                  m_server;
+  vector_fsm                                           m_vector_fsm;
+  explore_for_block_fsm                                m_explore_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

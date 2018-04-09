@@ -40,7 +40,7 @@ constexpr char pheromone_parser::kXMLRoot[];
 void pheromone_parser::parse(const ticpp::Element& node) {
   ticpp::Element pnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params.rho = std::atof(node.GetAttribute("rho").c_str());
+  m_params.rho = std::atof(pnode.GetAttribute("rho").c_str());
   XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
 } /* parse() */
 

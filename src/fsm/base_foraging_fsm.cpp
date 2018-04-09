@@ -42,9 +42,8 @@ using controller::steering_force_type;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    std::shared_ptr<controller::saa_subsystem> saa,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
@@ -56,16 +55,9 @@ base_foraging_fsm::base_foraging_fsm(
       entry_leaving_nest(),
       entry_new_direction(),
       entry_wait_for_signal(),
-      mc_dir_change_thresh(unsuccessful_dir_change_thresh),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_saa(std::move(saa)) {}
-
-base_foraging_fsm::base_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    uint8_t max_states)
-    : base_foraging_fsm(0, server, saa, max_states) {}
 
 /*******************************************************************************
  * States
@@ -83,7 +75,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   }
 
   m_saa->steering_force().anti_phototaxis();
-  m_saa->apply_steering_force();
+  m_saa->apply_steering_force(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
@@ -117,8 +109,21 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->steering_force().phototaxis();
-  m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
-  m_saa->apply_steering_force();
+  argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
+  if (m_saa->sensing()->threatening_obstacle_exists()) {
+    m_saa->steering_force().avoidance(obs);
+  } else {
+    /*
+     * If we are currently spinning in place (hard turn), we have 0 linear
+     * velocity, and that does not play well with the arrival force
+     * calculations. To fix this, and a bit of wander force.
+     */
+    if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+      saa_subsystem()->steering_force().wander();
+    }
+  }
+
+  m_saa->apply_steering_force(std::make_pair(true, false));
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
@@ -130,7 +135,7 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
     m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
 
     argos::CVector2 force = m_saa->steering_force().value();
-    m_saa->apply_steering_force();
+    m_saa->apply_steering_force(std::make_pair(false, false));
     ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
            force.GetX(),
            force.GetY(),
@@ -163,12 +168,11 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * from our desired new direction. This prevents excessive spinning due to
    * overshoot. See #191.
    */
-  actuators()->set_rel_heading(
-      argos::CVector2(
+  actuators()->differential_drive().fsm_drive(
           base_foraging_fsm::actuators()->differential_drive().max_speed() *
               0.1,
-          (current_dir - m_new_dir)),
-      true);
+          (current_dir - m_new_dir),
+          std::make_pair(false, true));
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance

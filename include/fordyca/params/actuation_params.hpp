@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/angles.h>
 #include "fordyca/params/throttling_params.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
 #include "fordyca/params/steering_force2D_params.hpp"

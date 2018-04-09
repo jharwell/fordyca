@@ -162,24 +162,20 @@ The following root XML tags are defined:
 
 ##### `wander_force`
 
-- `circle_distance`
+- `circle_distance` - Scaling factor for force; applied to current velocity.
 
-- `circle_radius`
+- `circle_radius` - Displacement (i.e. wander) circle radius; placed at
+                    `circle_distance` from the robot.
 
-- `max_angle_delta`
+- `max_angle_delta` -  +/- Maximum amount of heading change for the wander angle
+  (a random value is chosen in this range). Specified in degrees.
 
-#### `wheels`
+#### `differential_drive`
 
 - `soft_turn_max` - If actuators are told to change to a heading within a
                     difference greater than the one specified by this parameter
                     to the current heading, a hard turn is executed (spin in
-                    place). Otherwise, if it is greater than `no_turn_max`, a
-                    soft turn is executed (keep moving forward and turn
-                    gradually).
-
-- `no_turn_max` - If actuators are told to change to a heading within a
-                  difference less than the one specified by this parameter to
-                  the current heading, the heading change is ignored.
+                    place).
 
 - `max_speed` - The maximimum speed of the robot.
 

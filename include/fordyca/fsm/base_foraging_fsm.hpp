@@ -57,11 +57,6 @@ NS_START(fsm);
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
-  base_foraging_fsm(uint unsuccessful_dir_change_thresh,
-                    const std::shared_ptr<rcppsw::er::server>& server,
-                    std::shared_ptr<controller::saa_subsystem> saa,
-                    uint8_t max_states);
-
   base_foraging_fsm(
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::saa_subsystem>& saa,
@@ -93,8 +88,6 @@ class base_foraging_fsm : public state_machine::hfsm {
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
  protected:
-  double dir_change_thresh(void) const { return mc_dir_change_thresh; }
-
   /**
    * @brief Randomize the angle of a vector, for use in change robot heading
    *
@@ -211,7 +204,6 @@ class base_foraging_fsm : public state_machine::hfsm {
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
   // clang-format off
-  const double                               mc_dir_change_thresh;
   uint                                       m_new_dir_count{0};
   argos::CRadians                            m_new_dir;
   argos::CRandom::CRNG*                      m_rng;

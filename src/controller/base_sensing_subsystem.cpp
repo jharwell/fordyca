@@ -72,7 +72,10 @@ bool base_sensing_subsystem::in_nest(void) {
 
 bool base_sensing_subsystem::obstacle_is_threatening(
     const argos::CVector2& obstacle) const {
-  return obstacle.Length() >= mc_obstacle_delta;
+  argos::CRange<argos::CRadians> range(argos::CRadians(-5*M_PI/6),
+                                       argos::CRadians(5*M_PI/6));
+  return obstacle.Length() >= mc_obstacle_delta &&
+      range.WithinMinBoundIncludedMaxBoundIncluded(obstacle.Angle());
 } /* obstacle_is_threatening() */
 
 argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
@@ -88,7 +91,6 @@ argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
       }
     }
   } /* for(r..) */
-
   return closest;
 } /* find_closest_obstacle() */
 

@@ -32,12 +32,10 @@
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
-#include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -112,7 +110,6 @@ void stateful_foraging_controller::ControlStep(void) {
 
 void stateful_foraging_controller::Init(ticpp::Element& node) {
   params::depth0::stateful_foraging_repository param_repo;
-  params::depth1::task_repository task_repo;
 
   /*
    * Note that we do not call \ref stateless_foraging_controller::Init()--there
@@ -121,16 +118,18 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateful_foraging controller");
-  param_repo.parse_all(node);
-  task_repo.parse_all(node);
-  server_handle()->log_stream() << param_repo;
-  server_handle()->log_stream() << task_repo;
 
+  /* parse and validate parameters */
+  param_repo.parse_all(node);
+  server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
-  ER_ASSERT(task_repo.validate_all(),
-            "FATAL: Not all task parameters were validated");
+  auto* fsm_params = param_repo.parse_results<struct params::fsm_params>("fsm");
+  auto* task_params =
+      param_repo.parse_results<params::depth1::task_allocation_params>(
+          "task_allocation");
 
+  /* initialize subsystems and perception */
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
       param_repo.parse_results<params::depth0::occupancy_grid_params>(
@@ -138,16 +137,10 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       GetId());
 
   saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
-      param_repo.parse_results<struct params::sensing_params>("sensors"),
+      param_repo.parse_results<struct params::sensing_params>("sensing"),
       &saa_subsystem()->sensing()->sensor_list()));
 
-  const params::fsm_params* fsm_params =
-      param_repo.parse_results<struct params::fsm_params>("fsm");
-
-  const params::depth1::task_allocation_params* task_params =
-      param_repo.parse_results<params::depth1::task_allocation_params>(
-          "task_allocation");
-
+  /* initialize task */
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_params,

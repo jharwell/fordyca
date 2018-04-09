@@ -57,8 +57,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
                                public metrics::fsm::stateless_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(const struct params::fsm_params* params,
-                         const std::shared_ptr<rcppsw::er::server>& server,
+  stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
                          const std::shared_ptr<controller::saa_subsystem>& saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;

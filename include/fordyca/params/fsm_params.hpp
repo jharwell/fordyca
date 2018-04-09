@@ -41,12 +41,6 @@ NS_START(fordyca, params);
  */
 struct threshold_times {
   /*
-   * The number of exploration steps without finding block after which the
-   * footboot will randomly change direction.
-   */
-  uint unsuccessful_explore_dir_change{};
-
-  /*
    * The number of time steps between two successive collisions that will be
    * considered excessive, and result in a random direction being added to the
    * avoidance heading to help avoid collisions in the immediate future.

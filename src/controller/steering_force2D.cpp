@@ -36,7 +36,7 @@ steering_force2D::steering_force2D(
     const std::shared_ptr<rcppsw::er::server>& server,
     steering::boid& entity,
     const params::steering_force2D_params* const params,
-    const base_sensing_subsystem& sensors)
+    const std::shared_ptr<base_sensing_subsystem>& sensors)
     : steering::force_calculator(server, entity, params),
     m_phototaxis_force(&params->phototaxis, sensors) {}
 

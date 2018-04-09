@@ -60,7 +60,7 @@ class steering_force2D : public steering::force_calculator {
   steering_force2D(const std::shared_ptr<rcppsw::er::server>& server,
                    steering::boid& entity,
                    const params::steering_force2D_params* params,
-                   const base_sensing_subsystem& sensors);
+                   const std::shared_ptr<base_sensing_subsystem>& sensors);
 
   /**
    * @brief Add the \ref kPhototaxis force to the sum forces for this timestep.

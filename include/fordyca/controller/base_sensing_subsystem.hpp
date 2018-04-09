@@ -134,9 +134,7 @@ class base_sensing_subsystem {
    * @brief Get the robot's heading, which is computed from the previous 2
    * calculated (ahem set) robot positions.
    */
-  argos::CVector2 robot_heading(void) const {
-    return m_position - m_prev_position;
-  }
+  argos::CVector2 heading(void) const { return m_position - m_prev_position; }
 
   /**
    * @brief Get the angle of the current robot's heading. A shortcut to help
@@ -144,7 +142,7 @@ class base_sensing_subsystem {
    *
    * @return The heading angle.
    */
-  argos::CRadians heading_angle(void) const { return robot_heading().Angle(); }
+  argos::CRadians heading_angle(void) const { return heading().Angle(); }
 
   /**
    * @brief Figure out if a threatening obstacle exists near to the robot's

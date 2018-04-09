@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
@@ -87,7 +89,7 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
    * @brief Apply the summed steering forces; change wheel speeds. Resets the
    * summed forces.
    */
-  void apply_steering_force(void);
+  void apply_steering_force(const std::pair<bool, bool>& force);
 
   steering_force2D& steering_force(void) { return m_steering; }
   const steering_force2D& steering_force(void) const { return m_steering; }
