@@ -121,6 +121,14 @@
               />
       <nest size="0.5, 2.0" center="2, 2.5" />
     </arena_map>
+    <penalty pen_func = "kSine"
+             amp = "2"
+             per = "2"
+             phase = "1"
+             square = "2"
+             step = "2"
+             saw = "2"
+             />
     <visualization robot_id="true"
                    robot_los="false"
                    robot_task="true"
