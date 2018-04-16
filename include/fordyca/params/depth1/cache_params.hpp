@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ NS_START(fordyca, params, depth1);
  * @struct cache_params
  * @ingroup params depth1
  */
-struct cache_params : public rcppsw::common::base_params {
+struct cache_params : public rcppsw::params::base_params {
   bool create_static{false};
   bool create_dynamic{false};
   uint static_size{0};

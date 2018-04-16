@@ -1,5 +1,4 @@
 <?xml version="1.0" ?>
-
 <argos-configuration>
 
   <!-- ************************* -->
@@ -16,7 +15,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateful_foraging_controller id="ffc"
                                 library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -24,16 +23,16 @@
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
         <output>
-          <robot output_root="output"
-                 output_dir="__current_date__"
-                 />
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
@@ -54,30 +53,43 @@
               always_partition="true"
               never_partition="false"
               />
-          <init_estimates
+          <exec_estimates
               enabled="true"
               generalist_range="2000:4000"
               collector_range="1000:2000"
               harvester_range="1000:2000"
               />
         </task_allocation>
-        <sensors>
-          <proximity go_straight_angle_range="-5:5"
-                    delta="0.001" />
-        </sensors>
-        <actuators>
-          <wheels soft_turn_angle_max="30"
-                  no_turn_angle_max="5"
-                  max_speed="10" />
-        </actuators>
+        <sensing>
+          <proximity angle_range="-1.1:1.1"
+                     delta="0.0001" />
+        </sensing>
+        <actuation>
+          <throttling
+              block_carry="0.1"/>
+          <steering2D>
+            <avoidance_force lookahead="0.5"
+                             max="8"/>
+            <arrival_force slowing_radius="0.2"
+                           slowing_speed_min="1.0"
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="9.0"
+                          interval="1"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
+
+          <differential_drive soft_turn_max="30"
+                              max_speed="10" />
+        </actuation>
         <fsm
-          unsuccessful_explore_dir_change="1000"
-          frequent_collision_thresh="300"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.1"
           />
       </params>
-    </depth1_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
@@ -85,9 +97,9 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateful_foraging_loop_functions">
     <output>
-      <sim sim_log_fname="sim.log"
+      <sim log_fname="sim.log"
            output_root="output"
            output_dir="__current_date__"
            />
@@ -170,7 +182,7 @@
            medium="leds" />
 
     <distribute>
-      <position method="uniform" min="1,1,0" max="9,4,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
@@ -209,7 +221,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
+      <user_functions label="stateful_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

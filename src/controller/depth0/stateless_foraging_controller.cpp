@@ -24,13 +24,14 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/actuator_params.hpp"
+#include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/depth0/stateless_foraging_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "rcppsw/er/server.hpp"
 
@@ -50,23 +51,20 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateless_foraging controller");
 
   params::depth0::stateless_foraging_repository param_repo;
   param_repo.parse_all(node);
-  param_repo.show_all(client::server_handle()->log_stream());
+  client::server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      static_cast<const struct params::fsm_params*>(
-          param_repo.get_params("fsm")),
       base_foraging_controller::server(),
-      base_foraging_controller::base_sensors_ref(),
-      base_foraging_controller::actuators());
+      base_foraging_controller::saa_subsystem());
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 
@@ -78,11 +76,8 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
   m_fsm->run();
 } /* ControlStep() */
 
@@ -106,8 +101,8 @@ double stateless_foraging_controller::timestep_distance(void) const {
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
-  if (base_sensors()->tick() > 1) {
-    return base_sensors()->robot_heading().Length();
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->sensing()->heading().Length();
   }
   return 0;
 } /* timestep_distance() */

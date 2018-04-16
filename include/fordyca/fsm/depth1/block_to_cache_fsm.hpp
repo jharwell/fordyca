@@ -43,10 +43,6 @@ namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
-namespace controller {
-namespace depth1{ class foraging_sensors; };
-class actuator_manager;
-}
 
 NS_START(fsm, depth1);
 
@@ -74,8 +70,7 @@ class block_to_cache_fsm : public base_foraging_fsm,
   block_to_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
   block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
@@ -113,8 +108,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
    */
   void init(void) override;
 
-  controller::depth1::foraging_sensors* depth1_sensors(void) const { return m_sensors.get(); }
-
  protected:
   enum fsm_states {
     ST_START,
@@ -139,11 +132,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
     ST_WAIT_FOR_CACHE_DROP,
 
     /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
      * Block has been successfully dropped in a cache.
      */
     ST_FINISHED,
@@ -154,8 +142,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to cache states */
@@ -179,10 +165,9 @@ class block_to_cache_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                                                  m_pickup_count;
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
-  acquire_block_fsm                                     m_block_fsm;
-  acquire_cache_fsm                                     m_cache_fsm;
+  uint              m_pickup_count;
+  acquire_block_fsm m_block_fsm;
+  acquire_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

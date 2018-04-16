@@ -42,12 +42,6 @@ namespace representation { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
-namespace controller {
-namespace depth0 { class foraging_sensors; }
-namespace depth1 { class foraging_sensors; }
-class actuator_manager;
-}
-
 NS_START(fsm, depth0);
 
 /*******************************************************************************
@@ -74,13 +68,12 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   stateful_foraging_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }
-  void task_start(__unused const task_allocation::taskable_argument* ) override {}
+  void task_start(const task_allocation::taskable_argument*) override {}
   void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
@@ -104,8 +97,6 @@ class stateful_foraging_fsm : public base_foraging_fsm,
    * @brief Reset the FSM.
    */
   void init(void) override;
-
-  controller::depth0::foraging_sensors* depth0_sensors(void) const { return m_sensors.get(); }
 
  protected:
   enum fsm_states {
@@ -139,7 +130,6 @@ class stateful_foraging_fsm : public base_foraging_fsm,
 
   // clang-format off
   bool                                                  m_task_running;
-  std::shared_ptr<controller::depth0::foraging_sensors> m_sensors;
   block_to_nest_fsm                                     m_block_fsm;
   // clang-format on
 

@@ -32,7 +32,7 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-int robot_on_block(const controller::base_foraging_controller& controller,
+__pure int robot_on_block(const controller::base_foraging_controller& controller,
                    const representation::arena_map& map) {
   return map.robot_on_block(controller.robot_loc());
 } /* robot_on_block() */
@@ -54,7 +54,7 @@ int robot_id(const controller::base_foraging_controller& controller) {
   return std::atoi(controller.GetId().c_str() + 2);
 } /* robot_id() */
 
-int robot_on_cache(const controller::base_foraging_controller& controller,
+__pure int robot_on_cache(const controller::base_foraging_controller& controller,
                    const representation::arena_map& map) {
   return map.robot_on_cache(controller.robot_loc());
 } /* robot_on_cache() */

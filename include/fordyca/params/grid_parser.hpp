@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "fordyca/params/grid_params.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,19 +45,27 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for \ref arena_map grid into \ref grid_params.
  */
 
-class grid_parser : public rcppsw::common::xml_param_parser {
+class grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  grid_parser(void) : m_params() {}
+  explicit grid_parser(uint level) : xml_param_parser(level) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct grid_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all grid parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "grid";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct grid_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct grid_params> m_params;
+  struct grid_params m_params {};
 };
 
 NS_END(params, fordyca);

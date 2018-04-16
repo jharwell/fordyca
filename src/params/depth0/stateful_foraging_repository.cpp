@@ -22,10 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/actuator_parser.hpp"
-#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
+#include "fordyca/params/actuation_parser.hpp"
+#include "fordyca/params/occupancy_grid_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/sensor_parser.hpp"
+#include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/params/depth1/task_allocation_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,10 +37,24 @@ NS_START(fordyca, params, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_repository::stateful_foraging_repository(void) {
-  register_parser<actuator_parser>("actuators");
-  register_parser<sensor_parser>("sensors");
-  register_parser<fsm_parser>("fsm");
-  register_parser<occupancy_grid_parser>("occupancy_grid");
+  register_parser<actuation_parser, actuation_params>(
+      actuation_parser::kXMLRoot,
+      actuation_parser::kHeader1);
+  register_parser<sensing_parser, sensing_params>(
+      sensing_parser::kXMLRoot,
+      sensing_parser::kHeader1);
+  register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
+                                          fsm_parser::kHeader1);
+  register_parser<occupancy_grid_parser, occupancy_grid_params>(
+      occupancy_grid_parser::kXMLRoot,
+      occupancy_grid_parser::kHeader1);
+
+  /*
+   * @todo Dirty hack! Shouldn't need to reference depth1 stuff in here.
+   */
+  register_parser<depth1::task_allocation_parser, depth1::task_allocation_params>(
+      depth1::task_allocation_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

@@ -56,7 +56,7 @@ class stateless_foraging_controller : public base_foraging_controller,
   ~stateless_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
   void Reset(void) override;
 

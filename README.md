@@ -29,25 +29,46 @@ This is the main entry point for getting started on the project.
 
 5. Clone `rcsw` https://github.com/swarm-robotics/rcsw (Reusable C software)
    somewhere and create a symbolic to it in the repo as
-   `<fordyca_root>/ext/rcsw`. Follow all pre/post-cloning instructions found in
+   `<repo_root>/ext/rcsw`. Follow all pre/post-cloning instructions found in
    README in that repo.
 
 6. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable C++ software)
    somewhere and create a symbolic link it as
-   `<fordyca_root>/ext/rcppsw`. Follow all pre/post-cloning instructions found in
+   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions found in
    README for that repo.
 
 ## Post-cloning setup
 
-1. Pull in the cmake config:
+1. Check out the development branch, as that has not only the latest semi-stable
+   release, but also the most up-to-date documentation, including this README.
+
+        git checkout devel
+
+2. Pull in the cmake project scaffolding:
 
         git submodule update --init --recursive
 
-2. Build via:
+3. Build via:
 
         mkdir build && cd build
         cmake ..
         make
+
+For additional build configuration options, please see the README in
+the [cmake config](https://github.com/jharwell/cmake-config) repo.
+
+To build the documentation, do the following from the build directory:
+
+    make documentation
+
+## Running
+
+To run a simple single source foraging experiment, do the following after a
+successful build, from the root of the fordyca repo:
+
+    argos3 -c exp/single-source.argos
+
+which should pop up a nice GUI from which you can start the experiment.
 
 # Troubleshooting
 
@@ -57,13 +78,20 @@ This is the main entry point for getting started on the project.
 
           git submodule update
 
-  2. Updating `rcppsw` and `rcsw`, and possibly their cmake submodules
+  2. Updating `rcppsw` and `rcsw`, and possibly their cmake submodules.
 
   If the problem perists, open an issue.
 
-- If you are getting a segfault when running ARGoS, verify that if you are
-  running with Qt visualizations that the threadcount is 0 (Qt5 cannot run with
-  multiple threads without segfaulting).
+- If you are having trouble running experiments (i.e. they won't start/crash
+  immediately), try:
+
+  1. If you are getting a segfault when running ARGoS, verify that if you are
+     running with Qt visualizations that the threadcount is 0 (Qt5 cannot run
+     with multiple threads without segfaulting).
+
+  2. Verify you don't have any anaconda bits in your `PATH`. Depending on
+     version, anaconda loads a DIFFERENT version of the Qt than fordyca uses,
+     resulting in a dynamic linking error.
 
 ## Contributing
 

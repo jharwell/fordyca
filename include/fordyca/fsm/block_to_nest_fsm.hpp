@@ -44,9 +44,9 @@ struct fsm_params;
 }
 namespace controller {
 namespace depth1 {
-class foraging_sensors;
+class sensing_subsystem;
 }
-class actuator_manager;
+class actuation_subsystem;
 } // namespace controller
 namespace representation {
 class perceived_arena_map;
@@ -82,8 +82,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   block_to_nest_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
   block_to_nest_fsm(const block_to_nest_fsm& fsm) = delete;
@@ -171,11 +170,6 @@ class block_to_nest_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,
 
     /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
      * Block has been brought to the nest successfully.
      */
     ST_FINISHED,
@@ -200,9 +194,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   HFSM_STATE_INHERIT(base_foraging_fsm,
                      transport_to_nest,
                      state_machine::event_data);
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* memory foraging states */
@@ -228,10 +220,9 @@ class block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                                                  m_pickup_count{0};
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
-  acquire_block_fsm                                     m_block_fsm;
-  depth1::acquire_cache_fsm                             m_cache_fsm;
+  uint                      m_pickup_count{0};
+  acquire_block_fsm         m_block_fsm;
+  depth1::acquire_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

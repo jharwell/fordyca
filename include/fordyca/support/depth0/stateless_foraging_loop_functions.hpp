@@ -57,7 +57,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   stateless_foraging_loop_functions(void);
   ~stateless_foraging_loop_functions(void) override;
 
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void Reset() override;
   void Destroy() override;
   void PreStep() override;

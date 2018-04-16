@@ -27,15 +27,16 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
-#include "fordyca/params/depth1/executive_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
+namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -47,21 +48,33 @@ NS_START(fordyca, params, depth1);
  * @brief Parses XML parameters for relating to the task allocation methods used
  * in FORDYCA into \ref task_allocation_params.
  */
-class task_allocation_parser: public rcppsw::common::xml_param_parser {
+class task_allocation_parser: public rcppsw::params::xml_param_parser {
  public:
-  task_allocation_parser(void)
-      : m_params(), m_exec_parser(), m_estimate_parser() {}
+  explicit task_allocation_parser(uint level)
+      : xml_param_parser(level),
+        m_exec_parser(level + 1),
+        m_estimate_parser(level + 1) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct task_allocation_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
+  /**
+   * @brief The root tag that all task allocation parameters should lie under
+   * in the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "task_allocation";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct task_allocation_params* parse_results(void) const override {
+    return &m_params;
+  }
 
  private:
   // clang-format off
-  std::unique_ptr<struct task_allocation_params> m_params;
-  executive_parser                               m_exec_parser;
-  exec_estimates_parser                          m_estimate_parser;
+  struct task_allocation_params         m_params{};
+  task_allocation::executive_xml_parser m_exec_parser;
+  exec_estimates_parser                 m_estimate_parser;
   // clang-format on
 };
 
