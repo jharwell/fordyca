@@ -143,7 +143,7 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) const {
+  const std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const {
     return m_saa;
   }
   std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {

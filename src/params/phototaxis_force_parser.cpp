@@ -51,7 +51,7 @@ void phototaxis_force_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-bool phototaxis_force_parser::validate(void) const {
+__pure bool phototaxis_force_parser::validate(void) const {
   return m_params.max >= 0;
 } /* validate() */
 

@@ -34,6 +34,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/harvester.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -112,7 +113,7 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.current_task()->accept(*this);
 
   ER_NOM("depth1_foraging_controller: dropped block%d in cache%d",

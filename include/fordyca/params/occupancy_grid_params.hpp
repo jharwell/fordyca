@@ -18,20 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/params/base_params.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/depth0/pheromone_params.hpp"
+#include "fordyca/params/pheromone_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Structure Definitions
@@ -45,6 +45,6 @@ struct occupancy_grid_params : public rcppsw::params::base_params {
   struct pheromone_params pheromone{};
 };
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_ */

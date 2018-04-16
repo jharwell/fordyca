@@ -97,11 +97,6 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool block_acquired(void) const;
 
   /**
-   * @brief Process the LOS for the current timestep (blocks and caches)
-   */
-  void process_los(const representation::line_of_sight* c_los) override;
-
-  /**
    * @brief Set whether or not a robot is supposed to display the task it is
    * currently working on above itself during simulation.
    */
