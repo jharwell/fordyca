@@ -39,9 +39,7 @@ class server;
 }} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params { namespace depth0 {
-struct occupancy_grid_params;
-}} // namespace params::depth0
+namespace params { struct occupancy_grid_params;}
 
 NS_START(representation);
 class line_of_sight;
@@ -71,7 +69,7 @@ class perceived_arena_map
 
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
-      const struct fordyca::params::depth0::occupancy_grid_params* c_params,
+      const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
   bool pheromone_repeat_deposit(void) const {

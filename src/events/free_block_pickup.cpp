@@ -35,6 +35,7 @@
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/harvester.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -153,7 +154,7 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.current_task()->accept(*this);
   controller.block(m_block);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
@@ -166,7 +167,7 @@ void free_block_pickup::visit(
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_block);
   controller.current_task()->accept(*this);
 

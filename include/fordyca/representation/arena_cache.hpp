@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <utility>
 #include <vector>
 
 #include "fordyca/metrics/cache_metrics.hpp"

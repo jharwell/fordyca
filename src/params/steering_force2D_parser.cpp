@@ -51,7 +51,7 @@ void steering_force2D_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-bool steering_force2D_parser::validate(void) const {
+__pure bool steering_force2D_parser::validate(void) const {
   return force_calculator_xml_parser::validate() && m_phototaxis.validate();
 } /* validate() */
 

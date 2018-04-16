@@ -1,5 +1,5 @@
 /**
- * @file occupancy_grid_parser.cpp
+ * @file pheromone_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,42 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/occupancy_grid_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Global Variables
+ * Structure Definitions
  ******************************************************************************/
-constexpr char occupancy_grid_parser::kXMLRoot[];
+/**
+ * @struct pheromone_params
+ * @ingroup params depth0
+ */
+struct pheromone_params : public rcppsw::params::base_params {
+  double rho{0.0};
+  bool repeat_deposit{false};
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void occupancy_grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_grid_parser.parse(onode);
-  m_pheromone_parser.parse(onode);
-  m_params.grid = *m_grid_parser.parse_results();
-  m_params.pheromone = *m_pheromone_parser.parse_results();
-} /* parse() */
+NS_END(params, fordyca);
 
-void occupancy_grid_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_grid_parser << m_pheromone_parser
-         << build_footer();
-} /* show() */
-
-__pure bool occupancy_grid_parser::validate(void) const {
-  return m_grid_parser.validate() && m_pheromone_parser.validate();
-} /* validate() */
-
-NS_END(depth0, params, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARAMS_HPP_ */

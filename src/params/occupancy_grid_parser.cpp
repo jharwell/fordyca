@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_repository.cpp
+ * @file occupancy_grid_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,40 +21,39 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
 #include "fordyca/params/occupancy_grid_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
-#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Global Variables
  ******************************************************************************/
-stateful_foraging_repository::stateful_foraging_repository(void) {
-  register_parser<actuation_parser, actuation_params>(
-      actuation_parser::kXMLRoot,
-      actuation_parser::kHeader1);
-  register_parser<sensing_parser, sensing_params>(
-      sensing_parser::kXMLRoot,
-      sensing_parser::kHeader1);
-  register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
-                                          fsm_parser::kHeader1);
-  register_parser<occupancy_grid_parser, occupancy_grid_params>(
-      occupancy_grid_parser::kXMLRoot,
-      occupancy_grid_parser::kHeader1);
+constexpr char occupancy_grid_parser::kXMLRoot[];
 
-  /*
-   * @todo Dirty hack! Shouldn't need to reference depth1 stuff in here.
-   */
-  register_parser<depth1::task_allocation_parser, depth1::task_allocation_params>(
-      depth1::task_allocation_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-}
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void occupancy_grid_parser::parse(const ticpp::Element& node) {
+  ticpp::Element onode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_grid_parser.parse(onode);
+  m_pheromone_parser.parse(onode);
+  m_params.grid = *m_grid_parser.parse_results();
+  m_params.pheromone = *m_pheromone_parser.parse_results();
+} /* parse() */
 
-NS_END(depth0, params, fordyca);
+void occupancy_grid_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << m_grid_parser << m_pheromone_parser
+         << build_footer();
+} /* show() */
+
+__pure bool occupancy_grid_parser::validate(void) const {
+  return m_grid_parser.validate() && m_pheromone_parser.validate();
+} /* validate() */
+
+NS_END(params, fordyca);

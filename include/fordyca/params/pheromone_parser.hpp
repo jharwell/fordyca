@@ -1,5 +1,5 @@
 /**
- * @file occupancy_grid_parser.hpp
+ * @file pheromone_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,56 +27,47 @@
 #include <string>
 
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/depth0/occupancy_grid_params.hpp"
+#include "fordyca/params/pheromone_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/depth0/pheromone_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class occupancy_grid_parser
+ * @class pheromone_parser
  * @ingroup params depth0
  *
- * @brief Parses XML parameters for \ref occupancy_grid into
- * \ref occupancy_grid_params.
+ * @brief Parses XML parameters relating to pheromones into
+ * \ref pheromone_params.
  */
-class occupancy_grid_parser: public rcppsw::params::xml_param_parser {
+class pheromone_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit occupancy_grid_parser(uint level):
-      xml_param_parser(level),
-      m_grid_parser(level + 1),
-      m_pheromone_parser(level + 1) {}
+  explicit pheromone_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief The root tag that all occupancy grid parameters should lie under in
-   * the XML tree.
+   * @brief The root tag that all pheromone parameters should lie under in the
+   * XML tree.
    */
-  static constexpr char kXMLRoot[] = "occupancy_grid";
+  static constexpr char kXMLRoot[] = "pheromone";
 
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct occupancy_grid_params* parse_results(void) const override {
+  const struct pheromone_params* parse_results(void) const override {
     return &m_params;
   }
 
  private:
-  // clang-format off
-  occupancy_grid_params m_params{};
-  grid_parser           m_grid_parser;
-  pheromone_parser      m_pheromone_parser;
-  // clang-format on
+  struct pheromone_params m_params{};
 };
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_OCCUPANCY_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PHEROMONE_PARSER_HPP_ */

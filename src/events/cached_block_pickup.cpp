@@ -33,6 +33,8 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -202,7 +204,7 @@ void cached_block_pickup::visit(representation::block& block) {
 
 void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
   controller.current_task()->accept(*this);
 

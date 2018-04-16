@@ -1,7 +1,7 @@
 /**
- * @file throttling_parser.cpp
+ * @file pheromone_parser.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,10 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/params/pheromone_parser.hpp"
 #include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include "fordyca/params/throttling_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,25 +32,27 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char throttling_parser::kXMLRoot[];
+constexpr char pheromone_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void throttling_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tnode =
+void pheromone_parser::parse(const ticpp::Element& node) {
+  ticpp::Element pnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(tnode, m_params, block_carry);
+  m_params.rho = std::atof(pnode.GetAttribute("rho").c_str());
+  XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
 } /* parse() */
 
-void throttling_parser::show(std::ostream& stream) const {
+void pheromone_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << XML_PARAM_STR(m_params, block_carry) << std::endl
+         << XML_PARAM_STR(m_params, rho) << std::endl
+         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool throttling_parser::validate(void) const {
-  return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
+__pure bool pheromone_parser::validate(void) const {
+  return m_params.rho > 0.0;
 } /* validate() */
 
 NS_END(params, fordyca);

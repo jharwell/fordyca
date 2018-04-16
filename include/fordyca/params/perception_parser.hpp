@@ -1,7 +1,7 @@
 /**
- * @file pheromone_parser.cpp
+ * @file perception_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,41 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_PERCEPTION_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PERCEPTION_PARSER_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/pheromone_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include "fordyca/params/occupancy_grid_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Global Variables
+ * Structure Definitions
  ******************************************************************************/
-constexpr char pheromone_parser::kXMLRoot[];
+using perception_parser = occupancy_grid_parser;
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void pheromone_parser::parse(const ticpp::Element& node) {
-  ticpp::Element pnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params.rho = std::atof(pnode.GetAttribute("rho").c_str());
-  XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
-} /* parse() */
+NS_END(params, fordyca);
 
-void pheromone_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, rho) << std::endl
-         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl
-         << build_footer();
-} /* show() */
-
-__pure bool pheromone_parser::validate(void) const {
-  return m_params.rho > 0.0;
-} /* validate() */
-
-NS_END(depth0, params, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_PERCEPTION_PARSER_HPP_ */

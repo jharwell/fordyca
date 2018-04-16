@@ -1,5 +1,5 @@
 /**
- * @file throttling_parser.cpp
+ * @file depth1_perception_subsystem.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,41 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_PERCEPTION_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_PERCEPTION_SUBSYSTEM_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
-#include "fordyca/params/throttling_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca);
+
+namespace representation { class line_of_sight; class perceived_arena_map; }
+
+NS_START(controller, depth1);
 
 /*******************************************************************************
- * Global Variables
+ * Class Definitions
  ******************************************************************************/
-constexpr char throttling_parser::kXMLRoot[];
+class perception_subsystem : public base_perception_subsystem {
+ public:
+  perception_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+                            const params::perception_params* const params,
+                            const std::string& id);
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void throttling_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(tnode, m_params, block_carry);
-} /* parse() */
+  void process_los(const representation::line_of_sight* const los) override;
+};
 
-void throttling_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, block_carry) << std::endl
-         << build_footer();
-} /* show() */
+NS_END(depth1, controller, fordyca);
 
-__pure bool throttling_parser::validate(void) const {
-  return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
-} /* validate() */
-
-NS_END(params, fordyca);
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_PERCEPTION_SUBSYSTEM_HPP_ */

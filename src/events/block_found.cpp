@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"

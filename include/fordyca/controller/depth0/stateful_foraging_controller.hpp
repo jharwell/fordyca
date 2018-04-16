@@ -36,17 +36,16 @@ namespace rcppsw { namespace task_allocation {
 class polled_executive;
 class executable_task;
 }}
-
+namespace visitor = rcppsw::patterns::visitor;
+namespace task_allocation = rcppsw::task_allocation;
 NS_START(fordyca);
 namespace tasks { class generalist; class foraging_task; };
-namespace representation { class perceived_arena_map; }
 
 NS_START(controller);
-namespace visitor = rcppsw::patterns::visitor;
+class base_perception_subsystem;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
-namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -67,6 +66,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);
+  ~stateful_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
@@ -85,19 +85,12 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
-  /**
-   * @brief Process the LOS for a given timestep.
-   *
-   * Only handles blocks within a LOS; caches are ignored.
-   */
-  virtual void process_los(const representation::line_of_sight* los);
+std::shared_ptr<depth0::sensing_subsystem> stateful_sensors(void) const;
 
   /**
    * @brief Get the current LOS for the robot.
    */
   const representation::line_of_sight* los(void) const;
-
-  std::shared_ptr<depth0::sensing_subsystem> stateful_sensors(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -111,16 +104,23 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  std::shared_ptr<representation::perceived_arena_map> map(void) const { return m_map; }
   bool is_transporting_to_nest(void) const override;
+
+  const std::shared_ptr<base_perception_subsystem>& perception(void) const { return m_perception; }
+  std::shared_ptr<base_perception_subsystem> perception(void) { return m_perception; }
+
+ protected:
+  void perception(const std::shared_ptr<base_perception_subsystem>& perception) {
+    m_perception = perception;
+  }
 
  private:
   // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
-  std::shared_ptr<representation::perceived_arena_map> m_map;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;
   std::unique_ptr<tasks::generalist>                   m_generalist;
+  std::shared_ptr<base_perception_subsystem>           m_perception{nullptr};
   // clang-format on
 };
 

@@ -24,7 +24,7 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/depth0/occupancy_grid_params.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/block.hpp"
 #include "rcppsw/er/server.hpp"
@@ -40,7 +40,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     std::shared_ptr<rcppsw::er::server> server,
-    const struct fordyca::params::depth0::occupancy_grid_params* c_params,
+    const struct fordyca::params::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : m_server(std::move(server)),
       m_grid(m_server, c_params, robot_id),
