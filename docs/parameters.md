@@ -101,7 +101,7 @@ The following root XML tags are defined:
 - `never_partition` - If `true`, then robots will never choose to partition a
                        task, given the chance. Has no effect if `false`.
 
-#### `init_estimates`
+#### `exec_estimates`
 
 - `enabled` - If `true`, then all estimates of task execution times are
               initialized randomly within the specified ranges, rather than with
@@ -110,15 +110,18 @@ The following root XML tags are defined:
 
 - `generalist_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the generalist task will be drawn.
+  duration of the generalist task will be drawn. Only used if `enabled` is
+  `true`.
 
 - `collector_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the collector task will be drawn.
+  duration of the collector task will be drawn. Only used if `enabled` is
+  `true`.
 
 - `harvester_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the harvester task will be drawn.
+  duration of the harvester task will be drawn. Only used if `enabled` is
+  `true`.
 
 ### `sensing`
 
@@ -145,7 +148,8 @@ The following root XML tags are defined:
 
 ##### `avoidance_force`
 
-- `lookahead` - How far ahead of the robot to look for obstacles.
+- `lookahead` - How far ahead of the robot to look for obstacles. Currently
+  unused, but may be used in the future.
 
 - `max` - Max value for the force.
 
@@ -153,6 +157,9 @@ The following root XML tags are defined:
 
 - `slowing_radius` - Radius around target inside which robots will slow down
   linearly to not overshoot their target.
+
+- `slowing_speed_min` - The minimum speed robotics will linearly ramp down
+  to. Should be > 0.
 
 - `max` - Max value for the force.
 
@@ -170,6 +177,10 @@ The following root XML tags are defined:
 - `max_angle_delta` -  +/- Maximum amount of heading change for the wander angle
   (a random value is chosen in this range). Specified in degrees.
 
+##### `phototaxis_force`
+
+- `max` - Max value for the force.
+
 #### `differential_drive`
 
 - `soft_turn_max` - If actuators are told to change to a heading within a
@@ -181,26 +192,9 @@ The following root XML tags are defined:
 
 ### `fsm`
 
-- `unsuccessful_explore_dir_change` - For robots executing an explore FSM to
-                                      look for something, they will randomly
-                                      change direction after this many steps if
-                                      they are unsuccessful in finding what they
-                                      are looking for.
-
-- `frequent_collision_thresh` - The number of timesteps between subsequent
-                                collisions for said collisions to be considered
-                                frequent. If a collision is considered frequent,
-                                then instead of heading in the opposite
-                                direction after a collision, a robot will head
-                                in a random direction, which should hopefully
-                                help get it out of whatever situation it was in
-                                that caused the frequent collision(s) in the
-                                first place.
-
 - `nest` - The location of the nest. Again, this is a duplicate of the location
            passed to the loop functions, but it was easier to do it this way
            rather than muck about with XML tree traversal.
-
 
 ## Loop Functions
 
@@ -294,9 +288,6 @@ The following root XML tags are defined:
     - `single_source` - Placed within a small arena opposite about 90% of the
                         way from the nest to the other side of the arena
                         (assumes horizontal, rectangular arena).
-
-- `respawn` - Whether or not blocks should be re-distributed in the arena after
-              they are brought to the nest.
 
 #### `caches`
 

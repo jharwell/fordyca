@@ -48,10 +48,8 @@ base_foraging_fsm::base_foraging_fsm(
     : state_machine::hfsm(server, max_states),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_transport_to_nest(),
-      entry_collision_avoidance(),
       entry_leaving_nest(),
       entry_new_direction(),
       entry_wait_for_signal(),
@@ -126,26 +124,6 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   m_saa->apply_steering_force(std::make_pair(true, false));
   return state_machine::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
-  if (current_state() != last_state()) {
-    ER_DIAG("Executing ST_COLLISION_AVOIDANCE");
-  }
-
-  if (m_saa->sensing()->threatening_obstacle_exists()) {
-    m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
-
-    argos::CVector2 force = m_saa->steering_force().value();
-    m_saa->apply_steering_force(std::make_pair(false, false));
-    ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-           force.GetX(),
-           force.GetY(),
-           force.Angle().GetValue(),
-           force.Length());
-} else {
-    internal_event(previous_state());
-  }
-  return state_machine::event_signal::HANDLED;
-}
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
   argos::CRadians current_dir = m_saa->sensing()->heading_angle();
@@ -187,16 +165,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
-  ER_DIAG("Entering ST_LEAVING_NEST");
   m_saa->actuation()->leds_set_color(argos::CColor::WHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
-  ER_DIAG("Entering ST_TRANSPORT_TO_NEST");
   m_saa->actuation()->leds_set_color(argos::CColor::GREEN);
-}
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {
-  ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  m_saa->actuation()->leds_set_color(argos::CColor::RED);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(argos::CColor::CYAN);

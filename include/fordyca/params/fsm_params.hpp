@@ -36,24 +36,10 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct threshold_times
- * @ingroup params
- */
-struct threshold_times {
-  /*
-   * The number of time steps between two successive collisions that will be
-   * considered excessive, and result in a random direction being added to the
-   * avoidance heading to help avoid collisions in the immediate future.
-   */
-  uint frequent_collision_thresh{};
-};
-
-/**
  * @struct fsm_params
  * @ingroup params
  */
 struct fsm_params : public rcppsw::params::base_params {
-  struct threshold_times times {};
   argos::CVector2 nest_center{};
 };
 

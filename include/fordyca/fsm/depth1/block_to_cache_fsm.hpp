@@ -132,11 +132,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
     ST_WAIT_FOR_CACHE_DROP,
 
     /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
      * Block has been successfully dropped in a cache.
      */
     ST_FINISHED,
@@ -147,8 +142,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to cache states */

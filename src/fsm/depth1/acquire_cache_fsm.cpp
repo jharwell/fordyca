@@ -155,7 +155,7 @@ bool acquire_cache_fsm::acquire_known_cache(
              best.ent->discrete_loc().first,
              best.ent->discrete_loc().second,
              best.density.last_result());
-      tasks::vector_argument v(vector_fsm::kCacheArrivalTol,
+      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
                                best.ent->real_loc());
       m_explore_fsm.task_reset();
       m_vector_fsm.task_reset();

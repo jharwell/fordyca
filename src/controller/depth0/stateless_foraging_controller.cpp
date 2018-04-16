@@ -102,7 +102,7 @@ double stateless_foraging_controller::timestep_distance(void) const {
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->robot_heading().Length();
+    return saa_subsystem()->sensing()->heading().Length();
   }
   return 0;
 } /* timestep_distance() */
