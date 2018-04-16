@@ -1,5 +1,5 @@
 /**
- * @file sensor_parser.hpp
+ * @file actuation_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,46 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/params/sensor_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/params/throttling_params.hpp"
+#include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
+#include "fordyca/params/steering_force2D_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace kinematics2D = rcppsw::robotics::kinematics2D;
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
+
 /**
- * @class sensor_parser
+ * @struct actuation_params
  * @ingroup params
- *
- * @brief Parses XML parameters relating to sensors into \ref sensor_params.
  */
-class sensor_parser : public rcppsw::common::xml_param_parser {
- public:
-  sensor_parser(void) : m_params() {}
-
-  void parse(argos::TConfigurationNode& node) override;
-  const struct sensor_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
-
- private:
-  std::unique_ptr<struct sensor_params> m_params;
+struct actuation_params : public rcppsw::params::base_params {
+  struct kinematics2D::differential_drive_params differential_drive {};
+  struct steering_force2D_params steering {};
+  struct throttling_params throttling {};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_SENSOR_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATION_PARAMS_HPP_ */

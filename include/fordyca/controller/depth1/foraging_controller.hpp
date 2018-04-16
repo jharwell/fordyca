@@ -70,7 +70,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
   tasks::foraging_task* current_task(void) const;

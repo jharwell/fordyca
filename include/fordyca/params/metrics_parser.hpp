@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,19 +45,28 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters related to metric collection into
  * \ref metrics_params.
  */
-class metrics_parser : public rcppsw::common::xml_param_parser {
+class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
-  metrics_parser(void) : m_params() {}
+  explicit metrics_parser(uint level) : xml_param_parser(level) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct metrics_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all loop functions relating to metrics parameters
+   * should lie under in the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "metrics";
+
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct metrics_params* parse_results(void) const override {
+    return &m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct metrics_params> m_params;
+  bool m_parsed{false};
+  struct metrics_params m_params {};
 };
 
 NS_END(params, fordyca);

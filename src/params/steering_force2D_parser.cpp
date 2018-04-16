@@ -1,7 +1,7 @@
 /**
- * @file actuator_parser.cpp
+ * @file steering_force2D_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/actuator_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/steering_force2D_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,35 +34,25 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuator_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode wheel_node =
-      argos::GetNode(argos::GetNode(node, "actuators"), "wheels");
+void steering_force2D_parser::parse(const ticpp::Element& node) {
+  force_calculator_xml_parser::parse(node);
+  static_cast<steering::force_calculator_params&>(m_params) =
+      *force_calculator_xml_parser::parse_results();
 
-  m_params = rcppsw::make_unique<struct actuator_params>();
-
-  argos::CDegrees angle;
-  argos::GetNodeAttribute(wheel_node, "soft_turn_angle_max", angle);
-  m_params->wheels.soft_turn_max = ToRadians(angle);
-  argos::GetNodeAttribute(wheel_node, "no_turn_angle_max", angle);
-  m_params->wheels.no_turn_max = ToRadians(angle);
-  argos::GetNodeAttribute(wheel_node, "max_speed", m_params->wheels.max_speed);
+  ticpp::Element snode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_phototaxis.parse(snode);
+  m_params.phototaxis = *m_phototaxis.parse_results();
 } /* parse() */
 
-void actuator_parser::show(std::ostream& stream) {
-  stream << "====================\nActuator params\n====================\n";
-  stream << "soft_turn_max=" << m_params->wheels.soft_turn_max << std::endl;
-  stream << "no_turn_max=" << m_params->wheels.no_turn_max << std::endl;
-  stream << "max_speed=" << m_params->wheels.max_speed << std::endl;
+void steering_force2D_parser::show(std::ostream& stream) const {
+  force_calculator_xml_parser::show(stream);
+  stream << m_phototaxis
+         << build_footer();
 } /* show() */
 
-__pure bool actuator_parser::validate(void) {
-  if (!(m_params->wheels.soft_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  if (!(m_params->wheels.no_turn_max.GetValue() > 0)) {
-    return false;
-  }
-  return true;
+bool steering_force2D_parser::validate(void) const {
+  return force_calculator_xml_parser::validate() && m_phototaxis.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

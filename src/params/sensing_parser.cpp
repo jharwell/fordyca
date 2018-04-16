@@ -1,5 +1,5 @@
 /**
- * @file loop_functions_parser.cpp
+ * @file sensing_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/loop_functions_parser.hpp"
+#include "fordyca/params/sensing_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -29,32 +30,32 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char sensing_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void loop_functions_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct loop_functions_params>();
+void sensing_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
-                          "robot_id",
-                          m_params->display_robot_id);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
-                          "robot_los",
-                          m_params->display_robot_los);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
-                          "robot_task",
-                          m_params->display_robot_task);
-  argos::GetNodeAttribute(argos::GetNode(node, "visualization"),
-                          "block_id",
-                          m_params->display_block_id);
+  XML_PARSE_PARAM(pnode, m_params.proximity, delta);
 } /* parse() */
 
-void loop_functions_parser::show(std::ostream& stream) {
-  stream << "====================\nLoop Function "
-            "params\n====================\n";
-  stream << "display_robot_id=" << m_params->display_robot_id << std::endl;
-  stream << "display_robot_los=" << m_params->display_robot_los << std::endl;
-  stream << "display_robot_task=" << m_params->display_robot_task << std::endl;
-  stream << "display_block_id=" << m_params->display_block_id << std::endl;
+void sensing_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params.proximity, delta) << std::endl
+         << build_footer();
 } /* show() */
+
+__pure bool sensing_parser::validate(void) const {
+  if (m_params.proximity.delta <= 0) {
+    return false;
+  }
+  return true;
+} /* validate() */
 
 NS_END(params, fordyca);

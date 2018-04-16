@@ -1,7 +1,7 @@
 /**
- * @file loop_functions_params.hpp
+ * @file phototaxis_force_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,16 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
-#include <string>
-#include "fordyca/params/arena_map_params.hpp"
-#include "rcppsw/common/base_params.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/phototaxis_force_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,22 +32,27 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @struct loop_functions_params
- * @ingroup params
- */
-struct loop_functions_params : public rcppsw::common::base_params {
-  loop_functions_params(void) : arena_map() {}
+constexpr char phototaxis_force_parser::kXMLRoot[];
 
-  bool display_robot_id{false};
-  bool display_robot_los{false};
-  bool display_robot_task{false};
-  bool display_block_id{false};
-  struct arena_map_params arena_map;
-};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void phototaxis_force_parser::parse(const ticpp::Element& node) {
+  ticpp::Element pnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  XML_PARSE_PARAM(pnode, m_params, max);
+} /* parse() */
+
+void phototaxis_force_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, max) << std::endl
+         << build_footer();
+} /* show() */
+
+bool phototaxis_force_parser::validate(void) const {
+  return m_params.max >= 0;
+} /* validate() */
 
 NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARAMS_HPP_ */

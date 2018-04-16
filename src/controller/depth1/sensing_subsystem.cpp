@@ -1,5 +1,5 @@
 /**
- * @file depth1/foraging_sensors.cpp
+ * @file depth1/sensing_subsystem.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 /*******************************************************************************
@@ -32,17 +32,14 @@ NS_START(fordyca, controller, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-foraging_sensors::foraging_sensors(
-    const struct params::sensor_params* c_params,
-    argos::CCI_RangeAndBearingSensor* const rabs,
-    argos::CCI_FootBotProximitySensor* const proximity,
-    argos::CCI_FootBotLightSensor* const light,
-    argos::CCI_FootBotMotorGroundSensor* const ground)
-    : depth0::foraging_sensors(c_params, rabs, proximity, light, ground) {}
+sensing_subsystem::sensing_subsystem(
+    const struct params::sensing_params* c_params,
+    const struct base_sensing_subsystem::sensor_list* const list)
+    : depth0::sensing_subsystem(c_params, list) {}
 
-bool foraging_sensors::cache_detected(void) {
+bool sensing_subsystem::cache_detected(void) {
   const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      base_foraging_sensors::ground()->GetReadings();
+      base_sensing_subsystem::ground()->GetReadings();
 
   /*
    * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches

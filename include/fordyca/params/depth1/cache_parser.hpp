@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/depth1/cache_params.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,17 +44,25 @@ NS_START(fordyca, params, depth1);
  *
  * @brief Parses XML parameters for relating to caches into \ref cache_params.
  */
-class cache_parser: public rcppsw::common::xml_param_parser {
+class cache_parser: public rcppsw::params::xml_param_parser {
  public:
-  cache_parser(void): m_params() {}
+  explicit cache_parser(uint level) : xml_param_parser(level) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct cache_params* get_results(void) override { return m_params.get(); }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
+  /**
+   * @brief The root tag that all cache parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "caches";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct cache_params* parse_results(void) const override { return &m_params; }
 
  private:
-  std::unique_ptr<struct cache_params> m_params;
+  struct cache_params m_params{};
 };
 
 NS_END(depth1, params, fordyca);

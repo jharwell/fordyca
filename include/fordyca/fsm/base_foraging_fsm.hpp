@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/controller/kinematics_calculator.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 
@@ -36,8 +35,9 @@
 NS_START(fordyca);
 
 namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
+class saa_subsystem;
+class base_sensing_subsystem;
+class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
 NS_START(fsm);
@@ -57,16 +57,9 @@ NS_START(fsm);
  */
 class base_foraging_fsm : public state_machine::hfsm {
  public:
-  base_foraging_fsm(uint unsuccessful_dir_change_thresh,
-                    const std::shared_ptr<rcppsw::er::server>& server,
-                    std::shared_ptr<controller::base_foraging_sensors> sensors,
-                    std::shared_ptr<controller::actuator_manager> actuators,
-                    uint8_t max_states);
-
   base_foraging_fsm(
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
@@ -80,21 +73,21 @@ class base_foraging_fsm : public state_machine::hfsm {
   void init(void) override;
 
   /**
-   * @brief Get a reference to the \ref base_foraging_sensors.
+   * @brief Get a reference to the \ref base_sensing_subsystem.
    *
-   * Classes needing to reference these sensors should use this function rather
-   * than maintaining their own std::shared_ptr copy of things, as that can
-   * cause nasty bugs involving things set by the arena loop functions such as
-   * tick, location, etc., and that do not get propagated down the
+   * Derived classes needing to reference these sensors should use this function
+   * rather than maintaining their own std::shared_ptr copy of things, as that
+   * can cause nasty bugs involving things set by the arena loop functions such
+   * as tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  controller::base_foraging_sensors* base_sensors(void) const {
-    return m_sensors.get();
-  }
+  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(void) const;
+  const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
+
+  const std::shared_ptr<const controller::actuation_subsystem> actuators(void) const;
+  const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
  protected:
-  double dir_change_thresh(void) const { return mc_dir_change_thresh; }
-
   /**
    * @brief Randomize the angle of a vector, for use in change robot heading
    *
@@ -103,10 +96,10 @@ class base_foraging_fsm : public state_machine::hfsm {
    * @return The same vector, but with a new angle.
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
-  controller::actuator_manager* actuators(void) const {
-    return m_actuators.get();
+
+  controller::saa_subsystem* saa_subsystem(void) const {
+    return m_saa.get();
   }
-  controller::kinematics_calculator& kinematics(void) { return m_kinematics; }
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -211,13 +204,10 @@ class base_foraging_fsm : public state_machine::hfsm {
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
   // clang-format off
-  const double                                       mc_dir_change_thresh;
-  uint                                               m_new_dir_count{0};
-  argos::CRadians                                    m_new_dir;
-  argos::CRandom::CRNG*                              m_rng;
-  std::shared_ptr<controller::base_foraging_sensors> m_sensors;
-  std::shared_ptr<controller::actuator_manager>      m_actuators;
-  controller::kinematics_calculator                  m_kinematics;
+  uint                                       m_new_dir_count{0};
+  argos::CRadians                            m_new_dir;
+  argos::CRandom::CRNG*                      m_rng;
+  std::shared_ptr<controller::saa_subsystem> m_saa;
   // clang-format on
 };
 

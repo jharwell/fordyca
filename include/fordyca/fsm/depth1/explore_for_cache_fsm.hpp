@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { namespace depth1 {class foraging_sensors; }}
+namespace controller { namespace depth1 {class sensing_subsystem; }}
 
 NS_START(fsm, depth1);
 
@@ -59,56 +59,25 @@ class explore_for_cache_fsm : public base_explore_fsm {
     ST_EXPLORE,
 
     /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
-     * Changing direction to a (hopefully) more profitable search trajectory.
-     */
-    ST_NEW_DIRECTION,
-
-    /**
      * A cache has been acquired.
      */
     ST_FINISHED,
     ST_MAX_STATES
   };
 
-  explore_for_cache_fsm(uint unsuccessful_dir_change_thresh,
-                        const std::shared_ptr<rcppsw::er::server>& server,
-                        const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-                        const std::shared_ptr<controller::actuator_manager>& actuators);
+  explore_for_cache_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                        const std::shared_ptr<controller::saa_subsystem>& saa);
 
   explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
   explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;
 
   /* taskable overrides */
-  void task_execute(void) override;
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
 
-  /**
-   * @brief Reset the FSM
-   */
-  void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_avoiding_collision(void) const {
-    return current_state() == ST_COLLISION_AVOIDANCE;
-  }
-
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
   HFSM_ENTRY_INHERIT_ND(base_explore_fsm, entry_explore);
 
   /* exploration states */
@@ -136,7 +105,6 @@ class explore_for_cache_fsm : public base_explore_fsm {
     return &mc_state_map[index];
   }
 
-  std::shared_ptr<controller::depth1::foraging_sensors> m_sensors;
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

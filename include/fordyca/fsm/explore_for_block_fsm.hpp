@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/fsm/base_explore_fsm.hpp"
 
 /*******************************************************************************
@@ -53,17 +52,6 @@ class explore_for_block_fsm : public base_explore_fsm {
      * Roaming around looking for a block.
      */
     ST_EXPLORE,
-
-    /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
-     * Changing direction to a (hopefully) more profitable search trajectory.
-     */
-    ST_NEW_DIRECTION,
-
     /**
      * A block has been acquired.
      */
@@ -72,39 +60,18 @@ class explore_for_block_fsm : public base_explore_fsm {
   };
 
   explore_for_block_fsm(
-      uint unsuccessful_dir_change_thresh,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators);
+      const std::shared_ptr<controller::saa_subsystem>& saa);
 
   /* taskable overrides */
-  void task_execute(void) override;
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
 
-  /**
-   * @brief Reset the FSM
-   */
-  void init(void) override;
-
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_avoiding_collision(void) const {
-    return current_state() == ST_COLLISION_AVOIDANCE;
-  }
-
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
-  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
   HFSM_ENTRY_INHERIT_ND(base_explore_fsm, entry_explore);
 
   /* exploration states */

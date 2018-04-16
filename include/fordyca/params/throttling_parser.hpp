@@ -1,7 +1,7 @@
 /**
- * @file depth1/foraging_sensors.hpp
+ * @file throttling_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,56 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_THROTTLING_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_THROTTLING_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include <string>
+
+#include "fordyca/params/throttling_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class foraging_sensors
- * @ingroup controller depth1
+ * @class throttling_parser
+ * @ingroup params
  *
- * @brief The sensors used by the depth1 foraging controller.
+ * @brief Parses XML parameters for related to \ref throttling_handler objects
+ * into \ref throttling_params.
  */
-class foraging_sensors: public depth0::foraging_sensors {
+class throttling_parser : public rcppsw::params::xml_param_parser {
  public:
-  foraging_sensors(
-      const struct params::sensor_params* c_params,
-      argos::CCI_RangeAndBearingSensor* rabs,
-      argos::CCI_FootBotProximitySensor* proximity,
-      argos::CCI_FootBotLightSensor* light,
-      argos::CCI_FootBotMotorGroundSensor* ground);
-
-  foraging_sensors(const foraging_sensors& fsm) = delete;
-  foraging_sensors& operator=(const foraging_sensors& fsm) = delete;
+  explicit throttling_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief If \c TRUE, a cache has *possibly* been detected.
-   *
-   * Only possibly, because there are some false positives, such as the first
-   * timestep, before ARGoS has finished initializing things.
+   * @brief The root tag that all throttling parameters should lie under in the
+   * XML tree.
    */
-  bool cache_detected(void);
+  static constexpr char kXMLRoot[] = "throttling";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  const struct throttling_params* parse_results(void) const override {
+    return &m_params;
+  }
+
+ private:
+  struct throttling_params m_params {};
 };
 
-NS_END(depth1, controller, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_FORAGING_SENSORS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_THROTTLING_PARSER_HPP_ */

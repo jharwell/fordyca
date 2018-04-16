@@ -1,5 +1,5 @@
 /**
- * @file actuator_params.hpp
+ * @file depth0/sensing_subsystem.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,45 +18,22 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/angles.h>
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller, depth0);
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @struct wheel_params
- * @ingroup params
- */
-struct wheel_params {
-  wheel_params(void) : soft_turn_max(), no_turn_max() {}
+sensing_subsystem::sensing_subsystem(
+    const struct params::sensing_params* c_params,
+    const struct base_sensing_subsystem::sensor_list* list)
+    : base_sensing_subsystem(c_params, list), m_los(nullptr) {}
 
-  argos::CRadians soft_turn_max;
-  argos::CRadians no_turn_max;
-  double max_speed{0.0};
-};
-
-/**
- * @struct actuator_params
- * @ingroup params
- */
-struct actuator_params : public rcppsw::common::base_params {
-  actuator_params(void) : wheels() {}
-
-  struct wheel_params wheels;
-};
-
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARAMS_HPP_ */
+NS_END(depth0, controller, fordyca);

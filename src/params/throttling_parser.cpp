@@ -1,7 +1,7 @@
 /**
- * @file executive_parser.hpp
+ * @file throttling_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,48 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
-#include "rcppsw/task_allocation/partitionable_task_params.hpp"
+#include "fordyca/params/throttling_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
-namespace task_allocation = rcppsw::task_allocation;
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @class executive_parser
- * @ingroup params depth1
- *
- * @brief Parses XML parameters for relating to the task executive and the tasks
- * it runs.
- */
-class executive_parser: public rcppsw::common::xml_param_parser {
- public:
-  executive_parser(void) : m_params() {}
-  void parse(argos::TConfigurationNode& node) override;
-  const struct task_allocation::partitionable_task_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
+constexpr char throttling_parser::kXMLRoot[];
 
- private:
-  std::unique_ptr<struct task_allocation::partitionable_task_params> m_params;
-};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void throttling_parser::parse(const ticpp::Element& node) {
+  ticpp::Element tnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  XML_PARSE_PARAM(tnode, m_params, block_carry);
+} /* parse() */
 
-NS_END(params, fordyca, depth1);
+void throttling_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, block_carry) << std::endl
+         << build_footer();
+} /* show() */
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_EXECUTIVE_PARSER_HPP_ */
+bool throttling_parser::validate(void) const {
+  return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
+} /* validate() */
+
+NS_END(params, fordyca);

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/range.h>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,14 +43,11 @@ NS_START(fordyca, params, depth1);
  * something within a certain range, which helps to speed swarm convergence a
  * fair bit.
  */
-struct exec_estimates_params : public rcppsw::common::base_params {
-  exec_estimates_params(void)
-      : generalist_range(), harvester_range(), collector_range() {}
-
+struct exec_estimates_params : public rcppsw::params::base_params {
   bool enabled{false};
-  argos::CRange<double> generalist_range;
-  argos::CRange<double> harvester_range;
-  argos::CRange<double> collector_range;
+  argos::CRange<double> generalist_range{};
+  argos::CRange<double> harvester_range{};
+  argos::CRange<double> collector_range{};
 };
 
 NS_END(depth1, params, fordyca);

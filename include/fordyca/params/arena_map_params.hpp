@@ -28,7 +28,7 @@
 #include "fordyca/params/block_params.hpp"
 #include "fordyca/params/depth1/cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,17 +42,14 @@ NS_START(fordyca, params);
  * @struct arena_map_params
  * @ingroup params
  */
-struct arena_map_params : public rcppsw::common::base_params {
-  arena_map_params(void)
-      : grid(), block(), cache(), nest_center(), nest_x(), nest_y() {}
+struct arena_map_params : public rcppsw::params::base_params {
+  struct grid_params grid {};
+  struct block_params block {};
+  struct depth1::cache_params cache {};
 
-  struct grid_params grid;
-  struct block_params block;
-  struct depth1::cache_params cache;
-
-  argos::CVector2 nest_center;
-  argos::CRange<double> nest_x;
-  argos::CRange<double> nest_y;
+  argos::CVector2 nest_center{};
+  argos::CRange<double> nest_x{};
+  argos::CRange<double> nest_y{};
 };
 
 NS_END(params, fordyca);

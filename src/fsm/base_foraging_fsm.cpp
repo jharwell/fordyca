@@ -25,8 +25,9 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 
@@ -35,15 +36,14 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+using controller::steering_force_type;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    std::shared_ptr<controller::base_foraging_sensors> sensors,
-    std::shared_ptr<controller::actuator_manager> actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
@@ -55,19 +55,9 @@ base_foraging_fsm::base_foraging_fsm(
       entry_leaving_nest(),
       entry_new_direction(),
       entry_wait_for_signal(),
-      mc_dir_change_thresh(unsuccessful_dir_change_thresh),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_sensors(std::move(sensors)),
-      m_actuators(std::move(actuators)),
-      m_kinematics(m_sensors, m_actuators) {}
-
-base_foraging_fsm::base_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
-    uint8_t max_states)
-    : base_foraging_fsm(0, server, sensors, actuators, max_states) {}
+      m_saa(std::move(saa)) {}
 
 /*******************************************************************************
  * States
@@ -84,9 +74,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
 
-  m_actuators->set_rel_heading(m_kinematics.calc_light_repel_force());
+  m_saa->steering_force().anti_phototaxis();
+  m_saa->apply_steering_force(std::make_pair(false, false));
 
-  if (!m_sensors->in_nest()) {
+  if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
   }
   return state_machine::event_signal::HANDLED;
@@ -113,12 +104,26 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
    * BLOCK_DROP signal to the upper FSM, as that it what it is listening for.
    */
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-    ER_ASSERT(m_sensors->in_nest(), "FATAL: BLOCK_DROP outside nest");
+    ER_ASSERT(m_saa->sensing()->in_nest(), "FATAL: BLOCK_DROP outside nest");
     return data->signal();
   }
 
-  m_actuators->set_rel_heading(m_kinematics.calc_light_attract_force() +
-                               m_kinematics.calc_avoidance_force());
+  m_saa->steering_force().phototaxis();
+  argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
+  if (m_saa->sensing()->threatening_obstacle_exists()) {
+    m_saa->steering_force().avoidance(obs);
+  } else {
+    /*
+     * If we are currently spinning in place (hard turn), we have 0 linear
+     * velocity, and that does not play well with the arrival force
+     * calculations. To fix this, and a bit of wander force.
+     */
+    if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+      saa_subsystem()->steering_force().wander();
+    }
+  }
+
+  m_saa->apply_steering_force(std::make_pair(true, false));
   return state_machine::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
@@ -126,22 +131,24 @@ HFSM_STATE_DEFINE_ND(base_foraging_fsm, collision_avoidance) {
     ER_DIAG("Executing ST_COLLISION_AVOIDANCE");
   }
 
-  if (m_sensors->threatening_obstacle_exists()) {
-    argos::CVector2 force = kinematics().calc_avoidance_force();
+  if (m_saa->sensing()->threatening_obstacle_exists()) {
+    m_saa->steering_force().avoidance(m_saa->sensing()->find_closest_obstacle());
+
+    argos::CVector2 force = m_saa->steering_force().value();
+    m_saa->apply_steering_force(std::make_pair(false, false));
     ER_VER("Still found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
            force.GetX(),
            force.GetY(),
            force.Angle().GetValue(),
            force.Length());
-    m_actuators->set_rel_heading(force);
-  } else {
+} else {
     internal_event(previous_state());
   }
   return state_machine::event_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = m_kinematics.calc_light_attract_force().Angle();
+  argos::CRadians current_dir = m_saa->sensing()->heading_angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -161,10 +168,11 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * from our desired new direction. This prevents excessive spinning due to
    * overshoot. See #191.
    */
-  actuators()->set_rel_heading(
-      argos::CVector2(base_foraging_fsm::actuators()->max_wheel_speed() * 0.1,
-                      (current_dir - m_new_dir)),
-      true);
+  actuators()->differential_drive().fsm_drive(
+          base_foraging_fsm::actuators()->differential_drive().max_speed() *
+              0.1,
+          (current_dir - m_new_dir),
+          std::make_pair(false, true));
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
@@ -180,15 +188,15 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
   ER_DIAG("Entering ST_LEAVING_NEST");
-  m_actuators->leds_set_color(argos::CColor::WHITE);
+  m_saa->actuation()->leds_set_color(argos::CColor::WHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
   ER_DIAG("Entering ST_TRANSPORT_TO_NEST");
-  m_actuators->leds_set_color(argos::CColor::GREEN);
+  m_saa->actuation()->leds_set_color(argos::CColor::GREEN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  m_actuators->leds_set_color(argos::CColor::RED);
+  m_saa->actuation()->leds_set_color(argos::CColor::RED);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(argos::CColor::CYAN);
@@ -201,7 +209,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
  * General Member Functions
  ******************************************************************************/
 void base_foraging_fsm::init(void) {
-  m_actuators->reset();
+  m_saa->actuation()->reset();
   hfsm::init();
 } /* init() */
 
@@ -211,5 +219,21 @@ argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector
   vector.Rotate(m_rng->Uniform(range));
   return vector;
 } /* randomize_vector_angle() */
+
+const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) const {
+  return m_saa->sensing();
+} /* base_sensors() */
+
+const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) {
+  return m_saa->sensing();
+} /* base_actuation() */
+
+const std::shared_ptr<const controller::actuation_subsystem> base_foraging_fsm::actuators(void) const {
+  return m_saa->actuation();
+} /* actuators() */
+
+const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuators(void) {
+  return m_saa->actuation();
+} /* actuators() */
 
 NS_END(controller, fordyca);

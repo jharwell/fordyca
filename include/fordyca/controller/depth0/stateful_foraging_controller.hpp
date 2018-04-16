@@ -43,7 +43,7 @@ namespace representation { class perceived_arena_map; }
 
 NS_START(controller);
 namespace visitor = rcppsw::patterns::visitor;
-namespace depth1 { class foraging_sensors; }
+namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
 namespace task_allocation = rcppsw::task_allocation;
@@ -69,7 +69,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   stateful_foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
   bool block_acquired(void) const;
@@ -97,11 +97,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   const representation::line_of_sight* los(void) const;
 
-  std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
-    return m_map;
-  }
-  depth1::foraging_sensors* stateful_sensors(void) const;
-  std::shared_ptr<depth1::foraging_sensors> stateful_sensors_ref(void) const;
+  std::shared_ptr<depth0::sensing_subsystem> stateful_sensors(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -115,7 +111,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  representation::perceived_arena_map* map(void) const { return m_map.get(); }
+  std::shared_ptr<representation::perceived_arena_map> map(void) const { return m_map; }
   bool is_transporting_to_nest(void) const override;
 
  private:

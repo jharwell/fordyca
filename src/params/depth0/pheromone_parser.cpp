@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth0/pheromone_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -29,22 +30,29 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char pheromone_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void pheromone_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct pheromone_params>();
-  m_params->rho = std::atof(node.GetAttribute("rho").c_str());
-  argos::GetNodeAttribute(node, "repeat_deposit", m_params->repeat_deposit);
+void pheromone_parser::parse(const ticpp::Element& node) {
+  ticpp::Element pnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params.rho = std::atof(pnode.GetAttribute("rho").c_str());
+  XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
 } /* parse() */
 
-void pheromone_parser::show(std::ostream& stream) {
-  stream << "====================\nPheromone params\n====================\n";
-  stream << "rho=" << m_params->rho << std::endl;
-  stream << "repeat_deposit=" << m_params->repeat_deposit << std::endl;
+void pheromone_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, rho) << std::endl
+         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl
+         << build_footer();
 } /* show() */
 
-__pure bool pheromone_parser::validate(void) {
-  return m_params->rho > 0.0;
+__pure bool pheromone_parser::validate(void) const {
+  return m_params.rho > 0.0;
 } /* validate() */
 
 NS_END(depth0, params, fordyca);

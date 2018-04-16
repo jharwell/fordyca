@@ -25,7 +25,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 

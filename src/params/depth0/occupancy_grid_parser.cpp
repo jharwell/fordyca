@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth0/occupancy_grid_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -30,26 +30,29 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char occupancy_grid_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void occupancy_grid_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct occupancy_grid_params>();
-  argos::TConfigurationNode pnode = argos::GetNode(node, "occupancy_grid");
-
-  m_grid_parser.parse(argos::GetNode(pnode, "grid"));
-  m_pheromone_parser.parse(argos::GetNode(pnode, "pheromone"));
-  m_params->grid = *m_grid_parser.get_results();
-  m_params->pheromone = *m_pheromone_parser.get_results();
+void occupancy_grid_parser::parse(const ticpp::Element& node) {
+  ticpp::Element onode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_grid_parser.parse(onode);
+  m_pheromone_parser.parse(onode);
+  m_params.grid = *m_grid_parser.parse_results();
+  m_params.pheromone = *m_pheromone_parser.parse_results();
 } /* parse() */
 
-void occupancy_grid_parser::show(std::ostream& stream) {
-  stream << "====================\nPerceived arena_map "
-            "params\n====================\n";
-  m_grid_parser.show(stream);
-  m_pheromone_parser.show(stream);
+void occupancy_grid_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << m_grid_parser << m_pheromone_parser
+         << build_footer();
 } /* show() */
 
-__pure bool occupancy_grid_parser::validate(void) {
+__pure bool occupancy_grid_parser::validate(void) const {
   return m_grid_parser.validate() && m_pheromone_parser.validate();
 } /* validate() */
 

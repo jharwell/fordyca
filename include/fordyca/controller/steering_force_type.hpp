@@ -1,7 +1,7 @@
 /**
- * @file loop_functions_parser.hpp
+ * @file steering_force_type.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,47 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include "fordyca/params/loop_functions_params.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/robotics/steering2D/force_type.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
 /**
- * @class loop_functions_parser
- * @ingroup params
- *
- * @brief Parses XML parameters relating to loop functions into
- * \ref loop_functions_params.
+ * @brief List of steering forces available within the class
  */
-class loop_functions_parser : public rcppsw::common::xml_param_parser {
+class steering_force_type : public rcppsw::robotics::steering2D::force_type {
  public:
-  loop_functions_parser(void) : m_params() {}
+  enum {
+    /**
+     * Force pushing robots towards light.
+     */
+    kPhototaxis = rcppsw::robotics::steering2D::force_type::kExternalForces,
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct loop_functions_params* get_results(void) override {
-    return m_params.get();
-  }
-  void show(std::ostream& stream) override;
-
- private:
-  std::unique_ptr<struct loop_functions_params> m_params;
+    /**
+     * Force pushing robots away from light.
+     */
+    kAntiphototaxis
+  };
 };
 
-NS_END(params, fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_LOOP_FUNCTIONS_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_ */

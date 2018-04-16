@@ -28,17 +28,16 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/occupancy_grid_params.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
-#include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
@@ -88,15 +87,12 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure depth1::foraging_sensors* stateful_foraging_controller::stateful_sensors(
-    void) const {
-  return static_cast<depth1::foraging_sensors*>(base_sensors());
+__pure std::shared_ptr<depth0::sensing_subsystem> stateful_foraging_controller::
+    stateful_sensors(void) const {
+  return std::static_pointer_cast<depth0::sensing_subsystem>(
+      saa_subsystem()->sensing());
 }
 
-std::shared_ptr<depth1::foraging_sensors> stateful_foraging_controller::
-    stateful_sensors_ref(void) const {
-  return std::static_pointer_cast<depth1::foraging_sensors>(base_sensors_ref());
-}
 void stateful_foraging_controller::ControlStep(void) {
   /*
    * Update the perceived arena map with the current line-of-sight, and update
@@ -106,64 +102,51 @@ void stateful_foraging_controller::ControlStep(void) {
   process_los(stateful_sensors()->los());
   m_map->update();
 
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
 
   m_executive->run();
 } /* ControlStep() */
 
-void stateful_foraging_controller::Init(argos::TConfigurationNode& node) {
+void stateful_foraging_controller::Init(ticpp::Element& node) {
   params::depth0::stateful_foraging_repository param_repo;
-  params::depth1::task_repository task_repo;
 
   /*
-   * Note that we do not call the stateless_foraging_controller::Init()--there
+   * Note that we do not call \ref stateless_foraging_controller::Init()--there
    * is nothing in there that we need.
    */
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing stateful_foraging controller");
+
+  /* parse and validate parameters */
   param_repo.parse_all(node);
-  task_repo.parse_all(node);
-  param_repo.show_all(server_handle()->log_stream());
-  task_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
-  ER_ASSERT(task_repo.validate_all(),
-            "FATAL: Not all task parameters were validated");
+  auto* fsm_params = param_repo.parse_results<struct params::fsm_params>("fsm");
+  auto* task_params =
+      param_repo.parse_results<params::depth1::task_allocation_params>(
+          "task_allocation");
 
+  /* initialize subsystems and perception */
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      static_cast<const struct params::depth0::occupancy_grid_params*>(
-          param_repo.get_params("occupancy_grid")),
+      param_repo.parse_results<params::depth0::occupancy_grid_params>(
+          "occupancy_grid"),
       GetId());
 
-  base_sensors(rcppsw::make_unique<depth1::foraging_sensors>(
-      static_cast<const struct params::sensor_params*>(
-          param_repo.get_params("sensors")),
-      GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
-      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")));
+  saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
+      param_repo.parse_results<struct params::sensing_params>("sensing"),
+      &saa_subsystem()->sensing()->sensor_list()));
 
-  const params::fsm_params* fsm_params =
-      static_cast<const struct params::fsm_params*>(
-          param_repo.get_params("fsm"));
-
-  const params::depth1::task_allocation_params* task_params =
-      static_cast<const params::depth1::task_allocation_params*>(
-          task_repo.get_params("task_allocation"));
-
+  /* initialize task */
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           fsm_params,
           base_foraging_controller::server(),
-          stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          depth0::stateful_foraging_controller::map());
   m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->executive,
                                                         generalist_fsm);
   m_generalist->parent(m_generalist.get());

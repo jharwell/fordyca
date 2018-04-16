@@ -32,8 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 
-class base_foraging_sensors;
-class actuator_manager;
+class base_sensing_subsystem;
+class actuation_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,8 +51,8 @@ class actuator_manager;
  */
 class kinematics_calculator {
  public:
-  kinematics_calculator(std::shared_ptr<base_foraging_sensors>& sensors,
-                        std::shared_ptr<actuator_manager>& actuators)
+  kinematics_calculator(std::shared_ptr<base_sensing_subsystem>& sensors,
+                        std::shared_ptr<actuation_subsystem>& actuators)
       : mc_actuators(actuators), m_sensors(sensors) {}
 
   /**
@@ -84,8 +84,8 @@ class kinematics_calculator {
   static constexpr double kSCALE_AVOIDANCE_FORCE = 0.5;
 
   // clang-format off
-  std::shared_ptr<actuator_manager>      mc_actuators;
-  std::shared_ptr<base_foraging_sensors> m_sensors;
+  std::shared_ptr<actuation_subsystem>      mc_actuators;
+  std::shared_ptr<base_sensing_subsystem> m_sensors;
   // clang-format on
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file sensor_parser.cpp
+ * @file sensing_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,10 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/sensor_parser.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,35 +32,29 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-void sensor_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode diff_node =
-      argos::GetNode(argos::GetNode(node, "sensors"), "proximity");
-  m_params = rcppsw::make_unique<struct sensor_params>();
+/**
+ * @struct proximity_params
+ * @ingroup params
+ */
+struct proximity_params {
+  /*
+   * Maximum tolerance for the proximity reading between the robot and the
+   * closest obstacle.  The proximity reading is 0 when nothing is detected and
+   * grows exponentially to 1 when the obstacle is touching the robot.
+   */
+  double delta{0.0};
+};
 
-  argos::GetNodeAttribute(diff_node,
-                          "go_straight_angle_range",
-                          m_params->proximity.go_straight_angle_range);
-  argos::GetNodeAttribute(diff_node, "delta", m_params->proximity.delta);
-} /* parse() */
-
-void sensor_parser::show(std::ostream& stream) {
-  stream << "====================\nSensor params\n====================\n";
-  stream << "delta=" << m_params->proximity.delta << std::endl;
-  stream << "go_straight_angle_range="
-         << m_params->proximity.go_straight_angle_range << std::endl;
-} /* show() */
-
-__pure bool sensor_parser::validate(void) {
-  if (!(m_params->proximity.go_straight_angle_range.GetSpan().GetAbsoluteValue() >
-        0)) {
-    return false;
-  }
-  if (m_params->proximity.delta <= 0) {
-    return false;
-  }
-  return true;
-} /* validate() */
+/**
+ * @struct sensing_params
+ * @ingroup params
+ */
+struct sensing_params : public rcppsw::params::base_params {
+  struct proximity_params proximity{};
+};
 
 NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_SENSING_PARAMS_HPP_ */

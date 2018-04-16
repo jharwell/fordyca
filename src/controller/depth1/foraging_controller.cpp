@@ -28,8 +28,9 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -38,7 +39,7 @@
 #include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
@@ -78,61 +79,61 @@ void foraging_controller::ControlStep(void) {
   map()->update();
   m_metric_store.reset();
 
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
+
   m_executive->run();
 } /* ControlStep() */
 
-void foraging_controller::Init(argos::TConfigurationNode& node) {
+void foraging_controller::Init(ticpp::Element& node) {
   params::depth1::task_repository task_repo;
-  params::depth0::stateful_foraging_repository fsm_repo;
+  params::depth0::stateful_foraging_repository stateful_repo;
 
   depth0::stateful_foraging_controller::Init(node);
+  ER_NOM("Initializing depth1 controller");
+
   task_repo.parse_all(node);
-  task_repo.show_all(server_handle()->log_stream());
-  fsm_repo.parse_all(node);
-  fsm_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << task_repo;
+  stateful_repo.parse_all(node);
+  server_handle()->log_stream() << stateful_repo;
 
   ER_ASSERT(task_repo.validate_all(),
             "FATAL: Not all FSM parameters were validated");
-  ER_ASSERT(fsm_repo.validate_all(),
+  ER_ASSERT(stateful_repo.validate_all(),
             "FATAL: Not all task parameters were validated");
 
-  ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_allocation_params* p =
-      static_cast<const params::depth1::task_allocation_params*>(
-          task_repo.get_params("task_allocation"));
+  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>(
+      "task_allocation");
+
+  /* Put in new depth1 sensors, ala strategy pattern */
+  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
+      stateful_repo.parse_results<struct params::sensing_params>("sensors"),
+      &saa_subsystem()->sensing()->sensor_list()));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          stateful_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          depth0::stateful_foraging_controller::map());
   m_collector =
       rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          stateful_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          depth0::stateful_foraging_controller::map());
   m_harvester =
       rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          stateful_repo.parse_results<params::fsm_params>("fsm"),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          depth0::stateful_foraging_controller::map());
   m_generalist =
       rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
 

@@ -64,7 +64,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   base_foraging_loop_functions& operator=(
       const base_foraging_loop_functions& s) = delete;
 
-  void Init(argos::TConfigurationNode&) override {
+  void Init(ticpp::Element&) override {
     m_floor = &GetSpace().GetFloorEntity();
   }
 

@@ -1,5 +1,5 @@
 /**
- * @file depth0/foraging_sensors.cpp
+ * @file visualization_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,23 +21,39 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/visualization_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Global Variables
  ******************************************************************************/
-foraging_sensors::foraging_sensors(
-    const struct params::sensor_params* c_params,
-    argos::CCI_RangeAndBearingSensor* const rabs,
-    argos::CCI_FootBotProximitySensor* const proximity,
-    argos::CCI_FootBotLightSensor* const light,
-    argos::CCI_FootBotMotorGroundSensor* const ground)
-    : base_foraging_sensors(c_params, rabs, proximity, light, ground),
-      m_los(nullptr) {}
+constexpr char visualization_parser::kXMLRoot[];
 
-NS_END(depth0, controller, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void visualization_parser::parse(const ticpp::Element& node) {
+  ticpp::Element vnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  XML_PARSE_PARAM(vnode, m_params, robot_id);
+  XML_PARSE_PARAM(vnode, m_params, robot_los);
+  XML_PARSE_PARAM(vnode, m_params, robot_task);
+  XML_PARSE_PARAM(vnode, m_params, block_id);
+} /* parse() */
+
+void visualization_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, robot_id) << std::endl
+         << XML_PARAM_STR(m_params, robot_los) << std::endl
+         << XML_PARAM_STR(m_params, robot_task) << std::endl
+         << XML_PARAM_STR(m_params, block_id) << std::endl
+         << build_footer();
+} /* show() */
+
+NS_END(params, fordyca);

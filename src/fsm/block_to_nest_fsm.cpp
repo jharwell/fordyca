@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
@@ -39,15 +39,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_nest_fsm::block_to_nest_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     const std::shared_ptr<representation::perceived_arena_map>& map)
-    : base_foraging_fsm(
-          params->times.unsuccessful_explore_dir_change,
-          server,
-          std::static_pointer_cast<controller::base_foraging_sensors>(sensors),
-          actuators,
-          ST_MAX_STATES),
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_transport_to_nest(),
@@ -59,9 +53,8 @@ block_to_nest_fsm::block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(acquire_cached_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_cache_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_sensors(sensors),
-      m_block_fsm(params, server, sensors, actuators, map),
-      m_cache_fsm(params, server, sensors, actuators, map),
+      m_block_fsm(params, server, saa, map),
+      m_cache_fsm(params, server, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_free_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
@@ -103,7 +96,7 @@ HFSM_STATE_DEFINE(block_to_nest_fsm, start, state_machine::event_data) {
 }
 HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {
   if (m_block_fsm.task_finished()) {
-    actuators()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_block_fsm.task_execute();
@@ -112,7 +105,7 @@ HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_free_block) {
 }
 HFSM_STATE_DEFINE_ND(block_to_nest_fsm, acquire_cached_block) {
   if (m_cache_fsm.task_finished()) {
-    actuators()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_CACHE_PICKUP);
   } else {
     m_cache_fsm.task_execute();

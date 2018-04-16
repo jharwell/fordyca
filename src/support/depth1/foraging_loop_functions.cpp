@@ -36,8 +36,8 @@
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
@@ -51,22 +51,22 @@ NS_START(fordyca, support, depth1);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth1_foraging loop functions");
   params::loop_function_repository repo;
 
   repo.parse_all(node);
+  rcppsw::er::g_server->log_stream() << repo;
 
-  auto* arenap = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"));
+  auto* arenap = repo.parse_results<params::arena_map_params>("arena_map");
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
   /* initialize stat collecting */
-  metric_collecting_init(static_cast<const struct params::output_params*>(
-      repo.get_params("output")));
+  metric_collecting_init(
+      repo.parse_results<struct params::output_params>("output"));
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -82,10 +82,9 @@ void foraging_loop_functions::Init(argos::TConfigurationNode& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    auto* l_params = static_cast<const struct params::loop_functions_params*>(
-        repo.get_params("loop_functions"));
-
-    controller.display_task(l_params->display_robot_task);
+    controller.display_task(
+        repo.parse_results<params::visualization_params>("visualization")
+            ->robot_task);
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }

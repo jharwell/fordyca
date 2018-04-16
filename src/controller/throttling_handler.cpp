@@ -1,5 +1,5 @@
 /**
- * @file actuator_parser.hpp
+ * @file throttling_handler.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,47 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include "fordyca/params/actuator_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "fordyca/controller/throttling_handler.hpp"
+#include "fordyca/params/throttling_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class actuator_parser
- * @ingroup params
- *
- * @brief Parses XML parameters for \ref actuator_manager into
- * \ref actuator_params.
- */
-class actuator_parser : public rcppsw::common::xml_param_parser {
- public:
-  actuator_parser(void) : m_params() {}
+throttling_handler::throttling_handler(
+    const struct params::throttling_params* const params)
+    : m_block_carry(params->block_carry) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct actuator_params* get_results(void) override {
-    return m_params.get();
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void throttling_handler::update(void) {
+  if (m_carrying_block) {
+    m_block_current = m_block_carry;
+  } else {
+    m_block_current = 0;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
+} /* update() */
 
- private:
-  std::unique_ptr<struct actuator_params> m_params;
-};
-
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATOR_PARSER_HPP_ */
+NS_END(controller, fordyca);
