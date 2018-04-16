@@ -102,17 +102,16 @@ void foraging_controller::Init(ticpp::Element& node) {
   ER_ASSERT(stateful_repo.validate_all(),
             "FATAL: Not all task parameters were validated");
 
-  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>(
-      "task_allocation");
+  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>();
 
   /* Put in new depth1 sensors, ala strategy pattern */
   saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
-      stateful_repo.parse_results<struct params::sensing_params>("sensors"),
+      stateful_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
   std::unique_ptr<task_allocation::taskable> collector_fsm =
       rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          stateful_repo.parse_results<params::fsm_params>("fsm"),
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),
           depth0::stateful_foraging_controller::map());
@@ -121,7 +120,7 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          stateful_repo.parse_results<params::fsm_params>("fsm"),
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),
           depth0::stateful_foraging_controller::map());
@@ -130,7 +129,7 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          stateful_repo.parse_results<params::fsm_params>("fsm"),
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),
           depth0::stateful_foraging_controller::map());

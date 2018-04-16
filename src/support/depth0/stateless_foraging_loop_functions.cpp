@@ -82,10 +82,9 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo;
   repo.parse_all(node);
 
-  auto* p_output = repo.parse_results<params::output_params>("output");
-  auto* p_arena = repo.parse_results<params::arena_map_params>("arena_map");
-  auto* p_vis = repo.parse_results<params::visualization_params>(
-      "visualization");
+  auto* p_output = repo.parse_results<params::output_params>();
+  auto* p_arena = repo.parse_results<params::arena_map_params>();
+  auto* p_vis = repo.parse_results<params::visualization_params>();
 
   /* initialize output */
   output_init(p_output);
@@ -212,9 +211,9 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
   auto* aparams =
-      repo.parse_results<struct params::arena_map_params>("arena_map");
+      repo.parse_results<struct params::arena_map_params>();
   auto* vparams =
-      repo.parse_results<struct params::visualization_params>("visualization");
+      repo.parse_results<struct params::visualization_params>();
 
   m_arena_map.reset(new representation::arena_map(aparams));
   m_arena_map->distribute_blocks();

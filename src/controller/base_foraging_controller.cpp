@@ -86,7 +86,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize output */
   const struct params::output_params* params =
-      param_repo.parse_results<struct params::output_params>("output");
+      param_repo.parse_results<struct params::output_params>();
   client::server_handle()->log_stream() << param_repo;
   output_init(params);
 
@@ -105,8 +105,8 @@ void base_foraging_controller::Init(ticpp::Element& node) {
   };
   m_saa = std::make_shared<controller::saa_subsystem>(
       m_server,
-      param_repo.parse_results<struct params::actuation_params>("actuation"),
-      param_repo.parse_results<struct params::sensing_params>("sensing"),
+      param_repo.parse_results<struct params::actuation_params>(),
+      param_repo.parse_results<struct params::sensing_params>(),
       &alist,
       &slist);
 

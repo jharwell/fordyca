@@ -37,17 +37,22 @@ NS_START(fordyca, params, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_repository::stateful_foraging_repository(void) {
-  register_parser<actuation_parser>(actuation_parser::kXMLRoot,
-                                    actuation_parser::kHeader1);
-  register_parser<sensing_parser>(sensing_parser::kXMLRoot,
-                                  sensing_parser::kHeader1);
-  register_parser<fsm_parser>(fsm_parser::kXMLRoot, fsm_parser::kHeader1);
-  register_parser<occupancy_grid_parser>(occupancy_grid_parser::kXMLRoot,
-                                         occupancy_grid_parser::kHeader1);
+  register_parser<actuation_parser, actuation_params>(
+      actuation_parser::kXMLRoot,
+      actuation_parser::kHeader1);
+  register_parser<sensing_parser, sensing_params>(
+      sensing_parser::kXMLRoot,
+      sensing_parser::kHeader1);
+  register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
+                                          fsm_parser::kHeader1);
+  register_parser<occupancy_grid_parser, occupancy_grid_params>(
+      occupancy_grid_parser::kXMLRoot,
+      occupancy_grid_parser::kHeader1);
+
   /*
    * @todo Dirty hack! Shouldn't need to reference depth1 stuff in here.
    */
-  register_parser<depth1::task_allocation_parser>(
+  register_parser<depth1::task_allocation_parser, depth1::task_allocation_params>(
       depth1::task_allocation_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
