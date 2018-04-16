@@ -124,20 +124,18 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
-  auto* fsm_params = param_repo.parse_results<struct params::fsm_params>("fsm");
+  auto* fsm_params = param_repo.parse_results<struct params::fsm_params>();
   auto* task_params =
-      param_repo.parse_results<params::depth1::task_allocation_params>(
-          "task_allocation");
+      param_repo.parse_results<params::depth1::task_allocation_params>();
 
   /* initialize subsystems and perception */
   m_map = rcppsw::make_unique<representation::perceived_arena_map>(
       server(),
-      param_repo.parse_results<params::depth0::occupancy_grid_params>(
-          "occupancy_grid"),
+      param_repo.parse_results<params::depth0::occupancy_grid_params>(),
       GetId());
 
   saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
-      param_repo.parse_results<struct params::sensing_params>("sensing"),
+      param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
   /* initialize task */

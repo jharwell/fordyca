@@ -64,7 +64,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize stat collecting */
   auto* p_output =
-      repo.parse_results<const struct params::output_params>("output");
+      repo.parse_results<const struct params::output_params>();
   collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
       "fsm::stateful",
       metrics_path() + "/" + p_output->metrics.stateful_fname,
@@ -78,8 +78,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     auto& controller =
         dynamic_cast<controller::depth0::stateful_foraging_controller&>(
             robot.GetControllableEntity().GetController());
-    auto* l_params = repo.parse_results<struct params::visualization_params>(
-        "visualization");
+    auto* l_params = repo.parse_results<struct params::visualization_params>();
 
     controller.display_los(l_params->robot_los);
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(

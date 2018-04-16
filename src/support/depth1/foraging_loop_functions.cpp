@@ -60,13 +60,13 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;
 
-  auto* arenap = repo.parse_results<params::arena_map_params>("arena_map");
+  auto* arenap = repo.parse_results<params::arena_map_params>();
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
   /* initialize stat collecting */
   metric_collecting_init(
-      repo.parse_results<struct params::output_params>("output"));
+      repo.parse_results<struct params::output_params>());
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -82,9 +82,8 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(
-        repo.parse_results<params::visualization_params>("visualization")
-            ->robot_task);
+    controller.display_task(repo.parse_results<params::visualization_params>()
+                            ->robot_task);
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
