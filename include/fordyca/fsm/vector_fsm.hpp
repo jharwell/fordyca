@@ -66,13 +66,13 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at the specified block's location.
    */
-  constexpr static double kBlockArrivalTol = 0.02;
+  constexpr static double kBLOCK_ARRIVAL_TOL = 0.02;
 
   /**
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at the specified cache's location.
    */
-  constexpr static double kCacheArrivalTol = 0.3;
+  constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
   vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
              const std::shared_ptr<controller::saa_subsystem>& saa);
@@ -153,6 +153,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   };
 
   struct fsm_state {
+    uint m_collision_rec_count{0};
     uint last_collision_time{0};
   };
 
@@ -161,21 +162,14 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  constexpr static uint kCollisionRecoveryTime = 10;
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 10;
 
   /**
    * @brief If a robotics sees a threatening obstacle more than twice in this
    * interval, it is considered to be colliding too frequently, and will enter
    * collision recovery.
    */
-  constexpr static uint kFreqCollisionThresh = 300;
-
-  /**
-   * @brief The maximum arrival tolerance used by the FSM, for use in handling
-   * speed reduction near the target so as to not overshoot it.
-   */
-  constexpr static double kMaxArrivalTol =
-      std::max(kBlockArrivalTol, kCacheArrivalTol);
+  constexpr static uint kFREQ_COLLISION_THRESH = 300;
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
@@ -230,7 +224,6 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
 
   // clang-format off
   struct fsm_state m_state;
-  uint             m_collision_rec_count{0};
   struct goal_data m_goal_data;
   // clang-format on
 };

@@ -86,8 +86,6 @@
                               max_speed="10" />
         </actuation>
         <fsm
-          unsuccessful_explore_dir_change="1000"
-          frequent_collision_thresh="300"
           nest="2.0, 2.5"
           />
       </params>

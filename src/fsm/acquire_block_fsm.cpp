@@ -153,7 +153,8 @@ bool acquire_block_fsm::acquire_known_block(
            best.ent->discrete_loc().first,
            best.ent->discrete_loc().second,
            best.density.last_result());
-    tasks::vector_argument v(vector_fsm::kBlockArrivalTol, best.ent->real_loc());
+    tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
+                             best.ent->real_loc());
     m_best_block = best.ent;
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();

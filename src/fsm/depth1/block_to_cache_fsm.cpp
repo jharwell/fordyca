@@ -42,8 +42,6 @@ block_to_cache_fsm::block_to_cache_fsm(
     const std::shared_ptr<controller::saa_subsystem>& saa,
     const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
-      HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
-      entry_collision_avoidance(),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
@@ -67,10 +65,6 @@ block_to_cache_fsm::block_to_cache_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_cache_drop,
                                                nullptr,
                                                &entry_wait_for_signal,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                               nullptr,
-                                               &entry_collision_avoidance,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("block_to_cache_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);

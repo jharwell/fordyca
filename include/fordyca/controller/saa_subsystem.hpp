@@ -67,7 +67,7 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   /* BOID interface */
   argos::CVector2 linear_velocity(void) const override {
     return argos::CVector2(m_actuation->differential_drive().current_speed(),
-                           m_sensing->robot_heading().Angle());
+                           m_sensing->heading().Angle());
   }
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -

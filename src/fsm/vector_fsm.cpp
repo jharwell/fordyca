@@ -52,20 +52,7 @@ vector_fsm::vector_fsm(
       entry_collision_avoidance(),
       entry_collision_recovery(),
       m_state(),
-      m_collision_rec_count(0),
-      m_goal_data(),
-      m_ang_pid(4.0,
-                0,
-                0,
-                1,
-                -this->actuators()->differential_drive().max_speed() * 0.50,
-                this->actuators()->differential_drive().max_speed() * 0.50),
-      m_lin_pid(3.0,
-                0,
-                0,
-                1,
-                this->actuators()->differential_drive().max_speed() * 0.1,
-                this->actuators()->differential_drive().max_speed() * 0.7) {
+      m_goal_data() {
   insmod("vector_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -96,7 +83,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
 
   if (base_sensors()->threatening_obstacle_exists()) {
     if (base_sensors()->tick() - m_state.last_collision_time <
-        kFreqCollisionThresh) {
+        kFREQ_COLLISION_THRESH) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time,
               base_sensors()->tick());
@@ -131,8 +118,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
 
-  if (++m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
-    m_collision_rec_count = 0;
+  if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
+    m_state.m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
   return controller::foraging_signal::HANDLED;
@@ -150,8 +137,6 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
 
   if ((m_goal_data.loc - base_sensors()->position()).Length() <=
       m_goal_data.tolerance) {
-    m_ang_pid.reset();
-    m_lin_pid.reset();
     internal_event(ST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
   }

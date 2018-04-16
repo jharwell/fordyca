@@ -170,11 +170,6 @@ class block_to_nest_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,
 
     /**
-     * Obstacle nearby--avoid it.
-     */
-    ST_COLLISION_AVOIDANCE,
-
-    /**
      * Block has been brought to the nest successfully.
      */
     ST_FINISHED,
@@ -199,9 +194,7 @@ class block_to_nest_fsm : public base_foraging_fsm,
   HFSM_STATE_INHERIT(base_foraging_fsm,
                      transport_to_nest,
                      state_machine::event_data);
-  HFSM_STATE_INHERIT_ND(base_foraging_fsm, collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_collision_avoidance);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* memory foraging states */
@@ -227,9 +220,9 @@ class block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                                                  m_pickup_count{0};
-  acquire_block_fsm                                     m_block_fsm;
-  depth1::acquire_cache_fsm                             m_cache_fsm;
+  uint                      m_pickup_count{0};
+  acquire_block_fsm         m_block_fsm;
+  depth1::acquire_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

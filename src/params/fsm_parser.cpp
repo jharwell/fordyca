@@ -43,7 +43,6 @@ constexpr char fsm_parser::kXMLRoot[];
 void fsm_parser::parse(const ticpp::Element& node) {
   ticpp::Element fnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(fnode, m_params.times, frequent_collision_thresh);
 
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
@@ -53,7 +52,6 @@ void fsm_parser::parse(const ticpp::Element& node) {
 
 void fsm_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << XML_PARAM_STR(m_params.times, frequent_collision_thresh) << std::endl
          << "nest_center=" << m_params.nest_center << std::endl
          << build_footer();
 } /* show() */

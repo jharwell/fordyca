@@ -43,9 +43,7 @@ block_to_nest_fsm::block_to_nest_fsm(
     const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
-      HFSM_CONSTRUCT_STATE(collision_avoidance, &start),
       entry_transport_to_nest(),
-      entry_collision_avoidance(),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_free_block, hfsm::top_state()),
@@ -69,10 +67,6 @@ block_to_nest_fsm::block_to_nest_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
-                                               nullptr,
-                                               &entry_collision_avoidance,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 

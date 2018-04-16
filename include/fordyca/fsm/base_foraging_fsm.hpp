@@ -129,21 +129,6 @@ class base_foraging_fsm : public state_machine::hfsm {
   HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, state_machine::event_data);
 
   /**
-   * @brief Robots entering this state perform collision avoidance.
-   *
-   * Robots remain in this state until their FOV is clear of obstacles
-   * (additional obstacles many come into view as they avoid the first one). All
-   * signals are ignored in this state, so this state can use the default
-   * parent. Avoidance is performed by setting robot heading in the opposite
-   * direction as the average location of the detected obstacle, and then moving
-   * in that direction.
-   *
-   * After completing avoidance, robots will return to whatever state they were
-   * in prior to this one.
-   */
-  HFSM_STATE_DECLARE_ND(base_foraging_fsm, collision_avoidance);
-
-  /**
    * @brief Robots entering this state will randomly change their exploration
    * direction to the specified direction. All signals are ignored in this
    * state. Once the direction change has been accomplished, the robot will
@@ -156,12 +141,6 @@ class base_foraging_fsm : public state_machine::hfsm {
    * for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_transport_to_nest);
-
-  /**
-   * @brief A simple entry state for collision avoidance, used to set LED colors
-   * for visualization purposes.
-   */
-  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_collision_avoidance);
 
   /**
    * @brief A simple entry state for leaving nest, used to set LED colors for
