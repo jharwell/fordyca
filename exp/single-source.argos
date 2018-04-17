@@ -16,7 +16,7 @@
   <controllers>
 
     <stateful_foraging_controller id="ffc"
-                                library="build/lib/libfordyca">
+                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -96,7 +96,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/lib/libfordyca"
+  <loop_functions library="libfordyca"
                   label="stateful_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"

@@ -116,7 +116,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
                           *collector_group()["block"]));
 } /* pre_step_iter() */
 
-argos::CColor stateful_foraging_loop_functions::GetFloorColor(
+__pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
