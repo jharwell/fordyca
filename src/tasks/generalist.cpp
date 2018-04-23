@@ -46,7 +46,7 @@ generalist::generalist(
                                 params,
                                 mechanism),
       foraging_task(kGeneralistName),
-      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
+      m_abort_prob(&params->abort) {}
 
 /*******************************************************************************
  * Member Functions

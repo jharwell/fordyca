@@ -46,7 +46,7 @@ harvester::harvester(const struct task_allocation::task_params* params,
                      std::unique_ptr<task_allocation::taskable>& mechanism)
     : polled_task(kHarvesterName, params, mechanism),
       foraging_task(kHarvesterName),
-      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
+      m_abort_prob(&params->abort) {}
 
 /*******************************************************************************
  * Member Functions

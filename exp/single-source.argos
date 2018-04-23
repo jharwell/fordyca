@@ -42,17 +42,25 @@
                      repeat_deposit="false"/>
         </occupancy_grid>
         <task_allocation>
-          <executive
-              estimation_alpha="0.8"
-              abort_reactivity="8"
-              abort_offset="4"
-              partition_reactivity="0.5"
-              partition_offset="2"
-              subtask_selection_method="harwell2018"
-              partition_method="pini2011"
-              always_partition="true"
-              never_partition="false"
-              />
+          <executive>
+              <tasks estimation_alpha="0.8"/>
+              <aborting reactivity="8"
+                        offset="3"
+                        />
+              <partitioning
+                  method="pini2011"
+                  always_partition="true"
+                  never_partition="false"
+                  reactivity="1.5"
+                  offset="1.0"
+                  />
+              <subtask_selection
+                  method="harwell2018"
+                  reactivity="8"
+                  offset="1.25"
+                  gamma="1.0"
+                  />
+              </executive>
           <exec_estimates
               enabled="true"
               generalist_range="2000:4000"
