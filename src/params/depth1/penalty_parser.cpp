@@ -35,7 +35,12 @@
  void penalty_parser::parse(argos::TConfigurationNode& node) {
    m_params = rcppsw::make_unique<struct penalty_params>();
 
-   argos::GetNodeAttribute(node, "pen_func", m_params->pen_func);
+   char* penstr;
+   argos::GetNodeAttribute(node, "pen_func", penstr);
+   if (penstr == "kSine") m_params->pen_func = kSine;
+   else if(penstr == "kSquare") m_params->pen_func = kSquare;
+   else if(penstr == "kStep") m_params->pen_func = kStep;
+   else if(penstr == "kSaw") m_params->pen_func = kSaw;
    argos::GetNodeAttribute(node, "amp", m_params->amp);
    argos::GetNodeAttribute(node, "per", m_params->per);
    argos::GetNodeAttribute(node, "phase", m_params->phase);
