@@ -63,12 +63,19 @@ To build the documentation, do the following from the build directory:
 
 ## Running
 
-To run a simple single source foraging experiment, do the following after a
-successful build, from the root of the fordyca repo:
+After successful compilation, follow these steps to run a foraging scenario:
 
-    argos3 -c exp/single-source.argos
+1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
+   `libfordyca.so` file. On bash, that is:
 
-which should pop up a nice GUI from which you can start the experiment.
+        export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
+
+
+2. cd to the ROOT of the fordyca repo, and run the experiment:
+
+        argos3 -c exp/single-source.argos
+
+   This should pop up a nice GUI from which you can start the experiment.
 
 # Troubleshooting
 
