@@ -125,7 +125,7 @@ void stateless_foraging_loop_functions::Destroy() {
   m_collector_group.finalize_all();
 }
 
-argos::CColor stateless_foraging_loop_functions::GetFloorColor(
+__pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
