@@ -87,12 +87,6 @@ class cache_metrics : public rcppsw::metrics::base_metrics {
    * @brief Get the ID of the cache for use in metric collection.
    */
   virtual uint cache_id(void) const = 0;
-
-  /**
-   * @brief Reset all gathered metrics to their initial state after some
-   * interval of time has passed.
-   */
-  virtual void reset_metrics(void) = 0;
 };
 
 NS_END(metrics, fordyca);

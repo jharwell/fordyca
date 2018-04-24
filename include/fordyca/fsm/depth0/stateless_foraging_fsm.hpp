@@ -27,7 +27,8 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,7 +55,8 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::fsm::stateless_metrics,
+                               public metrics::fsm::block_acquisition_metrics,
+                               public metrics::fsm::block_transport_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
@@ -63,10 +65,18 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base metrics */
+  /* base FSM metrics */
+  bool is_avoiding_collision(void) const override {
+    return base_foraging_fsm::is_avoiding_collision();
+  }
+  /* block acquisition metrics */
   bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
+
+  /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; }
 
   bool block_acquired(void) const;
 

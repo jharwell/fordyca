@@ -1,7 +1,7 @@
 /**
- * @file stateful_metrics.hpp
+ * @file cache_acquisition_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
+#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,33 +35,37 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateful_metrics
+ * @class cache_acquisition_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics should be collected from all robots
- * executing the \ref stateful_foraging_controller, or any controller derived
- * from that controller.
+ * @brief Interface defining what metrics that should be collected from FSMs as
+ * they attempt to acquire a cache from SOMEWHERE in SOME way.
  */
-class stateful_metrics : public rcppsw::metrics::base_metrics {
+class cache_acquisition_metrics : public base_fsm_metrics {
  public:
-  stateful_metrics(void) = default;
-  ~stateful_metrics(void) override = default;
+  cache_acquisition_metrics(void) = default;
+  ~cache_acquisition_metrics(void) override = default;
 
   /**
-   * @brief If \c TRUE, then a robot is currently acquiring a block (either via
-   * exploring or via vectoring), and is executing the
-   * \ref explore_for_block_fsm or the \ref acquire_block_fsm.
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref explore_for_cache_fsm.
    */
-  virtual bool is_acquiring_block(void) const = 0;
+  virtual bool is_exploring_for_cache(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a robot is currently acquiring a block via
-   * vectoring and is executing the \ref vector_fsm or the
-   * \ref acquire_block_fsm.
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref vector_fsm and traveling toward a known cache.
    */
-  virtual bool is_vectoring_to_block(void) const = 0;
+  virtual bool is_vectoring_to_cache(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref acquire_cache_fsm, and is acquiring a cache either through exploring
+   * or by vectoring to a known one.
+   */
+  virtual bool is_acquiring_cache(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_HPP_ */

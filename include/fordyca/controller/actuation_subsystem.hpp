@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/datatypes/color.h>
 
 #include "fordyca/params/actuation_params.hpp"

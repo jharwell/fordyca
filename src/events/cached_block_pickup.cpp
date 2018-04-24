@@ -25,7 +25,7 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
@@ -214,10 +214,11 @@ void cached_block_pickup::visit(
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::collector& task) {
-  static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+      task.mechanism())->accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
+void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

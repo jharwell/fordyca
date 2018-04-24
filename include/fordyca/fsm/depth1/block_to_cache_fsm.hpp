@@ -30,9 +30,9 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,9 +61,9 @@ NS_START(fsm, depth1);
  * complete.
  */
 class block_to_cache_fsm : public base_foraging_fsm,
-                           public metrics::fsm::stateless_metrics,
-                           public metrics::fsm::stateful_metrics,
-                           public metrics::fsm::depth1_metrics,
+                           public metrics::fsm::block_acquisition_metrics,
+                           public metrics::fsm::cache_acquisition_metrics,
+                           public metrics::fsm::block_transport_metrics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<block_to_cache_fsm> {
  public:
@@ -85,19 +85,21 @@ class block_to_cache_fsm : public base_foraging_fsm,
   }
   void task_reset(void) override { init(); }
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 metrics */
+  /* block acquisition metrics */
+  bool is_exploring_for_block(void) const override;
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
 
-  /* depth1 metrics */
+  /* cache acquisition metrics */
   bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+
+  /* block transport metrics */
+  bool is_transporting_to_nest(void) const override { return false; }
   bool is_transporting_to_cache(void) const override;
 
   bool cache_acquired(void) const;

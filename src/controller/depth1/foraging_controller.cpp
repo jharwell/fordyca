@@ -32,7 +32,7 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
@@ -111,7 +111,7 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize task decomposition graph */
   std::unique_ptr<task_allocation::taskable> collector_fsm =
-      rcppsw::make_unique<fsm::block_to_nest_fsm>(
+      rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),

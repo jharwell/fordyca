@@ -42,10 +42,10 @@ void metrics_parser::parse(const ticpp::Element& node) {
   ticpp::Element mnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   XML_PARSE_PARAM(mnode, m_params, output_dir);
-  XML_PARSE_PARAM(mnode, m_params, stateless_fname);
+  XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
+  XML_PARSE_PARAM(mnode, m_params, cache_acquisition_fname);
   XML_PARSE_PARAM(mnode, m_params, distance_fname);
-  XML_PARSE_PARAM(mnode, m_params, stateful_fname);
-  XML_PARSE_PARAM(mnode, m_params, depth1_fname);
+  XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
   XML_PARSE_PARAM(mnode, m_params, block_fname);
   XML_PARSE_PARAM(mnode, m_params, task_execution_fname);
   XML_PARSE_PARAM(mnode, m_params, task_management_fname);
@@ -64,10 +64,10 @@ void metrics_parser::show(std::ostream& stream) const {
     return;
   }
   stream << XML_PARAM_STR(m_params, output_dir) << std::endl
-         << XML_PARAM_STR(m_params, stateless_fname) << std::endl
+         << XML_PARAM_STR(m_params, block_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, distance_fname) << std::endl
-         << XML_PARAM_STR(m_params, stateful_fname) << std::endl
-         << XML_PARAM_STR(m_params, depth1_fname) << std::endl
+         << XML_PARAM_STR(m_params, block_transport_fname) << std::endl
+         << XML_PARAM_STR(m_params, cache_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, block_fname) << std::endl
          << XML_PARAM_STR(m_params, task_execution_fname) << std::endl
          << XML_PARAM_STR(m_params, task_management_fname) << std::endl

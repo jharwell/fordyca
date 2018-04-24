@@ -1,7 +1,7 @@
 /**
- * @file cache_site_utility.cpp
+ * @file block_transport_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,38 +18,48 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/math/cache_site_utility.hpp"
-#include <cmath>
+#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, math);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-cache_site_utility::cache_site_utility(const argos::CVector2& site_loc,
-                                       const argos::CVector2& nest_loc)
-    : mc_site_loc(site_loc), mc_nest_loc(nest_loc) {}
+/**
+ * @class block_transport_metrics
+ * @ingroup metrics fsm
+ *
+ * @brief Interface defining what metrics that should be collected from robots
+ * as they transport blocks SOMEWHERE.
+ */
+class block_transport_metrics : public base_fsm_metrics {
+ public:
+  block_transport_metrics(void) = default;
+  ~block_transport_metrics(void) override = default;
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-double cache_site_utility::calc(const argos::CVector2& rloc,
-                                const argos::CVector2& nearest_cache) {
-  return set_result(
-      (nearest_cache - mc_site_loc).Length() /
-      ((mc_site_loc - rloc).Length() * (rloc - (rloc - mc_nest_loc) / 2.0))
-          .Length());
-} /* calc() */
+  /**
+   * @brief If \c TRUE, then a robot has acquired a block and is currently
+   * taking it back to the nest.
+   */
+  virtual bool is_transporting_to_nest(void) const = 0;
 
-double cache_site_utility::operator()(const argos::CVector2& rloc,
-                                      const argos::CVector2& nearest_cache) {
-  return calc(rloc, nearest_cache);
-} /* operator() */
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
+   * of choice.
+   */
+  virtual bool is_transporting_to_cache(void) const = 0;
+};
 
-NS_END(expressions, fordyca);
+NS_END(fsm, metrics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_ */

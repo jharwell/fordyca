@@ -71,13 +71,6 @@ class base_explore_fsm : public base_foraging_fsm,
    */
   void run(void);
 
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_avoiding_collision(void) const;
-
  protected:
   /**
    * @brief Perform random walk exploration: wander force + avoidance force.

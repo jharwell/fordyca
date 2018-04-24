@@ -99,7 +99,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   void init(void) override;
 
-  bool is_avoiding_collision(void) const {
+  bool is_avoiding_collision(void) const override {
     return ST_COLLISION_AVOIDANCE == current_state();
   }
 

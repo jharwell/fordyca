@@ -153,12 +153,6 @@ class base_foraging_controller : public argos::CCI_Controller,
     return m_server;
   }
 
-  /**
-   * @brief Interface for defining how loop functions can determine if a robot
-   * is currently transporting a block to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
-
  private:
   void output_init(const struct params::output_params* params);
   std::string log_header_calc(void) const;

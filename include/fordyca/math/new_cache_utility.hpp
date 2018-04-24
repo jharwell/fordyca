@@ -1,7 +1,7 @@
 /**
- * @file block_metrics.hpp
+ * @file existing_cache_utility.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,25 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_
+#define INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/common/common.hpp"
+#include "fordyca/math/existing_cache_utility.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, math);
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @class block_metrics
- * @ingroup metrics
- *
- * @brief Interface defining collectible metrics on a block.
- */
-class block_metrics : public rcppsw::metrics::base_metrics {
- public:
-  block_metrics(void) = default;
-  ~block_metrics(void) override = default;
-  block_metrics(const block_metrics&) = default;
-  block_metrics& operator=(const block_metrics&) = default;
+using new_cache_utility = existing_cache_utility;
 
-  /**
-   * @brief Get how many carries this object has had on its way from its
-   * original arena location back to the nest.
-   *
-   * @return # carries.
-   */
-  virtual uint n_carries(void) const = 0;
+NS_END(math, fordyca);
 
-  /**
-   * @brief Reset gathered metrics to their initial state.
-   */
-  virtual void reset_metrics(void) = 0;
-};
-
-NS_END(metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCK_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_MATH_NEW_CACHE_UTILITY_HPP_ */

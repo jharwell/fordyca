@@ -30,7 +30,7 @@
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
@@ -76,7 +76,7 @@ class arena_interactor : public rcppsw::er::client {
    * somewhat different than others, so collection needs to be treated
    * specially).
    */
-  void operator()(T& controller, metrics::block_metrics_collector& collector) {
+  void operator()(T& controller, metrics::block_transport_metrics_collector& collector) {
     if (controller.is_carrying_block()) {
       handle_nest_block_drop(controller, collector);
     } else {
@@ -119,13 +119,13 @@ class arena_interactor : public rcppsw::er::client {
    * otherwise.
    */
   bool handle_nest_block_drop(T& controller,
-      metrics::block_metrics_collector& block_collector) {
+      metrics::block_transport_metrics_collector& collector) {
     if (controller.in_nest() && controller.is_transporting_to_nest()) {
       /* Update arena map state due to a block nest drop */
       events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
-      /* update block carries */
-      block_collector.accept(drop_op);
+      /* update block transport metrics */
+      collector.accept(drop_op);
 
       m_map->accept(drop_op);
 

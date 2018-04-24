@@ -35,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace metrics { class block_metrics_collector; }
+namespace metrics { class block_transport_metrics_collector; }
 
 NS_START(support, depth1);
 
@@ -85,7 +85,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    */
   void operator()(T& controller,
                   uint timestep,
-                  metrics::block_metrics_collector& collector) {
+                  metrics::block_transport_metrics_collector& collector) {
       if (handle_task_abort(controller)) {
         return;
       }

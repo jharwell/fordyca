@@ -1,7 +1,7 @@
 /**
- * @file depth1_metrics_collector.hpp
+ * @file cache_acquisition_metrics_collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,21 +36,20 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth1_metrics_collector
+ * @class cache_acquisition_metrics_collector
  * @ingroup metrics fsm
  *
- * @brief Collector for \ref depth1_metrics.
+ * @brief Collector for \ref cache_acquisition_metrics.
  *
- * Metrics are written out every timestep, or at the end of the specified
- * interval, depending.
+ * Metrics are written out at the end of the specified interval.
  */
-class depth1_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class cache_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
    * @param interval The collection interval.
    */
-  depth1_metrics_collector(const std::string& ofname, uint interval);
+  cache_acquisition_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
@@ -59,15 +58,15 @@ class depth1_metrics_collector : public rcppsw::metrics::base_metrics_collector 
 
  private:
   struct stats {
-    size_t n_exploring_for_cache;
-    size_t n_vectoring_to_cache;
-    size_t n_acquiring_cache;
-    size_t n_transporting_to_cache;
+    uint n_exploring_for_cache;
+    uint n_vectoring_to_cache;
+    uint n_acquiring_cache;
+    uint n_avoiding_collision;
 
-    size_t n_cum_exploring_for_cache;
-    size_t n_cum_vectoring_to_cache;
-    size_t n_cum_acquiring_cache;
-    size_t n_cum_transporting_to_cache;
+    uint n_cum_exploring_for_cache;
+    uint n_cum_vectoring_to_cache;
+    uint n_cum_acquiring_cache;
+    uint n_cum_avoiding_collision;
   };
 
   std::string csv_header_build(const std::string& header) override;
@@ -78,4 +77,4 @@ class depth1_metrics_collector : public rcppsw::metrics::base_metrics_collector 
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_CACHE_ACQUISITION_METRICS_COLLECTOR_HPP_ */

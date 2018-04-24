@@ -95,8 +95,4 @@ void base_explore_fsm::task_execute(void) {
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-bool base_explore_fsm::is_avoiding_collision(void) const {
-  return base_sensors()->threatening_obstacle_exists();
-} /* is_avoiding_collision() */
-
 NS_END(fsm, fordyca);

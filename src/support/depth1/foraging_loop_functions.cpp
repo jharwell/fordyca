@@ -29,10 +29,10 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/metrics/cache_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/depth1_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
@@ -100,14 +100,14 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       static_cast<rcppsw::metrics::tasks::management_metrics&>(controller));
 
   if (nullptr != controller.current_task()) {
-    collector_group().collect_from("fsm::stateless",
-                                   static_cast<metrics::fsm::stateless_metrics&>(
+    collector_group().collect_from("fsm::block_acquisition",
+                                   static_cast<metrics::fsm::block_acquisition_metrics&>(
                                        *controller.current_task()));
-    collector_group().collect_from("fsm::stateful",
-                                   static_cast<metrics::fsm::stateful_metrics&>(
+    collector_group().collect_from("fsm::block_transport",
+                                   static_cast<metrics::fsm::block_transport_metrics&>(
                                        *controller.current_task()));
-    collector_group().collect_from("fsm::depth1",
-                                   static_cast<metrics::fsm::depth1_metrics&>(
+    collector_group().collect_from("fsm::cache_acquisition",
+                                   static_cast<metrics::fsm::cache_acquisition_metrics&>(
                                        *controller.current_task()));
     collector_group().collect_from(
         "tasks::execution",
@@ -123,7 +123,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   /* Now watch it react to the environment */
   (*m_interactor)(controller,
                   GetSpace().GetSimulationClock(),
-                  static_cast<metrics::block_metrics_collector&>(
+                  static_cast<metrics::block_transport_metrics_collector&>(
                       *collector_group()["block"]));
 } /* pre_step_iter() */
 
@@ -229,9 +229,9 @@ void foraging_loop_functions::cache_handling_init(
 
 void foraging_loop_functions::metric_collecting_init(
     const struct params::output_params* output_p) {
-  collector_group().register_collector<metrics::fsm::depth1_metrics_collector>(
-      "fsm::depth1",
-      metrics_path() + "/" + output_p->metrics.depth1_fname,
+  collector_group().register_collector<metrics::fsm::cache_acquisition_metrics_collector>(
+      "fsm::cache_acquisition",
+      metrics_path() + "/" + output_p->metrics.cache_acquisition_fname,
       output_p->metrics.collect_interval);
 
   collector_group()

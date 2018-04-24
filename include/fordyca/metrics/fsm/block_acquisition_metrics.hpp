@@ -1,7 +1,7 @@
 /**
- * @file stateless_metrics.hpp
+ * @file block_acquisition_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
+#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,36 +35,36 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateless_metrics
+ * @class block_acquisition_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics should be collected from any robot
- * executing the \ref stateless_foraging_controller, or any controller logically
- * (not necessarily in the C++ sense) derived from that controller.
+ * @brief Interface defining what metrics should be collected FSMs as they
+ * attempt to acquire a block from SOMEWHERE in SOME way.
  */
-class stateless_metrics : public rcppsw::metrics::base_metrics {
+class block_acquisition_metrics : public base_fsm_metrics {
  public:
-  stateless_metrics(void) = default;
-  ~stateless_metrics(void) override = default;
+  block_acquisition_metrics(void) = default;
+  ~block_acquisition_metrics(void) override = default;
 
   /**
-   * @brief If \c TRUE, then a robot is currently executing the
-   * \ref explore_for_block_fsm.
+   * @brief If \c TRUE, then a robot is currently exploring for a block (no
+   * known blocks) via the \ref explore_for_block_fsm.
    */
   virtual bool is_exploring_for_block(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
+   * @brief If \c TRUE, then a robot is currently acquiring a block (either via
+   * exploring or via vectoring)
    */
-  virtual bool is_avoiding_collision(void) const = 0;
+  virtual bool is_acquiring_block(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a robot has acquired a block and is currently
-   * taking it back to the nest.
+   * @brief If \c TRUE, then a robot is currently acquiring a block via
+   * vectoring via the \ref vector_fsm.
    */
-  virtual bool is_transporting_to_nest(void) const = 0;
+  virtual bool is_vectoring_to_block(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_HPP_ */

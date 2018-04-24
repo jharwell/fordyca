@@ -89,6 +89,14 @@ bool stateless_foraging_controller::is_transporting_to_nest(void) const {
   return m_fsm->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
+bool stateless_foraging_controller::is_exploring_for_block(void) const {
+  return m_fsm->is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+bool stateless_foraging_controller::is_avoiding_collision(void) const {
+  return m_fsm->is_avoiding_collision();
+} /* is_avoiding_collision() */
+
 /*******************************************************************************
  * Distance Metrics
  ******************************************************************************/

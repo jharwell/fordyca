@@ -1,7 +1,7 @@
 /**
- * @file block_to_nest_fsm.hpp
+ * @file cached_block_to_nest_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_BLOCK_TO_NEST_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_BLOCK_TO_NEST_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,9 +28,8 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -56,13 +55,13 @@ class block;
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
 
-NS_START(fsm);
+NS_START(fsm, depth1);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_nest_fsm
+ * @class cached_block_to_nest_fsm
  * @ingroup fsm
  *
  * @brief Each robot executing this FSM will locate for a block (either a known
@@ -72,25 +71,23 @@ NS_START(fsm);
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class block_to_nest_fsm : public base_foraging_fsm,
-                          public metrics::fsm::stateless_metrics,
-                          public metrics::fsm::stateful_metrics,
-                          public metrics::fsm::depth1_metrics,
-                          public task_allocation::taskable,
-                          public visitor::visitable_any<block_to_nest_fsm> {
+class cached_block_to_nest_fsm : public base_foraging_fsm,
+                                 public metrics::fsm::cache_acquisition_metrics,
+                                 public metrics::fsm::block_transport_metrics,
+                                 public task_allocation::taskable,
+                                 public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  block_to_nest_fsm(
+  cached_block_to_nest_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
-  block_to_nest_fsm(const block_to_nest_fsm& fsm) = delete;
-  block_to_nest_fsm& operator=(const block_to_nest_fsm& fsm) = delete;
+  cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
+  cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const task_allocation::taskable_argument* arg) override;
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }
@@ -103,20 +100,18 @@ class block_to_nest_fsm : public base_foraging_fsm,
    * @brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
+  void task_start(const task_allocation::taskable_argument*) override {}
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
 
-  /* depth0 metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* depth1 metrics */
+  /* cache acquisition metrics */
   bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+
+  /* block transport metrics */
+  bool is_transporting_to_nest(void) const override;
   bool is_transporting_to_cache(void) const override { return false; }
 
   /**
@@ -141,33 +136,23 @@ class block_to_nest_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START,
     /**
-     * Superstate for finding a free block.
-     */
-    ST_ACQUIRE_FREE_BLOCK,
-
-    /**
-     * @brief State robots wait in after acquiring a block for the simulation to
-     * send them the block pickup signal. Having this extra state solves a lot
-     * of handshaking/off by one issues regarding the timing of doing so.
-     */
-    ST_WAIT_FOR_BLOCK_PICKUP,
-
-    /**
      * Superstate for finding a cached block.
      */
-    ST_ACQUIRE_CACHED_BLOCK,
+    ST_ACQUIRE_BLOCK,
 
     /**
      * @brief State robots wait in after acquiring a cache for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    ST_WAIT_FOR_CACHE_PICKUP,
+    ST_WAIT_FOR_PICKUP,
 
     /**
      * Block found--bring it back to the nest.
      */
     ST_TRANSPORT_TO_NEST,
+
+    ST_LEAVING_NEST,
 
     /**
      * Block has been brought to the nest successfully.
@@ -194,20 +179,21 @@ class block_to_nest_fsm : public base_foraging_fsm,
   HFSM_STATE_INHERIT(base_foraging_fsm,
                      transport_to_nest,
                      state_machine::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm,
+                     leaving_nest,
+                     state_machine::event_data);
+
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* memory foraging states */
-  HFSM_STATE_DECLARE(block_to_nest_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_free_block);
-  HFSM_STATE_DECLARE(block_to_nest_fsm,
-                     wait_for_block_pickup,
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+                     wait_for_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_nest_fsm, acquire_cached_block);
-  HFSM_STATE_DECLARE(block_to_nest_fsm,
-                     wait_for_cache_pickup,
-                     state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_nest_fsm, finished);
+  HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -221,12 +207,11 @@ class block_to_nest_fsm : public base_foraging_fsm,
 
   // clang-format off
   uint                      m_pickup_count{0};
-  acquire_block_fsm         m_block_fsm;
   depth1::acquire_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
-NS_END(fsm, fordyca);
+NS_END(depth1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_BLOCK_TO_NEST_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_CACHED_BLOCK_TO_NEST_FSM_HPP_ */

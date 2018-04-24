@@ -1,7 +1,7 @@
 /**
- * @file depth1_metrics.hpp
+ * @file base_fsm_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -35,44 +35,23 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth1_metrics
+ * @class base_fsm_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics that should be collected from robots
- * executing the depth1 foraging controller.
+ * @brief Interface defining what metrics should be collected ANY FSM as it goes
+ * about whatever task it is supposed to do.
  */
-class depth1_metrics : public rcppsw::metrics::base_metrics {
+class base_fsm_metrics : public rcppsw::metrics::base_metrics {
  public:
-  depth1_metrics(void) = default;
-  ~depth1_metrics(void) override = default;
+  base_fsm_metrics(void) = default;
+  ~base_fsm_metrics(void) override = default;
 
   /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref explore_for_cache_fsm.
+   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
    */
-  virtual bool is_exploring_for_cache(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref vector_fsm and traveling toward a known cache.
-   */
-  virtual bool is_vectoring_to_cache(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref acquire_cache_fsm, and is acquiring a cache either through exploring
-   * or by vectoring to a known one.
-   */
-  virtual bool is_acquiring_cache(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
-   * of choice.
-   */
-  virtual bool is_transporting_to_cache(void) const = 0;
+  virtual bool is_avoiding_collision(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_DEPTH1_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_ */

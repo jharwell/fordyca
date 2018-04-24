@@ -113,15 +113,11 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
 bool stateless_foraging_fsm::is_exploring_for_block(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
 } /* is_exploring_for_block() */
-
-__pure bool stateless_foraging_fsm::is_avoiding_collision(void) const {
-  return m_explore_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
 
 bool stateless_foraging_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;

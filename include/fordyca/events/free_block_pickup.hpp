@@ -104,7 +104,7 @@ class free_block_pickup
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
-  void visit(fsm::block_to_nest_fsm& fsm) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
   void visit(tasks::harvester& task) override;
 

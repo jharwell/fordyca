@@ -1,7 +1,7 @@
 /**
- * @file stateless_metrics_collector.hpp
+ * @file block_transport_metrics_collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,63 +18,59 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCK_TRANSPORT_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCK_TRANSPORT_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+NS_START(fordyca, metrics);
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateless_metrics_collector
- * @ingroup metrics fsm
+ * @class block_transport_metrics_collector
+ * @ingroup metrics
  *
- * @brief Collector for \ref stateless_metrics.
+ * @brief Collector for \ref block_transport_metrics.
  *
- * Metrics are written out every timestep, or at the end of the specified
- * interval, depending.
+ * Metrics are written out at the specified interval.
  */
-class stateless_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class block_transport_metrics_collector
+    : public rcppsw::metrics::base_metrics_collector,
+      public visitor::visitable_any<block_transport_metrics_collector> {
  public:
   /**
    * @param ofname Output file name.
    * @param interval Collection interval.
    */
-  stateless_metrics_collector(const std::string& ofname,
-                              uint interval);
+  block_transport_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
-  void reset_after_timestep(void) override;
   void reset_after_interval(void) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  size_t cum_collected(void) const { return m_metrics.cum_collected; }
 
  private:
-  struct sim_stats {
-    size_t n_exploring_for_block;
-    size_t n_avoiding_collision;
-    size_t n_transporting_to_nest;
-
-    size_t n_cum_exploring_for_block;
-    size_t n_cum_avoiding_collision;
-    size_t n_cum_transporting_to_nest;
+  struct block_transport_metrics {
+    uint cum_collected; /* aggregate across blocks, not reset each timestep*/
+    uint cum_carries;   /* aggregate across blocks, not reset each timstep */
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
-
-  struct sim_stats m_stats;
+  struct block_transport_metrics m_metrics;
 };
 
-NS_END(fsm, metrics, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATELESS_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCK_TRANSPORT_METRICS_COLLECTOR_HPP_ */

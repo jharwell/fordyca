@@ -32,9 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace fsm {
-class block_to_nest_fsm;
-}
+namespace fsm { namespace depth1 { class cached_block_to_nest_fsm; } }
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth1 {
 class foraging_controller;
@@ -59,7 +57,7 @@ NS_START(events);
  * involving picking up a block will need to visit.
  */
 class block_pickup_event
-    : public visitor::visit_set<fsm::block_to_nest_fsm,
+    : public visitor::visit_set<fsm::depth1::cached_block_to_nest_fsm,
                                 representation::arena_map,
                                 representation::perceived_arena_map,
                                 representation::block,

@@ -29,11 +29,9 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -65,9 +63,13 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   /* initialize stat collecting */
   auto* p_output =
       repo.parse_results<const struct params::output_params>();
-  collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
-      "fsm::stateful",
-      metrics_path() + "/" + p_output->metrics.stateful_fname,
+  collector_group().register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+      "fsm::block_acquisition",
+      metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
+      p_output->metrics.collect_interval);
+  collector_group().register_collector<metrics::fsm::block_transport_metrics_collector>(
+      "fsm::block_transport",
+      metrics_path() + "/" + p_output->metrics.block_transport_fname,
       p_output->metrics.collect_interval);
   collector_group().reset_all();
 
@@ -97,8 +99,11 @@ void stateful_foraging_loop_functions::pre_step_iter(
   collector_group().collect_from(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    collector_group().collect_from("fsm::stateful",
-                                   static_cast<metrics::fsm::stateless_metrics&>(
+    collector_group().collect_from("fsm::block_acquisition",
+                                   static_cast<metrics::fsm::block_acquisition_metrics&>(
+                                       *controller.current_task()));
+    collector_group().collect_from("fsm::block_transport",
+                                   static_cast<metrics::fsm::block_transport_metrics&>(
                                        *controller.current_task()));
   }
 
@@ -112,7 +117,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
   interactor(rcppsw::er::g_server,
              arena_map(),
              floor())(controller,
-                      static_cast<metrics::block_metrics_collector&>(
+                      static_cast<metrics::block_transport_metrics_collector&>(
                           *collector_group()["block"]));
 } /* pre_step_iter() */
 

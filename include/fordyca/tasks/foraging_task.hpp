@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -61,9 +61,9 @@ NS_START(tasks);
  */
 class foraging_task
     : public rcppsw::metrics::tasks::execution_metrics,
-      public metrics::fsm::stateless_metrics,
-      public metrics::fsm::stateful_metrics,
-      public metrics::fsm::depth1_metrics,
+      public metrics::fsm::block_acquisition_metrics,
+      public metrics::fsm::block_transport_metrics,
+      public metrics::fsm::cache_acquisition_metrics,
       public visitor::polymorphic_visitable<foraging_task,
                                             events::cached_block_pickup,
                                             events::cache_block_drop,

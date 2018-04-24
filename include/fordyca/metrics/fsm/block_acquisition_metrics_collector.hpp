@@ -1,7 +1,7 @@
 /**
- * @file stateful_metrics_collector.hpp
+ * @file block_acquisition_metrics_collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,21 +36,20 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateful_metrics_collector
+ * @class block_acquisition_metrics_collector
  * @ingroup metrics fsm
  *
- * @brief Collector for \ref stateful_metrics.
+ * @brief Collector for \ref block_acquisition_metrics.
  *
- * Metrics are written out every timestep, or after the specified interval,
- * depending.
+ * Metrics are written out after the specified interval.
  */
-class stateful_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class block_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
    * @param interval Collection interval.
    */
-  stateful_metrics_collector(const std::string& ofname,
+  block_acquisition_metrics_collector(const std::string& ofname,
                              uint interval);
 
   void reset(void) override;
@@ -60,11 +59,15 @@ class stateful_metrics_collector : public rcppsw::metrics::base_metrics_collecto
 
  private:
   struct stats {
-    size_t n_acquiring_block;
-    size_t n_vectoring_to_block;
+    uint n_acquiring_block;
+    uint n_exploring_for_block;
+    uint n_vectoring_to_block;
+    uint n_avoiding_collision;
 
-    size_t n_cum_acquiring_block;
-    size_t n_cum_vectoring_to_block;
+    uint n_cum_acquiring_block;
+    uint n_cum_vectoring_to_block;
+    uint n_cum_exploring_for_block;
+    uint n_cum_avoiding_collision;
   };
 
   std::string csv_header_build(const std::string& header) override;
@@ -75,4 +78,4 @@ class stateful_metrics_collector : public rcppsw::metrics::base_metrics_collecto
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_STATEFUL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_ */

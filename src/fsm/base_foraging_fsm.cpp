@@ -208,4 +208,8 @@ const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuat
   return m_saa->actuation();
 } /* actuators() */
 
+bool base_foraging_fsm::is_avoiding_collision(void) const {
+  return m_saa->sensing()->threatening_obstacle_exists();
+} /* is_avoiding_collision() */
+
 NS_END(controller, fordyca);

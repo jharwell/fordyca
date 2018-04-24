@@ -1,5 +1,5 @@
 /**
- * @file depth1_metrics_collector.cpp
+ * @file cache_acquisition_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/depth1_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,14 +32,15 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-depth1_metrics_collector::depth1_metrics_collector(const std::string& ofname,
-                                                   uint interval)
+cache_acquisition_metrics_collector::cache_acquisition_metrics_collector(
+    const std::string& ofname,
+    uint interval)
     : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string depth1_metrics_collector::csv_header_build(const std::string& header) {
+std::string cache_acquisition_metrics_collector::csv_header_build(const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +
@@ -48,35 +49,34 @@ std::string depth1_metrics_collector::csv_header_build(const std::string& header
       "n_cum_vectoring_to_cache" + separator() +
       "n_exploring_for_cache" + separator() +
       "n_cum_exploring_for_cache" + separator() +
-      "n_transporting_to_cache" + separator() +
-      "n_cum_transporting_to_cache" + separator();
+      "n_avoiding_collision" + separator() +
+      "n_cum_avoiding_collision" + separator();
   // clang-format on
 } /* csv_header_build() */
 
-void depth1_metrics_collector::reset(void) {
+void cache_acquisition_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-void depth1_metrics_collector::collect(
+void cache_acquisition_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const metrics::fsm::depth1_metrics&>(metrics);
+  auto& m = static_cast<const metrics::fsm::cache_acquisition_metrics&>(metrics);
   m_stats.n_exploring_for_cache += static_cast<uint>(m.is_exploring_for_cache());
   m_stats.n_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
   m_stats.n_vectoring_to_cache += static_cast<uint>(m.is_vectoring_to_cache());
-  m_stats.n_transporting_to_cache +=
-      static_cast<uint>(m.is_transporting_to_cache());
+  m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
 
   m_stats.n_cum_exploring_for_cache +=
       static_cast<uint>(m.is_exploring_for_cache());
   m_stats.n_cum_acquiring_cache += static_cast<uint>(m.is_acquiring_cache());
   m_stats.n_cum_vectoring_to_cache +=
       static_cast<uint>(m.is_vectoring_to_cache());
-  m_stats.n_cum_transporting_to_cache +=
-      static_cast<uint>(m.is_transporting_to_cache());
+  m_stats.n_cum_avoiding_collision +=
+      static_cast<uint>(m.is_avoiding_collision());
 } /* collect() */
 
-bool depth1_metrics_collector::csv_line_build(std::string& line) {
+bool cache_acquisition_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
@@ -86,23 +86,23 @@ bool depth1_metrics_collector::csv_line_build(std::string& line) {
          std::to_string(m_stats.n_cum_vectoring_to_cache) + separator() +
          std::to_string(m_stats.n_exploring_for_cache) + separator() +
          std::to_string(m_stats.n_cum_exploring_for_cache) + separator() +
-         std::to_string(m_stats.n_transporting_to_cache) + separator() +
-         std::to_string(m_stats.n_cum_transporting_to_cache) + separator();
+         std::to_string(m_stats.n_avoiding_collision) + separator() +
+         std::to_string(m_stats.n_cum_avoiding_collision) + separator();
   return true;
 } /* store_foraging_stats() */
 
-void depth1_metrics_collector::reset_after_interval(void) {
+void cache_acquisition_metrics_collector::reset_after_interval(void) {
   m_stats.n_cum_exploring_for_cache = 0;
   m_stats.n_cum_acquiring_cache = 0;
   m_stats.n_cum_vectoring_to_cache = 0;
-  m_stats.n_cum_transporting_to_cache = 0;
+  m_stats.n_cum_avoiding_collision = 0;
 } /* reset_after_interval() */
 
-void depth1_metrics_collector::reset_after_timestep(void) {
+void cache_acquisition_metrics_collector::reset_after_timestep(void) {
   m_stats.n_exploring_for_cache = 0;
   m_stats.n_acquiring_cache = 0;
   m_stats.n_vectoring_to_cache = 0;
-  m_stats.n_transporting_to_cache = 0;
+  m_stats.n_avoiding_collision = 0;
 } /* reset_after_timestep() */
 
 NS_END(fsm, metrics, fordyca);
