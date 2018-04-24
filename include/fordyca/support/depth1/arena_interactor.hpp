@@ -129,7 +129,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.cache_acquired(),
+    ER_ASSERT(controller.current_task()->cache_acquired(),
               "FATAL: Controller not waiting for cached block pickup");
 
     /*
@@ -176,7 +176,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.cache_acquired(),
+    ER_ASSERT(controller.current_task()->cache_acquired(),
               "FATAL: Controller not waiting for cache block drop");
 
     /*

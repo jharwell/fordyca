@@ -49,14 +49,13 @@ void actuation_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_differential_drive << m_steering << m_throttling
+  stream << build_header() << m_differential_drive << m_steering << m_throttling
          << build_footer();
 } /* show() */
 
 __pure bool actuation_parser::validate(void) const {
   return m_differential_drive.validate() && m_steering.validate() &&
-      m_throttling.validate();
+         m_throttling.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

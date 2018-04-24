@@ -26,16 +26,19 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/perception_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/params/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class line_of_sight; class perceived_arena_map; }
+namespace representation {
+class line_of_sight;
+class perceived_arena_map;
+} // namespace representation
 
 NS_START(controller);
 
@@ -64,8 +67,12 @@ class base_perception_subsystem : public rcppsw::er::client {
    */
   void update(const representation::line_of_sight* const los);
 
-  const std::shared_ptr<representation::perceived_arena_map>& map(void) const { return m_map; }
-  std::shared_ptr<representation::perceived_arena_map> map(void) { return m_map; }
+  const std::shared_ptr<representation::perceived_arena_map>& map(void) const {
+    return m_map;
+  }
+  std::shared_ptr<representation::perceived_arena_map> map(void) {
+    return m_map;
+  }
 
  protected:
   /*

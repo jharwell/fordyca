@@ -43,7 +43,7 @@ class stateful_foraging_fsm;
 namespace depth1 {
 class block_to_cache_fsm;
 class cached_block_to_nest_fsm;
-}
+} // namespace depth1
 } // namespace fsm
 namespace controller { namespace depth0 {
 class stateless_foraging_controller;

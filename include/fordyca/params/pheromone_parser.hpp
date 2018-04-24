@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/pheromone_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to pheromones into
  * \ref pheromone_params.
  */
-class pheromone_parser: public rcppsw::params::xml_param_parser {
+class pheromone_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit pheromone_parser(uint level) : xml_param_parser(level) {}
 
@@ -65,7 +65,7 @@ class pheromone_parser: public rcppsw::params::xml_param_parser {
   }
 
  private:
-  struct pheromone_params m_params{};
+  struct pheromone_params m_params {};
 };
 
 NS_END(params, fordyca);

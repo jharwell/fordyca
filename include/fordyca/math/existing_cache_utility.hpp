@@ -56,7 +56,7 @@ class existing_cache_utility : public rcppsw::math::expression<double> {
   existing_cache_utility(const argos::CVector2& cache_loc,
                          const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc, double density, size_t n_blocks);
+  double calc(const argos::CVector2& rloc, double density, size_t n_blocks = 1);
   double operator()(const argos::CVector2& rloc,
                     double density,
                     size_t n_blocks) {

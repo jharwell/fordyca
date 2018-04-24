@@ -47,8 +47,7 @@ void steering_force2D_parser::parse(const ticpp::Element& node) {
 
 void steering_force2D_parser::show(std::ostream& stream) const {
   force_calculator_xml_parser::show(stream);
-  stream << m_phototaxis
-         << build_footer();
+  stream << m_phototaxis << build_footer();
 } /* show() */
 
 __pure bool steering_force2D_parser::validate(void) const {

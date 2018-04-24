@@ -28,8 +28,8 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
-#include "rcppsw/common/common.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/kinematics/twist.hpp"
 
 /*******************************************************************************
@@ -72,7 +72,7 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -
             m_actuation->differential_drive().left_linspeed()) /
-        m_actuation->differential_drive().axle_length();
+           m_actuation->differential_drive().axle_length();
   }
   double max_speed(void) const override {
     return m_actuation->differential_drive().max_speed();

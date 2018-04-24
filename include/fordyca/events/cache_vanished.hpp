@@ -37,12 +37,10 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth1 {
 class foraging_controller;
 }} // namespace controller::depth1
-namespace fsm {
-namespace depth1 {
+namespace fsm { namespace depth1 {
 class block_to_cache_fsm;
 class cached_block_to_nest_fsm;
-}
-} // namespace fsm
+}} // namespace fsm::depth1
 namespace tasks {
 class collector;
 class harvester;

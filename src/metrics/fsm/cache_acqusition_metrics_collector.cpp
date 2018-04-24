@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,8 @@ cache_acquisition_metrics_collector::cache_acquisition_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string cache_acquisition_metrics_collector::csv_header_build(const std::string& header) {
+std::string cache_acquisition_metrics_collector::csv_header_build(
+    const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "n_acquiring_cache" + separator() +

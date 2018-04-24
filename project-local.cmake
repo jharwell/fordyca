@@ -11,16 +11,14 @@ set(CMAKE_AUTOMOC OFF)
 
 # RCPPSW
 add_subdirectory(ext/rcppsw)
-include_directories(${rcppsw_INCLUDE_DIRS})
 
 ################################################################################
 # Includes                                                                     #
 ################################################################################
 if (NOT IS_ROOT_PROJECT)
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" PARENT_SCOPE)
-else()
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}")
+  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
+set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
 
 include_directories(BEFORE SYSTEM
   /usr/include/lua5.2
@@ -51,3 +49,4 @@ target_link_libraries(${target}
   Qt5::Core
   Qt5::Gui
   )
+target_include_directories(${target} PUBLIC "${${target}_INCLUDE_DIRS}")

@@ -1,7 +1,7 @@
 /**
- * @file acquire_block_fsm.cpp
+ * @file cache_finisher_fsm.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_block_fsm.hpp"
+#include "fordyca/fsm/depth2/cache_finisher_fsm.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
@@ -37,60 +37,106 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm);
+NS_START(fordyca, fsm, depth2);
 namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_block_fsm::acquire_block_fsm(
+cache_finisher_fsm::cache_finisher_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<representation::perceived_arena_map> map)
+    const std::shared_ptr<representation::perceived_arena_map>& map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
+      entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_new_cache, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      exit_acquire_block(),
-      mc_nest_center(params->nest_center),
-      m_best_block(nullptr),
-      m_map(std::move(map)),
-      m_server(server),
-      m_vector_fsm(server, saa),
-      m_explore_fsm(server, saa),
+      m_block_fsm(params, server, saa, map),
+      m_cache_fsm(params, server, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&acquire_block,
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_new_cache),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                                nullptr,
-                                               &exit_acquire_block),
+                                               &entry_wait_for_signal,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  client::insmod("acquire_block_fsm",
+  client::insmod("cache_finisher_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
 }
 
-HFSM_STATE_DEFINE_ND(acquire_block_fsm, start) {
+HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(acquire_block_fsm, acquire_block) {
-  if (ST_ACQUIRE_BLOCK != last_state()) {
-    ER_DIAG("Executing ST_ACQUIRE_BLOCK");
+HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_block) {
+  ER_DIAG("Executing ST_ACQUIRE_BLOCK");
+  if (m_block_fsm.task_finished()) {
+    actuators()->differential_drive().stop();
+    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
+  } else {
+    m_block_fsm.task_execute();
   }
+  return controller::foraging_signal::HANDLED;
+}
 
-  if (acquire_any_block()) {
+HFSM_STATE_DEFINE(cache_finisher_fsm,
+                  wait_for_block_pickup,
+                  state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.task_reset();
+    m_pickup_count = 0;
+    internal_event(ST_ACQUIRE_NEW_CACHE);
+  }
+  ++m_pickup_count;
+  if (m_pickup_count >= kPICKUP_TIMEOUT) {
+    m_pickup_count = 0;
+    m_block_fsm.task_reset();
+    internal_event(ST_ACQUIRE_BLOCK);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_new_cache) {
+  ER_DIAG("Executing ST_ACQUIRE_NEW_CACHE");
+  if (m_cache_fsm.task_finished()) {
+    actuators()->differential_drive().stop();
+    internal_event(ST_WAIT_FOR_BLOCK_DROP);
+  } else {
+    m_cache_fsm.task_execute();
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+HFSM_STATE_DEFINE(cache_finisher_fsm,
+                  wait_for_block_drop,
+                  state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    m_cache_fsm.task_reset();
+    m_pickup_count = 0;
+    internal_event(ST_ACQUIRE_NEW_CACHE);
+  }
+  ++m_pickup_count;
+  if (m_pickup_count >= kPICKUP_TIMEOUT) {
+    m_pickup_count = 0;
+    m_cache_fsm.task_reset();
     internal_event(ST_FINISHED);
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(acquire_block_fsm, exit_acquire_block) {
-  m_vector_fsm.task_reset();
-  m_explore_fsm.task_reset();
-}
-HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
+HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
@@ -98,114 +144,57 @@ HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
-bool acquire_block_fsm::is_exploring_for_block(void) const {
-  return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running());
-} /* is_exploring_for_block() */
-
-__pure bool acquire_block_fsm::is_avoiding_collision(void) const {
-  return m_explore_fsm.is_avoiding_collision() ||
-         m_vector_fsm.is_avoiding_collision();
+__pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
+  return m_block_fsm.is_avoiding_collision() ||
+         m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-/*******************************************************************************
- * Depth0 Diagnostics
- ******************************************************************************/
-bool acquire_block_fsm::is_acquiring_block(void) const {
-  return is_vectoring_to_block() || is_exploring_for_block();
+bool cache_finisher_fsm::is_exploring_for_block(void) const {
+  return m_block_fsm.is_exploring_for_block();
+} /* is_exploring_for_block() */
+
+bool cache_finisher_fsm::is_acquiring_block(void) const {
+  return m_block_fsm.is_acquiring_block();
 } /* is_acquiring_block() */
 
-bool acquire_block_fsm::is_vectoring_to_block(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.task_running();
+bool cache_finisher_fsm::is_vectoring_to_block(void) const {
+  return m_block_fsm.is_vectoring_to_block();
 } /* is_vectoring_to_block() */
+
+bool cache_finisher_fsm::block_acquired(void) const {
+  return m_block_fsm.block_acquired();
+} /* block_acquired() */
+
+bool cache_finisher_fsm::is_exploring_for_cache(void) const {
+  return m_cache_fsm.is_exploring_for_cache();
+} /* is_exploring_for_cache() */
+
+bool cache_finisher_fsm::is_acquiring_cache(void) const {
+  return m_cache_fsm.is_acquiring_cache();
+} /* is_acquiring_cache() */
+
+bool cache_finisher_fsm::is_vectoring_to_cache(void) const {
+  return m_cache_fsm.is_vectoring_to_cache();
+} /* is_vectoring_to_cache() */
+
+bool cache_finisher_fsm::cache_acquired(void) const {
+  return m_cache_fsm.cache_acquired();
+} /* cache_acquired() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void acquire_block_fsm::init(void) {
+void cache_finisher_fsm::init(void) {
   base_foraging_fsm::init();
-  m_vector_fsm.task_reset();
-  m_explore_fsm.task_reset();
+  m_block_fsm.task_reset();
+  m_cache_fsm.task_reset();
 } /* init() */
 
-bool acquire_block_fsm::acquire_known_block(
-    std::list<representation::perceived_block> blocks) {
-  /*
-   * If we don't know of any blocks and we are not current vectoring towards
-   * one, then there is no way we can acquire a known block, so bail out.
-   */
-  if (blocks.empty() && !m_vector_fsm.task_running()) {
-    return false;
-  }
-
-  if (!blocks.empty() && !m_vector_fsm.task_running()) {
-    /*
-     * If we get here, we must know of some blocks, but not be currently
-     * vectoring toward any of them.
-     */
-    controller::depth0::block_selector selector(m_server, mc_nest_center);
-    representation::perceived_block best =
-        selector.calc_best(blocks, base_sensors()->position());
-    ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
-           best.ent->id(),
-           best.ent->discrete_loc().first,
-           best.ent->discrete_loc().second,
-           best.density.last_result());
-    tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
-                             best.ent->real_loc());
-    m_best_block = best.ent;
-    m_explore_fsm.task_reset();
-    m_vector_fsm.task_reset();
-    m_vector_fsm.task_start(&v);
-  }
-
-  /* we are vectoring */
-  if (!m_vector_fsm.task_finished()) {
-    m_vector_fsm.task_execute();
-  }
-
-  if (m_vector_fsm.task_finished()) {
-    m_vector_fsm.task_reset();
-    if (base_sensors()->block_detected()) {
-      return true;
-    }
-    ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
-    return false;
-  }
-  return false;
-} /* acquire_known_block() */
-
-bool acquire_block_fsm::acquire_any_block(void) {
-  /*
-   * If we know of ANY blocks in the arena, go to the location of the best one
-   * and pick it up. Otherwise, explore until you find one. If during
-   * exploration we find one through our LOS, then stop exploring and go vector
-   * to it.
-   */
-  if (!acquire_known_block(m_map->perceived_blocks())) {
-    if (m_vector_fsm.task_running()) {
-      return false;
-    }
-
-    if (!m_explore_fsm.task_running()) {
-      m_explore_fsm.task_reset();
-      m_explore_fsm.task_start(nullptr);
-    }
-    m_explore_fsm.task_execute();
-    if (m_explore_fsm.task_finished()) {
-      ER_ASSERT(base_sensors()->block_detected(),
-                "FATAL: No block detected after successful exploration");
-      return true;
-    }
-    return false;
-  }
-  return true;
-} /* acquire_any_block() */
-
-void acquire_block_fsm::task_execute(void) {
+void cache_finisher_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-NS_END(controller, fordyca);
+NS_END(depth2, fsm, fordyca);

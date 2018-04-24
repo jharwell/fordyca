@@ -61,8 +61,7 @@ void output_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_metrics_parser
+  stream << build_header() << m_metrics_parser
          << XML_PARAM_STR(m_params, output_root) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
          << XML_PARAM_STR(m_params, log_fname) << std::endl

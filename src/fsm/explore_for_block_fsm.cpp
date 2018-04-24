@@ -25,8 +25,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -41,17 +41,14 @@ namespace kinematics = rcppsw::robotics::kinematics;
 explore_for_block_fsm::explore_for_block_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa)
-    : base_explore_fsm(server,
-                       saa,
-                       ST_MAX_STATES),
+    : base_explore_fsm(server, saa, ST_MAX_STATES),
       entry_explore(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      mc_state_map{
-          HFSM_STATE_MAP_ENTRY_EX(&start),
-              HFSM_STATE_MAP_ENTRY_EX(&explore),
-          HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
+                   HFSM_STATE_MAP_ENTRY_EX(&explore),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_block_fsm",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);

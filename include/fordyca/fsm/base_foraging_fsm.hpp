@@ -27,8 +27,8 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/new_direction_data.hpp"
-#include "rcppsw/patterns/state_machine/hfsm.hpp"
 #include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,10 +59,9 @@ NS_START(fsm);
 class base_foraging_fsm : public state_machine::hfsm,
                           public metrics::fsm::base_fsm_metrics {
  public:
-  base_foraging_fsm(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      uint8_t max_states);
+  base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                    const std::shared_ptr<controller::saa_subsystem>& saa,
+                    uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
 
@@ -83,10 +82,12 @@ class base_foraging_fsm : public state_machine::hfsm,
    * as tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(void) const;
+  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(
+      void) const;
   const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
 
-  const std::shared_ptr<const controller::actuation_subsystem> actuators(void) const;
+  const std::shared_ptr<const controller::actuation_subsystem> actuators(
+      void) const;
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
   /**
@@ -106,9 +107,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
 
-  controller::saa_subsystem* saa_subsystem(void) const {
-    return m_saa.get();
-  }
+  controller::saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
 
   /**
    * @brief Robots entering this state will return to the nest.

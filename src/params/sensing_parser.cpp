@@ -46,8 +46,8 @@ void sensing_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void sensing_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params.proximity, delta) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params.proximity, delta)
+         << std::endl
          << build_footer();
 } /* show() */
 

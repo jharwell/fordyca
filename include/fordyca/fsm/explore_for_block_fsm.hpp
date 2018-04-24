@@ -59,9 +59,8 @@ class explore_for_block_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_block_fsm(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa);
+  explore_for_block_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                        const std::shared_ptr<controller::saa_subsystem>& saa);
 
   /* taskable overrides */
   bool task_finished(void) const override {

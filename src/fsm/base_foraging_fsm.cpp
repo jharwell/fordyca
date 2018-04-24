@@ -27,8 +27,8 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 
 /*******************************************************************************
@@ -147,10 +147,9 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * overshoot. See #191.
    */
   actuators()->differential_drive().fsm_drive(
-          base_foraging_fsm::actuators()->differential_drive().max_speed() *
-              0.1,
-          (current_dir - m_new_dir),
-          std::make_pair(false, true));
+      base_foraging_fsm::actuators()->differential_drive().max_speed() * 0.1,
+      (current_dir - m_new_dir),
+      std::make_pair(false, true));
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
@@ -192,19 +191,23 @@ argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector
   return vector;
 } /* randomize_vector_angle() */
 
-const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) const {
+const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::
+    base_sensors(void) const {
   return m_saa->sensing();
 } /* base_sensors() */
 
-const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) {
+const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::
+    base_sensors(void) {
   return m_saa->sensing();
 } /* base_actuation() */
 
-const std::shared_ptr<const controller::actuation_subsystem> base_foraging_fsm::actuators(void) const {
+const std::shared_ptr<const controller::actuation_subsystem> base_foraging_fsm::
+    actuators(void) const {
   return m_saa->actuation();
 } /* actuators() */
 
-const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuators(void) {
+const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuators(
+    void) {
   return m_saa->actuation();
 } /* actuators() */
 

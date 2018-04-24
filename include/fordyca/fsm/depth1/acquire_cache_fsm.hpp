@@ -86,6 +86,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool is_exploring_for_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
+  bool cache_acquired(void) const override;
 
   /**
    * @brief Reset the FSM

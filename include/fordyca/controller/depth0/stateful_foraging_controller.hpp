@@ -72,7 +72,11 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  bool block_acquired(void) const;
+  /* block acquisition metrics */
+  bool block_acquired(void) const override;
+
+  /* block transport metrics */
+  bool is_transporting_to_nest(void) const override;
 
   /**
    * @brief Get the current task the controller is executing. For this
@@ -104,8 +108,6 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    * circle on the ground during simulation.
    */
   bool display_los(void) const { return m_display_los; }
-
-  bool is_transporting_to_nest(void) const override;
 
   const std::shared_ptr<const base_perception_subsystem> perception(void) const {
     return m_perception;

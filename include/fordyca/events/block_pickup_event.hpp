@@ -32,7 +32,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace fsm { namespace depth1 { class cached_block_to_nest_fsm; } }
+namespace fsm { namespace depth1 {
+class cached_block_to_nest_fsm;
+}} // namespace fsm::depth1
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth1 {
 class foraging_controller;

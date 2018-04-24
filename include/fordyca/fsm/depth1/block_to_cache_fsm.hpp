@@ -92,18 +92,17 @@ class block_to_cache_fsm : public base_foraging_fsm,
   bool is_exploring_for_block(void) const override;
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+  bool block_acquired(void) const override;
 
   /* cache acquisition metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
+  bool cache_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override { return false; }
   bool is_transporting_to_cache(void) const override;
-
-  bool cache_acquired(void) const;
-  bool block_acquired(void) const;
 
   /**
    * @brief Reset the FSM

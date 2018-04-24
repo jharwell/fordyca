@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/base_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "fordyca/params/pheromone_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +41,8 @@ NS_START(fordyca, params);
  * @ingroup params depth0
  */
 struct occupancy_grid_params : public rcppsw::params::base_params {
-  struct grid_params grid{};
-  struct pheromone_params pheromone{};
+  struct grid_params grid {};
+  struct pheromone_params pheromone {};
 };
 
 NS_END(params, fordyca);

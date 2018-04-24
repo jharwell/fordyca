@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
@@ -32,7 +33,6 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/harvester.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

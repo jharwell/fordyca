@@ -99,16 +99,17 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
 __pure bool acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-/*******************************************************************************
- * Depth1 Diagnostics
- ******************************************************************************/
+bool acquire_cache_fsm::cache_acquired(void) const {
+  return current_state() == ST_FINISHED;
+} /* cache_acquired() */
+
 bool acquire_cache_fsm::is_exploring_for_cache(void) const {
   return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.task_running());
 } /* is_exploring_for_cache() */

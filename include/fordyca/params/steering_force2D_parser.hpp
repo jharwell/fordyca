@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/robotics/steering2D/force_calculator_xml_parser.hpp"
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/steering_force2D_params.hpp"
 #include "fordyca/params/phototaxis_force_parser.hpp"
+#include "fordyca/params/steering_force2D_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/robotics/steering2D/force_calculator_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,9 +49,8 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class steering_force2D_parser : public steering::force_calculator_xml_parser {
  public:
-  explicit steering_force2D_parser(uint level) :
-      force_calculator_xml_parser(level),
-      m_phototaxis(level + 1) {}
+  explicit steering_force2D_parser(uint level)
+      : force_calculator_xml_parser(level), m_phototaxis(level + 1) {}
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;

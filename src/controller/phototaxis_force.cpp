@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/phototaxis_force.hpp"
-#include "fordyca/params/phototaxis_force_params.hpp"
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/params/phototaxis_force_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +49,7 @@ argos::CVector2 phototaxis_force::operator()() const {
     accum += argos::CVector2(r.Value, r.Angle);
   } /* for(r..) */
 
-  return argos::CVector2(1.0,
-                         accum.Angle()) * m_max;
+  return argos::CVector2(1.0, accum.Angle()) * m_max;
 } /* operator()() */
 
 NS_END(controller, fordyca);

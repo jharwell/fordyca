@@ -98,7 +98,7 @@ HFSM_STATE_DEFINE_ND(acquire_block_fsm, finished) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
 bool acquire_block_fsm::is_exploring_for_block(void) const {
   return (current_state() == ST_ACQUIRE_BLOCK && m_explore_fsm.task_running());
@@ -109,9 +109,6 @@ __pure bool acquire_block_fsm::is_avoiding_collision(void) const {
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-/*******************************************************************************
- * Depth0 Diagnostics
- ******************************************************************************/
 bool acquire_block_fsm::is_acquiring_block(void) const {
   return is_vectoring_to_block() || is_exploring_for_block();
 } /* is_acquiring_block() */
@@ -119,6 +116,10 @@ bool acquire_block_fsm::is_acquiring_block(void) const {
 bool acquire_block_fsm::is_vectoring_to_block(void) const {
   return current_state() == ST_ACQUIRE_BLOCK && m_vector_fsm.task_running();
 } /* is_vectoring_to_block() */
+
+bool acquire_block_fsm::block_acquired(void) const {
+  return ST_FINISHED == current_state();
+} /* block_acquired() */
 
 /*******************************************************************************
  * General Member Functions

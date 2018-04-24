@@ -110,7 +110,7 @@ __const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
 __pure bool cached_block_to_nest_fsm::is_avoiding_collision(void) const {
   return m_cache_fsm.is_avoiding_collision();
@@ -120,9 +120,6 @@ __pure bool cached_block_to_nest_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;
 } /* is_transporting_to_nest() */
 
-/*******************************************************************************
- * Depth1 Diagnostics
- ******************************************************************************/
 __pure bool cached_block_to_nest_fsm::is_exploring_for_cache(void) const {
   return m_cache_fsm.is_exploring_for_cache();
 } /* is_exploring_for_cache() */
@@ -135,13 +132,13 @@ __pure bool cached_block_to_nest_fsm::is_acquiring_cache(void) const {
   return m_cache_fsm.is_acquiring_cache();
 } /* is_acquiring_cache() */
 
+__pure bool cached_block_to_nest_fsm::cache_acquired(void) const {
+  return m_cache_fsm.cache_acquired();
+} /* cache_acquired() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-bool cached_block_to_nest_fsm::cache_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_PICKUP;
-} /* cache_acquired() */
-
 void cached_block_to_nest_fsm::init(void) {
   base_foraging_fsm::init();
   m_cache_fsm.task_reset();

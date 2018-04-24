@@ -59,8 +59,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 void metrics_parser::show(std::ostream& stream) const {
   stream << build_header();
   if (!m_parsed) {
-    stream << "<<  Not Parsed >>" << std::endl
-    << build_footer();
+    stream << "<<  Not Parsed >>" << std::endl << build_footer();
     return;
   }
   stream << XML_PARAM_STR(m_params, output_dir) << std::endl
