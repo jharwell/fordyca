@@ -64,6 +64,12 @@ class cache_acquisition_metrics : public base_fsm_metrics {
    * or by vectoring to a known one.
    */
   virtual bool is_acquiring_cache(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot has arrived at a cache, and is waiting
+   * for the simulation to send it the block pickup/drop signal.
+   */
+  virtual bool cache_acquired(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

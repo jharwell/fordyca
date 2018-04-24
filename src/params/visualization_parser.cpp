@@ -48,8 +48,7 @@ void visualization_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void visualization_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, robot_id) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, robot_id) << std::endl
          << XML_PARAM_STR(m_params, robot_los) << std::endl
          << XML_PARAM_STR(m_params, robot_task) << std::endl
          << XML_PARAM_STR(m_params, block_id) << std::endl

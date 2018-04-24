@@ -25,10 +25,10 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
@@ -92,17 +92,18 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize sensing and actuation subsystem */
   struct actuation_subsystem::actuator_list alist = {
-    .wheels = GetActuator<argos::CCI_DifferentialSteeringActuator>(
-        "differential_steering"),
-    .leds = GetActuator<argos::CCI_LEDsActuator>("leds"),
-    .raba = GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")
-  };
+      .wheels = GetActuator<argos::CCI_DifferentialSteeringActuator>(
+          "differential_steering"),
+      .leds = GetActuator<argos::CCI_LEDsActuator>("leds"),
+      .raba =
+          GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")};
   struct base_sensing_subsystem::sensor_list slist = {
-    .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-    .proximity = GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
-    .light = GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-    .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground")
-  };
+      .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+      .proximity =
+          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
+      .light = GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
+      .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
+          "footbot_motor_ground")};
   m_saa = std::make_shared<controller::saa_subsystem>(
       m_server,
       param_repo.parse_results<struct params::actuation_params>(),
@@ -148,7 +149,8 @@ void base_foraging_controller::output_init(
 } /* output_init() */
 
 std::string base_foraging_controller::log_header_calc(void) const {
-  return "[t=" + std::to_string(m_saa->sensing()->tick()) + "," + this->GetId() + "]";
+  return "[t=" + std::to_string(m_saa->sensing()->tick()) + "," +
+         this->GetId() + "]";
 } /* log_header_calc() */
 
 std::string base_foraging_controller::dbg_header_calc(void) const {

@@ -47,8 +47,7 @@ void occupancy_grid_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void occupancy_grid_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_grid_parser << m_pheromone_parser
+  stream << build_header() << m_grid_parser << m_pheromone_parser
          << build_footer();
 } /* show() */
 

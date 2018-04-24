@@ -61,16 +61,17 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   rcppsw::er::g_server->log_stream() << repo;
 
   /* initialize stat collecting */
-  auto* p_output =
-      repo.parse_results<const struct params::output_params>();
-  collector_group().register_collector<metrics::fsm::block_acquisition_metrics_collector>(
-      "fsm::block_acquisition",
-      metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
-      p_output->metrics.collect_interval);
-  collector_group().register_collector<metrics::fsm::block_transport_metrics_collector>(
-      "fsm::block_transport",
-      metrics_path() + "/" + p_output->metrics.block_transport_fname,
-      p_output->metrics.collect_interval);
+  auto* p_output = repo.parse_results<const struct params::output_params>();
+  collector_group()
+      .register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+          "fsm::block_acquisition",
+          metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
+          p_output->metrics.collect_interval);
+  collector_group()
+      .register_collector<metrics::fsm::block_transport_metrics_collector>(
+          "fsm::block_transport",
+          metrics_path() + "/" + p_output->metrics.block_transport_fname,
+          p_output->metrics.collect_interval);
   collector_group().reset_all();
 
   /* configure robots */
@@ -99,12 +100,14 @@ void stateful_foraging_loop_functions::pre_step_iter(
   collector_group().collect_from(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    collector_group().collect_from("fsm::block_acquisition",
-                                   static_cast<metrics::fsm::block_acquisition_metrics&>(
-                                       *controller.current_task()));
-    collector_group().collect_from("fsm::block_transport",
-                                   static_cast<metrics::fsm::block_transport_metrics&>(
-                                       *controller.current_task()));
+    collector_group().collect_from(
+        "fsm::block_acquisition",
+        static_cast<metrics::fsm::block_acquisition_metrics&>(
+            *controller.current_task()));
+    collector_group().collect_from(
+        "fsm::block_transport",
+        static_cast<metrics::fsm::block_transport_metrics&>(
+            *controller.current_task()));
   }
 
   /* Send the robot its new line of sight */

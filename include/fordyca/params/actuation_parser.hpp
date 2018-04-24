@@ -27,8 +27,8 @@
 #include <string>
 
 #include "fordyca/params/actuation_params.hpp"
-#include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
 #include "fordyca/params/throttling_parser.hpp"
+#include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
 
 #include "fordyca/params/steering_force2D_parser.hpp"
 

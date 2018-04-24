@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
 #include "fordyca/params/pheromone_parser.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,12 +47,12 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for \ref occupancy_grid into
  * \ref occupancy_grid_params.
  */
-class occupancy_grid_parser: public rcppsw::params::xml_param_parser {
+class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit occupancy_grid_parser(uint level):
-      xml_param_parser(level),
-      m_grid_parser(level + 1),
-      m_pheromone_parser(level + 1) {}
+  explicit occupancy_grid_parser(uint level)
+      : xml_param_parser(level),
+        m_grid_parser(level + 1),
+        m_pheromone_parser(level + 1) {}
 
   /**
    * @brief The root tag that all occupancy grid parameters should lie under in

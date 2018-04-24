@@ -32,8 +32,8 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/block_transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -104,7 +104,6 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
 
-
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
@@ -151,9 +150,9 @@ void stateless_foraging_loop_functions::pre_step_iter(
   /* get stats from this robot before its state changes */
   m_collector_group.collect_from(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect_from("fsm::block_acquisition",
-                                 static_cast<metrics::fsm::block_acquisition_metrics&>(
-                                     controller));
+  m_collector_group.collect_from(
+      "fsm::block_acquisition",
+      static_cast<metrics::fsm::block_acquisition_metrics&>(controller));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -191,10 +190,11 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   }
   fs::create_directories(m_metrics_path);
 
-  m_collector_group.register_collector<metrics::fsm::block_acquisition_metrics_collector>(
-      "fsm::block_acquisition",
-      m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
-      p_output->metrics.collect_interval);
+  m_collector_group
+      .register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+          "fsm::block_acquisition",
+          m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
+          p_output->metrics.collect_interval);
 
   m_collector_group.register_collector<metrics::block_transport_metrics_collector>(
       "block",
@@ -211,10 +211,8 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
-  auto* aparams =
-      repo.parse_results<struct params::arena_map_params>();
-  auto* vparams =
-      repo.parse_results<struct params::visualization_params>();
+  auto* aparams = repo.parse_results<struct params::arena_map_params>();
+  auto* vparams = repo.parse_results<struct params::visualization_params>();
 
   m_arena_map.reset(new representation::arena_map(aparams));
   m_arena_map->distribute_blocks();

@@ -51,8 +51,8 @@ void fsm_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << "nest_center=" << m_params.nest_center << std::endl
+  stream << build_header() << "nest_center=" << m_params.nest_center
+         << std::endl
          << build_footer();
 } /* show() */
 

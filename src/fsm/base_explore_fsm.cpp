@@ -28,8 +28,8 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,8 +43,7 @@ base_explore_fsm::base_explore_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
     uint8_t max_states)
-    : base_foraging_fsm(server, saa, max_states),
-      entry_explore() {
+    : base_foraging_fsm(server, saa, max_states), entry_explore() {
   insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -84,7 +83,8 @@ void base_explore_fsm::random_explore(void) {
      * This can be 0 if the wander force is not active this timestep.
      */
     if (force.Length() >= std::numeric_limits<double>::epsilon()) {
-      saa_subsystem()->steering_force().value(saa_subsystem()->steering_force().value() * 0.7);
+      saa_subsystem()->steering_force().value(
+          saa_subsystem()->steering_force().value() * 0.7);
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   }

@@ -77,18 +77,6 @@ class foraging_task
 
   explicit foraging_task(const std::string& name) : mc_name(name) {}
 
-  /**
-   * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the
-   * block pickup/block drop signal from the arena.
-   */
-  virtual bool cache_acquired(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block and is waiting for the
-   * block pickup signal from the arena.
-   */
-  virtual bool block_acquired(void) const = 0;
-
   std::string name(void) const { return mc_name; }
 
  private:

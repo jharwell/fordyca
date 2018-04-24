@@ -62,7 +62,8 @@ void nest_block_drop::visit(representation::arena_map& map) {
   m_block->accept(*this);
 } /* visit() */
 
-void nest_block_drop::visit(metrics::block_transport_metrics_collector& collector) {
+void nest_block_drop::visit(
+    metrics::block_transport_metrics_collector& collector) {
   collector.collect(*m_block);
 } /* visit() */
 
@@ -118,8 +119,8 @@ void nest_block_drop::visit(tasks::generalist& task) {
 } /* visit() */
 
 void nest_block_drop::visit(tasks::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-      task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {

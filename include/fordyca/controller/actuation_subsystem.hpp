@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/utility/datatypes/color.h>
 
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/controller/throttling_handler.hpp"
-#include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/footbot_differential_drive.hpp"
+#include "fordyca/controller/steering_force2D.hpp"
+#include "fordyca/controller/throttling_handler.hpp"
+#include "fordyca/params/actuation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,10 +74,9 @@ class actuation_subsystem {
    * @param list List of handles to actuator devices.
    * @param steering Handle for steering force calculator.
    */
-  actuation_subsystem(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const struct params::actuation_params* c_params,
-      struct actuator_list * list);
+  actuation_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+                      const struct params::actuation_params* c_params,
+                      struct actuator_list* list);
 
   /**
    * @brief Set the color of the robot's LEDs.
@@ -87,7 +86,9 @@ class actuation_subsystem {
   void leds_set_color(const argos::CColor& color);
 
   footbot_differential_drive& differential_drive(void) { return m_drive; }
-  const footbot_differential_drive& differential_drive(void) const { return m_drive; }
+  const footbot_differential_drive& differential_drive(void) const {
+    return m_drive;
+  }
 
   /**
    * @brief Set whether or not temporary throttling of overall maximum speed is

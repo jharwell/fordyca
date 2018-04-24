@@ -46,8 +46,7 @@ void phototaxis_force_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void phototaxis_force_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, max) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, max) << std::endl
          << build_footer();
 } /* show() */
 

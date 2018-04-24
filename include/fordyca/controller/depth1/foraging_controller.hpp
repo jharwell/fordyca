@@ -77,26 +77,6 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool is_transporting_to_nest(void) const override;
 
   /**
-   * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has
-   * arrived to one via some mechanism.
-   *
-   * This state corresponds to one of the FSMs within the controller waiting for
-   * a signal from the simulation that in order to move to the next stage of its
-   * task.
-   */
-  bool cache_acquired(void) const;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block, meaning that it has
-   * arrived to one via some mechanism.
-   *
-   * This state corresponds to one of the FSMs within the controller waiting for
-   * a signal from the simulation that in order to move to the next stage of its
-   * task.
-   */
-  bool block_acquired(void) const;
-
-  /**
    * @brief Set whether or not a robot is supposed to display the task it is
    * currently working on above itself during simulation.
    */

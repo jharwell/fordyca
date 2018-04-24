@@ -113,14 +113,14 @@
            />
       <metrics
           output_dir="metrics"
-          stateless_fname="stateless-stats.csv"
-          stateful_fname="stateful-stats.csv"
-          depth1_fname="depth1-stats.csv"
-          block_fname="block-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
           distance_fname="distance-stats.csv"
+          block_fname="block-stats.csv"
+          cache_fname="cache-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
-          cache_fname="cache-stats.csv"
           collect_interval="1000"
           />
     </output>

@@ -28,8 +28,8 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,10 +50,7 @@ explore_for_cache_fsm::explore_for_cache_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
-          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore,
-                                      nullptr,
-                                      &entry_explore,
-                                      nullptr),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
           HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   insmod("explore_for_cache_fsm",
          rcppsw::er::er_lvl::DIAG,

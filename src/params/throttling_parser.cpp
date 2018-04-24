@@ -46,8 +46,7 @@ void throttling_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void throttling_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, block_carry) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, block_carry) << std::endl
          << build_footer();
 } /* show() */
 

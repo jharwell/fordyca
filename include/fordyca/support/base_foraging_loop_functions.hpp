@@ -108,9 +108,10 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * otherwise.
    */
   template <typename T>
-  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
-                              representation::arena_map& map,
-                              metrics::block_transport_metrics_collector& collector) {
+  bool handle_nest_block_drop(
+      argos::CFootBotEntity& robot,
+      representation::arena_map& map,
+      metrics::block_transport_metrics_collector& collector) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {

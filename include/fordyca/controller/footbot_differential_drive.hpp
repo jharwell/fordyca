@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
+#include "fordyca/controller/throttling_handler.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive.hpp"
-#include "fordyca/controller/throttling_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,7 +59,8 @@ class footbot_differential_drive : public kinematics2D::differential_drive {
         m_wheels(wheels) {}
 
   footbot_differential_drive(const footbot_differential_drive& fsm) = delete;
-  footbot_differential_drive& operator=(const footbot_differential_drive& fsm) = delete;
+  footbot_differential_drive& operator=(const footbot_differential_drive& fsm) =
+      delete;
 
   void set_wheel_speeds(double left, double right) override {
     m_wheels->SetLinearVelocity((1.0 - mc_throttling.block_carry()) * left,

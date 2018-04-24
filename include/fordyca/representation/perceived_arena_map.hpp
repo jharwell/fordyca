@@ -39,7 +39,9 @@ class server;
 }} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params { struct occupancy_grid_params;}
+namespace params {
+struct occupancy_grid_params;
+}
 
 NS_START(representation);
 class line_of_sight;

@@ -29,12 +29,13 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
@@ -42,7 +43,6 @@
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/harvester.hpp"
@@ -171,20 +171,6 @@ void foraging_controller::Init(ticpp::Element& node) {
 __pure tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
-
-bool foraging_controller::cache_acquired(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->cache_acquired();
-  }
-  return false;
-} /* cache_detected() */
-
-bool foraging_controller::block_acquired(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->block_acquired();
-  }
-  return false;
-} /* block_detected() */
 
 bool foraging_controller::is_transporting_to_nest(void) const {
   if (nullptr != current_task()) {

@@ -50,8 +50,9 @@ representation::perceived_block block_selector::calc_best(
 
   ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto& b : blocks) {
-    double utility = math::block_utility(b.ent->real_loc(), m_nest_loc)
-                     (robot_loc, b.density.last_result());
+    double utility =
+        math::block_utility(b.ent->real_loc(),
+                            m_nest_loc)(robot_loc, b.density.last_result());
 
     ER_DIAG("Utility for block%d loc=(%zu, %zu), density=%f: %f",
             b.ent->id(),

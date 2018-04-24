@@ -75,20 +75,17 @@ class acquire_block_fsm : public base_foraging_fsm,
                           public metrics::fsm::block_acquisition_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
-  acquire_block_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      std::shared_ptr<representation::perceived_arena_map> map);
+  acquire_block_fsm(const struct params::fsm_params* params,
+                    const std::shared_ptr<rcppsw::er::server>& server,
+                    const std::shared_ptr<controller::saa_subsystem>& saa,
+                    std::shared_ptr<representation::perceived_arena_map> map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
-  }
+  bool task_finished(void) const override { return block_acquired(); }
   void task_reset(void) override { init(); }
   void task_start(
       const rcppsw::task_allocation::taskable_argument* const) override {}
@@ -103,6 +100,7 @@ class acquire_block_fsm : public base_foraging_fsm,
   bool is_exploring_for_block(void) const override;
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+  bool block_acquired(void) const override;
 
   /**
    * @brief Reset the FSM

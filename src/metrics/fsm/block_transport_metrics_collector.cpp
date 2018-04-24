@@ -65,8 +65,7 @@ void block_transport_metrics_collector::collect(
       static_cast<uint>(m.is_transporting_to_nest());
   m_stats.n_transporting_to_cache +=
       static_cast<uint>(m.is_transporting_to_cache());
-  m_stats.n_avoiding_collision +=
-      static_cast<uint>(m.is_avoiding_collision());
+  m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
 
   m_stats.n_cum_transporting_to_nest +=
       static_cast<uint>(m.is_transporting_to_nest());

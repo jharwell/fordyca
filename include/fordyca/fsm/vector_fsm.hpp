@@ -182,9 +182,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm,
-                     new_direction,
-                     state_machine::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
 
   /* vector states */

@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,12 +57,12 @@ stateful_foraging_fsm::stateful_foraging_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
-                                  nullptr,
-                                  &entry_transport_to_nest,
-                                  nullptr),
-      HFSM_STATE_MAP_ENTRY_EX(&leaving_nest),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                                               nullptr,
+                                               &entry_transport_to_nest,
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX(&leaving_nest),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 

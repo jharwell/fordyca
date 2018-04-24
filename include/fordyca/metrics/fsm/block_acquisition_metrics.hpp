@@ -63,6 +63,12 @@ class block_acquisition_metrics : public base_fsm_metrics {
    * vectoring via the \ref vector_fsm.
    */
   virtual bool is_vectoring_to_block(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot has arrived at a block, and is waiting
+   * for the simulation to send it the block pickup signal.
+   */
+  virtual bool block_acquired(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

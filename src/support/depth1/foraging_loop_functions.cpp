@@ -28,11 +28,11 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/metrics/cache_metrics_collector.hpp"
 #include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/cache_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
@@ -65,8 +65,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   cache_handling_init(arenap);
 
   /* initialize stat collecting */
-  metric_collecting_init(
-      repo.parse_results<struct params::output_params>());
+  metric_collecting_init(repo.parse_results<struct params::output_params>());
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -82,8 +81,8 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(repo.parse_results<params::visualization_params>()
-                            ->robot_task);
+    controller.display_task(
+        repo.parse_results<params::visualization_params>()->robot_task);
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -100,15 +99,18 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       static_cast<rcppsw::metrics::tasks::management_metrics&>(controller));
 
   if (nullptr != controller.current_task()) {
-    collector_group().collect_from("fsm::block_acquisition",
-                                   static_cast<metrics::fsm::block_acquisition_metrics&>(
-                                       *controller.current_task()));
-    collector_group().collect_from("fsm::block_transport",
-                                   static_cast<metrics::fsm::block_transport_metrics&>(
-                                       *controller.current_task()));
-    collector_group().collect_from("fsm::cache_acquisition",
-                                   static_cast<metrics::fsm::cache_acquisition_metrics&>(
-                                       *controller.current_task()));
+    collector_group().collect_from(
+        "fsm::block_acquisition",
+        static_cast<metrics::fsm::block_acquisition_metrics&>(
+            *controller.current_task()));
+    collector_group().collect_from(
+        "fsm::block_transport",
+        static_cast<metrics::fsm::block_transport_metrics&>(
+            *controller.current_task()));
+    collector_group().collect_from(
+        "fsm::cache_acquisition",
+        static_cast<metrics::fsm::cache_acquisition_metrics&>(
+            *controller.current_task()));
     collector_group().collect_from(
         "tasks::execution",
         static_cast<rcppsw::metrics::tasks::execution_metrics&>(
@@ -229,10 +231,11 @@ void foraging_loop_functions::cache_handling_init(
 
 void foraging_loop_functions::metric_collecting_init(
     const struct params::output_params* output_p) {
-  collector_group().register_collector<metrics::fsm::cache_acquisition_metrics_collector>(
-      "fsm::cache_acquisition",
-      metrics_path() + "/" + output_p->metrics.cache_acquisition_fname,
-      output_p->metrics.collect_interval);
+  collector_group()
+      .register_collector<metrics::fsm::cache_acquisition_metrics_collector>(
+          "fsm::cache_acquisition",
+          metrics_path() + "/" + output_p->metrics.cache_acquisition_fname,
+          output_p->metrics.collect_interval);
 
   collector_group()
       .register_collector<metrics::tasks::execution_metrics_collector>(

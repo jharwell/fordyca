@@ -52,7 +52,7 @@ struct proximity_params {
  * @ingroup params
  */
 struct sensing_params : public rcppsw::params::base_params {
-  struct proximity_params proximity{};
+  struct proximity_params proximity {};
 };
 
 NS_END(params, fordyca);

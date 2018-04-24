@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
@@ -36,7 +37,6 @@
 #include "fordyca/tasks/foraging_task.hpp"
 #include "fordyca/tasks/generalist.hpp"
 #include "fordyca/tasks/harvester.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

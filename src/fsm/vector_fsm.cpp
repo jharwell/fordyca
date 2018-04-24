@@ -25,8 +25,8 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/footbot_differential_drive.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,9 +37,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_fsm::vector_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
+vector_fsm::vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                       const std::shared_ptr<controller::saa_subsystem>& saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
@@ -92,13 +91,13 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
       argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-    ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
-            obs.GetX(),
-            obs.GetY(),
-            obs.Angle().GetValue(),
-            obs.Length());
-    saa_subsystem()->steering_force().avoidance(obs);
-    saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+      ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
+              obs.GetX(),
+              obs.GetY(),
+              obs.Angle().GetValue(),
+              obs.Length());
+      saa_subsystem()->steering_force().avoidance(obs);
+      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
     m_state.last_collision_time = base_sensors()->tick();

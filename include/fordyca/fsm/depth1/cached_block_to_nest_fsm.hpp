@@ -109,23 +109,11 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   bool is_exploring_for_cache(void) const override;
   bool is_acquiring_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
+  bool cache_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
   bool is_transporting_to_cache(void) const override { return false; }
-
-  /**
-   * @brief If \c TRUE, the robot has acquired (i.e. is sitting on top of) a
-   * cache, and is waiting for the simulation to send it the block pickup
-   * signal.
-   */
-  bool cache_acquired(void) const;
-
-  /* @brief If \c TRUE, the robot has acquired (i.e. is sitting on top of) a
-   * block, and is waiting for the simulation to send it the block pickup
-   * signal.
-   */
-  bool block_acquired(void) const;
 
   /**
    * @brief Reset the FSM

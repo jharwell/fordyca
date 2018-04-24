@@ -26,11 +26,10 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-
-#include "fordyca/fsm/base_foraging_fsm.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
+#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,14 +50,14 @@ NS_START(fsm, depth2);
  * @class cache_finisher_fsm
  * @ingroup fsm depth2
  *
- * @brief The FSM for a cache starter task. Each robot executing this
+ * @brief The FSM for a cache finisher task. Each robot executing this
  * FSM will locate for a block (either a known block or via random exploration),
  * pickup the block and then bring it to ANOTHER block (either a known block or
  * one found via random exploration) and drop it to create a new cache.
  */
 class cache_finisher_fsm : public base_foraging_fsm,
-                           public metrics::fsm::stateless_metrics,
-                           public metrics::fsm::stateful_metrics,
+                           public metrics::fsm::block_acquisition_metrics,
+                           public metrics::fsm::cache_acquisition_metrics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<depth2::cache_finisher_fsm> {
  public:
@@ -75,20 +74,20 @@ class cache_finisher_fsm : public base_foraging_fsm,
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
 
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
 
-  /* stateful metrics */
+  /* block acquisition metrics */
+  bool is_exploring_for_block(void) const override;
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+  bool block_acquired(void) const override;
 
-  /**
-   * @brief If \c TRUE, then the robot has arrived at a block, and is waiting
-   * for the simulation to send it the block pickup signal.
-   */
-  bool block_acquired(void) const;
+  /* cache acquisition metrics */
+  bool is_exploring_for_cache(void) const override;
+  bool is_acquiring_cache(void) const override;
+  bool is_vectoring_to_cache(void) const override;
+  bool cache_acquired(void) const override;
 
   /**
    * @brief Reset the FSM.
@@ -98,15 +97,10 @@ class cache_finisher_fsm : public base_foraging_fsm,
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_BLOCK,     /* superstate for finding a block */
-    /**
-     * @brief State robots wait in after acquiring a block for the simulation to
-     * send them the block pickup signal. Having this extra state solves a lot
-     * of handshaking/off by one issues regarding the timing of doing so.
-     */
-    ST_WAIT_FOR_PICKUP,
-    ST_TRANSPORT_TO_NEST, /* take block to nest */
-    ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
+    ST_ACQUIRE_BLOCK,         /* superstate for finding a block */
+    ST_WAIT_FOR_BLOCK_PICKUP, /* wait for block pickup signal */
+    ST_ACQUIRE_NEW_CACHE,    /* superstate for finding a new cache */
+    ST_WAIT_FOR_BLOCK_DROP,  /* wait for block drop signal go */
     ST_FINISHED,
     ST_MAX_STATES
   };
@@ -126,19 +120,18 @@ class cache_finisher_fsm : public base_foraging_fsm,
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     state_machine::event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
-                     state_machine::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* depth2 foraging states */
-  HFSM_STATE_DECLARE(cache_finisher_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(cache_finisher_fsm, start);
   HFSM_STATE_DECLARE_ND(cache_finisher_fsm, acquire_block);
   HFSM_STATE_DECLARE(cache_finisher_fsm,
-                     wait_for_pickup,
+                     wait_for_block_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(cache_finisher_fsm,
+                        acquire_new_cache);
+  HFSM_STATE_DECLARE(cache_finisher_fsm,
+                     wait_for_block_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cache_finisher_fsm, finished);
 
@@ -153,9 +146,10 @@ class cache_finisher_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint              m_pickup_count{0};
-  bool              m_task_running{false};
-  acquire_block_fsm m_block_fsm;
+  bool                      m_task_running{false};
+  uint                      m_pickup_count{0};
+  acquire_block_fsm         m_block_fsm;
+  depth1::acquire_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
