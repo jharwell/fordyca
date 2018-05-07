@@ -56,7 +56,7 @@ acquire_cache_fsm::acquire_cache_fsm(
       exit_acquire_cache(),
       mc_nest_center(params->nest_center),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_map(std::move(map)),
+      mc_map(std::move(map)),
       m_server(server),
       m_vector_fsm(server, saa),
       m_explore_fsm(server, saa),
@@ -183,6 +183,35 @@ bool acquire_cache_fsm::acquire_known_cache(
   return false;
 } /* acquire_known_cache() */
 
+argos::CVector2 acquire_cache_fsm::select_cache_for_acquisition(void) {
+  controller::depth1::existing_cache_selector selector(m_server,
+                                                       mc_nest_center);
+  representation::perceived_cache best =
+      selector.calc_best(mc_map->perceived_caches(), base_sensors()->position());
+  ER_NOM("Select cache for acquisition: %d@(%zu, %zu) [utility=%f]",
+         best.ent->id(),
+         best.ent->discrete_loc().first,
+         best.ent->discrete_loc().second,
+         best.density.last_result());
+  return best.ent->real_loc();
+} /* select_cache_for_acquisition() */
+
+bool acquire_cache_fsm::acquire_unknown_cache(void) {
+  if (!m_explore_fsm.task_running()) {
+    m_explore_fsm.task_reset();
+    m_explore_fsm.task_start(nullptr);
+  }
+  m_explore_fsm.task_execute();
+  if (m_explore_fsm.task_finished()) {
+    const auto& sensors =
+        std::static_pointer_cast<depth1::sensing_subsystem>(base_sensors());
+    ER_ASSERT(sensors->cache_detected(),
+              "FATAL: No cache detected after successful exploration");
+    return true;
+  }
+  return false;
+} /* acquire_unknown_cache() */
+
 bool acquire_cache_fsm::acquire_any_cache(void) {
   /*
    * If we know of ANY caches in the arena, go to the location of the best one
@@ -190,25 +219,13 @@ bool acquire_cache_fsm::acquire_any_cache(void) {
    * exploration we find one through our LOS, then stop exploring and go vector
    * to it.
    */
-  if (!acquire_known_cache(m_map->perceived_caches())) {
+  if (!acquire_known_cache(mc_map->perceived_caches())) {
     if (m_vector_fsm.task_running()) {
       return false;
     }
 
     /* try again--someone beat us to our chosen cache */
-    if (!m_explore_fsm.task_running()) {
-      m_explore_fsm.task_reset();
-      m_explore_fsm.task_start(nullptr);
-    }
-    m_explore_fsm.task_execute();
-    if (m_explore_fsm.task_finished()) {
-      const auto& sensors =
-          std::static_pointer_cast<depth1::sensing_subsystem>(base_sensors());
-      ER_ASSERT(sensors->cache_detected(),
-                "FATAL: No cache detected after successful exploration");
-      return true;
-    }
-    return false;
+    return acquire_unknown_cache();
   }
   return true;
 } /* acquire_any_cache() */

@@ -29,7 +29,7 @@
 #include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
+#include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -146,10 +146,10 @@ class cache_finisher_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  bool                      m_task_running{false};
-  uint                      m_pickup_count{0};
-  acquire_block_fsm         m_block_fsm;
-  depth1::acquire_cache_fsm m_cache_fsm;
+  bool                  m_task_running{false};
+  uint                  m_pickup_count{0};
+  acquire_block_fsm     m_block_fsm;
+  acquire_new_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
