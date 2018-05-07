@@ -101,13 +101,33 @@ class acquire_cache_fsm : public base_foraging_fsm,
     ST_MAX_STATES
   };
 
+  /**
+   * @brief Get the cache location corresponding to the "best" cache (by some
+   * measure), for use in vectoring.
+   *
+   * @return The location of the "best" cache to acquire
+   */
+  virtual argos::CVector2 select_cache_for_acquisition(void);
+
+  argos::CVector2 nest_center(void) const { return mc_nest_center; }
+  std::shared_ptr<const representation::perceived_arena_map> map(void) const {
+    return mc_map;
+  }
+
  private:
   /**
    * @brief Acquire a known cache or discover one via random exploration.
    *
-   * @return TRUE if a block has been acquired, FALSE otherwise.
+   * @return \c TRUE if a cache has been acquired, \c FALSE otherwise.
    */
   bool acquire_any_cache(void);
+
+  /**
+   * @brief Acquire an unknown cache via exploration.
+   *
+   * @return \c TRUE if a cache has been acquired \c FALSE otherwise.
+   */
+  bool acquire_unknown_cache(void);
 
   /**
    * @brief Acquire a known cache. If the robot's knowledge of the chosen
@@ -119,7 +139,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * acquiring a cache, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
+  bool acquire_known_cache(
+      std::list<representation::perceived_cache> caches);
 
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);
@@ -140,7 +161,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
   // clang-format off
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;
-  std::shared_ptr<const representation::perceived_arena_map> m_map;
+  std::shared_ptr<const representation::perceived_arena_map> mc_map;
   std::shared_ptr<rcppsw::er::server>                        m_server;
   vector_fsm                                                 m_vector_fsm;
   explore_for_cache_fsm                                      m_explore_fsm;
