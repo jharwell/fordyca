@@ -45,8 +45,8 @@ phototaxis_force::phototaxis_force(
 argos::CVector2 phototaxis_force::operator()() const {
   argos::CVector2 accum;
 
-  for (auto& r : m_sensors->light()->GetReadings()) {
-    accum += argos::CVector2(r.Value, r.Angle);
+  for (auto& r : m_sensors->light().readings()) {
+    accum += argos::CVector2(r.value, argos::CRadians(r.angle));
   } /* for(r..) */
 
   return argos::CVector2(1.0, accum.Angle()) * m_max;

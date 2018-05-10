@@ -77,6 +77,9 @@ class cache_penalty_handler : public rcppsw::er::client {
   template<typename T>
   bool penalty_init(T& controller,
                     uint timestep) {
+    if (nullptr == controller.current_task()) {
+      return false;
+    }
     if (controller.current_task()->cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);

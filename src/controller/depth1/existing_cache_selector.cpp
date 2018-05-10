@@ -53,6 +53,21 @@ representation::perceived_cache existing_cache_selector::calc_best(
 
   double max_utility = 0.0;
   for (auto& c : existing_caches) {
+    /**
+     * If a robot is currently IN a cache, and wants to pick up from/drop
+     * into a cache, it should generally ignored the cache it is currently in,
+     * otherwise you have the potential for a robot to endlessly pick up from
+     * a cache, drop in the same cache ad infinitum.
+     *
+     * This threshold prevents that behavior, forcing robots to at least LEAVE
+     * the cache, even if they will then immediately return to it.
+     */
+    if ((robot_loc - c.ent->real_loc()).Length() <=
+        std::max(c.ent->xsize(), c.ent->ysize())) {
+      ER_WARN("Ignoring cache%d in search: robot currently inside it",
+              c.ent->id());
+      continue;
+    }
     math::existing_cache_utility u(c.ent->real_loc(), m_nest_loc);
 
     double utility =

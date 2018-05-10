@@ -25,6 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 
 #include "rcppsw/common/common.hpp"
 
@@ -33,9 +36,6 @@
  ******************************************************************************/
 namespace argos {
 class CCI_RangeAndBearingSensor;
-class CCI_FootBotProximitySensor;
-class CCI_FootBotLightSensor;
-class CCI_FootBotMotorGroundSensor;
 } // namespace argos
 
 NS_START(fordyca);
@@ -45,6 +45,7 @@ struct sensing_params;
 }
 
 NS_START(controller);
+namespace hal = rcppsw::robotics::hal;
 
 /*******************************************************************************
  * Class Definitions
@@ -61,9 +62,9 @@ class base_sensing_subsystem {
  public:
   struct sensor_list {
     argos::CCI_RangeAndBearingSensor* rabs;
-    argos::CCI_FootBotProximitySensor* proximity;
-    argos::CCI_FootBotLightSensor* light;
-    argos::CCI_FootBotMotorGroundSensor* ground;
+    hal::sensors::proximity_sensor proximity;
+    hal::sensors::light_sensor light;
+    hal::sensors::ground_sensor ground;
   };
 
   /**
@@ -81,11 +82,13 @@ class base_sensing_subsystem {
   const sensor_list& sensor_list(void) const { return m_sensors; }
 
   argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_sensors.rabs; }
-  argos::CCI_FootBotProximitySensor* proximity(void) const {
+  const hal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }
-  argos::CCI_FootBotLightSensor* light(void) const { return m_sensors.light; }
-  argos::CCI_FootBotMotorGroundSensor* ground(void) const {
+  const hal::sensors::light_sensor& light(void) const {
+    return m_sensors.light;
+  }
+  const hal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
 

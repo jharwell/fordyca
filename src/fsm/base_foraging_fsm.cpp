@@ -36,6 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace utils = rcppsw::utils;
 using controller::steering_force_type;
 
 /*******************************************************************************
@@ -164,16 +165,16 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
-  m_saa->actuation()->leds_set_color(argos::CColor::WHITE);
+  m_saa->actuation()->leds_set_color(utils::color::kWHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
-  m_saa->actuation()->leds_set_color(argos::CColor::GREEN);
+  m_saa->actuation()->leds_set_color(utils::color::kGREEN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
-  actuators()->leds_set_color(argos::CColor::CYAN);
+  actuators()->leds_set_color(utils::color::kCYAN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
-  actuators()->leds_set_color(argos::CColor::WHITE);
+  actuators()->leds_set_color(utils::color::kWHITE);
 }
 
 /*******************************************************************************
