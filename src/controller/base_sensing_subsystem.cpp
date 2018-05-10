@@ -26,7 +26,6 @@
 
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include "fordyca/params/sensing_params.hpp"
@@ -52,8 +51,8 @@ base_sensing_subsystem::base_sensing_subsystem(
  * Member Functions
  ******************************************************************************/
 bool base_sensing_subsystem::in_nest(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      m_sensors.ground->GetReadings();
+  std::vector<hal::sensors::ground_sensor::reading> readings =
+      m_sensors.ground.readings();
   /*
    * The nest is a relatively light gray, so the sensors will return something
    * in the range specified below.
@@ -62,10 +61,10 @@ bool base_sensing_subsystem::in_nest(void) {
    * is on a black area.
    */
   int sum = 0;
-  sum += static_cast<int>(readings[0].Value > 0.60 && readings[0].Value < 0.80);
-  sum += static_cast<int>(readings[1].Value > 0.60 && readings[1].Value < 0.80);
-  sum += static_cast<int>(readings[2].Value > 0.60 && readings[2].Value < 0.80);
-  sum += static_cast<int>(readings[3].Value > 0.60 && readings[3].Value < 0.80);
+  sum += static_cast<int>(readings[0].value > 0.60 && readings[0].value < 0.80);
+  sum += static_cast<int>(readings[1].value > 0.60 && readings[1].value < 0.80);
+  sum += static_cast<int>(readings[2].value > 0.60 && readings[2].value < 0.80);
+  sum += static_cast<int>(readings[3].value > 0.60 && readings[3].value < 0.80);
 
   return sum >= 3;
 } /* in_nest() */
@@ -82,8 +81,8 @@ argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
   std::pair<argos::CVector2, bool> res;
   argos::CVector2 closest(0, 0);
 
-  for (auto& r : m_sensors.proximity->GetReadings()) {
-    argos::CVector2 obstacle(r.Value, r.Angle);
+  for (auto& r : m_sensors.proximity.readings()) {
+    argos::CVector2 obstacle(r.value, argos::CRadians(r.angle));
     if (obstacle_is_threatening(obstacle)) {
       if ((position() - obstacle).Length() < closest.Length() ||
           closest.Length() <= std::numeric_limits<double>::epsilon()) {
@@ -99,8 +98,8 @@ bool base_sensing_subsystem::threatening_obstacle_exists(void) const {
 } /* threatening_obstacle_exists() */
 
 bool base_sensing_subsystem::block_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      m_sensors.ground->GetReadings();
+  std::vector<hal::sensors::ground_sensor::reading> readings =
+      m_sensors.ground.readings();
   int sum = 0;
 
   /*
@@ -113,10 +112,10 @@ bool base_sensing_subsystem::block_detected(void) {
    *
    * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
-  sum += static_cast<int>(readings[0].Value < 0.05);
-  sum += static_cast<int>(readings[1].Value < 0.05);
-  sum += static_cast<int>(readings[2].Value < 0.05);
-  sum += static_cast<int>(readings[3].Value < 0.05);
+  sum += static_cast<int>(readings[0].value < 0.05);
+  sum += static_cast<int>(readings[1].value < 0.05);
+  sum += static_cast<int>(readings[2].value < 0.05);
+  sum += static_cast<int>(readings[3].value < 0.05);
 
   return 4 == sum;
 } /* block_detected() */

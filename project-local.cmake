@@ -51,3 +51,7 @@ target_link_libraries(${target}
   Qt5::Core
   Qt5::Gui
   )
+
+if ("${WITH_HAL_CONFIG}" MATCHES "argos-footbot")
+  target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
+endif()

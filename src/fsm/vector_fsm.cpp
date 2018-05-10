@@ -25,14 +25,15 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/footbot_differential_drive.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/throttling_differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -153,7 +154,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else {
     saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
-    saa_subsystem()->actuation()->leds_set_color(argos::CColor::BLUE);
+    saa_subsystem()->actuation()->leds_set_color(utils::color::kBLUE);
     saa_subsystem()->apply_steering_force(std::make_pair(true, false));
   }
   return controller::foraging_signal::HANDLED;
@@ -171,15 +172,15 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DIAG("Entering ST_VECTOR");
-  actuators()->leds_set_color(argos::CColor::BLUE);
+  actuators()->leds_set_color(utils::color::kBLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  actuators()->leds_set_color(argos::CColor::RED);
+  actuators()->leds_set_color(utils::color::kRED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
-  actuators()->leds_set_color(argos::CColor::YELLOW);
+  actuators()->leds_set_color(utils::color::kYELLOW);
 }
 /*******************************************************************************
  * General Member Functions

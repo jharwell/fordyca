@@ -1,5 +1,5 @@
 /**
- * @file cache_finisher_fsm.cpp
+ * @file cache_transferer_fsm.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth2/cache_finisher_fsm.hpp"
+#include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
@@ -43,7 +43,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-cache_finisher_fsm::cache_finisher_fsm(
+cache_transferer_fsm::cache_transferer_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
@@ -51,65 +51,57 @@ cache_finisher_fsm::cache_finisher_fsm(
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_src_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(acquire_new_cache, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(acquire_dest_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_block_fsm(params, server, saa, map),
       m_cache_fsm(params, server, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-                   HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_src_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&acquire_new_cache),
+                   HFSM_STATE_MAP_ENTRY_EX(&acquire_dest_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  client::insmod("cache_finisher_fsm",
+  client::insmod("cache_transferer_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
 }
 
-HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
-  internal_event(ST_ACQUIRE_BLOCK);
+HFSM_STATE_DEFINE_ND(cache_transferer_fsm, start) {
+  internal_event(ST_ACQUIRE_SRC_CACHE);
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_block) {
-  ER_DIAG("Executing ST_ACQUIRE_BLOCK");
-  if (m_block_fsm.task_finished()) {
+HFSM_STATE_DEFINE_ND(cache_transferer_fsm, acquire_src_cache) {
+  ER_DIAG("Executing ST_ACQUIRE_SRC_CACHE");
+  if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
-    m_block_fsm.task_execute();
+    m_cache_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(cache_finisher_fsm,
+HFSM_STATE_DEFINE(cache_transferer_fsm,
                   wait_for_block_pickup,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    m_block_fsm.task_reset();
-    m_pickup_count = 0;
-    internal_event(ST_ACQUIRE_NEW_CACHE);
-  }
-  ++m_pickup_count;
-  if (m_pickup_count >= kPICKUP_TIMEOUT) {
-    m_pickup_count = 0;
-    m_block_fsm.task_reset();
-    internal_event(ST_ACQUIRE_BLOCK);
+    m_cache_fsm.task_reset();
+    internal_event(ST_ACQUIRE_DEST_CACHE);
   }
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_new_cache) {
-  ER_DIAG("Executing ST_ACQUIRE_NEW_CACHE");
+HFSM_STATE_DEFINE_ND(cache_transferer_fsm, acquire_dest_cache) {
+  ER_DIAG("Executing ST_ACQUIRE_DEST_CACHE");
   if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_DROP);
@@ -119,7 +111,7 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_new_cache) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(cache_finisher_fsm,
+HFSM_STATE_DEFINE(cache_transferer_fsm,
                   wait_for_block_drop,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
@@ -129,7 +121,7 @@ HFSM_STATE_DEFINE(cache_finisher_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
+HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
@@ -139,53 +131,35 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-__pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
-  return m_block_fsm.is_avoiding_collision() ||
-         m_cache_fsm.is_avoiding_collision();
+__pure bool cache_transferer_fsm::is_avoiding_collision(void) const {
+  return m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool cache_finisher_fsm::is_exploring_for_block(void) const {
-  return m_block_fsm.is_exploring_for_block();
-} /* is_exploring_for_block() */
-
-bool cache_finisher_fsm::is_acquiring_block(void) const {
-  return m_block_fsm.is_acquiring_block();
-} /* is_acquiring_block() */
-
-bool cache_finisher_fsm::is_vectoring_to_block(void) const {
-  return m_block_fsm.is_vectoring_to_block();
-} /* is_vectoring_to_block() */
-
-bool cache_finisher_fsm::block_acquired(void) const {
-  return m_block_fsm.block_acquired();
-} /* block_acquired() */
-
-bool cache_finisher_fsm::is_exploring_for_cache(void) const {
+bool cache_transferer_fsm::is_exploring_for_cache(void) const {
   return m_cache_fsm.is_exploring_for_cache();
 } /* is_exploring_for_cache() */
 
-bool cache_finisher_fsm::is_acquiring_cache(void) const {
+bool cache_transferer_fsm::is_acquiring_cache(void) const {
   return m_cache_fsm.is_acquiring_cache();
 } /* is_acquiring_cache() */
 
-bool cache_finisher_fsm::is_vectoring_to_cache(void) const {
+bool cache_transferer_fsm::is_vectoring_to_cache(void) const {
   return m_cache_fsm.is_vectoring_to_cache();
 } /* is_vectoring_to_cache() */
 
-bool cache_finisher_fsm::cache_acquired(void) const {
+bool cache_transferer_fsm::cache_acquired(void) const {
   return m_cache_fsm.cache_acquired();
 } /* cache_acquired() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void cache_finisher_fsm::init(void) {
+void cache_transferer_fsm::init(void) {
   base_foraging_fsm::init();
-  m_block_fsm.task_reset();
   m_cache_fsm.task_reset();
 } /* init() */
 
-void cache_finisher_fsm::task_execute(void) {
+void cache_transferer_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */

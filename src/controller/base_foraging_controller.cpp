@@ -99,9 +99,10 @@ void base_foraging_controller::Init(ticpp::Element& node) {
           GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")};
   struct base_sensing_subsystem::sensor_list slist = {
       .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-      .proximity =
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
-      .light = GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
+      .proximity = hal::sensors::proximity_sensor(
+          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
+      .light = hal::sensors::light_sensor(
+          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
       .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
           "footbot_motor_ground")};
   m_saa = std::make_shared<controller::saa_subsystem>(

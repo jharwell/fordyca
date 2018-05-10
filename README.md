@@ -51,15 +51,12 @@ This is the main entry point for getting started on the project.
 3. Build via:
 
         mkdir build && cd build
-        cmake ..
+        cmake -DWITH_HAL="argos-footbot" ..
         make
 
-For additional build configuration options, please see the README in
-the [cmake config](https://github.com/jharwell/cmake-config) repo.
+   To build the documentation, do the following from the build directory:
 
-To build the documentation, do the following from the build directory:
-
-    make documentation
+        make documentation
 
 ## Running
 
