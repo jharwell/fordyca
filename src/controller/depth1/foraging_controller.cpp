@@ -28,17 +28,19 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/depth1/perception_subsystem.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/collector.hpp"
@@ -69,71 +71,69 @@ foraging_controller::foraging_controller(void)
  * Member Functions
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
-  /*
-   * Update the perceived arena map with the current line-of-sight, update
-   * the relevance of information (density) within it, and fix any blocks that
-   * should be hidden from our awareness.
-   */
-  process_los(depth0::stateful_foraging_controller::los());
-  map()->update();
-
+  perception()->update(depth0::stateful_foraging_controller::los());
   m_metric_store.reset();
 
-  if (is_carrying_block()) {
-    actuators()->set_speed_throttle(true);
-  } else {
-    actuators()->set_speed_throttle(false);
-  }
+  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->block_throttle_update();
+
   m_executive->run();
 } /* ControlStep() */
 
-void foraging_controller::Init(argos::TConfigurationNode& node) {
+void foraging_controller::Init(ticpp::Element& node) {
   params::depth1::task_repository task_repo;
-  params::depth0::stateful_foraging_repository fsm_repo;
+  params::depth0::stateful_foraging_repository stateful_repo;
 
   depth0::stateful_foraging_controller::Init(node);
+  ER_NOM("Initializing depth1 controller");
+
   task_repo.parse_all(node);
-  task_repo.show_all(server_handle()->log_stream());
-  fsm_repo.parse_all(node);
-  fsm_repo.show_all(server_handle()->log_stream());
+  server_handle()->log_stream() << task_repo;
+  stateful_repo.parse_all(node);
+  server_handle()->log_stream() << stateful_repo;
 
   ER_ASSERT(task_repo.validate_all(),
             "FATAL: Not all FSM parameters were validated");
-  ER_ASSERT(fsm_repo.validate_all(),
+  ER_ASSERT(stateful_repo.validate_all(),
             "FATAL: Not all task parameters were validated");
 
-  ER_NOM("Initializing depth1 controller");
-  const params::depth1::task_allocation_params* p =
-      static_cast<const params::depth1::task_allocation_params*>(
-          task_repo.get_params("task_allocation"));
+  auto* p = task_repo.parse_results<params::depth1::task_allocation_params>();
 
+  /* Put in new depth1 sensors and perception, ala strategy pattern */
+  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
+      stateful_repo.parse_results<struct params::sensing_params>(),
+      &saa_subsystem()->sensing()->sensor_list()));
+
+  perception(rcppsw::make_unique<perception_subsystem>(
+      server(),
+      stateful_repo.parse_results<params::perception_params>(),
+      GetId()));
+
+  /* initialize task decomposition graph */
   std::unique_ptr<task_allocation::taskable> collector_fsm =
-      rcppsw::make_unique<fsm::block_to_nest_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+      rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          perception()->map());
   m_collector =
       rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          perception()->map());
   m_harvester =
       rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          static_cast<const params::fsm_params*>(fsm_repo.get_params("fsm")),
+          stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
-          depth0::stateful_foraging_controller::stateful_sensors_ref(),
-          base_foraging_controller::actuators(),
-          depth0::stateful_foraging_controller::map_ref());
+          base_foraging_controller::saa_subsystem(),
+          perception()->map());
   m_generalist =
       rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
 
@@ -171,77 +171,6 @@ void foraging_controller::Init(argos::TConfigurationNode& node) {
 __pure tasks::foraging_task* foraging_controller::current_task(void) const {
   return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
 } /* current_task() */
-
-bool foraging_controller::cache_acquired(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->cache_acquired();
-  }
-  return false;
-} /* cache_detected() */
-
-bool foraging_controller::block_acquired(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->block_acquired();
-  }
-  return false;
-} /* block_detected() */
-
-void foraging_controller::process_los(
-    const representation::line_of_sight* const c_los) {
-  depth0::stateful_foraging_controller::process_los(c_los);
-
-  /*
-   * If the robot thinks that a cell contains a cache, because the cell had one
-   * the last time it passed nearby, but when coming near the cell a second time
-   * the cell does not contain a cache, then the cache was depleted between then
-   * and now, and it needs to update its internal representation accordingly.
-   */
-  for (size_t i = 0; i < c_los->xsize(); ++i) {
-    for (size_t j = 0; j < c_los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
-      if (!c_los->cell(i, j).state_has_cache() &&
-          map()->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
-        ER_DIAG("Correct cache%d discrepency at (%zu, %zu)",
-                map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
-                d.first,
-                d.second);
-        map()->cache_remove(
-            map()->access<occupancy_grid::kCellLayer>(d).cache());
-      }
-    } /* for(j..) */
-  }   /* for(i..) */
-
-  for (auto cache : c_los->caches()) {
-    /*
-     * The state of a cache can change between when the robot saw it last
-     * (i.e. different # of blocks in it), and so you need to always process
-     * caches in the LOS, even if you already know about them.
-     */
-    if (!map()
-             ->access<occupancy_grid::kCellLayer>(cache->discrete_loc())
-             .state_has_cache()) {
-      ER_NOM("Discovered cache%d at (%zu, %zu): %u blocks",
-             cache->id(),
-             cache->discrete_loc().first,
-             cache->discrete_loc().second,
-             cache->n_blocks());
-    }
-    /*
-     * The cache we get a handle to is owned by the simulation, and we don't
-     * want to just pass that into the robot's arena_map, as keeping them in
-     * sync is not possible in all situations.
-     *
-     * For example, if a block executing the collector task picks up a block and
-     * tries to compute the best cache to bring it to, only to have one or more
-     * of its cache references be invalid due to other robots causing caches to
-     * be created/destroyed.
-     *
-     * Cloning is definitely necessary here.
-     */
-    events::cache_found op(base_foraging_controller::server(), cache->clone());
-    map()->accept(op);
-  } /* for(cache..) */
-} /* process_los() */
 
 bool foraging_controller::is_transporting_to_nest(void) const {
   if (nullptr != current_task()) {

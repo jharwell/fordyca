@@ -56,6 +56,8 @@ class cache_site_utility : public rcppsw::math::expression<double> {
                      const argos::CVector2& nest_loc);
 
   double calc(const argos::CVector2& rloc, const argos::CVector2& nearest_cache);
+  double operator()(const argos::CVector2& rloc,
+                    const argos::CVector2& nearest_cache);
 
  private:
   const argos::CVector2 mc_site_loc;

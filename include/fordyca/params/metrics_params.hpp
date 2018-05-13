@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,16 +39,16 @@ NS_START(fordyca, params);
  * @struct metrics_params
  * @ingroup params
  */
-struct metrics_params : public rcppsw::common::base_params {
+struct metrics_params : public rcppsw::params::base_params {
   std::string output_dir{""};
   std::string block_fname{""};
-  std::string stateless_fname{""};
-  std::string stateful_fname{""};
+  std::string cache_fname{""};
+  std::string block_acquisition_fname{""};
+  std::string block_transport_fname{""};
   std::string distance_fname{""};
-  std::string depth1_fname{""};
+  std::string cache_acquisition_fname{""};
   std::string task_execution_fname{""};
   std::string task_management_fname{""};
-  std::string cache_fname{""};
   uint collect_interval{0};
 };
 

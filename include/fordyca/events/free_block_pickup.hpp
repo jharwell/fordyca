@@ -39,22 +39,20 @@ namespace fsm {
 namespace depth0 {
 class stateless_foraging_fsm;
 class stateful_foraging_fsm;
-}
+} // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
 }
-}
-namespace controller {
-namespace depth0 {
+} // namespace fsm
+namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
-}
+}} // namespace controller::depth0
 
 namespace tasks {
 class generalist;
 class harvester;
-}
+} // namespace tasks
 
 NS_START(events);
 
@@ -106,7 +104,7 @@ class free_block_pickup
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
-  void visit(fsm::block_to_nest_fsm& fsm) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
   void visit(tasks::harvester& task) override;
 

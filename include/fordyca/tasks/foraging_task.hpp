@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -44,7 +44,7 @@ class cache_block_drop;
 class free_block_pickup;
 class nest_block_drop;
 class cache_vanished;
-}
+} // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -61,9 +61,9 @@ NS_START(tasks);
  */
 class foraging_task
     : public rcppsw::metrics::tasks::execution_metrics,
-      public metrics::fsm::stateless_metrics,
-      public metrics::fsm::stateful_metrics,
-      public metrics::fsm::depth1_metrics,
+      public metrics::fsm::block_acquisition_metrics,
+      public metrics::fsm::block_transport_metrics,
+      public metrics::fsm::cache_acquisition_metrics,
       public visitor::polymorphic_visitable<foraging_task,
                                             events::cached_block_pickup,
                                             events::cache_block_drop,
@@ -76,18 +76,6 @@ class foraging_task
   static constexpr char kGeneralistName[] = "Generalist";
 
   explicit foraging_task(const std::string& name) : mc_name(name) {}
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a cache and is waiting for the
-   * block pickup/block drop signal from the arena.
-   */
-  virtual bool cache_acquired(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block and is waiting for the
-   * block pickup signal from the arena.
-   */
-  virtual bool block_acquired(void) const = 0;
 
   std::string name(void) const { return mc_name; }
 

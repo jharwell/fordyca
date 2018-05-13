@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/xml_param_repository.hpp"
+#include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +41,9 @@ NS_START(fordyca, params, depth1);
  * @brief Collection of all parameter parsers and parse results needed
  * controllers using tasks.
  */
-class task_repository: public rcppsw::common::xml_param_repository {
+class task_repository: public rcppsw::params::xml_param_repository {
  public:
+  static constexpr char kName[] = "task_repository";
   task_repository(void);
 };
 

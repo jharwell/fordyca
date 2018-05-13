@@ -25,9 +25,10 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -35,40 +36,65 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
+namespace utils = rcppsw::utils;
+
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(
-    uint unsuccessful_dir_change_thresh,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
     uint8_t max_states)
-    : base_foraging_fsm(unsuccessful_dir_change_thresh,
-                        server,
-                        sensors,
-                        actuators,
-                        max_states),
-      entry_explore(),
-      m_state() {
+    : base_foraging_fsm(server, saa, max_states), entry_explore() {
   insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
+/*******************************************************************************
+ * States
+ ******************************************************************************/
 HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::MAGENTA);
+  base_foraging_fsm::actuators()->leds_set_color(utils::color::kMAGENTA);
 }
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void base_explore_fsm::init(void) {
-  explore_time_reset();
-  base_foraging_fsm::init();
-} /* init() */
-
 void base_explore_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* run() */
+
+void base_explore_fsm::random_explore(void) {
+  argos::CVector2 obs = base_sensors()->find_closest_obstacle();
+  saa_subsystem()->steering_force().avoidance(obs);
+  saa_subsystem()->steering_force().wander();
+
+  if (base_sensors()->threatening_obstacle_exists()) {
+    ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
+            obs.GetX(),
+            obs.GetY(),
+            obs.Angle().GetValue(),
+            obs.Length());
+    saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+    saa_subsystem()->actuation()->leds_set_color(utils::color::kRED);
+  } else {
+    ER_DIAG("No threatening obstacle found");
+    saa_subsystem()->actuation()->leds_set_color(utils::color::kMAGENTA);
+    argos::CVector2 force = saa_subsystem()->steering_force().value();
+    /*
+     * This can be 0 if the wander force is not active this timestep.
+     */
+    if (force.Length() >= std::numeric_limits<double>::epsilon()) {
+      saa_subsystem()->steering_force().value(
+          saa_subsystem()->steering_force().value() * 0.7);
+      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+    }
+  }
+} /* random_explore() */
+
+void base_explore_fsm::task_execute(void) {
+  inject_event(controller::foraging_signal::FSM_RUN,
+               state_machine::event_type::NORMAL);
+} /* task_execute() */
 
 NS_END(fsm, fordyca);

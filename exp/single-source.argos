@@ -16,24 +16,24 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
-                                library="build/lib/libfordyca">
+    <stateful_foraging_controller id="ffc"
+                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
         <output>
-          <robot output_root="output"
-                 output_dir="__current_date__"
-                 />
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
@@ -43,64 +43,85 @@
                      repeat_deposit="false"/>
         </occupancy_grid>
         <task_allocation>
-          <executive
-              estimation_alpha="0.8"
-              abort_reactivity="8"
-              abort_offset="4"
-              partition_reactivity="0.5"
-              partition_offset="2"
-              subtask_selection_method="harwell2018"
-              partition_method="pini2011"
-              always_partition="true"
-              never_partition="false"
-              />
-          <init_estimates
+          <executive>
+              <tasks estimation_alpha="0.8"/>
+              <aborting reactivity="8"
+                        offset="3"
+                        />
+              <partitioning
+                  method="pini2011"
+                  always_partition="true"
+                  never_partition="false"
+                  reactivity="1.5"
+                  offset="1.0"
+                  />
+              <subtask_selection
+                  method="harwell2018"
+                  reactivity="8"
+                  offset="1.25"
+                  gamma="1.0"
+                  />
+              </executive>
+          <exec_estimates
               enabled="true"
               generalist_range="2000:4000"
               collector_range="1000:2000"
               harvester_range="1000:2000"
               />
         </task_allocation>
-        <sensors>
-          <proximity go_straight_angle_range="-5:5"
-                    delta="0.001" />
-        </sensors>
-        <actuators>
-          <wheels soft_turn_angle_max="30"
-                  no_turn_angle_max="5"
-                  max_speed="10" />
-        </actuators>
+        <sensing>
+          <proximity angle_range="-1.1:1.1"
+                     delta="0.0001" />
+        </sensing>
+        <actuation>
+          <throttling
+              block_carry="0.1"/>
+          <steering2D>
+            <avoidance_force lookahead="0.5"
+                             max="8"/>
+            <arrival_force slowing_radius="0.2"
+                           slowing_speed_min="1.0"
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="9.0"
+                          interval="1"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
+
+          <differential_drive soft_turn_max="30"
+                              max_speed="10" />
+        </actuation>
         <fsm
-          unsuccessful_explore_dir_change="1000"
-          frequent_collision_thresh="300"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.1"
           />
       </params>
-    </depth1_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+  <loop_functions library="libfordyca"
+                  label="stateful_foraging_loop_functions">
     <output>
-      <sim sim_log_fname="sim.log"
+      <sim log_fname="sim.log"
            output_root="output"
            output_dir="__current_date__"
            />
       <metrics
           output_dir="metrics"
-          stateless_fname="stateless-stats.csv"
-          stateful_fname="stateful-stats.csv"
-          depth1_fname="depth1-stats.csv"
-          block_fname="block-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
           distance_fname="distance-stats.csv"
+          block_fname="block-stats.csv"
+          cache_fname="cache-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
-          cache_fname="cache-stats.csv"
           collect_interval="1000"
           />
     </output>
@@ -170,7 +191,7 @@
            medium="leds" />
 
     <distribute>
-      <position method="uniform" min="1,1,0" max="9,4,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
@@ -199,18 +220,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth1_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
@@ -29,6 +30,7 @@
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -153,7 +155,7 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.current_task()->accept(*this);
   controller.block(m_block);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
@@ -166,7 +168,7 @@ void free_block_pickup::visit(
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_block);
   controller.current_task()->accept(*this);
 
@@ -189,7 +191,7 @@ void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
+#include <cassert>
 #include <utility>
 #include <vector>
-#include <cassert>
 
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
@@ -95,14 +95,18 @@ class base_cache : public immovable_cell_entity,
    * @brief Get a list of the blocks currently in the cache.
    */
   std::vector<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
-  const std::vector<std::shared_ptr<block>>& blocks(void) const { return m_blocks; }
+  const std::vector<std::shared_ptr<block>>& blocks(void) const {
+    return m_blocks;
+  }
 
   /**
    * @brief Add a new block to the cache's list of blocks.
    *
    * Does not update the block's location.
    */
-  void block_add(const std::shared_ptr<block>& block) { m_blocks.push_back(block); }
+  void block_add(const std::shared_ptr<block>& block) {
+    m_blocks.push_back(block);
+  }
 
   /**
    * @brief Remove a block from the cache's list of blocks.

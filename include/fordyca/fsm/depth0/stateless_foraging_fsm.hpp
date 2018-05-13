@@ -27,7 +27,8 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,13 +38,14 @@ NS_START(fordyca);
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
-namespace controller { class base_foraging_sensors; class actuator_manager;}
+namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class stateless_foraging_fsm
  * @ingroup fsm depth0
@@ -53,23 +55,29 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::fsm::stateless_metrics,
+                               public metrics::fsm::block_acquisition_metrics,
+                               public metrics::fsm::block_transport_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(const struct params::fsm_params* params,
-                         const std::shared_ptr<rcppsw::er::server>& server,
-                         const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-                         const std::shared_ptr<controller::actuator_manager>& actuators);
+  stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                         const std::shared_ptr<controller::saa_subsystem>& saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base metrics */
+  /* base FSM metrics */
+  bool is_avoiding_collision(void) const override {
+    return base_foraging_fsm::is_avoiding_collision();
+  }
+  /* block acquisition metrics */
   bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
+  bool block_acquired(void) const override;
 
-  bool block_acquired(void) const;
+  /* block transport metrics */
+  bool is_transporting_to_nest(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; }
 
   /**
    * @brief (Re)-initialize the FSM.

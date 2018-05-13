@@ -27,7 +27,8 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -43,8 +44,9 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-nest_block_drop::nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                                 const std::shared_ptr<representation::block>& block)
+nest_block_drop::nest_block_drop(
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<representation::block>& block)
     : client(server), m_block(block) {
   client::insmod("nest_block_drop",
                  rcppsw::er::er_lvl::DIAG,
@@ -60,7 +62,8 @@ void nest_block_drop::visit(representation::arena_map& map) {
   m_block->accept(*this);
 } /* visit() */
 
-void nest_block_drop::visit(metrics::block_metrics_collector& collector) {
+void nest_block_drop::visit(
+    metrics::block_transport_metrics_collector& collector) {
   collector.collect(*m_block);
 } /* visit() */
 
@@ -116,10 +119,11 @@ void nest_block_drop::visit(tasks::generalist& task) {
 } /* visit() */
 
 void nest_block_drop::visit(tasks::collector& task) {
-  static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
-void nest_block_drop::visit(fsm::block_to_nest_fsm& fsm) {
+void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

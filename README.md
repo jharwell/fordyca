@@ -2,56 +2,77 @@
 
 This is the main entry point for getting started on the project.
 
-## Basic Setup
+## Pre-cloning Setup
 
-Before starting, make sure you have ARGoS installed, and can run the simple
-foraging example given on the website.
+1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
+   for the project.
 
-These steps are for Linux, and while it may work on OSX, I have not tried it. It
-definitely will not work on windows. You will need a recent version of the
-following programs:
+2. Verify that you can run the simple foraging example that comes
+   packaged on the ARGoS website.
 
-- cmake
-- make
-- gcc
-- g++ A version that supports C++11 is required. A version that supports OpenMP
-  is highly recommended, otherwise simulations of large numbers of robots will
-  be (much) slower.
+3. This project uses the build scaffolding provided by
+   [cmake-config](https://github.com/jharwell/cmake-config). Please
+   look at the platform requirements for that project and install any
+   needed packages/libraries.
 
-You will also need recent versions of the following libraries:
+4. Install additional development packages for the project:
 
-- boost (1.58 is known to work; older versions may also work). Install all boost
-  libraries via:
+   - catch (A unit testing framework that some unit tests use).
+   - boost (1.58 is known to work; older versions may also work). Install all
+     boost libraries via:
 
         sudo  apt-get install libboost-all-dev
 
-- Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
+    - Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
 
-        sudo apt-get install qtbase5-dev
+            sudo apt-get install qtbase5-dev
 
-In addition, you will possibly want to install these programs:
+5. Clone `rcsw` https://github.com/swarm-robotics/rcsw (Reusable C software)
+   somewhere and create a symbolic to it in the repo as
+   `<repo_root>/ext/rcsw`. Follow all pre/post-cloning instructions found in
+   README in that repo.
 
-- ccache (will make compiling a lot faster)
-- icpc (additional syntax checking; comes from Intel Parallel Studio, which is ~14GB)
-- ctags/gtags/rtags/cscope (moving around in a large C/C++ code base)
+6. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable C++ software)
+   somewhere and create a symbolic link it as
+   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions found in
+   README for that repo.
 
-After cloning this repo, you will need to:
+## Post-cloning setup
 
-1. Pull in the cmake config:
+1. Check out the development branch, as that has not only the latest semi-stable
+   release, but also the most up-to-date documentation, including this README.
+
+        git checkout devel
+
+2. Pull in the cmake project scaffolding:
 
         git submodule update --init --recursive
 
-2. Clone `rcsw` https://github.com/jharwell/rcsw (Reusable C software) somewhere
-   and link it into `ext/rcsw`.
-
-3. Clone `rcppsw` https://github.com/jharwell/rcppsw (Reusable C++ software)
-   somewhere and link it into `ext/rcppsw`.
-
-3. Then you can build via:
+3. Build via:
 
         mkdir build && cd build
-        cmake ..
+        cmake -DWITH_HAL="argos-footbot" ..
         make
+
+   To build the documentation, do the following from the build directory:
+
+        make documentation
+
+## Running
+
+After successful compilation, follow these steps to run a foraging scenario:
+
+1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
+   `libfordyca.so` file. On bash, that is:
+
+        export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
+
+
+2. cd to the ROOT of the fordyca repo, and run the experiment:
+
+        argos3 -c exp/single-source.argos
+
+   This should pop up a nice GUI from which you can start the experiment.
 
 # Troubleshooting
 
@@ -61,15 +82,22 @@ After cloning this repo, you will need to:
 
           git submodule update
 
-  2. Updating rcppsw and rcsw, and possibly their cmake submodules
-  
+  2. Updating `rcppsw` and `rcsw`, and possibly their cmake submodules.
+
   If the problem perists, open an issue.
 
-- If you are getting a segfault when running ARGoS, verify that if you are
-  running with Qt visualizations that the threadcount is 0 (Qt5 cannot run with
-  multiple threads without segfaulting).
+- If you are having trouble running experiments (i.e. they won't start/crash
+  immediately), try:
+
+  1. If you are getting a segfault when running ARGoS, verify that if you are
+     running with Qt visualizations that the threadcount is 0 (Qt5 cannot run
+     with multiple threads without segfaulting).
+
+  2. Verify you don't have any anaconda bits in your `PATH`. Depending on
+     version, anaconda loads a DIFFERENT version of the Qt than fordyca uses,
+     resulting in a dynamic linking error.
 
 ## Contributing
 
-We use the same contributing guidelines as RCPPSW, whose guide can be found
-[here](https://github.com/jharwell/rcppsw/blob/master/docs/CONTRIBUTING.md).
+For contributing to `fordyca`, see
+[CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/blob/master/docs/CONTRIBUTING.md).

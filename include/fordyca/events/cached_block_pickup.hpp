@@ -76,7 +76,7 @@ class cached_block_pickup
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(fsm::block_to_nest_fsm& fsm) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(tasks::collector& task) override;
 

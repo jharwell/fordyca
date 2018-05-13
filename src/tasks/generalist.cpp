@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/generalist.hpp"
 
-#include "fordyca/controller/depth0/foraging_sensors.hpp"
+#include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
@@ -46,7 +46,7 @@ generalist::generalist(
                                 params,
                                 mechanism),
       foraging_task(kGeneralistName),
-      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
+      m_abort_prob(&params->abort) {}
 
 /*******************************************************************************
  * Member Functions

@@ -30,7 +30,7 @@
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
@@ -64,7 +64,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   base_foraging_loop_functions& operator=(
       const base_foraging_loop_functions& s) = delete;
 
-  void Init(argos::TConfigurationNode&) override {
+  void Init(ticpp::Element&) override {
     m_floor = &GetSpace().GetFloorEntity();
   }
 
@@ -103,21 +103,23 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * @brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    *
-   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
+   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c
+   * FALSE
    * otherwise.
    */
   template <typename T>
-  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
-                              representation::arena_map& map,
-                              metrics::block_metrics_collector& block_collector) {
+  bool handle_nest_block_drop(
+      argos::CFootBotEntity& robot,
+      representation::arena_map& map,
+      metrics::block_transport_metrics_collector& collector) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {
       /* Update arena map state due to a block nest drop */
       events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
-      /* update block carries */
-      block_collector.accept(drop_op);
+      /* update block transport metrics */
+      collector.accept(drop_op);
 
       map.accept(drop_op);
 

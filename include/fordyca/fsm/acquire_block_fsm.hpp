@@ -31,8 +31,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -47,14 +46,14 @@ struct fsm_params;
 namespace representation {
 class perceived_arena_map;
 class block;
-}
+} // namespace representation
 
 namespace controller {
 namespace depth0 {
-class foraging_sensors;
+class sensing_subsystem;
 }
-class actuator_manager;
-}
+class actuation_subsystem;
+} // namespace controller
 
 NS_START(fsm);
 
@@ -73,25 +72,20 @@ NS_START(fsm);
  * signals that it has completed its task.
  */
 class acquire_block_fsm : public base_foraging_fsm,
-                          public metrics::fsm::stateless_metrics,
-                          public metrics::fsm::stateful_metrics,
+                          public metrics::fsm::block_acquisition_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
-  acquire_block_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
-      std::shared_ptr<representation::perceived_arena_map> map);
+  acquire_block_fsm(const struct params::fsm_params* params,
+                    const std::shared_ptr<rcppsw::er::server>& server,
+                    const std::shared_ptr<controller::saa_subsystem>& saa,
+                    std::shared_ptr<representation::perceived_arena_map> map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
-  }
+  bool task_finished(void) const override { return block_acquired(); }
   void task_reset(void) override { init(); }
   void task_start(
       const rcppsw::task_allocation::taskable_argument* const) override {}
@@ -99,14 +93,14 @@ class acquire_block_fsm : public base_foraging_fsm,
     return ST_ACQUIRE_BLOCK == current_state();
   }
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 metrics */
+  /* block acquisition metrics */
+  bool is_exploring_for_block(void) const override;
   bool is_acquiring_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+  bool block_acquired(void) const override;
 
   /**
    * @brief Reset the FSM
@@ -158,14 +152,13 @@ class acquire_block_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  const argos::CVector2                                      mc_nest_center;
-  std::shared_ptr<representation::block>                     m_best_block{nullptr};
-  argos::CRandom::CRNG*                                      m_rng;
-  std::shared_ptr<representation::perceived_arena_map>       m_map;
-  std::shared_ptr<rcppsw::er::server>                        m_server;
-  std::shared_ptr<controller::depth0::foraging_sensors>      m_sensors;
-  vector_fsm                                                 m_vector_fsm;
-  explore_for_block_fsm                                      m_explore_fsm;
+  bool                                                 m_vectoring{false};
+  const argos::CVector2                                mc_nest_center;
+  std::shared_ptr<representation::block>               m_best_block{nullptr};
+  std::shared_ptr<representation::perceived_arena_map> m_map;
+  std::shared_ptr<rcppsw::er::server>                  m_server;
+  vector_fsm                                           m_vector_fsm;
+  explore_for_block_fsm                                m_explore_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

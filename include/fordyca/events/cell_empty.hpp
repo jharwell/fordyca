@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace representation {
 class arena_map;
 class perceived_arena_map;
-}
+} // namespace representation
 
 NS_START(events);
 

@@ -36,12 +36,10 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class arena_map;
 class block;
-}
-namespace controller {
-namespace depth1 {
+} // namespace representation
+namespace controller { namespace depth1 {
 class foraging_controller;
-}
-}
+}} // namespace controller::depth1
 
 NS_START(events);
 

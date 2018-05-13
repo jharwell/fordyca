@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/block_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -50,7 +50,7 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public metrics::block_metrics,
+              public metrics::block_transport_metrics,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
@@ -98,7 +98,8 @@ class block : public cell_entity,
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *
-   * @return The robot index, or -1 if no robot is currently carrying this block.
+   * @return The robot index, or -1 if no robot is currently carrying this
+   * block.
    */
   int robot_index(void) const { return m_robot_index; }
   void robot_index(int robot_index) { m_robot_index = robot_index; }

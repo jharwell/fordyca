@@ -35,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace metrics { class block_metrics_collector; }
+namespace metrics { class block_transport_metrics_collector; }
 
 NS_START(support, depth1);
 
@@ -85,7 +85,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    */
   void operator()(T& controller,
                   uint timestep,
-                  metrics::block_metrics_collector& collector) {
+                  metrics::block_transport_metrics_collector& collector) {
       if (handle_task_abort(controller)) {
         return;
       }
@@ -129,7 +129,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.cache_acquired(),
+    ER_ASSERT(controller.current_task()->cache_acquired(),
               "FATAL: Controller not waiting for cached block pickup");
 
     /*
@@ -176,7 +176,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.cache_acquired(),
+    ER_ASSERT(controller.current_task()->cache_acquired(),
               "FATAL: Controller not waiting for cache block drop");
 
     /*

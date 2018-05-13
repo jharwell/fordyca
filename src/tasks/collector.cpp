@@ -24,11 +24,11 @@
 #include "fordyca/tasks/collector.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
-#include "fordyca/controller/depth1/foraging_sensors.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
@@ -43,19 +43,21 @@ collector::collector(const struct task_allocation::task_params* const params,
                      std::unique_ptr<task_allocation::taskable>& mechanism)
     : polled_task(kCollectorName, params, mechanism),
       foraging_task(kCollectorName),
-      m_abort_prob(params->abort_reactivity, params->abort_offset) {}
+      m_abort_prob(&params->abort) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 __pure double collector::current_time(void) const {
-  return dynamic_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return dynamic_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
 bool collector::cache_acquired(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->cache_acquired();
 } /* cache_acquired() */
 
@@ -108,12 +110,14 @@ void collector::accept(events::cache_vanished& visitor) {
  * Base Metrics
  ******************************************************************************/
 bool collector::is_avoiding_collision(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 bool collector::is_transporting_to_nest(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
@@ -121,17 +125,20 @@ bool collector::is_transporting_to_nest(void) const {
  * Depth1 Metrics
  ******************************************************************************/
 bool collector::is_exploring_for_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->is_exploring_for_cache();
 } /* is_exploring_for_cache() */
 
 bool collector::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->is_vectoring_to_cache();
 } /* is_vectoring_to_cache() */
 
 bool collector::is_acquiring_cache(void) const {
-  return static_cast<fsm::block_to_nest_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->is_acquiring_cache();
 } /* is_acquiring_cache() */
 

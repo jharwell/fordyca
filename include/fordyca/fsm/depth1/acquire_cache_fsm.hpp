@@ -34,9 +34,7 @@
 #include "fordyca/fsm/depth1/explore_for_cache_fsm.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/depth1_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,10 +43,6 @@ NS_START(fordyca);
 
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class cache; }
-namespace controller {
-namespace depth1 {class foraging_sensors; }
-class actuator_manager;
-}
 
 NS_START(fsm, depth1);
 
@@ -66,16 +60,13 @@ NS_START(fsm, depth1);
  * cache has been acquired, it signals that it has completed its task.
  */
 class acquire_cache_fsm : public base_foraging_fsm,
-                          public metrics::fsm::stateless_metrics,
-                          public metrics::fsm::stateful_metrics,
-                          public metrics::fsm::depth1_metrics,
+                          public metrics::fsm::cache_acquisition_metrics,
                           public rcppsw::task_allocation::taskable {
  public:
   acquire_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth1::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& actuators,
       std::shared_ptr<const representation::perceived_arena_map> map);
 
   acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
@@ -88,20 +79,14 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool task_running(void) const override { return ST_ACQUIRE_CACHE == current_state(); }
   void task_reset(void) override { init(); }
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override { return false; }
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override { return false; }
 
-  /* depth0 metrics */
-  bool is_acquiring_block(void) const override { return false; }
-  bool is_vectoring_to_block(void) const override { return false; }
-
-  /* depth1 metrics */
+  /* cache acquisition metrics */
   bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override { return false; }
+  bool is_vectoring_to_cache(void) const override;
+  bool cache_acquired(void) const override;
 
   /**
    * @brief Reset the FSM
@@ -116,13 +101,33 @@ class acquire_cache_fsm : public base_foraging_fsm,
     ST_MAX_STATES
   };
 
+  /**
+   * @brief Get the cache location corresponding to the "best" cache (by some
+   * measure), for use in vectoring.
+   *
+   * @return The location of the "best" cache to acquire
+   */
+  virtual argos::CVector2 select_cache_for_acquisition(void);
+
+  argos::CVector2 nest_center(void) const { return mc_nest_center; }
+  std::shared_ptr<const representation::perceived_arena_map> map(void) const {
+    return mc_map;
+  }
+
  private:
   /**
    * @brief Acquire a known cache or discover one via random exploration.
    *
-   * @return TRUE if a block has been acquired, FALSE otherwise.
+   * @return \c TRUE if a cache has been acquired, \c FALSE otherwise.
    */
   bool acquire_any_cache(void);
+
+  /**
+   * @brief Acquire an unknown cache via exploration.
+   *
+   * @return \c TRUE if a cache has been acquired \c FALSE otherwise.
+   */
+  bool acquire_unknown_cache(void);
 
   /**
    * @brief Acquire a known cache. If the robot's knowledge of the chosen
@@ -134,7 +139,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
    * acquiring a cache, and refering to specific positions within the vector
    * that the robot maintains leads to...interesting behavior.
    */
-  bool acquire_known_cache(std::list<representation::perceived_cache> caches);
+  bool acquire_known_cache(
+      std::list<representation::perceived_cache> caches);
 
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);
@@ -155,9 +161,8 @@ class acquire_cache_fsm : public base_foraging_fsm,
   // clang-format off
   const argos::CVector2                                      mc_nest_center;
   argos::CRandom::CRNG*                                      m_rng;
-  std::shared_ptr<const representation::perceived_arena_map> m_map;
+  std::shared_ptr<const representation::perceived_arena_map> mc_map;
   std::shared_ptr<rcppsw::er::server>                        m_server;
-  std::shared_ptr<controller::depth1::foraging_sensors>      m_sensors;
   vector_fsm                                                 m_vector_fsm;
   explore_for_cache_fsm                                      m_explore_fsm;
   // clang-format on

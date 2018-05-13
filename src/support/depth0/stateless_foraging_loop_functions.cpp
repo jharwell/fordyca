@@ -31,13 +31,13 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
-#include "fordyca/params/loop_functions_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/visualization_parser.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
@@ -71,7 +71,7 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
+void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   base_foraging_loop_functions::Init(node);
 
   rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
@@ -82,31 +82,27 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
   params::loop_function_repository repo;
   repo.parse_all(node);
 
-  auto* p_output = static_cast<const struct params::output_params*>(
-      repo.get_params("output"));
-  auto* p_arena = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"));
+  auto* p_output = repo.parse_results<params::output_params>();
+  auto* p_arena = repo.parse_results<params::arena_map_params>();
+  auto* p_vis = repo.parse_results<params::visualization_params>();
 
+  /* initialize output */
   output_init(p_output);
+  metric_collecting_init(p_output);
 
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
-                                       p_output->sim_log_fname);
-  repo.show_all(rcppsw::er::g_server->log_stream());
+                                       p_output->log_fname);
+  rcppsw::er::g_server->log_stream() << repo;
 
   /* setup logging timestamp calculator */
   rcppsw::er::g_server->log_ts_calculator(
       std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
 
-  auto* l_params = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"));
   m_nest_x = p_arena->nest_x;
   m_nest_y = p_arena->nest_y;
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
-
-  /* initialize metric collecting */
-  metric_collecting_init(p_output);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -114,7 +110,7 @@ void stateless_foraging_loop_functions::Init(argos::TConfigurationNode& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = static_cast<controller::base_foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_id(l_params->display_robot_id);
+    controller.display_id(p_vis->robot_id);
   } /* for(&robot..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
 }
@@ -128,7 +124,7 @@ void stateless_foraging_loop_functions::Destroy() {
   m_collector_group.finalize_all();
 }
 
-argos::CColor stateless_foraging_loop_functions::GetFloorColor(
+__pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
@@ -154,9 +150,9 @@ void stateless_foraging_loop_functions::pre_step_iter(
   /* get stats from this robot before its state changes */
   m_collector_group.collect_from(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect_from("fsm::stateless",
-                                 static_cast<metrics::fsm::stateless_metrics&>(
-                                     *controller.fsm()));
+  m_collector_group.collect_from(
+      "fsm::block_acquisition",
+      static_cast<metrics::fsm::block_acquisition_metrics&>(controller));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -166,7 +162,7 @@ void stateless_foraging_loop_functions::pre_step_iter(
   interactor(rcppsw::er::g_server,
              m_arena_map,
              floor())(controller,
-                      static_cast<metrics::block_metrics_collector&>(
+                      static_cast<metrics::block_transport_metrics_collector&>(
                           *m_collector_group["block"]));
 } /* pre_step_iter() */
 
@@ -194,11 +190,13 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   }
   fs::create_directories(m_metrics_path);
 
-  m_collector_group.register_collector<metrics::fsm::stateless_metrics_collector>(
-      "fsm::stateless",
-      m_metrics_path + "/" + p_output->metrics.stateless_fname,
-      p_output->metrics.collect_interval);
-  m_collector_group.register_collector<metrics::block_metrics_collector>(
+  m_collector_group
+      .register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+          "fsm::block_acquisition",
+          m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
+          p_output->metrics.collect_interval);
+
+  m_collector_group.register_collector<metrics::block_transport_metrics_collector>(
       "block",
       m_metrics_path + "/" + p_output->metrics.block_fname,
       p_output->metrics.collect_interval);
@@ -213,15 +211,13 @@ void stateless_foraging_loop_functions::metric_collecting_init(
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
-  auto* arena_params = static_cast<const struct params::arena_map_params*>(
-      repo.get_params("arena_map"));
-  auto* l_params = static_cast<const struct params::loop_functions_params*>(
-      repo.get_params("loop_functions"));
+  auto* aparams = repo.parse_results<struct params::arena_map_params>();
+  auto* vparams = repo.parse_results<struct params::visualization_params>();
 
-  m_arena_map.reset(new representation::arena_map(arena_params));
+  m_arena_map.reset(new representation::arena_map(aparams));
   m_arena_map->distribute_blocks();
   for (auto& block : m_arena_map->blocks()) {
-    block->display_id(l_params->display_block_id);
+    block->display_id(vparams->block_id);
   } /* for(&block..) */
 } /* arena_map_init() */
 

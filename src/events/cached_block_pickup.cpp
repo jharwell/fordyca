@@ -22,17 +22,19 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+
 #include "fordyca/tasks/collector.hpp"
 #include "fordyca/tasks/foraging_task.hpp"
 
@@ -40,8 +42,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
 using representation::base_cache;
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -135,14 +137,13 @@ void cached_block_pickup::visit(representation::arena_map& map) {
     map.cache_removed(true);
   }
   m_pickup_block->accept(*this);
-  ER_NOM(
-      "arena_map: fb%u: block%d from cache%d @(%zu, %zu) [%u blocks remain]",
-      m_robot_index,
-      m_pickup_block->id(),
-      cache_id,
-      cell_op::x(),
-      cell_op::y(),
-      (m_real_cache) ? m_real_cache->n_blocks() : 1);
+  ER_NOM("arena_map: fb%u: block%d from cache%d @(%zu, %zu) [%u blocks remain]",
+         m_robot_index,
+         m_pickup_block->id(),
+         cache_id,
+         cell_op::x(),
+         cell_op::y(),
+         (m_real_cache) ? m_real_cache->n_blocks() : 1);
 } /* visit() */
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
@@ -203,7 +204,7 @@ void cached_block_pickup::visit(representation::block& block) {
 
 void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
   controller.current_task()->accept(*this);
 
@@ -213,10 +214,11 @@ void cached_block_pickup::visit(
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::collector& task) {
-  static_cast<fsm::block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
+void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

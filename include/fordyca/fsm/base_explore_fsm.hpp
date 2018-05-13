@@ -34,10 +34,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-class base_foraging_sensors;
-class actuator_manager;
-}
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -58,23 +54,16 @@ NS_START(fsm);
 class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
-  base_explore_fsm(
-      uint unsuccessful_dir_change_thresh,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
-      uint8_t max_states);
+  base_explore_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                   const std::shared_ptr<controller::saa_subsystem>& saa,
+                   uint8_t max_states);
 
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_start(const rcppsw::task_allocation::taskable_argument*) override {}
-
-  /**
-   * @brief Reset the FSM
-   */
-  void init(void) override;
+  void task_execute(void) override;
 
   /**
    * @brief Run the FSM in its current state without injecting an event into it.
@@ -83,37 +72,16 @@ class base_explore_fsm : public base_foraging_fsm,
 
  protected:
   /**
-   * @brief Reset the # of timesteps the robot has spent unsuccessfully looking
-   * for a block.
+   * @brief Perform random walk exploration: wander force + avoidance force.
    */
-  void explore_time_reset(void) { m_state.time_exploring_unsuccessfully = 0; }
-
-  /**
-   * @brief Increment the # of timesteps the robot has spent unsuccessfully
-   * looking for a block.
-   */
-  void explore_time_inc(void) { ++m_state.time_exploring_unsuccessfully; }
-
-  /**
-   * @brief Get the # of timesteps the robot has spent unsuccessfully looking
-   * for a block.
-   */
-  size_t explore_time(void) const {
-    return m_state.time_exploring_unsuccessfully;
-  }
+  void random_explore(void);
 
  private:
-  struct fsm_state {
-    size_t time_exploring_unsuccessfully{0};
-  };
-
   /**
    * @brief Simple state for entry in the main exploration state, used to change
    * LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_explore_fsm, entry_explore);
-
-  struct fsm_state m_state;
 };
 
 NS_END(fsm, fordyca);

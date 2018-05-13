@@ -25,7 +25,6 @@
 #include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -38,11 +37,12 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_drop::free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                                 const std::shared_ptr<representation::block>& block,
-                                 size_t x,
-                                 size_t y,
-                                 double resolution)
+free_block_drop::free_block_drop(
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<representation::block>& block,
+    size_t x,
+    size_t y,
+    double resolution)
     : cell_op(x, y),
       client(server),
       m_resolution(resolution),
@@ -90,7 +90,8 @@ void free_block_drop::visit(representation::arena_map& map) {
   if (cell.state_has_cache()) {
     cache_block_drop op(m_server,
                         m_block,
-                        std::static_pointer_cast<representation::arena_cache>(cell.cache()),
+                        std::static_pointer_cast<representation::arena_cache>(
+                            cell.cache()),
                         m_resolution);
     map.accept(op);
   } else if (cell.state_has_block()) {

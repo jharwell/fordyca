@@ -30,26 +30,29 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char task_allocation_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void task_allocation_parser::parse(argos::TConfigurationNode& node) {
-  argos::TConfigurationNode task_node = argos::GetNode(node, "task_allocation");
+void task_allocation_parser::parse(const ticpp::Element& node) {
+  ticpp::Element tnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
-  m_exec_parser.parse(argos::GetNode(task_node, "executive"));
-  m_estimate_parser.parse(argos::GetNode(task_node, "init_estimates"));
-  m_params = rcppsw::make_unique<struct task_allocation_params>();
-  m_params->executive = *m_exec_parser.get_results();
-  m_params->exec_estimates = *m_estimate_parser.get_results();
+  m_exec_parser.parse(tnode);
+  m_estimate_parser.parse(tnode);
+  m_params.executive = *m_exec_parser.parse_results();
+  m_params.exec_estimates = *m_estimate_parser.parse_results();
 } /* parse() */
 
-void task_allocation_parser::show(std::ostream& stream) {
-  stream
-      << "====================\nTask allocation params\n====================\n";
-  m_exec_parser.show(stream);
-  m_estimate_parser.show(stream);
+void task_allocation_parser::show(std::ostream& stream) const {
+  stream << build_header() << m_exec_parser << m_estimate_parser << std::endl
+         << build_footer();
 } /* show() */
 
-__pure bool task_allocation_parser::validate(void) {
+__pure bool task_allocation_parser::validate(void) const {
   return m_exec_parser.validate() && m_estimate_parser.validate();
 } /* validate() */
 

@@ -27,6 +27,8 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,13 +52,15 @@ NS_START(controller, depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
+                                      public metrics::fsm::block_acquisition_metrics,
+                                      public metrics::fsm::block_transport_metrics,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);
   ~stateless_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
   void Reset(void) override;
 
@@ -64,12 +68,23 @@ class stateless_foraging_controller : public base_foraging_controller,
   int entity_id(void) const override;
   double timestep_distance(void) const override;
 
+  /* base FSM metrics */
+  bool is_avoiding_collision(void) const override;
+
+  /* block acquisition metrics */
+  bool is_exploring_for_block(void) const override;
+  bool is_acquiring_block(void) const override { return false; }
+  bool is_vectoring_to_block(void) const override { return false; }
+  bool block_acquired(void) const override;
+
+  /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
-  bool block_acquired(void) const;
+  bool is_transporting_to_cache(void) const override { return false; }
+
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:
-  std::unique_ptr<fsm::depth0::stateless_foraging_fsm>     m_fsm;
+  std::unique_ptr<fsm::depth0::stateless_foraging_fsm> m_fsm;
 };
 
 NS_END(depth0, controller, fordyca);

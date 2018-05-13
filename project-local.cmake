@@ -11,19 +11,18 @@ set(CMAKE_AUTOMOC OFF)
 
 # RCPPSW
 add_subdirectory(ext/rcppsw)
-include_directories(${rcppsw_INCLUDE_DIRS})
 
 ################################################################################
 # Includes                                                                     #
 ################################################################################
 if (NOT IS_ROOT_PROJECT)
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" PARENT_SCOPE)
-else()
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}")
+  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS} PARENT_SCOPE)
 endif()
+set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
 
 include_directories(BEFORE SYSTEM
   /usr/include/lua5.2
+  /usr/local/include
   ${Qt5Widgets_INCLUDE_DIRS}
   )
 
@@ -31,15 +30,22 @@ include_directories(BEFORE SYSTEM
 # Libraries                                                                    #
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
-link_directories(/usr/lib/argos3 ${rcppsw_LINK_DIRS})
+link_directories(/usr/lib/argos3 /usr/local/lib/argos3 ${rcppsw_LINK_DIRS})
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 add_dependencies(${target} rcsw rcppsw)
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
 target_link_libraries(${target}
   rcppsw
   rcsw
   argos3core_simulator
   argos3plugin_simulator_footbot
+  argos3plugin_simulator_entities
+  argos3plugin_simulator_dynamics2d
   argos3plugin_simulator_genericrobot
+  argos3plugin_simulator_qtopengl
   stdc++fs
+  Qt5::Widgets
+  Qt5::Core
+  Qt5::Gui
   )
