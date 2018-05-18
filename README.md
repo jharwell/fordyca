@@ -18,24 +18,16 @@ This is the main entry point for getting started on the project.
 4. Install additional development packages for the project:
 
    - catch (A unit testing framework that some unit tests use).
-   - boost (1.58 is known to work; older versions may also work). Install all
-     boost libraries via:
-
-        sudo  apt-get install libboost-all-dev
+   - boost 1.58.
 
     - Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
 
             sudo apt-get install qtbase5-dev
 
-5. Clone `rcsw` https://github.com/swarm-robotics/rcsw (Reusable C software)
-   somewhere and create a symbolic to it in the repo as
-   `<repo_root>/ext/rcsw`. Follow all pre/post-cloning instructions found in
-   README in that repo.
-
-6. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable C++ software)
-   somewhere and create a symbolic link it as
-   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions found in
-   README for that repo.
+5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
+   C++ software) somewhere and create a symbolic link it as
+   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions
+   found in README for that repo.
 
 ## Post-cloning setup
 
@@ -46,7 +38,7 @@ This is the main entry point for getting started on the project.
 
 2. Pull in the cmake project scaffolding:
 
-        git submodule update --init --recursive
+        git submodule update --init --recursive --remote 
 
 3. Build via:
 
