@@ -31,7 +31,9 @@ include_directories(BEFORE SYSTEM
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
 link_directories(/usr/lib/argos3 /usr/local/lib/argos3 ${rcppsw_LINK_DIRS})
+
 add_library(${target} SHARED ${${target}_ROOT_SRC})
+target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
 add_dependencies(${target} rcsw rcppsw)
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
