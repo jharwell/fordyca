@@ -1,5 +1,5 @@
 /**
- * @file acquire_new_cache_fsm.hpp
+ * @file acquire_new_cache_fsm.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,13 +18,11 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
+#include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,30 +30,14 @@
 NS_START(fordyca, fsm, depth2);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * @class acquire_new_cache_fsm
- * @ingroup fsm depth2
- *
- * @brief The FSM for an acquiring a NEW cache within the arena.
- *
- * Each robot executing this FSM will look for a new cache (either a known new
- * cache or via random exploration). Once the chosen new cache has been
- * acquired, it signals that it has completed its task.
- */
-class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm {
- public:
-  acquire_new_cache_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& actuators,
-      std::shared_ptr<const representation::perceived_arena_map> map);
+block_to_new_cache_fsm::block_to_new_cache_fsm(
+    const struct params::fsm_params* params,
+    const std::shared_ptr<rcppsw::er::server>& server,
+    const std::shared_ptr<controller::saa_subsystem>& saa,
+    const std::shared_ptr<representation::perceived_arena_map>& map)
+    : base_block_to_cache_fsm(params, server, saa, map),
+      m_cache_fsm(params, server, saa, map) {}
 
- private:
-  argos::CVector2 select_cache_for_acquisition(void) override;
-};
-
-NS_END(depth2, fsm, fordyca);
-
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_ACQUIRE_NEW_CACHE_FSM_HPP_ */
+NS_END(depth2, controller, fordyca);

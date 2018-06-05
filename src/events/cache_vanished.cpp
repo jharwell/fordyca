@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/base_block_to_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
 #include "fordyca/tasks/collector.hpp"
@@ -61,7 +61,7 @@ void cache_vanished::visit(tasks::collector& task) {
 } /* visit() */
 
 void cache_vanished::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
@@ -69,7 +69,7 @@ void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void cache_vanished::visit(fsm::depth1::block_to_cache_fsm& fsm) {
+void cache_vanished::visit(fsm::depth1::base_block_to_cache_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */

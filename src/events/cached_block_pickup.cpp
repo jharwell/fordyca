@@ -28,7 +28,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"

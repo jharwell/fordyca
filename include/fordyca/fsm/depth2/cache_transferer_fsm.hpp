@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
-#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -124,8 +124,8 @@ class cache_transferer_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  bool                      m_task_running{false};
-  depth1::acquire_cache_fsm m_cache_fsm;
+  bool                               m_task_running{false};
+  depth1::acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
