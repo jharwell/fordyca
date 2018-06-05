@@ -51,6 +51,8 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
 argos::CVector2 acquire_new_cache_fsm::select_cache_for_acquisition(void) {
   controller::depth2::new_cache_selector selector(server_ref(),
                                                   nest_center());
+
+  /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
       selector.calc_best(map()->perceived_blocks(), base_sensors()->position());
   ER_NOM("Select new cache for acquisition: %d@(%zu, %zu) [utility=%f]",
