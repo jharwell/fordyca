@@ -41,7 +41,7 @@ class stateless_foraging_fsm;
 class stateful_foraging_fsm;
 } // namespace depth0
 namespace depth1 {
-class block_to_cache_fsm;
+class base_block_to_cache_fsm;
 }
 } // namespace fsm
 namespace controller { namespace depth0 {
@@ -74,7 +74,7 @@ class free_block_pickup
                                 controller::depth0::stateful_foraging_controller,
                                 fsm::depth0::stateless_foraging_fsm,
                                 fsm::depth0::stateful_foraging_fsm,
-                                fsm::depth1::block_to_cache_fsm,
+                                fsm::depth1::base_block_to_cache_fsm,
                                 tasks::generalist,
                                 tasks::harvester> {
  public:
@@ -103,7 +103,7 @@ class free_block_pickup
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(fsm::depth1::block_to_cache_fsm& fsm) override;
+  void visit(fsm::depth1::base_block_to_cache_fsm& fsm) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::generalist& task) override;
   void visit(tasks::harvester& task) override;

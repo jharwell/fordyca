@@ -1,7 +1,7 @@
 /**
- * @file block_to_cache_fsm.hpp
+ * @file base_block_to_cache_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_CACHE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,7 +29,6 @@
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
 #include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/block_transport_metrics.hpp"
@@ -43,14 +42,14 @@ namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
-
 NS_START(fsm, depth1);
+class base_acquire_cache_fsm;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_cache_fsm
+ * @class base_block_to_cache_fsm
  * @ingroup fsm depth1
  *
  * @brief The FSM for the block-to-cache subtask.
@@ -60,21 +59,21 @@ NS_START(fsm, depth1);
  * it knows about. Once it has done that it will signal that its task is
  * complete.
  */
-class block_to_cache_fsm : public base_foraging_fsm,
-                           public metrics::fsm::block_acquisition_metrics,
-                           public metrics::fsm::cache_acquisition_metrics,
-                           public metrics::fsm::block_transport_metrics,
-                           public task_allocation::taskable,
-                           public visitor::visitable_any<block_to_cache_fsm> {
+class base_block_to_cache_fsm : public base_foraging_fsm,
+                                public metrics::fsm::block_acquisition_metrics,
+                                public metrics::fsm::cache_acquisition_metrics,
+                                public metrics::fsm::block_transport_metrics,
+                                public task_allocation::taskable,
+                                public visitor::visitable_any<base_block_to_cache_fsm> {
  public:
-  block_to_cache_fsm(
+  base_block_to_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
-  block_to_cache_fsm(const block_to_cache_fsm& fsm) = delete;
-  block_to_cache_fsm& operator=(const block_to_cache_fsm& fsm) = delete;
+  base_block_to_cache_fsm(const base_block_to_cache_fsm& fsm) = delete;
+  base_block_to_cache_fsm& operator=(const base_block_to_cache_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -139,6 +138,10 @@ class block_to_cache_fsm : public base_foraging_fsm,
     ST_MAX_STATES,
   };
 
+  virtual base_acquire_cache_fsm& cache_fsm(void) = 0;
+  const base_acquire_cache_fsm& cache_fsm(void) const {
+    return const_cast<base_block_to_cache_fsm*>(this)->cache_fsm(); }
+
  private:
   constexpr static uint kPICKUP_TIMEOUT = 100;
 
@@ -146,14 +149,14 @@ class block_to_cache_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to cache states */
-  HFSM_STATE_DECLARE(block_to_cache_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_cache_fsm, acquire_free_block);
-  HFSM_STATE_DECLARE(block_to_cache_fsm, wait_for_block_pickup,
+  HFSM_STATE_DECLARE(base_block_to_cache_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, acquire_free_block);
+  HFSM_STATE_DECLARE(base_block_to_cache_fsm, wait_for_block_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_cache_fsm, transport_to_cache);
-  HFSM_STATE_DECLARE(block_to_cache_fsm, wait_for_cache_drop,
+  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, transport_to_cache);
+  HFSM_STATE_DECLARE(base_block_to_cache_fsm, wait_for_cache_drop,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_cache_fsm, finished);
+  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, finished);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -168,7 +171,6 @@ class block_to_cache_fsm : public base_foraging_fsm,
   // clang-format off
   uint              m_pickup_count;
   acquire_block_fsm m_block_fsm;
-  acquire_cache_fsm m_cache_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
@@ -176,4 +178,4 @@ class block_to_cache_fsm : public base_foraging_fsm,
 
 NS_END(depth1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_CACHE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_ */

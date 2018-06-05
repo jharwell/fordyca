@@ -25,7 +25,7 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
@@ -120,10 +120,10 @@ void cache_block_drop::visit(controller::depth1::foraging_controller& controller
 } /* visit() */
 
 void cache_block_drop::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_block_drop::visit(fsm::depth1::block_to_cache_fsm& fsm) {
+void cache_block_drop::visit(fsm::depth1::base_block_to_cache_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

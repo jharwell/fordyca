@@ -1,7 +1,7 @@
 /**
- * @file acquire_cache_fsm.hpp
+ * @file base_acquire_cache_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_ACQUIRE_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_ACQUIRE_CACHE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BASE_ACQUIRE_CACHE_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH1_BASE_ACQUIRE_CACHE_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -50,27 +50,27 @@ NS_START(fsm, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_cache_fsm
+ * @class base_acquire_cache_fsm
  * @ingroup fsm depth1
  *
- * @brief The FSM for an acquiring a block from a cache in the arena.
+ * @brief The base FSM for an acquiring from a cache in the arena.
  *
  * Each robot executing this FSM will look for a cache (either a known cache or
- * via random exploration). Once a block has been acquired from an existing
- * cache has been acquired, it signals that it has completed its task.
+ * via random exploration). Once a cache has been acquired, it signals that it
+ * has completed its task.
  */
-class acquire_cache_fsm : public base_foraging_fsm,
-                          public metrics::fsm::cache_acquisition_metrics,
-                          public rcppsw::task_allocation::taskable {
+class base_acquire_cache_fsm : public base_foraging_fsm,
+                               public metrics::fsm::cache_acquisition_metrics,
+                               public rcppsw::task_allocation::taskable {
  public:
-  acquire_cache_fsm(
+  base_acquire_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& actuators,
+      const std::shared_ptr<controller::saa_subsystem>& saa,
       std::shared_ptr<const representation::perceived_arena_map> map);
 
-  acquire_cache_fsm(const acquire_cache_fsm& fsm) = delete;
-  acquire_cache_fsm& operator=(const acquire_cache_fsm& fsm) = delete;
+  base_acquire_cache_fsm(const base_acquire_cache_fsm& fsm) = delete;
+  base_acquire_cache_fsm& operator=(const base_acquire_cache_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -107,7 +107,7 @@ class acquire_cache_fsm : public base_foraging_fsm,
    *
    * @return The location of the "best" cache to acquire
    */
-  virtual argos::CVector2 select_cache_for_acquisition(void);
+  virtual argos::CVector2 select_cache_for_acquisition(void) = 0;
 
   argos::CVector2 nest_center(void) const { return mc_nest_center; }
   std::shared_ptr<const representation::perceived_arena_map> map(void) const {
@@ -142,11 +142,11 @@ class acquire_cache_fsm : public base_foraging_fsm,
   bool acquire_known_cache(
       std::list<representation::perceived_cache> caches);
 
-  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, start);
-  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, acquire_cache);
-  HFSM_STATE_DECLARE_ND(acquire_cache_fsm, finished);
+  HFSM_STATE_DECLARE_ND(base_acquire_cache_fsm, start);
+  HFSM_STATE_DECLARE_ND(base_acquire_cache_fsm, acquire_cache);
+  HFSM_STATE_DECLARE_ND(base_acquire_cache_fsm, finished);
 
-  HFSM_EXIT_DECLARE(acquire_cache_fsm, exit_acquire_cache);
+  HFSM_EXIT_DECLARE(base_acquire_cache_fsm, exit_acquire_cache);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -172,4 +172,4 @@ class acquire_cache_fsm : public base_foraging_fsm,
 
 NS_END(depth1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_ACQUIRE_CACHE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BASE_ACQUIRE_CACHE_FSM_HPP_ */
