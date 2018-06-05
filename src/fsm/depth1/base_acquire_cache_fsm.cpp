@@ -1,7 +1,7 @@
 /**
- * @file acquire_cache_fsm.cpp
+ * @file base_acquire_cache_fsm.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
@@ -44,7 +44,7 @@ namespace depth1 = controller::depth1;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_fsm::acquire_cache_fsm(
+base_acquire_cache_fsm::base_acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
@@ -69,13 +69,13 @@ acquire_cache_fsm::acquire_cache_fsm(
   m_explore_fsm.change_parent(explore_for_cache_fsm::ST_EXPLORE, &acquire_cache);
 }
 
-HFSM_STATE_DEFINE_ND(acquire_cache_fsm, start) {
+HFSM_STATE_DEFINE_ND(base_acquire_cache_fsm, start) {
   ER_DIAG("Executing ST_START");
   internal_event(ST_ACQUIRE_CACHE);
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(acquire_cache_fsm, acquire_cache) {
+HFSM_STATE_DEFINE_ND(base_acquire_cache_fsm, acquire_cache) {
   if (ST_ACQUIRE_CACHE != last_state()) {
     ER_DIAG("Executing ST_ACQUIRE_CACHE");
   }
@@ -86,11 +86,11 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, acquire_cache) {
   return state_machine::event_signal::HANDLED;
 }
 
-HFSM_EXIT_DEFINE(acquire_cache_fsm, exit_acquire_cache) {
+HFSM_EXIT_DEFINE(base_acquire_cache_fsm, exit_acquire_cache) {
   m_vector_fsm.task_reset();
   m_explore_fsm.task_reset();
 }
-HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
+HFSM_STATE_DEFINE_ND(base_acquire_cache_fsm, finished) {
   if (ST_FINISHED != last_state()) {
     ER_DIAG("Executing ST_FINISHED");
   }
@@ -101,37 +101,37 @@ HFSM_STATE_DEFINE_ND(acquire_cache_fsm, finished) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-__pure bool acquire_cache_fsm::is_avoiding_collision(void) const {
+__pure bool base_acquire_cache_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool acquire_cache_fsm::cache_acquired(void) const {
+bool base_acquire_cache_fsm::cache_acquired(void) const {
   return current_state() == ST_FINISHED;
 } /* cache_acquired() */
 
-bool acquire_cache_fsm::is_exploring_for_cache(void) const {
+bool base_acquire_cache_fsm::is_exploring_for_cache(void) const {
   return (current_state() == ST_ACQUIRE_CACHE && m_explore_fsm.task_running());
 } /* is_exploring_for_cache() */
 
-bool acquire_cache_fsm::is_vectoring_to_cache(void) const {
+bool base_acquire_cache_fsm::is_vectoring_to_cache(void) const {
   return current_state() == ST_ACQUIRE_CACHE && m_vector_fsm.task_running();
 } /* is_vectoring_to_cache() */
 
-bool acquire_cache_fsm::is_acquiring_cache(void) const {
+bool base_acquire_cache_fsm::is_acquiring_cache(void) const {
   return is_vectoring_to_cache() || is_exploring_for_cache();
 } /* is_acquring_cache() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void acquire_cache_fsm::init(void) {
+void base_acquire_cache_fsm::init(void) {
   base_foraging_fsm::init();
   m_vector_fsm.task_reset();
   m_explore_fsm.task_reset();
 } /* init() */
 
-bool acquire_cache_fsm::acquire_known_cache(
+bool base_acquire_cache_fsm::acquire_known_cache(
     std::list<representation::perceived_cache> caches) {
   /*
    * If we don't know of any caches and we are not current vectoring towards
@@ -147,17 +147,10 @@ bool acquire_cache_fsm::acquire_known_cache(
      * vectoring toward any of them.
      */
     if (!m_vector_fsm.task_running()) {
-      controller::depth1::existing_cache_selector selector(m_server,
+      controller::depth1::existing_cache_selector selector(server_ref(),
                                                            mc_nest_center);
-      representation::perceived_cache best =
-          selector.calc_best(caches, base_sensors()->position());
-      ER_NOM("Vector towards best cache: %d@(%zu, %zu)=%f",
-             best.ent->id(),
-             best.ent->discrete_loc().first,
-             best.ent->discrete_loc().second,
-             best.density.last_result());
       tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               best.ent->real_loc());
+                               select_cache_for_acquisition());
       m_explore_fsm.task_reset();
       m_vector_fsm.task_reset();
       m_vector_fsm.task_start(&v);
@@ -183,20 +176,7 @@ bool acquire_cache_fsm::acquire_known_cache(
   return false;
 } /* acquire_known_cache() */
 
-argos::CVector2 acquire_cache_fsm::select_cache_for_acquisition(void) {
-  controller::depth1::existing_cache_selector selector(m_server,
-                                                       mc_nest_center);
-  representation::perceived_cache best =
-      selector.calc_best(mc_map->perceived_caches(), base_sensors()->position());
-  ER_NOM("Select cache for acquisition: %d@(%zu, %zu) [utility=%f]",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         best.density.last_result());
-  return best.ent->real_loc();
-} /* select_cache_for_acquisition() */
-
-bool acquire_cache_fsm::acquire_unknown_cache(void) {
+bool base_acquire_cache_fsm::acquire_unknown_cache(void) {
   if (!m_explore_fsm.task_running()) {
     m_explore_fsm.task_reset();
     m_explore_fsm.task_start(nullptr);
@@ -212,7 +192,7 @@ bool acquire_cache_fsm::acquire_unknown_cache(void) {
   return false;
 } /* acquire_unknown_cache() */
 
-bool acquire_cache_fsm::acquire_any_cache(void) {
+bool base_acquire_cache_fsm::acquire_any_cache(void) {
   /*
    * If we know of ANY caches in the arena, go to the location of the best one
    * and pick it up. Otherwise, explore until you find one. If during
@@ -230,7 +210,7 @@ bool acquire_cache_fsm::acquire_any_cache(void) {
   return true;
 } /* acquire_any_cache() */
 
-void acquire_cache_fsm::task_execute(void) {
+void base_acquire_cache_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */

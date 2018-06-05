@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 #include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
@@ -194,8 +194,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                      m_pickup_count{0};
-  depth1::acquire_cache_fsm m_cache_fsm;
+  uint                               m_pickup_count{0};
+  depth1::acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

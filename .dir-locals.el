@@ -33,7 +33,9 @@
                         (concat
                          (projectile-project-root)
                          "build")))
-          (add-hook 'c++-mode-hook 'google-style-hook))
+          (add-hook 'c++-mode-hook 'google-style-hook)
+          (setq helm-locate-project-list (list "fordyca" "rcppsw"))
+          )
         (let
             ((cc-search-dirs
               (list

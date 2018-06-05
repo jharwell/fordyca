@@ -51,4 +51,3 @@ target_link_libraries(${target}
   Qt5::Core
   Qt5::Gui
   )
-target_include_directories(${target} PUBLIC "${${target}_INCLUDE_DIRS}")

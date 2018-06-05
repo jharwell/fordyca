@@ -43,7 +43,7 @@ This is the main entry point for getting started on the project.
 3. Build via:
 
         mkdir build && cd build
-        cmake ..
+        cmake -DWITH_HAL="argos-footbot" ..
         make
 
    To build the documentation, do the following from the build directory:
