@@ -1,5 +1,5 @@
 /**
- * @file block_params.hpp
+ * @file block_distribution_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/block_params.hpp"
+#include "fordyca/representation/extent_model.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,13 +37,16 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct block_params
+ * @struct block_distribution_params
  * @ingroup params
  */
-struct block_params : public rcppsw::params::base_params {
-  double dimension{0.0};
+struct block_distribution_params : public rcppsw::params::base_params {
+  uint n_blocks{0};
+  std::string dist_type{""};
+  representation::extent_model arena_model{};
+  representation::extent_model nest_model{};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_ */

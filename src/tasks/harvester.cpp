@@ -52,18 +52,21 @@ harvester::harvester(const struct task_allocation::task_params* params,
  * Member Functions
  ******************************************************************************/
 __pure double harvester::current_time(void) const {
-  return dynamic_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return dynamic_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
 bool harvester::cache_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->cache_acquired();
 } /* cache_acquired() */
 
 bool harvester::block_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->block_acquired();
 } /* cache_acquired() */
 
@@ -120,12 +123,14 @@ void harvester::accept(events::cache_vanished& visitor) {
  * Base Metrics
  ******************************************************************************/
 bool harvester::is_exploring_for_block(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_exploring_for_block();
 } /* is_exploring_for_block() */
 
 bool harvester::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
@@ -133,12 +138,14 @@ bool harvester::is_avoiding_collision(void) const {
  * Depth0 Metrics
  ******************************************************************************/
 bool harvester::is_acquiring_block(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_acquiring_block();
 } /* is_acquiring_block() */
 
 bool harvester::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_vectoring_to_block();
 } /* is_vectoring_to_block() */
 
@@ -146,24 +153,26 @@ bool harvester::is_vectoring_to_block(void) const {
  * Depth1 Metrics
  ******************************************************************************/
 bool harvester::is_exploring_for_cache(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_exploring_for_cache();
 } /* is_exploring_for_cache() */
 
 bool harvester::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+             polled_task::mechanism())
       ->is_vectoring_to_cache();
 } /* is_vectoring_to_cache() */
 
 bool harvester::is_acquiring_cache(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-      polled_task::mechanism())
+             polled_task::mechanism())
       ->is_acquiring_cache();
 } /* is_acquiring_cache() */
 
 bool harvester::is_transporting_to_cache(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-      polled_task::mechanism())
+             polled_task::mechanism())
       ->is_transporting_to_cache();
 } /* is_transporting_to_cache() */
 

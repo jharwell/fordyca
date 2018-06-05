@@ -120,7 +120,8 @@ void cache_block_drop::visit(controller::depth1::foraging_controller& controller
 } /* visit() */
 
 void cache_block_drop::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(fsm::depth1::base_block_to_cache_fsm& fsm) {

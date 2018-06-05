@@ -47,6 +47,15 @@ void arena_map_parser::parse(const ticpp::Element& node) {
   m_block_parser.parse(anode);
   m_params.block = *m_block_parser.parse_results();
 
+  m_block_dist_parser.parse(anode);
+  m_params.block_dist = *m_block_dist_parser.parse_results();
+  m_params.block_dist.arena_model.x =
+      argos::CRange<double>(m_params.grid.lower.GetX(),
+                            m_params.grid.upper.GetX());
+  m_params.block_dist.arena_model.y =
+      argos::CRange<double>(m_params.grid.lower.GetY(),
+                            m_params.grid.upper.GetY());
+
   m_cache_parser.parse(anode);
   m_params.cache = *m_cache_parser.parse_results();
 
@@ -62,6 +71,8 @@ void arena_map_parser::parse(const ticpp::Element& node) {
                       std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
   m_params.nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
                       std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
+  m_params.block_dist.nest_model.x = m_params.nest_x;
+  m_params.block_dist.nest_model.y = m_params.nest_y;
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {

@@ -1,7 +1,7 @@
 /**
- * @file block_parser.cpp
+ * @file block_distribution_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "fordyca/params/block_parser.hpp"
+#include "fordyca/params/block_distribution_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -34,24 +34,37 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char block_parser::kXMLRoot[];
+constexpr char block_distribution_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_parser::parse(const ticpp::Element& node) {
+void block_distribution_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(bnode, m_params, dimension);
+  XML_PARSE_PARAM(bnode, m_params, dist_type);
+  XML_PARSE_PARAM(bnode, m_params, n_blocks);
+  XML_PARSE_PARAM(bnode, m_params, arena_model.shape);
+  XML_PARSE_PARAM(bnode, m_params, arena_model.orientation);
+  XML_PARSE_PARAM(bnode, m_params, nest_model.shape);
+  XML_PARSE_PARAM(bnode, m_params, nest_model.orientation);
 } /* parse() */
 
-void block_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, dimension) << std::endl
+void block_distribution_parser::show(std::ostream& stream) const {
+  stream << build_header() << XML_PARAM_STR(m_params, dist_type) << std::endl
+         << XML_PARAM_STR(m_params, n_blocks) << std::endl
+         << XML_PARAM_STR(m_params, arena_model.shape) << std::endl
+         << XML_PARAM_STR(m_params, arena_model.orientation) << std::endl
+         << XML_PARAM_STR(m_params, nest_model.shape) << std::endl
+         << XML_PARAM_STR(m_params, nest_model.orientation) << std::endl
          << build_footer();
 } /* show() */
 
-bool block_parser::validate(void) const {
-  return m_params.dimension > 0.0;
+bool block_distribution_parser::validate(void) const {
+  return !("" == m_params.dist_type || "" == m_params.arena_model.shape ||
+           "" == m_params.arena_model.orientation ||
+           "" == m_params.nest_model.shape ||
+           "" == m_params.nest_model.orientation);
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/base_block_to_cache_fsm.hpp"
-#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -64,7 +64,9 @@ base_block_to_cache_fsm::base_block_to_cache_fsm(
                                                &entry_wait_for_signal,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  insmod("base_block_to_cache_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
+  insmod("base_block_to_cache_fsm",
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
 }
 
 HFSM_STATE_DEFINE(base_block_to_cache_fsm, start, state_machine::event_data) {
