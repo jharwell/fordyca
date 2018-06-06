@@ -7,6 +7,14 @@ This is the main entry point for getting started on the project.
 1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
+   *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
+   _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
+   linux. This is because those packages were compiled with gcc/g++ 5.4, and
+   therefore the core ARGoS libraries that fordyca uses are ABI incompatible
+   with anything compiled with gcc >= 6.0. If you are compiling ARGoS from
+   source you can use whatever compiler/compiler version you like, so long as it
+   supports C++14.
+
 2. Verify that you can run the simple foraging example that comes
    packaged on the ARGoS website.
 
@@ -38,7 +46,7 @@ This is the main entry point for getting started on the project.
 
 2. Pull in the cmake project scaffolding:
 
-        git submodule update --init --recursive --remote 
+        git submodule update --init --recursive --remote
 
 3. Build via:
 
