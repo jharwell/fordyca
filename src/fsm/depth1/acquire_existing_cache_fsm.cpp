@@ -27,8 +27,8 @@
 #include <argos3/core/utility/datatypes/color.h>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -49,6 +49,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const std::shared_ptr<controller::saa_subsystem>& saa,
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_acquire_cache_fsm(params, server, saa, map) {}
+
 
 argos::CVector2 acquire_existing_cache_fsm::select_cache_for_acquisition(void) {
   controller::depth1::existing_cache_selector selector(server_ref(),

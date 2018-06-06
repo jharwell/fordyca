@@ -61,8 +61,7 @@ void cache_vanished::visit(tasks::collector& task) {
 } /* visit() */
 
 void cache_vanished::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())
-      ->accept(*this);
+  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
