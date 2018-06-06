@@ -41,15 +41,9 @@ arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
       mc_cache_params(params->cache),
       mc_nest_center(params->nest_center),
-      m_blocks(params->block.n_blocks),
+      m_blocks(params->block_dist.n_blocks),
       m_caches(),
-      m_block_distributor(argos::CRange<double>(params->grid.lower.GetX(),
-                                                params->grid.upper.GetX()),
-                          argos::CRange<double>(params->grid.lower.GetY(),
-                                                params->grid.upper.GetY()),
-                          params->nest_x,
-                          params->nest_y,
-                          &params->block),
+      m_block_distributor(&params->block_dist),
       m_server(rcppsw::er::g_server),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
@@ -131,9 +125,10 @@ void arena_map::distribute_block(const std::shared_ptr<block>& block) {
 } /* distribute_block() */
 
 void arena_map::static_cache_create(void) {
-  double src_center = (m_block_distributor.single_src_xrange().GetMin() +
-                       m_block_distributor.single_src_xrange().GetMax()) /
-                      2.0;
+  double src_center =
+      (m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMin() +
+       m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMax()) /
+      2.0;
   double x = (src_center + mc_nest_center.GetX()) / 2.0;
   double y = mc_nest_center.GetY();
 

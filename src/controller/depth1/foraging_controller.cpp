@@ -120,7 +120,7 @@ void foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
-      rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
+      rcppsw::make_unique<fsm::depth1::block_to_cache_fsm>(
           stateful_repo.parse_results<params::fsm_params>(),
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),

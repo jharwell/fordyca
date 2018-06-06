@@ -37,9 +37,7 @@ new_cache_selector::new_cache_selector(
     const std::shared_ptr<rcppsw::er::server>& server,
     argos::CVector2 nest_loc)
     : client(server), m_nest_loc(nest_loc) {
-  insmod("new_cache_selector",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+  insmod("new_cache_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
@@ -55,8 +53,7 @@ representation::perceived_block new_cache_selector::calc_best(
   for (auto& c : new_caches) {
     math::new_cache_utility u(c.ent->real_loc(), m_nest_loc);
 
-    double utility =
-        u.calc(robot_loc, c.density.last_result());
+    double utility = u.calc(robot_loc, c.density.last_result());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
     ER_DIAG("Utility for new_cache%d loc=(%zu, %zu), density=%f: %f",
             c.ent->id(),

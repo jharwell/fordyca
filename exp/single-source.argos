@@ -128,10 +128,14 @@
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks n_blocks="20"
-              dimension="0.2"
-              dist_model="single_source"
-              />
+      <blocks dimension="0.2" />
+      <block_distribution n_blocks="20"
+                          dist_type="single_source"
+                          arena_model.shape="rectangle"
+                          arena_model.orientation="horizontal"
+                          nest_model.shape="rectangle"
+                          nest_model.orientation="horizontal"
+                          />
       <caches create_static="true"
               create_dynamic="false"
               static_size="2"

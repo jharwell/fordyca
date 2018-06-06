@@ -1,7 +1,7 @@
 /**
- * @file block_params.hpp
+ * @file extent_model.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,31 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/params/base_params.hpp"
+#include "argos3/core/utility/math/range.h"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-/**
- * @struct block_params
- * @ingroup params
- */
-struct block_params : public rcppsw::params::base_params {
-  double dimension{0.0};
+struct extent_model {
+  std::string shape{""};
+  std::string orientation{""};
+  argos::CRange<double> x{0.0, 0.0};
+  argos::CRange<double> y{0.0, 0.0};
 };
 
-NS_END(params, fordyca);
+NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_ */
