@@ -35,6 +35,7 @@
 #include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
+#include "fordyca/tasks/existing_cache_interactor.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -110,7 +111,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     collector_group().collect_from(
         "fsm::cache_acquisition",
         static_cast<metrics::fsm::cache_acquisition_metrics&>(
-            *controller.current_task()));
+            dynamic_cast<tasks::existing_cache_interactor&>(*controller.current_task())));
     collector_group().collect_from(
         "tasks::execution",
         static_cast<rcppsw::metrics::tasks::execution_metrics&>(

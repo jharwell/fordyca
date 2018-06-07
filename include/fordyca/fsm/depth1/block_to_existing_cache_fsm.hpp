@@ -58,7 +58,9 @@ class block_to_existing_cache_fsm : public base_block_to_cache_fsm {
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;
 
   base_acquire_cache_fsm& cache_fsm(void) override { return m_cache_fsm; }
+  bool acquisition_exists(void) const override{ return m_cache_fsm.acquisition_exists(); }
 
+ private:
   // clang-format off
   acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on

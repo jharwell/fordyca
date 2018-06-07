@@ -47,6 +47,12 @@ class cache_acquisition_metrics : public base_fsm_metrics {
   ~cache_acquisition_metrics(void) override = default;
 
   /**
+   * @brief If \c TRUE, then the cache the robot is acquiring already exists (or
+   * at least the robot thinks it does).
+   */
+  virtual bool acquisition_exists(void) const = 0;
+
+  /**
    * @brief If \c TRUE, then the robot is currently running the
    * \ref explore_for_cache_fsm.
    */

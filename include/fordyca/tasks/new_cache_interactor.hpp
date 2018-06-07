@@ -1,7 +1,7 @@
 /**
- * @file block_drop_event.hpp
+ * @file new_cache_interactor.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_EVENT_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_EVENT_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include <string>
+
+#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/tasks/argument.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class arena_map;
-class block;
-} // namespace representation
-namespace controller { namespace depth1 {
-class foraging_controller;
-}} // namespace controller::depth1
-namespace tasks { class cache_starter; }
+namespace events {
+class cache_appeared;
+class free_block_drop;
+} // namespace events
 
-NS_START(events);
+namespace visitor = rcppsw::patterns::visitor;
+
+NS_START(tasks);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class block_drop_event
- * @ingroup events
+ * @class new_cache_interactor
+ * @ingroup tasks
  *
- * @brief Interface specifying the minimum set of classes any action involving
- * dropping a block will need to visit.
+ * @brief Interactor specifying the event visit set for all foraging tasks that
+ * interact with new caches in FORDYCA.
  */
-class block_drop_event
-    : public visitor::visit_set<representation::arena_map,
-                                representation::block,
-                                controller::depth1::foraging_controller,
-                                tasks::cache_starter,
-                                fsm::depth2::block_to_new_cache> {};
+class new_cache_interactor
+    : public metrics::fsm::cache_acquisition_metrics,
+      public visitor::polymorphic_visitable<new_cache_interactor,
+                                            events::free_block_drop,
+                                            events::cache_appeared> {};
 
-NS_END(events, fordyca);
+NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_EVENT_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_ */

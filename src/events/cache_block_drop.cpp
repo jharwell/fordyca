@@ -112,7 +112,8 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
-  controller.current_task()->accept(*this);
+  dynamic_cast<tasks::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
 
   ER_NOM("depth1_foraging_controller: dropped block%d in cache%d",
          m_block->id(),

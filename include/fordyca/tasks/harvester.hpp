@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/existing_cache_interactor.hpp"
+
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
@@ -33,6 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
+
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
@@ -45,7 +48,9 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
  */
-class harvester : public task_allocation::polled_task, public foraging_task {
+class harvester : public task_allocation::polled_task,
+                  public foraging_task,
+                  public existing_cache_interactor {
  public:
   harvester(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
@@ -57,26 +62,29 @@ class harvester : public task_allocation::polled_task, public foraging_task {
   void accept(events::cached_block_pickup&) override {}
   void accept(events::nest_block_drop&) override {}
 
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override { return false; }
 
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
+
+  /* block acquisition metrics */
+  bool is_exploring_for_block(void) const override;
   bool is_vectoring_to_block(void) const override;
+  bool is_acquiring_block(void) const override;
+  bool block_acquired(void) const override;
 
-  /* depth1 metrics */
+  /* existing cache acquisition metrics */
   bool is_exploring_for_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool is_acquiring_cache(void) const override;
+  bool cache_acquired(void) const override;
+  bool acquisition_exists(void) const override { return true; }
+
+  /* block transport metrics */
+  bool is_transporting_to_nest(void) const override { return false; }
   bool is_transporting_to_cache(void) const override;
 
   /* task metrics */
   bool at_interface(void) const override;
-
-  bool cache_acquired(void) const override;
-  bool block_acquired(void) const override;
 
   void task_start(const task_allocation::taskable_argument*) override;
   double current_time(void) const override;

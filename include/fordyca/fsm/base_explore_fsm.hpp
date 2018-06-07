@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -69,12 +67,6 @@ class base_explore_fsm : public base_foraging_fsm,
    * @brief Run the FSM in its current state without injecting an event into it.
    */
   void run(void);
-
- protected:
-  /**
-   * @brief Perform random walk exploration: wander force + avoidance force.
-   */
-  void random_explore(void);
 
  private:
   /**

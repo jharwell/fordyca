@@ -52,7 +52,8 @@ void cache_vanished::visit(controller::depth1::foraging_controller& controller) 
   ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
          controller.GetId().c_str(),
          m_cache_id);
-  controller.current_task()->accept(*this);
+  dynamic_cast<tasks::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
 } /* visit() */
 
 void cache_vanished::visit(tasks::collector& task) {

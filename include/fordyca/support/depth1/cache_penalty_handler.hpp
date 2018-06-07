@@ -28,6 +28,7 @@
 
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/tasks/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -80,7 +81,11 @@ class cache_penalty_handler : public rcppsw::er::client {
     if (nullptr == controller.current_task()) {
       return false;
     }
-    if (controller.current_task()->cache_acquired()) {
+    auto *task = dynamic_cast<tasks::existing_cache_interactor*>(
+        controller.current_task());
+    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+
+    if (task->cache_acquired()) {
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
       if (-1 == cache_id) {
