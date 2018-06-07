@@ -110,6 +110,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   bool is_acquiring_cache(void) const override;
   bool is_vectoring_to_cache(void) const override;
   bool cache_acquired(void) const override;
+  bool acquisition_exists(void) const override { return true; }
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;

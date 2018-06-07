@@ -30,6 +30,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/tasks/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -129,7 +130,10 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.current_task()->cache_acquired(),
+    auto *task = dynamic_cast<tasks::existing_cache_interactor*>(
+        controller.current_task());
+    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+    ER_ASSERT(task->cache_acquired(),
               "FATAL: Controller not waiting for cached block pickup");
 
     /*
@@ -176,8 +180,11 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    ER_ASSERT(controller.current_task()->cache_acquired(),
-              "FATAL: Controller not waiting for cache block drop");
+    auto *task = dynamic_cast<tasks::existing_cache_interactor*>(
+        controller.current_task());
+    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+      ER_ASSERT(task->cache_acquired(),
+                "FATAL: Controller not waiting for cache block drop");
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the

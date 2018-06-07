@@ -205,7 +205,8 @@ void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  controller.current_task()->accept(*this);
+  dynamic_cast<tasks::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),

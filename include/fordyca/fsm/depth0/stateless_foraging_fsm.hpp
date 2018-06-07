@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/block_transport_metrics.hpp"
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::fsm::block_acquisition_metrics,
+                               public metrics::fsm::goal_acquisition_metrics,
                                public metrics::fsm::block_transport_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
@@ -69,11 +69,14 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const override {
     return base_foraging_fsm::is_avoiding_collision();
   }
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_acquiring_block(void) const override { return false; }
-  bool is_vectoring_to_block(void) const override { return false; }
-  bool block_acquired(void) const override;
+
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kBlock;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override { return false; }
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;

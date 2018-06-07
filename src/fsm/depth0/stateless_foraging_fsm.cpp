@@ -115,9 +115,9 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool stateless_foraging_fsm::is_exploring_for_block(void) const {
+bool stateless_foraging_fsm::is_exploring_for_goal(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
-} /* is_exploring_for_block() */
+} /* is_exploring_for_goal() */
 
 bool stateless_foraging_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;
@@ -136,8 +136,8 @@ void stateless_foraging_fsm::run(void) {
                state_machine::event_type::NORMAL);
 } /* run() */
 
-bool stateless_foraging_fsm::block_acquired(void) const {
+bool stateless_foraging_fsm::goal_acquired(void) const {
   return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-} /* block_acquired() */
+} /* goal_acquired() */
 
 NS_END(depth0, fsm, fordyca);
