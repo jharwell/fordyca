@@ -39,8 +39,8 @@ NS_START(fordyca, controller, depth1);
  * @struct task_metrics_store
  * @ingroup controller depth1
  *
- * @brief A collection of variables used inreporting metrics about tasks at the
- * depth 1 level.
+ * @brief A collection of variables used in reporting metrics about tasks at the
+ * depth 1 level internally in the controller.
  */
 struct task_metrics_store {
   void reset(void) {
@@ -52,7 +52,7 @@ struct task_metrics_store {
   }
 
   bool task_aborted{false};  /// Was the current task aborted?
-  bool task_alloc{false};    /// Was a task allocated on the current timestep
+  bool task_alloc{false};    /// Was a task allocated on the current timestep?
 
   /**
    * Did a robot's task allocation change this timestep?

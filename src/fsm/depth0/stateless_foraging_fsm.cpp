@@ -25,6 +25,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/params/fsm_params.hpp"
+#include "fordyca/controller/random_explore_behavior.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,8 +48,11 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      m_rng(argos::CRandom::CreateRNG("argos")),
-      m_explore_fsm(server, saa),
+      m_explore_fsm(server,
+                    saa,
+                    std::make_unique<controller::random_explore_behavior>(server,
+                                                                          saa),
+                    std::bind(&stateless_foraging_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
@@ -139,5 +143,9 @@ void stateless_foraging_fsm::run(void) {
 bool stateless_foraging_fsm::goal_acquired(void) const {
   return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
 } /* goal_acquired() */
+
+bool stateless_foraging_fsm::block_detected(void) const {
+  return saa_subsystem()->sensing()->block_detected();
+} /* block_detected() */
 
 NS_END(depth0, fsm, fordyca);

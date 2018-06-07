@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
 
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
@@ -33,7 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth0);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -58,12 +58,6 @@ __pure double generalist::current_time(void) const {
       ->tick();
 } /* current_time() */
 
-bool generalist::block_acquired(void) const {
-  return static_cast<fsm::depth0::stateful_foraging_fsm*>(
-             polled_task::mechanism())
-      ->block_acquired();
-} /* cache_acquired() */
-
 double generalist::calc_abort_prob(void) {
   /*
    * Generalists always have a small chance of aborting their task when not at a
@@ -86,13 +80,13 @@ void generalist::accept(events::free_block_pickup& visitor) {
 }
 
 /*******************************************************************************
- * Stateless Metrics
+ * FSM Metrics
  ******************************************************************************/
-bool generalist::is_exploring_for_block(void) const {
+bool generalist::is_exploring_for_goal(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
-      ->is_exploring_for_block();
-} /* is_exploring_for_block() */
+      ->is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
 bool generalist::is_avoiding_collision(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(
@@ -106,19 +100,17 @@ bool generalist::is_transporting_to_nest(void) const {
       ->is_transporting_to_nest();
 } /* is_tranpsorting_to_nest() */
 
-/*******************************************************************************
- * Stateful Metrics
- ******************************************************************************/
-bool generalist::is_acquiring_block(void) const {
+bool generalist::is_vectoring_to_goal(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
-      ->is_acquiring_block();
-} /* is_acquiring_block() */
+      ->is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
-bool generalist::is_vectoring_to_block(void) const {
+bool generalist::goal_acquired(void) const {
   return static_cast<fsm::depth0::stateful_foraging_fsm*>(
-             polled_task::mechanism())
-      ->is_vectoring_to_block();
-} /* is_vectoring_to_block() */
+      polled_task::mechanism())
+      ->goal_acquired();
+} /* goal_acquired() */
 
-NS_END(tasks, fordyca);
+
+NS_END(depth0, tasks, fordyca);

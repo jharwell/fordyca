@@ -110,17 +110,13 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
   template <typename T>
   bool handle_nest_block_drop(
       argos::CFootBotEntity& robot,
-      representation::arena_map& map,
-      metrics::block_transport_metrics_collector& collector) {
+      representation::arena_map& map) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.is_transporting_to_nest()) {
-      /* Update arena map state due to a block nest drop */
       events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
-      /* update block transport metrics */
-      collector.accept(drop_op);
-
+      /* Update arena map state due to a block nest drop */
       map.accept(drop_op);
 
       /* Actually drop the block */

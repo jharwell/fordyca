@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/base_block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
 
 /*******************************************************************************
@@ -46,7 +46,7 @@ NS_START(fordyca, fsm, depth1);
  * existing cache it knows about. Once it has done that it will signal that its
  * task is complete.
  */
-class block_to_existing_cache_fsm : public base_block_to_cache_fsm {
+class block_to_existing_cache_fsm : public block_to_goal_fsm {
  public:
   block_to_existing_cache_fsm(
       const struct params::fsm_params* params,
@@ -57,8 +57,7 @@ class block_to_existing_cache_fsm : public base_block_to_cache_fsm {
   block_to_existing_cache_fsm(const block_to_existing_cache_fsm& fsm) = delete;
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;
 
-  base_acquire_cache_fsm& cache_fsm(void) override { return m_cache_fsm; }
-  bool acquisition_exists(void) const override{ return m_cache_fsm.acquisition_exists(); }
+  acquire_existing_cache_fsm& goal_fsm(void) override { return m_cache_fsm; }
 
  private:
   // clang-format off

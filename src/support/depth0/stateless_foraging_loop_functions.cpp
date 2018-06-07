@@ -32,7 +32,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/block_transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
@@ -40,7 +40,6 @@
 #include "fordyca/params/visualization_parser.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -148,11 +147,14 @@ void stateless_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_collector_group.collect_from(
+  m_collector_group.collect(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect_from(
+  m_collector_group.collect(
       "fsm::block_acquisition",
-      static_cast<metrics::fsm::block_acquisition_metrics&>(controller));
+      static_cast<metrics::fsm::goal_acquisition_metrics&>(controller));
+  m_collector_group.collect(
+      "block::transport",
+      static_cast<metrics::block_transport_metrics&>(controller));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -161,9 +163,7 @@ void stateless_foraging_loop_functions::pre_step_iter(
   /* Now watch it react to the environment */
   interactor(rcppsw::er::g_server,
              m_arena_map,
-             floor())(controller,
-                      static_cast<metrics::block_transport_metrics_collector&>(
-                          *m_collector_group["block"]));
+             floor())(controller);
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
@@ -191,13 +191,13 @@ void stateless_foraging_loop_functions::metric_collecting_init(
   fs::create_directories(m_metrics_path);
 
   m_collector_group
-      .register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
           "fsm::block_acquisition",
           m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
           p_output->metrics.collect_interval);
 
   m_collector_group.register_collector<metrics::block_transport_metrics_collector>(
-      "block",
+      "block::transport",
       m_metrics_path + "/" + p_output->metrics.block_fname,
       p_output->metrics.collect_interval);
 

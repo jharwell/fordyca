@@ -43,9 +43,9 @@
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/generalist.hpp"
-#include "fordyca/tasks/harvester.hpp"
+#include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
@@ -55,6 +55,7 @@
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
 using representation::occupancy_grid;
+namespace tasks = tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -135,7 +136,8 @@ void foraging_controller::Init(ticpp::Element& node) {
           base_foraging_controller::saa_subsystem(),
           perception()->map());
   m_generalist =
-      rcppsw::make_unique<tasks::generalist>(&p->executive, generalist_fsm);
+      rcppsw::make_unique<fordyca::tasks::depth0::generalist>(&p->executive,
+                                                              generalist_fsm);
 
   m_generalist->partition1(m_harvester.get());
   m_generalist->partition2(m_collector.get());

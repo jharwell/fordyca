@@ -51,23 +51,23 @@ acquire_block_fsm::acquire_block_fsm(
     : acquire_goal_fsm(server,
                        saa,
                        map,
-                       std::bind(&acquire_block_fsm::block_detected, this)),
+                       std::bind(&acquire_block_fsm::block_detected_cb, this)),
       mc_nest_center(params->nest_center) {
   client::insmod("acquire_block_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
-  goal_acquired_cb(std::bind(&acquire_block_fsm::block_detected_cb,
+  goal_acquired_cb(std::bind(&acquire_block_fsm::block_acquired_cb,
                              this,
                              std::placeholders::_1));
 }
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_block_fsm::block_detected(void) const {
+bool acquire_block_fsm::block_detected_cb(void) const {
   return saa_subsystem()->sensing()->block_detected();
-} /* block_detected() */
+} /* block_detected_cb() */
 
-bool acquire_block_fsm::block_detected_cb(bool explore_result) const {
+bool acquire_block_fsm::block_acquired_cb(bool explore_result) const {
   if (explore_result) {
     ER_ASSERT(saa_subsystem()->sensing()->block_detected(),
               "FATAL: No block detected after successful exploration?");
@@ -79,7 +79,7 @@ bool acquire_block_fsm::block_detected_cb(bool explore_result) const {
     ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
     return false;
   }
-} /* block_detected_cb() */
+} /* block_acquired_cb() */
 
 bool acquire_block_fsm::acquire_known_goal(void) {
   std::list<representation::perceived_block> blocks = map()->perceived_blocks();
@@ -120,7 +120,7 @@ bool acquire_block_fsm::acquire_known_goal(void) {
 
   if (vector_fsm().task_finished()) {
     vector_fsm().task_reset();
-    return block_detected_cb(false);
+    return block_acquired_cb(false);
   }
   return false;
 } /* acquire_known_block() */

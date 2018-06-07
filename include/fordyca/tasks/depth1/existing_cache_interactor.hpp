@@ -1,5 +1,5 @@
 /**
- * @file block_transport_metrics.hpp
+ * @file existing_cache_interactor.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,48 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include <string>
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+NS_START(fordyca);
+
+namespace events {
+class cached_block_pickup;
+class cache_block_drop;
+class cache_vanished;
+} // namespace events
+
+namespace visitor = rcppsw::patterns::visitor;
+
+NS_START(tasks, depth1);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class block_transport_metrics
- * @ingroup metrics fsm
+ * @class existing_cache_interactor
+ * @ingroup tasks depth1
  *
- * @brief Interface defining what metrics that should be collected from robots
- * as they transport blocks SOMEWHERE.
+ * @brief Interactor specifying the event visit set for all foraging tasks that
+ * interact with existing caches in FORDYCA.
  */
-class block_transport_metrics : public base_fsm_metrics {
- public:
-  block_transport_metrics(void) = default;
-  ~block_transport_metrics(void) override = default;
+class existing_cache_interactor
+    : public visitor::polymorphic_visitable<existing_cache_interactor,
+                                            events::cached_block_pickup,
+                                            events::cache_block_drop,
+                                            events::cache_vanished> {};
 
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block and is currently
-   * taking it back to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
+NS_END(depth1, tasks, fordyca);
 
-  /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
-   * of choice.
-   */
-  virtual bool is_transporting_to_cache(void) const = 0;
-};
-
-NS_END(fsm, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_ */

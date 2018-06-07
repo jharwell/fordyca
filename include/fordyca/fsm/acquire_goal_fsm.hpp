@@ -108,6 +108,13 @@ class acquire_goal_fsm : public base_foraging_fsm,
   const explore_for_goal_fsm& explore_fsm(void) const { return m_explore_fsm; }
   explore_for_goal_fsm& explore_fsm(void) { return m_explore_fsm; }
 
+  /**
+   * @brief Acquire a known goal. If the robot's knowledge of the chosen
+   * goal's existence expires during the pursuit of said goal, that is
+   * ignored.
+   */
+  virtual bool acquire_known_goal(void) = 0;
+
  private:
   /**
    * @brief Acquire a known goal or discover one via random exploration.
@@ -122,13 +129,6 @@ class acquire_goal_fsm : public base_foraging_fsm,
    * @return \c TRUE if a goal has been acquired \c FALSE otherwise.
    */
   bool acquire_unknown_goal(void);
-
-  /**
-   * @brief Acquire a known goal. If the robot's knowledge of the chosen
-   * goal's existence expires during the pursuit of said goal, that is
-   * ignored.
-   */
-  virtual bool acquire_known_goal(void) = 0;
 
   HFSM_STATE_DECLARE_ND(acquire_goal_fsm, start);
   HFSM_STATE_DECLARE_ND(acquire_goal_fsm, fsm_acquire_goal);

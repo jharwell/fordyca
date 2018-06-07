@@ -26,49 +26,51 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class block_transport_metrics_collector
- * @ingroup metrics
+ * @ingroup metrics fsm
  *
  * @brief Collector for \ref block_transport_metrics.
  *
- * Metrics are written out at the specified interval.
+ * Metrics are written out at the end of the specified interval.
  */
-class block_transport_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<block_transport_metrics_collector> {
+class block_transport_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
-   * @param interval Collection interval.
+   * @param interval The collection interval.
    */
   block_transport_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
+  void reset_after_timestep(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
-  size_t cum_collected(void) const { return m_metrics.cum_collected; }
 
  private:
-  struct block_transport_metrics {
-    uint cum_collected; /* aggregate across blocks, not reset each timestep*/
-    uint cum_carries;   /* aggregate across blocks, not reset each timstep */
+  struct stats {
+    uint n_transporting_to_nest;
+    uint n_transporting_to_cache;
+    uint n_avoiding_collision;
+
+    uint n_cum_transporting_to_nest;
+    uint n_cum_transporting_to_cache;
+    uint n_cum_avoiding_collision;
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
-  struct block_transport_metrics m_metrics;
+
+  struct stats m_stats;
 };
 
 NS_END(metrics, fordyca);

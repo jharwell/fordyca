@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, controller, depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -69,6 +69,6 @@ class cache_site_selector: public rcppsw::er::client {
   argos::CVector2 m_nest_loc;
 };
 
-NS_END(fordyca, controller);
+NS_END(depth2, controller, fordyca);
 
 #endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CACHE_SITE_SELECTOR_HPP_ */

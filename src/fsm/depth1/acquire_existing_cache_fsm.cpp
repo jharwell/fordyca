@@ -1,5 +1,5 @@
 /**
- * @file acquire_existing_cache_fsm.cpp
+ * @file block_to_existing_cache_fsm.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -22,15 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
-
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -51,6 +44,9 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     : base_acquire_cache_fsm(params, server, saa, map) {}
 
 
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
 argos::CVector2 acquire_existing_cache_fsm::select_cache_for_acquisition(void) {
   controller::depth1::existing_cache_selector selector(server_ref(),
                                                        nest_center());

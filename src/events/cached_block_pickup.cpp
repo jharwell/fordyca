@@ -34,8 +34,8 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
-#include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,6 +43,7 @@
 NS_START(fordyca, events);
 using representation::base_cache;
 using representation::occupancy_grid;
+namespace tasks = tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor

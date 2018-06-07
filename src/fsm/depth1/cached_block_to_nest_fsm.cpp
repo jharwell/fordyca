@@ -110,7 +110,7 @@ __const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
 __pure bool cached_block_to_nest_fsm::is_avoiding_collision(void) const {
   return m_cache_fsm.is_avoiding_collision();
@@ -120,21 +120,21 @@ __pure bool cached_block_to_nest_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;
 } /* is_transporting_to_nest() */
 
-__pure bool cached_block_to_nest_fsm::is_exploring_for_cache(void) const {
-  return m_cache_fsm.is_exploring_for_cache();
-} /* is_exploring_for_cache() */
+__pure bool cached_block_to_nest_fsm::is_exploring_for_goal(void) const {
+  return m_cache_fsm.is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
-__pure bool cached_block_to_nest_fsm::is_vectoring_to_cache(void) const {
-  return m_cache_fsm.is_vectoring_to_cache();
-} /* is_vectoring_to_cache() */
+__pure bool cached_block_to_nest_fsm::is_vectoring_to_goal(void) const {
+  return m_cache_fsm.is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
-__pure bool cached_block_to_nest_fsm::is_acquiring_cache(void) const {
-  return m_cache_fsm.is_acquiring_cache();
-} /* is_acquiring_cache() */
+__pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
+  return m_cache_fsm.goal_acquired();
+} /* goal_acquired() */
 
-__pure bool cached_block_to_nest_fsm::cache_acquired(void) const {
-  return m_cache_fsm.cache_acquired();
-} /* cache_acquired() */
+metrics::fsm::goal_acquisition_metrics::goal_type cached_block_to_nest_fsm::goal(void) const {
+  return m_cache_fsm.goal();
+}
 
 /*******************************************************************************
  * General Member Functions

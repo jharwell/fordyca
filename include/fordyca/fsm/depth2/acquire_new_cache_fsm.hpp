@@ -52,9 +52,13 @@ class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm {
       const std::shared_ptr<controller::saa_subsystem>& actuators,
       std::shared_ptr<const representation::perceived_arena_map> map);
 
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kNewCache;
+  }
+
  private:
   argos::CVector2 select_cache_for_acquisition(void) override;
-  bool acquisition_exists(void) const override { return false; }
 };
 
 NS_END(depth2, fsm, fordyca);

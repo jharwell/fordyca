@@ -27,9 +27,8 @@
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -72,8 +71,8 @@ NS_START(fsm, depth1);
  * one.
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
-                                 public metrics::fsm::cache_acquisition_metrics,
-                                 public metrics::fsm::block_transport_metrics,
+                                 public metrics::fsm::goal_acquisition_metrics,
+                                 public metrics::block_transport_metrics,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
@@ -105,12 +104,11 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool cache_acquired(void) const override;
-  bool acquisition_exists(void) const override { return true; }
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;

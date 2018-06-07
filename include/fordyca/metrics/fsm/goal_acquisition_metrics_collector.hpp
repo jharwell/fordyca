@@ -1,5 +1,5 @@
 /**
- * @file block_acquisition_metrics_collector.hpp
+ * @file cache_acquisition_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,38 +36,35 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_acquisition_metrics_collector
+ * @class goal_acquisition_metrics_collector
  * @ingroup metrics fsm
  *
- * @brief Collector for \ref block_acquisition_metrics.
+ * @brief Collector for \ref goal_acquisition_metrics.
  *
- * Metrics are written out after the specified interval.
+ * Metrics are written out at the end of the specified interval.
  */
-class block_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class goal_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
-   * @param interval Collection interval.
+   * @param interval The collection interval.
    */
-  block_acquisition_metrics_collector(const std::string& ofname,
-                             uint interval);
+  goal_acquisition_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
   void reset_after_timestep(void) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
   struct stats {
-    uint n_acquiring_block;
-    uint n_exploring_for_block;
-    uint n_vectoring_to_block;
-    uint n_avoiding_collision;
+    uint n_exploring_for_goal;
+    uint n_vectoring_to_goal;
+    uint n_acquiring_goal;
 
-    uint n_cum_acquiring_block;
-    uint n_cum_vectoring_to_block;
-    uint n_cum_exploring_for_block;
-    uint n_cum_avoiding_collision;
+    uint n_cum_exploring_for_goal;
+    uint n_cum_vectoring_to_goal;
+    uint n_cum_acquiring_goal;
   };
 
   std::string csv_header_build(const std::string& header) override;
@@ -78,4 +75,4 @@ class block_acquisition_metrics_collector : public rcppsw::metrics::base_metrics
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_ACQUISITION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_COLLECTOR_HPP_ */

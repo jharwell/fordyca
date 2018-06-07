@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/block_transport_metrics.hpp"
 #include "fordyca/representation/cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -50,7 +49,6 @@ NS_START(fordyca, representation);
  * locations (where they are mapped to within the arena map).
  */
 class block : public cell_entity,
-              public metrics::block_transport_metrics,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
@@ -73,8 +71,8 @@ class block : public cell_entity,
    * @brief Reset the metrics (# carries) for the block after it is dropped in
    * the nest.
    */
-  void reset_metrics(void) override { m_carries = 0; }
-  uint n_carries(void) const override { return m_carries; }
+  void reset_metrics(void) { m_carries = 0; }
+  uint n_carries(void) const { return m_carries; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back

@@ -35,7 +35,12 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-
+namespace fsm { namespace depth1 {
+class block_to_goal_fsm;
+}}
+namespace tasks { namespace depth2 {
+class cache_starter;
+}}
 NS_START(events);
 
 /*******************************************************************************
@@ -55,7 +60,9 @@ NS_START(events);
  */
 class free_block_drop : public cell_op,
                         public rcppsw::er::client,
-                        public block_drop_event {
+                        public block_drop_event,
+                        public visitor::visit_set<tasks::depth2::cache_starter,
+                                                  fsm::depth1::block_to_goal_fsm> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
                   const std::shared_ptr<representation::block>& block,
@@ -74,7 +81,12 @@ class free_block_drop : public cell_op,
   void visit(representation::arena_map& map) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller&) override {}
+  void visit(controller::depth1::foraging_controller&) override;
+
+  /* depth2 foraging */
+  void visit(controller::depth2::foraging_controller&) override;
+  void visit(tasks::depth2::cache_starter&) override;
+  void visit(fsm::depth1::block_to_goal_fsm&) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

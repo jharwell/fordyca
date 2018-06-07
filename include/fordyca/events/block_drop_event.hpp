@@ -39,7 +39,11 @@ class block;
 } // namespace representation
 namespace controller { namespace depth1 {
 class foraging_controller;
-}} // namespace controller::depth1
+}
+namespace depth2 {
+class foraging_controller;
+}
+} // namespace controller
 namespace tasks { class cache_starter; }
 
 NS_START(events);
@@ -58,8 +62,7 @@ class block_drop_event
     : public visitor::visit_set<representation::arena_map,
                                 representation::block,
                                 controller::depth1::foraging_controller,
-                                tasks::cache_starter,
-                                fsm::depth2::block_to_new_cache> {};
+                                controller::depth2::foraging_controller> {};
 
 NS_END(events, fordyca);
 

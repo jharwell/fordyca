@@ -1,7 +1,7 @@
 /**
- * @file new_cache_interactor.hpp
+ * @file base_foraging_task.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,17 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_BASE_FORAGING_TASK_HPP_
+#define INCLUDE_FORDYCA_TASKS_BASE_FORAGING_TASK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -36,33 +35,33 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace events {
-class cache_appeared;
-class free_block_drop;
-} // namespace events
-
+NS_START(fordyca, tasks);
 namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class new_cache_interactor
+ * @class base_foraging_task
  * @ingroup tasks
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
- * interact with new caches in FORDYCA.
+ * @brief Interface specifying the visit set common to all base_foraging tasks
+ * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
-class new_cache_interactor
-    : public metrics::fsm::cache_acquisition_metrics,
-      public visitor::polymorphic_visitable<new_cache_interactor,
-                                            events::free_block_drop,
-                                            events::cache_appeared> {};
+class base_foraging_task
+    : public rcppsw::metrics::tasks::execution_metrics,
+      public metrics::fsm::goal_acquisition_metrics,
+      public metrics::block_transport_metrics {
+
+ public:
+  explicit base_foraging_task(const std::string& name) : mc_name(name) {}
+
+  std::string name(void) const { return mc_name; }
+
+ private:
+  const std::string mc_name;
+};
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_NEW_CACHE_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_BASE_FORAGING_TASK_HPP_ */
