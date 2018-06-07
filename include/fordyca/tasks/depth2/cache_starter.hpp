@@ -18,22 +18,22 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_CACHE_STARTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_CACHE_STARTER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/tasks/new_cache_interactor.hpp"
+#include "fordyca/tasks/depth2/new_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth2);
 
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -42,7 +42,7 @@ namespace task_allocation = rcppsw::task_allocation;
  ******************************************************************************/
 /**
  * @class cache_starter
- * @ingroup tasks
+ * @ingroup tasks depth2
  *
  * @brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
@@ -56,29 +56,21 @@ class cache_starter : public task_allocation::polled_task,
 
   /* event handling */
   void accept(events::free_block_drop& visitor) override;
-  void accept(events::cache_appeared& visitor) override;
-  void accept(events::free_block_pickup&) override {}
-  void accept(events::nest_block_drop&) override {}
 
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-  bool is_acquiring_block(void) const override;
-  bool block_acquired(void) const override;
+  /* FSM goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kNewCache;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
-  /* new cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool cache_acquired(void) const override;
-  bool acquisition_exists(void) const override { return false; }
-
-  /* block transport metrics */
+  /* FSM block transport metrics */
   bool is_transporting_to_nest(void) const override { return false; }
-  bool is_transporting_to_cache(void) const override;
+  bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
   bool at_interface(void) const override;
@@ -95,6 +87,6 @@ class cache_starter : public task_allocation::polled_task,
   // clang-format on
 };
 
-NS_END(tasks, fordyca);
+NS_END(depth2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_CACHE_STARTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_STARTER_HPP_ */

@@ -44,10 +44,12 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 namespace tasks {
+namespace depth0 { class generalist; }
+namespace depth1 {
 class harvester;
 class collector;
-class generalist;
 class foraging_task;
+}
 }
 
 NS_START(controller, depth1);
@@ -73,7 +75,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  tasks::foraging_task* current_task(void) const;
+  tasks::depth1::foraging_task* current_task(void) const;
   bool is_transporting_to_nest(void) const override;
 
   /**
@@ -108,9 +110,9 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool                                               m_display_task{false};
   std::string                                        m_prev_task{""};
   std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::harvester>                  m_harvester;
-  std::unique_ptr<tasks::collector>                  m_collector;
-  std::unique_ptr<tasks::generalist>                 m_generalist;
+  std::unique_ptr<tasks::depth1::harvester>          m_harvester;
+  std::unique_ptr<tasks::depth1::collector>          m_collector;
+  std::unique_ptr<tasks::depth0::generalist>         m_generalist;
   // clang-format on
 };
 

@@ -27,7 +27,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
@@ -61,7 +61,7 @@ NS_START(fsm, depth0);
  */
 class stateful_foraging_fsm : public base_foraging_fsm,
                               public metrics::fsm::goal_acquisition_metrics,
-                              public metrics::fsm::block_transport_metrics,
+                              public metrics::block_transport_metrics,
                               public task_allocation::taskable,
                               public visitor::visitable_any<depth0::stateful_foraging_fsm> {
  public:

@@ -1,5 +1,5 @@
 /**
- * @file collector.hpp
+ * @file generalist.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,83 +18,77 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
-
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/existing_cache_interactor.hpp"
+#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth0);
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class collector
+ * @class generalist
  * @ingroup tasks
  *
- * @brief Task in which robots locate a cache and bring a block from it to the
- * nest. It is abortable, and has one task interface.
+ * @brief Class representing depth 0 task allocation: Perform the whole foraging
+ * task: (1) Find a free block, and (2) bring it to the nest.
+ *
+ * It is decomposable into two subtasks that result in the same net change to
+ * the arena state when run in sequence (possibly by two different robots):
+ * \ref collector and \ref forager. It is not abortable.
  */
-class collector : public task_allocation::polled_task,
-                  public foraging_task,
-                  public existing_cache_interactor {
+class generalist : public task_allocation::partitionable_polled_task,
+                   public foraging_task {
  public:
-  collector(const struct task_allocation::task_params* params,
-            std::unique_ptr<task_allocation::taskable>& mechanism);
+  generalist(const struct task_allocation::partitionable_task_params* params,
+             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::cached_block_pickup& visitor) override;
+  void accept(events::free_block_pickup& visitor) override;
   void accept(events::nest_block_drop& visitor) override;
-  void accept(events::cache_vanished& visitor) override;
-  void accept(events::cache_block_drop&) override {}
-  void accept(events::free_block_pickup&) override {}
 
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override { return false; }
-  bool is_vectoring_to_block(void) const override { return false; }
-  bool is_acquiring_block(void) const override { return false; }
-  bool block_acquired(void) const override { return false; }
-
-  /* existing cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool cache_acquired(void) const override;
-  bool acquisition_exists(void) const override { return true; }
+    /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kBlock;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
   bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
-  bool at_interface(void) const override;
+  bool at_interface(void) const override { return false; }
 
-  void task_start(const task_allocation::taskable_argument*) override;
+  executable_task* partition(void) override {
+    return partitionable_task::partition();
+  }
+  void task_start(const task_allocation::taskable_argument* const) override {}
+
   double current_time(void) const override;
   double calc_abort_prob(void) override;
-  double calc_interface_time(double start_time) override;
+  double calc_interface_time(double) override { return 0.0; }
 
  private:
-  // clang-format off
-  bool                               m_interface_complete{false};
   task_allocation::abort_probability m_abort_prob;
-  // clang-format on
 };
 
-NS_END(tasks, fordyca);
+NS_END(depth0, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_ */

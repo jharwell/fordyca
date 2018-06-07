@@ -27,8 +27,8 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +52,8 @@ NS_START(controller, depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
-                                      public metrics::fsm::block_acquisition_metrics,
-                                      public metrics::fsm::block_transport_metrics,
+                                      public metrics::fsm::goal_acquisition_metrics,
+                                      public metrics::block_transport_metrics,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);
@@ -71,11 +71,13 @@ class stateless_foraging_controller : public base_foraging_controller,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_acquiring_block(void) const override { return false; }
-  bool is_vectoring_to_block(void) const override { return false; }
-  bool block_acquired(void) const override;
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kBlock;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override { return false; }
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;

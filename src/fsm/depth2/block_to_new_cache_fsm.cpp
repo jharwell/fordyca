@@ -37,7 +37,7 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
     const std::shared_ptr<controller::saa_subsystem>& saa,
     const std::shared_ptr<representation::perceived_arena_map>& map)
-    : base_block_to_cache_fsm(params, server, saa, map),
+    : block_to_goal_fsm(params, server, saa, map),
       m_cache_fsm(params, server, saa, map) {}
 
 NS_END(depth2, controller, fordyca);

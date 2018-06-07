@@ -1,5 +1,5 @@
 /**
- * @file base_block_to_cache_fsm.hpp
+ * @file block_to_goal_fsm.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,9 +29,8 @@
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,37 +42,35 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
 NS_START(fsm, depth1);
-class base_acquire_cache_fsm;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_block_to_cache_fsm
+ * @class block_to_goal_fsm
  * @ingroup fsm depth1
  *
- * @brief The FSM for the block-to-cache subtask.
+ * @brief Base FSM for acquiring, picking up a block, and then bringing it
+ * somewhere and dropping it.
  *
  * Each robot executing this FSM will locate a free block (either a known block
- * or via random exploration), pickup the block and bring it to the best cache
- * it knows about. Once it has done that it will signal that its task is
- * complete.
+ * or via random exploration), pickup the block and bring it to its chosen
+ * goal. Once it has done that it will signal that its task is complete.
  */
-class base_block_to_cache_fsm : public base_foraging_fsm,
-                                public metrics::fsm::block_acquisition_metrics,
-                                public metrics::fsm::cache_acquisition_metrics,
-                                public metrics::fsm::block_transport_metrics,
-                                public task_allocation::taskable,
-                                public visitor::visitable_any<base_block_to_cache_fsm> {
+class block_to_goal_fsm : public base_foraging_fsm,
+                          public metrics::fsm::goal_acquisition_metrics,
+                          public metrics::block_transport_metrics,
+                          public task_allocation::taskable,
+                          public visitor::visitable_any<block_to_goal_fsm> {
  public:
-  base_block_to_cache_fsm(
+  block_to_goal_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
       const std::shared_ptr<controller::saa_subsystem>& saa,
       const std::shared_ptr<representation::perceived_arena_map>& map);
 
-  base_block_to_cache_fsm(const base_block_to_cache_fsm& fsm) = delete;
-  base_block_to_cache_fsm& operator=(const base_block_to_cache_fsm& fsm) = delete;
+  block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
+  block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -87,17 +84,11 @@ class base_block_to_cache_fsm : public base_foraging_fsm,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-  bool block_acquired(void) const override;
-
-  /* cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool cache_acquired(void) const override;
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override { return false; }
@@ -122,25 +113,25 @@ class base_block_to_cache_fsm : public base_foraging_fsm,
     ST_WAIT_FOR_BLOCK_PICKUP,
 
     /**
-     * We are transporting a carried block to a cache.
+     * We are transporting a carried block to our goal.
      */
-    ST_TRANSPORT_TO_CACHE,
+    ST_TRANSPORT_TO_GOAL,
 
     /**
-     * We have acquired a cache--wait for arena to send the block drop signal.
+     * We have acquired our goal--wait for arena to send the block drop signal.
      */
-    ST_WAIT_FOR_CACHE_DROP,
+    ST_WAIT_FOR_BLOCK_DROP,
 
     /**
-     * Block has been successfully dropped in a cache.
+     * Block has been successfully dropped at our goal/in our goal.
      */
     ST_FINISHED,
     ST_MAX_STATES,
   };
 
-  virtual base_acquire_cache_fsm& cache_fsm(void) = 0;
-  const base_acquire_cache_fsm& cache_fsm(void) const {
-    return const_cast<base_block_to_cache_fsm*>(this)->cache_fsm(); }
+  virtual acquire_goal_fsm& goal_fsm(void) = 0;
+  const acquire_goal_fsm& goal_fsm(void) const {
+    return const_cast<block_to_goal_fsm*>(this)->goal_fsm(); }
 
  private:
   constexpr static uint kPICKUP_TIMEOUT = 100;
@@ -148,15 +139,15 @@ class base_block_to_cache_fsm : public base_foraging_fsm,
   /* inherited states */
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* block to cache states */
-  HFSM_STATE_DECLARE(base_block_to_cache_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, acquire_free_block);
-  HFSM_STATE_DECLARE(base_block_to_cache_fsm, wait_for_block_pickup,
+  /* block to goal states */
+  HFSM_STATE_DECLARE(block_to_goal_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_free_block);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, transport_to_cache);
-  HFSM_STATE_DECLARE(base_block_to_cache_fsm, wait_for_cache_drop,
+  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(base_block_to_cache_fsm, finished);
+  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -178,4 +169,4 @@ class base_block_to_cache_fsm : public base_foraging_fsm,
 
 NS_END(depth1, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BASE_BLOCK_TO_CACHE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_ */

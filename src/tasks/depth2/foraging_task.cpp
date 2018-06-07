@@ -1,7 +1,7 @@
 /**
  * @file foraging_task.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,18 +21,16 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
  * Constant Definitions
  ******************************************************************************/
-constexpr char foraging_task::kCollectorName[];
-constexpr char foraging_task::kHarvesterName[];
-constexpr char foraging_task::kGeneralistName[];
+constexpr char foraging_task::kCacheStarterName[];
 
-NS_END(tasks, fordyca);
+NS_END(depth2, tasks, fordyca);

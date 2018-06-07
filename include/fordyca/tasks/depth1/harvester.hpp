@@ -18,14 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/existing_cache_interactor.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth1);
 
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -65,21 +65,13 @@ class harvester : public task_allocation::polled_task,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
+  /* FSM goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-  bool is_acquiring_block(void) const override;
-  bool block_acquired(void) const override;
-
-  /* existing cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool cache_acquired(void) const override;
-  bool acquisition_exists(void) const override { return true; }
-
-  /* block transport metrics */
+  /* FSM block transport metrics */
   bool is_transporting_to_nest(void) const override { return false; }
   bool is_transporting_to_cache(void) const override;
 
@@ -98,6 +90,6 @@ class harvester : public task_allocation::polled_task,
   // clang-format on
 };
 
-NS_END(tasks, fordyca);
+NS_END(depth1, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_HARVESTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_ */

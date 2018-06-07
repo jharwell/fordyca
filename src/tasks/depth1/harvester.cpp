@@ -1,7 +1,7 @@
 /**
- * @file cache_starter.cpp
+ * @file harvester.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/cache_starter.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
@@ -30,55 +30,46 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth1);
+using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_starter::cache_starter(const struct task_allocation::task_params* params,
+harvester::harvester(const struct task_allocation::task_params* params,
                      std::unique_ptr<task_allocation::taskable>& mechanism)
-    : polled_task(kCacheStarterName, params, mechanism),
-      foraging_task(kCacheStarterName),
+    : polled_task(kHarvesterName, params, mechanism),
+      foraging_task(kHarvesterName),
       m_abort_prob(&params->abort) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure double cache_starter::current_time(void) const {
-  return dynamic_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
+__pure double harvester::current_time(void) const {
+  return dynamic_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
 
-bool cache_starter::cache_acquired(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->cache_acquired();
-} /* cache_acquired() */
-
-bool cache_starter::block_acquired(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->block_acquired();
-} /* cache_acquired() */
-
-void cache_starter::task_start(const task_allocation::taskable_argument* const) {
+void harvester::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
   m_interface_complete = false;
 } /* task_start() */
 
-double cache_starter::calc_abort_prob(void) {
+double harvester::calc_abort_prob(void) {
   /*
-   * Cache starters always have a small chance of aborting their task when not
-   * at a task interface. Having the cache starter task un-abortable until AFTER
-   * it acquires a block can cause it to get stuck and not switch to another
-   * task if it cannot find a block anywhere.
+   * Harvesters always have a small chance of aborting their task when not at a
+   * task interface. Having the harvester task un-abortable until AFTER it
+   * acquires a block can cause it to get stuck and not switch to another task
+   * if it cannot find a block anywhere. See #232.
    */
   if (is_transporting_to_cache()) {
     return m_abort_prob.calc(executable_task::interface_time(),
@@ -88,12 +79,12 @@ double cache_starter::calc_abort_prob(void) {
                            executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
-double cache_starter::calc_interface_time(double start_time) {
-  if (at_interface()) {
+double harvester::calc_interface_time(double start_time) {
+  if (is_transporting_to_cache()) {
     return current_time() - start_time;
   }
 
-  if (cache_acquired()) {
+  if (goal_acquired() && goal_type::kExistingCache == goal()) {
     if (!m_interface_complete) {
       m_interface_complete = true;
       reset_interface_time();
@@ -106,63 +97,56 @@ double cache_starter::calc_interface_time(double start_time) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_starter::accept(events::free_block_drop& visitor) {
+void harvester::accept(events::cache_block_drop& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::cache_appeared& visitor) {
+void harvester::accept(events::free_block_pickup& visitor) {
+  visitor.visit(*this);
+}
+void harvester::accept(events::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 
 /*******************************************************************************
- * Base Metrics
+ * FSM Metrics
  ******************************************************************************/
-bool cache_starter::is_exploring_for_block(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->is_exploring_for_block();
-} /* is_exploring_for_block() */
+bool harvester::is_exploring_for_goal(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+      ->is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
-bool cache_starter::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
+bool harvester::is_avoiding_collision(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-/*******************************************************************************
- * Depth0 Metrics
- ******************************************************************************/
-bool cache_starter::is_acquiring_block(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->is_acquiring_block();
-} /* is_acquiring_block() */
+bool harvester::is_vectoring_to_goal(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+      ->is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
-bool cache_starter::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->is_vectoring_to_block();
-} /* is_vectoring_to_block() */
-
-/*******************************************************************************
- * Depth1 Metrics
- ******************************************************************************/
-bool cache_starter::is_exploring_for_cache(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->is_exploring_for_cache();
-} /* is_exploring_for_cache() */
-
-bool cache_starter::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism())
-      ->is_vectoring_to_cache();
-} /* is_vectoring_to_cache() */
-
-bool cache_starter::is_acquiring_cache(void) const {
-  return static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+bool harvester::is_transporting_to_cache(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
       polled_task::mechanism())
-      ->is_acquiring_cache();
-} /* is_acquiring_cache() */
+      ->is_transporting_to_cache();
+} /* is_transporting_to_cache() */
+
+goal_type harvester::goal(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+      polled_task::mechanism())->goal();
+  }
+
+bool harvester::goal_acquired(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+      ->goal_acquired();
+} /* goal_acquired() */
+
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool cache_starter::at_interface(void) const {
+__pure bool harvester::at_interface(void) const {
   return is_transporting_to_cache();
 } /* at_interface()() */
 
-NS_END(tasks, fordyca);
+NS_END(depth1, tasks, fordyca);

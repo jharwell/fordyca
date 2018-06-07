@@ -137,45 +137,35 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
 __pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
          m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool cache_finisher_fsm::is_exploring_for_block(void) const {
-  return m_block_fsm.is_exploring_for_block();
-} /* is_exploring_for_block() */
+bool cache_finisher_fsm::is_exploring_for_goal(void) const {
+  return m_block_fsm.is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
-bool cache_finisher_fsm::is_acquiring_block(void) const {
-  return m_block_fsm.is_acquiring_block();
-} /* is_acquiring_block() */
+bool cache_finisher_fsm::is_vectoring_to_goal(void) const {
+  return m_block_fsm.is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
-bool cache_finisher_fsm::is_vectoring_to_block(void) const {
-  return m_block_fsm.is_vectoring_to_block();
-} /* is_vectoring_to_block() */
-
-bool cache_finisher_fsm::block_acquired(void) const {
-  return m_block_fsm.block_acquired();
+bool cache_finisher_fsm::goal_acquired(void) const {
+  return m_block_fsm.goal_acquired();
 } /* block_acquired() */
 
-bool cache_finisher_fsm::is_exploring_for_cache(void) const {
-  return m_cache_fsm.is_exploring_for_cache();
-} /* is_exploring_for_cache() */
-
-bool cache_finisher_fsm::is_acquiring_cache(void) const {
-  return m_cache_fsm.is_acquiring_cache();
-} /* is_acquiring_cache() */
-
-bool cache_finisher_fsm::is_vectoring_to_cache(void) const {
-  return m_cache_fsm.is_vectoring_to_cache();
-} /* is_vectoring_to_cache() */
-
-bool cache_finisher_fsm::cache_acquired(void) const {
-  return m_cache_fsm.cache_acquired();
-} /* cache_acquired() */
-
+metrics::fsm::goal_acquisition_metrics::goal_type cache_finisher_fsm::goal(void) const {
+  if (m_block_fsm.task_running() ||
+      current_state() == ST_WAIT_FOR_BLOCK_PICKUP) {
+    return m_block_fsm.goal();
+  } else if (m_cache_fsm.task_running() ||
+             current_state() == ST_WAIT_FOR_BLOCK_DROP) {
+    return m_cache_fsm.goal();
+  }
+  return goal_type::kNone;
+} /* goal() */
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

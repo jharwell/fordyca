@@ -38,8 +38,9 @@ class executable_task;
 }}
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
+
 NS_START(fordyca);
-namespace tasks { class generalist; class foraging_task; };
+namespace tasks { namespace depth0 { class generalist; class foraging_task; }}
 
 NS_START(controller);
 class base_perception_subsystem;
@@ -72,8 +73,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  /* block acquisition metrics */
-  bool block_acquired(void) const override;
+  /* goal acquisition metrics */
+  bool goal_acquired(void) const override;
 
   /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
@@ -82,7 +83,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  tasks::foraging_task* current_task(void) const;
+  tasks::depth0::foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
@@ -124,7 +125,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;
-  std::unique_ptr<tasks::generalist>                   m_generalist;
+  std::unique_ptr<tasks::depth0::generalist>           m_generalist;
   std::shared_ptr<base_perception_subsystem>           m_perception{nullptr};
   // clang-format on
 };

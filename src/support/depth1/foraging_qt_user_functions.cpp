@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -32,9 +32,9 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,11 +60,6 @@ void nest_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
   map.distribute_block(m_block);
   m_block->accept(*this);
-} /* visit() */
-
-void nest_block_drop::visit(
-    metrics::block_transport_metrics_collector& collector) {
-  collector.collect(*m_block);
 } /* visit() */
 
 /*******************************************************************************
@@ -113,12 +108,12 @@ void nest_block_drop::visit(controller::depth1::foraging_controller& controller)
   ER_NOM("depth1_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 
-void nest_block_drop::visit(tasks::generalist& task) {
+void nest_block_drop::visit(tasks::depth0::generalist& task) {
   static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */
 
-void nest_block_drop::visit(tasks::collector& task) {
+void nest_block_drop::visit(tasks::depth1::collector& task) {
   static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */

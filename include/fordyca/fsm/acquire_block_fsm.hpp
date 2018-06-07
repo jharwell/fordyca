@@ -75,6 +75,9 @@ class acquire_block_fsm : public acquire_goal_fsm {
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kBlock; }
+
  private:
   bool acquire_known_goal(void) override;
 

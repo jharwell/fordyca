@@ -44,7 +44,7 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/generalist.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
@@ -54,6 +54,7 @@
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
 using representation::occupancy_grid;
+namespace tasks = tasks::depth0;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -165,12 +166,12 @@ bool stateful_foraging_controller::is_transporting_to_nest(void) const {
   return false;
 } /* is_transporting_to_nest() */
 
-bool stateful_foraging_controller::block_acquired(void) const {
+bool stateful_foraging_controller::goal_acquired(void) const {
   if (nullptr != current_task()) {
-    return current_task()->block_acquired();
+    return current_task()->goal_acquired();
   }
   return false;
-} /* block_acquired() */
+} /* goal_acquired() */
 
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,

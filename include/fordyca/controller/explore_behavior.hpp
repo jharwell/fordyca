@@ -47,7 +47,8 @@ class explore_behavior : public rcppsw::er::client {
  public:
   explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
                    const std::shared_ptr<controller::saa_subsystem>& saa)
-      : m_saa(saa) {}
+      : client(server), m_saa(saa) {}
+
   virtual ~explore_behavior(void) = default;
 
   explore_behavior(const explore_behavior& fsm) = delete;

@@ -26,7 +26,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, controller, depth2);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -53,4 +53,4 @@ argos::CVector2 cache_site_selector::calc_best(
   return site;
 } /* calc_best() */
 
-NS_END(controller, fordyca);
+NS_END(depth2, controller, fordyca);

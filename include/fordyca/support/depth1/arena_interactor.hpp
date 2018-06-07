@@ -30,15 +30,12 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/tasks/existing_cache_interactor.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace metrics { class block_transport_metrics_collector; }
-
-NS_START(support, depth1);
+NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
  * Classes
@@ -79,39 +76,33 @@ class arena_interactor : public depth0::arena_interactor<T> {
    *
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
-   * @param collector  The block metrics collector (block collection metrics are
-   * somewhat different than others, so collection needs to be treated
-   * specially).
-   *
    */
-  void operator()(T& controller,
-                  uint timestep,
-                  metrics::block_transport_metrics_collector& collector) {
-      if (handle_task_abort(controller)) {
+  void operator()(T& controller, uint timestep) {
+    if (handle_task_abort(controller)) {
         return;
-      }
-      if (controller.is_carrying_block()) {
-        handle_nest_block_drop(controller, collector);
-        if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
-          if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
-                                                            timestep)) {
-            finish_cache_block_drop(controller);
-          }
-        } else {
-          m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+    }
+    if (controller.is_carrying_block()) {
+      handle_nest_block_drop(controller);
+      if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
+                                                         timestep)) {
+          finish_cache_block_drop(controller);
         }
-      } else { /* The foot-bot has no block item */
-        handle_free_block_pickup(controller);
+      } else {
+        m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+      }
+    } else { /* The foot-bot has no block item */
+      handle_free_block_pickup(controller);
 
-        if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
-          if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
-                                                           timestep)) {
-            finish_cached_block_pickup(controller);
-          }
-        } else {
-          m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+      if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
+                                                         timestep)) {
+          finish_cached_block_pickup(controller);
         }
+      } else {
+        m_cache_penalty_handler.penalty_init<T>(controller, timestep);
       }
+    }
   }
 
  protected:
@@ -130,10 +121,10 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto *task = dynamic_cast<tasks::existing_cache_interactor*>(
+    auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
-    ER_ASSERT(task->cache_acquired(),
+    ER_ASSERT(goal_type::kExistingCache == controller.current_task()->goal(),
               "FATAL: Controller not waiting for cached block pickup");
 
     /*
@@ -180,11 +171,12 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto *task = dynamic_cast<tasks::existing_cache_interactor*>(
+    auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
-      ER_ASSERT(task->cache_acquired(),
-                "FATAL: Controller not waiting for cache block drop");
+    ER_ASSERT(controller.current_task()->goal_acquired() &&
+              goal_type::kExistingCache == controller.current_task()->goal(),
+              "FATAL: Controller not waiting for cache block drop");
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -287,22 +279,21 @@ class arena_interactor : public depth0::arena_interactor<T> {
                                                 controller.robot_loc())) {
         conflict = true;
       }
+      rcppsw::math::dcoord2 d =
+          math::rcoord_to_dcoord(controller.robot_loc(),
+                                 map()->grid_resolution());
+      events::free_block_drop drop_op(rcppsw::er::g_server,
+                                      controller.block(),
+                                      d.first,
+                                      d.second,
+                                      map()->grid_resolution());
       if (!conflict) {
-        rcppsw::math::dcoord2 d =
-            math::rcoord_to_dcoord(controller.robot_loc(),
-                                   map()->grid_resolution());
-        events::free_block_drop drop_op(rcppsw::er::g_server,
-                                        controller.block(),
-                                        d.first,
-                                        d.second,
-                                        map()->grid_resolution());
-
-        controller.block(nullptr);
+        controller.visitor::template visitable_any<T>::accept(drop_op);
         map()->accept(drop_op);
         floor()->SetChanged();
       } else {
         map()->distribute_block(controller.block());
-        controller.block(nullptr);
+        controller.visitor::template visitable_any<T>::accept(drop_op);
         floor()->SetChanged();
       }
     } else {

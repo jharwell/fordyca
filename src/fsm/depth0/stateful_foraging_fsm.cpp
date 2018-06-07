@@ -117,7 +117,7 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
 __pure bool stateful_foraging_fsm::is_exploring_for_goal(void) const {
   return m_block_fsm.is_exploring_for_goal();
@@ -126,10 +126,6 @@ __pure bool stateful_foraging_fsm::is_exploring_for_goal(void) const {
 __pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;
 } /* is_transporting_to_nest() */
-
-__pure bool stateful_foraging_fsm::is_acquiring_goal(void) const {
-  return m_block_fsm.is_acquiring_goal();
-} /* is_acquiring_block() */
 
 __pure bool stateful_foraging_fsm::is_vectoring_to_goal(void) const {
   return m_block_fsm.is_vectoring_to_goal();

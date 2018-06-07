@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_for_block_fsm.hpp"
+#include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ NS_START(fsm, depth0);
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
                                public metrics::fsm::goal_acquisition_metrics,
-                               public metrics::fsm::block_transport_metrics,
+                               public metrics::block_transport_metrics,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
@@ -93,7 +93,9 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   void run(void);
 
 
- protected:
+ private:
+  bool block_detected(void) const;
+
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
@@ -130,8 +132,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  argos::CRandom::CRNG* m_rng;
-  explore_for_block_fsm m_explore_fsm;
+  explore_for_goal_fsm m_explore_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

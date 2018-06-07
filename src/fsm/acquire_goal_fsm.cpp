@@ -60,6 +60,7 @@ acquire_goal_fsm::acquire_goal_fsm(
                     std::make_unique<controller::random_explore_behavior>(server,
                                                                           saa),
                     goal_detect),
+      m_goal_acquired_cb(nullptr),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
                                                nullptr,

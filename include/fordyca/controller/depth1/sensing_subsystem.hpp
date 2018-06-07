@@ -55,7 +55,7 @@ class sensing_subsystem: public depth0::sensing_subsystem {
    * Only possibly, because there are some false positives, such as the first
    * timestep, before ARGoS has finished initializing things.
    */
-  bool cache_detected(void);
+  bool cache_detected(void) const;
 };
 
 NS_END(depth1, controller, fordyca);
