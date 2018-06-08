@@ -26,8 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
@@ -56,8 +55,7 @@ NS_START(fsm, depth2);
  * one found via random exploration) and drop it to create a new cache.
  */
 class cache_finisher_fsm : public base_foraging_fsm,
-                           public metrics::fsm::block_acquisition_metrics,
-                           public metrics::fsm::cache_acquisition_metrics,
+                           public metrics::fsm::goal_acquisition_metrics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<depth2::cache_finisher_fsm> {
  public:
@@ -77,17 +75,11 @@ class cache_finisher_fsm : public base_foraging_fsm,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* block acquisition metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-  bool block_acquired(void) const override;
-
-  /* cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool cache_acquired(void) const override;
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /**
    * @brief Reset the FSM.

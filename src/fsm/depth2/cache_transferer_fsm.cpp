@@ -129,27 +129,23 @@ HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
 __pure bool cache_transferer_fsm::is_avoiding_collision(void) const {
   return m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool cache_transferer_fsm::is_exploring_for_cache(void) const {
-  return m_cache_fsm.is_exploring_for_cache();
-} /* is_exploring_for_cache() */
+bool cache_transferer_fsm::is_exploring_for_goal(void) const {
+  return m_cache_fsm.is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
-bool cache_transferer_fsm::is_acquiring_cache(void) const {
-  return m_cache_fsm.is_acquiring_cache();
-} /* is_acquiring_cache() */
+bool cache_transferer_fsm::is_vectoring_to_goal(void) const {
+  return m_cache_fsm.is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
-bool cache_transferer_fsm::is_vectoring_to_cache(void) const {
-  return m_cache_fsm.is_vectoring_to_cache();
-} /* is_vectoring_to_cache() */
-
-bool cache_transferer_fsm::cache_acquired(void) const {
-  return m_cache_fsm.cache_acquired();
-} /* cache_acquired() */
+bool cache_transferer_fsm::goal_acquired(void) const {
+  return m_cache_fsm.goal_acquired();
+} /* goal_acquired() */
 
 /*******************************************************************************
  * General Member Functions

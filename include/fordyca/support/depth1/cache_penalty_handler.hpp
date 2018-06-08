@@ -28,11 +28,14 @@
 
 #include "fordyca/support/depth1/cache_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -80,7 +83,13 @@ class cache_penalty_handler : public rcppsw::er::client {
     if (nullptr == controller.current_task()) {
       return false;
     }
-    if (controller.current_task()->cache_acquired()) {
+    auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+        controller.current_task());
+    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+    if (controller.current_task()->goal_acquired()) {
+      ER_ASSERT(goal_type::kExistingCache == controller.current_task()->goal(),
+                "FATAL: Bad goal for controller");
+
       /* Check whether the foot-bot is actually on a cache */
       int cache_id = utils::robot_on_cache(controller, m_map);
       if (-1 == cache_id) {
@@ -90,7 +99,7 @@ class cache_penalty_handler : public rcppsw::er::client {
       ER_ASSERT(!controller.block_detected(),
                 "FATAL: Block detected in cache?");
       ER_ASSERT(!is_serving_penalty<T>(controller),
-                "FATAL: Robot already serving cache penalty");
+                "FATAL: Robot already serving cache penalty!");
 
       ER_NOM("fb%d: start=%u, duration=%u",
              utils::robot_id(controller),

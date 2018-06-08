@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
 
 /*******************************************************************************
@@ -48,13 +48,13 @@ NS_START(fsm, depth2);
  * @class cache_transferer_fsm
  * @ingroup fsm depth2
  *
- * @brief The FSM for a cache transferer task. Each robot executing this
- * FSM will acquire a cache (either a known cache or via random exploration),
- * pickup a block from it and then bring it to ANOTHER cache (either a known cache or
+ * @brief The FSM for a cache transferer task. Each robot executing this FSM
+ * will acquire a cache (either a known cache or via random exploration), pickup
+ * a block from it and then bring it to ANOTHER cache (either a known cache or
  * one found via random exploration) and drop it.
  */
 class cache_transferer_fsm : public base_foraging_fsm,
-                             public metrics::fsm::cache_acquisition_metrics,
+                             public metrics::fsm::goal_acquisition_metrics,
                              public task_allocation::taskable,
                              public visitor::visitable_any<depth2::cache_transferer_fsm> {
  public:
@@ -74,11 +74,13 @@ class cache_transferer_fsm : public base_foraging_fsm,
   /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
 
-  /* cache acquisition metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool cache_acquired(void) const override;
+  /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kExistingCache;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /**
    * @brief Reset the FSM.

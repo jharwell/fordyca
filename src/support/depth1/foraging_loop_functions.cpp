@@ -30,11 +30,10 @@
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/metrics/cache_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -47,6 +46,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Member Functions
@@ -92,26 +92,35 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect_from(
+  collector_group().collect(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  collector_group().collect_from(
+  collector_group().collect(
       "tasks::management",
       static_cast<rcppsw::metrics::tasks::management_metrics&>(controller));
 
   if (nullptr != controller.current_task()) {
-    collector_group().collect_from(
+    collector_group().collect_if(
         "fsm::block_acquisition",
-        static_cast<metrics::fsm::block_acquisition_metrics&>(
-            *controller.current_task()));
-    collector_group().collect_from(
-        "fsm::block_transport",
-        static_cast<metrics::fsm::block_transport_metrics&>(
-            *controller.current_task()));
-    collector_group().collect_from(
+        static_cast<metrics::fsm::goal_acquisition_metrics&>(
+            *controller.current_task()),
+        [&](const rcppsw::metrics::base_metrics& metrics) {
+          return goal_type::kBlock ==
+          static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).goal();
+        });
+    collector_group().collect_if(
         "fsm::cache_acquisition",
-        static_cast<metrics::fsm::cache_acquisition_metrics&>(
+        static_cast<metrics::fsm::goal_acquisition_metrics&>(
+            *controller.current_task()),
+        [&](const rcppsw::metrics::base_metrics& metrics) {
+          return goal_type::kExistingCache ==
+              static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).goal();
+        });
+
+    collector_group().collect(
+        "block::transport",
+        static_cast<metrics::block_transport_metrics&>(
             *controller.current_task()));
-    collector_group().collect_from(
+    collector_group().collect(
         "tasks::execution",
         static_cast<rcppsw::metrics::tasks::execution_metrics&>(
             *controller.current_task()));
@@ -124,9 +133,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller,
-                  GetSpace().GetSimulationClock(),
-                  static_cast<metrics::block_transport_metrics_collector&>(
-                      *collector_group()["block"]));
+                  GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 argos::CColor foraging_loop_functions::GetFloorColor(
@@ -159,8 +166,8 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
-    collector_group().collect_from("cache",
-                                   static_cast<metrics::cache_metrics&>(*c));
+    collector_group().collect("cache",
+                              static_cast<metrics::cache_metrics&>(*c));
     c->reset_metrics();
   } /* for(&c..) */
 
@@ -232,7 +239,7 @@ void foraging_loop_functions::cache_handling_init(
 void foraging_loop_functions::metric_collecting_init(
     const struct params::output_params* output_p) {
   collector_group()
-      .register_collector<metrics::fsm::cache_acquisition_metrics_collector>(
+      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
           "fsm::cache_acquisition",
           metrics_path() + "/" + output_p->metrics.cache_acquisition_fname,
           output_p->metrics.collect_interval);

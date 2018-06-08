@@ -37,7 +37,7 @@ sensing_subsystem::sensing_subsystem(
     const struct base_sensing_subsystem::sensor_list* const list)
     : depth0::sensing_subsystem(c_params, list) {}
 
-bool sensing_subsystem::cache_detected(void) {
+bool sensing_subsystem::cache_detected(void) const {
   std::vector<hal::sensors::ground_sensor::reading> readings =
       base_sensing_subsystem::ground().readings();
 

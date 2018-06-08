@@ -1,5 +1,5 @@
 /**
- * @file block_transport_metrics.hpp
+ * @file foraging_task.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,48 +18,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
- * Class Definitions
+ * Constant Definitions
  ******************************************************************************/
-/**
- * @class block_transport_metrics
- * @ingroup metrics fsm
- *
- * @brief Interface defining what metrics that should be collected from robots
- * as they transport blocks SOMEWHERE.
- */
-class block_transport_metrics : public base_fsm_metrics {
- public:
-  block_transport_metrics(void) = default;
-  ~block_transport_metrics(void) override = default;
+constexpr char foraging_task::kCacheStarterName[];
 
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block and is currently
-   * taking it back to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
-
-  /**
-   * @brief If \c TRUE, then the robot is currently running the
-   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
-   * of choice.
-   */
-  virtual bool is_transporting_to_cache(void) const = 0;
-};
-
-NS_END(fsm, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_BLOCK_TRANSPORT_METRICS_HPP_ */
+NS_END(depth2, tasks, fordyca);

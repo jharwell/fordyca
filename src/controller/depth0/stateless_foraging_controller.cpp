@@ -81,17 +81,17 @@ void stateless_foraging_controller::ControlStep(void) {
   m_fsm->run();
 } /* ControlStep() */
 
-bool stateless_foraging_controller::block_acquired(void) const {
-  return m_fsm->block_acquired();
-} /* block_acquired() */
+bool stateless_foraging_controller::goal_acquired(void) const {
+  return m_fsm->goal_acquired();
+} /* goal_acquired() */
 
 bool stateless_foraging_controller::is_transporting_to_nest(void) const {
   return m_fsm->is_transporting_to_nest();
 } /* is_transporting_to_nest() */
 
-bool stateless_foraging_controller::is_exploring_for_block(void) const {
-  return m_fsm->is_exploring_for_block();
-} /* is_exploring_for_block() */
+bool stateless_foraging_controller::is_exploring_for_goal(void) const {
+  return m_fsm->is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
 bool stateless_foraging_controller::is_avoiding_collision(void) const {
   return m_fsm->is_avoiding_collision();

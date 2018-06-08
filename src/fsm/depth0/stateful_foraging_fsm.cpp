@@ -117,22 +117,18 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
-__pure bool stateful_foraging_fsm::is_exploring_for_block(void) const {
-  return m_block_fsm.is_exploring_for_block();
-} /* is_exploring_for_block() */
+__pure bool stateful_foraging_fsm::is_exploring_for_goal(void) const {
+  return m_block_fsm.is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
 __pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
   return current_state() == ST_TRANSPORT_TO_NEST;
 } /* is_transporting_to_nest() */
 
-__pure bool stateful_foraging_fsm::is_acquiring_block(void) const {
-  return m_block_fsm.is_acquiring_block();
-} /* is_acquiring_block() */
-
-__pure bool stateful_foraging_fsm::is_vectoring_to_block(void) const {
-  return m_block_fsm.is_vectoring_to_block();
+__pure bool stateful_foraging_fsm::is_vectoring_to_goal(void) const {
+  return m_block_fsm.is_vectoring_to_goal();
 } /* is_vectoring_to_block() */
 
 /*******************************************************************************
@@ -149,8 +145,8 @@ void stateful_foraging_fsm::task_execute(void) {
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-bool stateful_foraging_fsm::block_acquired(void) const {
+bool stateful_foraging_fsm::goal_acquired(void) const {
   return current_state() == ST_WAIT_FOR_PICKUP;
-} /* block_acquired() */
+} /* goal_acquired() */
 
 NS_END(depth0, fsm, fordyca);

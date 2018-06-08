@@ -1,7 +1,7 @@
 /**
- * @file explore_for_block_fsm.cpp
+ * @file explore_for_goal_fsm.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/explore_for_block_fsm.hpp"
+#include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
@@ -38,9 +38,11 @@ namespace kinematics = rcppsw::robotics::kinematics;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-explore_for_block_fsm::explore_for_block_fsm(
+explore_for_goal_fsm::explore_for_goal_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
+    const std::shared_ptr<controller::saa_subsystem>& saa,
+    std::unique_ptr<controller::explore_behavior> behavior,
+    std::function<bool(void)> goal_detect)
     : base_explore_fsm(server, saa, ST_MAX_STATES),
       entry_explore(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -48,30 +50,32 @@ explore_for_block_fsm::explore_for_block_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&explore),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  insmod("explore_for_block_fsm",
+      HFSM_STATE_MAP_ENTRY_EX(&finished)},
+      m_explore_behavior(std::move(behavior)),
+      m_goal_detect(goal_detect) {
+  insmod("explore_for_goal_fsm",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
 }
 
-HFSM_STATE_DEFINE_ND(explore_for_block_fsm, start) {
+HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
   internal_event(ST_EXPLORE);
   return controller::foraging_signal::HANDLED;
 }
 
-__const HFSM_STATE_DEFINE_ND(explore_for_block_fsm, finished) {
+__const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
+HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
   if (ST_EXPLORE != last_state()) {
     ER_DIAG("Executing ST_EXPLORE");
   }
 
-  if (base_foraging_fsm::base_sensors()->block_detected()) {
+  if (m_goal_detect()) {
     internal_event(ST_FINISHED);
   } else {
-    base_explore_fsm::random_explore();
+    m_explore_behavior->execute();
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -79,7 +83,7 @@ HFSM_STATE_DEFINE_ND(explore_for_block_fsm, explore) {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-bool explore_for_block_fsm::task_running(void) const {
+bool explore_for_goal_fsm::task_running(void) const {
   return ST_START != current_state() && ST_FINISHED != current_state();
 }
 

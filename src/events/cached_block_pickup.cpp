@@ -34,8 +34,8 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
-#include "fordyca/tasks/collector.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,6 +43,7 @@
 NS_START(fordyca, events);
 using representation::base_cache;
 using representation::occupancy_grid;
+namespace tasks = tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -205,7 +206,8 @@ void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  controller.current_task()->accept(*this);
+  dynamic_cast<tasks::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),

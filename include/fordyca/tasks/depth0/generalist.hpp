@@ -18,20 +18,20 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_GENERALIST_HPP_
-#define INCLUDE_FORDYCA_TASKS_GENERALIST_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth0);
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
@@ -57,29 +57,24 @@ class generalist : public task_allocation::partitionable_polled_task,
   /* event handling */
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::nest_block_drop& visitor) override;
-  void accept(events::cache_block_drop&) override {}
-  void accept(events::cached_block_pickup&) override {}
-  void accept(events::cache_vanished&) override {}
 
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
+  /* base FSM metrics */
   bool is_avoiding_collision(void) const override;
+
+    /* goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kBlock;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
+
+  /* block transport metrics */
   bool is_transporting_to_nest(void) const override;
-
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* depth1 metrics */
-  bool is_exploring_for_cache(void) const override { return false; }
-  bool is_vectoring_to_cache(void) const override { return false; }
-  bool is_acquiring_cache(void) const override { return false; }
   bool is_transporting_to_cache(void) const override { return false; }
 
   /* task metrics */
   bool at_interface(void) const override { return false; }
-  bool cache_acquired(void) const override { return false; }
-  bool block_acquired(void) const override;
 
   executable_task* partition(void) override {
     return partitionable_task::partition();
@@ -94,6 +89,6 @@ class generalist : public task_allocation::partitionable_polled_task,
   task_allocation::abort_probability m_abort_prob;
 };
 
-NS_END(tasks, fordyca);
+NS_END(depth0, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_GENERALIST_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_ */

@@ -30,15 +30,14 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/block_transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/block_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -63,14 +62,9 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<const struct params::output_params>();
   collector_group()
-      .register_collector<metrics::fsm::block_acquisition_metrics_collector>(
+      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
           "fsm::block_acquisition",
           metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
-          p_output->metrics.collect_interval);
-  collector_group()
-      .register_collector<metrics::fsm::block_transport_metrics_collector>(
-          "fsm::block_transport",
-          metrics_path() + "/" + p_output->metrics.block_transport_fname,
           p_output->metrics.collect_interval);
   collector_group().reset_all();
 
@@ -97,16 +91,16 @@ void stateful_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect_from(
+  collector_group().collect(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    collector_group().collect_from(
+    collector_group().collect(
         "fsm::block_acquisition",
-        static_cast<metrics::fsm::block_acquisition_metrics&>(
+        static_cast<metrics::fsm::goal_acquisition_metrics&>(
             *controller.current_task()));
-    collector_group().collect_from(
-        "fsm::block_transport",
-        static_cast<metrics::fsm::block_transport_metrics&>(
+    collector_group().collect(
+        "block::transport",
+        static_cast<metrics::block_transport_metrics&>(
             *controller.current_task()));
   }
 
@@ -119,9 +113,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
   /* Now watch it react to the environment */
   interactor(rcppsw::er::g_server,
              arena_map(),
-             floor())(controller,
-                      static_cast<metrics::block_transport_metrics_collector&>(
-                          *collector_group()["block"]));
+             floor())(controller);
 } /* pre_step_iter() */
 
 __pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(

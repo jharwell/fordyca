@@ -35,7 +35,7 @@ NS_START(fordyca, metrics);
 block_transport_metrics_collector::block_transport_metrics_collector(
     const std::string& ofname,
     uint interval)
-    : base_metrics_collector(ofname, interval), m_metrics() {}
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
@@ -44,40 +44,55 @@ std::string block_transport_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "transport_avg_carries" + separator();
+      "n_transporting_to_nest" + separator() +
+      "n_cum_transporting_to_nest" + separator() +
+      "n_transporting_to_cache" + separator() +
+      "n_cum_transporting_to_cache" + separator();
   // clang-format on
 } /* csv_header_build() */
 
 void block_transport_metrics_collector::reset(void) {
   base_metrics_collector::reset();
-  m_metrics = {0, 0};
+  reset_after_interval();
 } /* reset() */
-
-bool block_transport_metrics_collector::csv_line_build(std::string& line) {
-  double avg_carries = 0;
-  if (!((timestep() + 1) % interval() == 0)) {
-    return false;
-  }
-
-  if (m_metrics.cum_collected > 0) {
-    avg_carries =
-        static_cast<double>(m_metrics.cum_carries) / m_metrics.cum_collected;
-  }
-  line = std::to_string(avg_carries) + separator() +
-         std::to_string(m_metrics.cum_collected) + separator();
-  return true;
-} /* csv_line_build() */
 
 void block_transport_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const metrics::block_transport_metrics&>(metrics);
-  m_metrics.cum_carries += m.n_carries();
-  ++m_metrics.cum_collected;
+  auto& m = static_cast<const metrics::block_transport_metrics&>(metrics);
+  m_stats.n_transporting_to_nest +=
+      static_cast<uint>(m.is_transporting_to_nest());
+  m_stats.n_transporting_to_cache +=
+      static_cast<uint>(m.is_transporting_to_cache());
+
+  m_stats.n_cum_transporting_to_nest +=
+      static_cast<uint>(m.is_transporting_to_nest());
+  m_stats.n_cum_transporting_to_cache +=
+      static_cast<uint>(m.is_transporting_to_cache());
 } /* collect() */
 
+bool block_transport_metrics_collector::csv_line_build(std::string& line) {
+  if (!((timestep() + 1) % interval() == 0)) {
+    return false;
+  }
+  line = std::to_string(m_stats.n_transporting_to_nest) + separator() +
+         std::to_string(m_stats.n_cum_transporting_to_nest) + separator() +
+         std::to_string(m_stats.n_transporting_to_cache) + separator() +
+         std::to_string(m_stats.n_cum_transporting_to_cache) + separator() +
+         std::to_string(m_stats.n_avoiding_collision) + separator() +
+         std::to_string(m_stats.n_cum_avoiding_collision) + separator();
+  return true;
+} /* store_foraging_stats() */
+
 void block_transport_metrics_collector::reset_after_interval(void) {
-  m_metrics.cum_carries = 0;
-  m_metrics.cum_collected = 0;
+  m_stats.n_cum_transporting_to_nest = 0;
+  m_stats.n_cum_transporting_to_cache = 0;
+  m_stats.n_cum_avoiding_collision = 0;
 } /* reset_after_interval() */
+
+void block_transport_metrics_collector::reset_after_timestep(void) {
+  m_stats.n_transporting_to_nest = 0;
+  m_stats.n_transporting_to_cache = 0;
+  m_stats.n_avoiding_collision = 0;
+} /* reset_after_timestep() */
 
 NS_END(metrics, fordyca);

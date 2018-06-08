@@ -1,7 +1,7 @@
 /**
- * @file foraging_task.cpp
+ * @file random_explore_behavior.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,21 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_RANDOM_EXPLORE_BEHAVIOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_RANDOM_EXPLORE_BEHAVIOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/controller/explore_behavior.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Constant Definitions
+ * Class Definitions
  ******************************************************************************/
-constexpr char foraging_task::kCollectorName[];
-constexpr char foraging_task::kHarvesterName[];
-constexpr char foraging_task::kGeneralistName[];
+/**
+ * @class random_explore_behavior
+ * @ingroup controller
+ *
+ *
+ * @brief Perform random walk exploration: wander force + avoidance force.
+ */
+class random_explore_behavior : public explore_behavior {
+ public:
+  random_explore_behavior(
+      const std::shared_ptr<rcppsw::er::server>& server,
+      const std::shared_ptr<controller::saa_subsystem>& saa);
 
-NS_END(tasks, fordyca);
+  ~random_explore_behavior(void) override = default;
+  random_explore_behavior(const random_explore_behavior& fsm) = delete;
+  random_explore_behavior& operator=(const random_explore_behavior& fsm) = delete;
+
+  void execute(void) override;
+};
+
+NS_END(controller, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_RANDOM_EXPLORE_BEHAVIOR_HPP_ */

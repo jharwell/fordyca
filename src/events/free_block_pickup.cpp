@@ -29,14 +29,13 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/base_block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/generalist.hpp"
-#include "fordyca/tasks/harvester.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -177,16 +176,16 @@ void free_block_pickup::visit(
          m_block->id());
 } /* visit() */
 
-void free_block_pickup::visit(tasks::generalist& task) {
+void free_block_pickup::visit(tasks::depth0::generalist& task) {
   static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::base_block_to_cache_fsm*>(task.mechanism())->accept(*this);
+void free_block_pickup::visit(tasks::depth1::harvester& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth1::base_block_to_cache_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

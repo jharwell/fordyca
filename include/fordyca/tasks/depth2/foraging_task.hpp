@@ -18,19 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_
-#define INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/metrics/fsm/block_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/block_transport_metrics.hpp"
-#include "fordyca/metrics/fsm/cache_acquisition_metrics.hpp"
-#include "fordyca/tasks/argument.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -39,50 +35,38 @@
 NS_START(fordyca);
 
 namespace events {
-class cached_block_pickup;
-class cache_block_drop;
-class free_block_pickup;
-class nest_block_drop;
-class cache_vanished;
+class free_block_drop;
 } // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 
-NS_START(tasks);
+NS_START(tasks, depth2);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class foraging_task
- * @ingroup tasks
+ * @ingroup tasks depth2
  *
- * @brief Interface specifying the visit set for all foraging tasks in FORDYCA.
+ * @brief Interface specifying the visit set for all depth2 foraging tasks
+ * in FORDYCA.
+ *
+ * Not all tasks need all events, but it is convenient both from a design point
+ * of view as well as not having to fight with the compiler as much if you do it
+ * this way.
  */
 class foraging_task
-    : public rcppsw::metrics::tasks::execution_metrics,
-      public metrics::fsm::block_acquisition_metrics,
-      public metrics::fsm::block_transport_metrics,
-      public metrics::fsm::cache_acquisition_metrics,
+    : public base_foraging_task,
       public visitor::polymorphic_visitable<foraging_task,
-                                            events::cached_block_pickup,
-                                            events::cache_block_drop,
-                                            events::free_block_pickup,
-                                            events::nest_block_drop,
-                                            events::cache_vanished> {
+                                            events::free_block_drop> {
  public:
-  static constexpr char kCollectorName[] = "Collector";
-  static constexpr char kHarvesterName[] = "Harvester";
-  static constexpr char kGeneralistName[] = "Generalist";
+  explicit foraging_task(const std::string& name) :
+      base_foraging_task(name) {}
 
-  explicit foraging_task(const std::string& name) : mc_name(name) {}
-
-  std::string name(void) const { return mc_name; }
-
- private:
-  const std::string mc_name;
+  static constexpr char kCacheStarterName[] = "Cache Starter";
 };
 
-NS_END(tasks, fordyca);
+NS_END(depth2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_FORAGING_TASK_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_FORAGING_TASK_HPP_ */

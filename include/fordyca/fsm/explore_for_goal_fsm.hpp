@@ -1,7 +1,7 @@
 /**
- * @file explore_for_cache_fsm.hpp
+ * @file explore_for_goal_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,63 +18,66 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_EXPLORE_FOR_CACHE_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_EXPLORE_FOR_CACHE_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXPLORE_FOR_GOAL_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPLORE_FOR_GOAL_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
-
+#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/base_explore_fsm.hpp"
+#include "fordyca/controller/explore_behavior.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller { namespace depth1 {class sensing_subsystem; }}
-
-NS_START(fsm, depth1);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class explore_for_cache_fsm
- * @ingroup fsm depth1
+ * @class explore_for_goal_fsm
+ * @ingroup fsm
  *
- * @brief Robots executing this task will roam around randomly looking for a
- * cache. Once they have found one, the FSM will signal that its task is
- * complete.
+ * @brief Robots executing this task will roam around randomly looking for an
+ * instance of their goal. Once they have found one, the FSM will signal that
+ * its task is complete.
  */
-class explore_for_cache_fsm : public base_explore_fsm {
+class explore_for_goal_fsm : public base_explore_fsm {
  public:
   enum fsm_states {
     ST_START,
     /**
-     * Roaming around looking for a cache.
+     * Roaming around looking for a goal.
      */
     ST_EXPLORE,
-
     /**
-     * A cache has been acquired.
+     * A goal has been acquired.
      */
     ST_FINISHED,
     ST_MAX_STATES
   };
 
-  explore_for_cache_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                        const std::shared_ptr<controller::saa_subsystem>& saa);
-
-  explore_for_cache_fsm(const explore_for_cache_fsm& fsm) = delete;
-  explore_for_cache_fsm& operator=(const explore_for_cache_fsm& fsm) = delete;
+  explore_for_goal_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                       const std::shared_ptr<controller::saa_subsystem>& saa,
+                       std::unique_ptr<controller::explore_behavior> behavior,
+                       std::function<bool(void)> goal_detect);
 
   /* taskable overrides */
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
+
+    /**
+   * @brief Set callback for determining if the goal has been detected (i.e. the
+   * robot is either on top of it, or is otherwise near enough so that the next
+   * stage of whatever it is currently doing can happen).
+   */
+  void set_goal_detection(std::function<bool(void)> cb) { m_goal_detect = cb; }
 
  private:
   /* inherited states */
@@ -85,15 +88,20 @@ class explore_for_cache_fsm : public base_explore_fsm {
   /**
    * @brief Starting/reset state for FSM. Has no purpose other than that.
    */
-  HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, start);
+  HFSM_STATE_DECLARE_ND(explore_for_goal_fsm, start);
 
   /**
    * @brief The main state for the explore FSM. Robots in this state maintain
-   * their heading, looking for a cache, until they find it or exceed the
-   * direction change threshold.
+   * their heading, looking for SOMETHING of interest, until they find it or
+   * exceed the direction change threshold.
    */
-  HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, explore);
-  HFSM_STATE_DECLARE_ND(explore_for_cache_fsm, finished);
+  HFSM_STATE_DECLARE_ND(explore_for_goal_fsm, explore);
+
+  /**
+   * @brief Once a goal has been acquired, robots wait in this state until
+   * reset by a higher level FSM.
+   */
+  HFSM_STATE_DECLARE_ND(explore_for_goal_fsm, finished);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -106,8 +114,13 @@ class explore_for_cache_fsm : public base_explore_fsm {
   }
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+
+  // clang-format off
+  std::unique_ptr<controller::explore_behavior> m_explore_behavior;
+  std::function<bool(void)>                     m_goal_detect;
+  // clang-format on
 };
 
-NS_END(depth1, fsm, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_EXPLORE_FOR_CACHE_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXPLORE_FOR_GOAL_FSM_HPP_ */

@@ -37,9 +37,9 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class arena_cache;
 }
-namespace tasks {
+namespace tasks { namespace depth1 {
 class collector;
-}
+}}
 
 NS_START(events);
 
@@ -59,7 +59,8 @@ class cached_block_pickup
     : public cell_op,
       public rcppsw::er::client,
       public block_pickup_event,
-      public visitor::visit_set<tasks::collector, representation::arena_cache> {
+      public visitor::visit_set<tasks::depth1::collector,
+                                representation::arena_cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                       const std::shared_ptr<representation::arena_cache>& cache,
@@ -78,7 +79,7 @@ class cached_block_pickup
   void visit(representation::arena_cache& cache) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(tasks::collector& task) override;
+  void visit(tasks::depth1::collector& task) override;
 
  private:
   // clang-format off

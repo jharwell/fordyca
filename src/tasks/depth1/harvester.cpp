@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/harvester.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
@@ -37,7 +37,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks);
+NS_START(fordyca, tasks, depth1);
+using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -56,16 +57,6 @@ __pure double harvester::current_time(void) const {
       ->base_sensors()
       ->tick();
 } /* current_time() */
-
-bool harvester::cache_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->cache_acquired();
-} /* cache_acquired() */
-
-bool harvester::block_acquired(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->block_acquired();
-} /* cache_acquired() */
 
 void harvester::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
@@ -93,7 +84,7 @@ double harvester::calc_interface_time(double start_time) {
     return current_time() - start_time;
   }
 
-  if (cache_acquired()) {
+  if (goal_acquired() && goal_type::kExistingCache == goal()) {
     if (!m_interface_complete) {
       m_interface_complete = true;
       reset_interface_time();
@@ -117,55 +108,39 @@ void harvester::accept(events::cache_vanished& visitor) {
 }
 
 /*******************************************************************************
- * Base Metrics
+ * FSM Metrics
  ******************************************************************************/
-bool harvester::is_exploring_for_block(void) const {
+bool harvester::is_exploring_for_goal(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->is_exploring_for_block();
-} /* is_exploring_for_block() */
+      ->is_exploring_for_goal();
+} /* is_exploring_for_goal() */
 
 bool harvester::is_avoiding_collision(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
       ->is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-/*******************************************************************************
- * Depth0 Metrics
- ******************************************************************************/
-bool harvester::is_acquiring_block(void) const {
+bool harvester::is_vectoring_to_goal(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->is_acquiring_block();
-} /* is_acquiring_block() */
-
-bool harvester::is_vectoring_to_block(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->is_vectoring_to_block();
-} /* is_vectoring_to_block() */
-
-/*******************************************************************************
- * Depth1 Metrics
- ******************************************************************************/
-bool harvester::is_exploring_for_cache(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->is_exploring_for_cache();
-} /* is_exploring_for_cache() */
-
-bool harvester::is_vectoring_to_cache(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->is_vectoring_to_cache();
-} /* is_vectoring_to_cache() */
-
-bool harvester::is_acquiring_cache(void) const {
-  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-      polled_task::mechanism())
-      ->is_acquiring_cache();
-} /* is_acquiring_cache() */
+      ->is_vectoring_to_goal();
+} /* is_vectoring_to_goal() */
 
 bool harvester::is_transporting_to_cache(void) const {
   return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
       polled_task::mechanism())
       ->is_transporting_to_cache();
 } /* is_transporting_to_cache() */
+
+goal_type harvester::goal(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+      polled_task::mechanism())->goal();
+  }
+
+bool harvester::goal_acquired(void) const {
+  return static_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
+      ->goal_acquired();
+} /* goal_acquired() */
+
 
 /*******************************************************************************
  * Task Metrics
@@ -174,4 +149,4 @@ __pure bool harvester::at_interface(void) const {
   return is_transporting_to_cache();
 } /* at_interface()() */
 
-NS_END(tasks, fordyca);
+NS_END(depth1, tasks, fordyca);

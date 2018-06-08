@@ -38,23 +38,26 @@ NS_START(fordyca, metrics);
  * @class block_transport_metrics
  * @ingroup metrics
  *
- * @brief Interface defining metrics that can be collected on a block's journey
- * from its initial position in the arena to the nest.
+ * @brief Interface defining what metrics that should be collected from robots
+ * as they transport blocks SOMEWHERE.
  */
 class block_transport_metrics : public rcppsw::metrics::base_metrics {
  public:
   block_transport_metrics(void) = default;
   ~block_transport_metrics(void) override = default;
-  block_transport_metrics(const block_transport_metrics&) = default;
-  block_transport_metrics& operator=(const block_transport_metrics&) = default;
 
   /**
-   * @brief Get how many carries this object has had on its way from its
-   * original arena location back to the nest.
-   *
-   * @return # carries.
+   * @brief If \c TRUE, then a robot has acquired a block and is currently
+   * taking it back to the nest.
    */
-  virtual uint n_carries(void) const = 0;
+  virtual bool is_transporting_to_nest(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then the robot is currently running the
+   * \ref block_to_cache_fsm, and is transporting an acquired block to its cache
+   * of choice.
+   */
+  virtual bool is_transporting_to_cache(void) const = 0;
 };
 
 NS_END(metrics, fordyca);
