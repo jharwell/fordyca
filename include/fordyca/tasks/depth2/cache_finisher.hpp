@@ -1,7 +1,7 @@
 /**
- * @file generalist.hpp
+ * @file cache_finisher.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,45 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/tasks/depth2/new_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks, depth0);
+NS_START(fordyca, tasks, depth2);
+
 namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class generalist
- * @ingroup tasks
+ * @class cache_finisher
+ * @ingroup tasks depth2
  *
- * @brief Class representing depth 0 task allocation: Perform the whole foraging
- * task: (1) Find a free block, and (2) bring it to the nest.
- *
- * It is decomposable into two subtasks that result in the same net change to
- * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager. It is not abortable.
+ * @brief Task in which robots locate a free block and drop it next to/on top of
+ * a free block in the arena to finish the creation of a new cache. It is
+ * abortable, and has one task interface.
  */
-class generalist : public task_allocation::partitionable_polled_task,
-                   public foraging_task {
+class cache_finisher : public task_allocation::polled_task,
+                      public foraging_task,
+                      public new_cache_interactor {
  public:
-  generalist(const struct task_allocation::partitionable_task_params* params,
-             std::unique_ptr<task_allocation::taskable>& mechanism);
+  cache_finisher(const struct task_allocation::task_params* params,
+            std::unique_ptr<task_allocation::taskable>& mechanism);
 
-  /* event handling */
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::nest_block_drop& visitor) override;
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a \ref new_cache_interactor, you have no way to way
+   * which depth2 task the object ACTUALLY is without using a set of if()
+   * statements, which is a brittle design. This is not the cleanest, but is
+   * still more elegant than the alternative.
+   */
+  void accept(events::free_block_drop& visitor) override;
 
   /* base FSM metrics */
   TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
@@ -71,21 +77,20 @@ class generalist : public task_allocation::partitionable_polled_task,
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
-  bool at_interface(void) const override { return false; }
+  bool at_interface(void) const override;
 
-  executable_task* partition(void) override {
-    return partitionable_task::partition();
-  }
-  void task_start(const task_allocation::taskable_argument* const) override {}
-
+  void task_start(const task_allocation::taskable_argument*) override;
   double current_time(void) const override;
   double calc_abort_prob(void) override;
-  double calc_interface_time(double) override { return 0.0; }
+  double calc_interface_time(double start_time) override;
 
  private:
+  // clang-format off
+  bool                               m_interface_complete{false};
   task_allocation::abort_probability m_abort_prob;
+  // clang-format on
 };
 
-NS_END(depth0, tasks, fordyca);
+NS_END(depth2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH0_GENERALIST_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_ */

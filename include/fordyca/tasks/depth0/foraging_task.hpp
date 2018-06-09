@@ -59,9 +59,8 @@ NS_START(tasks, depth0);
  */
 class foraging_task
     : public base_foraging_task,
-      public visitor::polymorphic_visitable<foraging_task,
-                                            events::free_block_pickup,
-                                            events::nest_block_drop> {
+      public visitor::polymorphic_accept_set<events::free_block_pickup,
+                                             events::nest_block_drop> {
  public:
   static constexpr char kGeneralistName[] = "Generalist";
 

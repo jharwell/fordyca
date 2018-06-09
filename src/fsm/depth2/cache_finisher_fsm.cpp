@@ -144,28 +144,27 @@ __pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
          m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-bool cache_finisher_fsm::is_exploring_for_goal(void) const {
-  return m_block_fsm.is_exploring_for_goal();
-} /* is_exploring_for_goal() */
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
+                   goal_acquired,
+                   m_block_fsm);
 
-bool cache_finisher_fsm::is_vectoring_to_goal(void) const {
-  return m_block_fsm.is_vectoring_to_goal();
-} /* is_vectoring_to_goal() */
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
+                   is_vectoring_to_goal,
+                   m_block_fsm);
 
-bool cache_finisher_fsm::goal_acquired(void) const {
-  return m_block_fsm.goal_acquired();
-} /* block_acquired() */
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
+                   is_exploring_for_goal,
+                   m_block_fsm);
 
-metrics::fsm::goal_acquisition_metrics::goal_type cache_finisher_fsm::goal(void) const {
-  if (m_block_fsm.task_running() ||
-      current_state() == ST_WAIT_FOR_BLOCK_PICKUP) {
-    return m_block_fsm.goal();
-  } else if (m_cache_fsm.task_running() ||
-             current_state() == ST_WAIT_FOR_BLOCK_DROP) {
-    return m_cache_fsm.goal();
+acquisition_goal_type cache_finisher_fsm::acquisition_goal(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.acquisition_goal();
+  } else if (m_cache_fsm.task_running()) {
+    return m_cache_fsm.acquisition_goal();
   }
   return goal_type::kNone;
-} /* goal() */
+} /* acquisition_goal() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

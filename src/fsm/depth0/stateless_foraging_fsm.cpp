@@ -123,9 +123,9 @@ bool stateless_foraging_fsm::is_exploring_for_goal(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
 } /* is_exploring_for_goal() */
 
-bool stateless_foraging_fsm::is_transporting_to_nest(void) const {
-  return current_state() == ST_TRANSPORT_TO_NEST;
-} /* is_transporting_to_nest() */
+bool stateless_foraging_fsm::goal_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+} /* goal_acquired() */
 
 /*******************************************************************************
  * General Member Functions
@@ -140,12 +140,22 @@ void stateless_foraging_fsm::run(void) {
                state_machine::event_type::NORMAL);
 } /* run() */
 
-bool stateless_foraging_fsm::goal_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-} /* goal_acquired() */
-
 bool stateless_foraging_fsm::block_detected(void) const {
   return saa_subsystem()->sensing()->block_detected();
 } /* block_detected() */
+
+transport_goal_type stateless_foraging_fsm::block_transport_goal(void) const {
+  if (ST_TRANSPORT_TO_NEST == current_state()) {
+    return transport_goal_type::kNest;
+  }
+  return transport_goal_type::kNone;
+} /* block_transport_goal() */
+
+acquisition_goal_type stateless_foraging_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_BLOCK == current_state()) {
+    return acquisition_goal_type::kBlock;
+  }
+  return acquisition_goal_type::kNone;
+} /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

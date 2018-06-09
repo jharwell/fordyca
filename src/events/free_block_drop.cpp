@@ -33,6 +33,7 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -120,11 +121,15 @@ void free_block_drop::visit(
  ******************************************************************************/
 void free_block_drop::visit(
     controller::depth2::foraging_controller& controller) {
-  controller.current_task()->accept(*this);
+  static_cast<tasks::depth2::foraging_task*>(controller.current_task())->accept(*this);
   controller.block(nullptr);
 } /* visit() */
 
 void free_block_drop::visit(tasks::depth2::cache_starter& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
   static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 

@@ -43,6 +43,8 @@ namespace representation { class perceived_arena_map; }
 
 NS_START(fsm);
 
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/

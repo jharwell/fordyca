@@ -72,15 +72,13 @@ class cache_transferer_fsm : public base_foraging_fsm,
   bool task_running(void) const override { return m_task_running; }
 
   /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kExistingCache;
-  }
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
+  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
 
   /**
    * @brief Reset the FSM.

@@ -35,7 +35,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -87,7 +88,8 @@ class cache_penalty_handler : public rcppsw::er::client {
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     if (controller.current_task()->goal_acquired()) {
-      ER_ASSERT(goal_type::kExistingCache == controller.current_task()->goal(),
+      ER_ASSERT(acquisition_goal_type::kExistingCache ==
+                controller.current_task()->acquisition_goal(),
                 "FATAL: Bad goal for controller");
 
       /* Check whether the foot-bot is actually on a cache */

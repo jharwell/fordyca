@@ -75,8 +75,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  tasks::depth1::foraging_task* current_task(void) const;
-  bool is_transporting_to_nest(void) const override;
+  tasks::base_foraging_task* current_task(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is

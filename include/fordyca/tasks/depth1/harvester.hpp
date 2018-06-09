@@ -55,25 +55,30 @@ class harvester : public task_allocation::polled_task,
   harvester(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
-  /* event handling */
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a \ref existing_cache_interactor, you have no way to
+   * way which task the object ACTUALLY is without using a set of if()
+   * statements, which is a brittle design. This is not the cleanest, but is
+   * still more elegant than the alternative.
+   */
   void accept(events::cache_block_drop& visitor) override;
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::cache_vanished& visitor) override;
   void accept(events::cached_block_pickup&) override {}
+  void accept(events::cache_vanished& visitor) override;
+  void accept(events::free_block_pickup& visitor) override;
   void accept(events::nest_block_drop&) override {}
 
   /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
-  /* FSM goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
+  /* goal acquisition metrics */
+  TASK_WRAPPER_DECLARE(bool, goal_acquired);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
 
-  /* FSM block transport metrics */
-  bool is_transporting_to_nest(void) const override { return false; }
-  bool is_transporting_to_cache(void) const override;
+  /* block transportation */
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool at_interface(void) const override;

@@ -59,6 +59,12 @@ class block_to_new_cache_fsm : public depth1::block_to_goal_fsm {
 
   acquire_new_cache_fsm& goal_fsm(void) override { return m_cache_fsm; }
 
+  /* goal acquisition metrics */
+  acquisition_goal_type acquisition_goal(void) const override;
+
+  /* block transportation */
+  transport_goal_type block_transport_goal(void) const override;
+
   // clang-format off
   acquire_new_cache_fsm m_cache_fsm;
   // clang-format on

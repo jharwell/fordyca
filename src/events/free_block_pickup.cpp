@@ -155,7 +155,7 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
-  controller.current_task()->accept(*this);
+  static_cast<tasks::depth0::foraging_task*>(controller.current_task())->accept(*this);
   controller.block(m_block);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
@@ -169,7 +169,7 @@ void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  controller.current_task()->accept(*this);
+  static_cast<tasks::depth1::foraging_task*>(controller.current_task())->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),

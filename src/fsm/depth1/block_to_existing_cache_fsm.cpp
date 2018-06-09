@@ -40,4 +40,24 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
     : block_to_goal_fsm(params, server, saa, map),
       m_cache_fsm(params, server, saa, map) {}
 
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+acquisition_goal_type block_to_existing_cache_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_FREE_BLOCK == current_state()) {
+    return block_fsm().acquisition_goal();
+  } else if (ST_TRANSPORT_TO_GOAL == current_state()) {
+    return m_cache_fsm.acquisition_goal();
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
+transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) const {
+  if (ST_TRANSPORT_TO_GOAL == current_state() ||
+      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return transport_goal_type::kExistingCache;
+  }
+  return transport_goal_type::kNone;
+} /* acquisition_goal() */
+
 NS_END(depth1, controller, fordyca);

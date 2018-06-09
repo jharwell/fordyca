@@ -112,33 +112,39 @@ __const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__pure bool cached_block_to_nest_fsm::is_avoiding_collision(void) const {
-  return m_cache_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
+FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+                   is_avoiding_collision,
+                   m_cache_fsm);
 
-__pure bool cached_block_to_nest_fsm::is_transporting_to_nest(void) const {
-  return current_state() == ST_TRANSPORT_TO_NEST;
-} /* is_transporting_to_nest() */
+FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+                   is_exploring_for_goal,
+                   m_cache_fsm);
 
-__pure bool cached_block_to_nest_fsm::is_exploring_for_goal(void) const {
-  return m_cache_fsm.is_exploring_for_goal();
-} /* is_exploring_for_goal() */
+FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+                   is_vectoring_to_goal,
+                   m_cache_fsm);
 
-__pure bool cached_block_to_nest_fsm::is_vectoring_to_goal(void) const {
-  return m_cache_fsm.is_vectoring_to_goal();
-} /* is_vectoring_to_goal() */
+FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+                   goal_acquired,
+                   m_cache_fsm);
 
-__pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
-  return m_cache_fsm.goal_acquired();
-} /* goal_acquired() */
-
-metrics::fsm::goal_acquisition_metrics::goal_type cached_block_to_nest_fsm::goal(void) const {
-  return m_cache_fsm.goal();
-}
+acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_BLOCK == current_state()) {
+    return m_cache_fsm.acquisition_goal();
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
+transport_goal_type cached_block_to_nest_fsm::block_transport_goal(void) const {
+  if (ST_TRANSPORT_TO_NEST == current_state()) {
+    return transport_goal_type::kNest;
+  }
+  return transport_goal_type::kNone;
+} /* block_transport_goal() */
+
 void cached_block_to_nest_fsm::init(void) {
   base_foraging_fsm::init();
   m_cache_fsm.task_reset();

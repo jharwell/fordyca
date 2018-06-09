@@ -52,6 +52,13 @@ class block : public cell_entity,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
+  /**
+   * @brief Out of sight location blocks are moved to when a robot picks them
+   * up, for visualization/rending purposes.
+   */
+  static rcppsw::math::dcoord2 kOutOfSightDLoc;
+  static argos::CVector2 kOutOfSightRLoc;
+
   explicit block(double dimension)
       : cell_entity(dimension, argos::CColor::BLACK, -1),
         m_robot_index(-1),
@@ -93,6 +100,15 @@ class block : public cell_entity,
    */
   void move_out_of_sight(void);
 
+  /**
+   * @brief Determine if the block is currently out of sight.
+   *
+   * This should only happen if the block is being carried by a robot.
+   */
+  bool is_out_of_sight(void) const {
+    return kOutOfSightDLoc == discrete_loc() ||
+        kOutOfSightRLoc == real_loc();
+  }
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *

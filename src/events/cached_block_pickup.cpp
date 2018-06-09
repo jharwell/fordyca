@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
+#include <type_traits>
+
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cache_found.hpp"

@@ -28,6 +28,7 @@
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,17 +74,23 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  /* goal acquisition metrics */
-  bool goal_acquired(void) const override;
+  /* base FSM metrics */
+  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
-  /* block transport metrics */
-  bool is_transporting_to_nest(void) const override;
+  /* goal acquisition metrics */
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+
+  /* block transportation */
+  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  tasks::depth0::foraging_task* current_task(void) const;
+  virtual tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
