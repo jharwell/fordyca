@@ -28,7 +28,6 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/metrics/cache_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
@@ -46,7 +45,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Member Functions
@@ -104,22 +102,18 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
         static_cast<metrics::fsm::goal_acquisition_metrics&>(
             *controller.current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
-          return goal_type::kBlock ==
-          static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).goal();
+          return acquisition_goal_type::kBlock ==
+          static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).acquisition_goal();
         });
     collector_group().collect_if(
         "fsm::cache_acquisition",
         static_cast<metrics::fsm::goal_acquisition_metrics&>(
             *controller.current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
-          return goal_type::kExistingCache ==
-              static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).goal();
+          return acquisition_goal_type::kExistingCache ==
+              static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).acquisition_goal();
         });
 
-    collector_group().collect(
-        "block::transport",
-        static_cast<metrics::block_transport_metrics&>(
-            *controller.current_task()));
     collector_group().collect(
         "tasks::execution",
         static_cast<rcppsw::metrics::tasks::execution_metrics&>(

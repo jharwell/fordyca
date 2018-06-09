@@ -92,4 +92,14 @@ bool acquire_cache_site_fsm::acquire_known_goal(void) {
   return false;
 } /* acquire_known_goal() */
 
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+acquisition_goal_type acquire_cache_site_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_GOAL == current_state()) {
+    return acquisition_goal_type::kCacheSite;
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
 NS_END(depth2, controller, fordyca);

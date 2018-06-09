@@ -61,7 +61,7 @@ class goal_acquisition_metrics : public base_fsm_metrics {
    * @return The acquisition type, or \ref kNone if no acquisition is currently
    * in progress.
    */
-  virtual goal_type goal(void) const = 0;
+  virtual goal_type acquisition_goal(void) const = 0;
 
   /**
    * @brief Output only defined if \ref goal_type() is not \ref kNone. If

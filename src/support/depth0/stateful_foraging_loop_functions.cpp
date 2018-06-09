@@ -29,7 +29,6 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -97,10 +96,6 @@ void stateful_foraging_loop_functions::pre_step_iter(
     collector_group().collect(
         "fsm::block_acquisition",
         static_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller.current_task()));
-    collector_group().collect(
-        "block::transport",
-        static_cast<metrics::block_transport_metrics&>(
             *controller.current_task()));
   }
 

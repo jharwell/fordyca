@@ -53,9 +53,7 @@ class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm {
       std::shared_ptr<const representation::perceived_arena_map> map);
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kNewCache;
-  }
+  acquisition_goal_type acquisition_goal(void) const override;
 
  private:
   argos::CVector2 select_cache_for_acquisition(void) override;

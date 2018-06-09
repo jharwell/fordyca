@@ -125,4 +125,15 @@ bool acquire_block_fsm::acquire_known_goal(void) {
   return false;
 } /* acquire_known_block() */
 
+
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+acquisition_goal_type acquire_block_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_GOAL == current_state()) {
+    return acquisition_goal_type::kBlock;
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
 NS_END(controller, fordyca);

@@ -70,11 +70,9 @@ class foraging_controller : public depth1::foraging_controller,
   void ControlStep(void) override;
 
 
-  __pure tasks::depth2::foraging_task* current_task(void) const {
+  tasks::base_foraging_task* current_task(void) const override {
     return nullptr; /* TODO: Fixme! */
   } /* current_task() */
-
-  bool is_transporting_to_nest(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is

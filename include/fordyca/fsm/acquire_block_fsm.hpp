@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <list>
 
@@ -38,16 +37,6 @@ NS_START(fordyca);
 namespace params {
 struct fsm_params;
 }
-namespace representation {
-class block;
-} // namespace representation
-
-namespace controller {
-namespace depth0 {
-class sensing_subsystem;
-}
-class actuation_subsystem;
-} // namespace controller
 
 NS_START(fsm);
 
@@ -75,8 +64,8 @@ class acquire_block_fsm : public acquire_goal_fsm {
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kBlock; }
+  /* goal acquisition metrics */
+  acquisition_goal_type acquisition_goal(void) const override;
 
  private:
   bool acquire_known_goal(void) override;

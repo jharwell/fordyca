@@ -76,10 +76,10 @@ class cache_finisher_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const override;
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
+  acquisition_goal_type acquisition_goal(void) const override;
+  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
 
   /**
    * @brief Reset the FSM.

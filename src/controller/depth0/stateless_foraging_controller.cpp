@@ -81,21 +81,27 @@ void stateless_foraging_controller::ControlStep(void) {
   m_fsm->run();
 } /* ControlStep() */
 
-bool stateless_foraging_controller::goal_acquired(void) const {
-  return m_fsm->goal_acquired();
-} /* goal_acquired() */
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
+                              is_avoiding_collision,
+                              m_fsm);
+FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
+                              is_exploring_for_goal,
+                              m_fsm);
 
-bool stateless_foraging_controller::is_transporting_to_nest(void) const {
-  return m_fsm->is_transporting_to_nest();
-} /* is_transporting_to_nest() */
+FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
+                              goal_acquired,
+                              m_fsm);
 
-bool stateless_foraging_controller::is_exploring_for_goal(void) const {
-  return m_fsm->is_exploring_for_goal();
-} /* is_exploring_for_goal() */
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, stateless_foraging_controller,
+                              acquisition_goal,
+                              m_fsm);
 
-bool stateless_foraging_controller::is_avoiding_collision(void) const {
-  return m_fsm->is_avoiding_collision();
-} /* is_avoiding_collision() */
+FSM_WRAPPER_DEFINE_PTR(transport_goal_type, stateless_foraging_controller,
+                              block_transport_goal,
+                              m_fsm);
 
 /*******************************************************************************
  * Distance Metrics

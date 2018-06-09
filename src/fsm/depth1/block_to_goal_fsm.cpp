@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth1);
 namespace state_machine = rcppsw::patterns::state_machine;
-using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -136,12 +135,13 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     ER_DIAG("Block drop signal received");
     internal_event(ST_FINISHED);
   } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
-    ER_ASSERT(goal_type::kExistingCache == goal(),
+    ER_ASSERT(acquisition_goal_type::kExistingCache == acquisition_goal(),
               "FATAL: Non-existing cache vanished? ");
     goal_fsm().task_reset();
     internal_event(ST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::CACHE_APPEARED == data->signal()) {
-    ER_ASSERT(goal_type::kNewCache == goal() || goal_type::kCacheSite == goal(),
+    ER_ASSERT(acquisition_goal_type::kNewCache == acquisition_goal() ||
+              acquisition_goal_type::kCacheSite == acquisition_goal(),
               "FATAL: Bad goal on cache appear");
       goal_fsm().task_reset();
       internal_event(ST_TRANSPORT_TO_GOAL);
@@ -171,12 +171,6 @@ __pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
       (goal_fsm().is_vectoring_to_goal() && goal_fsm().task_running());
 } /* is_vectoring_to_block */
 
-__pure bool block_to_goal_fsm::is_transporting_to_cache(void) const {
-  return current_state() == ST_TRANSPORT_TO_GOAL &&
-      (goal_type::kExistingCache == goal() ||
-       goal_type::kNewCache == goal());
-}
-
 bool block_to_goal_fsm::goal_acquired(void) const {
   if (m_block_fsm.task_running()) {
     return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
@@ -186,16 +180,14 @@ bool block_to_goal_fsm::goal_acquired(void) const {
   return false;
 } /* goal_acquired() */
 
-goal_type block_to_goal_fsm::goal(void) const {
-  if (m_block_fsm.task_running() ||
-      current_state() == ST_WAIT_FOR_BLOCK_PICKUP) {
-    return m_block_fsm.goal();
-  } else if (goal_fsm().task_running() ||
-             current_state() == ST_WAIT_FOR_BLOCK_DROP) {
-    return goal_fsm().goal();
+acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.acquisition_goal();
+  } else if (goal_fsm().task_running()) {
+    return goal_fsm().acquisition_goal();
   }
-  return goal_type::kNone;
-} /* goal() */
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
 
 /*******************************************************************************
  * General Member Functions

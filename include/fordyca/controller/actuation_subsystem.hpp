@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/datatypes/color.h>
-
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
 #include "fordyca/params/actuation_params.hpp"

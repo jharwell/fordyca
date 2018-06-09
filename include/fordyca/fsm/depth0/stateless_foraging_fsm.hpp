@@ -28,7 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/block_transport_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +41,8 @@ namespace params { struct fsm_params; }
 namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,7 +58,7 @@ NS_START(fsm, depth0);
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
                                public metrics::fsm::goal_acquisition_metrics,
-                               public metrics::block_transport_metrics,
+                               public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
@@ -71,16 +73,13 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   }
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kBlock;
-  }
+  acquisition_goal_type acquisition_goal(void) const override;
   bool is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
 
-  /* block transport metrics */
-  bool is_transporting_to_nest(void) const override;
-  bool is_transporting_to_cache(void) const override { return false; }
+  /* block transportation */
+  transport_goal_type block_transport_goal(void) const override;
 
   /**
    * @brief (Re)-initialize the FSM.

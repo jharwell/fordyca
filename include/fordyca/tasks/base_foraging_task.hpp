@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/block_transport_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -37,6 +37,8 @@
  ******************************************************************************/
 NS_START(fordyca, tasks);
 namespace visitor = rcppsw::patterns::visitor;
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Structure Definitions
@@ -51,7 +53,7 @@ namespace visitor = rcppsw::patterns::visitor;
 class base_foraging_task
     : public rcppsw::metrics::tasks::execution_metrics,
       public metrics::fsm::goal_acquisition_metrics,
-      public metrics::block_transport_metrics {
+      public fsm::block_transporter {
 
  public:
   explicit base_foraging_task(const std::string& name) : mc_name(name) {}

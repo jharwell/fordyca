@@ -22,23 +22,16 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
-#include "fordyca/params/perception_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/block.hpp"
@@ -53,8 +46,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
-using representation::occupancy_grid;
-namespace tasks = tasks::depth0;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -70,9 +61,9 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure tasks::foraging_task* stateful_foraging_controller::current_task(
+__pure tasks::base_foraging_task* stateful_foraging_controller::current_task(
     void) const {
-  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 __pure const representation::line_of_sight* stateful_foraging_controller::los(
@@ -145,8 +136,9 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
           base_foraging_controller::server(),
           base_foraging_controller::saa_subsystem(),
           m_perception->map());
-  m_generalist = rcppsw::make_unique<tasks::generalist>(&task_params->executive,
-                                                        generalist_fsm);
+  m_generalist = rcppsw::make_unique<tasks::depth0::generalist>(
+      &task_params->executive,
+      generalist_fsm);
   m_generalist->parent(m_generalist.get());
   m_generalist->set_atomic();
 
@@ -156,22 +148,31 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
-/*******************************************************************************
- * Metrics
- ******************************************************************************/
-bool stateful_foraging_controller::is_transporting_to_nest(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_transporting_to_nest();
-  }
-  return false;
-} /* is_transporting_to_nest() */
+FSM_WRAPPER_DEFINE_PTR(transport_goal_type, stateful_foraging_controller,
+                              block_transport_goal,
+                              current_task());
 
-bool stateful_foraging_controller::goal_acquired(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->goal_acquired();
-  }
-  return false;
-} /* goal_acquired() */
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
+                              is_avoiding_collision,
+                              current_task());
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
+                              is_exploring_for_goal,
+                              current_task());
+
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
+                       is_vectoring_to_goal,
+                       current_task());
+
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
+                              goal_acquired,
+                              current_task());
+
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, stateful_foraging_controller,
+                              acquisition_goal,
+                              current_task());
 
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,
