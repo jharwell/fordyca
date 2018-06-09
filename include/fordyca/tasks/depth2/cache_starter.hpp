@@ -54,7 +54,13 @@ class cache_starter : public task_allocation::polled_task,
   cache_starter(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
-  /* event handling */
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a \ref new_cache_interactor, you have no way to way
+   * which depth2 task the object ACTUALLY is without using a set of if()
+   * statements, which is a brittle design. This is not the cleanest, but is
+   * still more elegant than the alternative.
+   */
   void accept(events::free_block_drop& visitor) override;
 
   /* base FSM metrics */

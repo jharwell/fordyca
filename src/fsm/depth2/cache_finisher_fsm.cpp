@@ -157,11 +157,9 @@ FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
                    m_block_fsm);
 
 acquisition_goal_type cache_finisher_fsm::acquisition_goal(void) const {
-  if (m_block_fsm.task_running() ||
-      current_state() == ST_WAIT_FOR_BLOCK_PICKUP) {
+  if (m_block_fsm.task_running()) {
     return m_block_fsm.acquisition_goal();
-  } else if (m_cache_fsm.task_running() ||
-             current_state() == ST_WAIT_FOR_BLOCK_DROP) {
+  } else if (m_cache_fsm.task_running()) {
     return m_cache_fsm.acquisition_goal();
   }
   return goal_type::kNone;

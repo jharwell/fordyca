@@ -53,7 +53,13 @@ class collector : public task_allocation::polled_task,
   collector(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
-  /* event handling */
+  /*
+   * Event handling. This CANNOT be done using the regular visitor pattern,
+   * because when visiting a \ref existing_cache_interactor, you have no way to
+   * way which task the object ACTUALLY is without using a set of if()
+   * statements, which is a brittle design. This is not the cleanest, but is
+   * still more elegant than the alternative.
+   */
   void accept(events::cached_block_pickup& visitor) override;
   void accept(events::nest_block_drop& visitor) override;
   void accept(events::cache_vanished& visitor) override;

@@ -32,5 +32,6 @@ NS_START(fordyca, tasks, depth2);
  * Constant Definitions
  ******************************************************************************/
 constexpr char foraging_task::kCacheStarterName[];
+constexpr char foraging_task::kCacheFinisherName[];
 
 NS_END(depth2, tasks, fordyca);
