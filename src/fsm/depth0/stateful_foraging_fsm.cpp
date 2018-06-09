@@ -119,17 +119,24 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__pure bool stateful_foraging_fsm::is_exploring_for_goal(void) const {
-  return m_block_fsm.is_exploring_for_goal();
-} /* is_exploring_for_goal() */
+FSM_WRAPPER_DEFINE(bool, stateful_foraging_fsm,
+                          is_exploring_for_goal,
+                          m_block_fsm);
 
-__pure bool stateful_foraging_fsm::is_transporting_to_nest(void) const {
-  return current_state() == ST_TRANSPORT_TO_NEST;
-} /* is_transporting_to_nest() */
+FSM_WRAPPER_DEFINE(bool, stateful_foraging_fsm,
+                          is_vectoring_to_goal,
+                          m_block_fsm);
 
-__pure bool stateful_foraging_fsm::is_vectoring_to_goal(void) const {
-  return m_block_fsm.is_vectoring_to_goal();
-} /* is_vectoring_to_block() */
+acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_BLOCK == current_state()) {
+    return acquisition_goal_type::kBlock;
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
+bool stateful_foraging_fsm::goal_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_PICKUP;
+} /* goal_acquired() */
 
 /*******************************************************************************
  * General Member Functions
@@ -145,8 +152,11 @@ void stateful_foraging_fsm::task_execute(void) {
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-bool stateful_foraging_fsm::goal_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_PICKUP;
-} /* goal_acquired() */
+transport_goal_type stateful_foraging_fsm::block_transport_goal(void) const {
+  if (ST_TRANSPORT_TO_NEST == current_state()) {
+    return transport_goal_type::kNest;
+  }
+  return transport_goal_type::kNone;
+} /* acquisition_goal() */
 
 NS_END(depth0, fsm, fordyca);

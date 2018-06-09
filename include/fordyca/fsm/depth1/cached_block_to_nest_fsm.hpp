@@ -27,7 +27,7 @@
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
-#include "fordyca/metrics/block_transport_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
@@ -56,6 +56,8 @@ namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(fsm, depth1);
 
+using transport_goal_type = block_transporter::goal_type;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -72,7 +74,7 @@ NS_START(fsm, depth1);
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  public metrics::fsm::goal_acquisition_metrics,
-                                 public metrics::block_transport_metrics,
+                                 public block_transporter,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
@@ -102,17 +104,16 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   void task_start(const task_allocation::taskable_argument*) override {}
 
   /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  acquisition_goal_type acquisition_goal(void) const override;
 
-  /* block transport metrics */
-  bool is_transporting_to_nest(void) const override;
-  bool is_transporting_to_cache(void) const override { return false; }
+  /* block transportation */
+  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Reset the FSM
@@ -193,7 +194,6 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint                               m_pickup_count{0};
   depth1::acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

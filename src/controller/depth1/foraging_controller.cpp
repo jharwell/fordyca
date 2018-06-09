@@ -55,7 +55,6 @@
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
 using representation::occupancy_grid;
-namespace tasks = tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -118,7 +117,7 @@ void foraging_controller::Init(ticpp::Element& node) {
           base_foraging_controller::saa_subsystem(),
           perception()->map());
   m_collector =
-      rcppsw::make_unique<tasks::collector>(&p->executive, collector_fsm);
+      rcppsw::make_unique<tasks::depth1::collector>(&p->executive, collector_fsm);
 
   std::unique_ptr<task_allocation::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
@@ -127,7 +126,7 @@ void foraging_controller::Init(ticpp::Element& node) {
           base_foraging_controller::saa_subsystem(),
           perception()->map());
   m_harvester =
-      rcppsw::make_unique<tasks::harvester>(&p->executive, harvester_fsm);
+      rcppsw::make_unique<tasks::depth1::harvester>(&p->executive, harvester_fsm);
 
   std::unique_ptr<task_allocation::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
@@ -170,16 +169,9 @@ void foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("depth1 controller initialization finished");
 } /* Init() */
 
-__pure tasks::foraging_task* foraging_controller::current_task(void) const {
-  return dynamic_cast<tasks::foraging_task*>(m_executive->current_task());
+__pure tasks::base_foraging_task* foraging_controller::current_task(void) const {
+  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
-
-bool foraging_controller::is_transporting_to_nest(void) const {
-  if (nullptr != current_task()) {
-    return current_task()->is_transporting_to_nest();
-  }
-  return false;
-} /* is_transporting_to_nest() */
 
 /*******************************************************************************
  * Executive Callbacks

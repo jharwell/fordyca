@@ -1,7 +1,7 @@
 /**
- * @file harvester.hpp
+ * @file cache_finisher.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,23 +18,22 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/tasks/depth2/new_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks, depth1);
+NS_START(fordyca, tasks, depth2);
 
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -42,37 +41,37 @@ namespace task_allocation = rcppsw::task_allocation;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class harvester
- * @ingroup tasks
+ * @class cache_finisher
+ * @ingroup tasks depth2
  *
- * @brief Task in which robots locate a free block and bring it to a known
- * cache. It is abortable, and has one task interface.
+ * @brief Task in which robots locate a free block and drop it next to/on top of
+ * a free block in the arena to finish the creation of a new cache. It is
+ * abortable, and has one task interface.
  */
-class harvester : public task_allocation::polled_task,
-                  public foraging_task,
-                  public existing_cache_interactor {
+class cache_finisher : public task_allocation::polled_task,
+                      public foraging_task,
+                      public new_cache_interactor {
  public:
-  harvester(const struct task_allocation::task_params* params,
+  cache_finisher(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /* event handling */
-  void accept(events::cache_block_drop& visitor) override;
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::cache_vanished& visitor) override;
-  void accept(events::cached_block_pickup&) override {}
-  void accept(events::nest_block_drop&) override {}
+  void accept(events::free_block_drop& visitor) override;
 
-    /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  /* base FSM metrics */
+  bool is_avoiding_collision(void) const override;
 
-  /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  /* FSM goal acquisition metrics */
+  goal_acquisition_metrics::goal_type goal(void) const override {
+    return goal_acquisition_metrics::goal_type::kNewCache;
+  }
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
 
-  /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  /* Block transportation status */
+  bool is_transporting_to_nest(void) const override { return false; }
+  bool is_transporting_to_cache(void) const override;
 
   /* task metrics */
   bool at_interface(void) const override;
@@ -89,6 +88,6 @@ class harvester : public task_allocation::polled_task,
   // clang-format on
 };
 
-NS_END(depth1, tasks, fordyca);
+NS_END(depth2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_HARVESTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_FINISHER_HPP_ */

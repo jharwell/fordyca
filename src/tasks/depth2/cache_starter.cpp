@@ -71,7 +71,7 @@ double cache_starter::calc_abort_prob(void) {
    * it acquires a block can cause it to get stuck and not switch to another
    * task if it cannot find a block anywhere.
    */
-  if (is_transporting_to_cache()) {
+  if (transport_goal_type::kCacheSite == block_transport_goal()) {
     return m_abort_prob.calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
@@ -84,7 +84,7 @@ double cache_starter::calc_interface_time(double start_time) {
     return current_time() - start_time;
   }
 
-  if (goal_acquired() && goal_type::kCacheSite == goal()) {
+  if (goal_acquired() && transport_goal_type::kCacheSite == block_transport_goal()) {
     if (!m_interface_complete) {
       m_interface_complete = true;
       reset_interface_time();
@@ -93,6 +93,11 @@ double cache_starter::calc_interface_time(double start_time) {
   }
   return 0.0;
 } /* calc_interface_time() */
+
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type, cache_starter,
+                       block_transport_goal,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -104,31 +109,34 @@ void cache_starter::accept(events::free_block_drop& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-bool cache_starter::goal_acquired(void) const {
-  return static_cast<fsm::depth2::block_to_cache_site_fsm*>(polled_task::mechanism())
-      ->goal_acquired();
-} /* cache_goal() */
+TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
+                       is_avoiding_collision,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
+                       is_exploring_for_goal,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
+                       is_vectoring_to_goal,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
 
-bool cache_starter::is_exploring_for_goal(void) const {
-  return static_cast<fsm::depth2::block_to_cache_site_fsm*>(polled_task::mechanism())
-      ->is_exploring_for_goal();
-} /* is_exploring_for_goal() */
+TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
+                       goal_acquired,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
 
-bool cache_starter::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth2::block_to_cache_site_fsm*>(polled_task::mechanism())
-      ->is_avoiding_collision();
-} /* is_avoiding_collision() */
-
-bool cache_starter::is_vectoring_to_goal(void) const {
-  return static_cast<fsm::depth2::block_to_cache_site_fsm*>(polled_task::mechanism())
-      ->is_vectoring_to_goal();
-} /* is_vectoring_to_goal() */
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type, cache_starter,
+                       acquisition_goal,
+                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 __pure bool cache_starter::at_interface(void) const {
-  return is_transporting_to_cache();
+  return acquisition_goal_type::kExistingCache == acquisition_goal();
 } /* at_interface()() */
 
 NS_END(depth2, tasks, fordyca);

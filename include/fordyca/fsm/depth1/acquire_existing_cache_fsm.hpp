@@ -57,9 +57,7 @@ class acquire_existing_cache_fsm : public base_acquire_cache_fsm {
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) = delete;
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kExistingCache;
-  }
+  acquisition_goal_type acquisition_goal(void) const override;
 
   argos::CVector2 select_cache_for_acquisition(void) override;
 };

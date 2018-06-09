@@ -30,7 +30,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/block_transport_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,11 @@ namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
 namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
-NS_START(fsm, depth1);
+NS_START(fsm);
+
+using transport_goal_type = block_transporter::goal_type;
+
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -59,8 +63,8 @@ NS_START(fsm, depth1);
  */
 class block_to_goal_fsm : public base_foraging_fsm,
                           public metrics::fsm::goal_acquisition_metrics,
-                          public metrics::block_transport_metrics,
                           public task_allocation::taskable,
+                          public block_transporter,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
   block_to_goal_fsm(
@@ -85,14 +89,10 @@ class block_to_goal_fsm : public base_foraging_fsm,
   bool is_avoiding_collision(void) const override;
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override;
   bool is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override;
   bool goal_acquired(void) const override;
-
-  /* block transport metrics */
-  bool is_transporting_to_nest(void) const override { return false; }
-  bool is_transporting_to_cache(void) const override;
+  acquisition_goal_type acquisition_goal(void) const override;
 
   /**
    * @brief Reset the FSM
@@ -132,6 +132,7 @@ class block_to_goal_fsm : public base_foraging_fsm,
   virtual acquire_goal_fsm& goal_fsm(void) = 0;
   const acquire_goal_fsm& goal_fsm(void) const {
     return const_cast<block_to_goal_fsm*>(this)->goal_fsm(); }
+  const acquire_block_fsm& block_fsm(void) const { return m_block_fsm; }
 
  private:
   constexpr static uint kPICKUP_TIMEOUT = 100;

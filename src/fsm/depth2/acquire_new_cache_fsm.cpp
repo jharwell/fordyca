@@ -62,4 +62,14 @@ argos::CVector2 acquire_new_cache_fsm::select_cache_for_acquisition(void) {
   return best.ent->real_loc();
 } /* select_cache() */
 
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+acquisition_goal_type acquire_new_cache_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_GOAL == current_state()) {
+    return acquisition_goal_type::kNewCache;
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
 NS_END(depth2, controller, fordyca);

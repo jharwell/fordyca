@@ -24,12 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/metrics/block_transport_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/tasks/argument.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************

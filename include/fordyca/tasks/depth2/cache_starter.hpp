@@ -58,19 +58,16 @@ class cache_starter : public task_allocation::polled_task,
   void accept(events::free_block_drop& visitor) override;
 
   /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
-  /* FSM goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kNewCache;
-  }
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
+  /* goal acquisition metrics */
+  TASK_WRAPPER_DECLARE(bool, goal_acquired);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
 
-  /* FSM block transport metrics */
-  bool is_transporting_to_nest(void) const override { return false; }
-  bool is_transporting_to_cache(void) const override { return false; }
+  /* block transportation */
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool at_interface(void) const override;

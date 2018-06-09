@@ -68,9 +68,7 @@ class acquire_cache_site_fsm : public acquire_goal_fsm {
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;
 
   /* goal acquisition metrics */
-  goal_acquisition_metrics::goal_type goal(void) const override {
-    return goal_acquisition_metrics::goal_type::kCacheSite;
-  }
+  acquisition_goal_type acquisition_goal(void) const override;
 
  private:
   bool acquire_known_goal(void) override;

@@ -124,7 +124,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
     auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
-    ER_ASSERT(goal_type::kExistingCache == controller.current_task()->goal(),
+    ER_ASSERT(acquisition_goal_type::kExistingCache ==
+              controller.current_task()->acquisition_goal(),
               "FATAL: Controller not waiting for cached block pickup");
 
     /*
@@ -175,7 +176,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              goal_type::kExistingCache == controller.current_task()->goal(),
+              acquisition_goal_type::kExistingCache == controller.current_task()->acquisition_goal(),
               "FATAL: Controller not waiting for cache block drop");
 
     /*

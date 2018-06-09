@@ -30,7 +30,6 @@
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
@@ -113,7 +112,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
       representation::arena_map& map) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
-    if (controller.in_nest() && controller.is_transporting_to_nest()) {
+    if (controller.in_nest() && controller.goal_is_nest()) {
       events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
       /* Update arena map state due to a block nest drop */

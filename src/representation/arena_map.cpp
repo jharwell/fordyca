@@ -168,6 +168,14 @@ void arena_map::distribute_blocks(void) {
   for (auto& b : m_blocks) {
     distribute_block(b);
   } /* for(b..) */
+  for (auto& b : m_blocks) {
+    ER_ASSERT(representation::block::kOutOfSightDLoc != b->discrete_loc(),
+              "FATAL: Block%d discrete coordinates still out of sight after distribution",
+              b->id());
+    ER_ASSERT(representation::block::kOutOfSightRLoc != b->real_loc(),
+              "FATAL: Block%d real coordinates still out of sight after distribution",
+              b->id());
+  } /* for(b..) */
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been

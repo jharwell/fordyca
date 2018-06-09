@@ -31,7 +31,6 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/block_transport_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
@@ -152,9 +151,6 @@ void stateless_foraging_loop_functions::pre_step_iter(
   m_collector_group.collect(
       "fsm::block_acquisition",
       static_cast<metrics::fsm::goal_acquisition_metrics&>(controller));
-  m_collector_group.collect(
-      "block::transport",
-      static_cast<metrics::block_transport_metrics&>(controller));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -195,11 +191,6 @@ void stateless_foraging_loop_functions::metric_collecting_init(
           "fsm::block_acquisition",
           m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
           p_output->metrics.collect_interval);
-
-  m_collector_group.register_collector<metrics::block_transport_metrics_collector>(
-      "block::transport",
-      m_metrics_path + "/" + p_output->metrics.block_fname,
-      p_output->metrics.collect_interval);
 
   m_collector_group.register_collector<metrics::fsm::distance_metrics_collector>(
       "fsm::distance",

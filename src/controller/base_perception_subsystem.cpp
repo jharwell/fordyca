@@ -81,6 +81,8 @@ void base_perception_subsystem::process_los(
   }   /* for(i..) */
 
   for (auto block : los->blocks()) {
+    ER_ASSERT(!block->is_out_of_sight(),
+              "FATAL: Block out of sight in LOS?");
     if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
              .state_has_block()) {
       ER_NOM("Discovered block%d at (%zu, %zu)",

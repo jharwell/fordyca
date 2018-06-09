@@ -68,7 +68,7 @@ double collector::calc_abort_prob(void) {
    * necessary for foragers and so it seems like a good idea to add this to all
    * tasks.
    */
-  if (is_transporting_to_nest()) {
+  if (transport_goal_type::kNest == block_transport_goal()) {
     return 0.0;
   }
   return m_abort_prob.calc(executable_task::interface_time(),
@@ -76,16 +76,22 @@ double collector::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double collector::calc_interface_time(double start_time) {
-  if (is_transporting_to_nest() && !m_interface_complete) {
+  if (transport_goal_type::kNest == block_transport_goal() &&
+      !m_interface_complete) {
     m_interface_complete = true;
     reset_interface_time();
   }
 
-  if (!is_transporting_to_nest()) {
+  if (!(transport_goal_type::kNest == block_transport_goal())) {
     return current_time() - start_time;
   }
   return 0.0;
 } /* calc_interface_time() */
+
+FSM_WRAPPER_DEFINE_PTR(transport_goal_type, collector,
+                       block_transport_goal,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -103,41 +109,34 @@ void collector::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-bool collector::is_avoiding_collision(void) const {
-  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-             polled_task::mechanism())
-      ->is_avoiding_collision();
-} /* is_avoiding_collision() */
+FSM_WRAPPER_DEFINE_PTR(bool, collector,
+                       is_avoiding_collision,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
+FSM_WRAPPER_DEFINE_PTR(bool, collector,
+                       is_exploring_for_goal,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
+FSM_WRAPPER_DEFINE_PTR(bool, collector,
+                       is_vectoring_to_goal,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
 
-bool collector::is_transporting_to_nest(void) const {
-  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-             polled_task::mechanism())
-      ->is_transporting_to_nest();
-} /* is_transporting_to_nest() */
+FSM_WRAPPER_DEFINE_PTR(bool, collector,
+                       goal_acquired,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
 
-bool collector::is_exploring_for_goal(void) const {
-  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-             polled_task::mechanism())
-      ->is_exploring_for_goal();
-} /* is_exploring_for_goal() */
-
-bool collector::is_vectoring_to_goal(void) const {
-  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-             polled_task::mechanism())
-      ->is_vectoring_to_goal();
-} /* is_vectoring_to_goal() */
-
-bool collector::goal_acquired(void) const {
-  return static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-      polled_task::mechanism())
-      ->goal_acquired();
-} /* cache_acquired() */
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, collector,
+                       acquisition_goal,
+                       static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 __pure bool collector::at_interface(void) const {
-  return !is_transporting_to_nest();
+  return !(transport_goal_type::kNest == block_transport_goal());
 } /* at_interface() */
 
 NS_END(depth1, tasks, fordyca);
