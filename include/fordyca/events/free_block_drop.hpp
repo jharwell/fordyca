@@ -40,6 +40,7 @@ class block_to_goal_fsm;
 }}
 namespace tasks { namespace depth2 {
 class cache_starter;
+class cache_finisher;
 }}
 NS_START(events);
 
@@ -62,6 +63,7 @@ class free_block_drop : public cell_op,
                         public rcppsw::er::client,
                         public block_drop_event,
                         public visitor::visit_set<tasks::depth2::cache_starter,
+                                                  tasks::depth2::cache_finisher,
                                                   fsm::depth1::block_to_goal_fsm> {
  public:
   free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
@@ -86,6 +88,7 @@ class free_block_drop : public cell_op,
   /* depth2 foraging */
   void visit(controller::depth2::foraging_controller&) override;
   void visit(tasks::depth2::cache_starter&) override;
+  void visit(tasks::depth2::cache_finisher&) override;
   void visit(fsm::depth1::block_to_goal_fsm&) override;
 
   /**

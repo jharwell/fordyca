@@ -50,7 +50,7 @@ NS_START(events);
  * @class cached_block_pickup
  * @ingroup events
  *
- * @brief Created whenever a robot picks up a block from a cache.
+ * @brief Created whenever a robpot picks up a block from a cache.
  *
  * The cache usage penalty, if there is one, is assessed prior to this event
  * being created, at a higher level.

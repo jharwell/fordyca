@@ -52,8 +52,7 @@ NS_START(tasks, depth2);
  */
 class new_cache_interactor
     : public metrics::fsm::goal_acquisition_metrics,
-      public visitor::polymorphic_visitable<new_cache_interactor,
-                                            events::free_block_drop> {};
+      public visitor::polymorphic_accept_set<events::free_block_drop> {};
 
 NS_END(depth2, tasks, fordyca);
 

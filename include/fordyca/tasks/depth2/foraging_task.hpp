@@ -58,13 +58,14 @@ NS_START(tasks, depth2);
  */
 class foraging_task
     : public base_foraging_task,
-      public visitor::polymorphic_visitable<foraging_task,
-                                            events::free_block_drop> {
+      public visitor::polymorphic_accept_set<events::free_block_drop> {
+
  public:
   explicit foraging_task(const std::string& name) :
       base_foraging_task(name) {}
 
   static constexpr char kCacheStarterName[] = "Cache Starter";
+  static constexpr char kCacheFinisherName[] = "Cache Finisher";
 };
 
 NS_END(depth2, tasks, fordyca);

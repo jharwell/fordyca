@@ -53,10 +53,9 @@ NS_START(tasks, depth1);
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public visitor::polymorphic_visitable<existing_cache_interactor,
-                                            events::cached_block_pickup,
-                                            events::cache_block_drop,
-                                            events::cache_vanished> {};
+    : public visitor::polymorphic_accept_set<events::cache_block_drop,
+                                             events::cached_block_pickup,
+                                             events::cache_vanished> {};
 
 NS_END(depth1, tasks, fordyca);
 

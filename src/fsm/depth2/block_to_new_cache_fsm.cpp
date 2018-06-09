@@ -53,7 +53,8 @@ acquisition_goal_type block_to_new_cache_fsm::acquisition_goal(void) const {
 } /* acquisition_goal() */
 
 transport_goal_type block_to_new_cache_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_GOAL == current_state()) {
+  if (ST_TRANSPORT_TO_GOAL == current_state() ||
+      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kNewCache;
   }
   return transport_goal_type::kNone;

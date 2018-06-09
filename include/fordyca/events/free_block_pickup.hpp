@@ -54,6 +54,7 @@ class generalist;
 }
 namespace depth1 {
 class harvester;
+class existing_cache_interactor;
 }
 } // namespace tasks
 
