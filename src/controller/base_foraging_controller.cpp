@@ -116,7 +116,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
 void base_foraging_controller::Reset(void) {
   CCI_Controller::Reset();
-  m_block = nullptr;
+  m_block.reset();
 } /* Reset() */
 
 void base_foraging_controller::output_init(
