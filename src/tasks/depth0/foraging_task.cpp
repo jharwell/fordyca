@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,5 +33,11 @@ NS_START(fordyca, tasks, depth0);
  * Constant Definitions
  ******************************************************************************/
 constexpr char foraging_task::kGeneralistName[];
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_task::foraging_task(const struct ta::task_params *params)
+    : base_foraging_task(&params->abort) {}
 
 NS_END(depth0, tasks, fordyca);

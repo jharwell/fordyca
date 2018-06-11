@@ -22,12 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,23 +38,15 @@ using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  ******************************************************************************/
 cache_starter::cache_starter(const struct task_allocation::task_params* params,
                              std::unique_ptr<task_allocation::taskable>& mechanism)
-    : polled_task(kCacheStarterName, params, mechanism),
-      foraging_task(kCacheStarterName),
-      m_abort_prob(&params->abort) {}
+    : foraging_task(kCacheStarterName, params, mechanism) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure double cache_starter::current_time(void) const {
-  return dynamic_cast<fsm::depth2::block_to_cache_site_fsm*>(polled_task::mechanism())
-      ->base_sensors()
-      ->tick();
-} /* current_time() */
-
 void cache_starter::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  m_interface_complete = false;
+  interface_complete(false);
 } /* task_start() */
 
 double cache_starter::calc_abort_prob(void) {
@@ -67,10 +57,10 @@ double cache_starter::calc_abort_prob(void) {
    * task if it cannot find a block anywhere.
    */
   if (transport_goal_type::kCacheSite == block_transport_goal()) {
-    return m_abort_prob.calc(executable_task::interface_time(),
+    return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
-  return m_abort_prob.calc(executable_task::exec_time(),
+  return abort_prob().calc(executable_task::exec_time(),
                            executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
@@ -80,8 +70,8 @@ double cache_starter::calc_interface_time(double start_time) {
   }
 
   if (goal_acquired() && transport_goal_type::kCacheSite == block_transport_goal()) {
-    if (!m_interface_complete) {
-      m_interface_complete = true;
+    if (!interface_complete()) {
+      interface_complete(true);
       reset_interface_time();
     }
     return interface_time();
@@ -90,9 +80,9 @@ double cache_starter::calc_interface_time(double start_time) {
 } /* calc_interface_time() */
 
 TASK_WRAPPER_DEFINE_PTR(transport_goal_type, cache_starter,
-                       block_transport_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        block_transport_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -105,27 +95,27 @@ void cache_starter::accept(events::free_block_drop& visitor) {
  * FSM Metrics
  ******************************************************************************/
 TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
-                       is_avoiding_collision,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        is_avoiding_collision,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
-                       is_exploring_for_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
-                       is_vectoring_to_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 TASK_WRAPPER_DEFINE_PTR(bool, cache_starter,
-                       goal_acquired,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        goal_acquired,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type, cache_starter,
-                       acquisition_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+                        acquisition_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

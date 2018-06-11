@@ -38,6 +38,13 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
 }}
+namespace controller { namespace depth1 {
+class foraging_controller;
+}
+namespace depth2 {
+class foraging_controller;
+}
+}
 namespace tasks { namespace depth2 {
 class cache_starter;
 class cache_finisher;
@@ -62,7 +69,9 @@ NS_START(events);
 class free_block_drop : public cell_op,
                         public rcppsw::er::client,
                         public block_drop_event,
-                        public visitor::visit_set<tasks::depth2::cache_starter,
+                        public visitor::visit_set<controller::depth1::foraging_controller,
+                                                  controller::depth2::foraging_controller,
+                                                  tasks::depth2::cache_starter,
                                                   tasks::depth2::cache_finisher,
                                                   fsm::depth1::block_to_goal_fsm> {
  public:

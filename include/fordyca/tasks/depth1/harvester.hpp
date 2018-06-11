@@ -36,8 +36,6 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
 
-namespace task_allocation = rcppsw::task_allocation;
-
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -48,12 +46,11 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
  */
-class harvester : public task_allocation::polled_task,
-                  public foraging_task,
+class harvester : public foraging_task,
                   public existing_cache_interactor {
  public:
-  harvester(const struct task_allocation::task_params* params,
-            std::unique_ptr<task_allocation::taskable>& mechanism);
+  harvester(const struct ta::task_params* params,
+            std::unique_ptr<ta::taskable>& mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -83,16 +80,9 @@ class harvester : public task_allocation::polled_task,
   /* task metrics */
   bool at_interface(void) const override;
 
-  void task_start(const task_allocation::taskable_argument*) override;
-  double current_time(void) const override;
+  void task_start(const ta::taskable_argument*) override;
   double calc_abort_prob(void) override;
   double calc_interface_time(double start_time) override;
-
- private:
-  // clang-format off
-  bool                               m_interface_complete{false};
-  task_allocation::abort_probability m_abort_prob;
-  // clang-format on
 };
 
 NS_END(depth1, tasks, fordyca);

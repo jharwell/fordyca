@@ -1,7 +1,7 @@
 /**
- * @file block_pickup_event.hpp
+ * @file base_foraging_task.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,44 +18,21 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
+#include "rcppsw/task_allocation/abort_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
-class arena_map;
-class perceived_arena_map;
-class block;
-} // namespace representation
-
-NS_START(events);
+NS_START(fordyca, tasks);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class block_pickup_event
- * @ingroup events
- *
- * @brief Interface specifying the core class of classes any action involving
- * dropping a block will need to visit (think data structures).
- */
-class block_pickup_event
-    : public visitor::visit_set<representation::arena_map,
-                                representation::perceived_arena_map,
-                                representation::block> {};
+base_foraging_task::base_foraging_task(const struct ta::abort_params *params)
+    : m_abort_prob(params) {}
 
-NS_END(events, fordyca);
-
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_ */
+NS_END(depth2, tasks);

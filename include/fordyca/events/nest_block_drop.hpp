@@ -48,7 +48,10 @@ class cached_block_to_nest_fsm;
 namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}} // namespace controller::depth0
+}
+namespace depth1 { class foraging_controller; }
+namespace depth2 { class foraging_controller; }
+} // namespace controller
 
 namespace tasks { namespace depth0 {
 class generalist;
@@ -75,6 +78,8 @@ class nest_block_drop
       public rcppsw::er::client,
       public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                 controller::depth0::stateless_foraging_controller,
+                                controller::depth1::foraging_controller,
+                                controller::depth2::foraging_controller,
                                 fsm::depth0::stateless_foraging_fsm,
                                 fsm::depth0::stateful_foraging_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,

@@ -26,8 +26,6 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/depth2/new_cache_interactor.hpp"
 
 /*******************************************************************************
@@ -47,8 +45,7 @@ namespace task_allocation = rcppsw::task_allocation;
  * @brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
  */
-class cache_starter : public task_allocation::polled_task,
-                      public foraging_task,
+class cache_starter : public foraging_task,
                       public new_cache_interactor {
  public:
   cache_starter(const struct task_allocation::task_params* params,
@@ -79,15 +76,8 @@ class cache_starter : public task_allocation::polled_task,
   bool at_interface(void) const override;
 
   void task_start(const task_allocation::taskable_argument*) override;
-  double current_time(void) const override;
   double calc_abort_prob(void) override;
   double calc_interface_time(double start_time) override;
-
- private:
-  // clang-format off
-  bool                               m_interface_complete{false};
-  task_allocation::abort_probability m_abort_prob;
-  // clang-format on
 };
 
 NS_END(depth2, tasks, fordyca);
