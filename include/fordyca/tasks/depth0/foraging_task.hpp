@@ -28,6 +28,7 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ class foraging_task
  public:
   static constexpr char kGeneralistName[] = "Generalist";
 
-  explicit foraging_task(const std::string& name) : base_foraging_task(name) {}
+  explicit foraging_task(const struct ta::task_params *params);
 };
 
 NS_END(depth0, tasks, fordyca);

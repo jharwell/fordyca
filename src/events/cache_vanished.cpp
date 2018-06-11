@@ -23,17 +23,18 @@
  ******************************************************************************/
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth2/foraging_controller.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
+#include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-namespace tasks = tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -53,27 +54,36 @@ void cache_vanished::visit(controller::depth1::foraging_controller& controller) 
   ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
          controller.GetId().c_str(),
          m_cache_id);
-  dynamic_cast<tasks::existing_cache_interactor*>(
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())->accept(*this);
 } /* visit() */
 
-void cache_vanished::visit(tasks::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
-} /* visit() */
-
-void cache_vanished::visit(tasks::harvester& task) {
+void cache_vanished::visit(tasks::depth1::collector& task) {
   static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
-                   state_machine::event_type::NORMAL);
+void cache_vanished::visit(tasks::depth1::harvester& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
                    state_machine::event_type::NORMAL);
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void cache_vanished::visit(controller::depth2::foraging_controller& controller) {
+  ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
+         controller.GetId().c_str(),
+         m_cache_id);
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
+} /* visit() */
+
+void cache_vanished::visit(tasks::depth2::cache_transferer& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

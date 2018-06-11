@@ -31,6 +31,7 @@
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -241,7 +242,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (controller.is_carrying_block()) {
       ER_NOM("%s aborted task %s while carrying block%d",
              controller.GetId().c_str(),
-             controller.current_task()->name().c_str(),
+             dynamic_cast<tasks::depth1::foraging_task*>(
+                 controller.current_task())->name().c_str(),
              controller.block()->id());
 
       /*
@@ -300,7 +302,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
-             controller.current_task()->name().c_str());
+             dynamic_cast<tasks::depth1::foraging_task*>(
+                 controller.current_task())->name().c_str());
     }
     m_cache_penalty_handler.penalty_abort(controller);
     return true;

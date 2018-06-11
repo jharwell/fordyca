@@ -25,14 +25,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth0);
-namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Structure Definitions
@@ -46,13 +44,15 @@ namespace task_allocation = rcppsw::task_allocation;
  *
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager. It is not abortable.
+ * \ref collector and \ref forager. It is not abortable at task interfaces,
+ * because it does not have any, but it IS still abortable if its current
+ * execution time takes too long (as configured by parameters).
  */
-class generalist : public task_allocation::partitionable_polled_task,
+class generalist : public ta::partitionable_polled_task,
                    public foraging_task {
  public:
-  generalist(const struct task_allocation::partitionable_task_params* params,
-             std::unique_ptr<task_allocation::taskable>& mechanism);
+  generalist(const struct ta::partitionable_task_params* params,
+             std::unique_ptr<ta::taskable>& mechanism);
 
   /* event handling */
   void accept(events::free_block_pickup& visitor) override;
@@ -76,14 +76,11 @@ class generalist : public task_allocation::partitionable_polled_task,
   executable_task* partition(void) override {
     return partitionable_task::partition();
   }
-  void task_start(const task_allocation::taskable_argument* const) override {}
+  void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;
   double calc_abort_prob(void) override;
   double calc_interface_time(double) override { return 0.0; }
-
- private:
-  task_allocation::abort_probability m_abort_prob;
 };
 
 NS_END(depth0, tasks, fordyca);

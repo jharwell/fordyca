@@ -47,14 +47,20 @@ class block_to_goal_fsm;
 namespace controller { namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}} // namespace controller::depth0
+}
+namespace depth1 { class foraging_controller;}
+namespace depth2 { class foraging_controller; }
+} // namespace controller::depth0
 
 namespace tasks { namespace depth0 {
 class generalist;
 }
 namespace depth1 {
 class harvester;
-class existing_cache_interactor;
+}
+namespace depth2 {
+class cache_starter;
+class cache_finisher;
 }
 } // namespace tasks
 
@@ -76,11 +82,15 @@ class free_block_pickup
       public block_pickup_event,
       public visitor::visit_set<controller::depth0::stateless_foraging_controller,
                                 controller::depth0::stateful_foraging_controller,
+                                controller::depth1::foraging_controller,
+                                controller::depth2::foraging_controller,
                                 fsm::depth0::stateless_foraging_fsm,
                                 fsm::depth0::stateful_foraging_fsm,
                                 fsm::depth1::block_to_goal_fsm,
                                 tasks::depth0::generalist,
-                                tasks::depth1::harvester> {
+                                tasks::depth1::harvester,
+                                tasks::depth2::cache_starter,
+                                tasks::depth2::cache_finisher> {
  public:
   free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
                     const std::shared_ptr<representation::block>& block,
@@ -108,9 +118,13 @@ class free_block_pickup
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(tasks::depth1::harvester& task) override;
+
+  /* depth2 foraging */
+  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(tasks::depth2::cache_starter& task) override;
+  void visit(tasks::depth2::cache_finisher& task) override;
 
  private:
   // clang-format off

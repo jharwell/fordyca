@@ -36,6 +36,8 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/tasks/depth2/cache_finisher.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -190,9 +192,20 @@ void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void free_block_pickup::visit(
+    controller::depth2::foraging_controller& controller) {
+  ER_ASSERT(false, "FATAL: Not implemented");
+} /* visit() */
+
+void free_block_pickup::visit(tasks::depth2::cache_starter& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_pickup::visit(tasks::depth2::cache_finisher& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

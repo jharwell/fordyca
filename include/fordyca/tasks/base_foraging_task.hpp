@@ -28,9 +28,9 @@
 
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/tasks/argument.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "rcppsw/task_allocation/abort_probability.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,6 +39,7 @@ NS_START(fordyca, tasks);
 namespace visitor = rcppsw::patterns::visitor;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Structure Definitions
@@ -56,12 +57,12 @@ class base_foraging_task
       public fsm::block_transporter {
 
  public:
-  explicit base_foraging_task(const std::string& name) : mc_name(name) {}
+  base_foraging_task(const struct ta::abort_params *params);
 
-  std::string name(void) const { return mc_name; }
+  ta::abort_probability  abort_prob(void) const { return m_abort_prob; }
 
  private:
-  const std::string mc_name;
+  ta::abort_probability m_abort_prob;
 };
 
 NS_END(tasks, fordyca);

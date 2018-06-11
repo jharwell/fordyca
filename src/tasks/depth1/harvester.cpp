@@ -44,23 +44,15 @@ NS_START(fordyca, tasks, depth1);
  ******************************************************************************/
 harvester::harvester(const struct task_allocation::task_params* params,
                      std::unique_ptr<task_allocation::taskable>& mechanism)
-    : polled_task(kHarvesterName, params, mechanism),
-      foraging_task(kHarvesterName),
-      m_abort_prob(&params->abort) {}
+    : foraging_task(kHarvesterName, params, mechanism) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure double harvester::current_time(void) const {
-  return dynamic_cast<fsm::depth1::block_to_existing_cache_fsm*>(polled_task::mechanism())
-      ->base_sensors()
-      ->tick();
-} /* current_time() */
-
 void harvester::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  m_interface_complete = false;
+  interface_complete(false);
 } /* task_start() */
 
 double harvester::calc_abort_prob(void) {
@@ -71,10 +63,10 @@ double harvester::calc_abort_prob(void) {
    * if it cannot find a block anywhere. See #232.
    */
   if (transport_goal_type::kExistingCache == block_transport_goal()) {
-    return m_abort_prob.calc(executable_task::interface_time(),
+    return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
-  return m_abort_prob.calc(executable_task::exec_time(),
+  return abort_prob().calc(executable_task::exec_time(),
                            executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
@@ -85,8 +77,8 @@ double harvester::calc_interface_time(double start_time) {
 
   if (goal_acquired() &&
       fsm::block_transporter::goal_type::kExistingCache == block_transport_goal()) {
-    if (!m_interface_complete) {
-      m_interface_complete = true;
+    if (!interface_complete()) {
+      interface_complete(true);
       reset_interface_time();
     }
     return interface_time();
@@ -130,7 +122,8 @@ FSM_WRAPPER_DEFINE_PTR(bool, harvester,
 
 FSM_WRAPPER_DEFINE_PTR(bool, harvester,
                        goal_acquired,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(                           polled_task::mechanism()));
+                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                           polled_task::mechanism()));
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, harvester,
                        acquisition_goal,

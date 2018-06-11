@@ -1,7 +1,7 @@
 /**
- * @file collector.hpp
+ * @file cache_transferer.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,51 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_TRANSFERER_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_TRANSFERER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
-
-#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks, depth1);
+NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class collector
- * @ingroup tasks depth1
+ * @class cache_transferer
+ * @ingroup tasks depth2
  *
- * @brief Task in which robots locate a cache and bring a block from it to the
- * nest. It is abortable, and has one task interface.
+ * @brief Task in which robots locate an existing cache, pickup a block from it,
+ * and then transfer the block to a cache with higher utility (presumably one
+ * that is closer to the nest). It is abortable, and has two task interfaces:
+ * one at each cache it interacts with.
  */
-class collector : public foraging_task,
-                  public existing_cache_interactor {
+class cache_transferer : public foraging_task,
+                         public depth1::existing_cache_interactor {
  public:
-  collector(const struct ta::task_params* params,
+  cache_transferer(const struct ta::task_params* params,
             std::unique_ptr<ta::taskable>& mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref existing_cache_interactor, you have no way to
-   * way which task the object ACTUALLY is without using a set of if()
+   * because when visiting a \ref new_cache_interactor, you have no way to way
+   * which depth2 task the object ACTUALLY is without using a set of if()
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
+  void accept(events::cache_block_drop& visitor) override;
   void accept(events::cached_block_pickup& visitor) override;
-  void accept(events::nest_block_drop& visitor) override;
   void accept(events::cache_vanished& visitor) override;
-  void accept(events::cache_block_drop&) override {}
-  void accept(events::free_block_pickup&) override {}
+  void accept(events::free_block_drop&) override {}
 
   /* base FSM metrics */
   TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
@@ -84,6 +83,6 @@ class collector : public foraging_task,
   double calc_interface_time(double start_time) override;
 };
 
-NS_END(depth1, tasks, fordyca);
+NS_END(depth2, tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_TRANSFERER_HPP_ */

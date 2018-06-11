@@ -34,12 +34,21 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace fsm { namespace depth1 { class block_to_goal_fsm; }}
+namespace controller { namespace depth1 {
+class foraging_controller;
+}
+namespace depth2 {
+class foraging_controller;
+}}
 namespace representation {
 class arena_cache;
 }
 namespace tasks { namespace depth1 {
 class collector;
-}}
+}
+namespace depth2 { class cache_transferer; }
+}
 
 NS_START(events);
 
@@ -59,7 +68,11 @@ class cached_block_pickup
     : public cell_op,
       public rcppsw::er::client,
       public block_pickup_event,
-      public visitor::visit_set<tasks::depth1::collector,
+      public visitor::visit_set<controller::depth1::foraging_controller,
+                                controller::depth2::foraging_controller,
+                                fsm::depth1::block_to_goal_fsm,
+                                tasks::depth1::collector,
+                                tasks::depth2::cache_transferer,
                                 representation::arena_cache> {
  public:
   cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
@@ -77,9 +90,13 @@ class cached_block_pickup
   void visit(representation::perceived_arena_map& map) override;
   void visit(representation::block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
+  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(tasks::depth1::collector& task) override;
+
+  /* depth2 foraging */
+  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(tasks::depth2::cache_transferer& task) override;
 
  private:
   // clang-format off

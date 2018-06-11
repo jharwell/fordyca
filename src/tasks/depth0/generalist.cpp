@@ -39,14 +39,13 @@ NS_START(fordyca, tasks, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 generalist::generalist(
-    const struct task_allocation::partitionable_task_params* const params,
-    std::unique_ptr<task_allocation::taskable>& mechanism)
+    const struct ta::partitionable_task_params* const params,
+    std::unique_ptr<ta::taskable>& mechanism)
     : partitionable_polled_task(rcppsw::er::g_server,
                                 kGeneralistName,
                                 params,
                                 mechanism),
-      foraging_task(kGeneralistName),
-      m_abort_prob(&params->abort) {}
+      foraging_task(params) {}
 
 /*******************************************************************************
  * Member Functions
@@ -65,14 +64,14 @@ double generalist::calc_abort_prob(void) {
    * necessary for foragers and so it seems like a good idea to add this to all
    * tasks.
    */
-  return m_abort_prob.calc(executable_task::exec_time(),
+  return abort_prob().calc(executable_task::exec_time(),
                            executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type, generalist,
-                              block_transport_goal,
-                              static_cast<fsm::depth0::stateful_foraging_fsm*>(
-                                  polled_task::mechanism()));
+                       block_transport_goal,
+                       static_cast<fsm::depth0::stateful_foraging_fsm*>(
+                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling

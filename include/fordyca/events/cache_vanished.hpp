@@ -36,15 +36,20 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth1 {
 class foraging_controller;
-}} // namespace controller::depth1
+}
+namespace depth2 { class foraging_controller; }
+} // namespace controller::depth1
+
 namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
-class cached_block_to_nest_fsm;
 }} // namespace fsm::depth1
 namespace tasks { namespace depth1 {
 class collector;
 class harvester;
-}} // namespace tasks
+}
+namespace depth2 { class cache_transferer; }
+} // namespace tasks
+
 NS_START(events);
 
 /*******************************************************************************
@@ -61,9 +66,10 @@ NS_START(events);
 class cache_vanished
     : public rcppsw::er::client,
       public visitor::visit_set<controller::depth1::foraging_controller,
+                                controller::depth2::foraging_controller,
                                 tasks::depth1::collector,
                                 tasks::depth1::harvester,
-                                fsm::depth1::cached_block_to_nest_fsm,
+                                tasks::depth2::cache_transferer,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
   cache_vanished(const std::shared_ptr<rcppsw::er::server>& server,
@@ -74,11 +80,14 @@ class cache_vanished
   cache_vanished& operator=(const cache_vanished& op) = delete;
 
   /* depth1 foraging */
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(tasks::depth1::harvester& task) override;
   void visit(controller::depth1::foraging_controller& controller) override;
+
+  /* depth2 foraging */
+  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(tasks::depth2::cache_transferer& controller) override;
 
  private:
   uint m_cache_id;

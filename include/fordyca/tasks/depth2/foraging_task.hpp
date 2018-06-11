@@ -28,6 +28,7 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,14 +59,26 @@ NS_START(tasks, depth2);
  */
 class foraging_task
     : public base_foraging_task,
+      public ta::polled_task,
       public visitor::polymorphic_accept_set<events::free_block_drop> {
-
  public:
-  explicit foraging_task(const std::string& name) :
-      base_foraging_task(name) {}
+  foraging_task(const std::string& name,
+                const struct ta::task_params *params,
+                std::unique_ptr<ta::taskable>& mechanism);
 
   static constexpr char kCacheStarterName[] = "Cache Starter";
   static constexpr char kCacheFinisherName[] = "Cache Finisher";
+  static constexpr char kCacheTransfererName[] = "Cache Transferer";
+
+  /* task overrides */
+  double current_time(void) const override;
+
+ protected:
+  void interface_complete(bool interface_complete) { m_interface_complete = interface_complete; }
+  bool interface_complete(void) const { return m_interface_complete; }
+
+ private:
+  bool m_interface_complete{false};
 };
 
 NS_END(depth2, tasks, fordyca);
