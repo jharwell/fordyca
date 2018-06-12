@@ -31,8 +31,8 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -157,9 +157,7 @@ void stateless_foraging_loop_functions::pre_step_iter(
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server,
-             m_arena_map,
-             floor())(controller);
+  interactor(rcppsw::er::g_server, m_arena_map, floor())(controller);
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {

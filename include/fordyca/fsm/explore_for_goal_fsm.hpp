@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/fsm/base_explore_fsm.hpp"
 #include "fordyca/controller/explore_behavior.hpp"
+#include "fordyca/fsm/base_explore_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,7 +72,7 @@ class explore_for_goal_fsm : public base_explore_fsm {
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
 
-    /**
+  /**
    * @brief Set callback for determining if the goal has been detected (i.e. the
    * robot is either on top of it, or is otherwise near enough so that the next
    * stage of whatever it is currently doing can happen).

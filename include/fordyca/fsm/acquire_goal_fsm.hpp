@@ -24,22 +24,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/math/vector2.h>
 
-#include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
+#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class perceived_arena_map; }
+namespace representation {
+class perceived_arena_map;
+}
 
 NS_START(fsm);
 
@@ -62,20 +63,24 @@ class acquire_goal_fsm : public base_foraging_fsm,
                          public metrics::fsm::goal_acquisition_metrics,
                          public rcppsw::task_allocation::taskable {
  public:
-  acquire_goal_fsm(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      std::shared_ptr<const representation::perceived_arena_map> map,
-      std::function<bool(void)> goal_detect);
+  acquire_goal_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                   const std::shared_ptr<controller::saa_subsystem>& saa,
+                   std::shared_ptr<const representation::perceived_arena_map> map,
+                   std::function<bool(void)> goal_detect);
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
   acquire_goal_fsm& operator=(const acquire_goal_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const arg) override {}
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
-  bool task_running(void) const override { return ST_ACQUIRE_GOAL == current_state(); }
+  void task_start(__unused const rcppsw::task_allocation::taskable_argument* const
+                      arg) override {}
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
+  bool task_running(void) const override {
+    return ST_ACQUIRE_GOAL == current_state();
+  }
   void task_reset(void) override { init(); }
 
   /* base FSM metrics */

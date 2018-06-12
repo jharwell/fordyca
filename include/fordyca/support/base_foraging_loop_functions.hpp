@@ -107,9 +107,8 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
    * otherwise.
    */
   template <typename T>
-  bool handle_nest_block_drop(
-      argos::CFootBotEntity& robot,
-      representation::arena_map& map) {
+  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
+                              representation::arena_map& map) {
     auto& controller =
         static_cast<T&>(robot.GetControllableEntity().GetController());
     if (controller.in_nest() && controller.goal_is_nest()) {

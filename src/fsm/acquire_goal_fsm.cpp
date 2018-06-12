@@ -30,10 +30,10 @@
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/random_explore_behavior.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/random_explore_behavior.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,11 +55,11 @@ acquire_goal_fsm::acquire_goal_fsm(
       exit_fsm_acquire_goal(),
       mc_map(std::move(map)),
       m_vector_fsm(server, saa),
-      m_explore_fsm(server,
-                    saa,
-                    std::make_unique<controller::random_explore_behavior>(server,
-                                                                          saa),
-                    goal_detect),
+      m_explore_fsm(
+          server,
+          saa,
+          std::make_unique<controller::random_explore_behavior>(server, saa),
+          goal_detect),
       m_goal_acquired_cb(nullptr),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
@@ -67,7 +67,8 @@ acquire_goal_fsm::acquire_goal_fsm(
                                                nullptr,
                                                &exit_fsm_acquire_goal),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_for_goal_fsm::ST_EXPLORE, &fsm_acquire_goal);
+  m_explore_fsm.change_parent(explore_for_goal_fsm::ST_EXPLORE,
+                              &fsm_acquire_goal);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, start) {
@@ -118,7 +119,6 @@ bool acquire_goal_fsm::is_exploring_for_goal(void) const {
 bool acquire_goal_fsm::is_vectoring_to_goal(void) const {
   return current_state() == ST_ACQUIRE_GOAL && m_vector_fsm.task_running();
 } /* is_vectoring_to_goal() */
-
 
 /*******************************************************************************
  * General Member Functions

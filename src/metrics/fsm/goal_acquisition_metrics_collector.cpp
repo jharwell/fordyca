@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,8 +68,7 @@ void goal_acquisition_metrics_collector::collect(
   m_stats.n_cum_exploring_for_goal +=
       static_cast<uint>(m.is_exploring_for_goal());
   ++m_stats.n_cum_acquiring_goal;
-  m_stats.n_cum_vectoring_to_goal +=
-      static_cast<uint>(m.is_vectoring_to_goal());
+  m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
 bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {

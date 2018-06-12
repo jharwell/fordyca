@@ -25,8 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include <list>
-
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************

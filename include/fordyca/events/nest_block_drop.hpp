@@ -45,15 +45,21 @@ class block_to_cache_fsm;
 class cached_block_to_nest_fsm;
 } // namespace depth1
 } // namespace fsm
-namespace controller { namespace depth0 {
+namespace controller {
+namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
+} // namespace depth0
+namespace depth1 {
+class foraging_controller;
 }
-namespace depth1 { class foraging_controller; }
-namespace depth2 { class foraging_controller; }
+namespace depth2 {
+class foraging_controller;
+}
 } // namespace controller
 
-namespace tasks { namespace depth0 {
+namespace tasks {
+namespace depth0 {
 class generalist;
 }
 namespace depth1 {

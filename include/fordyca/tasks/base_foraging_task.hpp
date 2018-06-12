@@ -24,10 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
@@ -51,15 +49,13 @@ namespace ta = rcppsw::task_allocation;
  * @brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
-class base_foraging_task
-    : public rcppsw::metrics::tasks::execution_metrics,
-      public metrics::fsm::goal_acquisition_metrics,
-      public fsm::block_transporter {
-
+class base_foraging_task : public rcppsw::metrics::tasks::execution_metrics,
+                           public metrics::fsm::goal_acquisition_metrics,
+                           public fsm::block_transporter {
  public:
-  base_foraging_task(const struct ta::abort_params *params);
+  base_foraging_task(const struct ta::abort_params* params);
 
-  ta::abort_probability  abort_prob(void) const { return m_abort_prob; }
+  ta::abort_probability abort_prob(void) const { return m_abort_prob; }
 
  private:
   ta::abort_probability m_abort_prob;

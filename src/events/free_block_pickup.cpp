@@ -36,8 +36,8 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
-#include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -157,7 +157,9 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
-  static_cast<tasks::depth0::foraging_task*>(controller.current_task())->accept(*this);
+  std::static_pointer_cast<tasks::depth0::foraging_task>(
+      controller.current_task())
+      ->accept(*this);
   controller.block(m_block);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
@@ -171,7 +173,9 @@ void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  static_cast<tasks::depth1::foraging_task*>(controller.current_task())->accept(*this);
+  std::static_pointer_cast<tasks::depth1::foraging_task>(
+      controller.current_task())
+      ->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),

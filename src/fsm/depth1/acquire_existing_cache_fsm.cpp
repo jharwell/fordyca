@@ -43,7 +43,6 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     std::shared_ptr<const representation::perceived_arena_map> map)
     : base_acquire_cache_fsm(params, server, saa, map) {}
 
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/

@@ -42,8 +42,8 @@ NS_START(fordyca, params, depth1);
  * @class exec_estimates_parser
  * @ingroup params depth1
  *
- * @brief Parses XML parameters used for estimation of task execution at the
- * start of simulation.
+ * @brief Parses XML parameters used for estimation of depth1 task execution
+ * times at the start of simulation.
  */
 class exec_estimates_parser: public rcppsw::params::xml_param_parser {
  public:

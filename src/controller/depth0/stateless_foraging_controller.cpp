@@ -63,8 +63,7 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      base_foraging_controller::server(),
-      base_foraging_controller::saa_subsystem());
+      client::server_ref(), base_foraging_controller::saa_subsystem());
   ER_NOM("stateless_foraging controller initialization finished");
 } /* Init() */
 
@@ -84,24 +83,26 @@ void stateless_foraging_controller::ControlStep(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
-                              is_avoiding_collision,
-                              m_fsm);
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
-                              is_exploring_for_goal,
-                              m_fsm);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateless_foraging_controller,
+                       is_avoiding_collision,
+                       m_fsm);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateless_foraging_controller,
+                       is_exploring_for_goal,
+                       m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller,
-                              goal_acquired,
-                              m_fsm);
+FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller, goal_acquired, m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, stateless_foraging_controller,
-                              acquisition_goal,
-                              m_fsm);
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                       stateless_foraging_controller,
+                       acquisition_goal,
+                       m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type, stateless_foraging_controller,
-                              block_transport_goal,
-                              m_fsm);
+FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
+                       stateless_foraging_controller,
+                       block_transport_goal,
+                       m_fsm);
 
 /*******************************************************************************
  * Distance Metrics

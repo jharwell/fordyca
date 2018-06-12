@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_interactor.hpp
+ * @file exec_estimates_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,44 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "fordyca/params/depth1/exec_estimates_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace events {
-class cached_block_pickup;
-class cache_block_drop;
-class cache_vanished;
-} // namespace events
-
-namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth1);
+NS_START(fordyca, params, depth2);
 
 /*******************************************************************************
- * Structure Definitions
+ * Structure Defexecions
  ******************************************************************************/
 /**
- * @class existing_cache_interactor
- * @ingroup tasks depth1
+ * @struct exec_estimates_params
+ * @ingroup params depth2
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
- * interact with existing caches in FORDYCA.
+ * @brief Parameters for initializing execution time estimates of tasks involved
+ * in depth1 foraging to something within a certain range, which helps to speed
+ * swarm convergence a fair bit.
  */
-class existing_cache_interactor
-    : public visitor::polymorphic_accept_set<events::cache_block_drop,
-                                             events::cached_block_pickup,
-                                             events::cache_vanished> {};
+struct exec_estimates_params : public depth1::exec_estimates_params {
+  argos::CRange<double> cache_starter_range{};
+  argos::CRange<double> cache_finisher_range{};
+  argos::CRange<double> cache_transferer_range{};
+  argos::CRange<double> cache_collector_range{};
+};
 
-NS_END(depth1, tasks, fordyca);
+NS_END(depth2, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_EXISTING_CACHE_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARAMS_HPP_ */

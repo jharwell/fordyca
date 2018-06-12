@@ -31,9 +31,9 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth0/generalist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,7 +87,9 @@ void nest_block_drop::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(
     controller::depth0::stateful_foraging_controller& controller) {
-  static_cast<tasks::depth0::foraging_task*>(controller.current_task())->accept(*this);
+  std::static_pointer_cast<tasks::depth0::foraging_task>(
+      controller.current_task())
+      ->accept(*this);
   controller.block(nullptr);
   ER_NOM("stateful_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
@@ -102,7 +104,9 @@ void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
-  static_cast<tasks::depth0::foraging_task*>(controller.current_task())->accept(*this);
+  std::static_pointer_cast<tasks::depth0::foraging_task>(
+      controller.current_task())
+      ->accept(*this);
   ER_NOM("depth1_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 

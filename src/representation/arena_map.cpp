@@ -39,7 +39,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
-      mc_cache_params(params->cache),
+      mc_static_cache_params(params->static_cache),
       mc_nest_center(params->nest_center),
       m_blocks(params->block_dist.n_blocks),
       m_caches(),
@@ -136,7 +136,7 @@ void arena_map::static_cache_create(void) {
   support::depth1::static_cache_creator c(m_server,
                                           m_grid,
                                           argos::CVector2(x, y),
-                                          mc_cache_params.dimension,
+                                          mc_static_cache_params.dimension,
                                           m_grid.resolution());
 
   std::vector<std::shared_ptr<representation::block>> blocks;
@@ -155,7 +155,7 @@ void arena_map::static_cache_create(void) {
                                                     m_grid.resolution())) {
       blocks.push_back(b);
     }
-    if (blocks.size() >= mc_cache_params.static_size) {
+    if (blocks.size() >= mc_static_cache_params.size) {
       break;
     }
   } /* for(b..) */
@@ -170,11 +170,13 @@ void arena_map::distribute_blocks(void) {
   } /* for(b..) */
   for (auto& b : m_blocks) {
     ER_ASSERT(representation::block::kOutOfSightDLoc != b->discrete_loc(),
-              "FATAL: Block%d discrete coordinates still out of sight after distribution",
+              "FATAL: Block%d discrete coordinates still out of sight after "
+              "distribution",
               b->id());
-    ER_ASSERT(representation::block::kOutOfSightRLoc != b->real_loc(),
-              "FATAL: Block%d real coordinates still out of sight after distribution",
-              b->id());
+    ER_ASSERT(
+        representation::block::kOutOfSightRLoc != b->real_loc(),
+        "FATAL: Block%d real coordinates still out of sight after distribution",
+        b->id());
   } /* for(b..) */
 
   /*

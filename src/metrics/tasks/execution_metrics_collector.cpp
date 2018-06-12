@@ -91,8 +91,8 @@ void execution_metrics_collector::collect(
       static_cast<uint>(task.name() == tasks1::foraging_task::kCollectorName);
   m_count_stats.n_cum_harvesters +=
       static_cast<uint>(task.name() == tasks1::foraging_task::kHarvesterName);
-  m_count_stats.n_cum_generalists += static_cast<uint>(
-      task.name() == tasks0::foraging_task::kGeneralistName);
+  m_count_stats.n_cum_generalists +=
+      static_cast<uint>(task.name() == tasks0::foraging_task::kGeneralistName);
 } /* collect() */
 
 bool execution_metrics_collector::csv_line_build(std::string& line) {

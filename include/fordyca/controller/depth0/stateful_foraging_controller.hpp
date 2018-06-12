@@ -29,6 +29,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
+#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,14 +37,17 @@
 namespace rcppsw { namespace task_allocation {
 class polled_executive;
 class executable_task;
+using executive_params = partitionable_task_params;
 }}
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
-namespace tasks { namespace depth0 { class generalist; class foraging_task; }}
+
+namespace tasks { namespace depth0 { class foraging_task; }}
 
 NS_START(controller);
+
 class base_perception_subsystem;
 namespace depth0 { class sensing_subsystem; }
 
@@ -90,7 +94,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  virtual tasks::base_foraging_task* current_task(void) const;
+  virtual std::shared_ptr<tasks::base_foraging_task> current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
@@ -128,11 +132,16 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   }
 
  private:
+  /**
+   * @brief Initialize the task executive and all tasks for this controller.
+   */
+  void tasking_init(const struct params::fsm_params* fsm_params,
+                    const ta::executive_params* exec_params);
+
   // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
   std::unique_ptr<task_allocation::polled_executive>   m_executive;
-  std::unique_ptr<tasks::depth0::generalist>           m_generalist;
   std::shared_ptr<base_perception_subsystem>           m_perception{nullptr};
   // clang-format on
 };

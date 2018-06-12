@@ -73,9 +73,6 @@ class generalist : public ta::partitionable_polled_task,
   /* task metrics */
   bool at_interface(void) const override { return false; }
 
-  executable_task* partition(void) override {
-    return partitionable_task::partition();
-  }
   void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;

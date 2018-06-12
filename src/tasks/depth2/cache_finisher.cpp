@@ -35,8 +35,9 @@ using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_finisher::cache_finisher(const struct task_allocation::task_params* params,
-                             std::unique_ptr<task_allocation::taskable>& mechanism)
+cache_finisher::cache_finisher(
+    const struct task_allocation::task_params* params,
+    std::unique_ptr<task_allocation::taskable>& mechanism)
     : foraging_task(kCacheFinisherName, params, mechanism) {}
 
 /*******************************************************************************
@@ -68,7 +69,8 @@ double cache_finisher::calc_interface_time(double start_time) {
     return current_time() - start_time;
   }
 
-  if (goal_acquired() && transport_goal_type::kNewCache == block_transport_goal()) {
+  if (goal_acquired() &&
+      transport_goal_type::kNewCache == block_transport_goal()) {
     if (!interface_complete()) {
       interface_complete(true);
       reset_interface_time();
@@ -78,7 +80,8 @@ double cache_finisher::calc_interface_time(double start_time) {
   return 0.0;
 } /* calc_interface_time() */
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type, cache_finisher,
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        cache_finisher,
                         block_transport_goal,
                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
                             polled_task::mechanism()));
@@ -93,28 +96,33 @@ void cache_finisher::accept(events::free_block_drop& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool, cache_finisher,
-                       is_avoiding_collision,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool, cache_finisher,
-                       is_exploring_for_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool, cache_finisher,
-                       is_vectoring_to_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        is_avoiding_collision,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool, cache_finisher,
-                       goal_acquired,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        goal_acquired,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type, cache_finisher,
-                       acquisition_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        cache_finisher,
+                        acquisition_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

@@ -51,8 +51,8 @@ NS_START(events);
  * dropping a block will need to visit (think data structures).
  */
 class block_drop_event
-    : public visitor::visit_set<representation::arena_map,
-                                representation::block> {};
+    : public visitor::visit_set<representation::arena_map, representation::block> {
+};
 
 NS_END(events, fordyca);
 

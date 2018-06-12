@@ -113,8 +113,9 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())->accept(*this);
+  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+      controller.current_task())
+      ->accept(*this);
 
   ER_NOM("Depth1 foraging controller: dropped block%d in cache%d",
          m_block->id(),
@@ -140,6 +141,5 @@ void cache_block_drop::visit(controller::depth2::foraging_controller& controller
 void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {
   static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
-
 
 NS_END(events, fordyca);

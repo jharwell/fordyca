@@ -29,7 +29,6 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "rcppsw/metrics/tasks/allocation_metrics.hpp"
-#include "fordyca/controller/depth1/task_metrics_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,12 +40,12 @@ class executable_task;
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
+namespace ta = rcppsw::task_allocation;
 
 namespace tasks { namespace depth2 {
 class foraging_task;
 }}
-
+namespace params { namespace depth2 { class task_repository; }}
 NS_START(controller, depth2);
 
 /*******************************************************************************
@@ -70,42 +69,34 @@ class foraging_controller : public depth1::foraging_controller,
   void ControlStep(void) override;
 
 
-  tasks::base_foraging_task* current_task(void) const override {
-    return nullptr; /* TODO: Fixme! */
-  } /* current_task() */
-
-  /**
-   * @brief Set whether or not a robot is supposed to display the task it is
-   * currently working on above itself during simulation.
-   */
-  void display_task(bool display_task) { m_display_task = display_task; }
-
-  /**
-   * @brief If \c TRUE, then the robot should display the task it is currently
-   * working on above itself during simulation.
-   */
-  bool display_task(void) const { return m_display_task; }
+  std::shared_ptr<tasks::base_foraging_task> current_task(void) const override;
 
   /* task metrics */
-  bool has_aborted_task(void) const override { return m_metric_store.task_aborted; }
-  bool has_new_allocation(void) const override { return m_metric_store.task_alloc; }
-  bool has_changed_allocation(void) const override { return m_metric_store.alloc_sw; }
-  bool has_finished_task(void) const override { return m_metric_store.task_finish; }
-  double last_task_exec_time(void) const override { return m_metric_store.last_task_exec_time; }
   std::string current_task_name(void) const override;
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
 
+ protected:
+  metrics::tasks::reactive_collator& task_collator(void) override {
+    return m_task_collator;
+  }
+
  private:
-  void task_abort_cleanup(task_allocation::executable_task*);
-  void task_alloc_notify(task_allocation::executable_task*);
-  void task_finish_notify(task_allocation::executable_task*);
+  void depth0_tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
+                           params::depth1::task_repository* task_repo);
+  void depth1_tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
+                           params::depth1::task_repository* task_repo);
+  void depth2_tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
+                           params::depth2::task_repository* task_repo);
+  void tasking_init(params::depth0::stateful_foraging_repository *const stateful_repo,
+                    params::depth1::task_repository *const depth1_task_repo,
+                    params::depth2::task_repository *const depth2_task_repo);
 
   // clang-format off
-  struct depth1::task_metrics_store                  m_metric_store;
-  bool                                               m_display_task{false};
-  std::string                                        m_prev_task{""};
-  std::unique_ptr<task_allocation::polled_executive> m_executive;
+  std::string                                   m_prev_task{""};
+  metrics::tasks::reactive_collator             m_task_collator;
+  std::unique_ptr<ta::polled_executive>         m_executive;
+  std::shared_ptr<ta::task_decomposition_graph> m_graph;
   // clang-format on
 };
 

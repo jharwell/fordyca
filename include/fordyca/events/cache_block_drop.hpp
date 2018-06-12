@@ -35,12 +35,14 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller { namespace depth1 {
+namespace controller {
+namespace depth1 {
 class foraging_controller;
 }
-namespace depth2 { class foraging_controller; }
+namespace depth2 {
+class foraging_controller;
+}
 } // namespace controller
-
 
 namespace representation {
 class perceived_arena_map;
@@ -49,11 +51,14 @@ class arena_cache;
 namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
 }} // namespace fsm::depth1
-namespace tasks { namespace depth1 {
+namespace tasks {
+namespace depth1 {
 class harvester;
 }
-namespace depth2 { class cache_transferer; }
+namespace depth2 {
+class cache_transferer;
 }
+} // namespace tasks
 
 NS_START(events);
 

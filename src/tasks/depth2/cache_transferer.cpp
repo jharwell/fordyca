@@ -24,8 +24,8 @@
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -37,15 +37,17 @@ NS_START(fordyca, tasks, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_transferer::cache_transferer(const struct task_allocation::task_params* params,
-                             std::unique_ptr<task_allocation::taskable>& mechanism)
+cache_transferer::cache_transferer(
+    const struct task_allocation::task_params* params,
+    std::unique_ptr<task_allocation::taskable>& mechanism)
     : foraging_task(kCacheTransfererName, params, mechanism) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 
-void cache_transferer::task_start(const task_allocation::taskable_argument* const) {
+void cache_transferer::task_start(
+    const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
   interface_complete(false);
@@ -81,10 +83,11 @@ double cache_transferer::calc_interface_time(double start_time) {
   return 0.0;
 } /* calc_interface_time() */
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type, cache_transferer,
-                       block_transport_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        cache_transferer,
+                        block_transport_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -104,28 +107,33 @@ void cache_transferer::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool, cache_transferer,
-                       is_avoiding_collision,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool, cache_transferer,
-                       is_exploring_for_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool, cache_transferer,
-                       is_vectoring_to_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_transferer,
+                        is_avoiding_collision,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_transferer,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_transferer,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool, cache_transferer,
-                       goal_acquired,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_transferer,
+                        goal_acquired,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type, cache_transferer,
-                       acquisition_goal,
-                       static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        cache_transferer,
+                        acquisition_goal,
+                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

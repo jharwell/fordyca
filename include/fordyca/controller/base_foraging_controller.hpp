@@ -150,9 +150,6 @@ class base_foraging_controller : public argos::CCI_Controller,
   std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
     return m_saa;
   }
-  const std::shared_ptr<rcppsw::er::server> server(void) const {
-    return m_server;
-  }
 
  private:
   void output_init(const struct params::output_params* params);

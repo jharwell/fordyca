@@ -24,8 +24,8 @@
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,11 +48,11 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      m_explore_fsm(server,
-                    saa,
-                    std::make_unique<controller::random_explore_behavior>(server,
-                                                                          saa),
-                    std::bind(&stateless_foraging_fsm::block_detected, this)),
+      m_explore_fsm(
+          server,
+          saa,
+          std::make_unique<controller::random_explore_behavior>(server, saa),
+          std::bind(&stateless_foraging_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,

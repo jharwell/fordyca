@@ -1,7 +1,7 @@
 /**
- * @file cache_parser.cpp
+ * @file exec_estimates_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,57 +23,51 @@
  ******************************************************************************/
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "fordyca/params/depth1/cache_parser.hpp"
+#include "fordyca/params/depth2/exec_estimates_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, depth2);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char cache_parser::kXMLRoot[];
+constexpr char exec_estimates_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
+void exec_estimates_parser::parse(const ticpp::Element& node) {
+  ticpp::Element enode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(bnode, m_params, dimension);
-  XML_PARSE_PARAM(bnode, m_params, min_dist);
-  XML_PARSE_PARAM(bnode, m_params, static_size);
-  XML_PARSE_PARAM(bnode, m_params, usage_penalty);
-  XML_PARSE_PARAM(bnode, m_params, create_static);
-  XML_PARSE_PARAM(bnode, m_params, create_dynamic);
-  XML_PARSE_PARAM(bnode, m_params, static_respawn_scale_factor);
+
+  XML_PARSE_PARAM(enode, m_params, enabled);
+  if (m_params.enabled) {
+    XML_PARSE_PARAM(enode, m_params, generalist_range);
+
+    XML_PARSE_PARAM(enode, m_params, harvester_range);
+    XML_PARSE_PARAM(enode, m_params, collector_range);
+
+    XML_PARSE_PARAM(enode, m_params, cache_starter_range);
+    XML_PARSE_PARAM(enode, m_params, cache_finisher_range);
+    XML_PARSE_PARAM(enode, m_params, cache_transferer_range);
+    XML_PARSE_PARAM(enode, m_params, cache_collector_range);
+  }
 } /* parse() */
 
-void cache_parser::show(std::ostream& stream) const {
-  stream << build_header() << std::endl
-         << XML_PARAM_STR(m_params, dimension) << std::endl
-         << XML_PARAM_STR(m_params, min_dist) << std::endl
-         << XML_PARAM_STR(m_params, static_size) << std::endl
-         << XML_PARAM_STR(m_params, usage_penalty) << std::endl
-         << XML_PARAM_STR(m_params, create_static) << std::endl
-         << XML_PARAM_STR(m_params, create_dynamic) << std::endl
-         << XML_PARAM_STR(m_params, static_respawn_scale_factor) << std::endl
+void exec_estimates_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, enabled) << std::endl
+         << XML_PARAM_STR(m_params, generalist_range) << std::endl
+         << XML_PARAM_STR(m_params, harvester_range) << std::endl
+         << XML_PARAM_STR(m_params, collector_range) << std::endl
+         << XML_PARAM_STR(m_params, cache_starter_range) << std::endl
+         << XML_PARAM_STR(m_params, cache_finisher_range) << std::endl
+         << XML_PARAM_STR(m_params, cache_transferer_range) << std::endl
+         << XML_PARAM_STR(m_params, cache_collector_range) << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool cache_parser::validate(void) const {
-  if (m_params.dimension <= 0.0) {
-    return false;
-  }
-  if (m_params.create_static && 0 == m_params.static_size) {
-    return false;
-  }
-  if (m_params.static_respawn_scale_factor <= 0.0) {
-    return false;
-  }
-  return true;
-} /* validate() */
-
-NS_END(depth1, params, fordyca);
+NS_END(depth2, params, fordyca);

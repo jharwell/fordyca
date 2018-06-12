@@ -57,7 +57,7 @@ void arena_map_parser::parse(const ticpp::Element& node) {
                             m_params.grid.upper.GetY());
 
   m_cache_parser.parse(anode);
-  m_params.cache = *m_cache_parser.parse_results();
+  m_params.static_cache = *m_cache_parser.parse_results();
 
   std::vector<std::string> res, res2;
   rcppsw::utils::line_parser parser(' ');
@@ -84,20 +84,18 @@ void arena_map_parser::show(std::ostream& stream) const {
 } /* show() */
 
 bool arena_map_parser::validate(void) const {
-  if (!m_grid_parser.validate() || !m_block_parser.validate() ||
-      !m_cache_parser.validate()) {
-    return false;
-  }
-  if (!(m_params.nest_center.GetX() > 0) || !(m_params.nest_center.GetY() > 0)) {
-    return false;
-  }
-  if (!(m_params.nest_x.GetMin() > 0) || !(m_params.nest_x.GetMax() > 0)) {
-    return false;
-  }
-  if (!(m_params.nest_y.GetMin() > 0) || !(m_params.nest_y.GetMax() > 0)) {
-    return false;
-  }
+  CHECK(m_grid_parser.validate() && m_block_parser.validate() &&
+        m_cache_parser.validate());
+  CHECK(m_params.nest_center.GetX() > 0);
+  CHECK(m_params.nest_center.GetY() > 0);
+  CHECK(m_params.nest_x.GetMin() > 0);
+  CHECK(m_params.nest_x.GetMax() > 0);
+  CHECK(m_params.nest_y.GetMin() > 0);
+  CHECK(m_params.nest_y.GetMax() > 0);
   return true;
+
+ error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);
