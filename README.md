@@ -33,12 +33,15 @@ This is the main entry point for getting started on the project.
 
 4. Install additional development packages for the project:
 
-   - catch (A unit testing framework that some unit tests use).
+   - catch (A unit testing framework that some unit tests use)
+
+        sudo apt install catch
    - boost 1.58.
 
-    - Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
+        sudo apt install libboost-all-dev
 
-            sudo apt-get install qtbase5-dev
+    - Qt (Qt 5 is known to work; older versions may also work)
+            sudo apt install qtbase5-dev
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link it as
@@ -86,11 +89,14 @@ After successful compilation, follow these steps to run a foraging scenario:
 
 - If you are having trouble building, try:
 
-  1. Updating the cmake submodule:
+  1. Verifying that both `fordyca` AND `rcppsw` are on the `devel` branch.
 
-          git submodule update
+  2. Updating `rcppsw` and `fordyca` to the latest `devel` branch via `git
+     pull`.
 
-  2. Updating `rcppsw` and `rcsw`, and possibly their cmake submodules.
+  2. Updating the `fordyca`, `rcppsw` cmake submodules by running `git submodule
+     update` in the root of each repository.
+
 
   If the problem perists, open an issue.
 
