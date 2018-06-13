@@ -2,6 +2,14 @@
 
 This is the main entry point for getting started on the project.
 
+## Papers
+
+1. J. Harwell and M. Gini, "Broadening applicability of swarm-robotic foraging
+   through constraint relaxation," 2018 IEEE International Conference on
+   Simulation, Modeling, and Programming for Autonomous Robots (SIMPAR), Brisbane,
+   Australia, 2018, pp. 116-122.
+   [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
+
 ## Pre-cloning Setup
 
 1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
