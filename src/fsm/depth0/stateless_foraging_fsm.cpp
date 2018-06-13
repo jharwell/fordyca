@@ -152,7 +152,8 @@ transport_goal_type stateless_foraging_fsm::block_transport_goal(void) const {
 } /* block_transport_goal() */
 
 acquisition_goal_type stateless_foraging_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state()) {
+  if (ST_ACQUIRE_BLOCK == current_state() ||
+      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
   }
   return acquisition_goal_type::kNone;
