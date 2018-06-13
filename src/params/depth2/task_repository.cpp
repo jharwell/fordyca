@@ -1,7 +1,7 @@
 /**
- * @file task_allocation_params.hpp
+ * @file task_repository.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,35 +18,29 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_ALLOCATION_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_ALLOCATION_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/base_params.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
-#include "fordyca/params/depth1/exec_estimates_params.hpp"
+#include "fordyca/params/depth2/task_repository.hpp"
+#include "fordyca/params/depth2/exec_estimates_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, depth2);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @struct task_allocation_params
- * @ingroup params depth1
- */
-struct task_allocation_params : public rcppsw::params::base_params {
-  task_allocation_params(void) : executive(), exec_estimates() {}
+task_repository::task_repository(void) {
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      exec_estimates_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<ta::executive_xml_parser, ta::executive_params>(
+      ta::executive_xml_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+}
 
-  rcppsw::task_allocation::executive_params executive;
-  struct exec_estimates_params exec_estimates;
-};
-
-NS_END(depth1, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_ALLOCATION_PARAMS_HPP_ */
+NS_END(depth2, params, fordyca);

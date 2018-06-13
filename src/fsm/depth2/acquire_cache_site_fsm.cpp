@@ -24,9 +24,9 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/controller/depth2/cache_site_selector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,13 +71,13 @@ bool acquire_cache_site_fsm::acquire_known_goal(void) {
   /* Start vectoring towards our chosen site */
   if (!vector_fsm().task_running() && !vector_fsm().task_finished()) {
     controller::depth2::cache_site_selector s(server_ref(), mc_nest_center);
-      tasks::vector_argument v(vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
-                               s.calc_best(
-                                   std::list<representation::perceived_cache>(),
-                                   saa_subsystem()->sensing()->position()));
-      explore_fsm().task_reset();
-      vector_fsm().task_reset();
-      vector_fsm().task_start(&v);
+    tasks::vector_argument v(
+        vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
+        s.calc_best(std::list<representation::perceived_cache>(),
+                    saa_subsystem()->sensing()->position()));
+    explore_fsm().task_reset();
+    vector_fsm().task_reset();
+    vector_fsm().task_start(&v);
   }
 
   /* we are vectoring */

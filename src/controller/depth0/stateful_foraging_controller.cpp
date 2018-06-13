@@ -30,7 +30,6 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/depth1/task_allocation_params.hpp"
 #include "fordyca/params/fsm_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -40,30 +39,31 @@
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/polled_executive.hpp"
+#include "rcppsw/task_allocation/task_decomposition_graph.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/executive_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
-    : stateless_foraging_controller(),
-      m_light_loc(),
-      m_executive(),
-      m_generalist() {}
+    : stateless_foraging_controller(), m_light_loc(), m_executive() {}
 
 stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure tasks::base_foraging_task* stateful_foraging_controller::current_task(
-    void) const {
-  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
+__pure std::shared_ptr<tasks::base_foraging_task> stateful_foraging_controller::
+    current_task(void) const {
+  return std::dynamic_pointer_cast<tasks::base_foraging_task>(
+      m_executive->current_task());
 } /* current_task() */
 
 __pure const representation::line_of_sight* stateful_foraging_controller::los(
@@ -117,62 +117,76 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
-  auto* fsm_params = param_repo.parse_results<struct params::fsm_params>();
-  auto* task_params =
-      param_repo.parse_results<params::depth1::task_allocation_params>();
 
   /* initialize subsystems and perception */
   m_perception = rcppsw::make_unique<base_perception_subsystem>(
-      server(), param_repo.parse_results<params::perception_params>(), GetId());
+      client::server_ref(),
+      param_repo.parse_results<params::perception_params>(),
+      GetId());
 
   saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
-  /* initialize task */
-  std::unique_ptr<task_allocation::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          fsm_params,
-          base_foraging_controller::server(),
-          base_foraging_controller::saa_subsystem(),
-          m_perception->map());
-  m_generalist = rcppsw::make_unique<tasks::depth0::generalist>(
-      &task_params->executive,
-      generalist_fsm);
-  m_generalist->parent(m_generalist.get());
-  m_generalist->set_atomic();
-
-  m_executive = rcppsw::make_unique<task_allocation::polled_executive>(
-      base_foraging_controller::server(), m_generalist.get());
+  /* initialize tasking */
+  tasking_init(
+      param_repo.parse_results<struct params::fsm_params>(),
+      param_repo.parse_results<ta::executive_params>());
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type, stateful_foraging_controller,
-                              block_transport_goal,
-                              current_task());
+void stateful_foraging_controller::tasking_init(
+    const struct params::fsm_params* fsm_params,
+    const ta::executive_params* exec_params) {
+  std::unique_ptr<ta::taskable> generalist_fsm =
+      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
+          fsm_params,
+          client::server_ref(),
+          base_foraging_controller::saa_subsystem(),
+          m_perception->map());
+  auto generalist =
+      std::make_shared<tasks::depth0::generalist>(exec_params, generalist_fsm);
+
+  generalist->set_atomic();
+
+  auto graph = std::make_shared<ta::task_decomposition_graph>(server_ref());
+  graph->set_root(generalist);
+
+  m_executive = rcppsw::make_unique<ta::polled_executive>(server_ref(), graph);
+} /* tasking_init() */
+
+FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
+                       stateful_foraging_controller,
+                       block_transport_goal,
+                       current_task());
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
-                              is_avoiding_collision,
-                              current_task());
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
-                              is_exploring_for_goal,
-                              current_task());
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateful_foraging_controller,
+                       is_avoiding_collision,
+                       current_task());
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateful_foraging_controller,
+                       is_exploring_for_goal,
+                       current_task());
 
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateful_foraging_controller,
                        is_vectoring_to_goal,
                        current_task());
 
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_foraging_controller,
-                              goal_acquired,
-                              current_task());
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       stateful_foraging_controller,
+                       goal_acquired,
+                       current_task());
 
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type, stateful_foraging_controller,
-                              acquisition_goal,
-                              current_task());
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                       stateful_foraging_controller,
+                       acquisition_goal,
+                       current_task());
 
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,

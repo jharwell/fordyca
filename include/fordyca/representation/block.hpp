@@ -106,8 +106,7 @@ class block : public cell_entity,
    * This should only happen if the block is being carried by a robot.
    */
   bool is_out_of_sight(void) const {
-    return kOutOfSightDLoc == discrete_loc() ||
-        kOutOfSightRLoc == real_loc();
+    return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
   }
   /**
    * @brief Get the ID/index of the robot that is currently carrying this block

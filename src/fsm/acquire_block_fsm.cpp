@@ -56,9 +56,8 @@ acquire_block_fsm::acquire_block_fsm(
   client::insmod("acquire_block_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
-  goal_acquired_cb(std::bind(&acquire_block_fsm::block_acquired_cb,
-                             this,
-                             std::placeholders::_1));
+  goal_acquired_cb(std::bind(
+      &acquire_block_fsm::block_acquired_cb, this, std::placeholders::_1));
 }
 /*******************************************************************************
  * Member Functions
@@ -124,7 +123,6 @@ bool acquire_block_fsm::acquire_known_goal(void) {
   }
   return false;
 } /* acquire_known_block() */
-
 
 /*******************************************************************************
  * FSM Metrics

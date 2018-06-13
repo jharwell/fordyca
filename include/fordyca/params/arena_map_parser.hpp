@@ -29,7 +29,7 @@
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/block_distribution_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
-#include "fordyca/params/depth1/cache_parser.hpp"
+#include "fordyca/params/depth1/static_cache_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
@@ -74,11 +74,11 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
 
  private:
   // clang-format off
-  struct arena_map_params m_params {};
+  struct arena_map_params          m_params {};
   grid_parser                      m_grid_parser;
   block_parser                     m_block_parser;
   block_distribution_parser        m_block_dist_parser;
-  depth1::cache_parser             m_cache_parser;
+  depth1::static_cache_parser      m_cache_parser;
   // clang-format on
 };
 

@@ -131,23 +131,22 @@ HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm,
+FSM_WRAPPER_DEFINE(bool,
+                   cache_transferer_fsm,
                    is_avoiding_collision,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm,
-                   goal_acquired,
-                   m_cache_fsm);
+FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm, goal_acquired, m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm,
-                   is_vectoring_to_goal,
-                   m_cache_fsm);
+FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm, is_vectoring_to_goal, m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm,
+FSM_WRAPPER_DEFINE(bool,
+                   cache_transferer_fsm,
                    is_exploring_for_goal,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(acquisition_goal_type, cache_transferer_fsm,
+FSM_WRAPPER_DEFINE(acquisition_goal_type,
+                   cache_transferer_fsm,
                    acquisition_goal,
                    m_cache_fsm);
 

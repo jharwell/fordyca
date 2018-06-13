@@ -32,9 +32,8 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_fsm_metrics_collector::base_fsm_metrics_collector(
-    const std::string& ofname,
-    uint interval)
+base_fsm_metrics_collector::base_fsm_metrics_collector(const std::string& ofname,
+                                                       uint interval)
     : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************

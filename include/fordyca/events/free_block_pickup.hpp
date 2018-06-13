@@ -44,15 +44,21 @@ namespace depth1 {
 class block_to_goal_fsm;
 }
 } // namespace fsm
-namespace controller { namespace depth0 {
+namespace controller {
+namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
+} // namespace depth0
+namespace depth1 {
+class foraging_controller;
 }
-namespace depth1 { class foraging_controller;}
-namespace depth2 { class foraging_controller; }
-} // namespace controller::depth0
+namespace depth2 {
+class foraging_controller;
+}
+} // namespace controller
 
-namespace tasks { namespace depth0 {
+namespace tasks {
+namespace depth0 {
 class generalist;
 }
 namespace depth1 {
@@ -61,7 +67,7 @@ class harvester;
 namespace depth2 {
 class cache_starter;
 class cache_finisher;
-}
+} // namespace depth2
 } // namespace tasks
 
 NS_START(events);

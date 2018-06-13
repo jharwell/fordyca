@@ -1,5 +1,5 @@
 /**
- * @file task_metrics_store.hpp
+ * @file task_repository.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,55 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_TASK_METRICS_STORE_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_TASK_METRICS_STORE_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
+NS_START(fordyca, params, depth2);
 
 /*******************************************************************************
- * Struct Definitions
+ * Class Definitions
  ******************************************************************************/
-
 /**
- * @struct task_metrics_store
- * @ingroup controller depth1
+ * @class task_repository
+ * @ingroup params depth2
  *
- * @brief A collection of variables used in reporting metrics about tasks at the
- * depth 1 level internally in the controller.
+ * @brief Collection of all parameter parsers and parse results needed
+ * by the \ref depth2::foraging_controller.
  */
-struct task_metrics_store {
-  void reset(void) {
-    task_aborted = false;
-    task_alloc = false;
-    alloc_sw = false;
-    task_finish = false;
-    last_task_exec_time = 0.0;
-  }
-
-  bool task_aborted{false};  /// Was the current task aborted?
-  bool task_alloc{false};    /// Was a task allocated on the current timestep?
-
-  /**
-   * Did a robot's task allocation change this timestep?
-   */
-  bool alloc_sw{false};
-  bool task_finish{false};   /// Was a task finished on this timestep?
-
-  /**
-   * How long did the most recently finished task take?
-   */
-  double last_task_exec_time{0.0};
+class task_repository: public rcppsw::params::xml_param_repository {
+ public:
+  static constexpr char kName[] = "depth2_task_repository";
+  task_repository(void);
 };
 
+NS_END(depth2, params, fordyca);
 
-NS_END(depth1, controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_TASK_METRICS_STORE_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_ */

@@ -29,7 +29,8 @@
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "rcppsw/metrics/tasks/allocation_metrics.hpp"
-#include "fordyca/controller/depth1/task_metrics_store.hpp"
+#include "rcppsw/task_allocation/task_graph_vertex.hpp"
+#include "fordyca/metrics/tasks/reactive_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,11 +38,12 @@
 namespace rcppsw { namespace task_allocation {
 class polled_executive;
 class executable_task;
+class task_decomposition_graph;
 }}
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
+namespace ta = rcppsw::task_allocation;
 
 namespace tasks {
 namespace depth0 { class generalist; }
@@ -50,6 +52,10 @@ class harvester;
 class collector;
 class foraging_task;
 }
+}
+namespace params {
+namespace depth0 { class stateful_foraging_repository; }
+namespace depth1 { class task_repository; }
 }
 
 NS_START(controller, depth1);
@@ -75,7 +81,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  tasks::base_foraging_task* current_task(void) const override;
+  std::shared_ptr<tasks::base_foraging_task> current_task(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -90,28 +96,38 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool display_task(void) const { return m_display_task; }
 
   /* task metrics */
-  bool has_aborted_task(void) const override { return m_metric_store.task_aborted; }
-  bool has_new_allocation(void) const override { return m_metric_store.task_alloc; }
-  bool has_changed_allocation(void) const override { return m_metric_store.alloc_sw; }
-  bool has_finished_task(void) const override { return m_metric_store.task_finish; }
-  double last_task_exec_time(void) const override { return m_metric_store.last_task_exec_time; }
+  bool has_aborted_task(void) const override { return task_collator().task_aborted(); }
+  bool has_new_allocation(void) const override { return task_collator().has_new_allocation(); }
+  bool has_changed_allocation(void) const override { return task_collator().has_new_allocation(); }
+  bool has_finished_task(void) const override { return task_collator().task_finished(); }
+  double last_task_exec_time(void) const override { return task_collator().last_task_exec_time(); }
+
   std::string current_task_name(void) const override;
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
 
+ protected:
+  virtual metrics::tasks::reactive_collator& task_collator(void) {
+    return m_task_collator;
+  }
+  const metrics::tasks::reactive_collator& task_collator(void) const {
+    return const_cast<foraging_controller*>(this)->task_collator();
+  }
+  /* executive callbacks */
+  void task_abort_cleanup(const ta::task_graph_vertex& task);
+  void task_alloc_notify(const ta::task_graph_vertex& task);
+  void task_finish_notify(const ta::task_graph_vertex& task);
+
  private:
-  void task_abort_cleanup(task_allocation::executable_task*);
-  void task_alloc_notify(task_allocation::executable_task*);
-  void task_finish_notify(task_allocation::executable_task*);
+  void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
+                    params::depth1::task_repository* task_repo);
 
   // clang-format off
-  struct task_metrics_store                          m_metric_store;
+  metrics::tasks::reactive_collator                  m_task_collator;
   bool                                               m_display_task{false};
   std::string                                        m_prev_task{""};
-  std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::depth1::harvester>          m_harvester;
-  std::unique_ptr<tasks::depth1::collector>          m_collector;
-  std::unique_ptr<tasks::depth0::generalist>         m_generalist;
+  std::unique_ptr<ta::polled_executive>              m_executive;
+  std::shared_ptr<ta::task_decomposition_graph>      m_graph;
   // clang-format on
 };
 

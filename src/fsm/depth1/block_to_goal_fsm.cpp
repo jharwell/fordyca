@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -141,13 +141,13 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     internal_event(ST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::CACHE_APPEARED == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kNewCache == acquisition_goal() ||
-              acquisition_goal_type::kCacheSite == acquisition_goal(),
+                  acquisition_goal_type::kCacheSite == acquisition_goal(),
               "FATAL: Bad goal on cache appear");
-      goal_fsm().task_reset();
-      internal_event(ST_TRANSPORT_TO_GOAL);
+    goal_fsm().task_reset();
+    internal_event(ST_TRANSPORT_TO_GOAL);
   }
   return controller::foraging_signal::HANDLED;
-  }
+}
 
 __const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
   return controller::foraging_signal::HANDLED;
@@ -158,17 +158,17 @@ __const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
  ******************************************************************************/
 __pure bool block_to_goal_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
-      goal_fsm().is_avoiding_collision();
+         goal_fsm().is_avoiding_collision();
 } /* is_avoiding_collision() */
 
 __pure bool block_to_goal_fsm::is_exploring_for_goal(void) const {
   return (m_block_fsm.is_exploring_for_goal() && m_block_fsm.task_running()) ||
-      (goal_fsm().is_exploring_for_goal() && goal_fsm().task_running());
+         (goal_fsm().is_exploring_for_goal() && goal_fsm().task_running());
 } /* is_exploring_for_goal() */
 
 __pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
   return (m_block_fsm.is_vectoring_to_goal() && m_block_fsm.task_running()) ||
-      (goal_fsm().is_vectoring_to_goal() && goal_fsm().task_running());
+         (goal_fsm().is_vectoring_to_goal() && goal_fsm().task_running());
 } /* is_vectoring_to_block */
 
 bool block_to_goal_fsm::goal_acquired(void) const {

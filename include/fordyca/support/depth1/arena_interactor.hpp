@@ -122,7 +122,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+    auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     ER_ASSERT(acquisition_goal_type::kExistingCache ==
@@ -173,7 +173,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     cache_penalty& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto *task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+    auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
@@ -242,7 +242,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (controller.is_carrying_block()) {
       ER_NOM("%s aborted task %s while carrying block%d",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             std::static_pointer_cast<tasks::depth1::foraging_task>(
                  controller.current_task())->name().c_str(),
              controller.block()->id());
 
@@ -302,7 +302,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             std::dynamic_pointer_cast<tasks::depth1::foraging_task>(
                  controller.current_task())->name().c_str());
     }
     m_cache_penalty_handler.penalty_abort(controller);

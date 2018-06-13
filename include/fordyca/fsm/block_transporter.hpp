@@ -49,29 +49,29 @@ class block_transporter {
      */
     kNone,
 
-      /**
+    /**
        * @brief A robot has acquired a block and is currently taking it back to
        * the nest.
        */
-      kNest,
+    kNest,
 
-      /**
+    /**
        * @brief A robot is currently transporting an acquired block to its
        * existing cache of choice.
        */
-      kExistingCache,
+    kExistingCache,
 
-      /**
+    /**
        * @brief A robot is currently transporting an acquired block to its new
        * cache of choice.
        */
-      kNewCache,
+    kNewCache,
 
-      /**
+    /**
        * @brief A robot is currently transporting an acquired block to its cache
        * site of choice.
        */
-      kCacheSite
+    kCacheSite
   };
   block_transporter(void) = default;
   virtual ~block_transporter(void) = default;

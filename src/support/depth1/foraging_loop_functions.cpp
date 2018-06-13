@@ -32,11 +32,11 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
 #include "rcppsw/er/server.hpp"
@@ -71,7 +71,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
                                                  floor(),
                                                  nest_xrange(),
                                                  nest_yrange(),
-                                                 arenap->cache.usage_penalty);
+                                                 arenap->static_cache.usage_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -103,7 +103,9 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
             *controller.current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
           return acquisition_goal_type::kBlock ==
-          static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).acquisition_goal();
+                 static_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                     metrics)
+                     .acquisition_goal();
         });
     collector_group().collect_if(
         "fsm::cache_acquisition",
@@ -111,7 +113,9 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
             *controller.current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
           return acquisition_goal_type::kExistingCache ==
-              static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics).acquisition_goal();
+                 static_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                     metrics)
+                     .acquisition_goal();
         });
 
     collector_group().collect(
@@ -126,8 +130,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* Now watch it react to the environment */
-  (*m_interactor)(controller,
-                  GetSpace().GetSimulationClock());
+  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 argos::CColor foraging_loop_functions::GetFloorColor(
@@ -160,8 +163,7 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
-    collector_group().collect("cache",
-                              static_cast<metrics::cache_metrics&>(*c));
+    collector_group().collect("cache", static_cast<metrics::cache_metrics&>(*c));
     c->reset_metrics();
   } /* for(&c..) */
 
@@ -223,11 +225,11 @@ void foraging_loop_functions::cache_handling_init(
    * Regardless of how many foragers/etc there are, always create an
    * initial cache.
    */
-  if (arenap->cache.create_static) {
+  if (arenap->static_cache.enable) {
     arena_map()->static_cache_create();
   }
 
-  mc_cache_respawn_scale_factor = arenap->cache.static_respawn_scale_factor;
+  mc_cache_respawn_scale_factor = arenap->static_cache.respawn_scale_factor;
 } /* cache_handling_init() */
 
 void foraging_loop_functions::metric_collecting_init(

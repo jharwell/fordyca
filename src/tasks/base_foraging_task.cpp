@@ -32,7 +32,7 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_foraging_task::base_foraging_task(const struct ta::abort_params *params)
+base_foraging_task::base_foraging_task(const struct ta::abort_params* params)
     : m_abort_prob(params) {}
 
 NS_END(depth2, tasks);

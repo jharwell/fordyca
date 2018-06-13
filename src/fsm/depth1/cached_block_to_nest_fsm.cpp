@@ -112,21 +112,22 @@ __const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+FSM_WRAPPER_DEFINE(bool,
+                   cached_block_to_nest_fsm,
                    is_avoiding_collision,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+FSM_WRAPPER_DEFINE(bool,
+                   cached_block_to_nest_fsm,
                    is_exploring_for_goal,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
+FSM_WRAPPER_DEFINE(bool,
+                   cached_block_to_nest_fsm,
                    is_vectoring_to_goal,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm,
-                   goal_acquired,
-                   m_cache_fsm);
+FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm, goal_acquired, m_cache_fsm);
 
 acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state()) {

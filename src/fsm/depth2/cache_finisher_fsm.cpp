@@ -144,17 +144,11 @@ __pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
          m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
-                   goal_acquired,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, goal_acquired, m_block_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
-                   is_vectoring_to_goal,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, is_vectoring_to_goal, m_block_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm,
-                   is_exploring_for_goal,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, is_exploring_for_goal, m_block_fsm);
 
 acquisition_goal_type cache_finisher_fsm::acquisition_goal(void) const {
   if (m_block_fsm.task_running()) {

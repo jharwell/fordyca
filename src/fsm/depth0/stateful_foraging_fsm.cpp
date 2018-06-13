@@ -119,13 +119,15 @@ __const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, stateful_foraging_fsm,
-                          is_exploring_for_goal,
-                          m_block_fsm);
+FSM_WRAPPER_DEFINE(bool,
+                   stateful_foraging_fsm,
+                   is_exploring_for_goal,
+                   m_block_fsm);
 
-FSM_WRAPPER_DEFINE(bool, stateful_foraging_fsm,
-                          is_vectoring_to_goal,
-                          m_block_fsm);
+FSM_WRAPPER_DEFINE(bool,
+                   stateful_foraging_fsm,
+                   is_vectoring_to_goal,
+                   m_block_fsm);
 
 acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state()) {

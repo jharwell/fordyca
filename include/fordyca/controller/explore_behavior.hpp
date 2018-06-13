@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,8 +60,12 @@ class explore_behavior : public rcppsw::er::client {
   virtual void execute(void) = 0;
 
  protected:
-  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) { return m_saa; }
-  std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const { return m_saa; }
+  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
+    return m_saa;
+  }
+  std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const {
+    return m_saa;
+  }
 
  private:
   std::shared_ptr<controller::saa_subsystem> m_saa;

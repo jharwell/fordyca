@@ -22,19 +22,24 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/task_repository.hpp"
-#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 task_repository::task_repository(void) {
-  register_parser<task_allocation_parser, task_allocation_params>(
-      task_allocation_parser::kXMLRoot,
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      exec_estimates_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<ta::executive_xml_parser, ta::executive_params>(
+      ta::executive_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

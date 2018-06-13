@@ -1,7 +1,7 @@
 /**
- * @file task_allocation_parser.cpp
+ * @file static_cache_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include "fordyca/params/depth1/static_cache_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -32,28 +34,45 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char task_allocation_parser::kXMLRoot[];
+constexpr char static_cache_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void task_allocation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tnode =
+void static_cache_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-
-  m_exec_parser.parse(tnode);
-  m_estimate_parser.parse(tnode);
-  m_params.executive = *m_exec_parser.parse_results();
-  m_params.exec_estimates = *m_estimate_parser.parse_results();
+  XML_PARSE_PARAM(bnode, m_params, enable);
+  if (m_params.enable) {
+    XML_PARSE_PARAM(bnode, m_params, size);
+    XML_PARSE_PARAM(bnode, m_params, dimension);
+    XML_PARSE_PARAM(bnode, m_params, min_dist);
+    XML_PARSE_PARAM(bnode, m_params, usage_penalty);
+    XML_PARSE_PARAM(bnode, m_params, respawn_scale_factor);
+  }
 } /* parse() */
 
-void task_allocation_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_exec_parser << m_estimate_parser << std::endl
+void static_cache_parser::show(std::ostream& stream) const {
+  stream << build_header() << std::endl
+         << XML_PARAM_STR(m_params, enable) << std::endl
+         << XML_PARAM_STR(m_params, size) << std::endl
+         << XML_PARAM_STR(m_params, dimension) << std::endl
+         << XML_PARAM_STR(m_params, min_dist) << std::endl
+         << XML_PARAM_STR(m_params, usage_penalty) << std::endl
+         << XML_PARAM_STR(m_params, respawn_scale_factor) << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool task_allocation_parser::validate(void) const {
-  return m_exec_parser.validate() && m_estimate_parser.validate();
+__pure bool static_cache_parser::validate(void) const {
+  if (m_params.enable) {
+    CHECK(m_params.dimension > 0.0);
+    CHECK(m_params.size > 0.0);
+    CHECK(m_params.respawn_scale_factor > 0.0);
+    return true;
+  }
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(depth1, params, fordyca);

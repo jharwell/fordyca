@@ -206,8 +206,9 @@ void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())->accept(*this);
+  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+      controller.current_task())
+      ->accept(*this);
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
@@ -232,8 +233,7 @@ void cached_block_pickup::visit(
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())
-      ->accept(*this);
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

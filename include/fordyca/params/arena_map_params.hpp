@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/params/block_distribution_params.hpp"
 #include "fordyca/params/block_params.hpp"
-#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 
@@ -47,7 +47,7 @@ struct arena_map_params : public rcppsw::params::base_params {
   struct grid_params grid {};
   struct block_params block {};
   struct block_distribution_params block_dist {};
-  struct depth1::cache_params cache {};
+  struct depth1::static_cache_params static_cache {};
 
   uint n_blocks{0};
   argos::CVector2 nest_center{};

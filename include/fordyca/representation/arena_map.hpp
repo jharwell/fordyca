@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <vector>
 
-#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/block.hpp"
@@ -130,7 +130,7 @@ class arena_map : public rcppsw::er::client,
    */
   void static_cache_create(void);
 
-  bool has_static_cache(void) const { return mc_cache_params.create_static; }
+  bool has_static_cache(void) const { return mc_static_cache_params.enable; }
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -196,14 +196,14 @@ class arena_map : public rcppsw::er::client,
 
  private:
   // clang-format off
-  bool                                      m_cache_removed;
-  const struct params::depth1::cache_params mc_cache_params;
-  const argos::CVector2                     mc_nest_center;
-  block_vector                              m_blocks;
-  cache_vector                              m_caches;
-  support::block_distributor                m_block_distributor;
-  std::shared_ptr<rcppsw::er::server>       m_server;
-  arena_grid                                m_grid;
+  bool                                             m_cache_removed;
+  const struct params::depth1::static_cache_params mc_static_cache_params;
+  const argos::CVector2                            mc_nest_center;
+  block_vector                                     m_blocks;
+  cache_vector                                     m_caches;
+  support::block_distributor                       m_block_distributor;
+  std::shared_ptr<rcppsw::er::server>              m_server;
+  arena_grid                                       m_grid;
   // clang-format on
 };
 
