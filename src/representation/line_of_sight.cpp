@@ -73,7 +73,7 @@ void line_of_sight::cache_add(const std::shared_ptr<base_cache>& cache) {
   }
 } /* cache_add() */
 
-__pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
+__rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
   return *m_view[i][j];

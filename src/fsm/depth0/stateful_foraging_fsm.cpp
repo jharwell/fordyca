@@ -112,7 +112,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-__const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
+__rcsw_const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

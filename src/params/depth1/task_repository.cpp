@@ -24,6 +24,7 @@
 #include "fordyca/params/depth1/task_repository.hpp"
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +35,8 @@ namespace ta = rcppsw::task_allocation;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-task_repository::task_repository(void) {
+task_repository::task_repository(const std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
   register_parser<exec_estimates_parser, exec_estimates_params>(
       exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);

@@ -139,7 +139,7 @@ FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool harvester::at_interface(void) const {
+__rcsw_pure bool harvester::at_interface(void) const {
   return transport_goal_type::kExistingCache == block_transport_goal();
 } /* at_interface()() */
 

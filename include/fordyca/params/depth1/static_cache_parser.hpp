@@ -46,7 +46,9 @@ NS_START(fordyca, params, depth1);
  */
 class static_cache_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit static_cache_parser(uint level) : xml_param_parser(level) {}
+  static_cache_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                      uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all static cache parameters should lie under in

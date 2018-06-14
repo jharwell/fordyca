@@ -63,7 +63,7 @@ HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
-__const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
+__rcsw_const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

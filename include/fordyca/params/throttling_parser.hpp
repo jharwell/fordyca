@@ -47,7 +47,9 @@ NS_START(fordyca, params);
  */
 class throttling_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit throttling_parser(uint level) : xml_param_parser(level) {}
+  throttling_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                    uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all throttling parameters should lie under in the

@@ -50,12 +50,12 @@ NS_START(fordyca, params);
  */
 class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit arena_map_parser(uint level)
-      : xml_param_parser(level),
-        m_grid_parser(level + 1),
-        m_block_parser(level + 1),
-        m_block_dist_parser(level + 1),
-        m_cache_parser(level + 1) {}
+  arena_map_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level),
+        m_grid_parser(server, level + 1),
+        m_block_parser(server, level + 1),
+        m_block_dist_parser(server, level + 1),
+        m_cache_parser(server, level + 1) {}
 
   /**
    * @brief The root tag that all arena map parameters should lie under in the

@@ -78,14 +78,14 @@ class base_cache : public immovable_cell_entity,
              const std::vector<std::shared_ptr<block>>& blocks,
              int id);
 
-  __pure bool operator==(const base_cache& other) const {
+  __rcsw_pure bool operator==(const base_cache& other) const {
     return this->discrete_loc() == other.discrete_loc();
   }
 
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    */
-  __pure bool contains_block(const std::shared_ptr<block> c_block) const {
+  __rcsw_pure bool contains_block(const std::shared_ptr<block> c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }

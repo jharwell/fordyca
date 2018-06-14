@@ -77,7 +77,7 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   ER_NOM("Initializing stateless foraging loop functions");
 
   /* parse all environment parameters and capture in logfile */
-  params::loop_function_repository repo;
+  params::loop_function_repository repo(server_ref());
   repo.parse_all(node);
 
   auto* p_output = repo.parse_results<params::output_params>();
@@ -122,7 +122,7 @@ void stateless_foraging_loop_functions::Destroy() {
   m_collector_group.finalize_all();
 }
 
-__pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&

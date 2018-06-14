@@ -29,6 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
@@ -43,7 +44,7 @@ NS_START(fordyca, params, depth0);
  */
 class stateful_foraging_repository: public rcppsw::params::xml_param_repository {
  public:
-  stateful_foraging_repository(void);
+  stateful_foraging_repository(const std::shared_ptr<rcppsw::er::server>& server);
 };
 
 NS_END(depth0, params, fordyca);

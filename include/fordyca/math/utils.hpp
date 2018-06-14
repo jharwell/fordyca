@@ -41,7 +41,7 @@ NS_START(fordyca, math);
  * @brief Translate real (continuous) coordinates to discrete ones using the
  * specified resolution.
  */
-__pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
+__rcsw_pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
     const argos::CVector2& r_coord,
     double resolution) {
   return rcppsw::math::dcoord2(
@@ -53,7 +53,7 @@ __pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
  * @brief Translate discrete coordinates to real (continuous) ones using the
  * specified resolution.
  */
-__pure static inline argos::CVector2 dcoord_to_rcoord(
+__rcsw_pure static inline argos::CVector2 dcoord_to_rcoord(
     const rcppsw::math::dcoord2& d_coord,
     double resolution) {
   return argos::CVector2(d_coord.first * resolution,

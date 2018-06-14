@@ -103,7 +103,7 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-__pure bool acquire_goal_fsm::is_avoiding_collision(void) const {
+__rcsw_pure bool acquire_goal_fsm::is_avoiding_collision(void) const {
   return m_explore_fsm.is_avoiding_collision() ||
          m_vector_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */

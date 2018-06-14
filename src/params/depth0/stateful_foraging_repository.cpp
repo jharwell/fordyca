@@ -27,6 +27,7 @@
 #include "fordyca/params/occupancy_grid_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
 #include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +38,9 @@ namespace ta = rcppsw::task_allocation;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_foraging_repository::stateful_foraging_repository(void) {
+stateful_foraging_repository::stateful_foraging_repository(
+    const std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
   register_parser<actuation_parser, actuation_params>(
       actuation_parser::kXMLRoot, actuation_parser::kHeader1);
   register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,

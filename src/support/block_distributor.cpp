@@ -81,13 +81,13 @@ argos::CVector2 block_distributor::dist_random(
   return dist_outside_range(block.xsize(), m_nest_model.x, m_nest_model.y);
 } /* dist_random() */
 
-__pure argos::CRange<double> block_distributor::single_src_xrange(
+__rcsw_pure argos::CRange<double> block_distributor::single_src_xrange(
     double block_xdim) {
   return argos::CRange<double>(m_arena_model.x.GetMax() * 0.9 - 4 * block_xdim,
                                m_arena_model.x.GetMax() * 0.9);
 } /* single_src_xrange() */
 
-__pure argos::CRange<double> block_distributor::single_src_yrange(
+__rcsw_pure argos::CRange<double> block_distributor::single_src_yrange(
     double block_ydim) {
   return argos::CRange<double>(
       std::max(4 * block_ydim, m_nest_model.y.GetMin() - 4 * block_ydim),

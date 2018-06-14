@@ -138,7 +138,7 @@ TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__pure bool cache_transferer::at_interface(void) const {
+__rcsw_pure bool cache_transferer::at_interface(void) const {
   return acquisition_goal_type::kExistingCache == acquisition_goal();
 } /* at_interface()() */
 

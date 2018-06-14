@@ -1,3 +1,6 @@
 [submodule "cmake"]
 	path = cmake
-	url = git@github.com:jharwell/cmake-config
+	url = https://github.com/jharwell/cmake-config
+[submodule "ext/ticpp"]
+	path = ext/ticpp
+	url = https://github.com/wxFormBuilder/ticpp.git

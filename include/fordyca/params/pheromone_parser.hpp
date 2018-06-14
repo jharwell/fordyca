@@ -47,7 +47,9 @@ NS_START(fordyca, params);
  */
 class pheromone_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit pheromone_parser(uint level) : xml_param_parser(level) {}
+  pheromone_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                   uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all pheromone parameters should lie under in the

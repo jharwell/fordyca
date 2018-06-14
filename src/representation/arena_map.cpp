@@ -74,7 +74,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i]->contains_point(pos)) {
       return static_cast<int>(i);
@@ -83,7 +83,7 @@ __pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_block() */
 
-__pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     if (m_caches[i]->contains_point(pos)) {
       return static_cast<int>(i);
