@@ -105,7 +105,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-__const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
+__rcsw_const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 

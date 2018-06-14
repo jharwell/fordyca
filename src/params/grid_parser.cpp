@@ -58,7 +58,7 @@ void grid_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool grid_parser::validate(void) const {
+__rcsw_pure bool grid_parser::validate(void) const {
   if (!(m_params.resolution > 0.0)) {
     return false;
   }

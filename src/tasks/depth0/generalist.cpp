@@ -49,7 +49,7 @@ generalist::generalist(const struct ta::partitionable_task_params* const params,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure double generalist::current_time(void) const {
+__rcsw_pure double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
              polled_task::mechanism())
       ->base_sensors()

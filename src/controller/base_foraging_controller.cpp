@@ -73,7 +73,7 @@ void base_foraging_controller::robot_loc(argos::CVector2 loc) {
   m_saa->sensing()->position(loc);
 }
 
-__pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
+__rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
   return m_saa->sensing()->position();
 }
 

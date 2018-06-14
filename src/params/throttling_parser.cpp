@@ -50,7 +50,7 @@ void throttling_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool throttling_parser::validate(void) const {
+__rcsw_pure bool throttling_parser::validate(void) const {
   return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
 } /* validate() */
 

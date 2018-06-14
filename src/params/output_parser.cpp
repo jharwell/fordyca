@@ -68,7 +68,7 @@ void output_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool output_parser::validate(void) const {
+__rcsw_pure bool output_parser::validate(void) const {
   return m_metrics_parser.validate();
 } /* validate() */
 

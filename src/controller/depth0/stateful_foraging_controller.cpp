@@ -60,13 +60,13 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure std::shared_ptr<tasks::base_foraging_task> stateful_foraging_controller::
+__rcsw_pure std::shared_ptr<tasks::base_foraging_task> stateful_foraging_controller::
     current_task(void) const {
   return std::dynamic_pointer_cast<tasks::base_foraging_task>(
       m_executive->current_task());
 } /* current_task() */
 
-__pure const representation::line_of_sight* stateful_foraging_controller::los(
+__rcsw_pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {
   return stateful_sensors()->los();
 }
@@ -75,13 +75,13 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__pure const std::shared_ptr<const depth0::sensing_subsystem>
+__rcsw_pure const std::shared_ptr<const depth0::sensing_subsystem>
 stateful_foraging_controller::stateful_sensors(void) const {
   return std::static_pointer_cast<const depth0::sensing_subsystem>(
       saa_subsystem()->sensing());
 }
 
-__pure std::shared_ptr<depth0::sensing_subsystem> stateful_foraging_controller::
+__rcsw_pure std::shared_ptr<depth0::sensing_subsystem> stateful_foraging_controller::
     stateful_sensors(void) {
   return std::static_pointer_cast<depth0::sensing_subsystem>(
       saa_subsystem()->sensing());

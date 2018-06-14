@@ -139,7 +139,7 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
+__rcsw_pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
          m_cache_fsm.is_avoiding_collision();
 } /* is_avoiding_collision() */

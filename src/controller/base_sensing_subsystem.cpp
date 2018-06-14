@@ -69,7 +69,7 @@ bool base_sensing_subsystem::in_nest(void) {
   return sum >= 3;
 } /* in_nest() */
 
-__pure bool base_sensing_subsystem::obstacle_is_threatening(
+__rcsw_pure bool base_sensing_subsystem::obstacle_is_threatening(
     const argos::CVector2& obstacle) const {
   argos::CRange<argos::CRadians> range(argos::CRadians(-5 * M_PI / 6),
                                        argos::CRadians(5 * M_PI / 6));

@@ -149,24 +149,24 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-__const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
+__rcsw_const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__pure bool block_to_goal_fsm::is_avoiding_collision(void) const {
+__rcsw_pure bool block_to_goal_fsm::is_avoiding_collision(void) const {
   return m_block_fsm.is_avoiding_collision() ||
          goal_fsm().is_avoiding_collision();
 } /* is_avoiding_collision() */
 
-__pure bool block_to_goal_fsm::is_exploring_for_goal(void) const {
+__rcsw_pure bool block_to_goal_fsm::is_exploring_for_goal(void) const {
   return (m_block_fsm.is_exploring_for_goal() && m_block_fsm.task_running()) ||
          (goal_fsm().is_exploring_for_goal() && goal_fsm().task_running());
 } /* is_exploring_for_goal() */
 
-__pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
+__rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
   return (m_block_fsm.is_vectoring_to_goal() && m_block_fsm.task_running()) ||
          (goal_fsm().is_vectoring_to_goal() && goal_fsm().task_running());
 } /* is_vectoring_to_block */

@@ -69,7 +69,7 @@ class block : public cell_entity,
         m_robot_index(-1),
         m_carries(0) {}
 
-  __pure bool operator==(const block& other) const {
+  __rcsw_pure bool operator==(const block& other) const {
     return (this->id() == other.id());
   }
 

@@ -76,7 +76,7 @@ void metrics_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool metrics_parser::validate(void) const {
+__rcsw_pure bool metrics_parser::validate(void) const {
   if (m_parsed) {
     return (0 != m_params.collect_interval);
   }

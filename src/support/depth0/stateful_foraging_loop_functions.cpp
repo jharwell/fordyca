@@ -109,7 +109,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
   interactor(rcppsw::er::g_server, arena_map(), floor())(controller);
 } /* pre_step_iter() */
 
-__pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   /* The nest is a light gray */
   if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&

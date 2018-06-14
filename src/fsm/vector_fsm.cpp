@@ -59,7 +59,7 @@ vector_fsm::vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
 /*******************************************************************************
  * States
  ******************************************************************************/
-__const FSM_STATE_DEFINE_ND(vector_fsm, start) {
+__rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
@@ -213,7 +213,7 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-__pure argos::CVector2 vector_fsm::calc_vector_to_goal(
+__rcsw_pure argos::CVector2 vector_fsm::calc_vector_to_goal(
     const argos::CVector2& goal) {
   return goal - base_sensors()->position();
 } /* calc_vector_to_goal() */

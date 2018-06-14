@@ -56,7 +56,7 @@ void fsm_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool fsm_parser::validate(void) const {
+__rcsw_pure bool fsm_parser::validate(void) const {
   return (m_params.nest_center.GetX() > 0) && (m_params.nest_center.GetY() > 0);
 } /* validate() */
 

@@ -50,7 +50,7 @@ void pheromone_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__pure bool pheromone_parser::validate(void) const {
+__rcsw_pure bool pheromone_parser::validate(void) const {
   return m_params.rho > 0.0;
 } /* validate() */
 

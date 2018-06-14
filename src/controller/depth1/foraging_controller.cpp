@@ -181,7 +181,7 @@ void foraging_controller::tasking_init(
       &foraging_controller::task_finish_notify, this, std::placeholders::_1));
 } /* tasking_init() */
 
-__pure std::shared_ptr<tasks::base_foraging_task> foraging_controller::current_task(
+__rcsw_pure std::shared_ptr<tasks::base_foraging_task> foraging_controller::current_task(
     void) const {
   return std::dynamic_pointer_cast<tasks::base_foraging_task>(
       m_executive->current_task());
