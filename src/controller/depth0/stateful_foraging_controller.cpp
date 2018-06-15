@@ -164,6 +164,11 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
+void stateful_foraging_controller::Reset(void) {
+  stateless_foraging_controller::Reset();
+  m_perception->Reset();
+} /* Reset() */
+
 
 bool stateful_foraging_controller::is_transporting_to_nest(void) const {
   if (nullptr != current_task()) {

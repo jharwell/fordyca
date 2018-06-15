@@ -110,7 +110,6 @@ void base_foraging_controller::Init(ticpp::Element& node) {
       &alist,
       &slist);
 
-  this->Reset();
   ER_NOM("Base foraging controller initialization finished");
 } /* Init() */
 

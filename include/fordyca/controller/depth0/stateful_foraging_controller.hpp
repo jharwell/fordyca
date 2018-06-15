@@ -71,6 +71,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
+  void Reset(void) override;
 
   bool block_acquired(void) const;
 
