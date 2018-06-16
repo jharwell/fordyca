@@ -46,7 +46,7 @@ target_include_directories(${target} PUBLIC
   )
 
 if (BUILD_ON_MSI)
-  target_include_directories(${target} PUBLIC ${MSI_ARGOS_INSTALL_PREFIX}/include)
+  target_include_directories(${target} SYSTEM PUBLIC ${MSI_ARGOS_INSTALL_PREFIX}/include)
   target_compile_options(${target} PUBLIC -Wno-missing-include-dirs)
 endif()
 
