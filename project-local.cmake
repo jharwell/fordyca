@@ -20,7 +20,7 @@ add_subdirectory(ext/rcppsw)
 # Includes                                                                     #
 ################################################################################
 if (NOT IS_ROOT_PROJECT)
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS} PARENT_SCOPE)
+  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS}  PARENT_SCOPE)
 endif()
 set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
 
@@ -42,6 +42,7 @@ target_include_directories(${target} PUBLIC
   /usr/include/lua5.2
   /usr/local/include
   ${Qt5Widgets_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/ext/rcppsw
   )
 
 if (BUILD_ON_MSI)
@@ -66,4 +67,3 @@ target_link_libraries(${target}
   Qt5::Core
   Qt5::Gui
   )
-

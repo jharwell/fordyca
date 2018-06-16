@@ -102,7 +102,7 @@ void stateful_foraging_controller::ControlStep(void) {
 } /* ControlStep() */
 
 void stateful_foraging_controller::Init(ticpp::Element& node) {
-  params::depth0::stateful_foraging_repository param_repo;
+  params::depth0::stateful_foraging_repository param_repo(server_ref());
 
   /*
    * Note that we do not call \ref stateless_foraging_controller::Init()--there

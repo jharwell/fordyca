@@ -47,7 +47,9 @@ NS_START(fordyca, params, depth2);
  */
 class exec_estimates_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit exec_estimates_parser(uint level) : xml_param_parser(level) {}
+  exec_estimates_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                        uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all cache parameters should lie under in the

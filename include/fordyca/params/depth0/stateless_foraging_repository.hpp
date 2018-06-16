@@ -43,7 +43,8 @@ NS_START(fordyca, params, depth0);
  */
 class stateless_foraging_repository: public rcppsw::params::xml_param_repository {
  public:
-  stateless_foraging_repository(void);
+  explicit stateless_foraging_repository(
+      const std::shared_ptr<rcppsw::er::server>& server);
 };
 
 NS_END(params, fordyca, depth0);

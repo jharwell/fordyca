@@ -79,7 +79,7 @@ __rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
 
 void base_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing base foraging controller");
-  params::depth0::stateless_foraging_repository param_repo;
+  params::depth0::stateless_foraging_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");

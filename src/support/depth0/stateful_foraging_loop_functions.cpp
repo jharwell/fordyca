@@ -53,7 +53,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth0_foraging loop functions");
-  params::loop_function_repository repo;
+  params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;

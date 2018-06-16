@@ -56,7 +56,7 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
 
   ER_NOM("Initializing stateless_foraging controller");
 
-  params::depth0::stateless_foraging_repository param_repo;
+  params::depth0::stateless_foraging_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
   client::server_handle()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),

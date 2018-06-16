@@ -85,9 +85,9 @@ void foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
 
   ER_NOM("Initializing depth2 foraging controller");
-  params::depth1::task_repository depth1_task_repo;
-  params::depth2::task_repository depth2_task_repo;
-  params::depth0::stateful_foraging_repository stateful_repo;
+  params::depth1::task_repository depth1_task_repo(client::server_ref());
+  params::depth2::task_repository depth2_task_repo(client::server_ref());
+  params::depth0::stateful_foraging_repository stateful_repo(client::server_ref());
 
   depth1_task_repo.parse_all(node);
   server_handle()->log_stream() << depth1_task_repo;

@@ -49,10 +49,11 @@ NS_START(fordyca, params);
  */
 class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit occupancy_grid_parser(uint level)
-      : xml_param_parser(level),
-        m_grid_parser(level + 1),
-        m_pheromone_parser(level + 1) {}
+  occupancy_grid_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                        uint level)
+      : xml_param_parser(server, level),
+        m_grid_parser(server, level + 1),
+        m_pheromone_parser(server, level + 1) {}
 
   /**
    * @brief The root tag that all occupancy grid parameters should lie under in

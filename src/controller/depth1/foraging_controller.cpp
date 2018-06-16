@@ -75,8 +75,8 @@ void foraging_controller::ControlStep(void) {
 } /* ControlStep() */
 
 void foraging_controller::Init(ticpp::Element& node) {
-  params::depth1::task_repository task_repo;
-  params::depth0::stateful_foraging_repository stateful_repo;
+  params::depth1::task_repository task_repo(client::server_ref());
+  params::depth0::stateful_foraging_repository stateful_repo(client::server_ref());
 
   /*
    * Note that we do not call \ref stateful_foraging_controller::Init()--there
