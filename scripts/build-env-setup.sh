@@ -22,3 +22,4 @@ export CXX=g++
 gcc_prefix=$(gcc -v 2>&1  |grep prefix | awk -F'=' '{print $2}' | awk '{print $1}')
 export PATH=$PATH:$SWARM_ROOT/bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWARM_ROOT/lib/argos3:$gcc_prefix/lib64
+export ARGOS_PLUGIN_PATH=$SWARM_ROOT/git/fordyca/build/lib
