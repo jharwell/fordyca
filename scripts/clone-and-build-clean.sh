@@ -22,5 +22,5 @@ mkdir -p ext
 ln -s ../../rcppsw ext/
 
 mkdir build && cd build
-cmake ..
+cmake -DBUILD_ON_MSI=yes ..
 make -j 8
