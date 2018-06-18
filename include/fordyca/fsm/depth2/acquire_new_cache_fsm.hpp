@@ -56,7 +56,7 @@ class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm {
   acquisition_goal_type acquisition_goal(void) const override;
 
  private:
-  argos::CVector2 select_cache_for_acquisition(void) override;
+  bool select_cache_for_acquisition(argos::CVector2 * acquisition) override;
 };
 
 NS_END(depth2, fsm, fordyca);

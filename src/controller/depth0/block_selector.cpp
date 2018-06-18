@@ -46,10 +46,20 @@ representation::perceived_block block_selector::calc_best(
     const std::list<representation::perceived_block>& blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  representation::perceived_block best;
+  representation::perceived_block best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto& b : blocks) {
+    if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
+      ER_DIAG("Ignoring block at (%f, %f) [%zu, %zu]: Too close (%f < %f)",
+              b.ent->real_loc().GetX(),
+              b.ent->real_loc().GetY(),
+              b.ent->discrete_loc().first,
+              b.ent->discrete_loc().second,
+              (robot_loc - b.ent->real_loc()).Length(),
+              kMinDist);
+      continue;
+    }
     double utility =
         math::block_utility(b.ent->real_loc(),
                             m_nest_loc)(robot_loc, b.density.last_result());
