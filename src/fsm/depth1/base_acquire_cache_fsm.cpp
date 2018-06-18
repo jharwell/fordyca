@@ -90,8 +90,16 @@ bool base_acquire_cache_fsm::acquire_known_goal(void) {
      * vectoring toward any of them.
      */
     if (!vector_fsm().task_running()) {
+      argos::CVector2 best;
+      /*
+     * If this happens, all the blocks we know of are too close for us to vector
+     * to.
+     */
+      if (!select_cache_for_acquisition(&best)) {
+        return false;
+      }
       tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               select_cache_for_acquisition());
+                               best);
       explore_fsm().task_reset();
       vector_fsm().task_reset();
       vector_fsm().task_start(&v);

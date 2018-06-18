@@ -100,6 +100,13 @@ bool acquire_block_fsm::acquire_known_goal(void) {
                                                 mc_nest_center);
     representation::perceived_block best =
         selector.calc_best(blocks, base_sensors()->position());
+    /*
+     * If this happens, all the blocks we know of are too close for us to vector
+     * to.
+     */
+    if (nullptr == best.ent) {
+      return false;
+    }
     ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
            best.ent->id(),
            best.ent->discrete_loc().first,

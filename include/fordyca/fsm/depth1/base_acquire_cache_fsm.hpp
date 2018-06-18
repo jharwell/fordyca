@@ -68,9 +68,12 @@ class base_acquire_cache_fsm : public acquire_goal_fsm {
    * @brief Get the cache location corresponding to the "best" cache (by some
    * measure), for use in vectoring.
    *
-   * @return The location of the "best" cache to acquire
+   * @param acquisition The location of the cache to acquire.
+   *
+   * @return Was the cache selection process successful? (Not guaranteed; we may
+   * be too close to our chosen "cache" to vector to it if it is a block).
    */
-  virtual argos::CVector2 select_cache_for_acquisition(void) = 0;
+  virtual bool select_cache_for_acquisition(argos::CVector2* acquisition) = 0;
 
   argos::CVector2 nest_center(void) const { return mc_nest_center; }
 

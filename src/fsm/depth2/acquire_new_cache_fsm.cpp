@@ -47,18 +47,27 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-argos::CVector2 acquire_new_cache_fsm::select_cache_for_acquisition(void) {
+bool acquire_new_cache_fsm::select_cache_for_acquisition(
+    argos::CVector2 *const acquisition) {
   controller::depth2::new_cache_selector selector(server_ref(), nest_center());
 
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
       selector.calc_best(map()->perceived_blocks(), base_sensors()->position());
+  /*a
+   * If this happens, all the blocks we know of are too close for us to vector
+   * to.
+   */
+    if (nullptr == best.ent) {
+      return false;
+    }
   ER_NOM("Select new cache for acquisition: %d@(%zu, %zu) [utility=%f]",
          best.ent->id(),
          best.ent->discrete_loc().first,
          best.ent->discrete_loc().second,
          best.density.last_result());
-  return best.ent->real_loc();
+  *acquisition = best.ent->real_loc();
+  return true;
 } /* select_cache() */
 
 /*******************************************************************************
