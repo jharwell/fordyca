@@ -190,7 +190,8 @@ void foraging_controller::depth1_tasking_init(
   collector->set_partitionable();
 
   m_graph->set_children(tasks::depth0::foraging_task::kGeneralistName,
-                      std::list<ta::task_graph_vertex>({collector, harvester}));
+                        std::list<ta::task_graph_vertex>({collector,
+                                harvester}));
 } /* depth1_tasking_init() */
 
 void foraging_controller::depth2_tasking_init(

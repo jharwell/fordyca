@@ -83,10 +83,10 @@ class cache_penalty_handler : public rcppsw::er::client {
                     uint timestep) {
     if (nullptr == controller.current_task()) {
       return false;
+    } else if (std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+        controller.current_task())) {
+      return false;
     }
-    auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
-        controller.current_task());
-    ER_ASSERT(task, "FATAL: Non-cache interface task!");
     if (controller.current_task()->goal_acquired()) {
       ER_ASSERT(acquisition_goal_type::kExistingCache ==
                 controller.current_task()->acquisition_goal(),

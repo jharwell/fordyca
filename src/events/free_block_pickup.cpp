@@ -173,9 +173,15 @@ void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  std::static_pointer_cast<tasks::depth1::foraging_task>(
-      controller.current_task())
-      ->accept(*this);
+  auto depth0 = std::dynamic_pointer_cast<tasks::depth0::foraging_task>(
+      controller.current_task());
+  auto depth1 = std::dynamic_pointer_cast<tasks::depth1::foraging_task>(
+      controller.current_task());
+  if (nullptr != depth0) {
+    depth0->accept(*this);
+  } else if (nullptr != depth1) {
+    depth1->accept(*this);
+  }
 
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),

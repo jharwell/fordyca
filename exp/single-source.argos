@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <depth1_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -96,7 +96,7 @@
           nest="2.0, 2.5"
           />
       </params>
-    </stateful_foraging_controller>
+    </depth1_foraging_controller>
 
   </controllers>
 
@@ -104,7 +104,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="depth1_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -134,7 +134,7 @@
                           nest_model.shape="rectangle"
                           nest_model.orientation="horizontal"
                           />
-      <static_caches enable="false"
+      <static_caches enable="true"
                      size="2"
                      respawn_scale_factor="0.05"
                      dimension="0.8"
@@ -231,7 +231,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
+      <user_functions label="depth1_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

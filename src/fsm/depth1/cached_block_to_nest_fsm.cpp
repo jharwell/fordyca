@@ -130,7 +130,7 @@ FSM_WRAPPER_DEFINE(bool,
 FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm, goal_acquired, m_cache_fsm);
 
 acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state()) {
+  if (ST_ACQUIRE_BLOCK == current_state() || ST_WAIT_FOR_PICKUP) {
     return m_cache_fsm.acquisition_goal();
   }
   return acquisition_goal_type::kNone;
