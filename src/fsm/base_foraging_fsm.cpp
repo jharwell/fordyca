@@ -72,8 +72,16 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
-
-  m_saa->steering_force().anti_phototaxis();
+  /*
+   * We don't want to just apply anti-phototaxis force, because that will make
+   * the robot immediately turn around as soon as it has entered the nest and
+   * dropped its block, leading to a lot of traffic jams by the edge of the
+   * nest. Instead, wander about within the nest until you find the edge (either
+   * on your own or being pushed out via collision avoidance).
+   */
+  argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+  saa_subsystem()->steering_force().avoidance(obs);
+  saa_subsystem()->steering_force().wander();
   m_saa->apply_steering_force(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {

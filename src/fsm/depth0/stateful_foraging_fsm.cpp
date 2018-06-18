@@ -61,7 +61,10 @@ stateful_foraging_fsm::stateful_foraging_fsm(
                                                nullptr,
                                                &entry_transport_to_nest,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&leaving_nest),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                  nullptr,
+                                  &entry_leaving_nest,
+                                  nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
@@ -130,7 +133,8 @@ FSM_WRAPPER_DEFINE(bool,
                    m_block_fsm);
 
 acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state()) {
+  if (ST_ACQUIRE_BLOCK == current_state() ||
+      ST_WAIT_FOR_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
   }
   return acquisition_goal_type::kNone;

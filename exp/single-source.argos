@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateless_foraging_controller id="ffc"
+    <stateful_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -42,33 +42,31 @@
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
-        <task_allocation>
-          <executive>
-              <tasks estimation_alpha="0.8"/>
-              <aborting reactivity="8"
-                        offset="3"
-                        />
-              <partitioning
-                  method="pini2011"
-                  always_partition="true"
-                  never_partition="false"
-                  reactivity="1.5"
-                  offset="1.0"
-                  />
-              <subtask_selection
-                  method="harwell2018"
-                  reactivity="8"
-                  offset="1.25"
-                  gamma="1.0"
-                  />
-              </executive>
-          <exec_estimates
-              enabled="true"
-              generalist_range="2000:4000"
-              collector_range="1000:2000"
-              harvester_range="1000:2000"
+        <task_executive>
+          <tasks estimation_alpha="0.8"/>
+          <aborting reactivity="8"
+                    offset="3"
+                    />
+          <partitioning
+              method="pini2011"
+              always_partition="true"
+              never_partition="false"
+              reactivity="1.5"
+              offset="1.0"
               />
-        </task_allocation>
+          <subtask_selection
+              method="harwell2018"
+              reactivity="8"
+              offset="1.25"
+              gamma="1.0"
+              />
+        </task_executive>
+        <task_exec_estimates
+            enabled="true"
+            generalist_range="2000:4000"
+            collector_range="1000:2000"
+            harvester_range="1000:2000"
+            />
         <sensing>
           <proximity angle_range="-1.1:1.1"
                      delta="0.0001" />
@@ -98,7 +96,7 @@
           nest="2.0, 2.5"
           />
       </params>
-    </stateless_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
@@ -106,7 +104,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateless_foraging_loop_functions">
+                  label="stateful_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -233,7 +231,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateless_foraging_qt_user_functions" />
+      <user_functions label="stateful_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
