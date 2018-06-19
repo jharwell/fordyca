@@ -44,9 +44,11 @@ This is the main entry point for getting started on the project.
             sudo apt install qtbase5-dev
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
-   C++ software) somewhere and create a symbolic link it as
-   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions
-   found in README for that repo.
+   C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
+
+        `ln -s /path/to/rcppsw ext/rcppsw`
+
+   Follow all pre/post-cloning instructions found in README for the rcppsw repo.
 
 ## Post-cloning setup
 
@@ -69,7 +71,7 @@ This is the main entry point for getting started on the project.
 
         make documentation
 
-## Running
+## Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
 
@@ -84,6 +86,33 @@ After successful compilation, follow these steps to run a foraging scenario:
         argos3 -c exp/single-source.argos
 
    This should pop up a nice GUI from which you can start the experiment.
+
+## Running on MSI
+
+ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
+access to that directory as part of the gini group.
+
+1. In `/home/gini/shared/swarm`, source the build/run environment setup
+   script:
+
+        . /home/gini/shared/swarm/bin/build-env-setup.sh
+
+   If you use a different shell than bash, you will have to look at the script
+   and modify it (in *your* home directory somewhere) so your shell understands
+   the syntax.
+
+2. Run the bash script to clone and build the project:
+
+        clone-and-build-clean.sh /path/to/project/root
+
+   The 1st argument is the path (relative or absolute) to the location where you
+   want the project repos to live (they will all be cloned into that level).
+
+   If you need to checkout a particular branch in the repo you can do that after
+   running the script and then re-running make.
+
+3. Once the script finishes, set `ARGOS_PLUGIN_PATH` as before and you should be
+   able to run experiments.
 
 # Troubleshooting
 
