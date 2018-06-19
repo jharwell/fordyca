@@ -44,9 +44,11 @@ This is the main entry point for getting started on the project.
             sudo apt install qtbase5-dev
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
-   C++ software) somewhere and create a symbolic link it as
-   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions
-   found in README for that repo.
+   C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
+
+        `ln -s /path/to/rcppsw ext/rcppsw`
+
+   Follow all pre/post-cloning instructions found in README for the rcppsw repo.
 
 ## Post-cloning setup
 
