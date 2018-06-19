@@ -66,6 +66,7 @@ class visualization_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
+  bool                        m_parsed{false};
   struct visualization_params m_params {};
 };
 

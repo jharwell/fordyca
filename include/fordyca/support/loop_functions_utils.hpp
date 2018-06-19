@@ -66,9 +66,9 @@ int robot_on_block(const controller::base_foraging_controller& controller,
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */
 int robot_on_cache(argos::CFootBotEntity& robot,
-                   const representation::arena_map& map);
+                   const std::shared_ptr<representation::arena_map>& map);
 int robot_on_cache(const controller::base_foraging_controller& controller,
-                   const representation::arena_map& map);
+                   const std::shared_ptr<representation::arena_map>& map);
 /**
  * @brief Get the ID of the robot as an integer.
  */

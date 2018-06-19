@@ -96,7 +96,6 @@ class arena_interactor : public rcppsw::er::client {
    * \c FALSE otherwise.
    */
   bool handle_free_block_pickup(T& controller) {
-    printf("ID: %s goal_acquired: %d\n", controller.GetId().c_str(), controller.goal_acquired());
     if (controller.goal_acquired() &&
         acquisition_goal_type::kBlock == controller.acquisition_goal()) {
       /* Check whether the foot-bot is actually on a block */
