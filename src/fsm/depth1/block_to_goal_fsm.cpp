@@ -106,6 +106,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     m_block_fsm.task_reset();
     m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_GOAL);
+    return controller::foraging_signal::HANDLED;
   }
   /*
    * It is possible that robots can be waiting in this wait indefinitely for a
@@ -123,8 +124,8 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     m_pickup_count = 0;
     m_block_fsm.task_reset();
     internal_event(ST_ACQUIRE_FREE_BLOCK);
+    return controller::foraging_signal::HANDLED;
   }
-
   return controller::foraging_signal::HANDLED;
 }
 
@@ -172,12 +173,8 @@ __rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
 } /* is_vectoring_to_block */
 
 bool block_to_goal_fsm::goal_acquired(void) const {
-  if (m_block_fsm.task_running()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (goal_fsm().task_running()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
-  }
-  return false;
+  return (ST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
+      (ST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
 acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {

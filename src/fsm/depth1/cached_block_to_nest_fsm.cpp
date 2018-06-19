@@ -62,7 +62,10 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                                nullptr,
                                                &entry_transport_to_nest,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&leaving_nest),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                  nullptr,
+                                  &entry_leaving_nest,
+                                  nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, state_machine::event_data) {
@@ -130,8 +133,8 @@ FSM_WRAPPER_DEFINE(bool,
 FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm, goal_acquired, m_cache_fsm);
 
 acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state()) {
-    return m_cache_fsm.acquisition_goal();
+  if (ST_ACQUIRE_BLOCK == current_state() || ST_WAIT_FOR_PICKUP) {
+    return acquisition_goal_type::kExistingCache;
   }
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */

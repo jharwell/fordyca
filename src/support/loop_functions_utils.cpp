@@ -55,14 +55,14 @@ int robot_id(const controller::base_foraging_controller& controller) {
 } /* robot_id() */
 
 __rcsw_pure int robot_on_cache(const controller::base_foraging_controller& controller,
-                          const representation::arena_map& map) {
-  return map.robot_on_cache(controller.robot_loc());
+                               const std::shared_ptr<representation::arena_map>& map) {
+  return map->robot_on_cache(controller.robot_loc());
 } /* robot_on_cache() */
 
 __rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
-                          const representation::arena_map& map) {
+                               const std::shared_ptr<representation::arena_map>& map) {
   return robot_on_cache(dynamic_cast<controller::base_foraging_controller&>(
-                            robot.GetControllableEntity().GetController()),
+      robot.GetControllableEntity().GetController()),
                         map);
 }
 

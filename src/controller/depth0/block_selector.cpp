@@ -76,12 +76,17 @@ representation::perceived_block block_selector::calc_best(
     }
   } /* for(block..) */
 
-  ER_ASSERT(nullptr != best.ent, "FATAL: No best perceived block?");
-  ER_NOM("Best utility: block%d at (%zu, %zu): %f",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         max_utility);
+  if (nullptr != best.ent) {
+    ER_NOM("Best utility: block%d at (%f, %f) [%zu, %zu]: %f",
+           best.ent->id(),
+           best.ent->real_loc().GetX(),
+           best.ent->real_loc().GetY(),
+           best.ent->discrete_loc().first,
+           best.ent->discrete_loc().second,
+           max_utility);
+  } else {
+    ER_WARN("No best block found: all known blocks too close!");
+  }
   return best;
 } /* calc_best() */
 

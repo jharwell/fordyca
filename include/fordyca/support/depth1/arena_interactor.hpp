@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "fordyca/support/depth1/cache_penalty_handler.hpp"
+#include "fordyca/support/depth1/existing_cache_penalty_handler.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -65,9 +65,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    const argos::CRange<double>& nest_yrange,
                    uint cache_usage_penalty)
       : depth0::arena_interactor<T>(server, map_in, floor_in),
-      m_nest_xrange(nest_xrange),
-      m_nest_yrange(nest_yrange),
-    m_cache_penalty_handler(server, *map_in, cache_usage_penalty) {}
+      mc_nest_xrange(nest_xrange),
+      mc_nest_yrange(nest_yrange),
+      m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
@@ -84,24 +84,24 @@ class arena_interactor : public depth0::arena_interactor<T> {
     }
     if (controller.is_carrying_block()) {
       handle_nest_block_drop(controller);
-      if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
-        if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
+      if (m_cache_penalty_handler.is_serving_penalty(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied(controller,
                                                          timestep)) {
           finish_cache_block_drop(controller);
         }
       } else {
-        m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+        m_cache_penalty_handler.penalty_init(controller, timestep);
       }
     } else { /* The foot-bot has no block item */
       handle_free_block_pickup(controller);
 
-      if (m_cache_penalty_handler.is_serving_penalty<T>(controller)) {
-        if (m_cache_penalty_handler.penalty_satisfied<T>(controller,
+      if (m_cache_penalty_handler.is_serving_penalty(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied(controller,
                                                          timestep)) {
           finish_cached_block_pickup(controller);
         }
       } else {
-        m_cache_penalty_handler.penalty_init<T>(controller, timestep);
+        m_cache_penalty_handler.penalty_init(controller, timestep);
       }
     }
   }
@@ -119,7 +119,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * robot for block pickup.
    */
   void finish_cached_block_pickup(T& controller) {
-    cache_penalty& p = m_cache_penalty_handler.next();
+    const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
     auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
@@ -139,25 +139,16 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, *map());
+    int cache_id = utils::robot_on_cache(controller, map());
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
-              p.cache_id());
+              p.id());
       events::cache_vanished vanished(depth0::arena_interactor<T>::server_ref(),
-                                      p.cache_id());
+                                      p.id());
       controller.visitor::template visitable_any<T>::accept(vanished);
     } else {
-      events::cached_block_pickup pickup_op(rcppsw::er::g_server,
-                                            map()->caches()[p.cache_id()],
-                                            utils::robot_id(controller));
-      map()->caches()[cache_id]->penalty_served(p.penalty());
-
-      /*
-       * Map must be called before controller for proper cache block decrement!
-       */
-      map()->accept(pickup_op);
-      controller.visitor::template visitable_any<T>::accept(pickup_op);
+      perform_cached_block_pickup(controller, p);
       floor()->SetChanged();
     }
     m_cache_penalty_handler.remove(p);
@@ -166,11 +157,29 @@ class arena_interactor : public depth0::arena_interactor<T> {
   }
 
   /**
+   * @brief Perform the actual pickup of a block from a cache, once all
+   * preconditions have been satisfied.
+   */
+  void perform_cached_block_pickup(T& controller,
+                                   const block_manipulation_penalty<T>& penalty) {
+    events::cached_block_pickup pickup_op(rcppsw::er::g_server,
+                                          map()->caches()[penalty.id()],
+                                          utils::robot_id(controller));
+    map()->caches()[penalty.id()]->penalty_served(penalty.penalty());
+
+    /*
+     * Map must be called before controller for proper cache block decrement!
+     */
+    map()->accept(pickup_op);
+    controller.visitor::template visitable_any<T>::accept(pickup_op);
+  }
+
+  /**
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    cache_penalty& p = m_cache_penalty_handler.next();
+    const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
     auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
@@ -190,30 +199,39 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, *map());
+    int cache_id = utils::robot_on_cache(controller, map());
 
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
-              p.cache_id());
+              p.id());
       events::cache_vanished vanished(depth0::arena_interactor<T>::server_ref(),
-                                      p.cache_id());
+                                      p.id());
 
       controller.visitor::template visitable_any<T>::accept(vanished);
     } else {
-      events::cache_block_drop drop_op(rcppsw::er::g_server,
-                                       controller.block(),
-                                       map()->caches()[cache_id],
-                                       map()->grid_resolution());
-      map()->caches()[cache_id]->penalty_served(p.penalty());
-
-      /* Update arena map state due to a cache drop */
-      map()->accept(drop_op);
-      controller.visitor::template visitable_any<T>::accept(drop_op);
+      perform_cache_block_drop(controller, p);
     }
     m_cache_penalty_handler.remove(p);
     ER_ASSERT(!m_cache_penalty_handler.is_serving_penalty(controller),
               "FATAL: Multiple instances of same controller serving cache penalty");
+  }
+
+  /**
+   * @brief Perform the actual dropping of a block in the cache once all
+   * preconditions have been satisfied.
+   */
+  void perform_cache_block_drop(T& controller,
+                                const block_manipulation_penalty<T>& penalty) {
+    events::cache_block_drop drop_op(rcppsw::er::g_server,
+                                     controller.block(),
+                                     map()->caches()[penalty.id()],
+                                     map()->grid_resolution());
+    map()->caches()[penalty.id()]->penalty_served(penalty.penalty());
+
+    /* Update arena map state due to a cache drop */
+    map()->accept(drop_op);
+    controller.visitor::template visitable_any<T>::accept(drop_op);
   }
 
   /**
@@ -245,60 +263,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
              std::static_pointer_cast<tasks::depth1::foraging_task>(
                  controller.current_task())->name().c_str(),
              controller.block()->id());
-
-      /*
-       * If the robot is currently right on the edge of a cache, we can't just
-       * drop the block here, as it will overlap with the cache, and robots
-       * will think that is accessible, but will not be able to vector to it
-       * (not all 4 wheel sensors will report the color of a block). See #233.
-       */
-      bool conflict = false;
-      for (auto &cache : map()->caches()) {
-        if (utils::block_drop_overlap_with_cache(controller.block(),
-                                                 cache,
-                                                 controller.robot_loc())) {
-          conflict = true;
-        }
-      } /* for(cache..) */
-
-      /*
-       * If the robot is currently right on the edge of the nest, we can't
-       * just drop the block in the nest, as it will not be processed as a
-       * normal block_nest_drop, and will be discoverable by a robot via LOS
-       * but not able to be acquired, as its color is hidden by that of the
-       * nest.
-       *
-       * If the robot is really close to a wall, then dropping a block may make
-       * it inaccessible to future robots trying to reach it, due to obstacle
-       * avoidance kicking in. This can result in an endless loop if said block
-       * is the only one a robot knows about (see #242).
-       */
-      if (utils::block_drop_overlap_with_nest(controller.block(),
-                                              m_nest_xrange,
-                                              m_nest_yrange,
-                                              controller.robot_loc()) ||
-          utils::block_drop_near_arena_boundary(*map(),
-                                                controller.block(),
-                                                controller.robot_loc())) {
-        conflict = true;
-      }
-      rcppsw::math::dcoord2 d =
-          math::rcoord_to_dcoord(controller.robot_loc(),
-                                 map()->grid_resolution());
-      events::free_block_drop drop_op(rcppsw::er::g_server,
-                                      controller.block(),
-                                      d.first,
-                                      d.second,
-                                      map()->grid_resolution());
-      if (!conflict) {
-        controller.visitor::template visitable_any<T>::accept(drop_op);
-        map()->accept(drop_op);
-        floor()->SetChanged();
-      } else {
-        map()->distribute_block(controller.block());
-        controller.visitor::template visitable_any<T>::accept(drop_op);
-        floor()->SetChanged();
-      }
+      task_abort_with_block(controller);
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
@@ -309,11 +274,65 @@ class arena_interactor : public depth0::arena_interactor<T> {
     return true;
   }
 
+  void task_abort_with_block(T& controller) {
+    /*
+     * If the robot is currently right on the edge of a cache, we can't just
+     * drop the block here, as it will overlap with the cache, and robots
+     * will think that is accessible, but will not be able to vector to it
+     * (not all 4 wheel sensors will report the color of a block). See #233.
+     */
+    bool conflict = false;
+    for (auto &cache : map()->caches()) {
+      if (utils::block_drop_overlap_with_cache(controller.block(),
+                                               cache,
+                                               controller.robot_loc())) {
+        conflict = true;
+      }
+    } /* for(cache..) */
+
+    /*
+     * If the robot is currently right on the edge of the nest, we can't just
+     * drop the block in the nest, as it will not be processed as a normal
+     * \ref block_nest_drop, and will be discoverable by a robot via LOS but
+     * not able to be acquired, as its color is hidden by that of the nest.
+     *
+     * If the robot is really close to a wall, then dropping a block may make
+     * it inaccessible to future robots trying to reach it, due to obstacle
+     * avoidance kicking in. This can result in an endless loop if said block
+     * is the only one a robot knows about (see #242).
+     */
+    if (utils::block_drop_overlap_with_nest(controller.block(),
+                                            mc_nest_xrange,
+                                            mc_nest_yrange,
+                                            controller.robot_loc()) ||
+        utils::block_drop_near_arena_boundary(*map(),
+                                              controller.block(),
+                                              controller.robot_loc())) {
+      conflict = true;
+    }
+    rcppsw::math::dcoord2 d =
+        math::rcoord_to_dcoord(controller.robot_loc(),
+                               map()->grid_resolution());
+    events::free_block_drop drop_op(rcppsw::er::g_server,
+                                    controller.block(),
+                                    d.first,
+                                    d.second,
+                                    map()->grid_resolution());
+    if (!conflict) {
+      controller.visitor::template visitable_any<T>::accept(drop_op);
+      map()->accept(drop_op);
+    } else {
+      map()->distribute_block(controller.block());
+      controller.visitor::template visitable_any<T>::accept(drop_op);
+    }
+    floor()->SetChanged();
+  }
+
  private:
   // clang-format off
-  const argos::CRange<double>& m_nest_xrange;
-  const argos::CRange<double>& m_nest_yrange;
-  cache_penalty_handler        m_cache_penalty_handler;
+  argos::CRange<double>             mc_nest_xrange;
+  argos::CRange<double>             mc_nest_yrange;
+  existing_cache_penalty_handler<T> m_cache_penalty_handler;
   // clang-format on
 };
 

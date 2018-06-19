@@ -39,16 +39,24 @@ constexpr char visualization_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void visualization_parser::parse(const ticpp::Element& node) {
-  ticpp::Element vnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(vnode, m_params, robot_id);
-  XML_PARSE_PARAM(vnode, m_params, robot_los);
-  XML_PARSE_PARAM(vnode, m_params, robot_task);
-  XML_PARSE_PARAM(vnode, m_params, block_id);
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element vnode = argos::GetNode(const_cast<ticpp::Element&>(node),
+                                          kXMLRoot);
+    XML_PARSE_PARAM(vnode, m_params, robot_id);
+    XML_PARSE_PARAM(vnode, m_params, robot_los);
+    XML_PARSE_PARAM(vnode, m_params, robot_task);
+    XML_PARSE_PARAM(vnode, m_params, block_id);
+    m_parsed = true;
+  }
 } /* parse() */
 
 void visualization_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, robot_id) << std::endl
+  if (!m_parsed) {
+    stream << "<< Not parsed >>" << std::endl << build_footer();
+    return;
+  }
+  stream << build_header()
+         << XML_PARAM_STR(m_params, robot_id) << std::endl
          << XML_PARAM_STR(m_params, robot_los) << std::endl
          << XML_PARAM_STR(m_params, robot_task) << std::endl
          << XML_PARAM_STR(m_params, block_id) << std::endl

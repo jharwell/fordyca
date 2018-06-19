@@ -104,9 +104,16 @@ void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
-  std::static_pointer_cast<tasks::depth0::foraging_task>(
-      controller.current_task())
-      ->accept(*this);
+  auto depth0 = std::dynamic_pointer_cast<tasks::depth0::foraging_task>(
+      controller.current_task());
+  auto depth1 = std::dynamic_pointer_cast<tasks::depth1::foraging_task>(
+      controller.current_task());
+
+  if (nullptr != depth0) {
+    depth0->accept(*this);
+  } else if (nullptr != depth1) {
+    depth1->accept(*this);
+  }
   ER_NOM("depth1_foraging_controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 

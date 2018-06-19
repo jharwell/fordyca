@@ -148,7 +148,8 @@ void foraging_controller::tasking_init(
       ta::make_task_graph_vertex<tasks::depth1::harvester>(exec_params,
                                                            harvester_fsm);
   if (est_params->enabled) {
-    std::static_pointer_cast<ta::polled_task>(generalist)->init_random(
+    std::static_pointer_cast<ta::partitionable_polled_task>(generalist)->init_random(
+        (random() % 2) ? harvester : collector,
         est_params->generalist_range.GetMin(),
         est_params->generalist_range.GetMax());
     std::static_pointer_cast<ta::polled_task>(harvester)->init_random(
@@ -165,8 +166,8 @@ void foraging_controller::tasking_init(
   m_graph->set_root(generalist);
   generalist->set_partitionable();
 
-  m_graph->set_children(tasks::depth0::foraging_task::kGeneralistName,
-                        std::list<ta::task_graph_vertex>({collector, harvester}));
+  m_graph->set_children(generalist,
+                        std::list<ta::task_graph_vertex>({harvester, collector}));
 
   m_executive =
       rcppsw::make_unique<ta::polled_executive>(client::server_ref(), m_graph);

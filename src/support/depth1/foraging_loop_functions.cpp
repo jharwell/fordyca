@@ -52,7 +52,7 @@ NS_START(fordyca, support, depth1);
 void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing depth1_foraging loop functions");
+  ER_NOM("Initializing depth1 foraging loop functions");
   params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
