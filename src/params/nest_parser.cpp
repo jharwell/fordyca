@@ -1,7 +1,7 @@
 /**
- * @file arena_map_parser.cpp
+ * @file nest_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/arena_map_parser.hpp"
+#include "fordyca/params/nest_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -32,49 +32,40 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char arena_map_parser::kXMLRoot[];
+constexpr char nest_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+void nest_parser::parse(const ticpp::Element& node) {
+  ticpp::Element nnode =
+      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
 
-  m_grid_parser.parse(anode);
-  m_params.grid = *m_grid_parser.parse_results();
+  std::vector<std::string> res;
+  rcppsw::utils::line_parser parser(' ');
 
-  m_block_parser.parse(anode);
-  m_params.block = *m_block_parser.parse_results();
+  res = parser.parse(nnode.GetAttribute("center"));
 
-  m_block_dist_parser.parse(anode);
-  m_params.block_dist = *m_block_dist_parser.parse_results();
-  m_params.block_dist.arena_model.x =
-      argos::CRange<double>(m_params.grid.lower.GetX(),
-                            m_params.grid.upper.GetX());
-  m_params.block_dist.arena_model.y =
-      argos::CRange<double>(m_params.grid.lower.GetY(),
-                            m_params.grid.upper.GetY());
-
-  m_cache_parser.parse(anode);
-  m_params.static_cache = *m_cache_parser.parse_results();
-
-  m_nest_parser.parse(anode);
-  m_params.nest = * m_nest_parser.parse_results();
-
-  m_params.block_dist.nest_model.x = {0, m_params.nest.xdim};
-  m_params.block_dist.nest_model.y = {0, m_params.nest.ydim};
+  m_params.center = argos::CVector2(std::atof(res[0].c_str()),
+                                         std::atof(res[1].c_str()));
+  res = parser.parse(nnode.GetAttribute("size"));
+  m_params.xdim = std::atof(res[0].c_str());
+  m_params.ydim = std::atof(res[1].c_str());
 } /* parse() */
 
-void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
-         << m_nest_parser
+void nest_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << "xdim=" << m_params.xdim << std::endl
+         << "ydim=" << m_params.ydim << std::endl
+         << "center=" << m_params.center << std::endl
          << build_footer();
 } /* show() */
 
-bool arena_map_parser::validate(void) const {
-  CHECK(m_grid_parser.validate() && m_block_parser.validate() &&
-        m_cache_parser.validate() && m_nest_parser.validate());
+bool nest_parser::validate(void) const {
+  CHECK(m_params.center.GetX() > 0);
+  CHECK(m_params.center.GetY() > 0);
+  CHECK(m_params.xdim > 0);
+  CHECK(m_params.ydim > 0);
   return true;
 
  error:

@@ -69,8 +69,6 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
                                                  arena_map(),
                                                  floor(),
-                                                 nest_xrange(),
-                                                 nest_yrange(),
                                                  arenap->static_cache.usage_penalty);
 
   /* configure robots */
@@ -135,25 +133,28 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
 argos::CColor foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  /* The nest is a light gray */
-  if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY70;
+  if (arena_map()->nest().contains_point(plane_pos)) {
+    return argos::CColor(arena_map()->nest().color().red(),
+                         arena_map()->nest().color().green(),
+                         arena_map()->nest().color().blue());
   }
-
   /*
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks renderin inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
     if (cache->contains_point(plane_pos)) {
-      return cache->color();
+      return argos::CColor(cache->color().red(),
+                           cache->color().green(),
+                           cache->color().blue());
     }
   } /* for(&cache..) */
 
   for (auto& block : arena_map()->blocks()) {
     if (block->contains_point(plane_pos)) {
-      return block->color();
+      return argos::CColor(block->color().red(),
+                           block->color().green(),
+                           block->color().blue());
     }
   } /* for(&block..) */
 

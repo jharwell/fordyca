@@ -141,7 +141,7 @@
                      min_dist="0.8"
                      usage_penalty="10"
                      />
-      <nest size="0.5, 2.0" center="2, 2.5" />
+      <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
     <visualization robot_id="true"
                    robot_los="false"

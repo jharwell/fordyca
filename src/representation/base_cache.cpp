@@ -42,8 +42,9 @@ base_cache::base_cache(double dimension,
                        argos::CVector2 center,
                        const std::vector<std::shared_ptr<block>>& blocks,
                        int id)
-    : immovable_cell_entity(dimension, argos::CColor::GRAY40, center, resolution),
-
+    : multicell_entity(dimension, rcppsw::utils::color::kGRAY40),
+      immovable_cell_entity(center, resolution),
+      m_resolution(resolution),
       m_blocks(blocks) {
   if (-1 == id) {
     this->id(m_next_id++);
@@ -61,7 +62,7 @@ void base_cache::block_remove(const std::shared_ptr<block>& block) {
 
 std::unique_ptr<base_cache> base_cache::clone(void) const {
   return rcppsw::make_unique<base_cache>(
-      cell_entity::xsize(), resolution(), real_loc(), blocks(), id());
+      xsize(), m_resolution, real_loc(), blocks(), id());
 } /* clone() */
 
 NS_END(fordyca, representation);

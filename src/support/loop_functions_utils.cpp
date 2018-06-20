@@ -78,28 +78,23 @@ __rcsw_const bool block_drop_overlap_with_cache(
 } /* block_drop_overlap_with_cache() */
 
 __rcsw_pure bool block_drop_near_arena_boundary(
-    const representation::arena_map& map,
+    const std::shared_ptr<representation::arena_map>& map,
     const std::shared_ptr<representation::block>& block,
     const argos::CVector2& drop_loc) {
   return (drop_loc.GetX() <= block->xsize() * 2 ||
-          drop_loc.GetX() >= map.xrsize() - block->xsize() * 2 ||
+          drop_loc.GetX() >= map->xrsize() - block->xsize() * 2 ||
           drop_loc.GetY() <= block->ysize() * 2 ||
-          drop_loc.GetY() >= map.yrsize() - block->ysize() * 2);
+          drop_loc.GetY() >= map->yrsize() - block->ysize() * 2);
 } /* block_drop_overlap_with_nest() */
 
 __rcsw_pure bool block_drop_overlap_with_nest(
     const std::shared_ptr<representation::block>& block,
-    const argos::CRange<double>& xrange,
-    const argos::CRange<double>& yrange,
+    const representation::nest& nest,
     const argos::CVector2& drop_loc) {
-  return (xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() +
-                                                        block->xsize()) ||
-          xrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetX() -
-                                                        block->xsize()) ||
-          yrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetY() +
-                                                        block->ysize()) ||
-          yrange.WithinMinBoundIncludedMaxBoundIncluded(drop_loc.GetY() -
-                                                        block->ysize()));
+  return (nest.contains_point(drop_loc + argos::CVector2(block->xsize(), 0.0)) ||
+          nest.contains_point(drop_loc - argos::CVector2(block->xsize(), 0.0)) ||
+          nest.contains_point(drop_loc + argos::CVector2(0.0, block->ysize())) ||
+          nest.contains_point(drop_loc - argos::CVector2(0.0, block->ysize())));
 } /* block_drop_overlap_with_nest() */
 
 NS_END(utils, support, fordyca);

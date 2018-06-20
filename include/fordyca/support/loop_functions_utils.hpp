@@ -81,13 +81,12 @@ bool block_drop_overlap_with_cache(
     const argos::CVector2& drop_loc);
 
 bool block_drop_near_arena_boundary(
-    const representation::arena_map& map,
+    const std::shared_ptr<representation::arena_map>& map,
     const std::shared_ptr<representation::block>& block,
     const argos::CVector2& drop_loc);
 bool block_drop_overlap_with_nest(
     const std::shared_ptr<representation::block>& block,
-    const argos::CRange<double>& xrange,
-    const argos::CRange<double>& yrange,
+    const representation::nest& nest,
     const argos::CVector2& drop_loc);
 
 /**

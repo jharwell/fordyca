@@ -96,7 +96,7 @@ class foraging_controller : public depth1::foraging_controller,
   std::string                                   m_prev_task{""};
   metrics::tasks::reactive_collator             m_task_collator;
   std::unique_ptr<ta::polled_executive>         m_executive;
-  std::shared_ptr<ta::task_decomposition_graph> m_graph;
+  std::shared_ptr<ta::task_decomposition_graph> m_graph{nullptr};
   // clang-format on
 };
 

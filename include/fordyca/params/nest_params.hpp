@@ -1,5 +1,5 @@
 /**
- * @file block.cpp
+ * @file nest_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,36 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_NEST_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_NEST_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/block.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- *  Static Variables
+ * Structure Definitions
  ******************************************************************************/
-rcppsw::math::dcoord2 block::kOutOfSightDLoc = rcppsw::math::dcoord2(100, 100);
-argos::CVector2 block::kOutOfSightRLoc = argos::CVector2(100.0, 100.0);
+/**
+ * @struct nest_params
+ * @ingroup params
+ */
+struct nest_params : public rcppsw::params::base_params {
+  argos::CVector2 center{};
+  double xdim{};
+  double ydim{};
+};
 
-/******************************************************************************
- * Member Functions
- ******************************************************************************/
-void block::move_out_of_sight(void) {
-  real_loc(kOutOfSightRLoc);
-  discrete_loc(kOutOfSightDLoc);
-} /* move_out_of_sight() */
+NS_END(params, fordyca);
 
-std::unique_ptr<block> block::clone(void) const {
-  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(xsize());
-  tmp->discrete_loc(this->discrete_loc());
-  tmp->real_loc(this->real_loc());
-  tmp->id(this->id());
-  tmp->reset_index();
-  return tmp;
-} /* clone() */
-NS_END(representation, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_NEST_PARAMS_HPP_ */

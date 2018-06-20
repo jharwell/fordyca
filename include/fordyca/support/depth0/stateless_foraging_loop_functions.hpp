@@ -68,8 +68,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
 
   rcppsw::metrics::collector_group& collector_group(void) { return m_collector_group; }
 
-  const argos::CRange<double>& nest_xrange(void) const { return m_nest_x; }
-  const argos::CRange<double>& nest_yrange(void) const { return m_nest_y; }
   virtual void pre_step_final(void);
   std::string log_timestamp_calc(void);
   const std::string& metrics_path(void) const { return m_metrics_path; }
@@ -88,13 +86,10 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
-  argos::CRange<double>                      m_nest_x;
-  argos::CRange<double>                      m_nest_y;
-  std::string                                m_output_root;
-  std::string                                m_metrics_path;
-
+  std::string                                m_output_root{""};
+  std::string                                m_metrics_path{""};
   rcppsw::metrics::collector_group           m_collector_group;
-  std::shared_ptr<representation::arena_map> m_arena_map;
+  std::shared_ptr<representation::arena_map> m_arena_map{nullptr};
   // clang-format on
 };
 

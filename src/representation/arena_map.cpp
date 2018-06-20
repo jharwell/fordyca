@@ -40,7 +40,6 @@ NS_START(fordyca, representation);
 arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
       mc_static_cache_params(params->static_cache),
-      mc_nest_center(params->nest_center),
       m_blocks(params->block_dist.n_blocks),
       m_caches(),
       m_block_distributor(&params->block_dist),
@@ -48,7 +47,11 @@ arena_map::arena_map(const struct params::arena_map_params* params)
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
-             m_server) {
+             m_server),
+      m_nest(params->nest.xdim,
+             params->nest.ydim,
+             params->nest.center,
+             params->grid.resolution) {
   deferred_client_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
@@ -129,8 +132,8 @@ void arena_map::static_cache_create(void) {
       (m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMin() +
        m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMax()) /
       2.0;
-  double x = (src_center + mc_nest_center.GetX()) / 2.0;
-  double y = mc_nest_center.GetY();
+  double x = (src_center + m_nest.real_loc().GetX()) / 2.0;
+  double y = m_nest.real_loc().GetY();
 
   ER_DIAG("(Re)-Creating static cache");
   support::depth1::static_cache_creator c(m_server,

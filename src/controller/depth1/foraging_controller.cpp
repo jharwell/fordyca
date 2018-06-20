@@ -58,6 +58,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
+      m_task_collator(),
       m_executive(),
       m_graph() {}
 

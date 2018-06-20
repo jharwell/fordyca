@@ -41,7 +41,7 @@ NS_START(fordyca, representation);
 namespace visitor = rcppsw::patterns::visitor;
 class base_cache;
 class block;
-class cell_entity;
+class base_cell_entity;
 
 /*******************************************************************************
  * Class Definitions
@@ -96,8 +96,9 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<cell_entity>& entity) { m_entity = entity; }
-  const std::shared_ptr<cell_entity>& entity(void) const { return m_entity; }
+  void entity(const std::shared_ptr<base_cell_entity>& entity) { m_entity = entity; }
+  const std::shared_ptr<base_cell_entity>& entity(void) const { return m_entity; }
+
   void loc(rcppsw::math::dcoord2 loc) { m_loc = loc; }
   rcppsw::math::dcoord2 loc(void) const { return m_loc; }
 
@@ -123,10 +124,10 @@ class cell2D : public visitor::visitable_any<cell2D> {
 
  private:
   // clang-format off
-  std::string                  m_robot_id{""};
-  std::shared_ptr<cell_entity> m_entity{nullptr};
-  rcppsw::math::dcoord2        m_loc;
-  fsm::cell2D_fsm              m_fsm;
+  std::string                       m_robot_id{""};
+  std::shared_ptr<base_cell_entity> m_entity{nullptr};
+  rcppsw::math::dcoord2             m_loc;
+  fsm::cell2D_fsm                   m_fsm;
   // clang-format on
 };
 

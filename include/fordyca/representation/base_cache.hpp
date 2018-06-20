@@ -32,6 +32,7 @@
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
+#include "fordyca/representation/multicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,8 @@ NS_START(fordyca, representation);
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class base_cache : public immovable_cell_entity,
+class base_cache : public multicell_entity,
+                   public immovable_cell_entity,
                    public prototype::clonable<base_cache> {
  public:
   /**
@@ -109,6 +111,22 @@ class base_cache : public immovable_cell_entity,
   }
 
   /**
+   * @brief Determine if a real-valued point lies within the extent of the
+   * entity for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of an entity.
+   *
+   * @param point The point to check.
+   *
+   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   */
+  bool contains_point(const argos::CVector2& point) const {
+    return xspan(real_loc()).value_within(point.GetX()) &&
+        yspan(real_loc()).value_within(point.GetY());
+  }
+
+  /**
    * @brief Remove a block from the cache's list of blocks.
    *
    * Does not update the block's location.
@@ -127,6 +145,8 @@ class base_cache : public immovable_cell_entity,
   // clang-format off
   static int          m_next_id;
 
+
+  double                              m_resolution;
   std::vector<std::shared_ptr<block>> m_blocks;
   // clang-format on
 };

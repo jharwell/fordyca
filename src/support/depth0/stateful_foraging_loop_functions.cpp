@@ -111,10 +111,10 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  /* The nest is a light gray */
-  if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY70;
+  if (arena_map()->nest().contains_point(plane_pos)) {
+    return argos::CColor(arena_map()->nest().color().red(),
+                         arena_map()->nest().color().green(),
+                         arena_map()->nest().color().blue());
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {

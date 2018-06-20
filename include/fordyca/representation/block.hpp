@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/representation/unicell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/math/dcoord.hpp"
+#include "fordyca/representation/movable_cell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +50,8 @@ NS_START(fordyca, representation);
  * have both real (where they actually live in the world) and discretized
  * locations (where they are mapped to within the arena map).
  */
-class block : public cell_entity,
+class block : public unicell_entity,
+              public movable_cell_entity,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
@@ -60,12 +63,14 @@ class block : public cell_entity,
   static argos::CVector2 kOutOfSightRLoc;
 
   explicit block(double dimension)
-      : cell_entity(dimension, argos::CColor::BLACK, -1),
+      : unicell_entity(dimension, rcppsw::utils::color::kBLACK, -1),
+        movable_cell_entity(),
         m_robot_index(-1),
         m_carries(0) {}
 
   block(double dimension, int id)
-      : cell_entity(dimension, argos::CColor::BLACK, id),
+      : unicell_entity(dimension, rcppsw::utils::color::kBLACK, id),
+        movable_cell_entity(),
         m_robot_index(-1),
         m_carries(0) {}
 
@@ -116,6 +121,22 @@ class block : public cell_entity,
    */
   int robot_index(void) const { return m_robot_index; }
   void robot_index(int robot_index) { m_robot_index = robot_index; }
+
+  /**
+   * @brief Determine if a real-valued point lies within the extent of the
+   * entity for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of an entity.
+   *
+   * @param point The point to check.
+   *
+   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   */
+  bool contains_point(const argos::CVector2& point) const {
+    return xspan(real_loc()).value_within(point.GetX()) &&
+        yspan(real_loc()).value_within(point.GetY());
+  }
 
  private:
   // clang-format off

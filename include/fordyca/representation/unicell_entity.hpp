@@ -1,7 +1,7 @@
 /**
- * @file block.cpp
+ * @file unicell_entity.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,10 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/multicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,25 +32,17 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- *  Static Variables
+ * Class Definitions
  ******************************************************************************/
-rcppsw::math::dcoord2 block::kOutOfSightDLoc = rcppsw::math::dcoord2(100, 100);
-argos::CVector2 block::kOutOfSightRLoc = argos::CVector2(100.0, 100.0);
+/**
+ * @class unicell_entity
+ * @ingroup representation
+ *
+ * @brief Representation of an entity in the arena that only spans a single
+ * cell.
+ */
+using unicell_entity = multicell_entity;
 
-/******************************************************************************
- * Member Functions
- ******************************************************************************/
-void block::move_out_of_sight(void) {
-  real_loc(kOutOfSightRLoc);
-  discrete_loc(kOutOfSightDLoc);
-} /* move_out_of_sight() */
-
-std::unique_ptr<block> block::clone(void) const {
-  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(xsize());
-  tmp->discrete_loc(this->discrete_loc());
-  tmp->real_loc(this->real_loc());
-  tmp->id(this->id());
-  tmp->reset_index();
-  return tmp;
-} /* clone() */
 NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_ */
