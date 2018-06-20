@@ -33,6 +33,7 @@
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/representation/nest.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -193,17 +194,18 @@ class arena_map : public rcppsw::er::client,
     return m_grid.subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
+  const representation::nest& nest(void) const { return m_nest; }
 
  private:
   // clang-format off
   bool                                             m_cache_removed;
   const struct params::depth1::static_cache_params mc_static_cache_params;
-  const argos::CVector2                            mc_nest_center;
   block_vector                                     m_blocks;
   cache_vector                                     m_caches;
   support::block_distributor                       m_block_distributor;
   std::shared_ptr<rcppsw::er::server>              m_server;
   arena_grid                                       m_grid;
+  representation::nest                             m_nest;
   // clang-format on
 };
 

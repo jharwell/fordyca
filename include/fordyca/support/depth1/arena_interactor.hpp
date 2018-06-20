@@ -61,12 +61,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
   arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
                    const std::shared_ptr<representation::arena_map>& map_in,
                    argos::CFloorEntity* floor_in,
-                   const argos::CRange<double>& nest_xrange,
-                   const argos::CRange<double>& nest_yrange,
                    uint cache_usage_penalty)
       : depth0::arena_interactor<T>(server, map_in, floor_in),
-      mc_nest_xrange(nest_xrange),
-      mc_nest_yrange(nest_yrange),
       m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
@@ -302,10 +298,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * is the only one a robot knows about (see #242).
      */
     if (utils::block_drop_overlap_with_nest(controller.block(),
-                                            mc_nest_xrange,
-                                            mc_nest_yrange,
+                                            map()->nest(),
                                             controller.robot_loc()) ||
-        utils::block_drop_near_arena_boundary(*map(),
+        utils::block_drop_near_arena_boundary(map(),
                                               controller.block(),
                                               controller.robot_loc())) {
       conflict = true;

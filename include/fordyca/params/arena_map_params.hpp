@@ -29,6 +29,7 @@
 #include "fordyca/params/block_params.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
+#include "fordyca/params/nest_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -48,11 +49,9 @@ struct arena_map_params : public rcppsw::params::base_params {
   struct block_params block {};
   struct block_distribution_params block_dist {};
   struct depth1::static_cache_params static_cache {};
+  struct nest_params nest {};
 
   uint n_blocks{0};
-  argos::CVector2 nest_center{};
-  argos::CRange<double> nest_x{};
-  argos::CRange<double> nest_y{};
 };
 
 NS_END(params, fordyca);

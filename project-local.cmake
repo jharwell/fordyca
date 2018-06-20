@@ -19,43 +19,22 @@ add_subdirectory(ext/rcppsw)
 ################################################################################
 # Includes                                                                     #
 ################################################################################
-if (NOT IS_ROOT_PROJECT)
-  set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS}  PARENT_SCOPE)
-endif()
 set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
+set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS})
+
+if (BUILD_ON_MSI)
+  set(${target}_SYS_INCLUDE_DIRS ${MSI_ARGOS_INSTALL_PREFIX}/include)
+endif()
 
 ################################################################################
 # Libraries                                                                    #
 ################################################################################
 get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
 
-# Add linker search directories
-link_directories(/usr/lib/argos3 /usr/local/lib/argos3 ${rcppsw_LINK_DIRS})
-if (BUILD_ON_MSI)
-  link_directories(${MSI_ARGOS_INSTALL_PREFIX}/lib/argos3)
-endif()
-
-add_library(${target} SHARED ${${target}_ROOT_SRC})
-target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
-
-target_include_directories(${target} PUBLIC
-  /usr/include/lua5.2
-  /usr/local/include
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/ext/rcppsw
-  )
-
-if (BUILD_ON_MSI)
-  target_include_directories(${target} SYSTEM PUBLIC ${MSI_ARGOS_INSTALL_PREFIX}/include)
-  target_compile_options(${target} PUBLIC -Wno-missing-include-dirs)
-endif()
-
-add_dependencies(${target} rcsw rcppsw)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
-
-target_link_libraries(${target}
+# Define link libraries
+set(${target}_LIBRARIES
   rcppsw
-  rcsw
+  ${rcppsw_LIBRARIES}
   argos3core_simulator
   argos3plugin_simulator_footbot
   argos3plugin_simulator_entities
@@ -65,5 +44,41 @@ target_link_libraries(${target}
   stdc++fs
   Qt5::Widgets
   Qt5::Core
-  Qt5::Gui
+  Qt5::Gui)
+
+# Define link search dirs
+if (BUILD_ON_MSI)
+  set(${target}_LIBRARY_DIRS ${MSI_ARGOS_INSTALL_PREFIX}/lib/argos3 ${rcppsw_LIBRARY_DIRS})
+else()
+  set(${target}_LIBRARY_DIRS /usr/lib/argos3 /usr/local/lib/argos3 ${rcppsw_LIBRARY_DIRS})
+endif()
+link_directories(${${target}_LIBRARY_DIRS})
+
+# Force failures at build time rather than runtime
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+
+add_library(${target} SHARED ${${target}_ROOT_SRC})
+add_dependencies(${target} rcsw rcppsw)
+
+target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
+target_include_directories(${target} SYSTEM PUBLIC
+  /usr/include/lua5.2
+  /usr/local/include
+  ${Qt5Widgets_INCLUDE_DIRS}
+  ${${target}_SYS_INCLUDE_DIRS}
   )
+target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
+target_link_libraries(${target} ${${target}_LIBRARIES})
+
+if (BUILD_ON_MSI)
+  target_compile_options(${target} PUBLIC -Wno-missing-include-dirs)
+endif()
+
+################################################################################
+# Exports                                                                      #
+################################################################################
+if (NOT IS_ROOT_PROJECT)
+  set(${target}_INCLUDE_DIRS ${${target}_INCLUDE_DIRS} PARENT_SCOPE)
+  set(${target}_LIBRARY_DIRS ${${target}_LIBRARY_DIRS} PARENT_SCOPE)
+  set(${target}_LIBRARIES ${${target}_LIBRARIES} PARENT_SCOPE)
+endif()

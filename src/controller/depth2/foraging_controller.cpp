@@ -62,8 +62,10 @@ using representation::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-foraging_controller::foraging_controller(void)
-    : depth1::foraging_controller(), m_executive() {}
+foraging_controller::foraging_controller(void) :
+    depth1::foraging_controller(),
+    m_task_collator(),
+    m_executive() {}
 
 /*******************************************************************************
  * Member Functions

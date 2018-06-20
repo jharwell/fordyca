@@ -53,10 +53,6 @@ block_distributor::block_distributor(
    * @todo For now, assume horizontal rectangle--this will change in the
    * future...eventually.
    */
-  std::cout << m_arena_model.x << std::endl;
-  std::cout << m_arena_model.y << std::endl;
-  std::cout << m_nest_model.x << std::endl;
-  std::cout << m_nest_model.y << std::endl;
   assert(m_arena_model.shape == kMODEL_SHAPE_RECT);
   assert(m_arena_model.orientation == kMODEL_ORIENTATION_HOR);
 }

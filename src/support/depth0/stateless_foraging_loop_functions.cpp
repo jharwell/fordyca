@@ -54,12 +54,9 @@ using interactor =
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
     : client(rcppsw::er::g_server),
-      m_nest_x(),
-      m_nest_y(),
       m_output_root(),
       m_metrics_path(),
-      m_collector_group(),
-      m_arena_map() {
+      m_collector_group() {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -81,7 +78,6 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   repo.parse_all(node);
 
   auto* p_output = repo.parse_results<params::output_params>();
-  auto* p_arena = repo.parse_results<params::arena_map_params>();
   auto* p_vis = repo.parse_results<params::visualization_params>();
 
   /* initialize output */
@@ -95,9 +91,6 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   /* setup logging timestamp calculator */
   rcppsw::er::g_server->log_ts_calculator(
       std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
-
-  m_nest_x = p_arena->nest_x;
-  m_nest_y = p_arena->nest_y;
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
@@ -124,15 +117,17 @@ void stateless_foraging_loop_functions::Destroy() {
 
 __rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  /* The nest is a light gray */
-  if (m_nest_x.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      m_nest_y.WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY70;
+  if (m_arena_map->nest().contains_point(plane_pos)) {
+    return argos::CColor(m_arena_map->nest().color().red(),
+                         m_arena_map->nest().color().green(),
+                         m_arena_map->nest().color().blue());
   }
 
-  for (auto& block : arena_map()->blocks()) {
+  for (auto& block : m_arena_map->blocks()) {
     if (block->contains_point(plane_pos)) {
-      return block->color();
+      return argos::CColor(block->color().red(),
+                           block->color().green(),
+                           block->color().blue());
     }
   } /* for(&block..) */
 
