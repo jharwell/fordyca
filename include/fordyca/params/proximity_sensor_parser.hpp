@@ -1,5 +1,5 @@
 /**
- * @file exec_estimates_parser.hpp
+ * @file proximity_sensor_parser.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,50 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_PROXIMITY_SENSOR_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_PROXIMITY_SENSOR_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/proximity_sensor_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "fordyca/params/depth2/exec_estimates_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class exec_estimates_parser
- * @ingroup params depth2
+ * @class proximity_sensor_parser
+ * @ingroup params
  *
- * @brief Parses XML parameters used for estimation of depth2 task execution
- * times at the start of simulation.
+ * @brief Parses XML parameters relating to proximity_sensors into \ref proximity_sensor_params.
  */
-class exec_estimates_parser: public rcppsw::params::xml_param_parser {
+class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
  public:
-  exec_estimates_parser(const std::shared_ptr<rcppsw::er::server>& server,
-                        uint level)
+  proximity_sensor_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
       : xml_param_parser(server, level) {}
 
   /**
-   * @brief The root tag that all cache parameters should lie under in the
-   * XML tree.
+   * @brief The root tag that all robot proximity_sensor parameters should lie under in
+   * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "task_exec_estimates";
+  static constexpr char kXMLRoot[] = "proximity_sensor";
 
-  void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<exec_estimates_params> parse_results(void) const {
+
+  std::shared_ptr<proximity_sensor_params> parse_results(void) const {
     return m_params;
   }
 
@@ -70,12 +70,9 @@ class exec_estimates_parser: public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
-  bool                                   m_parsed{false};
-  std::shared_ptr<exec_estimates_params> m_params{nullptr};
-  // clang-format on
+  std::shared_ptr<proximity_sensor_params> m_params{nullptr};
 };
 
-NS_END(params, fordyca, depth2);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_EXEC_ESTIMATES_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_PROXIMITY_SENSOR_PARSER_HPP_ */

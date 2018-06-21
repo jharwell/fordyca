@@ -44,10 +44,12 @@ void output_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res, res2;
 
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
   /* only present for loop functions */
   if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
     m_metrics_parser.parse(onode);
-    m_params.metrics = *m_metrics_parser.parse_results();
+    m_params->metrics = *m_metrics_parser.parse_results();
   }
 
   ticpp::Element snode = argos::GetNode(onode, "sim");

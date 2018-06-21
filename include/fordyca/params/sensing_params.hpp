@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/proximity_sensor_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,24 +36,11 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct proximity_params
- * @ingroup params
- */
-struct proximity_params {
-  /*
-   * Maximum tolerance for the proximity reading between the robot and the
-   * closest obstacle.  The proximity reading is 0 when nothing is detected and
-   * grows exponentially to 1 when the obstacle is touching the robot.
-   */
-  double delta{0.0};
-};
-
-/**
  * @struct sensing_params
  * @ingroup params
  */
 struct sensing_params : public rcppsw::params::base_params {
-  struct proximity_params proximity {};
+  struct proximity_sensor_params proximity {};
 };
 
 NS_END(params, fordyca);

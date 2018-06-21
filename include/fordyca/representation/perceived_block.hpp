@@ -46,12 +46,12 @@ class block;
  * pheromone density/relevance associated with it.
  */
 struct perceived_block {
-  perceived_block(void) : ent(nullptr), density() {}
+  perceived_block(void) : density() {}
   perceived_block(const std::shared_ptr<block>& b,
                   const rcppsw::swarm::pheromone_density& d)
       : ent(b), density(d) {}
 
-  std::shared_ptr<block> ent;
+  std::shared_ptr<block> ent{nullptr};
   rcppsw::swarm::pheromone_density density;
 };
 

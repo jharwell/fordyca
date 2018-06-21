@@ -146,7 +146,8 @@ void stateful_foraging_controller::tasking_init(
           base_foraging_controller::saa_subsystem(),
           m_perception->map());
   auto generalist =
-      std::make_shared<tasks::depth0::generalist>(exec_params, generalist_fsm);
+      std::make_shared<tasks::depth0::generalist>(exec_params,
+                                                  generalist_fsm);
 
   generalist->set_atomic();
 

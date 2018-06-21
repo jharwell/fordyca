@@ -36,13 +36,15 @@ NS_START(fordyca, params);
  ******************************************************************************/
 void steering_force2D_parser::parse(const ticpp::Element& node) {
   force_calculator_xml_parser::parse(node);
-  static_cast<steering::force_calculator_params&>(m_params) =
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  *std::static_pointer_cast<steering::force_calculator_params>(m_params) =
       *force_calculator_xml_parser::parse_results();
 
   ticpp::Element snode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_phototaxis.parse(snode);
-  m_params.phototaxis = *m_phototaxis.parse_results();
+  m_params->phototaxis = *m_phototaxis.parse_results();
 } /* parse() */
 
 void steering_force2D_parser::show(std::ostream& stream) const {

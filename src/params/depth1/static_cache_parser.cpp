@@ -40,19 +40,30 @@ constexpr char static_cache_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void static_cache_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(bnode, m_params, enable);
-  if (m_params.enable) {
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element bnode =
+        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(bnode, m_params, enable);
     XML_PARSE_PARAM(bnode, m_params, size);
     XML_PARSE_PARAM(bnode, m_params, dimension);
     XML_PARSE_PARAM(bnode, m_params, min_dist);
     XML_PARSE_PARAM(bnode, m_params, usage_penalty);
     XML_PARSE_PARAM(bnode, m_params, respawn_scale_factor);
+    m_parsed = true;
   }
 } /* parse() */
 
 void static_cache_parser::show(std::ostream& stream) const {
+  if (!m_parsed) {
+    stream << build_header()
+           << "<< Not Parsed >>"
+           << std::endl
+           << build_footer();
+    return;
+  }
+
   stream << build_header() << std::endl
          << XML_PARAM_STR(m_params, enable) << std::endl
          << XML_PARAM_STR(m_params, size) << std::endl
@@ -64,10 +75,10 @@ void static_cache_parser::show(std::ostream& stream) const {
 } /* show() */
 
 __rcsw_pure bool static_cache_parser::validate(void) const {
-  if (m_params.enable) {
-    CHECK(m_params.dimension > 0.0);
-    CHECK(m_params.size > 0.0);
-    CHECK(m_params.respawn_scale_factor > 0.0);
+  if (m_parsed) {
+    CHECK(m_params->dimension > 0.0);
+    CHECK(m_params->size > 0.0);
+    CHECK(m_params->respawn_scale_factor > 0.0);
     return true;
   }
 

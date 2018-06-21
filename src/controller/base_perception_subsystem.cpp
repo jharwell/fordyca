@@ -38,7 +38,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 base_perception_subsystem::base_perception_subsystem(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const params::perception_params* const params,
     const std::string& id)
     : client(server),

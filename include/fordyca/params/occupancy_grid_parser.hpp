@@ -66,15 +66,20 @@ class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct occupancy_grid_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<occupancy_grid_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  occupancy_grid_params m_params{};
-  grid_parser           m_grid_parser;
-  pheromone_parser      m_pheromone_parser;
+  bool                                   m_parsed{false};
+  std::shared_ptr<occupancy_grid_params> m_params{nullptr};
+  grid_parser                            m_grid_parser;
+  pheromone_parser                       m_pheromone_parser;
   // clang-format on
 };
 

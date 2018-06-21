@@ -1,5 +1,5 @@
 /**
- * @file actuation_parser.cpp
+ * @file proximity_sensor_parser.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/actuation_parser.hpp"
+#include "fordyca/params/proximity_sensor_parser.hpp"
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
@@ -32,32 +32,32 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char actuation_parser::kXMLRoot[];
+constexpr char proximity_sensor_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
+void proximity_sensor_parser::parse(const ticpp::Element& node) {
+  ticpp::Element pnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_differential_drive.parse(anode);
-  m_steering.parse(anode);
-  m_throttling.parse(anode);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  m_params->differential_drive = *m_differential_drive.parse_results();
-  m_params->steering = *m_steering.parse_results();
-  m_params->throttling = *m_throttling.parse_results();
+  XML_PARSE_PARAM(pnode, m_params, delta);
 } /* parse() */
 
-void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_differential_drive << m_steering << m_throttling
+void proximity_sensor_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, delta)
+         << std::endl
          << build_footer();
 } /* show() */
 
-__rcsw_pure bool actuation_parser::validate(void) const {
-  return m_differential_drive.validate() && m_steering.validate() &&
-         m_throttling.validate();
+__rcsw_pure bool proximity_sensor_parser::validate(void) const {
+  CHECK(m_params->delta > 0.0);
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

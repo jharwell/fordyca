@@ -59,14 +59,19 @@ class steering_force2D_parser : public steering::force_calculator_xml_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct steering_force2D_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<steering_force2D_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  struct steering_force2D_params m_params{};
-  phototaxis_force_parser        m_phototaxis;
+  std::shared_ptr<steering_force2D_params> m_params{};
+  phototaxis_force_parser                  m_phototaxis;
   // clang-format on
 };
 

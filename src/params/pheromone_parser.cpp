@@ -40,7 +40,9 @@ constexpr char pheromone_parser::kXMLRoot[];
 void pheromone_parser::parse(const ticpp::Element& node) {
   ticpp::Element pnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params.rho = std::atof(pnode.GetAttribute("rho").c_str());
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_PARAM(pnode, m_params, rho);
   XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
 } /* parse() */
 
@@ -51,7 +53,7 @@ void pheromone_parser::show(std::ostream& stream) const {
 } /* show() */
 
 __rcsw_pure bool pheromone_parser::validate(void) const {
-  return m_params.rho > 0.0;
+  return m_params->rho > 0.0;
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -64,13 +64,20 @@ class output_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct output_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<output_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct output_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  std::shared_ptr<output_params> m_params{nullptr};
   metrics_parser m_metrics_parser;
+  // clang-format on
 };
 
 NS_END(params, fordyca);

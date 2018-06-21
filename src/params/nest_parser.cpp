@@ -46,26 +46,27 @@ void nest_parser::parse(const ticpp::Element& node) {
 
   res = parser.parse(nnode.GetAttribute("center"));
 
-  m_params.center = argos::CVector2(std::atof(res[0].c_str()),
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params->center = argos::CVector2(std::atof(res[0].c_str()),
                                          std::atof(res[1].c_str()));
   res = parser.parse(nnode.GetAttribute("size"));
-  m_params.xdim = std::atof(res[0].c_str());
-  m_params.ydim = std::atof(res[1].c_str());
+  m_params->xdim = std::atof(res[0].c_str());
+  m_params->ydim = std::atof(res[1].c_str());
 } /* parse() */
 
 void nest_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << "xdim=" << m_params.xdim << std::endl
-         << "ydim=" << m_params.ydim << std::endl
-         << "center=" << m_params.center << std::endl
+         << "xdim=" << m_params->xdim << std::endl
+         << "ydim=" << m_params->ydim << std::endl
+         << "center=" << m_params->center << std::endl
          << build_footer();
 } /* show() */
 
 bool nest_parser::validate(void) const {
-  CHECK(m_params.center.GetX() > 0);
-  CHECK(m_params.center.GetY() > 0);
-  CHECK(m_params.xdim > 0);
-  CHECK(m_params.ydim > 0);
+  CHECK(m_params->center.GetX() > 0);
+  CHECK(m_params->center.GetY() > 0);
+  CHECK(m_params->xdim > 0);
+  CHECK(m_params->ydim > 0);
   return true;
 
  error:

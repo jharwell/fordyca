@@ -43,11 +43,11 @@
                      repeat_deposit="false"/>
         </occupancy_grid>
         <task_executive>
-          <tasks estimation_alpha="0.8"/>
-          <aborting reactivity="8"
+          <estimation alpha="0.8"/>
+          <task_abort reactivity="8"
                     offset="3"
                     />
-          <partitioning
+          <task_partition
               method="pini2011"
               always_partition="true"
               never_partition="false"
@@ -68,8 +68,8 @@
             harvester_range="1000:2000"
             />
         <sensing>
-          <proximity angle_range="-1.1:1.1"
-                     delta="0.0001" />
+          <proximity_sensor angle_range="-1.1:1.1"
+                            delta="0.0001" />
         </sensing>
         <actuation>
           <throttling

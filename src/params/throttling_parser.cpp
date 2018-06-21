@@ -40,18 +40,38 @@ constexpr char throttling_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void throttling_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(tnode, m_params, block_carry);
+    if (nullptr != node.FirstChild(kXMLRoot, false)) {
+      ticpp::Element tnode =
+          argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+      m_params =
+          std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+      XML_PARSE_PARAM(tnode, m_params, block_carry);
+      m_parsed = true;
+    }
 } /* parse() */
 
 void throttling_parser::show(std::ostream& stream) const {
+  if (!m_parsed) {
+    stream << build_header()
+           << "<< Not Parsed >>"
+           << std::endl
+           << build_footer();
+    return;
+  }
+
   stream << build_header() << XML_PARAM_STR(m_params, block_carry) << std::endl
          << build_footer();
 } /* show() */
 
 __rcsw_pure bool throttling_parser::validate(void) const {
-  return m_params.block_carry >= 0 && m_params.block_carry <= 1.0;
+  if (m_parsed) {
+    CHECK(m_params->block_carry >= 0.0);
+    CHECK(m_params->block_carry <= 1.0);
+  }
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

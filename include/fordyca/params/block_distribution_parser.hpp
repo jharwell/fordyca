@@ -62,12 +62,16 @@ class block_distribution_parser : public rcppsw::params::xml_param_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct block_distribution_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<block_distribution_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct block_distribution_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  std::shared_ptr<block_distribution_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);

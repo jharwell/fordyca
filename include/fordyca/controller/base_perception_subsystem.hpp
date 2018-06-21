@@ -55,7 +55,7 @@ NS_START(controller);
  */
 class base_perception_subsystem : public rcppsw::er::client {
  public:
-  base_perception_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+  base_perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
                             const params::perception_params* const params,
                             const std::string& id);
 
