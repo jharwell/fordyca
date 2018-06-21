@@ -42,6 +42,7 @@ constexpr char block_distribution_parser::kXMLRoot[];
 void block_distribution_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_PARAM(bnode, m_params, dist_type);
   XML_PARSE_PARAM(bnode, m_params, n_blocks);
   XML_PARSE_PARAM(bnode, m_params, arena_model.shape);
@@ -61,10 +62,10 @@ void block_distribution_parser::show(std::ostream& stream) const {
 } /* show() */
 
 bool block_distribution_parser::validate(void) const {
-  return !("" == m_params.dist_type || "" == m_params.arena_model.shape ||
-           "" == m_params.arena_model.orientation ||
-           "" == m_params.nest_model.shape ||
-           "" == m_params.nest_model.orientation);
+  return !("" == m_params->dist_type || "" == m_params->arena_model.shape ||
+           "" == m_params->arena_model.orientation ||
+           "" == m_params->nest_model.shape ||
+           "" == m_params->nest_model.orientation);
 } /* validate() */
 
 NS_END(params, fordyca);

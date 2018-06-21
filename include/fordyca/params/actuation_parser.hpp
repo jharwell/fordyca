@@ -67,13 +67,17 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct actuation_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<actuation_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  struct actuation_params                     m_params{};
+  std::shared_ptr<actuation_params>           m_params{nullptr};
   kinematics2D::differential_drive_xml_parser m_differential_drive;
   steering_force2D_parser                     m_steering;
   throttling_parser                           m_throttling;

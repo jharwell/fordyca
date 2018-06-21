@@ -62,12 +62,20 @@ class phototaxis_force_parser : public rcppsw::params::xml_param_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct phototaxis_force_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<phototaxis_force_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct phototaxis_force_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+
+  // clang-format on
+  bool                                     m_parsed{false};
+  std::shared_ptr<phototaxis_force_params> m_params{nullptr};
+  // clang-format off
 };
 
 NS_END(params, fordyca);

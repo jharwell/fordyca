@@ -42,6 +42,8 @@ void visualization_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element vnode = argos::GetNode(const_cast<ticpp::Element&>(node),
                                           kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_PARAM(vnode, m_params, robot_id);
     XML_PARSE_PARAM(vnode, m_params, robot_los);
     XML_PARSE_PARAM(vnode, m_params, robot_task);
@@ -52,7 +54,10 @@ void visualization_parser::parse(const ticpp::Element& node) {
 
 void visualization_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
-    stream << "<< Not parsed >>" << std::endl << build_footer();
+    stream << build_header()
+           << "<< Not parsed >>"
+           << std::endl
+           << build_footer();
     return;
   }
   stream << build_header()

@@ -74,10 +74,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
             map.subgrid(robot_loc.first, robot_loc.second, 2),
             robot_loc);
 
-    /*
-     * [JRH]: TODO: Once caches are arena entities, then this might not be
-     * necessary.
-     */
     for (auto &c : map.caches()) {
       argos::CVector2 ll = math::dcoord_to_rcoord(new_los->abs_ll(),
                                                   map.grid_resolution());

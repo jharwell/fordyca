@@ -61,13 +61,19 @@ class visualization_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct visualization_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<visualization_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  bool                        m_parsed{false};
-  struct visualization_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  bool                                  m_parsed{false};
+  std::shared_ptr<visualization_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);

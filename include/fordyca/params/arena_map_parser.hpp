@@ -71,18 +71,23 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct arena_map_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<arena_map_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  struct arena_map_params          m_params {};
-  grid_parser                      m_grid_parser;
-  block_parser                     m_block_parser;
-  block_distribution_parser        m_block_dist_parser;
-  depth1::static_cache_parser      m_cache_parser;
-  nest_parser                      m_nest_parser;
+  std::shared_ptr<arena_map_params> m_params{nullptr};
+  grid_parser                       m_grid_parser;
+  block_parser                      m_block_parser;
+  block_distribution_parser         m_block_dist_parser;
+  depth1::static_cache_parser       m_cache_parser;
+  nest_parser                       m_nest_parser;
   // clang-format on
 };
 

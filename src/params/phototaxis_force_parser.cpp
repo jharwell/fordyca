@@ -40,18 +40,31 @@ constexpr char phototaxis_force_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void phototaxis_force_parser::parse(const ticpp::Element& node) {
-  ticpp::Element pnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(pnode, m_params, max);
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element pnode =
+        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(pnode, m_params, max);
+    m_parsed = true;
+  }
 } /* parse() */
 
 void phototaxis_force_parser::show(std::ostream& stream) const {
+  if (!m_parsed) {
+    stream << build_header()
+           << "<< Not Parsed >>"
+           << std::endl
+           << build_footer();
+    return;
+  }
   stream << build_header() << XML_PARAM_STR(m_params, max) << std::endl
          << build_footer();
 } /* show() */
 
 __rcsw_pure bool phototaxis_force_parser::validate(void) const {
-  return m_params.max >= 0;
+  if (m_parsed) {
+    return m_params->max >= 0;
+  }
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -85,8 +85,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
             "FATAL: Not all parameters were validated");
 
   /* initialize output */
-  const struct params::output_params* params =
-      param_repo.parse_results<struct params::output_params>();
+  auto* params = param_repo.parse_results<struct params::output_params>();
   client::server_handle()->log_stream() << param_repo;
   output_init(params);
 

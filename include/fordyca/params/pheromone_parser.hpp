@@ -62,12 +62,17 @@ class pheromone_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct pheromone_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<pheromone_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct pheromone_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+ private:
+  std::shared_ptr<pheromone_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);

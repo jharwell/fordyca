@@ -39,21 +39,25 @@ constexpr char metrics_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
-  ticpp::Element mnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(mnode, m_params, output_dir);
-  XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
-  XML_PARSE_PARAM(mnode, m_params, cache_acquisition_fname);
-  XML_PARSE_PARAM(mnode, m_params, distance_fname);
-  XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
-  XML_PARSE_PARAM(mnode, m_params, block_fname);
-  XML_PARSE_PARAM(mnode, m_params, task_execution_fname);
-  XML_PARSE_PARAM(mnode, m_params, task_management_fname);
-  XML_PARSE_PARAM(mnode, m_params, task_management_fname);
-  XML_PARSE_PARAM(mnode, m_params, cache_fname);
-  XML_PARSE_PARAM(mnode, m_params, collect_interval);
+    if (nullptr != node.FirstChild(kXMLRoot, false)) {
+      ticpp::Element mnode =
+          argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+      m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+      XML_PARSE_PARAM(mnode, m_params, output_dir);
+      XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
+      XML_PARSE_PARAM(mnode, m_params, cache_acquisition_fname);
+      XML_PARSE_PARAM(mnode, m_params, distance_fname);
+      XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
+      XML_PARSE_PARAM(mnode, m_params, block_fname);
+      XML_PARSE_PARAM(mnode, m_params, task_execution_fname);
+      XML_PARSE_PARAM(mnode, m_params, task_management_fname);
+      XML_PARSE_PARAM(mnode, m_params, task_management_fname);
+      XML_PARSE_PARAM(mnode, m_params, cache_fname);
+      XML_PARSE_PARAM(mnode, m_params, collect_interval);
 
-  m_parsed = true;
+      m_parsed = true;
+    }
 } /* parse() */
 
 void metrics_parser::show(std::ostream& stream) const {
@@ -78,9 +82,12 @@ void metrics_parser::show(std::ostream& stream) const {
 
 __rcsw_pure bool metrics_parser::validate(void) const {
   if (m_parsed) {
-    return (0 != m_params.collect_interval);
+    CHECK(0 != m_params->collect_interval);
   }
   return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

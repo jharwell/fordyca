@@ -43,7 +43,7 @@ generalist::generalist(const struct ta::partitionable_task_params* const params,
     : partitionable_polled_task(rcppsw::er::g_server,
                                 kGeneralistName,
                                 params,
-                                mechanism),
+                                std::move(mechanism)),
       foraging_task(params) {}
 
 /*******************************************************************************
