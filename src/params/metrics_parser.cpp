@@ -82,7 +82,7 @@ void metrics_parser::show(std::ostream& stream) const {
 
 __rcsw_pure bool metrics_parser::validate(void) const {
   if (m_parsed) {
-    CHECK(0 != m_params->collect_interval);
+    CHECK(m_params->collect_interval > 0);
   }
   return true;
 

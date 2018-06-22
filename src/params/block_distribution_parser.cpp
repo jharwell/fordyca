@@ -62,10 +62,16 @@ void block_distribution_parser::show(std::ostream& stream) const {
 } /* show() */
 
 bool block_distribution_parser::validate(void) const {
-  return !("" == m_params->dist_type || "" == m_params->arena_model.shape ||
-           "" == m_params->arena_model.orientation ||
-           "" == m_params->nest_model.shape ||
-           "" == m_params->nest_model.orientation);
+  CHECK(m_params->n_blocks > 0);
+  CHECK("" != m_params->dist_type);
+  CHECK("" != m_params->arena_model.shape);
+  CHECK("" != m_params->arena_model.orientation);
+  CHECK("" != m_params->nest_model.shape);
+  CHECK("" != m_params->nest_model.orientation);
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);
