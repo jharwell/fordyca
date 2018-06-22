@@ -38,8 +38,7 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena_map_params* params)
-    : m_cache_removed(false),
-      mc_static_cache_params(params->static_cache),
+    : mc_static_cache_params(params->static_cache),
       m_blocks(params->block_dist.n_blocks),
       m_caches(),
       m_block_distributor(&params->block_dist),

@@ -90,7 +90,7 @@
           </steering2D>
 
           <differential_drive soft_turn_max="30"
-                              max_speed="10" />
+                              max_speed="10.0" />
         </actuation>
         <fsm
           nest="2.0, 2.5"
@@ -112,14 +112,15 @@
            />
       <metrics
           output_dir="metrics"
+          block_fname="block-stats.csv"
           block_acquisition_fname="block-acquisition-stats.csv"
           block_transport_fname="block-transport-stats.csv"
           cache_acquisition_fname="cache-acquisition-stats.csv"
-          distance_fname="distance-stats.csv"
-          block_fname="block-stats.csv"
-          cache_fname="cache-stats.csv"
+          cache_utilization_fname="cache-utilization-stats.csv"
+          cache_lifecycle_fname="cache-lifecycle-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
+          distance_fname="distance-stats.csv"
           collect_interval="1000"
           />
     </output>

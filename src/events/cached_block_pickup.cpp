@@ -135,7 +135,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
               cell_op::y());
 
     map.cache_remove(m_real_cache);
-    map.cache_removed(true);
+    map.caches_removed(1);
   }
   m_pickup_block->accept(*this);
   ER_NOM("arena_map: fb%u: block%d from cache%d @(%zu, %zu) [%u blocks remain]",

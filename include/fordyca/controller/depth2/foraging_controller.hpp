@@ -76,11 +76,6 @@ class foraging_controller : public depth1::foraging_controller,
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
 
- protected:
-  metrics::tasks::reactive_collator& task_collator(void) override {
-    return m_task_collator;
-  }
-
  private:
   void depth0_tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
                            params::depth1::task_repository* task_repo);

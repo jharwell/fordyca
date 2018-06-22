@@ -28,6 +28,7 @@
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
+#include "fordyca/metrics/caches/lifecycle_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -104,8 +105,9 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void cache_handling_init(const struct params::arena_map_params *arenap);
 
   // clang-format off
-  double                      mc_cache_respawn_scale_factor{0.0};
-  std::unique_ptr<interactor> m_interactor{nullptr};
+  double                              mc_cache_respawn_scale_factor{0.0};
+  std::unique_ptr<interactor>         m_interactor{nullptr};
+  metrics::caches::lifecycle_collator m_cache_collator{};
   // clang-format on
 };
 

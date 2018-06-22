@@ -1,7 +1,7 @@
 /**
- * @file cache_metrics_collector.cpp
+ * @file utilization_metrics_collector.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,25 +21,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/cache_metrics_collector.hpp"
-#include "fordyca/metrics/cache_metrics.hpp"
+#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
+#include "fordyca/metrics/caches/utilization_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, caches);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_metrics_collector::cache_metrics_collector(const std::string& ofname,
-                                                 uint interval)
-    : base_metrics_collector(ofname, interval), m_stats(), m_cache_ids() {}
+utilization_metrics_collector::utilization_metrics_collector(
+    const std::string& ofname,
+    uint interval)
+    : base_metrics_collector(ofname, interval),
+      m_stats(),
+      m_cache_ids() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string cache_metrics_collector::csv_header_build(const std::string& header) {
+std::string utilization_metrics_collector::csv_header_build(
+    const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "avg_blocks" + separator() +
@@ -49,50 +53,50 @@ std::string cache_metrics_collector::csv_header_build(const std::string& header)
   // clang-format on
 } /* csv_header_build() */
 
-void cache_metrics_collector::reset(void) {
+void utilization_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool cache_metrics_collector::csv_line_build(std::string& line) {
+bool utilization_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
   /*
-   * Because # blocks is always non-zero and collected every timestep, we need
-   * to account for that in the avg # blocks across all caches. This is not
-   * necessary for the rest of the reported metrics.
+   * Because the # of caches can change at any time in the arena, we need to use
+   * the count of all caches that are involved in the events that we collect
+   * metrics on and use that to average the cumulative counts that we get.
    */
   line += (!m_cache_ids.empty())
-              ? std::to_string(static_cast<double>(m_stats.n_blocks) /
-                               (m_cache_ids.size() * interval()))
-              : "0";
+          ? std::to_string(static_cast<double>(m_stats.n_blocks) /
+                           (m_cache_ids.size() * interval()))
+          : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-              ? std::to_string(static_cast<double>(m_stats.n_pickups) /
-                               (m_cache_ids.size()))
-              : "0";
+          ? std::to_string(static_cast<double>(m_stats.n_pickups) /
+                           (m_cache_ids.size()))
+          : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-              ? std::to_string(static_cast<double>(m_stats.n_drops) /
-                               (m_cache_ids.size()))
-              : "0";
+          ? std::to_string(static_cast<double>(m_stats.n_drops) /
+                           (m_cache_ids.size()))
+          : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-              ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
-                               (m_penalty_count))
-              : "0";
+          ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
+                           (m_penalty_count))
+          : "0";
   line += separator();
 
   return true;
 } /* csv_line_build() */
 
-void cache_metrics_collector::collect(
+void utilization_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const metrics::cache_metrics&>(metrics);
+  auto& m = static_cast<const utilization_metrics&>(metrics);
   m_stats.n_blocks += m.n_blocks();
   m_cache_ids.insert(m.cache_id());
   m_stats.n_pickups += m.total_block_pickups();
@@ -103,7 +107,7 @@ void cache_metrics_collector::collect(
   }
 } /* collect() */
 
-void cache_metrics_collector::reset_after_interval(void) {
+void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.n_blocks = 0;
   m_stats.n_pickups = 0;
   m_stats.n_drops = 0;
@@ -112,4 +116,4 @@ void cache_metrics_collector::reset_after_interval(void) {
   m_cache_ids.clear();
 } /* reset_after_interval() */
 
-NS_END(metrics, fordyca);
+NS_END(caches, metrics, fordyca);

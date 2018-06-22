@@ -1,7 +1,7 @@
 /**
- * @file metrics_params.hpp
+ * @file lifecycle_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,45 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, metrics, caches);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct metrics_params
- * @ingroup params
+ * @class lifecycle_metrics
+ * @ingroup metrics caches
+ *
+ * @brief Interface defining lifecycle metrics that can be collected on
+ * static/dynamic caches in the arena during their lifetime.
  */
-struct metrics_params : public rcppsw::params::base_params {
-  std::string block_fname{""};
-  std::string block_acquisition_fname{""};
-  std::string block_transport_fname{""};
+class lifecycle_metrics : public rcppsw::metrics::base_metrics {
+ public:
+  lifecycle_metrics(void) = default;
+  ~lifecycle_metrics(void) override = default;
+  lifecycle_metrics(const lifecycle_metrics&) = default;
+  lifecycle_metrics& operator=(const lifecycle_metrics&) = default;
 
-  std::string cache_acquisition_fname{""};
-  std::string cache_utilization_fname{""};
-  std::string cache_lifecycle_fname{""};
+  /**
+   * @brief Should return the # caches that have been created in the arena this
+   * timestep.
+   */
+  virtual uint caches_created(void) const = 0;
 
-  std::string task_execution_fname{""};
-  std::string task_management_fname{""};
-
-  std::string distance_fname{""};
-  std::string output_dir{""};
-
-  uint collect_interval{0};
+  /**
+   * @brief Should return the # of caches that have been depleted in the arena
+   * this timestep.
+   */
+  virtual uint caches_depleted(void) const = 0;
 };
 
-NS_END(params, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_HPP_ */
