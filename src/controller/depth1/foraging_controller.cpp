@@ -67,7 +67,7 @@ foraging_controller::foraging_controller(void)
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
   perception()->update(depth0::stateful_foraging_controller::los());
-  task_collator().reset();
+  m_task_collator.reset();
 
   saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
   saa_subsystem()->actuation()->block_throttle_update();
@@ -193,20 +193,20 @@ __rcsw_pure std::shared_ptr<tasks::base_foraging_task> foraging_controller::curr
  * Executive Callbacks
  ******************************************************************************/
 void foraging_controller::task_abort_cleanup(const ta::task_graph_vertex&) {
-  task_collator().task_aborted(true);
+  m_task_collator.task_aborted(true);
 } /* task_abort_cleanup() */
 
 void foraging_controller::task_alloc_notify(const ta::task_graph_vertex& task) {
-  task_collator().has_new_allocation(true);
+  m_task_collator.has_new_allocation(true);
   if (nullptr == current_task() ||
       task->name() != m_executive->last_task()->name()) {
-    task_collator().allocation_changed(true);
+    m_task_collator.allocation_changed(true);
   }
 } /* task_alloc_notify() */
 
 void foraging_controller::task_finish_notify(const ta::task_graph_vertex& task) {
-  task_collator().last_task_exec_time(task->exec_time());
-  task_collator().task_finished(true);
+  m_task_collator.task_last_exec_time(task->exec_time());
+  m_task_collator.task_finished(true);
 } /* task_finish_notify() */
 
 /*******************************************************************************
@@ -214,7 +214,7 @@ void foraging_controller::task_finish_notify(const ta::task_graph_vertex& task) 
  ******************************************************************************/
 bool foraging_controller::employed_partitioning(void) const {
   ER_ASSERT(nullptr != current_task(),
-            "FATAL: Have not yet employed partitioning?");
+            "FATAL: Have not yet executed a task?");
 
   auto task = std::dynamic_pointer_cast<ta::executable_task>(current_task());
   auto partitionable = std::dynamic_pointer_cast<ta::partitionable_task>(task);
@@ -224,7 +224,7 @@ bool foraging_controller::employed_partitioning(void) const {
         m_executive->parent_task(
             std::dynamic_pointer_cast<ta::executable_task>(current_task())));
   }
-  ER_ASSERT(nullptr != partitionable, "FATAL: Not an executable task?");
+  ER_ASSERT(nullptr != partitionable, "FATAL: Not partitionable task?");
   return partitionable->employed_partitioning();
 } /* employed_partitioning() */
 

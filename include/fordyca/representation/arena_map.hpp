@@ -100,8 +100,8 @@ class arena_map : public rcppsw::er::client,
    */
   void delete_caches(void);
 
-  void cache_removed(bool b) { m_cache_removed = b; }
-  bool cache_removed(void) const { return m_cache_removed; }
+  void caches_removed(uint b) { m_caches_removed += b; }
+  uint caches_removed(void) const { return m_caches_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
   cell2D& access(const rcppsw::math::dcoord2& coord) {
@@ -198,7 +198,7 @@ class arena_map : public rcppsw::er::client,
 
  private:
   // clang-format off
-  bool                                             m_cache_removed;
+  uint                                             m_caches_removed{0};
   const struct params::depth1::static_cache_params mc_static_cache_params;
   block_vector                                     m_blocks;
   cache_vector                                     m_caches;

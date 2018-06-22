@@ -1,7 +1,7 @@
 /**
- * @file cache_metrics_collector.hpp
+ * @file utilization_metrics_collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,7 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, caches);
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -41,22 +41,22 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_metrics_collector
- * @ingroup metrics
+ * @class utilization_metrics_collector
+ * @ingroup metrics caches
  *
- * @brief Collector for \ref cache_metrics.
+ * @brief Collector for \ref utilization_metrics.
  *
  * Metrics are output at the specified interval.
  */
-class cache_metrics_collector
+class utilization_metrics_collector
     : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<cache_metrics_collector> {
+      public visitor::visitable_any<utilization_metrics_collector> {
  public:
   /**
    * @param ofname Output file name.
    * @param interval Collection interval.
    */
-  cache_metrics_collector(const std::string& ofname, uint interval);
+  utilization_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
@@ -88,6 +88,6 @@ class cache_metrics_collector
   // clang-format on
 };
 
-NS_END(metrics, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHE_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_ */

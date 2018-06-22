@@ -47,14 +47,18 @@ class reactive_collator {
 
   bool task_aborted(void) const { return m_task_aborted; }
   void task_aborted(bool b) { m_task_aborted = b; }
+
   bool task_finished(void) const { return m_task_finish; }
   void task_finished(bool b) { m_task_finish = b; }
+
   bool has_new_allocation(void) const { return m_task_alloc; }
   void has_new_allocation(bool b) { m_task_alloc = b; }
+
   bool allocation_changed(void) const { return m_alloc_sw; }
   void allocation_changed(bool b) { m_alloc_sw = b; }
-  double last_task_exec_time(void) const { return m_last_task_exec_time; }
-  void last_task_exec_time(double d) { m_last_task_exec_time = d; }
+
+  double task_last_exec_time(void) const { return m_last_task_exec_time; }
+  void task_last_exec_time(double d) { m_last_task_exec_time = d; }
 
   void reset(void) {
     m_task_aborted = false;

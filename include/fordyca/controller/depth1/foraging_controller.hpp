@@ -96,23 +96,17 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   bool display_task(void) const { return m_display_task; }
 
   /* task metrics */
-  bool has_aborted_task(void) const override { return task_collator().task_aborted(); }
-  bool has_new_allocation(void) const override { return task_collator().has_new_allocation(); }
-  bool has_changed_allocation(void) const override { return task_collator().has_new_allocation(); }
-  bool has_finished_task(void) const override { return task_collator().task_finished(); }
-  double last_task_exec_time(void) const override { return task_collator().last_task_exec_time(); }
+  bool task_aborted(void) const override { return m_task_collator.task_aborted(); }
+  bool has_new_allocation(void) const override { return m_task_collator.has_new_allocation(); }
+  bool allocation_changed(void) const override { return m_task_collator.has_new_allocation(); }
+  bool task_finished(void) const override { return m_task_collator.task_finished(); }
+  double task_last_exec_time(void) const override { return m_task_collator.task_last_exec_time(); }
 
   std::string current_task_name(void) const override;
   bool employed_partitioning(void) const override;
   std::string subtask_selection(void) const override;
 
  protected:
-  virtual metrics::tasks::reactive_collator& task_collator(void) {
-    return m_task_collator;
-  }
-  const metrics::tasks::reactive_collator& task_collator(void) const {
-    return const_cast<foraging_controller*>(this)->task_collator();
-  }
   /* executive callbacks */
   void task_abort_cleanup(const ta::task_graph_vertex& task);
   void task_alloc_notify(const ta::task_graph_vertex& task);

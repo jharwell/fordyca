@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "fordyca/metrics/cache_metrics.hpp"
+#include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -49,7 +49,7 @@ NS_START(fordyca, representation);
  */
 class arena_cache
     : public base_cache,
-      public metrics::cache_metrics,
+      public metrics::caches::utilization_metrics,
       public rcppsw::patterns::visitor::visitable_any<arena_cache> {
  public:
   arena_cache(double dimension,

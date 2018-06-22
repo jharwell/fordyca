@@ -72,6 +72,7 @@ foraging_controller::foraging_controller(void) :
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
   perception()->update(depth0::stateful_foraging_controller::los());
+  m_task_collator.reset();
 
   saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
   saa_subsystem()->actuation()->block_throttle_update();

@@ -1,7 +1,7 @@
 /**
- * @file management_metrics_collector.hpp
+ * @file lifecycle_metrics_collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,83 +18,67 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <set>
 #include <string>
-#include <vector>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, tasks);
+NS_START(fordyca, metrics, caches);
+
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class management_metrics_collector
- * @ingroup metrics tasks
+ * @class lifecycle_metrics_collector
+ * @ingroup metrics caches
  *
- * @brief Collector for \ref management_metrics.
+ * @brief Collector for \ref lifecycle_metrics.
  *
- * Collects metrics about the allocation of tasks at the level of the task
- * executive/controller. Metrics are written out at the specified interval.
+ * Metrics are output at the specified interval.
  */
-class management_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class lifecycle_metrics_collector
+    : public rcppsw::metrics::base_metrics_collector,
+      public visitor::visitable_any<lifecycle_metrics_collector> {
  public:
   /**
    * @param ofname Output file name.
    * @param interval Collection interval.
    */
-  management_metrics_collector(const std::string& ofname, uint interval);
+  lifecycle_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
-  struct subtask_selection_stats {
-    uint n_harvesters;
-    uint n_collectors;
-  };
-
-  struct partitioning_stats {
-    uint n_partition;
-    uint n_no_partition;
-  };
-
-  struct allocation_stats {
-    uint n_alloc_sw;
-    uint n_abort;
-  };
-
-  struct finish_stats {
-    uint n_completed;
-    uint n_harvester_completed;
-    uint n_collector_completed;
-    uint n_generalist_completed;
-
-    uint cum_collector_exec_time;
-    uint cum_harvester_exec_time;
-    uint cum_generalist_exec_time;
-    uint cum_task_exec_time;
+  /**
+   * @brief All stats are cumulative within an interval.
+   */
+  struct stats {
+    uint n_created;
+    uint n_depleted;
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct subtask_selection_stats m_sel_stats;
-  struct partitioning_stats m_partition_stats;
-  struct allocation_stats m_alloc_stats;
-  struct finish_stats m_finish_stats;
+  // clang-format off
+  struct stats   m_stats;
+  // clang-format on
 };
 
-NS_END(tasks, metrics, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_TASKS_MANAGEMENT_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_METRICS_COLLECTOR_HPP_ */

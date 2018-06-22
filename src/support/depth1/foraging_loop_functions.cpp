@@ -28,7 +28,8 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/metrics/cache_metrics_collector.hpp"
+#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
@@ -164,9 +165,11 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
-    collector_group().collect("cache", static_cast<metrics::cache_metrics&>(*c));
+    collector_group().collect("caches::utilization", *c);
     c->reset_metrics();
   } /* for(&c..) */
+  collector_group().collect("caches::lifecycle", m_cache_collator);
+  m_cache_collator.reset_metrics();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
@@ -205,13 +208,14 @@ void foraging_loop_functions::pre_step_final(void) {
                 "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                 arena_map()->caches()[0]->n_blocks(),
                 cell.block_count());
+      m_cache_collator.cache_created();
       floor()->SetChanged();
     }
   }
-
-  if (arena_map()->cache_removed()) {
+  if (arena_map()->caches_removed() > 0) {
+    m_cache_collator.cache_depleted();
     floor()->SetChanged();
-    arena_map()->cache_removed(false);
+    arena_map()->caches_removed(0);
   }
 
   collector_group().metrics_write_all(GetSpace().GetSimulationClock());
@@ -253,9 +257,13 @@ void foraging_loop_functions::metric_collecting_init(
           metrics_path() + "/" + output_p->metrics.task_management_fname,
           output_p->metrics.collect_interval);
 
-  collector_group().register_collector<metrics::cache_metrics_collector>(
-      "cache",
-      metrics_path() + "/" + output_p->metrics.cache_fname,
+  collector_group().register_collector<metrics::caches::utilization_metrics_collector>(
+      "caches::utilization",
+      metrics_path() + "/" + output_p->metrics.cache_utilization_fname,
+      output_p->metrics.collect_interval);
+  collector_group().register_collector<metrics::caches::lifecycle_metrics_collector>(
+      "caches::lifecycle",
+      metrics_path() + "/" + output_p->metrics.cache_lifecycle_fname,
       output_p->metrics.collect_interval);
   collector_group().reset_all();
 } /* metric_collecting_init() */
