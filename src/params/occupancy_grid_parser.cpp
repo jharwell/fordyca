@@ -43,6 +43,7 @@ void occupancy_grid_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_grid_parser.parse(onode);
   m_pheromone_parser.parse(onode);
+
   m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_params->grid = *m_grid_parser.parse_results();
   m_params->pheromone = *m_pheromone_parser.parse_results();

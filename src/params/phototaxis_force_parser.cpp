@@ -65,6 +65,7 @@ __rcsw_pure bool phototaxis_force_parser::validate(void) const {
   if (m_parsed) {
     return m_params->max >= 0;
   }
+  return true;
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -325,8 +325,6 @@ class arena_interactor : public depth0::arena_interactor<T> {
 
  private:
   // clang-format off
-  argos::CRange<double>             mc_nest_xrange;
-  argos::CRange<double>             mc_nest_yrange;
   existing_cache_penalty_handler<T> m_cache_penalty_handler;
   // clang-format on
 };

@@ -43,6 +43,7 @@ void actuation_parser::parse(const ticpp::Element& node) {
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
   m_throttling.parse(anode);
+
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_params->differential_drive = *m_differential_drive.parse_results();
