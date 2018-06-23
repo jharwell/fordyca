@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/fsm/base_fsm_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,7 @@ void base_fsm_metrics_collector::reset(void) {
 
 void base_fsm_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
+  auto& m = dynamic_cast<const metrics::fsm::base_fsm_metrics&>(metrics);
   m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
   m_stats.n_cum_avoiding_collision +=
       static_cast<uint>(m.is_avoiding_collision());

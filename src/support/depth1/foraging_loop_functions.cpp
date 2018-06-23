@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
- */
+n */
 
 /*******************************************************************************
  * Includes
@@ -28,17 +28,13 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
-#include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
+#include "fordyca/support/depth1/metrics_aggregator.hpp"
 
 #include "rcppsw/er/server.hpp"
 
@@ -64,7 +60,9 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   cache_handling_init(arenap);
 
   /* initialize stat collecting */
-  metric_collecting_init(repo.parse_results<struct params::output_params>());
+  auto* p_output = repo.parse_results<params::output_params>();
+  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(
+      rcppsw::er::g_server, &p_output->metrics, output_root());
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -89,39 +87,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect(
-      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  collector_group().collect(
-      "tasks::management",
-      static_cast<rcppsw::metrics::tasks::management_metrics&>(controller));
-
-  if (nullptr != controller.current_task()) {
-    collector_group().collect_if(
-        "fsm::block_acquisition",
-        static_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller.current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kBlock ==
-                 static_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-    collector_group().collect_if(
-        "fsm::cache_acquisition",
-        static_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller.current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kExistingCache ==
-                 static_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-
-    collector_group().collect(
-        "tasks::execution",
-        static_cast<rcppsw::metrics::tasks::execution_metrics&>(
-            *controller.current_task()));
-  }
+  m_metrics_agg->collect_from_controller(&controller);
 
   /* send the robot its view of the world: what it sees and where it is */
   utils::set_robot_pos<decltype(controller)>(robot);
@@ -165,10 +131,10 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 void foraging_loop_functions::PreStep() {
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
-    collector_group().collect("caches::utilization", *c);
+    m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
-  collector_group().collect("caches::lifecycle", m_cache_collator);
+  m_metrics_agg->collect_from_cache_collator(&m_cache_collator);
   m_cache_collator.reset_metrics();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -180,7 +146,7 @@ void foraging_loop_functions::PreStep() {
 } /* PreStep() */
 
 void foraging_loop_functions::Reset() {
-  collector_group().reset_all();
+  m_metrics_agg->reset_all();
   arena_map()->static_cache_create();
 }
 
@@ -195,7 +161,7 @@ void foraging_loop_functions::pre_step_final(void) {
    */
   if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
     auto& collector = static_cast<metrics::tasks::execution_metrics_collector&>(
-        *collector_group()["tasks::execution"]);
+        *(*m_metrics_agg)["tasks::execution"]);
     int n_harvesters = collector.n_harvesters();
     int n_collectors = collector.n_collectors();
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
@@ -218,10 +184,10 @@ void foraging_loop_functions::pre_step_final(void) {
     arena_map()->caches_removed(0);
   }
 
-  collector_group().metrics_write_all(GetSpace().GetSimulationClock());
-  collector_group().timestep_reset_all();
-  collector_group().interval_reset_all();
-  collector_group().timestep_inc_all();
+  m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_reset_all();
+  m_metrics_agg->interval_reset_all();
+  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 void foraging_loop_functions::cache_handling_init(
@@ -236,37 +202,6 @@ void foraging_loop_functions::cache_handling_init(
 
   mc_cache_respawn_scale_factor = arenap->static_cache.respawn_scale_factor;
 } /* cache_handling_init() */
-
-void foraging_loop_functions::metric_collecting_init(
-    const struct params::output_params* output_p) {
-  collector_group()
-      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-          "fsm::cache_acquisition",
-          metrics_path() + "/" + output_p->metrics.cache_acquisition_fname,
-          output_p->metrics.collect_interval);
-
-  collector_group()
-      .register_collector<metrics::tasks::execution_metrics_collector>(
-          "tasks::execution",
-          metrics_path() + "/" + output_p->metrics.task_execution_fname,
-          output_p->metrics.collect_interval);
-
-  collector_group()
-      .register_collector<metrics::tasks::management_metrics_collector>(
-          "tasks::management",
-          metrics_path() + "/" + output_p->metrics.task_management_fname,
-          output_p->metrics.collect_interval);
-
-  collector_group().register_collector<metrics::caches::utilization_metrics_collector>(
-      "caches::utilization",
-      metrics_path() + "/" + output_p->metrics.cache_utilization_fname,
-      output_p->metrics.collect_interval);
-  collector_group().register_collector<metrics::caches::lifecycle_metrics_collector>(
-      "caches::lifecycle",
-      metrics_path() + "/" + output_p->metrics.cache_lifecycle_fname,
-      output_p->metrics.collect_interval);
-  collector_group().reset_all();
-} /* metric_collecting_init() */
 
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support

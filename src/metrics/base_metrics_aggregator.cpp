@@ -1,5 +1,5 @@
 /**
- * @file new_cache_interactor.hpp
+ * @file base_metrics_aggregator.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,42 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "fordyca/metrics/base_metrics_aggregator.hpp"
+#include "fordyca/params/metrics_params.hpp"
+
+#include <experimental/filesystem>
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace events {
-class free_block_drop;
-} // namespace events
-
-namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth2);
+namespace fs = std::experimental::filesystem;
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * @class new_cache_interactor
- * @ingroup tasks_depth2
- *
- * @brief Interactor specifying the event visit set for all foraging
- * tasks_depth2 that interact with new caches in FORDYCA.
- */
-class new_cache_interactor
-    : public virtual metrics::fsm::goal_acquisition_metrics,
-      public visitor::polymorphic_accept_set<events::free_block_drop> {};
+base_metrics_aggregator::base_metrics_aggregator(
+    std::shared_ptr<rcppsw::er::server> server,
+    const struct params::metrics_params* params,
+    const std::string& output_root) : client(server), collector_group() {
+  m_metrics_path = output_root + "/" + params->output_dir;
+  if (fs::exists(m_metrics_path)) {
+    fs::remove_all(m_metrics_path);
+  }
+  fs::create_directories(m_metrics_path);
+}
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
 
-NS_END(depth2, tasks, fordyca);
-
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_ */
+NS_END(metrics, fordyca);

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,7 @@ NS_START(fordyca, metrics, fsm);
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving
  * to it directly, exploring for it, etc).
  */
-class goal_acquisition_metrics : public base_fsm_metrics {
+class goal_acquisition_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
   enum class goal_type {
     kNone,

@@ -55,6 +55,7 @@ NS_START(depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
+                                      public metrics::fsm::base_fsm_metrics,
                                       public metrics::fsm::goal_acquisition_metrics,
                                       public fsm::block_transporter,
                                       public visitor::visitable_any<stateless_foraging_controller> {

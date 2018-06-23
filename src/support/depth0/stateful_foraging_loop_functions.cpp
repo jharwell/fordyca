@@ -38,6 +38,7 @@
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,12 +61,8 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<const struct params::output_params>();
-  collector_group()
-      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-          "fsm::block_acquisition",
-          metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
-          p_output->metrics.collect_interval);
-  collector_group().reset_all();
+  m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
+      rcppsw::er::g_server, &p_output->metrics, output_root());
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -89,15 +86,8 @@ void stateful_foraging_loop_functions::pre_step_iter(
       static_cast<controller::depth0::stateful_foraging_controller&>(
           robot.GetControllableEntity().GetController());
 
-  /* get stats from this robot before its state changes */
-  collector_group().collect(
-      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  if (controller.current_task()) {
-    collector_group().collect(
-        "fsm::block_acquisition",
-        static_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller.current_task()));
-  }
+  /* collect metrics from robot before its state changes */
+  m_metrics_agg->collect_from_controller(&controller);
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);

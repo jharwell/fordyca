@@ -31,6 +31,8 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 
+class stateful_metrics_aggregator;
+
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -56,6 +58,8 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+
+  std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg{nullptr};
 };
 
 NS_END(depth0, support, fordyca);

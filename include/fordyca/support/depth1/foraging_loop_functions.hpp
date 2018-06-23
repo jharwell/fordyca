@@ -35,6 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 
+class metrics_aggregator;
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -101,13 +102,13 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void metric_collecting_init(const struct params::output_params *output_p);
   void cache_handling_init(const struct params::arena_map_params *arenap);
 
   // clang-format off
   double                              mc_cache_respawn_scale_factor{0.0};
   std::unique_ptr<interactor>         m_interactor{nullptr};
   metrics::caches::lifecycle_collator m_cache_collator{};
+  std::unique_ptr<metrics_aggregator> m_metrics_agg{nullptr};
   // clang-format on
 };
 
