@@ -56,6 +56,10 @@ void base_perception_subsystem::update(
   m_map->update();
 } /* update() */
 
+void base_perception_subsystem::reset(void) {
+    m_map->reset();
+}
+
 void base_perception_subsystem::process_los(
     const representation::line_of_sight* const los) {
   /*

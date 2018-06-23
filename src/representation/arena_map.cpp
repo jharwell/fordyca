@@ -102,7 +102,6 @@ void arena_map::distribute_block(const std::shared_ptr<block>& block) {
       rcppsw::math::dcoord2 d_coord =
           math::rcoord_to_dcoord(r_coord, m_grid.resolution());
       cell = &m_grid.access(d_coord.first, d_coord.second);
-
       /*
        * You can only distribute blocks to cells that do not currently have
        * anything in them.
@@ -167,6 +166,9 @@ void arena_map::static_cache_create(void) {
 } /* static_cache_create() */
 
 void arena_map::distribute_blocks(void) {
+  // Reset all the cells to clear old references to blocks
+  m_grid.reset();
+  
   for (auto& b : m_blocks) {
     distribute_block(b);
   } /* for(b..) */

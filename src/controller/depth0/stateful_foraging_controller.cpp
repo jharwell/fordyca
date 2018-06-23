@@ -136,6 +136,11 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
 
+void stateful_foraging_controller::Reset(void) {
+  stateless_foraging_controller::Reset();
+  m_perception->reset();
+} /* Reset() */
+
 void stateful_foraging_controller::tasking_init(
     const struct params::fsm_params* fsm_params,
     const ta::executive_params* exec_params) {

@@ -60,6 +60,12 @@ class occupancy_grid : public rcppsw::er::client,
    * @brief Update the density of all cells in the grid.
    */
   void update(void);
+
+  /**
+   * @brief Reset all the cells in the grid
+   */
+  void reset(void);
+
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;
   }

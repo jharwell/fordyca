@@ -26,21 +26,48 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/ds/grid2D_ptr.hpp"
+#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er {
-class server;
-}} // namespace rcppsw::er
+// namespace rcppsw { namespace er {
+// class server;
+// }} // namespace rcppsw::er
 NS_START(fordyca, representation);
-class cell2D;
+// class cell2D;
 
 /*******************************************************************************
- * Type Definitions
+ * Class Definitions
  ******************************************************************************/
-using arena_grid =
-    rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>;
+/**
+ * @class arena_grid
+ * @ingroup representation
+ *
+ * @brief Representation of the cells within a grid layout
+ */
+class arena_grid : public rcppsw::ds::grid2D_ptr<cell2D, 
+                                        std::shared_ptr<rcppsw::er::server>&> {
+ public:
+   arena_grid(const double& resolution, size_t x_max, size_t y_max, 
+       std::shared_ptr<rcppsw::er::server>& server) :
+     rcppsw::ds::grid2D_ptr<cell2D, 
+       std::shared_ptr<rcppsw::er::server>&>(resolution, x_max, y_max, server) {
+   }
+
+   /**
+    * @brief Reset all the cells within the grid, removing all
+    * references to old blocks.
+    */
+   void reset(void) {
+     for (size_t i = 0; i < xdsize(); ++i) {
+       for (size_t j = 0; j < ydsize(); ++j) {
+         cell2D& cell = access(i, j);
+         cell.reset();
+       } /* for(j..) */
+     }   /* for(i..) */
+   } /* reset */
+};
 
 NS_END(representation, fordyca);
 

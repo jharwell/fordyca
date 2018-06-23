@@ -29,6 +29,8 @@
 #include "fordyca/params/perception_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/params/perception_params.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,6 +69,11 @@ class base_perception_subsystem : public rcppsw::er::client {
    */
   void update(const representation::line_of_sight* const los);
 
+  /**
+   * @brief Reset the robot's perception of the environment to an initial state
+   */
+  void reset(void);
+  
   const std::shared_ptr<representation::perceived_arena_map>& map(void) const {
     return m_map;
   }

@@ -169,6 +169,11 @@ class perceived_arena_map
    */
   void update(void) { m_grid.update(); }
 
+  /**
+   * @brief Reset all the cells in the percieved arena.
+   */
+  void reset(void) { m_grid.reset(); }
+
  private:
   // clang-format off
   std::shared_ptr<rcppsw::er::server> m_server;

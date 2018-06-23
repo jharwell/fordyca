@@ -89,7 +89,10 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Reset the cell to its UNKNOWN state.
    */
-  void reset(void) { m_fsm.init(); }
+  void reset(void) { 
+    m_fsm.init();
+    m_entity.reset();
+  }
 
   size_t block_count(void) const { return m_fsm.block_count(); }
 
