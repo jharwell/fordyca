@@ -72,7 +72,7 @@ NS_START(controller, depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public rcppsw::metrics::tasks::management_metrics,
+                            public virtual rcppsw::metrics::tasks::management_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);

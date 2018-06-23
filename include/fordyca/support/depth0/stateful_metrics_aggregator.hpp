@@ -1,5 +1,5 @@
 /**
- * @file new_cache_interactor.hpp
+ * @file stateful_metrics_aggregator.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,42 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_
+#ifndef INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
+#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace events {
-class free_block_drop;
-} // namespace events
+namespace controller { namespace depth0 { class stateful_foraging_controller; }}
 
-namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth2);
+NS_START(support, depth0);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @class new_cache_interactor
- * @ingroup tasks_depth2
+ * @class stateful_metrics_aggregator
+ * @ingroup support depth0
  *
- * @brief Interactor specifying the event visit set for all foraging
- * tasks_depth2 that interact with new caches in FORDYCA.
+ * @brief Aggregates and metrics metric collection for stateful foraging. That
+ * includes:
+ *
+ * - FSM distance/block acquisition metrics
  */
-class new_cache_interactor
-    : public virtual metrics::fsm::goal_acquisition_metrics,
-      public visitor::polymorphic_accept_set<events::free_block_drop> {};
 
-NS_END(depth2, tasks, fordyca);
+class stateful_metrics_aggregator : public stateless_metrics_aggregator {
+ public:
+  stateful_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
+                               const struct params::metrics_params* params,
+                               const std::string& output_root);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_NEW_CACHE_INTERACTOR_HPP_ */
+  void collect_from_controller(
+      const controller::depth0::stateful_foraging_controller* controller);
+};
+
+NS_END(depth0, support, fordyca);
+
+#endif /* INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_ */

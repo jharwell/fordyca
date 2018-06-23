@@ -1,7 +1,7 @@
 /**
- * @file distance_metrics_collector.cpp
+ * @file stateful_metrics_aggregator.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,52 +21,45 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+NS_START(fordyca, support, depth0);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Constructors/Destructors
  ******************************************************************************/
-distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
-                                                       uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+stateful_metrics_aggregator::stateful_metrics_aggregator(
+    std::shared_ptr<rcppsw::er::server> server,
+    const struct params::metrics_params* params,
+    const std::string& output_root)
+    : stateless_metrics_aggregator(server, params, output_root) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string distance_metrics_collector::csv_header_build(
-    const std::string& header) {
-  std::string line;
-  line = "cum_distance";
-  return base_metrics_collector::csv_header_build(header) + line;
-} /* csv_header_build() */
+void stateful_metrics_aggregator::collect_from_controller(
+const controller::depth0::stateful_foraging_controller* const controller) {
+  auto distance_m = dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
+  collect("fsm::distance", *distance_m);
 
-void distance_metrics_collector::reset(void) {
-  base_metrics_collector::reset();
-  reset_after_interval();
-} /* reset() */
-
-bool distance_metrics_collector::csv_line_build(std::string& line) {
-  if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+  if (controller->current_task()) {
+    auto block_acq_m = std::dynamic_pointer_cast<metrics::fsm::goal_acquisition_metrics>(
+        controller->current_task());
+    ER_ASSERT(block_acq_m,
+              "FATAL: Controller does not provide FSM block acquisition metrics");
+    collector_group().collect(
+        "fsm::block_acquisition", *block_acq_m);
   }
-  line += std::to_string(m_stats.cum_distance) + separator();
-  return true;
-} /* csv_line_build() */
 
-void distance_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const metrics::fsm::distance_metrics&>(metrics);
-  m_stats.cum_distance += m.timestep_distance();
-} /* collect() */
 
-void distance_metrics_collector::reset_after_interval(void) {
-  m_stats = {0};
-} /* reset_after_interval() */
+} /* collect_from_controller() */
 
-NS_END(fsm, metrics, fordyca);
+NS_END(depth0, support, fordyca);

@@ -82,7 +82,7 @@ void management_metrics_collector::reset(void) {
 
 void management_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const task_metrics::management_metrics&>(metrics);
+  auto& m = dynamic_cast<const task_metrics::management_metrics&>(metrics);
   if (m.has_new_allocation()) {
     if (m.employed_partitioning()) {
       ++m_partition_stats.n_partition;

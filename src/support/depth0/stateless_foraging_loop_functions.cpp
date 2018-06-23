@@ -25,14 +25,11 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <experimental/filesystem>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -40,12 +37,12 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-namespace fs = std::experimental::filesystem;
 using interactor =
     arena_interactor<controller::depth0::stateless_foraging_controller>;
 
@@ -53,10 +50,7 @@ using interactor =
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server),
-      m_output_root(),
-      m_metrics_path(),
-      m_collector_group() {
+    : client(rcppsw::er::g_server) {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -80,9 +74,10 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<params::output_params>();
   auto* p_vis = repo.parse_results<params::visualization_params>();
 
-  /* initialize output */
+  /* initialize output and metrics collection */
   output_init(p_output);
-  metric_collecting_init(p_output);
+  m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
+      rcppsw::er::g_server, &p_output->metrics, m_output_root);
 
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
                                        p_output->log_fname);
@@ -107,12 +102,12 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
 }
 
 void stateless_foraging_loop_functions::Reset() {
-  m_collector_group.reset_all();
+  m_metrics_agg->reset_all();
   m_arena_map->distribute_blocks();
 }
 
 void stateless_foraging_loop_functions::Destroy() {
-  m_collector_group.finalize_all();
+  m_metrics_agg->finalize_all();
 }
 
 __rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
@@ -141,11 +136,8 @@ void stateless_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_collector_group.collect(
-      "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
-  m_collector_group.collect(
-      "fsm::block_acquisition",
-      static_cast<metrics::fsm::goal_acquisition_metrics&>(controller));
+  m_metrics_agg->collect_from_controller(
+      static_cast<rcppsw::metrics::base_metrics*>(&controller));
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
@@ -156,10 +148,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
-  m_collector_group.metrics_write_all(GetSpace().GetSimulationClock());
-  m_collector_group.timestep_reset_all();
-  m_collector_group.interval_reset_all();
-  m_collector_group.timestep_inc_all();
+  m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_reset_all();
+  m_metrics_agg->interval_reset_all();
+  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
@@ -170,28 +162,6 @@ void stateless_foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
-
-void stateless_foraging_loop_functions::metric_collecting_init(
-    const struct params::output_params* p_output) {
-  m_metrics_path = m_output_root + "/" + p_output->metrics.output_dir;
-  if (fs::exists(m_metrics_path)) {
-    fs::remove_all(m_metrics_path);
-  }
-  fs::create_directories(m_metrics_path);
-
-  m_collector_group
-      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-          "fsm::block_acquisition",
-          m_metrics_path + "/" + p_output->metrics.block_acquisition_fname,
-          p_output->metrics.collect_interval);
-
-  m_collector_group.register_collector<metrics::fsm::distance_metrics_collector>(
-      "fsm::distance",
-      m_metrics_path + "/" + p_output->metrics.distance_fname,
-      p_output->metrics.collect_interval);
-
-  m_collector_group.reset_all();
-} /* metric_collecting_init() */
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {

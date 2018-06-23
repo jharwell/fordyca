@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, fsm);
  * @brief Interface defining what metrics should be collected ANY FSM as it goes
  * about whatever task it is supposed to do.
  */
-class base_fsm_metrics : public rcppsw::metrics::base_metrics {
+class base_fsm_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   base_fsm_metrics(void) = default;
   ~base_fsm_metrics(void) override = default;

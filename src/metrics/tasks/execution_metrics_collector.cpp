@@ -69,7 +69,7 @@ void execution_metrics_collector::reset(void) {
 
 void execution_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const task_metrics::execution_metrics&>(metrics);
+  auto& m = dynamic_cast<const task_metrics::execution_metrics&>(metrics);
   auto& task =
       dynamic_cast<const rcppsw::task_allocation::logical_task&>(metrics);
 

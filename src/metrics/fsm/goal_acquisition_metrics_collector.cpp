@@ -60,7 +60,7 @@ void goal_acquisition_metrics_collector::reset(void) {
 
 void goal_acquisition_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
+  auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
   m_stats.n_exploring_for_goal += static_cast<uint>(m.is_exploring_for_goal());
   ++m_stats.n_acquiring_goal;
   m_stats.n_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
