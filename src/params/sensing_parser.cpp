@@ -38,24 +38,23 @@ constexpr char sensing_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void sensing_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
+  ticpp::Element snode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  ticpp::Element pnode = argos::GetNode(bnode, "proximity");
 
-  XML_PARSE_PARAM(pnode, m_params.proximity, delta);
+  m_params =
+  std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_proximity_parser.parse(snode);
+  m_params->proximity = *m_proximity_parser.parse_results();
 } /* parse() */
 
 void sensing_parser::show(std::ostream& stream) const {
   stream << build_header()
-         << XML_PARAM_STR(m_params.proximity, delta) << std::endl
+         << m_proximity_parser
          << build_footer();
 } /* show() */
 
-__pure bool sensing_parser::validate(void) const {
-  if (m_params.proximity.delta <= 0) {
-    return false;
-  }
-  return true;
+__rcsw_pure bool sensing_parser::validate(void) const {
+  return m_proximity_parser.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

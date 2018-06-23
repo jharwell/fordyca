@@ -55,6 +55,9 @@ class block_utility : public rcppsw::math::expression<double> {
                 const argos::CVector2& nest_loc);
 
   double calc(const argos::CVector2& rloc, double density);
+  double operator()(const argos::CVector2& rloc, double density) {
+    return calc(rloc, density);
+  }
 
  private:
   const argos::CVector2 mc_block_loc;

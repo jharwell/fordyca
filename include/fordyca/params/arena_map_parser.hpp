@@ -27,9 +27,12 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/params/block_distribution_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
-#include "fordyca/params/depth1/cache_parser.hpp"
+#include "fordyca/params/depth1/static_cache_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/nest_parser.hpp"
+
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
@@ -49,11 +52,13 @@ NS_START(fordyca, params);
  */
 class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit arena_map_parser(uint level)
-      : xml_param_parser(level),
-        m_grid_parser(level + 1),
-        m_block_parser(level + 1),
-        m_cache_parser(level + 1) {}
+  arena_map_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level),
+        m_grid_parser(server, level + 1),
+        m_block_parser(server, level + 1),
+        m_block_dist_parser(server, level + 1),
+        m_cache_parser(server, level + 1),
+        m_nest_parser(server, level + 1) {}
 
   /**
    * @brief The root tag that all arena map parameters should lie under in the
@@ -66,15 +71,24 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct arena_map_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<arena_map_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct arena_map_params m_params {};
-  grid_parser m_grid_parser;
-  block_parser m_block_parser;
-  depth1::cache_parser m_cache_parser;
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  std::shared_ptr<arena_map_params> m_params{nullptr};
+  grid_parser                       m_grid_parser;
+  block_parser                      m_block_parser;
+  block_distribution_parser         m_block_dist_parser;
+  depth1::static_cache_parser       m_cache_parser;
+  nest_parser                       m_nest_parser;
+  // clang-format on
 };
 
 NS_END(params, fordyca);

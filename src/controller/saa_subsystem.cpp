@@ -39,13 +39,11 @@ saa_subsystem::saa_subsystem(
     struct actuation_subsystem::actuator_list* const actuator_list,
     struct base_sensing_subsystem::sensor_list* const sensor_list)
     : client(server),
-      m_actuation(std::make_shared<actuation_subsystem>(server,
-                                                        aparams,
-                                                        actuator_list)),
-      m_sensing(std::make_shared<base_sensing_subsystem>(sparams,
-                                                         sensor_list)),
+      m_actuation(
+          std::make_shared<actuation_subsystem>(server, aparams, actuator_list)),
+      m_sensing(std::make_shared<base_sensing_subsystem>(sparams, sensor_list)),
       m_steering(server, *this, &aparams->steering, m_sensing) {
-    if (ERROR == client::attmod("saa_subsystem")) {
+  if (ERROR == client::attmod("saa_subsystem")) {
     client::insmod("saa_subsystem",
                    rcppsw::er::er_lvl::DIAG,
                    rcppsw::er::er_lvl::NOM);
@@ -72,7 +70,8 @@ void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
           m_steering.value().Length());
 
   m_actuation->differential_drive().fsm_drive(m_steering.value().Length(),
-                                              m_steering.value().Angle(), force);
+                                              m_steering.value().Angle(),
+                                              force);
   m_steering.reset();
 }
 NS_END(controller, fordyca);

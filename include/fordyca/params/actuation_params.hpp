@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/throttling_params.hpp"
-#include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
 #include "fordyca/params/steering_force2D_params.hpp"
+#include "fordyca/params/throttling_params.hpp"
 #include "rcppsw/params/base_params.hpp"
+#include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
 
 /*******************************************************************************
  * Namespaces

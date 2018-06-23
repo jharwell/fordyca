@@ -39,12 +39,12 @@ NS_START(fordyca, params, depth1);
  * @ingroup params depth1
  *
  * @brief Collection of all parameter parsers and parse results needed
- * controllers using tasks.
+ * by the \ref depth1::foraging_controller.
  */
 class task_repository: public rcppsw::params::xml_param_repository {
  public:
-  static constexpr char kName[] = "task_repository";
-  task_repository(void);
+  static constexpr char kName[] = "depth0_task_repository";
+  task_repository(const std::shared_ptr<rcppsw::er::server>& server);
 };
 
 NS_END(depth1, params, fordyca);

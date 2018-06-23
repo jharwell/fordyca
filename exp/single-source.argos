@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+
 <argos-configuration>
 
   <!-- ************************* -->
@@ -15,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <depth1_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -41,28 +42,34 @@
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
-        <task_allocation>
-          <executive
-              estimation_alpha="0.8"
-              abort_reactivity="8"
-              abort_offset="4"
-              partition_reactivity="0.5"
-              partition_offset="2"
-              subtask_selection_method="harwell2018"
-              partition_method="pini2011"
+        <task_executive>
+          <estimation alpha="0.8"/>
+          <task_abort reactivity="8"
+                    offset="3"
+                    />
+          <task_partition
+              method="pini2011"
               always_partition="true"
               never_partition="false"
+              reactivity="1.5"
+              offset="1.0"
               />
-          <exec_estimates
-              enabled="true"
-              generalist_range="2000:4000"
-              collector_range="1000:2000"
-              harvester_range="1000:2000"
+          <subtask_selection
+              method="harwell2018"
+              reactivity="8"
+              offset="1.25"
+              gamma="1.0"
               />
-        </task_allocation>
+        </task_executive>
+        <task_exec_estimates
+            enabled="true"
+            generalist_range="2000:4000"
+            collector_range="1000:2000"
+            harvester_range="1000:2000"
+            />
         <sensing>
-          <proximity angle_range="-1.1:1.1"
-                     delta="0.0001" />
+          <proximity_sensor angle_range="-1.1:1.1"
+                            delta="0.0001" />
         </sensing>
         <actuation>
           <throttling
@@ -89,7 +96,7 @@
           nest="2.0, 2.5"
           />
       </params>
-    </stateful_foraging_controller>
+    </depth1_foraging_controller>
 
   </controllers>
 
@@ -97,7 +104,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="depth1_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -105,33 +112,36 @@
            />
       <metrics
           output_dir="metrics"
-          stateless_fname="stateless-stats.csv"
-          stateful_fname="stateful-stats.csv"
-          depth1_fname="depth1-stats.csv"
-          block_fname="block-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
           distance_fname="distance-stats.csv"
+          block_fname="block-stats.csv"
+          cache_fname="cache-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
-          cache_fname="cache-stats.csv"
           collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks n_blocks="20"
-              dimension="0.2"
-              dist_model="single_source"
-              />
-      <caches create_static="true"
-              create_dynamic="false"
-              static_size="2"
-              static_respawn_scale_factor="0.05"
-              dimension="0.8"
-              min_dist="0.8"
-              usage_penalty="10"
-              />
-      <nest size="0.5, 2.0" center="2, 2.5" />
+      <blocks dimension="0.2" />
+      <block_distribution n_blocks="20"
+                          dist_type="single_source"
+                          arena_model.shape="rectangle"
+                          arena_model.orientation="horizontal"
+                          nest_model.shape="rectangle"
+                          nest_model.orientation="horizontal"
+                          />
+      <static_caches enable="true"
+                     size="2"
+                     respawn_scale_factor="0.05"
+                     dimension="0.8"
+                     min_dist="0.8"
+                     usage_penalty="10"
+                     />
+      <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
     <visualization robot_id="true"
                    robot_los="false"
@@ -221,7 +231,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
+      <user_functions label="depth1_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

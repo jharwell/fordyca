@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 
-#include "rcppsw/common/common.hpp"
-#include "fordyca/controller/steering_force_type.hpp"
 #include "fordyca/controller/phototaxis_force.hpp"
+#include "fordyca/controller/steering_force_type.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/steering2D/force_calculator.hpp"
 
 /*******************************************************************************
@@ -35,7 +35,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct steering_force2D_params; }
+namespace params {
+struct steering_force2D_params;
+}
 
 NS_START(controller);
 namespace steering = rcppsw::robotics::steering2D;

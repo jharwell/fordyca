@@ -34,13 +34,13 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
+loop_function_repository::loop_function_repository(
+    const std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
   register_parser<output_parser, output_params>(
-      output_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<arena_map_parser, arena_map_params>(
-      arena_map_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      arena_map_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);

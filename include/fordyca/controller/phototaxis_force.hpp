@@ -32,7 +32,9 @@
  * namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { struct phototaxis_force_params; }
+namespace params {
+struct phototaxis_force_params;
+}
 
 NS_START(controller);
 class base_sensing_subsystem;
@@ -50,8 +52,9 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class phototaxis_force {
  public:
-  explicit phototaxis_force(const struct params::phototaxis_force_params* params,
-                            const std::shared_ptr<base_sensing_subsystem>& sensors);
+  explicit phototaxis_force(
+      const struct params::phototaxis_force_params* params,
+      const std::shared_ptr<base_sensing_subsystem>& sensors);
 
   argos::CVector2 operator()() const;
 

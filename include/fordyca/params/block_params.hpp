@@ -40,9 +40,7 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct block_params : public rcppsw::params::base_params {
-  uint n_blocks{0};
   double dimension{0.0};
-  std::string dist_model{""};
 };
 
 NS_END(params, fordyca);

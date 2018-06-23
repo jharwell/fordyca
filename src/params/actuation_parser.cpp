@@ -43,20 +43,21 @@ void actuation_parser::parse(const ticpp::Element& node) {
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
   m_throttling.parse(anode);
-  m_params.differential_drive = *m_differential_drive.parse_results();
-  m_params.steering = *m_steering.parse_results();
-  m_params.throttling = *m_throttling.parse_results();
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params->differential_drive = *m_differential_drive.parse_results();
+  m_params->steering = *m_steering.parse_results();
+  m_params->throttling = *m_throttling.parse_results();
 } /* parse() */
 
 void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_differential_drive << m_steering << m_throttling
+  stream << build_header() << m_differential_drive << m_steering << m_throttling
          << build_footer();
 } /* show() */
 
-__pure bool actuation_parser::validate(void) const {
+__rcsw_pure bool actuation_parser::validate(void) const {
   return m_differential_drive.validate() && m_steering.validate() &&
-      m_throttling.validate();
+         m_throttling.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

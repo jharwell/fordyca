@@ -26,8 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
-#include "fordyca/support/depth1/cache_penalty_handler.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
 
 /*******************************************************************************
@@ -44,10 +43,8 @@ NS_START(fordyca, support, depth1);
  *
  * @brief The loop functions for depth 1 foraging.
  *
- * Handles:
- *
- * - Robots picking up from/dropping in a cache
- * - Subjecting robots using caches to a penalty (only on pickup).
+ * Handles all operations robots perform relating to static caches: pickup,
+ * drop, etc.
  */
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
@@ -77,10 +74,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
             map.subgrid(robot_loc.first, robot_loc.second, 2),
             robot_loc);
 
-    /*
-     * [JRH]: TODO: Once caches are arena entities, then this make not be
-     * necessary.
-     */
     for (auto &c : map.caches()) {
       argos::CVector2 ll = math::dcoord_to_rcoord(new_los->abs_ll(),
                                                   map.grid_resolution());

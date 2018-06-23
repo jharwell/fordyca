@@ -72,7 +72,7 @@ void occupancy_grid::update(void) {
   }   /* for(i..) */
 } /* update() */
 
-void occupancy_grid::Reset(void) {
+void occupancy_grid::reset(void) {
   for (size_t i = 0; i < stacked_grid2::xdsize(); ++i) {
     for (size_t j = 0; j < stacked_grid2::ydsize(); ++j) {
       cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);

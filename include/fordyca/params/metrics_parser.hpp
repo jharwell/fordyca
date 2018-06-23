@@ -47,7 +47,8 @@ NS_START(fordyca, params);
  */
 class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit metrics_parser(uint level) : xml_param_parser(level) {}
+  metrics_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all loop functions relating to metrics parameters
@@ -60,13 +61,20 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct metrics_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<metrics_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  bool m_parsed{false};
-  struct metrics_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  bool                            m_parsed{false};
+  std::shared_ptr<metrics_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);

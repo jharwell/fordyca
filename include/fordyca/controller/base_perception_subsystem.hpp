@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/perception_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "fordyca/params/perception_params.hpp"
@@ -36,7 +37,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class line_of_sight; class perceived_arena_map; }
+namespace representation {
+class line_of_sight;
+class perceived_arena_map;
+} // namespace representation
 
 NS_START(controller);
 
@@ -53,7 +57,7 @@ NS_START(controller);
  */
 class base_perception_subsystem : public rcppsw::er::client {
  public:
-  base_perception_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+  base_perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
                             const params::perception_params* const params,
                             const std::string& id);
 
@@ -68,12 +72,14 @@ class base_perception_subsystem : public rcppsw::er::client {
   /**
    * @brief Reset the robot's perception of the environment to an initial state
    */
-  void Reset(void) {
-    m_map->Reset();
+  void reset(void);
+  
+  const std::shared_ptr<representation::perceived_arena_map>& map(void) const {
+    return m_map;
   }
-
-  const std::shared_ptr<representation::perceived_arena_map>& map(void) const { return m_map; }
-  std::shared_ptr<representation::perceived_arena_map> map(void) { return m_map; }
+  std::shared_ptr<representation::perceived_arena_map> map(void) {
+    return m_map;
+  }
 
  protected:
   /*

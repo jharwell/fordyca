@@ -27,8 +27,8 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 
 /*******************************************************************************
@@ -36,6 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace utils = rcppsw::utils;
 using controller::steering_force_type;
 
 /*******************************************************************************
@@ -71,8 +72,16 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_LEAVING_NEST");
   }
-
-  m_saa->steering_force().anti_phototaxis();
+  /*
+   * We don't want to just apply anti-phototaxis force, because that will make
+   * the robot immediately turn around as soon as it has entered the nest and
+   * dropped its block, leading to a lot of traffic jams by the edge of the
+   * nest. Instead, wander about within the nest until you find the edge (either
+   * on your own or being pushed out via collision avoidance).
+   */
+  argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+  saa_subsystem()->steering_force().avoidance(obs);
+  saa_subsystem()->steering_force().wander();
   m_saa->apply_steering_force(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {
@@ -147,10 +156,9 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * overshoot. See #191.
    */
   actuators()->differential_drive().fsm_drive(
-          base_foraging_fsm::actuators()->differential_drive().max_speed() *
-              0.1,
-          (current_dir - m_new_dir),
-          std::make_pair(false, true));
+      base_foraging_fsm::actuators()->differential_drive().max_speed() * 0.1,
+      (current_dir - m_new_dir),
+      std::make_pair(false, true));
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
@@ -165,16 +173,16 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
-  m_saa->actuation()->leds_set_color(argos::CColor::WHITE);
+  m_saa->actuation()->leds_set_color(utils::color::kWHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
-  m_saa->actuation()->leds_set_color(argos::CColor::GREEN);
+  m_saa->actuation()->leds_set_color(utils::color::kGREEN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
-  actuators()->leds_set_color(argos::CColor::CYAN);
+  actuators()->leds_set_color(utils::color::kCYAN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
-  actuators()->leds_set_color(argos::CColor::WHITE);
+  actuators()->leds_set_color(utils::color::kWHITE);
 }
 
 /*******************************************************************************
@@ -192,20 +200,28 @@ argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector
   return vector;
 } /* randomize_vector_angle() */
 
-const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) const {
+const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::
+    base_sensors(void) const {
   return m_saa->sensing();
 } /* base_sensors() */
 
-const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::base_sensors(void) {
+const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::
+    base_sensors(void) {
   return m_saa->sensing();
 } /* base_actuation() */
 
-const std::shared_ptr<const controller::actuation_subsystem> base_foraging_fsm::actuators(void) const {
+const std::shared_ptr<const controller::actuation_subsystem> base_foraging_fsm::
+    actuators(void) const {
   return m_saa->actuation();
 } /* actuators() */
 
-const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuators(void) {
+const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuators(
+    void) {
   return m_saa->actuation();
 } /* actuators() */
+
+bool base_foraging_fsm::is_avoiding_collision(void) const {
+  return m_saa->sensing()->threatening_obstacle_exists();
+} /* is_avoiding_collision() */
 
 NS_END(controller, fordyca);

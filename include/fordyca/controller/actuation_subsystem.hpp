@@ -24,26 +24,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include <argos3/core/utility/datatypes/color.h>
-
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/controller/throttling_handler.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
-#include "fordyca/controller/footbot_differential_drive.hpp"
+#include "fordyca/controller/throttling_differential_drive.hpp"
+#include "fordyca/params/actuation_params.hpp"
+#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
+#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace argos {
-class CCI_DifferentialSteeringActuator;
-class CCI_LEDsActuator;
 class CCI_RangeAndBearingActuator;
 } // namespace argos
 
 NS_START(fordyca, controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace hal = rcppsw::robotics::hal;
+namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,8 +61,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 class actuation_subsystem {
  public:
   struct actuator_list {
-    argos::CCI_DifferentialSteeringActuator* wheels;
-    argos::CCI_LEDsActuator* leds;
+    hal::actuators::differential_drive_actuator wheels;
+    hal::actuators::led_actuator leds;
     argos::CCI_RangeAndBearingActuator* raba;
   };
 
@@ -75,32 +73,33 @@ class actuation_subsystem {
    * @param list List of handles to actuator devices.
    * @param steering Handle for steering force calculator.
    */
-  actuation_subsystem(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const struct params::actuation_params* c_params,
-      struct actuator_list * list);
+  actuation_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
+                      const struct params::actuation_params* c_params,
+                      struct actuator_list* list);
 
   /**
    * @brief Set the color of the robot's LEDs.
    *
    * @param color The new color.
    */
-  void leds_set_color(const argos::CColor& color);
+  void leds_set_color(const utils::color& color);
 
-  footbot_differential_drive& differential_drive(void) { return m_drive; }
-  const footbot_differential_drive& differential_drive(void) const { return m_drive; }
+  throttling_differential_drive& differential_drive(void) { return m_drive; }
+  const throttling_differential_drive& differential_drive(void) const {
+    return m_drive;
+  }
 
   /**
    * @brief Set whether or not temporary throttling of overall maximum speed is
    * enabled when a robot is carrying a block.
    */
-  void block_throttle_toggle(bool en) { m_throttling.carrying_block(en); }
+  void block_throttle_toggle(bool en) { m_drive.throttle_toggle(en); }
 
   /**
    * @brief Update the currently applied amount of throttling based on
    * presumably new configuration.
    */
-  void block_throttle_update(void) { m_throttling.update(); }
+  void block_throttle_update(void) { m_drive.throttling_update(); }
 
   /**
    * @brief Reset the actuations, including stopping the robot.
@@ -111,8 +110,7 @@ class actuation_subsystem {
   // clang-format off
   const struct params::actuation_params    mc_params;
   struct actuator_list                     m_actuators;
-  throttling_handler                       m_throttling;
-  footbot_differential_drive               m_drive;
+  throttling_differential_drive            m_drive;
   // clang-format on
 };
 

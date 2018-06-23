@@ -23,37 +23,35 @@
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_foraging_repository.hpp"
 #include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/occupancy_grid_parser.hpp"
 #include "fordyca/params/fsm_parser.hpp"
+#include "fordyca/params/occupancy_grid_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
-#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth0);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_foraging_repository::stateful_foraging_repository(void) {
+stateful_foraging_repository::stateful_foraging_repository(
+    const std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
   register_parser<actuation_parser, actuation_params>(
-      actuation_parser::kXMLRoot,
-      actuation_parser::kHeader1);
-  register_parser<sensing_parser, sensing_params>(
-      sensing_parser::kXMLRoot,
-      sensing_parser::kHeader1);
+      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
+  register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
+                                                  sensing_parser::kHeader1);
   register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
                                           fsm_parser::kHeader1);
   register_parser<occupancy_grid_parser, occupancy_grid_params>(
-      occupancy_grid_parser::kXMLRoot,
-      occupancy_grid_parser::kHeader1);
+      occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
 
-  /*
-   * @todo Dirty hack! Shouldn't need to reference depth1 stuff in here.
-   */
-  register_parser<depth1::task_allocation_parser, depth1::task_allocation_params>(
-      depth1::task_allocation_parser::kXMLRoot,
+  register_parser<ta::executive_xml_parser, ta::executive_params>(
+      ta::executive_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

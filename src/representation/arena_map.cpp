@@ -39,22 +39,19 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena_map_params* params)
     : m_cache_removed(false),
-      mc_cache_params(params->cache),
-      mc_nest_center(params->nest_center),
-      m_blocks(params->block.n_blocks),
+      mc_static_cache_params(params->static_cache),
+      m_blocks(params->block_dist.n_blocks),
       m_caches(),
-      m_block_distributor(argos::CRange<double>(params->grid.lower.GetX(),
-                                                params->grid.upper.GetX()),
-                          argos::CRange<double>(params->grid.lower.GetY(),
-                                                params->grid.upper.GetY()),
-                          params->nest_x,
-                          params->nest_y,
-                          &params->block),
+      m_block_distributor(&params->block_dist),
       m_server(rcppsw::er::g_server),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
-             m_server) {
+             m_server),
+      m_nest(params->nest.xdim,
+             params->nest.ydim,
+             params->nest.center,
+             params->grid.resolution) {
   deferred_client_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
@@ -80,7 +77,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i]->contains_point(pos)) {
       return static_cast<int>(i);
@@ -89,7 +86,7 @@ __pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_block() */
 
-__pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     if (m_caches[i]->contains_point(pos)) {
       return static_cast<int>(i);
@@ -130,17 +127,18 @@ void arena_map::distribute_block(const std::shared_ptr<block>& block) {
 } /* distribute_block() */
 
 void arena_map::static_cache_create(void) {
-  double src_center = (m_block_distributor.single_src_xrange().GetMin() +
-                       m_block_distributor.single_src_xrange().GetMax()) /
-                      2.0;
-  double x = (src_center + mc_nest_center.GetX()) / 2.0;
-  double y = mc_nest_center.GetY();
+  double src_center =
+      (m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMin() +
+       m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMax()) /
+      2.0;
+  double x = (src_center + m_nest.real_loc().GetX()) / 2.0;
+  double y = m_nest.real_loc().GetY();
 
   ER_DIAG("(Re)-Creating static cache");
   support::depth1::static_cache_creator c(m_server,
                                           m_grid,
                                           argos::CVector2(x, y),
-                                          mc_cache_params.dimension,
+                                          mc_static_cache_params.dimension,
                                           m_grid.resolution());
 
   std::vector<std::shared_ptr<representation::block>> blocks;
@@ -159,7 +157,7 @@ void arena_map::static_cache_create(void) {
                                                     m_grid.resolution())) {
       blocks.push_back(b);
     }
-    if (blocks.size() >= mc_cache_params.static_size) {
+    if (blocks.size() >= mc_static_cache_params.size) {
       break;
     }
   } /* for(b..) */
@@ -169,16 +167,21 @@ void arena_map::static_cache_create(void) {
 } /* static_cache_create() */
 
 void arena_map::distribute_blocks(void) {
-  // Clear out old references to blocks
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      cell2D& cell = m_grid.access(i, j);
-      cell.reset();
-    } /* for(j..) */
-  }   /* for(i..) */
-
+  // Reset all the cells to clear old references to blocks
+  m_grid.reset();
+  
   for (auto& b : m_blocks) {
     distribute_block(b);
+  } /* for(b..) */
+  for (auto& b : m_blocks) {
+    ER_ASSERT(representation::block::kOutOfSightDLoc != b->discrete_loc(),
+              "FATAL: Block%d discrete coordinates still out of sight after "
+              "distribution",
+              b->id());
+    ER_ASSERT(
+        representation::block::kOutOfSightRLoc != b->real_loc(),
+        "FATAL: Block%d real coordinates still out of sight after distribution",
+        b->id());
   } /* for(b..) */
 
   /*

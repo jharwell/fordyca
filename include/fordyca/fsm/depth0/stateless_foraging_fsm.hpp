@@ -26,8 +26,9 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/fsm/explore_for_goal_fsm.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,6 +41,8 @@ namespace params { struct fsm_params; }
 namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,7 +57,8 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::fsm::stateless_metrics,
+                               public metrics::fsm::goal_acquisition_metrics,
+                               public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
   stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
@@ -63,12 +67,19 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
+  /* base FSM metrics */
+  bool is_avoiding_collision(void) const override {
+    return base_foraging_fsm::is_avoiding_collision();
+  }
 
-  bool block_acquired(void) const;
+  /* goal acquisition metrics */
+  acquisition_goal_type acquisition_goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override { return false; }
+  bool goal_acquired(void) const override;
+
+  /* block transportation */
+  transport_goal_type block_transport_goal(void) const override;
 
   /**
    * @brief (Re)-initialize the FSM.
@@ -81,7 +92,9 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   void run(void);
 
 
- protected:
+ private:
+  bool block_detected(void) const;
+
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
@@ -118,8 +131,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  argos::CRandom::CRNG* m_rng;
-  explore_for_block_fsm m_explore_fsm;
+  explore_for_goal_fsm m_explore_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

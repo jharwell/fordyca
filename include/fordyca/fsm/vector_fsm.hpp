@@ -74,6 +74,12 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered to have arrived at the specified cache site.
+   */
+  constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
+
   vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
              const std::shared_ptr<controller::saa_subsystem>& saa);
 
@@ -99,7 +105,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   void init(void) override;
 
-  bool is_avoiding_collision(void) const {
+  bool is_avoiding_collision(void) const override {
     return ST_COLLISION_AVOIDANCE == current_state();
   }
 
@@ -182,9 +188,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm,
-                     new_direction,
-                     state_machine::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
 
   /* vector states */

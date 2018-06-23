@@ -65,6 +65,15 @@ class block_selector: public rcppsw::er::client {
       argos::CVector2 robot_loc);
 
  private:
+  /**
+   * @brief The minimum distance a robot has to be from a block for it to have a
+   * non-zero utility. Allowing robots to consider ANY block, regardless of how
+   * close it is to the robot, can potentially get the robot stuck in an
+   * infinite loop of trying to acquire a block that is REALLY close to it and
+   * failing, due to kinematic parameters making its turning radius too large.
+   */
+  static constexpr double kMinDist = 0.2;
+
   argos::CVector2 m_nest_loc;
 };
 

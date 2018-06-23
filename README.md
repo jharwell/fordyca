@@ -2,10 +2,26 @@
 
 This is the main entry point for getting started on the project.
 
+## Papers
+
+1. J. Harwell and M. Gini, "Broadening applicability of swarm-robotic foraging
+   through constraint relaxation," 2018 IEEE International Conference on
+   Simulation, Modeling, and Programming for Autonomous Robots (SIMPAR), Brisbane,
+   Australia, 2018, pp. 116-122.
+   [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
+
 ## Pre-cloning Setup
 
 1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
+
+   *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
+   _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
+   linux. This is because those packages were compiled with gcc/g++ 5.4, and
+   therefore the core ARGoS libraries that fordyca uses are ABI incompatible
+   with anything compiled with gcc >= 6.0. If you are compiling ARGoS from
+   source you can use whatever compiler/compiler version you like, so long as it
+   supports C++14.
 
 2. Verify that you can run the simple foraging example that comes
    packaged on the ARGoS website.
@@ -17,25 +33,22 @@ This is the main entry point for getting started on the project.
 
 4. Install additional development packages for the project:
 
-   - catch (A unit testing framework that some unit tests use).
-   - boost (1.58 is known to work; older versions may also work). Install all
-     boost libraries via:
+   - catch (A unit testing framework that some unit tests use)
 
-        sudo  apt-get install libboost-all-dev
+        sudo apt install catch
+   - boost 1.58.
 
-    - Qt (Qt 5 is known to work; older versions may also work). Install Qt5 via:
+        sudo apt install libboost-all-dev
 
-            sudo apt-get install qtbase5-dev
+    - Qt (Qt 5 is known to work; older versions may also work)
+            sudo apt install qtbase5-dev
 
-5. Clone `rcsw` https://github.com/swarm-robotics/rcsw (Reusable C software)
-   somewhere and create a symbolic to it in the repo as
-   `<repo_root>/ext/rcsw`. Follow all pre/post-cloning instructions found in
-   README in that repo.
+5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
+   C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
 
-6. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable C++ software)
-   somewhere and create a symbolic link it as
-   `<repo_root>/ext/rcppsw`. Follow all pre/post-cloning instructions found in
-   README for that repo.
+        `ln -s /path/to/rcppsw ext/rcppsw`
+
+   Follow all pre/post-cloning instructions found in README for the rcppsw repo.
 
 ## Post-cloning setup
 
@@ -46,7 +59,7 @@ This is the main entry point for getting started on the project.
 
 2. Pull in the cmake project scaffolding:
 
-        git submodule update --init --recursive
+        git submodule update --init --recursive --remote
 
 3. Build via:
 
@@ -54,14 +67,11 @@ This is the main entry point for getting started on the project.
         cmake ..
         make
 
-For additional build configuration options, please see the README in
-the [cmake config](https://github.com/jharwell/cmake-config) repo.
+   To build the documentation, do the following from the build directory:
 
-To build the documentation, do the following from the build directory:
+        make documentation
 
-    make documentation
-
-## Running
+## Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
 
@@ -77,15 +87,45 @@ After successful compilation, follow these steps to run a foraging scenario:
 
    This should pop up a nice GUI from which you can start the experiment.
 
+## Running on MSI
+
+ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
+access to that directory as part of the gini group.
+
+1. In `/home/gini/shared/swarm`, source the build/run environment setup
+   script:
+
+        . /home/gini/shared/swarm/bin/build-env-setup.sh
+
+   If you use a different shell than bash, you will have to look at the script
+   and modify it (in *your* home directory somewhere) so your shell understands
+   the syntax.
+
+2. Run the bash script to clone and build the project:
+
+        clone-and-build-clean.sh /path/to/project/root
+
+   The 1st argument is the path (relative or absolute) to the location where you
+   want the project repos to live (they will all be cloned into that level).
+
+   If you need to checkout a particular branch in the repo you can do that after
+   running the script and then re-running make.
+
+3. Once the script finishes, set `ARGOS_PLUGIN_PATH` as before and you should be
+   able to run experiments.
+
 # Troubleshooting
 
 - If you are having trouble building, try:
 
-  1. Updating the cmake submodule:
+  1. Verifying that both `fordyca` AND `rcppsw` are on the `devel` branch.
 
-          git submodule update
+  2. Updating `rcppsw` and `fordyca` to the latest `devel` branch via `git
+     pull`.
 
-  2. Updating `rcppsw` and `rcsw`, and possibly their cmake submodules.
+  2. Updating the `fordyca`, `rcppsw` cmake submodules by running `git submodule
+     update` in the root of each repository.
+
 
   If the problem perists, open an issue.
 

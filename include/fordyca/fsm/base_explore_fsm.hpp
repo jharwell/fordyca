@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
@@ -54,10 +52,9 @@ NS_START(fsm);
 class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
-  base_explore_fsm(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      uint8_t max_states);
+  base_explore_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                   const std::shared_ptr<controller::saa_subsystem>& saa,
+                   uint8_t max_states);
 
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
@@ -70,19 +67,6 @@ class base_explore_fsm : public base_foraging_fsm,
    * @brief Run the FSM in its current state without injecting an event into it.
    */
   void run(void);
-
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_avoiding_collision(void) const;
-
- protected:
-  /**
-   * @brief Perform random walk exploration: wander force + avoidance force.
-   */
-  void random_explore(void);
 
  private:
   /**

@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/robotics/steering2D/force_calculator_xml_parser.hpp"
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/steering_force2D_params.hpp"
 #include "fordyca/params/phototaxis_force_parser.hpp"
+#include "fordyca/params/steering_force2D_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/robotics/steering2D/force_calculator_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,23 +49,29 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class steering_force2D_parser : public steering::force_calculator_xml_parser {
  public:
-  explicit steering_force2D_parser(uint level) :
-      force_calculator_xml_parser(level),
-      m_phototaxis(level + 1) {}
+  steering_force2D_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                          uint level)
+      : force_calculator_xml_parser(server, level),
+        m_phototaxis(server, level + 1) {}
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct steering_force2D_params* parse_results(void) const override {
-    return &m_params;
+
+  std::shared_ptr<steering_force2D_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  struct steering_force2D_params m_params{};
-  phototaxis_force_parser        m_phototaxis;
+  std::shared_ptr<steering_force2D_params> m_params{};
+  phototaxis_force_parser                  m_phototaxis;
   // clang-format on
 };
 

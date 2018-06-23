@@ -143,21 +143,13 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const {
+  const std::shared_ptr<const controller::saa_subsystem> saa_subsystem(
+      void) const {
     return m_saa;
   }
   std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
     return m_saa;
   }
-  const std::shared_ptr<rcppsw::er::server> server(void) const {
-    return m_server;
-  }
-
-  /**
-   * @brief Interface for defining how loop functions can determine if a robot
-   * is currently transporting a block to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
 
  private:
   void output_init(const struct params::output_params* params);

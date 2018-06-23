@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
 #include "fordyca/params/pheromone_parser.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,12 +47,13 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for \ref occupancy_grid into
  * \ref occupancy_grid_params.
  */
-class occupancy_grid_parser: public rcppsw::params::xml_param_parser {
+class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit occupancy_grid_parser(uint level):
-      xml_param_parser(level),
-      m_grid_parser(level + 1),
-      m_pheromone_parser(level + 1) {}
+  occupancy_grid_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                        uint level)
+      : xml_param_parser(server, level),
+        m_grid_parser(server, level + 1),
+        m_pheromone_parser(server, level + 1) {}
 
   /**
    * @brief The root tag that all occupancy grid parameters should lie under in
@@ -65,15 +66,20 @@ class occupancy_grid_parser: public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct occupancy_grid_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<occupancy_grid_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
   // clang-format off
-  occupancy_grid_params m_params{};
-  grid_parser           m_grid_parser;
-  pheromone_parser      m_pheromone_parser;
+  bool                                   m_parsed{false};
+  std::shared_ptr<occupancy_grid_params> m_params{nullptr};
+  grid_parser                            m_grid_parser;
+  pheromone_parser                       m_pheromone_parser;
   // clang-format on
 };
 

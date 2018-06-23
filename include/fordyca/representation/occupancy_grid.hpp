@@ -38,7 +38,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct occupancy_grid_params; }
+namespace params {
+struct occupancy_grid_params;
+}
 
 NS_START(representation);
 
@@ -62,7 +64,7 @@ class occupancy_grid : public rcppsw::er::client,
   /**
    * @brief Reset all the cells in the grid
    */
-  void Reset(void);
+  void reset(void);
 
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;

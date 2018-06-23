@@ -44,10 +44,12 @@ void output_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res, res2;
 
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
   /* only present for loop functions */
   if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
     m_metrics_parser.parse(onode);
-    m_params.metrics = *m_metrics_parser.parse_results();
+    m_params->metrics = *m_metrics_parser.parse_results();
   }
 
   ticpp::Element snode = argos::GetNode(onode, "sim");
@@ -61,15 +63,14 @@ void output_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_metrics_parser
+  stream << build_header() << m_metrics_parser
          << XML_PARAM_STR(m_params, output_root) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
          << XML_PARAM_STR(m_params, log_fname) << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool output_parser::validate(void) const {
+__rcsw_pure bool output_parser::validate(void) const {
   return m_metrics_parser.validate();
 } /* validate() */
 

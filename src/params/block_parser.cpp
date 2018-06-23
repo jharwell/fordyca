@@ -42,22 +42,17 @@ constexpr char block_parser::kXMLRoot[];
 void block_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  XML_PARSE_PARAM(bnode, m_params, n_blocks);
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_PARAM(bnode, m_params, dimension);
-  XML_PARSE_PARAM(bnode, m_params, dist_model);
 } /* parse() */
 
 void block_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, n_blocks) << std::endl
-         << XML_PARAM_STR(m_params, dimension) << std::endl
-         << XML_PARAM_STR(m_params, dist_model) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, dimension) << std::endl
          << build_footer();
 } /* show() */
 
 bool block_parser::validate(void) const {
-  return !(0 == m_params.n_blocks || m_params.dimension <= 0.0 ||
-           "" == m_params.dist_model);
+  return m_params->dimension > 0.0;
 } /* validate() */
 
 NS_END(params, fordyca);

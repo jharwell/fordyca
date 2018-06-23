@@ -29,18 +29,14 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -57,18 +53,18 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth0_foraging loop functions");
-  params::loop_function_repository repo;
+  params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;
 
   /* initialize stat collecting */
-  auto* p_output =
-      repo.parse_results<const struct params::output_params>();
-  collector_group().register_collector<metrics::fsm::stateful_metrics_collector>(
-      "fsm::stateful",
-      metrics_path() + "/" + p_output->metrics.stateful_fname,
-      p_output->metrics.collect_interval);
+  auto* p_output = repo.parse_results<const struct params::output_params>();
+  collector_group()
+      .register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
+          "fsm::block_acquisition",
+          metrics_path() + "/" + p_output->metrics.block_acquisition_fname,
+          p_output->metrics.collect_interval);
   collector_group().reset_all();
 
   /* configure robots */
@@ -94,12 +90,13 @@ void stateful_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  collector_group().collect_from(
+  collector_group().collect(
       "fsm::distance", static_cast<metrics::fsm::distance_metrics&>(controller));
   if (controller.current_task()) {
-    collector_group().collect_from("fsm::stateful",
-                                   static_cast<metrics::fsm::stateless_metrics&>(
-                                       *controller.current_task()));
+    collector_group().collect(
+        "fsm::block_acquisition",
+        static_cast<metrics::fsm::goal_acquisition_metrics&>(
+            *controller.current_task()));
   }
 
   /* Send the robot its new line of sight */
@@ -109,19 +106,15 @@ void stateful_foraging_loop_functions::pre_step_iter(
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server,
-             arena_map(),
-             floor())(controller,
-                      static_cast<metrics::block_metrics_collector&>(
-                          *collector_group()["block"]));
+  interactor(rcppsw::er::g_server, arena_map(), floor())(controller);
 } /* pre_step_iter() */
 
-__pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  /* The nest is a light gray */
-  if (nest_xrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetX()) &&
-      nest_yrange().WithinMinBoundIncludedMaxBoundIncluded(plane_pos.GetY())) {
-    return argos::CColor::GRAY70;
+  if (arena_map()->nest().contains_point(plane_pos)) {
+    return argos::CColor(arena_map()->nest().color().red(),
+                         arena_map()->nest().color().green(),
+                         arena_map()->nest().color().blue());
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {

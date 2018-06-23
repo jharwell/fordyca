@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
 #include "fordyca/params/pheromone_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
@@ -45,9 +45,11 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to pheromones into
  * \ref pheromone_params.
  */
-class pheromone_parser: public rcppsw::params::xml_param_parser {
+class pheromone_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit pheromone_parser(uint level) : xml_param_parser(level) {}
+  pheromone_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                   uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all pheromone parameters should lie under in the
@@ -60,12 +62,17 @@ class pheromone_parser: public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct pheromone_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<pheromone_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct pheromone_params m_params{};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+ private:
+  std::shared_ptr<pheromone_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);

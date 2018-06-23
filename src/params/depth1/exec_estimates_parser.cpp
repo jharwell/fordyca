@@ -40,18 +40,31 @@ constexpr char exec_estimates_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void exec_estimates_parser::parse(const ticpp::Element& node) {
-  ticpp::Element enode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element enode =
+        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(enode, m_params, enabled);
+    if (m_params->enabled) {
+      XML_PARSE_PARAM(enode, m_params, generalist_range);
 
-  XML_PARSE_PARAM(enode, m_params, enabled);
-  if (m_params.enabled) {
-    XML_PARSE_PARAM(enode, m_params, generalist_range);
-    XML_PARSE_PARAM(enode, m_params, harvester_range);
-    XML_PARSE_PARAM(enode, m_params, collector_range);
+      XML_PARSE_PARAM(enode, m_params, harvester_range);
+      XML_PARSE_PARAM(enode, m_params, collector_range);
+    }
+    m_parsed = true;
   }
 } /* parse() */
 
 void exec_estimates_parser::show(std::ostream& stream) const {
+    if (!m_parsed) {
+    stream << build_header()
+           << "<< Not Parsed >>"
+           << std::endl
+           << build_footer();
+    return;
+  }
+
   stream << build_header()
          << XML_PARAM_STR(m_params, enabled) << std::endl
          << XML_PARAM_STR(m_params, generalist_range) << std::endl

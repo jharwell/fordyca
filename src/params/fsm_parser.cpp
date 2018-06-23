@@ -43,21 +43,28 @@ constexpr char fsm_parser::kXMLRoot[];
 void fsm_parser::parse(const ticpp::Element& node) {
   ticpp::Element fnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-
   rcppsw::utils::line_parser parser(' ');
   std::vector<std::string> res;
   res = parser.parse(fnode.GetAttribute("nest"));
-  m_params.nest_center.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
+
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params->nest_center.Set(std::atof(res[0].c_str()),
+                            std::atof(res[1].c_str()));
 } /* parse() */
 
 void fsm_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << "nest_center=" << m_params.nest_center << std::endl
+  stream << build_header() << "nest_center=" << m_params->nest_center
+         << std::endl
          << build_footer();
 } /* show() */
 
-__pure bool fsm_parser::validate(void) const {
-  return (m_params.nest_center.GetX() > 0) && (m_params.nest_center.GetY() > 0);
+__rcsw_pure bool fsm_parser::validate(void) const {
+  CHECK(m_params->nest_center.GetX() > 0.0);
+  CHECK(m_params->nest_center.GetY() > 0.0);
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

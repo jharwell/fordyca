@@ -47,7 +47,8 @@ NS_START(fordyca, params);
 
 class grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit grid_parser(uint level) : xml_param_parser(level) {}
+  grid_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all grid parameters should lie under in the
@@ -60,12 +61,16 @@ class grid_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct grid_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<grid_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct grid_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  std::shared_ptr<grid_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);

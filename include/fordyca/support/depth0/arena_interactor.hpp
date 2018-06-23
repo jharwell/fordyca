@@ -30,16 +30,22 @@
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, support);
+
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = fsm::block_transporter::goal_type;
+
+NS_START(depth0);
 
 /*******************************************************************************
  * Classes
@@ -72,13 +78,10 @@ class arena_interactor : public rcppsw::er::client {
    * @brief The actual handling function for the interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param collector  The block metrics collector (block collection metrics are
-   * somewhat different than others, so collection needs to be treated
-   * specially).
    */
-  void operator()(T& controller, metrics::block_metrics_collector& collector) {
+  void operator()(T& controller) {
     if (controller.is_carrying_block()) {
-      handle_nest_block_drop(controller, collector);
+      handle_nest_block_drop(controller);
     } else {
       handle_free_block_pickup(controller);
     }
@@ -93,7 +96,8 @@ class arena_interactor : public rcppsw::er::client {
    * \c FALSE otherwise.
    */
   bool handle_free_block_pickup(T& controller) {
-    if (controller.block_acquired()) {
+    if (controller.goal_acquired() &&
+        acquisition_goal_type::kBlock == controller.acquisition_goal()) {
       /* Check whether the foot-bot is actually on a block */
       int block = utils::robot_on_block(controller, *m_map);
       if (-1 != block) {
@@ -118,15 +122,12 @@ class arena_interactor : public rcppsw::er::client {
    * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
    * otherwise.
    */
-  bool handle_nest_block_drop(T& controller,
-      metrics::block_metrics_collector& block_collector) {
-    if (controller.in_nest() && controller.is_transporting_to_nest()) {
-      /* Update arena map state due to a block nest drop */
+  bool handle_nest_block_drop(T& controller) {
+    if (controller.in_nest() &&
+        transport_goal_type::kNest == controller.block_transport_goal()) {
       events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
 
-      /* update block carries */
-      block_collector.accept(drop_op);
-
+      /* Update arena map state due to a block nest drop */
       m_map->accept(drop_op);
 
       /* Actually drop the block */

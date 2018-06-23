@@ -37,9 +37,9 @@ sensing_subsystem::sensing_subsystem(
     const struct base_sensing_subsystem::sensor_list* const list)
     : depth0::sensing_subsystem(c_params, list) {}
 
-bool sensing_subsystem::cache_detected(void) {
-  const argos::CCI_FootBotMotorGroundSensor::TReadings& readings =
-      base_sensing_subsystem::ground()->GetReadings();
+bool sensing_subsystem::cache_detected(void) const {
+  std::vector<hal::sensors::ground_sensor::reading> readings =
+      base_sensing_subsystem::ground().readings();
 
   /*
    * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
@@ -47,10 +47,10 @@ bool sensing_subsystem::cache_detected(void) {
    * range specified below.
    */
   int sum = 0;
-  sum += static_cast<int>(readings[0].Value > 0.30 && readings[0].Value < 0.50);
-  sum += static_cast<int>(readings[1].Value > 0.30 && readings[1].Value < 0.50);
-  sum += static_cast<int>(readings[2].Value > 0.30 && readings[2].Value < 0.50);
-  sum += static_cast<int>(readings[3].Value > 0.30 && readings[3].Value < 0.50);
+  sum += static_cast<int>(readings[0].value > 0.30 && readings[0].value < 0.50);
+  sum += static_cast<int>(readings[1].value > 0.30 && readings[1].value < 0.50);
+  sum += static_cast<int>(readings[2].value > 0.30 && readings[2].value < 0.50);
+  sum += static_cast<int>(readings[3].value > 0.30 && readings[3].value < 0.50);
 
   return sum >= 3;
 } /* block_detected() */

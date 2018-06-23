@@ -24,11 +24,17 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include <argos3/core/utility/math/vector2.h>
 
+#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth2/foraging_controller.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +61,7 @@ free_block_drop::free_block_drop(
 }
 
 /*******************************************************************************
- * Foraging Support
+ * Depth0/Support
  ******************************************************************************/
 void free_block_drop::visit(representation::cell2D& cell) {
   cell.entity(m_block);
@@ -100,6 +106,36 @@ void free_block_drop::visit(representation::arena_map& map) {
   } else {
     cell.accept(*this);
   }
+} /* visit() */
+
+/*******************************************************************************
+ * Depth1
+ ******************************************************************************/
+void free_block_drop::visit(controller::depth1::foraging_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2
+ ******************************************************************************/
+void free_block_drop::visit(controller::depth2::foraging_controller& controller) {
+  std::static_pointer_cast<tasks::depth2::foraging_task>(
+      controller.current_task())
+      ->accept(*this);
+  controller.block(nullptr);
+} /* visit() */
+
+void free_block_drop::visit(tasks::depth2::cache_starter& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_drop::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
+                   state_machine::event_type::NORMAL);
 } /* visit() */
 
 NS_END(events, fordyca);

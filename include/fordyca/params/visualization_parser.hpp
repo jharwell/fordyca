@@ -47,7 +47,9 @@ NS_START(fordyca, params);
  */
 class visualization_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit visualization_parser(uint level) : xml_param_parser(level) {}
+  visualization_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                       uint level)
+      : xml_param_parser(server, level) {}
 
   /**
    * @brief The root tag that all visualization loop functions parameters should
@@ -59,12 +61,19 @@ class visualization_parser : public rcppsw::params::xml_param_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  const struct visualization_params* parse_results(void) const override {
-    return &m_params;
+  std::shared_ptr<visualization_params> parse_results(void) const {
+    return m_params;
   }
 
  private:
-  struct visualization_params m_params {};
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  bool                                  m_parsed{false};
+  std::shared_ptr<visualization_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);

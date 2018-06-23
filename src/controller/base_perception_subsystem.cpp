@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 base_perception_subsystem::base_perception_subsystem(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const params::perception_params* const params,
     const std::string& id)
     : client(server),
@@ -55,6 +55,10 @@ void base_perception_subsystem::update(
   process_los(los);
   m_map->update();
 } /* update() */
+
+void base_perception_subsystem::reset(void) {
+    m_map->reset();
+}
 
 void base_perception_subsystem::process_los(
     const representation::line_of_sight* const los) {
@@ -81,6 +85,7 @@ void base_perception_subsystem::process_los(
   }   /* for(i..) */
 
   for (auto block : los->blocks()) {
+    ER_ASSERT(!block->is_out_of_sight(), "FATAL: Block out of sight in LOS?");
     if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
              .state_has_block()) {
       ER_NOM("Discovered block%d at (%zu, %zu)",

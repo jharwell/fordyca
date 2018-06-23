@@ -28,16 +28,22 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-/***********************e*******************************************************
+/*******************************************************************************
+ *  Static Variables
+ ******************************************************************************/
+rcppsw::math::dcoord2 block::kOutOfSightDLoc = rcppsw::math::dcoord2(100, 100);
+argos::CVector2 block::kOutOfSightRLoc = argos::CVector2(100.0, 100.0);
+
+/******************************************************************************
  * Member Functions
  ******************************************************************************/
 void block::move_out_of_sight(void) {
-  real_loc(argos::CVector2(100.0, 100.0));
-  discrete_loc(rcppsw::math::dcoord2(100, 100));
+  real_loc(kOutOfSightRLoc);
+  discrete_loc(kOutOfSightDLoc);
 } /* move_out_of_sight() */
 
 std::unique_ptr<block> block::clone(void) const {
-  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(cell_entity::xsize());
+  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(xsize());
   tmp->discrete_loc(this->discrete_loc());
   tmp->real_loc(this->real_loc());
   tmp->id(this->id());

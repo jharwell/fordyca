@@ -26,20 +26,20 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/footbot_differential_drive.hpp"
+#include "fordyca/controller/throttling_differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_fsm::vector_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
+vector_fsm::vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+                       const std::shared_ptr<controller::saa_subsystem>& saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
@@ -59,7 +59,7 @@ vector_fsm::vector_fsm(
 /*******************************************************************************
  * States
  ******************************************************************************/
-__const FSM_STATE_DEFINE_ND(vector_fsm, start) {
+__rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
@@ -92,13 +92,13 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
       argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-    ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
-            obs.GetX(),
-            obs.GetY(),
-            obs.Angle().GetValue(),
-            obs.Length());
-    saa_subsystem()->steering_force().avoidance(obs);
-    saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+      ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
+              obs.GetX(),
+              obs.GetY(),
+              obs.Angle().GetValue(),
+              obs.Length());
+      saa_subsystem()->steering_force().avoidance(obs);
+      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
     m_state.last_collision_time = base_sensors()->tick();
@@ -154,7 +154,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else {
     saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
-    saa_subsystem()->actuation()->leds_set_color(argos::CColor::BLUE);
+    saa_subsystem()->actuation()->leds_set_color(utils::color::kBLUE);
     saa_subsystem()->apply_steering_force(std::make_pair(true, false));
   }
   return controller::foraging_signal::HANDLED;
@@ -172,15 +172,15 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DIAG("Entering ST_VECTOR");
-  actuators()->leds_set_color(argos::CColor::BLUE);
+  actuators()->leds_set_color(utils::color::kBLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  actuators()->leds_set_color(argos::CColor::RED);
+  actuators()->leds_set_color(utils::color::kRED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
-  actuators()->leds_set_color(argos::CColor::YELLOW);
+  actuators()->leds_set_color(utils::color::kYELLOW);
 }
 /*******************************************************************************
  * General Member Functions
@@ -213,7 +213,7 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-__pure argos::CVector2 vector_fsm::calc_vector_to_goal(
+__rcsw_pure argos::CVector2 vector_fsm::calc_vector_to_goal(
     const argos::CVector2& goal) {
   return goal - base_sensors()->position();
 } /* calc_vector_to_goal() */

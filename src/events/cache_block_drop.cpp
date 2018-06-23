@@ -22,19 +22,18 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/fsm/block_to_nest_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
-#include "fordyca/metrics/block_metrics_collector.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/harvester.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
+#include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -114,20 +113,33 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
-  controller.current_task()->accept(*this);
+  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+      controller.current_task())
+      ->accept(*this);
 
-  ER_NOM("depth1_foraging_controller: dropped block%d in cache%d",
+  ER_NOM("Depth1 foraging controller: dropped block%d in cache%d",
          m_block->id(),
          m_cache->id());
 } /* visit() */
 
-void cache_block_drop::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
-} /* visit() */
-
-void cache_block_drop::visit(fsm::depth1::block_to_cache_fsm& fsm) {
+void cache_block_drop::visit(fsm::depth1::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
+} /* visit() */
+
+void cache_block_drop::visit(tasks::depth1::harvester& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void cache_block_drop::visit(controller::depth2::foraging_controller& controller) {
+  ER_ASSERT(false, "FATAL: Not implemented");
+} /* visit() */
+
+void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);
