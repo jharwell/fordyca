@@ -94,7 +94,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
       .wheels = GetActuator<argos::CCI_DifferentialSteeringActuator>(
           "differential_steering"),
       .leds = GetActuator<argos::CCI_LEDsActuator>("leds"),
-      .raba =
+      .wifi =
           GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")};
   struct base_sensing_subsystem::sensor_list slist = {
       .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),

@@ -59,10 +59,21 @@ class metrics_aggregator : public depth0::stateful_metrics_aggregator {
                      const struct params::metrics_params* params,
                      const std::string& output_root);
 
+  /**
+   * @brief Collect metrics from the depth1 controller.
+   */
   void collect_from_controller(
       const controller::depth1::foraging_controller* controller);
+
+  /**
+   * @brief Collect utilization metrics from a cache in the arena.
+   */
   void collect_from_cache(
       const representation::arena_cache* cache);
+
+  /**
+   * @brief Collect lifecycle metrics across all caches in the arena.
+   */
   void collect_from_cache_collator(
       const metrics::caches::lifecycle_collator* collator);
 };

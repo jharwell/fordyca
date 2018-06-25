@@ -21,7 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+/*
+ * @todo Figure out how to work remove this warning properly.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
+#pragma  GCC diagnostic pop
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 

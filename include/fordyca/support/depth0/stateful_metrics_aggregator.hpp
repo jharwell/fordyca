@@ -54,6 +54,9 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator {
                                const struct params::metrics_params* params,
                                const std::string& output_root);
 
+  /**
+   * @brief Collect metrics from the stateful controller.
+   */
   void collect_from_controller(
       const controller::depth0::stateful_foraging_controller* controller);
 };

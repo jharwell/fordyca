@@ -28,16 +28,13 @@
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
 
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace argos {
-class CCI_RangeAndBearingSensor;
-} // namespace argos
-
 NS_START(fordyca);
 
 namespace params {
@@ -61,7 +58,7 @@ namespace hal = rcppsw::robotics::hal;
 class base_sensing_subsystem {
  public:
   struct sensor_list {
-    argos::CCI_RangeAndBearingSensor* rabs;
+    hal::sensors::rab_wifi_sensor rabs;
     hal::sensors::proximity_sensor proximity;
     hal::sensors::light_sensor light;
     hal::sensors::ground_sensor ground;
@@ -81,7 +78,6 @@ class base_sensing_subsystem {
    */
   const sensor_list& sensor_list(void) const { return m_sensors; }
 
-  argos::CCI_RangeAndBearingSensor* rabs(void) const { return m_sensors.rabs; }
   const hal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }

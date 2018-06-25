@@ -51,7 +51,7 @@ actuation_subsystem::actuation_subsystem(
               &c_params->throttling) {}
 
 void actuation_subsystem::reset(void) {
-  m_actuators.raba->ClearData();
+  m_actuators.wifi.reset();
   m_drive.stop();
 } /* reset() */
 
