@@ -29,14 +29,11 @@
 #include "fordyca/params/actuation_params.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
 #include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
+#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace argos {
-class CCI_RangeAndBearingActuator;
-} // namespace argos
-
 NS_START(fordyca, controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
@@ -63,7 +60,7 @@ class actuation_subsystem {
   struct actuator_list {
     hal::actuators::differential_drive_actuator wheels;
     hal::actuators::led_actuator leds;
-    argos::CCI_RangeAndBearingActuator* raba;
+    hal::actuators::wifi_actuator wifi;
   };
 
   /**

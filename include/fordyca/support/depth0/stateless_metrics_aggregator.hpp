@@ -50,6 +50,9 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
                                const struct params::metrics_params* params,
                                const std::string& output_root);
 
+  /**
+   * @brief Collect metrics from the stateless controller.
+   */
   void collect_from_controller(const rcppsw::metrics::base_metrics* controller);
 };
 
