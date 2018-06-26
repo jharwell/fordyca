@@ -27,6 +27,8 @@
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,16 +47,20 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
 
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-      "fsm::block_acquisition",
-      metrics_path() + "/" + params->block_acquisition_fname,
-      params->collect_interval);
-
   register_collector<metrics::fsm::distance_metrics_collector>(
       "fsm::distance",
       metrics_path() + "/" + params->distance_fname,
       params->collect_interval);
 
+  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
+      "blocks::acquisition",
+      metrics_path() + "/" + params->block_acquisition_fname,
+      params->collect_interval);
+
+  register_collector<metrics::block_transport_metrics_collector>(
+      "blocks::transport",
+      metrics_path() + "/" + params->block_transport_fname,
+      params->collect_interval);
   reset_all();
 }
 
@@ -72,5 +78,10 @@ void stateless_metrics_aggregator::collect_from_controller(
   collect("fsm::distance", *distance_m);
   collect("fsm::block_acquisition", *block_acq_m);
 } /* collect_from_controller() */
+
+void stateless_metrics_aggregator::collect_from_block(
+    const representation::block* const block) {
+  collect("blocks::transport", *block);
+} /* collect_from_block() */
 
 NS_END(depth0, support, fordyca);

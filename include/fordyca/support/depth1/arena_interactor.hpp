@@ -59,10 +59,11 @@ template <typename T>
 class arena_interactor : public depth0::arena_interactor<T> {
  public:
   arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<representation::arena_map>& map_in,
+                   std::shared_ptr<representation::arena_map>& map_in,
+                   depth0::stateless_metrics_aggregator *metrics_agg,
                    argos::CFloorEntity* floor_in,
                    uint cache_usage_penalty)
-      : depth0::arena_interactor<T>(server, map_in, floor_in),
+      : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
       m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
@@ -79,7 +80,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
         return;
     }
     if (controller.is_carrying_block()) {
-      handle_nest_block_drop(controller);
+      handle_nest_block_drop(controller, timestep);
       if (m_cache_penalty_handler.is_serving_penalty(controller)) {
         if (m_cache_penalty_handler.penalty_satisfied(controller,
                                                          timestep)) {
@@ -89,7 +90,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
         m_cache_penalty_handler.penalty_init(controller, timestep);
       }
     } else { /* The foot-bot has no block item */
-      handle_free_block_pickup(controller);
+      handle_free_block_pickup(controller, timestep);
 
       if (m_cache_penalty_handler.is_serving_penalty(controller)) {
         if (m_cache_penalty_handler.penalty_satisfied(controller,

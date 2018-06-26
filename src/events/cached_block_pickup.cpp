@@ -50,7 +50,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::arena_cache>& cache,
     size_t robot_index)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
@@ -195,8 +195,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
 
 void cached_block_pickup::visit(representation::block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
-  block.add_carry();
-  block.robot_index(m_robot_index);
+  block.add_transporter(m_robot_index);
 
   /* Move block out of sight */
   block.move_out_of_sight();

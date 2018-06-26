@@ -51,7 +51,7 @@ metrics_aggregator::metrics_aggregator(
     const std::string& output_root)
     : stateful_metrics_aggregator(server, params, output_root) {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-      "fsm::cache_acquisition",
+      "caches::acquisition",
       metrics_path() + "/" + params->cache_acquisition_fname,
       params->collect_interval);
 
@@ -90,7 +90,7 @@ const controller::depth1::foraging_controller* const controller) {
   collect("tasks::management", *taskm_m);
 
   if (nullptr != controller->current_task()) {
-    collect_if("fsm::block_acquisition",
+    collect_if("blocks::acquisition",
                dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
                    *controller->current_task()),
                [&](const rcppsw::metrics::base_metrics& metrics) {
@@ -99,7 +99,7 @@ const controller::depth1::foraging_controller* const controller) {
                          metrics)
                      .acquisition_goal();
                });
-    collect_if("fsm::cache_acquisition",
+    collect_if("caches::acquisition",
                dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
                    *controller->current_task()),
                [&](const rcppsw::metrics::base_metrics& metrics) {

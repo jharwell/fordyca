@@ -67,6 +67,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
                                                  arena_map(),
+                                                 m_metrics_agg.get(),
                                                  floor(),
                                                  arenap->static_cache.usage_penalty);
 

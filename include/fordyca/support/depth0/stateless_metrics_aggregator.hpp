@@ -29,7 +29,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca);
+
+namespace representation {
+class block;
+} /* namespace representation */
+
+NS_START(support, depth0);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,6 +60,11 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
    * @brief Collect metrics from the stateless controller.
    */
   void collect_from_controller(const rcppsw::metrics::base_metrics* controller);
+
+  /**
+   * @brief Collect metrics from a block right before it is dropped in the nest.
+   */
+  void collect_from_block(const representation::block* block);
 };
 
 NS_END(depth0, support, fordyca);

@@ -92,8 +92,9 @@ class nest_block_drop
                                 tasks::depth0::generalist,
                                 tasks::depth1::collector> {
  public:
-  nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  const std::shared_ptr<representation::block>& block);
+  nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
+                  std::shared_ptr<representation::block> block,
+                  uint timestep);
   ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -126,7 +127,10 @@ class nest_block_drop
   std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
+  // clang-format off
+  uint                                   m_timestep;
   std::shared_ptr<representation::block> m_block;
+  //clang-format on
 };
 
 NS_END(events, fordyca);

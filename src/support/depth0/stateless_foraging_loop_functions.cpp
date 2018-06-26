@@ -144,7 +144,9 @@ void stateless_foraging_loop_functions::pre_step_iter(
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, m_arena_map, floor())(controller);
+  interactor(rcppsw::er::g_server, m_arena_map, m_metrics_agg.get(), floor())(
+      controller,
+      GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {

@@ -29,6 +29,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/math/dcoord.hpp"
 #include "fordyca/representation/movable_cell_entity.hpp"
+#include "fordyca/metrics/blocks/transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,6 +53,7 @@ NS_START(fordyca, representation);
  */
 class block : public unicell_entity,
               public movable_cell_entity,
+              public metrics::blocks::transport_metrics,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
@@ -64,40 +66,56 @@ class block : public unicell_entity,
 
   explicit block(double dimension)
       : unicell_entity(dimension, rcppsw::utils::color::kBLACK, -1),
-        movable_cell_entity(),
-        m_robot_index(-1),
-        m_carries(0) {}
+        movable_cell_entity() {}
 
   block(double dimension, int id)
       : unicell_entity(dimension, rcppsw::utils::color::kBLACK, id),
-        movable_cell_entity(),
-        m_robot_index(-1),
-        m_carries(0) {}
+        movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const block& other) const {
     return (this->id() == other.id());
   }
 
-  /* metrics */
-  /**
-   * @brief Reset the metrics (# carries) for the block after it is dropped in
-   * the nest.
-   */
-  void reset_metrics(void) { m_carries = 0; }
-  uint n_carries(void) const { return m_carries; }
+  /* transport metrics */
+  void reset_metrics(void) override;
+  uint total_transporters(void) const override { return m_transporters; }
+  double total_transport_time(void) const override;
+  double initial_wait_time(void) const override;
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
-  void add_carry(void) { ++m_carries; }
+  void add_transporter(uint robot_id) { ++m_transporters; m_robot_id = robot_id; }
+
+  /**
+   * @brief Set the time that the block is picked up for the first time after
+   * being distributed in the arena.
+   *
+   * @param current_time The current simulation time.
+   */
+  void first_pickup_time(double time);
+
+  /**
+   * @brief Set the time that the block dropped in the nest.
+   *
+   * @param current_time The current simulation time.
+   */
+  void nest_drop_time(double time) { m_nest_drop_time = time; }
+
+  /**
+   * @brief Set the time that the block was distributed in the arena.
+   */
+  void distribution_time(double dist_time) { m_dist_time = dist_time; }
 
   std::unique_ptr<block> clone(void) const override;
 
   /**
-   * @brief Reset the state of the block (i.e. not carried by a robot anymore).
+   * @brief Reset the the blocks carried/not carried state when it is not
+   * carried by a robot anymore, but has not yet made it back to the nest
+   * (i.e. dropped in a cache).
    */
-  void reset_index(void) { m_robot_index = -1; }
+  void reset_robot_id(void) { m_robot_id = -1; }
 
   /**
    * @brief change the block's location to something outside the visitable space
@@ -119,8 +137,7 @@ class block : public unicell_entity,
    * @return The robot index, or -1 if no robot is currently carrying this
    * block.
    */
-  int robot_index(void) const { return m_robot_index; }
-  void robot_index(int robot_index) { m_robot_index = robot_index; }
+  int robot_id(void) const { return m_robot_id; }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the
@@ -140,8 +157,12 @@ class block : public unicell_entity,
 
  private:
   // clang-format off
-  int    m_robot_index;
-  size_t m_carries;
+  int  m_robot_id{-1};
+  uint m_transporters{0};
+  bool m_first_pickup{false};
+  double m_first_pickup_time{0.0};
+  double m_dist_time{0.0};
+  double m_nest_drop_time{0.0};
   // clang-format on
 };
 

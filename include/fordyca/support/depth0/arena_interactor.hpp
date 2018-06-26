@@ -36,6 +36,7 @@
 #include "rcppsw/er/server.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,11 +65,13 @@ NS_START(depth0);
 template <typename T>
 class arena_interactor : public rcppsw::er::client {
  public:
-  arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<representation::arena_map>& map,
+  arena_interactor(std::shared_ptr<rcppsw::er::server> server,
+                   std::shared_ptr<representation::arena_map> map,
+                   stateless_metrics_aggregator *metrics_agg,
                    argos::CFloorEntity* floor)
       : client(server),
         m_floor(floor),
+        m_metrics_agg(metrics_agg),
         m_map(map) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
@@ -78,12 +81,13 @@ class arena_interactor : public rcppsw::er::client {
    * @brief The actual handling function for the interactions.
    *
    * @param controller The controller to handle interactions for.
+   * @param timestep The current timestep.
    */
-  void operator()(T& controller) {
+  void operator()(T& controller, uint timestep) {
     if (controller.is_carrying_block()) {
-      handle_nest_block_drop(controller);
+      handle_nest_block_drop(controller, timestep);
     } else {
-      handle_free_block_pickup(controller);
+      handle_free_block_pickup(controller, timestep);
     }
   }
 
@@ -95,7 +99,7 @@ class arena_interactor : public rcppsw::er::client {
    * @return \c TRUE if the robot was sent the \ref free_block_pickup event,
    * \c FALSE otherwise.
    */
-  bool handle_free_block_pickup(T& controller) {
+  bool handle_free_block_pickup(T& controller, uint timestep) {
     if (controller.goal_acquired() &&
         acquisition_goal_type::kBlock == controller.acquisition_goal()) {
       /* Check whether the foot-bot is actually on a block */
@@ -103,7 +107,8 @@ class arena_interactor : public rcppsw::er::client {
       if (-1 != block) {
         events::free_block_pickup pickup_op(rcppsw::er::g_server,
                                             m_map->blocks()[block],
-                                            utils::robot_id(controller));
+                                            utils::robot_id(controller),
+                                            timestep);
         controller.visitor::template visitable_any<T>::accept(pickup_op);
         m_map->accept(pickup_op);
 
@@ -122,10 +127,19 @@ class arena_interactor : public rcppsw::er::client {
    * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c FALSE
    * otherwise.
    */
-  bool handle_nest_block_drop(T& controller) {
+  bool handle_nest_block_drop(T& controller, uint timestep) {
     if (controller.in_nest() &&
         transport_goal_type::kNest == controller.block_transport_goal()) {
-      events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
+      /*
+       * Gather block transport metrics before event processing and they get
+       * reset.
+       */
+      controller.block()->nest_drop_time(timestep);
+      m_metrics_agg->collect_from_block(controller.block().get());
+
+      events::nest_block_drop drop_op(rcppsw::er::g_server,
+                                      controller.block(),
+                                      timestep);
 
       /* Update arena map state due to a block nest drop */
       m_map->accept(drop_op);
@@ -146,6 +160,7 @@ class arena_interactor : public rcppsw::er::client {
  private:
   // clang-format off
   argos::CFloorEntity*                       m_floor;
+  stateless_metrics_aggregator*              m_metrics_agg;
   std::shared_ptr<representation::arena_map> m_map;
   // clang-format on
 };
