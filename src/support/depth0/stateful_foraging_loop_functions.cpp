@@ -96,7 +96,9 @@ void stateful_foraging_loop_functions::pre_step_iter(
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, arena_map(), floor())(controller);
+  interactor(rcppsw::er::g_server, arena_map(), m_metrics_agg.get(), floor())(
+      controller,
+      GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(

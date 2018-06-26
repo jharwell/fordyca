@@ -74,7 +74,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void free_block_drop::visit(representation::block& block) {
-  block.reset_index();
+  block.reset_robot_id();
   rcppsw::math::dcoord2 d(cell_op::x(), cell_op::y());
   block.real_loc(math::dcoord_to_rcoord(d, m_resolution));
   block.discrete_loc(d);

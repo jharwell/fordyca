@@ -44,9 +44,10 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 nest_block_drop::nest_block_drop(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<representation::block>& block)
-    : client(server), m_block(block) {
+    std::shared_ptr<rcppsw::er::server> server,
+    std::shared_ptr<representation::block> block,
+    uint timestep)
+    : client(server), m_timestep(timestep), m_block(block) {
   client::insmod("nest_block_drop",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -56,7 +57,7 @@ nest_block_drop::nest_block_drop(
  * Foraging Support
  ******************************************************************************/
 void nest_block_drop::visit(representation::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
+  ER_ASSERT(-1 != m_block->robot_id(), "FATAL: undefined robot index");
   map.distribute_block(m_block);
   m_block->accept(*this);
 } /* visit() */
@@ -65,8 +66,8 @@ void nest_block_drop::visit(representation::arena_map& map) {
  * Stateless Foraging
  ******************************************************************************/
 void nest_block_drop::visit(representation::block& block) {
-  block.reset_index();
   block.reset_metrics();
+  block.distribution_time(m_timestep);
 } /* visit() */
 
 void nest_block_drop::visit(

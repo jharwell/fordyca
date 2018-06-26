@@ -67,66 +67,6 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
     m_floor = &GetSpace().GetFloorEntity();
   }
 
-  /**
-   * @brief Determine if a robot is waiting to pick up a free block, and if it
-   * is actually on a free block, send it the \ref free_block_pickup event.
-   *
-   * @return \c TRUE if the robot was sent the \ref free_block_pickup event,
-   * \c FALSE otherwise.
-   */
-  template <typename T>
-  bool handle_free_block_pickup(argos::CFootBotEntity& robot,
-                                representation::arena_map& map) {
-    auto& controller =
-        static_cast<T&>(robot.GetControllableEntity().GetController());
-
-    if (controller.block_acquired()) {
-      /* Check whether the foot-bot is actually on a block */
-      int block = utils::robot_on_block(robot, map);
-      if (-1 != block) {
-        events::free_block_pickup pickup_op(rcppsw::er::g_server,
-                                            map.blocks()[block],
-                                            utils::robot_id(robot));
-        controller.visitor::template visitable_any<T>::accept(pickup_op);
-        map.accept(pickup_op);
-
-        /* The floor texture must be updated */
-        m_floor->SetChanged();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @brief Determine if a robot is waiting to drop a block in the nest, and if
-   * so send it the \ref nest_block_drop event.
-   *
-   * @return \c TRUE if the robot was sent the \ref nest_block_drop event, \c
-   * FALSE
-   * otherwise.
-   */
-  template <typename T>
-  bool handle_nest_block_drop(argos::CFootBotEntity& robot,
-                              representation::arena_map& map) {
-    auto& controller =
-        static_cast<T&>(robot.GetControllableEntity().GetController());
-    if (controller.in_nest() && controller.goal_is_nest()) {
-      events::nest_block_drop drop_op(rcppsw::er::g_server, controller.block());
-
-      /* Update arena map state due to a block nest drop */
-      map.accept(drop_op);
-
-      /* Actually drop the block */
-      controller.visitor::template visitable_any<T>::accept(drop_op);
-
-      /* The floor texture must be updated */
-      m_floor->SetChanged();
-      return true;
-    }
-    return false;
-  }
-
  protected:
   argos::CFloorEntity* floor(void) const { return m_floor; }
 

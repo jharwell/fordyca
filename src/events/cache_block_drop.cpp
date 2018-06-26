@@ -80,8 +80,8 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_index(), "FATAL: undefined robot index");
-  int index = m_block->robot_index();
+  ER_ASSERT(-1 != m_block->robot_id(), "FATAL: undefined robot index");
+  int index = m_block->robot_id();
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access(cell_op::x(), cell_op::y()).accept(*this);

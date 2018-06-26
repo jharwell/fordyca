@@ -151,7 +151,7 @@ void arena_map::static_cache_create(void) {
    * are eligible for being used to re-create the static cache.
    */
   for (auto& b : m_blocks) {
-    if (-1 == b->robot_index() &&
+    if (-1 == b->robot_id() &&
         b->discrete_loc() != math::rcoord_to_dcoord(argos::CVector2(x, y),
                                                     m_grid.resolution())) {
       blocks.push_back(b);
@@ -168,7 +168,7 @@ void arena_map::static_cache_create(void) {
 void arena_map::distribute_blocks(void) {
   // Reset all the cells to clear old references to blocks
   m_grid.reset();
-  
+
   for (auto& b : m_blocks) {
     distribute_block(b);
   } /* for(b..) */

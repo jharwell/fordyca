@@ -84,7 +84,7 @@ class cached_block_pickup
                                 tasks::depth2::cache_transferer,
                                 representation::arena_cache> {
  public:
-  cached_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
+  cached_block_pickup(std::shared_ptr<rcppsw::er::server> server,
                       const std::shared_ptr<representation::arena_cache>& cache,
                       size_t robot_index);
   ~cached_block_pickup(void) override { client::rmmod(); }

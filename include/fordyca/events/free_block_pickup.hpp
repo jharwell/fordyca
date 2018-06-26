@@ -98,9 +98,10 @@ class free_block_pickup
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher> {
  public:
-  free_block_pickup(const std::shared_ptr<rcppsw::er::server>& server,
-                    const std::shared_ptr<representation::block>& block,
-                    uint robot_index);
+  free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
+                    std::shared_ptr<representation::block> block,
+                    uint robot_index,
+                    uint timestep);
   ~free_block_pickup(void) override { client::rmmod(); }
 
   free_block_pickup(const free_block_pickup& op) = delete;
@@ -134,6 +135,7 @@ class free_block_pickup
 
  private:
   // clang-format off
+  uint                                   m_timestep;
   uint                                   m_robot_index;
   std::shared_ptr<representation::block> m_block;
   std::shared_ptr<rcppsw::er::server>    m_server;
