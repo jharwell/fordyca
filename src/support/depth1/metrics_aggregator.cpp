@@ -85,6 +85,10 @@ const controller::depth1::foraging_controller* const controller) {
   ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
   collect("fsm::distance", *distance_m);
 
+  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
+  ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
+  collect("perception::world_model", *worldm_m);
+
   auto taskm_m = dynamic_cast<const rcppsw::metrics::tasks::management_metrics*>(controller);
   ER_ASSERT(taskm_m, "FATAL: Controller does not provide task management metrics");
   collect("tasks::management", *taskm_m);

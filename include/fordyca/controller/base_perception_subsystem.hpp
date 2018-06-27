@@ -31,6 +31,7 @@
 #include "rcppsw/er/client.hpp"
 #include "fordyca/params/perception_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +56,8 @@ NS_START(controller);
  * take what the sensors read and turn it into a useful internal
  * representation.
  */
-class base_perception_subsystem : public rcppsw::er::client {
+class base_perception_subsystem : public rcppsw::er::client,
+                                  public metrics::world_model_metrics {
  public:
   base_perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
                             const params::perception_params* const params,
@@ -73,13 +75,19 @@ class base_perception_subsystem : public rcppsw::er::client {
    * @brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void);
-  
+
   const std::shared_ptr<representation::perceived_arena_map>& map(void) const {
     return m_map;
   }
   std::shared_ptr<representation::perceived_arena_map> map(void) {
     return m_map;
   }
+
+  /* metrics */
+  uint cell_state_inaccuracies(uint state) const override {
+    return m_cell_stats[state];
+  }
+  void reset_metrics(void) override;
 
  protected:
   /*
@@ -90,7 +98,18 @@ class base_perception_subsystem : public rcppsw::er::client {
   virtual void process_los(const representation::line_of_sight* const los);
 
  private:
+  /**
+   * @brief Update the aggregate stats on inaccuracies in the robot's perceived
+   * arena map for this timestep.
+   *
+   * @param los
+   */
+  void update_cell_stats(const representation::line_of_sight* const los);
+
+  // clang-format off
+  std::vector<uint>                                    m_cell_stats;
   std::shared_ptr<representation::perceived_arena_map> m_map;
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

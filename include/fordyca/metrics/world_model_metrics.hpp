@@ -1,5 +1,5 @@
 /**
- * @file transport_metrics.hpp
+ * @file world_model_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,47 +29,39 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, blocks);
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 
 /**
- * @class transport_metrics
- * @ingroup metrics blocks
+ * @class world_model_metrics
+ * @ingroup metrics
  *
- * @brief Defines the metrics to be collected from blocks about the process of
- * transportation from their original location in the arena after distribution
- * to the nest.
+ * @brief Defines the metrics to be collected from robots about their world
+ * model.
  *
- * Metrics should be collected upon deposition in nest, rather than every
- * timestep.
+ * Metrics are collected every timestep.
  */
-class transport_metrics : public rcppsw::metrics::base_metrics {
+class world_model_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
-  transport_metrics(void) = default;
+  world_model_metrics(void) = default;
 
   /**
-   * @brief Return the total # of robots that have carried the block since it
-   * was originally distributed in the arena until it makes it all the way back
-   * to the nest.
+   * @brief Return the total # of times the robot's world model was inaccurate
+   * regarding which cells in their world model were thought to contain
+   * something/not to contain something.
+   *
+   * This does not collect any information about WHERE in the world model an
+   * inaccuracy was detected, only that there was one. That may be added later
+   * if additional insight is desired.
+   *
+   * @param state The state type for which inaccuracies should be reported.
    */
-  virtual uint total_transporters(void) const = 0;
-
-  /**
-   * @brief Return the total amount of time that it took from the first pickup
-   * to when the block was deposited in the nest.
-   */
-  virtual double total_transport_time(void) const = 0;
-
-  /**
-   * @brief Return the amount of time that the block sits in the arena after
-   * being distributed but before it is picked up for the first time.
-   */
-  virtual double initial_wait_time(void) const = 0;
+  virtual uint cell_state_inaccuracies(uint state) const = 0;
 };
 
-NS_END(blocks, metrics, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_ */

@@ -54,6 +54,8 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string distance_fname{""};
   std::string output_dir{""};
 
+  std::string perception_world_model_fname{""};
+
   uint collect_interval{0};
 };
 

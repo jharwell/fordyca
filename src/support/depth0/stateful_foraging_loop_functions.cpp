@@ -63,6 +63,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<const struct params::output_params>();
   m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
       rcppsw::er::g_server, &p_output->metrics, output_root());
+  m_metrics_agg->reset_all();
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -126,6 +127,19 @@ void stateful_foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   pre_step_final();
 } /* PreStep() */
+
+void stateful_foraging_loop_functions::Reset(void) {
+  stateless_foraging_loop_functions::Reset();
+  m_metrics_agg->reset_all();
+} /* Reset() */
+
+void stateful_foraging_loop_functions::pre_step_final(void) {
+  stateless_foraging_loop_functions::pre_step_final();
+  m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_reset_all();
+  m_metrics_agg->interval_reset_all();
+  m_metrics_agg->timestep_inc_all();
+} /* pre_step_final() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
