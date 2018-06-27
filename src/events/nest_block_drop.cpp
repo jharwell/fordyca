@@ -58,7 +58,7 @@ nest_block_drop::nest_block_drop(
  ******************************************************************************/
 void nest_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "FATAL: undefined robot index");
-  map.distribute_block(m_block);
+  map.distribute_single_block(m_block);
   m_block->accept(*this);
 } /* visit() */
 

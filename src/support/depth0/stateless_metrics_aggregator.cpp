@@ -27,7 +27,7 @@
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/block_transport_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -57,7 +57,7 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
       metrics_path() + "/" + params->block_acquisition_fname,
       params->collect_interval);
 
-  register_collector<metrics::block_transport_metrics_collector>(
+  register_collector<metrics::blocks::transport_metrics_collector>(
       "blocks::transport",
       metrics_path() + "/" + params->block_transport_fname,
       params->collect_interval);

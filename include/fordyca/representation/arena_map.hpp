@@ -109,14 +109,10 @@ class arena_map : public rcppsw::er::client,
   }
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * @brief Distribute all blocks in the arena. Resets arena state. Should only
+   * be called during (re)-initialization.
    */
-  void distribute_blocks(void);
-
-  size_t xdsize(void) const { return m_grid.xdsize(); }
-  size_t ydsize(void) const { return m_grid.ydsize(); }
-  size_t xrsize(void) const { return m_grid.xrsize(); }
-  size_t yrsize(void) const { return m_grid.yrsize(); }
+  void distribute_all_blocks(void);
 
   /**
    * @brief Distribute a particular block in the arena, according to whatever
@@ -124,7 +120,14 @@ class arena_map : public rcppsw::er::client,
    *
    * @param block The block to distribute.
    */
-  void distribute_block(const std::shared_ptr<block>& block);
+  void distribute_single_block(std::shared_ptr<block>& block) {
+    m_block_distributor.distribute_block(m_grid, block);
+  }
+
+  size_t xdsize(void) const { return m_grid.xdsize(); }
+  size_t ydsize(void) const { return m_grid.ydsize(); }
+  size_t xrsize(void) const { return m_grid.xrsize(); }
+  size_t yrsize(void) const { return m_grid.yrsize(); }
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).

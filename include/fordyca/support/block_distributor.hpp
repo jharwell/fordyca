@@ -30,6 +30,7 @@
 #include "fordyca/representation/extent_model.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,6 +39,7 @@ NS_START(fordyca);
 
 namespace representation {
 class block;
+class arena_grid;
 }
 namespace params {
 struct block_distribution_params;
@@ -55,14 +57,15 @@ NS_START(support);
  * @brief Distributes all blocks as directed on simulation start, and then
  * re-dstributes individual blocks every time they are dropped in the nest.
  */
-class block_distributor {
+class block_distributor : public rcppsw::er::client {
  public:
   static constexpr char kDIST_SINGLE_SRC[] = "single_source";
   static constexpr char kDIST_RANDOM[] = "random";
   static constexpr char kMODEL_SHAPE_RECT[] = "rectangle";
   static constexpr char kMODEL_ORIENTATION_HOR[] = "horizontal";
 
-  explicit block_distributor(
+  block_distributor(
+      std::shared_ptr<rcppsw::er::server> server,
       const struct params::block_distribution_params* params);
 
   block_distributor(const block_distributor& s) = delete;
@@ -71,8 +74,8 @@ class block_distributor {
   /**
    * @brief Distribute a block in the arena.
    */
-  bool distribute_block(const representation::block& block,
-                        argos::CVector2* coord);
+  void distribute_block(representation::arena_grid& grid,
+                        std::shared_ptr<representation::block>& block);
 
   /**
    * @brief Get the range in X over which the block will be distributed during
@@ -102,13 +105,13 @@ class block_distributor {
    *
    * @param block The block to place/distribute.
    */
-  argos::CVector2 dist_random(const representation::block& block);
+  argos::CVector2 dist_random(std::shared_ptr<representation::block>& block);
 
   /**
    * @brief Distribute a block within a small range about 90% of the way between
    * the nest and the far wall. Assumes a horizontally rectangular arena.
    */
-  argos::CVector2 dist_single_src(const representation::block& block);
+  argos::CVector2 dist_single_src(std::shared_ptr<representation::block>& block);
 
   /**
    * @brief Distribute a block within a [x_min, y_min], [x_max, y_max]

@@ -318,7 +318,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
       controller.visitor::template visitable_any<T>::accept(drop_op);
       map()->accept(drop_op);
     } else {
-      map()->distribute_block(controller.block());
+      auto b = controller.block();
+      map()->distribute_single_block(b);
       controller.visitor::template visitable_any<T>::accept(drop_op);
     }
     floor()->SetChanged();

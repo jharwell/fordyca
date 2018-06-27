@@ -45,7 +45,7 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 free_block_drop::free_block_drop(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::block>& block,
     size_t x,
     size_t y,
@@ -102,7 +102,7 @@ void free_block_drop::visit(representation::arena_map& map) {
                         m_resolution);
     map.accept(op);
   } else if (cell.state_has_block()) {
-    map.distribute_block(m_block);
+    map.distribute_single_block(m_block);
   } else {
     cell.accept(*this);
   }
