@@ -121,7 +121,8 @@
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
           distance_fname="distance-stats.csv"
-          collect_interval="1000"
+          perception_world_model_fname="perception-world-model.csv"
+          collect_interval="10"
           />
     </output>
     <arena_map>

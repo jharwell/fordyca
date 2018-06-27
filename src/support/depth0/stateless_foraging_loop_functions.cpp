@@ -76,8 +76,6 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize output and metrics collection */
   output_init(p_output);
-  m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, m_output_root);
 
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
                                        p_output->log_fname);
@@ -190,6 +188,9 @@ void stateless_foraging_loop_functions::output_init(
   } else {
     m_output_root = params->output_root + "/" + params->output_dir;
   }
+  m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
+      rcppsw::er::g_server, &params->metrics, m_output_root);
+  m_metrics_agg->reset_all();
 } /* output_init() */
 
 std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {

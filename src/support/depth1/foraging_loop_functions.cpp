@@ -63,6 +63,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<params::output_params>();
   m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(
       rcppsw::er::g_server, &p_output->metrics, output_root());
+  m_metrics_agg->reset_all();
 
   /* intitialize robot interactions with environment */
   m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
@@ -185,6 +186,7 @@ void foraging_loop_functions::pre_step_final(void) {
     arena_map()->caches_removed(0);
   }
 
+  stateful_foraging_loop_functions::pre_step_final();
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();

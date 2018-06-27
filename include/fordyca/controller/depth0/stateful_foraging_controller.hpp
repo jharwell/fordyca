@@ -30,6 +30,7 @@
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,6 +70,7 @@ NS_START(depth0);
  * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public stateless_foraging_controller,
+                                     public metrics::world_model_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);
@@ -87,6 +89,9 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+
+  /* world model metrics */
+  uint cell_state_inaccuracies(uint state) const override;
 
   /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);

@@ -54,6 +54,10 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
 
   void Init(ticpp::Element& node) override;
   void PreStep(void) override;
+  void Reset(void) override;
+
+ protected:
+  void pre_step_final(void) override;
 
  private:
   void pre_step_iter(argos::CFootBotEntity& robot);

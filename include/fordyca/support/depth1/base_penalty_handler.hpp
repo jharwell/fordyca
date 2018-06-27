@@ -91,7 +91,7 @@ class base_penalty_handler : public rcppsw::er::client {
     return false;
   }
   /**
-   * @brief Get the next robot that will satisfy its penalty from the list
+   * @brief Get the next robot that will satisfy its penalty from the list.
    */
   const block_manipulation_penalty<T>& next(void) const { return m_penalty_list.front(); }
 

@@ -27,6 +27,7 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/fsm/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,6 +43,7 @@ base_perception_subsystem::base_perception_subsystem(
     const params::perception_params* const params,
     const std::string& id)
     : client(server),
+      m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
       m_map(rcppsw::make_unique<representation::perceived_arena_map>(
           client::server_ref(),
           params,
@@ -80,6 +82,7 @@ void base_perception_subsystem::process_los(
                 d.second);
         m_map->block_remove(
             m_map->access<occupancy_grid::kCellLayer>(d).block());
+        m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -97,5 +100,28 @@ void base_perception_subsystem::process_los(
     m_map->accept(op);
   } /* for(block..) */
 } /* process_los() */
+
+void base_perception_subsystem::update_cell_stats(
+    const representation::line_of_sight* const los) {
+  for (size_t i = 0; i < los->xsize(); ++i) {
+    for (size_t j = 0; j < los->ysize(); ++j) {
+      rcppsw::math::dcoord2 d = los->cell(i, j).loc();
+      if (!los->cell(i, j).state_is_empty() &&
+          m_map->access<occupancy_grid::kCellLayer>(d).state_is_empty()) {
+        m_cell_stats[fsm::cell2D_fsm::ST_EMPTY]++;
+      } else if (!los->cell(i, j).state_has_block() &&
+                 m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
+        m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
+      } else if (!los->cell(i, j).state_has_cache() &&
+                 m_map->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+        m_cell_stats[fsm::cell2D_fsm::ST_HAS_CACHE]++;
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
+} /* update_cell_stats() */
+
+void base_perception_subsystem::reset_metrics(void) {
+  m_cell_stats.assign(m_cell_stats.size(), 0);
+} /* reset_metrics() */
 
 NS_END(controller, fordyca);

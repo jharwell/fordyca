@@ -194,6 +194,13 @@ FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        acquisition_goal,
                        current_task());
 
+/*******************************************************************************
+ * World Model Metrics
+ ******************************************************************************/
+uint stateful_foraging_controller::cell_state_inaccuracies(uint state) const {
+  return m_perception->cell_state_inaccuracies(state);
+} /* cell_state_inaccuracies() */
+
 using namespace argos;
 REGISTER_CONTROLLER(stateful_foraging_controller,
                     "stateful_foraging_controller"); // NOLINT
