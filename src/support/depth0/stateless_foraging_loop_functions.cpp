@@ -103,7 +103,7 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
 
 void stateless_foraging_loop_functions::Reset() {
   m_metrics_agg->reset_all();
-  m_arena_map->distribute_blocks();
+  m_arena_map->distribute_all_blocks();
 }
 
 void stateless_foraging_loop_functions::Destroy() {
@@ -171,7 +171,7 @@ void stateless_foraging_loop_functions::arena_map_init(
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
   m_arena_map.reset(new representation::arena_map(aparams));
-  m_arena_map->distribute_blocks();
+  m_arena_map->distribute_all_blocks();
   for (auto& block : m_arena_map->blocks()) {
     block->display_id(vparams->block_id);
   } /* for(&block..) */

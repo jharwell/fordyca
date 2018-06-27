@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -41,7 +40,7 @@ arena_map::arena_map(const struct params::arena_map_params* params)
     : mc_static_cache_params(params->static_cache),
       m_blocks(params->block_dist.n_blocks),
       m_caches(),
-      m_block_distributor(&params->block_dist),
+      m_block_distributor(rcppsw::er::g_server, &params->block_dist),
       m_server(rcppsw::er::g_server),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
@@ -94,37 +93,6 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-void arena_map::distribute_block(const std::shared_ptr<block>& block) {
-  cell2D* cell = nullptr;
-  while (true) {
-    argos::CVector2 r_coord;
-    if (m_block_distributor.distribute_block(*block, &r_coord)) {
-      rcppsw::math::dcoord2 d_coord =
-          math::rcoord_to_dcoord(r_coord, m_grid.resolution());
-      cell = &m_grid.access(d_coord.first, d_coord.second);
-      /*
-       * You can only distribute blocks to cells that do not currently have
-       * anything in them.
-       */
-      if (!cell->state_has_block() && !cell->state_has_cache()) {
-        events::free_block_drop op(
-            m_server, block, d_coord.first, d_coord.second, m_grid.resolution());
-        cell->accept(op);
-        break;
-      }
-    } else { /* no distributing needs to be done (respawn is disabled) */
-      return;
-    }
-  } /* while() */
-  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
-         block->id(),
-         block->real_loc().GetX(),
-         block->real_loc().GetY(),
-         block->discrete_loc().first,
-         block->discrete_loc().second,
-         reinterpret_cast<void*>(cell->block().get()));
-} /* distribute_block() */
-
 void arena_map::static_cache_create(void) {
   double src_center =
       (m_block_distributor.single_src_xrange(m_blocks[0]->xsize()).GetMin() +
@@ -165,22 +133,12 @@ void arena_map::static_cache_create(void) {
   c.update_host_cells(m_grid, m_caches);
 } /* static_cache_create() */
 
-void arena_map::distribute_blocks(void) {
+void arena_map::distribute_all_blocks(void) {
   // Reset all the cells to clear old references to blocks
   m_grid.reset();
 
   for (auto& b : m_blocks) {
-    distribute_block(b);
-  } /* for(b..) */
-  for (auto& b : m_blocks) {
-    ER_ASSERT(representation::block::kOutOfSightDLoc != b->discrete_loc(),
-              "FATAL: Block%d discrete coordinates still out of sight after "
-              "distribution",
-              b->id());
-    ER_ASSERT(
-        representation::block::kOutOfSightRLoc != b->real_loc(),
-        "FATAL: Block%d real coordinates still out of sight after distribution",
-        b->id());
+    m_block_distributor.distribute_block(m_grid, b);
   } /* for(b..) */
 
   /*
@@ -197,7 +155,7 @@ void arena_map::distribute_blocks(void) {
       }
     } /* for(j..) */
   }   /* for(i..) */
-} /* distribute_blocks() */
+} /* distribute_all_blocks() */
 
 void arena_map::cache_remove(const std::shared_ptr<arena_cache>& victim) {
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));

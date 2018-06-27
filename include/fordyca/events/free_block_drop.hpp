@@ -77,7 +77,7 @@ class free_block_drop
                                 tasks::depth2::cache_finisher,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
-  free_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
+  free_block_drop(std::shared_ptr<rcppsw::er::server> server,
                   const std::shared_ptr<representation::block>& block,
                   size_t x,
                   size_t y,
