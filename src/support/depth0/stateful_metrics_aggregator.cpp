@@ -46,6 +46,7 @@ stateful_metrics_aggregator::stateful_metrics_aggregator(
       "perception::world_model",
       metrics_path() + "/" + params->perception_world_model_fname,
       params->collect_interval);
+  reset_all();
 }
 
 /*******************************************************************************
@@ -66,8 +67,7 @@ const controller::depth0::stateful_foraging_controller* const controller) {
         controller->current_task());
     ER_ASSERT(block_acq_m,
               "FATAL: Controller does not provide FSM block acquisition metrics");
-    collector_group().collect(
-        "fsm::block_acquisition", *block_acq_m);
+    collect("blocks::acquisition", *block_acq_m);
   }
 
 

@@ -44,7 +44,7 @@ std::string transport_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "cum_collected" + separator() +
+      "n_collected" + separator() +
       "avg_transporters" + separator() +
       "avg_transport_time" + separator() +
       "avg_initial_wait_time" + separator();
@@ -62,12 +62,15 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   }
   line += std::to_string(m_stats.cum_collected) + separator();
   if (m_stats.cum_collected > 0) {
-    line += std::to_string(static_cast<double>(m_stats.cum_transporters) /
-                           m_stats.cum_collected) + separator();
-    line += std::to_string(static_cast<double>(m_stats.cum_transporters) /
-                           m_stats.cum_transport_time) + separator();
-    line += std::to_string(static_cast<double>(m_stats.cum_transporters) /
-                           m_stats.cum_initial_wait_time) + separator();
+    line += std::to_string(m_stats.cum_collected /
+                           static_cast<double>(m_stats.cum_transporters)) +
+            separator();
+    line += std::to_string(m_stats.cum_transport_time /
+                           static_cast<double>(m_stats.cum_transporters)) +
+            separator();
+    line += std::to_string(m_stats.cum_initial_wait_time /
+                           static_cast<double>(m_stats.cum_transporters)) +
+            separator();
   } else {
     line += "0" + separator() + "0" + separator() + "0" + separator();
   }

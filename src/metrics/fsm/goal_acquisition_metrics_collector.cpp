@@ -44,12 +44,12 @@ std::string goal_acquisition_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "n_acquiring_goal" + separator() +
-      "n_cum_acquiring_goal" + separator() +
-      "n_vectoring_to_goal" + separator() +
-      "n_cum_vectoring_to_goal" + separator() +
-      "n_exploring_for_goal" + separator() +
-      "n_cum_exploring_for_goal" + separator();
+      "avg_acquiring_goal" + separator() +
+      "avg_cum_acquiring_goal" + separator() +
+      "avg_vectoring_to_goal" + separator() +
+      "avg_cum_vectoring_to_goal" + separator() +
+      "avg_exploring_for_goal" + separator() +
+      "avg_cum_exploring_for_goal" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -62,12 +62,14 @@ void goal_acquisition_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
   m_stats.n_exploring_for_goal += static_cast<uint>(m.is_exploring_for_goal());
-  ++m_stats.n_acquiring_goal;
+  m_stats.n_acquiring_goal += static_cast<uint>(m.is_exploring_for_goal() ||
+                                                m.is_vectoring_to_goal());
   m_stats.n_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 
   m_stats.n_cum_exploring_for_goal +=
       static_cast<uint>(m.is_exploring_for_goal());
-  ++m_stats.n_cum_acquiring_goal;
+  m_stats.n_cum_acquiring_goal += static_cast<uint>(m.is_exploring_for_goal() ||
+                                                    m.is_vectoring_to_goal());
   m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
@@ -75,25 +77,25 @@ bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line = std::to_string(m_stats.n_acquiring_goal) + separator() +
-         std::to_string(m_stats.n_cum_acquiring_goal) + separator() +
-         std::to_string(m_stats.n_vectoring_to_goal) + separator() +
-         std::to_string(m_stats.n_cum_vectoring_to_goal) + separator() +
-         std::to_string(m_stats.n_exploring_for_goal) + separator() +
-         std::to_string(m_stats.n_cum_exploring_for_goal) + separator();
+  line = std::to_string(m_stats.n_acquiring_goal /
+                        static_cast<double>(interval())) + separator() +
+         std::to_string(m_stats.n_cum_acquiring_goal /
+                        static_cast<double>(timestep()+1)) + separator() +
+         std::to_string(m_stats.n_vectoring_to_goal /
+                        static_cast<double>(interval())) + separator() +
+         std::to_string(m_stats.n_cum_vectoring_to_goal /
+                        static_cast<double>(timestep()+1)) + separator() +
+         std::to_string(m_stats.n_exploring_for_goal /
+                        static_cast<double>(interval())) + separator() +
+         std::to_string(m_stats.n_cum_exploring_for_goal /
+                        static_cast<double>(timestep()+1)) + separator();
   return true;
 } /* store_foraging_stats() */
 
 void goal_acquisition_metrics_collector::reset_after_interval(void) {
-  m_stats.n_cum_exploring_for_goal = 0;
-  m_stats.n_cum_acquiring_goal = 0;
-  m_stats.n_cum_vectoring_to_goal = 0;
-} /* reset_after_interval() */
-
-void goal_acquisition_metrics_collector::reset_after_timestep(void) {
   m_stats.n_exploring_for_goal = 0;
   m_stats.n_acquiring_goal = 0;
   m_stats.n_vectoring_to_goal = 0;
-} /* reset_after_timestep() */
+} /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

@@ -61,16 +61,18 @@ bool world_model_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_EMPTY]) + separator();
-  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]) + separator();
-  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE]) + separator();
+  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_EMPTY] /
+                         static_cast<double>(timestep()+1)) + separator();
+  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] /
+                         static_cast<double>(timestep()+1)) + separator();
+  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] /
+                         static_cast<double>(timestep()+1)) + separator();
   return true;
 } /* csv_line_build() */
 
 void world_model_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const world_model_metrics&>(metrics);
-  m_stats[fsm::cell2D_fsm::ST_UNKNOWN] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_UNKNOWN);
   m_stats[fsm::cell2D_fsm::ST_EMPTY] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_EMPTY);
   m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_BLOCK);
   m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_CACHE);

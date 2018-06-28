@@ -76,7 +76,7 @@ void stateless_metrics_aggregator::collect_from_controller(
   ER_ASSERT(block_acq_m, "FATAL: Controller does not provide FSM block acquisition metrics");
 
   collect("fsm::distance", *distance_m);
-  collect("fsm::block_acquisition", *block_acq_m);
+  collect("blocks::acquisition", *block_acq_m);
 } /* collect_from_controller() */
 
 void stateless_metrics_aggregator::collect_from_block(
