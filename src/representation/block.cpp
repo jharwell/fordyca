@@ -67,7 +67,7 @@ void block::first_pickup_time(double time) {
 } /* first_pickup_time() */
 
 double block::total_transport_time(void) const {
-  return m_nest_drop_time - m_dist_time;
+  return m_nest_drop_time - m_first_pickup_time;
 } /* total_transport_time() */
 
 double block::initial_wait_time(void) const {

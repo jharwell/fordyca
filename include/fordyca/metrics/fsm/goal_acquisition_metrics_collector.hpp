@@ -53,7 +53,6 @@ class goal_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void reset_after_timestep(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:

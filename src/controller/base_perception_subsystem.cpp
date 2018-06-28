@@ -54,6 +54,7 @@ base_perception_subsystem::base_perception_subsystem(
  ******************************************************************************/
 void base_perception_subsystem::update(
     const representation::line_of_sight* const los) {
+  update_cell_stats(los);
   process_los(los);
   m_map->update();
 } /* update() */
@@ -82,7 +83,6 @@ void base_perception_subsystem::process_los(
                 d.second);
         m_map->block_remove(
             m_map->access<occupancy_grid::kCellLayer>(d).block());
-        m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -106,14 +106,17 @@ void base_perception_subsystem::update_cell_stats(
   for (size_t i = 0; i < los->xsize(); ++i) {
     for (size_t j = 0; j < los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
-      if (!los->cell(i, j).state_is_empty() &&
-          m_map->access<occupancy_grid::kCellLayer>(d).state_is_empty()) {
+      if (los->cell(i, j).state_is_empty() &&
+          m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
+          !m_map->access<occupancy_grid::kCellLayer>(d).state_is_empty()) {
         m_cell_stats[fsm::cell2D_fsm::ST_EMPTY]++;
-      } else if (!los->cell(i, j).state_has_block() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
+      } else if (los->cell(i, j).state_has_block() &&
+                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
-      } else if (!los->cell(i, j).state_has_cache() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+      } else if (los->cell(i, j).state_has_cache() &&
+                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_CACHE]++;
       }
     } /* for(j..) */

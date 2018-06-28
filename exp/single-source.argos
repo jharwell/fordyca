@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateful_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -96,7 +96,7 @@
           nest="2.0, 2.5"
           />
       </params>
-    </depth1_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
@@ -104,7 +104,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateful_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -122,7 +122,7 @@
           task_management_fname="task-management-stats.csv"
           distance_fname="distance-stats.csv"
           perception_world_model_fname="perception-world-model.csv"
-          collect_interval="10"
+          collect_interval="1000"
           />
     </output>
     <arena_map>
@@ -196,7 +196,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="4" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -233,7 +233,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
+      <user_functions label="stateful_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
