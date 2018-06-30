@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,10 +39,8 @@ NS_START(fordyca, params);
  * @struct block_params
  * @ingroup params
  */
-struct block_params : public rcppsw::common::base_params {
-  uint n_blocks{0};
+struct block_params : public rcppsw::params::base_params {
   double dimension{0.0};
-  std::string dist_model{""};
 };
 
 NS_END(params, fordyca);

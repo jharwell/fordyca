@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "rcppsw/metrics/tasks/management_metrics.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
@@ -31,7 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, tasks);
 namespace task_metrics = rcppsw::metrics::tasks;
-namespace tasks = fordyca::tasks;
+namespace tasks1 = fordyca::tasks::depth1;
+namespace tasks0 = fordyca::tasks::depth0;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -80,36 +82,36 @@ void management_metrics_collector::reset(void) {
 
 void management_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const task_metrics::management_metrics&>(metrics);
+  auto& m = dynamic_cast<const task_metrics::management_metrics&>(metrics);
   if (m.has_new_allocation()) {
     if (m.employed_partitioning()) {
       ++m_partition_stats.n_partition;
       m_sel_stats.n_collectors += static_cast<uint>(
-          m.current_task_name() == tasks::foraging_task::kCollectorName);
+          m.current_task_name() == tasks1::foraging_task::kCollectorName);
       m_sel_stats.n_harvesters += static_cast<uint>(
-          m.current_task_name() == tasks::foraging_task::kHarvesterName);
+          m.current_task_name() == tasks1::foraging_task::kHarvesterName);
     } else {
       ++m_partition_stats.n_no_partition;
     }
-    m_alloc_stats.n_alloc_sw += static_cast<uint>(m.has_changed_allocation());
+    m_alloc_stats.n_alloc_sw += static_cast<uint>(m.allocation_changed());
   }
-  m_alloc_stats.n_abort += static_cast<uint>(m.has_aborted_task());
+  m_alloc_stats.n_abort += static_cast<uint>(m.task_aborted());
 
   /*
    * Task finish stats. current_task_name() is still valid because the task
    * has not been reset yet/new task has not been allocated.
    */
-  if (m.has_finished_task()) {
+  if (m.task_finished()) {
     ++m_finish_stats.n_completed;
-    m_finish_stats.cum_task_exec_time += m.last_task_exec_time();
-    if (m.current_task_name() == tasks::foraging_task::kCollectorName) {
-      m_finish_stats.cum_collector_exec_time += m.last_task_exec_time();
+    m_finish_stats.cum_task_exec_time += m.task_last_exec_time();
+    if (m.current_task_name() == tasks1::foraging_task::kCollectorName) {
+      m_finish_stats.cum_collector_exec_time += m.task_last_exec_time();
       ++m_finish_stats.n_collector_completed;
-    } else if (m.current_task_name() == tasks::foraging_task::kHarvesterName) {
-      m_finish_stats.cum_harvester_exec_time += m.last_task_exec_time();
+    } else if (m.current_task_name() == tasks1::foraging_task::kHarvesterName) {
+      m_finish_stats.cum_harvester_exec_time += m.task_last_exec_time();
       ++m_finish_stats.n_harvester_completed;
-    } else if (m.current_task_name() == tasks::foraging_task::kGeneralistName) {
-      m_finish_stats.cum_generalist_exec_time += m.last_task_exec_time();
+    } else if (m.current_task_name() == tasks0::foraging_task::kGeneralistName) {
+      m_finish_stats.cum_generalist_exec_time += m.task_last_exec_time();
       ++m_finish_stats.n_generalist_completed;
     }
   }

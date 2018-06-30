@@ -25,10 +25,12 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include "fordyca/params/block_distribution_params.hpp"
 #include "fordyca/params/block_params.hpp"
-#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
-#include "rcppsw/common/base_params.hpp"
+#include "fordyca/params/nest_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,17 +44,14 @@ NS_START(fordyca, params);
  * @struct arena_map_params
  * @ingroup params
  */
-struct arena_map_params : public rcppsw::common::base_params {
-  arena_map_params(void)
-      : grid(), block(), cache(), nest_center(), nest_x(), nest_y() {}
+struct arena_map_params : public rcppsw::params::base_params {
+  struct grid_params grid {};
+  struct block_params block {};
+  struct block_distribution_params block_dist {};
+  struct depth1::static_cache_params static_cache {};
+  struct nest_params nest {};
 
-  struct grid_params grid;
-  struct block_params block;
-  struct depth1::cache_params cache;
-
-  argos::CVector2 nest_center;
-  argos::CRange<double> nest_x;
-  argos::CRange<double> nest_y;
+  uint n_blocks{0};
 };
 
 NS_END(params, fordyca);

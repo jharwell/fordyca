@@ -24,10 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/block_metrics.hpp"
-#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/representation/unicell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/math/dcoord.hpp"
+#include "fordyca/representation/movable_cell_entity.hpp"
+#include "fordyca/metrics/blocks/transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,45 +51,71 @@ NS_START(fordyca, representation);
  * have both real (where they actually live in the world) and discretized
  * locations (where they are mapped to within the arena map).
  */
-class block : public cell_entity,
-              public metrics::block_metrics,
+class block : public unicell_entity,
+              public movable_cell_entity,
+              public metrics::blocks::transport_metrics,
               public rcppsw::patterns::visitor::visitable_any<block>,
               public prototype::clonable<block> {
  public:
+  /**
+   * @brief Out of sight location blocks are moved to when a robot picks them
+   * up, for visualization/rending purposes.
+   */
+  static rcppsw::math::dcoord2 kOutOfSightDLoc;
+  static argos::CVector2 kOutOfSightRLoc;
+
   explicit block(double dimension)
-      : cell_entity(dimension, argos::CColor::BLACK, -1),
-        m_robot_index(-1),
-        m_carries(0) {}
+      : unicell_entity(dimension, rcppsw::utils::color::kBLACK, -1),
+        movable_cell_entity() {}
 
   block(double dimension, int id)
-      : cell_entity(dimension, argos::CColor::BLACK, id),
-        m_robot_index(-1),
-        m_carries(0) {}
+      : unicell_entity(dimension, rcppsw::utils::color::kBLACK, id),
+        movable_cell_entity() {}
 
-  __pure bool operator==(const block& other) const {
+  __rcsw_pure bool operator==(const block& other) const {
     return (this->id() == other.id());
   }
 
-  /* metrics */
-  /**
-   * @brief Reset the metrics (# carries) for the block after it is dropped in
-   * the nest.
-   */
-  void reset_metrics(void) override { m_carries = 0; }
-  uint n_carries(void) const override { return m_carries; }
+  /* transport metrics */
+  void reset_metrics(void) override;
+  uint total_transporters(void) const override { return m_transporters; }
+  double total_transport_time(void) const override;
+  double initial_wait_time(void) const override;
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
-  void add_carry(void) { ++m_carries; }
+  void add_transporter(uint robot_id) { ++m_transporters; m_robot_id = robot_id; }
+
+  /**
+   * @brief Set the time that the block is picked up for the first time after
+   * being distributed in the arena.
+   *
+   * @param current_time The current simulation time.
+   */
+  void first_pickup_time(double time);
+
+  /**
+   * @brief Set the time that the block dropped in the nest.
+   *
+   * @param current_time The current simulation time.
+   */
+  void nest_drop_time(double time) { m_nest_drop_time = time; }
+
+  /**
+   * @brief Set the time that the block was distributed in the arena.
+   */
+  void distribution_time(double dist_time) { m_dist_time = dist_time; }
 
   std::unique_ptr<block> clone(void) const override;
 
   /**
-   * @brief Reset the state of the block (i.e. not carried by a robot anymore).
+   * @brief Reset the the blocks carried/not carried state when it is not
+   * carried by a robot anymore, but has not yet made it back to the nest
+   * (i.e. dropped in a cache).
    */
-  void reset_index(void) { m_robot_index = -1; }
+  void reset_robot_id(void) { m_robot_id = -1; }
 
   /**
    * @brief change the block's location to something outside the visitable space
@@ -96,18 +124,45 @@ class block : public cell_entity,
   void move_out_of_sight(void);
 
   /**
+   * @brief Determine if the block is currently out of sight.
+   *
+   * This should only happen if the block is being carried by a robot.
+   */
+  bool is_out_of_sight(void) const {
+    return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
+  }
+  /**
    * @brief Get the ID/index of the robot that is currently carrying this block
    *
    * @return The robot index, or -1 if no robot is currently carrying this
    * block.
    */
-  int robot_index(void) const { return m_robot_index; }
-  void robot_index(int robot_index) { m_robot_index = robot_index; }
+  int robot_id(void) const { return m_robot_id; }
+
+  /**
+   * @brief Determine if a real-valued point lies within the extent of the
+   * entity for:
+   *
+   * 1. Visualization purposes.
+   * 2. Determining if a robot is on top of an entity.
+   *
+   * @param point The point to check.
+   *
+   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   */
+  bool contains_point(const argos::CVector2& point) const {
+    return xspan(real_loc()).value_within(point.GetX()) &&
+        yspan(real_loc()).value_within(point.GetY());
+  }
 
  private:
   // clang-format off
-  int    m_robot_index;
-  size_t m_carries;
+  int  m_robot_id{-1};
+  uint m_transporters{0};
+  bool m_first_pickup{false};
+  double m_first_pickup_time{0.0};
+  double m_dist_time{0.0};
+  double m_nest_drop_time{0.0};
   // clang-format on
 };
 

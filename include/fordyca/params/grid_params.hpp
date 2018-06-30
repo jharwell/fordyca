@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,12 +39,10 @@ NS_START(fordyca, params);
  * @struct grid_params
  * @ingroup params
  */
-struct grid_params : public rcppsw::common::base_params {
-  grid_params(void) : upper(), lower() {}
-
+struct grid_params : public rcppsw::params::base_params {
   double resolution{0.0};
-  argos::CVector2 upper;
-  argos::CVector2 lower;
+  argos::CVector2 upper{};
+  argos::CVector2 lower{};
 };
 
 NS_END(params, fordyca);

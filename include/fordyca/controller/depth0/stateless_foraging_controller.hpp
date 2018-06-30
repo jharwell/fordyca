@@ -27,6 +27,9 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,10 +37,12 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
-NS_START(controller, depth0);
+NS_START(controller);
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = fsm::block_transporter::goal_type;
 
+NS_START(depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -50,13 +55,16 @@ NS_START(controller, depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
+                                      public metrics::fsm::base_fsm_metrics,
+                                      public metrics::fsm::goal_acquisition_metrics,
+                                      public fsm::block_transporter,
                                       public visitor::visitable_any<stateless_foraging_controller> {
  public:
   stateless_foraging_controller(void);
   ~stateless_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
   void Reset(void) override;
 
@@ -64,12 +72,24 @@ class stateless_foraging_controller : public base_foraging_controller,
   int entity_id(void) const override;
   double timestep_distance(void) const override;
 
-  bool is_transporting_to_nest(void) const override;
-  bool block_acquired(void) const;
+  /* base FSM metrics */
+  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
+
+  /* goal acquisition metrics */
+  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  bool is_vectoring_to_goal(void) const override { return false; }
+  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+
+  /* block transportation */
+  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+
   fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
 
  private:
-  std::unique_ptr<fsm::depth0::stateless_foraging_fsm>     m_fsm;
+  // clang-format off
+  std::unique_ptr<fsm::depth0::stateless_foraging_fsm> m_fsm;
+  // clang-format on
 };
 
 NS_END(depth0, controller, fordyca);

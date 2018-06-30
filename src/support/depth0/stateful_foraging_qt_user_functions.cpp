@@ -21,7 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+/*
+ * @todo Figure out how to work remove this warning properly.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
+#pragma  GCC diagnostic pop
+
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/representation/cell2D.hpp"

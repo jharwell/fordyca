@@ -58,7 +58,12 @@ class foraging_signal : public state_machine::event_signal {
      * @brief The cache the robot was waiting to pickup from has vanished (see
      * #247).
      */
-    CACHE_VANISHED
+    CACHE_VANISHED,
+    /**
+     * @brief The place the robot wait waiting to drop a block into has suddenly
+     * become a cache.
+    */
+    CACHE_APPEARED
   };
 };
 

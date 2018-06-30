@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/params/depth0/occupancy_grid_params.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,7 +35,7 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
     std::shared_ptr<rcppsw::er::server> server,
-    const struct params::depth0::occupancy_grid_params* c_params,
+    const struct params::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : client(),
       stacked_grid2(c_params->grid.resolution,
@@ -72,6 +72,15 @@ void occupancy_grid::update(void) {
   }   /* for(i..) */
 } /* update() */
 
+void occupancy_grid::reset(void) {
+  for (size_t i = 0; i < stacked_grid2::xdsize(); ++i) {
+    for (size_t j = 0; j < stacked_grid2::ydsize(); ++j) {
+      cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
+      cell.reset();
+    } /* for(j..) */
+  }   /* for(i..) */
+} /* Reset */
+
 void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {
   stacked_grid2::access<kPheromoneLayer>(i, j).rho(pheromone_rho);
   cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
@@ -89,11 +98,11 @@ void occupancy_grid::cell_update(size_t i, size_t j) {
               "FATAL: Repeat pheromone deposit detected");
   }
 
-  if (density.calc() < kEpsilon) {
+  if (density.calc() < kEPSILON) {
     ER_VER("Relevance of cell(%zu, %zu) is within %f of 0 for %s",
            i,
            j,
-           kEpsilon,
+           kEPSILON,
            m_robot_id.c_str());
     events::cell_unknown op(cell.loc().first, cell.loc().second);
     cell.accept(op);

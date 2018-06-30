@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "fordyca/params/block_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -30,26 +32,28 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char block_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct block_params>();
-
-  argos::GetNodeAttribute(node, "n_blocks", m_params->n_blocks);
-  argos::GetNodeAttribute(node, "dimension", m_params->dimension);
-  argos::GetNodeAttribute(node, "dist_model", m_params->dist_model);
+void block_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_PARAM(bnode, m_params, dimension);
 } /* parse() */
 
-void block_parser::show(std::ostream& stream) {
-  stream << "====================\nBlock params\n====================\n";
-  stream << "n_blocks=" << m_params->n_blocks << std::endl;
-  stream << "dimension=" << m_params->dimension << std::endl;
-  stream << "dist_model=" << m_params->dist_model << std::endl;
+void block_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, dimension) << std::endl
+         << build_footer();
 } /* show() */
 
-bool block_parser::validate(void) {
-  return !(0 == m_params->n_blocks || m_params->dimension <= 0.0 ||
-           "" == m_params->dist_model);
+bool block_parser::validate(void) const {
+  return m_params->dimension > 0.0;
 } /* validate() */
 
 NS_END(params, fordyca);

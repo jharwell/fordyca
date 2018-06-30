@@ -42,20 +42,29 @@ class stateful_foraging_fsm;
 } // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
-}
-class block_to_nest_fsm;
+class cached_block_to_nest_fsm;
+} // namespace depth1
 } // namespace fsm
-namespace controller { namespace depth0 {
+namespace controller {
+namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}} // namespace controller::depth0
-
-namespace metrics {
-class block_metrics_collector;
+} // namespace depth0
+namespace depth1 {
+class foraging_controller;
 }
+namespace depth2 {
+class foraging_controller;
+}
+} // namespace controller
+
 namespace tasks {
+namespace depth0 {
 class generalist;
+}
+namespace depth1 {
 class collector;
+}
 } // namespace tasks
 
 NS_START(events);
@@ -75,15 +84,17 @@ class nest_block_drop
       public rcppsw::er::client,
       public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                 controller::depth0::stateless_foraging_controller,
+                                controller::depth1::foraging_controller,
+                                controller::depth2::foraging_controller,
                                 fsm::depth0::stateless_foraging_fsm,
                                 fsm::depth0::stateful_foraging_fsm,
-                                fsm::block_to_nest_fsm,
-                                tasks::generalist,
-                                tasks::collector,
-                                metrics::block_metrics_collector> {
+                                fsm::depth1::cached_block_to_nest_fsm,
+                                tasks::depth0::generalist,
+                                tasks::depth1::collector> {
  public:
-  nest_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                  const std::shared_ptr<representation::block>& block);
+  nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
+                  std::shared_ptr<representation::block> block,
+                  uint timestep);
   ~nest_block_drop(void) override { client::rmmod(); }
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -91,7 +102,6 @@ class nest_block_drop
 
   /* stateless foraging */
   void visit(representation::arena_map& map) override;
-  void visit(metrics::block_metrics_collector& collector) override;
   void visit(representation::block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(
@@ -101,12 +111,15 @@ class nest_block_drop
   void visit(
       controller::depth0::stateful_foraging_controller& controller) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
+  void visit(tasks::depth0::generalist& task) override;
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(fsm::block_to_nest_fsm& fsm) override;
-  void visit(tasks::collector& task) override;
-  void visit(tasks::generalist& task) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
+  void visit(tasks::depth1::collector& task) override;
+
+  /* depth2 foraging */
+  void visit(controller::depth2::foraging_controller&) override {}
 
   /**
    * @brief Get the handle on the block that has been dropped.
@@ -114,7 +127,10 @@ class nest_block_drop
   std::shared_ptr<representation::block> block(void) const { return m_block; }
 
  private:
+  // clang-format off
+  uint                                   m_timestep;
   std::shared_ptr<representation::block> m_block;
+  //clang-format on
 };
 
 NS_END(events, fordyca);
