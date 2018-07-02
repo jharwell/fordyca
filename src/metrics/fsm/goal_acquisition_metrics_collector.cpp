@@ -62,14 +62,14 @@ void goal_acquisition_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
   m_stats.n_exploring_for_goal += static_cast<uint>(m.is_exploring_for_goal());
-  m_stats.n_acquiring_goal += static_cast<uint>(m.is_exploring_for_goal() ||
-                                                m.is_vectoring_to_goal());
+  m_stats.n_acquiring_goal +=
+      static_cast<uint>(m.is_exploring_for_goal() || m.is_vectoring_to_goal());
   m_stats.n_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 
   m_stats.n_cum_exploring_for_goal +=
       static_cast<uint>(m.is_exploring_for_goal());
-  m_stats.n_cum_acquiring_goal += static_cast<uint>(m.is_exploring_for_goal() ||
-                                                    m.is_vectoring_to_goal());
+  m_stats.n_cum_acquiring_goal +=
+      static_cast<uint>(m.is_exploring_for_goal() || m.is_vectoring_to_goal());
   m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
@@ -78,17 +78,23 @@ bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line = std::to_string(m_stats.n_acquiring_goal /
-                        static_cast<double>(interval())) + separator() +
+                        static_cast<double>(interval())) +
+         separator() +
          std::to_string(m_stats.n_cum_acquiring_goal /
-                        static_cast<double>(timestep()+1)) + separator() +
+                        static_cast<double>(timestep() + 1)) +
+         separator() +
          std::to_string(m_stats.n_vectoring_to_goal /
-                        static_cast<double>(interval())) + separator() +
+                        static_cast<double>(interval())) +
+         separator() +
          std::to_string(m_stats.n_cum_vectoring_to_goal /
-                        static_cast<double>(timestep()+1)) + separator() +
+                        static_cast<double>(timestep() + 1)) +
+         separator() +
          std::to_string(m_stats.n_exploring_for_goal /
-                        static_cast<double>(interval())) + separator() +
+                        static_cast<double>(interval())) +
+         separator() +
          std::to_string(m_stats.n_cum_exploring_for_goal /
-                        static_cast<double>(timestep()+1)) + separator();
+                        static_cast<double>(timestep() + 1)) +
+         separator();
   return true;
 } /* store_foraging_stats() */
 

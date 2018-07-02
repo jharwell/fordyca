@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "fordyca/params/metrics_params.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
@@ -43,9 +43,7 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
     : base_metrics_aggregator(server, params, output_root) {
-  insmod("metrics_agg",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+  insmod("metrics_agg", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
   register_collector<metrics::fsm::distance_metrics_collector>(
       "fsm::distance",
@@ -69,11 +67,15 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
  ******************************************************************************/
 void stateless_metrics_aggregator::collect_from_controller(
     const rcppsw::metrics::base_metrics* const controller) {
-  auto distance_m = dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
+  auto distance_m =
+      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  auto block_acq_m =
+      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
 
-  ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
-  ER_ASSERT(block_acq_m, "FATAL: Controller does not provide FSM block acquisition metrics");
+  ER_ASSERT(distance_m,
+            "FATAL: Controller does not provide FSM distance metrics");
+  ER_ASSERT(block_acq_m,
+            "FATAL: Controller does not provide FSM block acquisition metrics");
 
   collect("fsm::distance", *distance_m);
   collect("blocks::acquisition", *block_acq_m);

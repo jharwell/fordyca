@@ -29,8 +29,8 @@
 #include <string>
 #include "fordyca/representation/extent_model.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca);
 namespace representation {
 class block;
 class arena_grid;
-}
+} // namespace representation
 namespace params {
 struct block_distribution_params;
 }
@@ -64,9 +64,8 @@ class block_distributor : public rcppsw::er::client {
   static constexpr char kMODEL_SHAPE_RECT[] = "rectangle";
   static constexpr char kMODEL_ORIENTATION_HOR[] = "horizontal";
 
-  block_distributor(
-      std::shared_ptr<rcppsw::er::server> server,
-      const struct params::block_distribution_params* params);
+  block_distributor(std::shared_ptr<rcppsw::er::server> server,
+                    const struct params::block_distribution_params* params);
 
   block_distributor(const block_distributor& s) = delete;
   block_distributor& operator=(const block_distributor& s) = delete;

@@ -38,8 +38,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateful_foraging_fsm::stateful_foraging_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    const std::shared_ptr<representation::perceived_arena_map>& map)
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -61,10 +61,10 @@ stateful_foraging_fsm::stateful_foraging_fsm(
                                                nullptr,
                                                &entry_transport_to_nest,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                  nullptr,
-                                  &entry_leaving_nest,
-                                  nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                               nullptr,
+                                               &entry_leaving_nest,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }

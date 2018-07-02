@@ -33,7 +33,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 random_explore_behavior::random_explore_behavior(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
+    controller::saa_subsystem* const saa)
     : explore_behavior(server, saa) {
   insmod("random_explore_behavior",
          rcppsw::er::er_lvl::DIAG,

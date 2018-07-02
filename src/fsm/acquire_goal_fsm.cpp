@@ -45,15 +45,15 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map,
+    controller::saa_subsystem* saa,
+    const representation::perceived_arena_map* const map,
     std::function<bool(void)> goal_detect)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(fsm_acquire_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       exit_fsm_acquire_goal(),
-      mc_map(std::move(map)),
+      mc_map(map),
       m_vector_fsm(server, saa),
       m_explore_fsm(
           server,

@@ -143,12 +143,9 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<const controller::saa_subsystem> saa_subsystem(
-      void) const {
-    return m_saa;
-  }
-  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
-    return m_saa;
+  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  class saa_subsystem* saa_subsystem(void) {
+    return m_saa.get();
   }
 
  private:
@@ -159,7 +156,7 @@ class base_foraging_controller : public argos::CCI_Controller,
   // clang-format off
   bool                                       m_display_id{false};
   std::shared_ptr<representation::block>     m_block{nullptr};
-  std::shared_ptr<controller::saa_subsystem> m_saa{nullptr};
+  std::unique_ptr<controller::saa_subsystem> m_saa;
   std::shared_ptr<rcppsw::er::server>        m_server;
   // clang-format on
 };

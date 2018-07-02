@@ -36,7 +36,7 @@
 
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "rcppsw/er/server.hpp"
@@ -51,7 +51,7 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
-    : m_server(std::make_shared<rcppsw::er::server>()) {
+    : m_saa(nullptr), m_server(std::make_shared<rcppsw::er::server>()) {
   client::deferred_client_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
@@ -79,14 +79,14 @@ __rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
 
 void base_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing base foraging controller");
-  params::depth0::stateless_foraging_repository param_repo(client::server_ref());
+  params::depth0::stateless_param_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
   /* initialize output */
   auto* params = param_repo.parse_results<struct params::output_params>();
-  client::server_handle()->log_stream() << param_repo;
+  client::server_ptr()->log_stream() << param_repo;
   output_init(params);
 
   /* initialize sensing and actuation subsystem */
@@ -104,7 +104,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
           GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
       .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
           "footbot_motor_ground")};
-  m_saa = std::make_shared<controller::saa_subsystem>(
+  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
       m_server,
       param_repo.parse_results<struct params::actuation_params>(),
       param_repo.parse_results<struct params::sensing_params>(),
@@ -138,13 +138,13 @@ void base_foraging_controller::output_init(
   }
 
   /* setup logging timestamp calculator */
-  client::server_handle()->log_ts_calculator(
+  client::server_ptr()->log_ts_calculator(
       std::bind(&base_foraging_controller::log_header_calc, this));
-  client::server_handle()->dbg_ts_calculator(
+  client::server_ptr()->dbg_ts_calculator(
       std::bind(&base_foraging_controller::dbg_header_calc, this));
 
-  client::server_handle()->change_logfile(output_root + "/" + this->GetId() +
-                                          ".log");
+  client::server_ptr()->change_logfile(output_root + "/" + this->GetId() +
+                                       ".log");
 } /* output_init() */
 
 std::string base_foraging_controller::log_header_calc(void) const {

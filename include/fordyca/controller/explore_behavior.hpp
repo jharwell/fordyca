@@ -46,7 +46,7 @@ NS_START(fordyca, controller);
 class explore_behavior : public rcppsw::er::client {
  public:
   explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::saa_subsystem>& saa)
+                   controller::saa_subsystem* const saa)
       : client(server), m_saa(saa) {}
 
   virtual ~explore_behavior(void) = default;
@@ -60,15 +60,11 @@ class explore_behavior : public rcppsw::er::client {
   virtual void execute(void) = 0;
 
  protected:
-  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
-    return m_saa;
-  }
-  std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const {
-    return m_saa;
-  }
+  const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
 
  private:
-  std::shared_ptr<controller::saa_subsystem> m_saa;
+  controller::saa_subsystem* const m_saa;
 };
 
 NS_END(controller, fordyca);

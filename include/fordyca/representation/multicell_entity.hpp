@@ -50,24 +50,19 @@ NS_START(fordyca, representation);
  */
 class multicell_entity : public base_cell_entity {
  public:
-  multicell_entity(double xdim,
-                   double ydim,
-                   const rcppsw::utils::color& color)
+  multicell_entity(double xdim, double ydim, const rcppsw::utils::color& color)
       : multicell_entity{xdim, ydim, color, -1} {}
 
-  multicell_entity(double dim,
-                       const rcppsw::utils::color& color)
+  multicell_entity(double dim, const rcppsw::utils::color& color)
       : multicell_entity{dim, dim, color, -1} {}
 
-  multicell_entity(double dim,
-                       const rcppsw::utils::color& color,
-                       int id)
+  multicell_entity(double dim, const rcppsw::utils::color& color, int id)
       : multicell_entity{dim, dim, color, id} {}
 
   multicell_entity(double xdim,
-                       double ydim,
-                       const rcppsw::utils::color& color,
-                       int id)
+                   double ydim,
+                   const rcppsw::utils::color& color,
+                   int id)
       : base_cell_entity(color, id), m_xdim(xdim), m_ydim(ydim) {}
 
   /**

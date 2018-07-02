@@ -65,7 +65,8 @@ class steering_force2D_parser : public steering::force_calculator_xml_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

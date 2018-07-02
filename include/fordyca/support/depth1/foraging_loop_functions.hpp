@@ -36,6 +36,7 @@
 NS_START(fordyca, support, depth1);
 
 class metrics_aggregator;
+
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -50,7 +51,7 @@ class metrics_aggregator;
  */
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
-  foraging_loop_functions(void) = default;
+  foraging_loop_functions(void) : m_metrics_agg(nullptr) {}
   ~foraging_loop_functions(void) override = default;
 
   void Init(ticpp::Element& node) override;
@@ -108,7 +109,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   double                              mc_cache_respawn_scale_factor{0.0};
   std::unique_ptr<interactor>         m_interactor{nullptr};
   metrics::caches::lifecycle_collator m_cache_collator{};
-  std::unique_ptr<metrics_aggregator> m_metrics_agg{nullptr};
+  std::unique_ptr<metrics_aggregator> m_metrics_agg;
   // clang-format on
 };
 

@@ -40,15 +40,15 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map)
+    controller::saa_subsystem* saa,
+    representation::perceived_arena_map* const map)
     : base_acquire_cache_fsm(params, server, saa, map) {}
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::select_cache_for_acquisition(
-    argos::CVector2 *const acquisition) {
+    argos::CVector2* const acquisition) {
   controller::depth2::new_cache_selector selector(server_ref(), nest_center());
 
   /* A "new" cache is the same as a single block  */
@@ -58,9 +58,9 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
    * If this happens, all the blocks we know of are too close for us to vector
    * to.
    */
-    if (nullptr == best.ent) {
-      return false;
-    }
+  if (nullptr == best.ent) {
+    return false;
+  }
   ER_NOM("Select new cache for acquisition: %d@(%zu, %zu) [utility=%f]",
          best.ent->id(),
          best.ent->discrete_loc().first,

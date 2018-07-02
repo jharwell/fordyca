@@ -47,7 +47,8 @@ void fsm_parser::parse(const ticpp::Element& node) {
   std::vector<std::string> res;
   res = parser.parse(fnode.GetAttribute("nest"));
 
-  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_params->nest_center.Set(std::atof(res[0].c_str()),
                             std::atof(res[1].c_str()));
 } /* parse() */

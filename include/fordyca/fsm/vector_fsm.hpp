@@ -81,7 +81,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
 
   vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-             const std::shared_ptr<controller::saa_subsystem>& saa);
+             controller::saa_subsystem* saa);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;

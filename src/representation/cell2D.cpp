@@ -44,7 +44,8 @@ cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure const std::shared_ptr<representation::block> cell2D::block(void) const {
+__rcsw_pure const std::shared_ptr<representation::block> cell2D::block(
+    void) const {
   return std::dynamic_pointer_cast<representation::block>(m_entity);
 } /* block() */
 

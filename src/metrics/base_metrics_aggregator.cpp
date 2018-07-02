@@ -38,7 +38,8 @@ NS_START(fordyca, metrics);
 base_metrics_aggregator::base_metrics_aggregator(
     std::shared_ptr<rcppsw::er::server> server,
     const struct params::metrics_params* params,
-    const std::string& output_root) : client(server), collector_group() {
+    const std::string& output_root)
+    : client(server), collector_group() {
   m_metrics_path = output_root + "/" + params->output_dir;
   if (fs::exists(m_metrics_path)) {
     fs::remove_all(m_metrics_path);

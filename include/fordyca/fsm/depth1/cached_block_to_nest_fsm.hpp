@@ -81,8 +81,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   cached_block_to_nest_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      const std::shared_ptr<representation::perceived_arena_map>& map);
+      controller::saa_subsystem* saa,
+      representation::perceived_arena_map* map);
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
   cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;

@@ -50,7 +50,7 @@ base_sensing_subsystem::base_sensing_subsystem(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_sensing_subsystem::in_nest(void) {
+bool base_sensing_subsystem::in_nest(void) const {
   std::vector<hal::sensors::ground_sensor::reading> readings =
       m_sensors.ground.readings();
   /*
@@ -78,7 +78,6 @@ __rcsw_pure bool base_sensing_subsystem::obstacle_is_threatening(
 } /* obstacle_is_threatening() */
 
 argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
-  std::pair<argos::CVector2, bool> res;
   argos::CVector2 closest(0, 0);
 
   for (auto& r : m_sensors.proximity.readings()) {
@@ -97,7 +96,7 @@ bool base_sensing_subsystem::threatening_obstacle_exists(void) const {
   return find_closest_obstacle().Length() > 0;
 } /* threatening_obstacle_exists() */
 
-bool base_sensing_subsystem::block_detected(void) {
+bool base_sensing_subsystem::block_detected(void) const {
   std::vector<hal::sensors::ground_sensor::reading> readings =
       m_sensors.ground.readings();
   int sum = 0;

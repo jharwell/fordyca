@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.cpp
+ * @file task_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,34 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/fsm_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/params/depth0/stateful_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-stateless_foraging_repository::stateless_foraging_repository(
-    const std::shared_ptr<rcppsw::er::server>& server)
-    : xml_param_repository(server) {
-  register_parser<output_parser, output_params>(output_parser::kXMLRoot,
-                                                output_parser::kHeader1);
-  register_parser<actuation_parser, actuation_params>(
-      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
-  register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
-                                                  sensing_parser::kHeader1);
-  register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
-                                          fsm_parser::kHeader1);
-}
+/**
+ * @class param_repository
+ * @ingroup params depth1
+ *
+ * @brief Collection of all parameter parsers and parse results needed
+ * by the \ref depth1::foraging_controller.
+ */
+class param_repository: public depth0::stateful_param_repository {
+ public:
+  explicit param_repository(std::shared_ptr<rcppsw::er::server>& server);
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(depth1, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_ */

@@ -186,7 +186,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  cache_list                          m_caches;
+  cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -194,7 +194,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  block_list                          m_blocks;
+  block_list m_blocks;
   // clang-format on
 };
 

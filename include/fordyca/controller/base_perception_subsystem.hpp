@@ -26,12 +26,11 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/perception_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/er/client.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,12 +75,10 @@ class base_perception_subsystem : public rcppsw::er::client,
    */
   void reset(void);
 
-  const std::shared_ptr<representation::perceived_arena_map>& map(void) const {
-    return m_map;
+  const representation::perceived_arena_map* map(void) const {
+    return m_map.get();
   }
-  std::shared_ptr<representation::perceived_arena_map> map(void) {
-    return m_map;
-  }
+  representation::perceived_arena_map* map(void) { return m_map.get(); }
 
   /* metrics */
   uint cell_state_inaccuracies(uint state) const override {
@@ -108,7 +105,7 @@ class base_perception_subsystem : public rcppsw::er::client,
 
   // clang-format off
   std::vector<uint>                                    m_cell_stats;
-  std::shared_ptr<representation::perceived_arena_map> m_map;
+  std::unique_ptr<representation::perceived_arena_map> m_map;
   // clang-format on
 };
 

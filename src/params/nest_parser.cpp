@@ -38,25 +38,24 @@ constexpr char nest_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void nest_parser::parse(const ticpp::Element& node) {
-  ticpp::Element nnode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element nnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   std::vector<std::string> res;
   rcppsw::utils::line_parser parser(' ');
 
   res = parser.parse(nnode.GetAttribute("center"));
 
-  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  m_params->center = argos::CVector2(std::atof(res[0].c_str()),
-                                         std::atof(res[1].c_str()));
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params->center =
+      argos::CVector2(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
   res = parser.parse(nnode.GetAttribute("size"));
   m_params->xdim = std::atof(res[0].c_str());
   m_params->ydim = std::atof(res[1].c_str());
 } /* parse() */
 
 void nest_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << "xdim=" << m_params->xdim << std::endl
+  stream << build_header() << "xdim=" << m_params->xdim << std::endl
          << "ydim=" << m_params->ydim << std::endl
          << "center=" << m_params->center << std::endl
          << build_footer();
@@ -69,7 +68,7 @@ bool nest_parser::validate(void) const {
   CHECK(m_params->ydim > 0);
   return true;
 
- error:
+error:
   return false;
 } /* validate() */
 

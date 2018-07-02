@@ -34,10 +34,11 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_parser.hpp"
+#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,7 @@ using interactor =
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server) {
+    : client(rcppsw::er::g_server), m_arena_map(nullptr) {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -142,9 +143,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, m_arena_map, m_metrics_agg.get(), floor())(
-      controller,
-      GetSpace().GetSimulationClock());
+  interactor(rcppsw::er::g_server,
+             m_arena_map.get(),
+             m_metrics_agg.get(),
+             floor())(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {

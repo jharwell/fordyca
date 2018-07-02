@@ -62,8 +62,8 @@ class cache_finisher_fsm : public base_foraging_fsm,
   cache_finisher_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      const std::shared_ptr<representation::perceived_arena_map>& map);
+      controller::saa_subsystem* saa,
+      representation::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }

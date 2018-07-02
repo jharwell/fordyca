@@ -24,10 +24,10 @@
 #include "fordyca/support/block_distributor.hpp"
 #include <assert.h>
 
-#include "fordyca/params/block_distribution_params.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/params/block_distribution_params.hpp"
+#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/representation/block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,11 +66,12 @@ block_distributor::block_distributor(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distributor::distribute_block(representation::arena_grid& grid,
-                                         std::shared_ptr<representation::block>& block) {
+void block_distributor::distribute_block(
+    representation::arena_grid& grid,
+    std::shared_ptr<representation::block>& block) {
   argos::CVector2 r_coord;
   representation::cell2D* cell = nullptr;
-  while(true) {
+  while (true) {
     if (m_dist_type == kDIST_RANDOM) {
       r_coord = dist_random(block);
     } else if (m_dist_type == kDIST_SINGLE_SRC) {
@@ -103,9 +104,10 @@ void block_distributor::distribute_block(representation::arena_grid& grid,
             "FATAL: Block%d discrete coordinates still out of sight after "
             "distribution",
             block->id());
-  ER_ASSERT(representation::block::kOutOfSightRLoc != block->real_loc(),
-            "FATAL: Block%d real coordinates still out of sight after distribution",
-            block->id());
+  ER_ASSERT(
+      representation::block::kOutOfSightRLoc != block->real_loc(),
+      "FATAL: Block%d real coordinates still out of sight after distribution",
+      block->id());
 
   ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
          block->id(),

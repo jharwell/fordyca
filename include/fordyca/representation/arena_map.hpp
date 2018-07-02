@@ -30,10 +30,10 @@
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/nest.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/nest.hpp"
 
 /*******************************************************************************
  * Namespaces

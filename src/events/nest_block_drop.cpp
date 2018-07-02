@@ -43,10 +43,9 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-nest_block_drop::nest_block_drop(
-    std::shared_ptr<rcppsw::er::server> server,
-    std::shared_ptr<representation::block> block,
-    uint timestep)
+nest_block_drop::nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
+                                 std::shared_ptr<representation::block> block,
+                                 uint timestep)
     : client(server), m_timestep(timestep), m_block(block) {
   client::insmod("nest_block_drop",
                  rcppsw::er::er_lvl::DIAG,

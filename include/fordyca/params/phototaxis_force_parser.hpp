@@ -67,13 +67,13 @@ class phototaxis_force_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 
-
   // clang-format on
-  bool                                     m_parsed{false};
+  bool m_parsed{false};
   std::shared_ptr<phototaxis_force_params> m_params{nullptr};
   // clang-format off
 };

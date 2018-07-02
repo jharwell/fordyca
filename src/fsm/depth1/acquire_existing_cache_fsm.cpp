@@ -39,15 +39,15 @@ namespace depth1 = controller::depth1;
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map)
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
     : base_acquire_cache_fsm(params, server, saa, map) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool acquire_existing_cache_fsm::select_cache_for_acquisition(
-    argos::CVector2 * const acquisition) {
+    argos::CVector2* const acquisition) {
   controller::depth1::existing_cache_selector selector(server_ref(),
                                                        nest_center());
   representation::perceived_cache best =
