@@ -84,11 +84,12 @@ class stateless_foraging_controller : public base_foraging_controller,
   /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
-  fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
+  const fsm::depth0::stateless_foraging_fsm* fsm(void) const { return m_fsm.get(); }
+  fsm::depth0::stateless_foraging_fsm* fsm(void) { return m_fsm.get(); }
 
  private:
   // clang-format off
-  std::unique_ptr<fsm::depth0::stateless_foraging_fsm> m_fsm;
+  std::unique_ptr<fsm::depth0::stateless_foraging_fsm> m_fsm{nullptr};
   // clang-format on
 };
 

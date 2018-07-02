@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
+    controller::saa_subsystem* const saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),

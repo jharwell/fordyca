@@ -47,8 +47,7 @@ NS_START(fordyca, params);
  */
 class pheromone_parser : public rcppsw::params::xml_param_parser {
  public:
-  pheromone_parser(const std::shared_ptr<rcppsw::er::server>& server,
-                   uint level)
+  pheromone_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
       : xml_param_parser(server, level) {}
 
   /**
@@ -67,7 +66,8 @@ class pheromone_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

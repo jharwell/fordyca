@@ -57,9 +57,7 @@ void static_cache_parser::parse(const ticpp::Element& node) {
 
 void static_cache_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
-    stream << build_header()
-           << "<< Not Parsed >>"
-           << std::endl
+    stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
     return;
   }

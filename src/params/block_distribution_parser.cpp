@@ -42,7 +42,8 @@ constexpr char block_distribution_parser::kXMLRoot[];
 void block_distribution_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_PARAM(bnode, m_params, dist_type);
   XML_PARSE_PARAM(bnode, m_params, n_blocks);
   XML_PARSE_PARAM(bnode, m_params, arena_model.shape);

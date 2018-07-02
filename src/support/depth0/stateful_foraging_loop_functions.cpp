@@ -35,10 +35,10 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -97,8 +97,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
   /* Now watch it react to the environment */
   interactor(rcppsw::er::g_server, arena_map(), m_metrics_agg.get(), floor())(
-      controller,
-      GetSpace().GetSimulationClock());
+      controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(

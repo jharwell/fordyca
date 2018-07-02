@@ -89,7 +89,7 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Reset the cell to its UNKNOWN state.
    */
-  void reset(void) { 
+  void reset(void) {
     m_fsm.init();
     m_entity.reset();
   }
@@ -99,8 +99,12 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<base_cell_entity>& entity) { m_entity = entity; }
-  const std::shared_ptr<base_cell_entity>& entity(void) const { return m_entity; }
+  void entity(const std::shared_ptr<base_cell_entity>& entity) {
+    m_entity = entity;
+  }
+  const std::shared_ptr<base_cell_entity>& entity(void) const {
+    return m_entity;
+  }
 
   void loc(rcppsw::math::dcoord2 loc) { m_loc = loc; }
   rcppsw::math::dcoord2 loc(void) const { return m_loc; }

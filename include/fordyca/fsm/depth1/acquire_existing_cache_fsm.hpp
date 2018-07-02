@@ -49,8 +49,8 @@ class acquire_existing_cache_fsm : public base_acquire_cache_fsm {
   acquire_existing_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      std::shared_ptr<const representation::perceived_arena_map> map);
+      controller::saa_subsystem* saa,
+      representation::perceived_arena_map* map);
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) = delete;

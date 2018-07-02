@@ -63,7 +63,7 @@ void arena_map_parser::parse(const ticpp::Element& node) {
   }
 
   m_nest_parser.parse(anode);
-  m_params->nest = * m_nest_parser.parse_results();
+  m_params->nest = *m_nest_parser.parse_results();
 
   m_params->block_dist.nest_model.x = {0, m_params->nest.xdim};
   m_params->block_dist.nest_model.y = {0, m_params->nest.ydim};
@@ -71,13 +71,12 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 
 void arena_map_parser::show(std::ostream& stream) const {
   stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
-         << m_nest_parser
-         << build_footer();
+         << m_nest_parser << build_footer();
 } /* show() */
 
 bool arena_map_parser::validate(void) const {
   return m_grid_parser.validate() && m_block_parser.validate() &&
-      m_cache_parser.validate() && m_nest_parser.validate();
+         m_cache_parser.validate() && m_nest_parser.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -22,19 +22,19 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/metrics/tasks/management_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,39 +79,44 @@ metrics_aggregator::metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void metrics_aggregator::collect_from_controller(
-const controller::depth1::foraging_controller* const controller) {
-
-  auto distance_m = dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
+    const controller::depth1::foraging_controller* const controller) {
+  auto distance_m =
+      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  ER_ASSERT(distance_m,
+            "FATAL: Controller does not provide FSM distance metrics");
   collect("fsm::distance", *distance_m);
 
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
   collect("perception::world_model", *worldm_m);
 
-  auto taskm_m = dynamic_cast<const rcppsw::metrics::tasks::management_metrics*>(controller);
-  ER_ASSERT(taskm_m, "FATAL: Controller does not provide task management metrics");
+  auto taskm_m = dynamic_cast<const rcppsw::metrics::tasks::management_metrics*>(
+      controller);
+  ER_ASSERT(taskm_m,
+            "FATAL: Controller does not provide task management metrics");
   collect("tasks::management", *taskm_m);
 
   if (nullptr != controller->current_task()) {
-    collect_if("blocks::acquisition",
-               dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
-                   *controller->current_task()),
-               [&](const rcppsw::metrics::base_metrics& metrics) {
-                 return acquisition_goal_type::kBlock ==
-                     dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                         metrics)
+    collect_if(
+        "blocks::acquisition",
+        dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
+            *controller->current_task()),
+        [&](const rcppsw::metrics::base_metrics& metrics) {
+          return acquisition_goal_type::kBlock ==
+                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                     metrics)
                      .acquisition_goal();
-               });
-    collect_if("caches::acquisition",
-               dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
-                   *controller->current_task()),
-               [&](const rcppsw::metrics::base_metrics& metrics) {
-                 return acquisition_goal_type::kExistingCache ==
-                     dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                         metrics)
+        });
+    collect_if(
+        "caches::acquisition",
+        dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
+            *controller->current_task()),
+        [&](const rcppsw::metrics::base_metrics& metrics) {
+          return acquisition_goal_type::kExistingCache ==
+                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                     metrics)
                      .acquisition_goal();
-               });
+        });
 
     collect("tasks::execution",
             dynamic_cast<rcppsw::metrics::tasks::execution_metrics&>(

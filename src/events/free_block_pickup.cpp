@@ -49,17 +49,16 @@ using representation::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(
-    std::shared_ptr<rcppsw::er::server> server,
-    std::shared_ptr<representation::block> block,
-    uint robot_index,
-    uint timestep)
+free_block_pickup::free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
+                                     std::shared_ptr<representation::block> block,
+                                     uint robot_index,
+                                     uint timestep)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
       client(server),
-  m_timestep(timestep),
-  m_robot_index(robot_index),
-  m_block(block),
-  m_server(server) {
+      m_timestep(timestep),
+      m_robot_index(robot_index),
+      m_block(block),
+      m_server(server) {
   client::insmod("free_block_pickup",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);

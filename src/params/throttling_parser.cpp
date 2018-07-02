@@ -40,21 +40,19 @@ constexpr char throttling_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void throttling_parser::parse(const ticpp::Element& node) {
-    if (nullptr != node.FirstChild(kXMLRoot, false)) {
-      ticpp::Element tnode =
-          argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-      m_params =
-          std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-      XML_PARSE_PARAM(tnode, m_params, block_carry);
-      m_parsed = true;
-    }
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element tnode =
+        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(tnode, m_params, block_carry);
+    m_parsed = true;
+  }
 } /* parse() */
 
 void throttling_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
-    stream << build_header()
-           << "<< Not Parsed >>"
-           << std::endl
+    stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
     return;
   }

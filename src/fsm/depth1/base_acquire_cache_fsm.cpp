@@ -40,8 +40,8 @@ namespace depth1 = controller::depth1;
 base_acquire_cache_fsm::base_acquire_cache_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map)
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
     : acquire_goal_fsm(server,
                        saa,
                        map,
@@ -98,8 +98,7 @@ bool base_acquire_cache_fsm::acquire_known_goal(void) {
       if (!select_cache_for_acquisition(&best)) {
         return false;
       }
-      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               best);
+      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, best);
       explore_fsm().task_reset();
       vector_fsm().task_reset();
       vector_fsm().task_start(&v);

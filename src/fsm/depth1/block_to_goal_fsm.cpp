@@ -40,8 +40,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_goal_fsm::block_to_goal_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    const std::shared_ptr<representation::perceived_arena_map>& map)
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -174,7 +174,7 @@ __rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
 
 bool block_to_goal_fsm::goal_acquired(void) const {
   return (ST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
-      (ST_WAIT_FOR_BLOCK_DROP == current_state());
+         (ST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
 acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {

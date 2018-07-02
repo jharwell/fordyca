@@ -1,5 +1,5 @@
 /**
- * @file task_repository.cpp
+ * @file tasking_initializer.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,31 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth2/task_repository.hpp"
-#include "fordyca/params/depth2/exec_estimates_parser.hpp"
-#include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include <string>
 
+#include "fordyca/controller/depth1/tasking_initializer.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
-namespace ta = rcppsw::task_allocation;
-
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-task_repository::task_repository(
-    const std::shared_ptr<rcppsw::er::server>& server)
-    : xml_param_repository(server) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ta::executive_xml_parser, ta::executive_params>(
-      ta::executive_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+NS_START(fordyca);
+namespace params {
+namespace depth2 { class param_repository; }
 }
 
-NS_END(depth2, params, fordyca);
+NS_START(controller, depth2);
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+/**
+ * @class tasking_initializer
+ * @ingroup controller depth2
+ *
+ * @brief A helper class to offload initialization of the task tree for depth2
+ * foraging.
+ */
+class tasking_initializer : public depth1::tasking_initializer {
+ public:
+  tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
+                      controller::saa_subsystem* saa,
+                      base_perception_subsystem* perception);
+  ~tasking_initializer(void);
+
+  std::unique_ptr<ta::polled_executive>
+  operator()(params::depth2::param_repository *const param_repo);
+
+ protected:
+  void depth2_tasking_init(params::depth2::param_repository* param_repo);
+};
+
+NS_END(depth2, controller, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_TASKING_INITIALIZER_HPP_ */

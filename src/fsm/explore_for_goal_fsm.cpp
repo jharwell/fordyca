@@ -40,7 +40,7 @@ namespace kinematics = rcppsw::robotics::kinematics;
  ******************************************************************************/
 explore_for_goal_fsm::explore_for_goal_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
+    controller::saa_subsystem* const saa,
     std::unique_ptr<controller::explore_behavior> behavior,
     std::function<bool(void)> goal_detect)
     : base_explore_fsm(server, saa, ST_MAX_STATES),
@@ -48,9 +48,10 @@ explore_for_goal_fsm::explore_for_goal_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)},
+      mc_state_map{
+          HFSM_STATE_MAP_ENTRY_EX(&start),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
+          HFSM_STATE_MAP_ENTRY_EX(&finished)},
       m_explore_behavior(std::move(behavior)),
       m_goal_detect(goal_detect) {
   insmod("explore_for_goal_fsm",

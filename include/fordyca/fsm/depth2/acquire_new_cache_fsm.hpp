@@ -49,8 +49,8 @@ class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm {
   acquire_new_cache_fsm(
       const struct params::fsm_params* params,
       const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& actuators,
-      std::shared_ptr<const representation::perceived_arena_map> map);
+      controller::saa_subsystem* actuators,
+      representation::perceived_arena_map* map);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

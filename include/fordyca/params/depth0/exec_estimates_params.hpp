@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_repository.hpp
+ * @file exec_estimates_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_FORAGING_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_FORAGING_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/xml_param_repository.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,21 +33,22 @@
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Defexecions
  ******************************************************************************/
 /**
- * @class stateless_foraging_repository
+ * @struct exec_estimates_params
  * @ingroup params depth0
  *
- * @brief Collection of all parameter parsers and parse results needed by
- * \ref stateless_foraging_controller.
+ * @brief Parameters for initializing execution time estimates of tasks involved
+ * in depth0 foraging to something within a certain range, which helps to speed
+ * swarm convergence a fair bit.
  */
-class stateless_foraging_repository: public rcppsw::params::xml_param_repository {
- public:
-  explicit stateless_foraging_repository(
-      const std::shared_ptr<rcppsw::er::server>& server);
+struct exec_estimates_params : public rcppsw::params::base_params {
+  bool enabled{false};
+
+  argos::CRange<double> generalist_range{};
 };
 
-NS_END(params, fordyca, depth0);
+NS_END(depth0, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_FORAGING_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_ */

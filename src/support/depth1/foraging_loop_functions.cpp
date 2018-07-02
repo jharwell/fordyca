@@ -22,19 +22,16 @@ n */
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <random>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
+#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 
 #include "rcppsw/er/server.hpp"
 
@@ -61,16 +58,18 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
+  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(rcppsw::er::g_server,
+                                                          &p_output->metrics,
+                                                          output_root());
   m_metrics_agg->reset_all();
 
   /* intitialize robot interactions with environment */
-  m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                                 arena_map(),
-                                                 m_metrics_agg.get(),
-                                                 floor(),
-                                                 arenap->static_cache.usage_penalty);
+  m_interactor =
+      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                      arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      arenap->static_cache.usage_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
