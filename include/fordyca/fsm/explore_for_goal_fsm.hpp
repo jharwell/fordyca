@@ -61,7 +61,7 @@ class explore_for_goal_fsm : public base_explore_fsm {
   };
 
   explore_for_goal_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                       const std::shared_ptr<controller::saa_subsystem>& saa,
+                       controller::saa_subsystem* saa,
                        std::unique_ptr<controller::explore_behavior> behavior,
                        std::function<bool(void)> goal_detect);
 

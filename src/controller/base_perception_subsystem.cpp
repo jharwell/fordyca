@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/fsm/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,9 +59,7 @@ void base_perception_subsystem::update(
   m_map->update();
 } /* update() */
 
-void base_perception_subsystem::reset(void) {
-    m_map->reset();
-}
+void base_perception_subsystem::reset(void) { m_map->reset(); }
 
 void base_perception_subsystem::process_los(
     const representation::line_of_sight* const los) {

@@ -44,7 +44,7 @@ NS_START(fordyca, controller);
 class random_explore_behavior : public explore_behavior {
  public:
   random_explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
-                          const std::shared_ptr<controller::saa_subsystem>& saa);
+                          controller::saa_subsystem* saa);
 
   ~random_explore_behavior(void) override = default;
   random_explore_behavior(const random_explore_behavior& fsm) = delete;

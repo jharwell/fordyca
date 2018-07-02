@@ -31,8 +31,8 @@
 
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -123,7 +123,7 @@ class base_cache : public multicell_entity,
    */
   bool contains_point(const argos::CVector2& point) const {
     return xspan(real_loc()).value_within(point.GetX()) &&
-        yspan(real_loc()).value_within(point.GetY());
+           yspan(real_loc()).value_within(point.GetY());
   }
 
   /**

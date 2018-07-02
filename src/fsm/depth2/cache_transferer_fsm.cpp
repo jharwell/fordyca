@@ -46,8 +46,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
 cache_transferer_fsm::cache_transferer_fsm(
     const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    const std::shared_ptr<representation::perceived_arena_map>& map)
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),

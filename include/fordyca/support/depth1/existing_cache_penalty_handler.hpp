@@ -54,7 +54,7 @@ template <typename T>
 class existing_cache_penalty_handler : public base_penalty_handler<T> {
  public:
   existing_cache_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
-                        const std::shared_ptr<representation::arena_map>& map,
+                                 representation::arena_map* const map,
                         uint penalty)
       : base_penalty_handler<T>(server, penalty), m_map(map) {
     rcppsw::er::client::insmod("existing_cache_penalty_handler",
@@ -63,7 +63,10 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
   }
 
   ~existing_cache_penalty_handler(void) override = default;
-
+  existing_cache_penalty_handler& operator=(
+      const existing_cache_penalty_handler& other) = delete;
+  existing_cache_penalty_handler(
+      const existing_cache_penalty_handler& other) = delete;
   /**
    * @brief Check if a robot has acquired a cache, and is trying to pickup from
    * a cache, then creates a \ref block_manipulation_penalty object and
@@ -93,7 +96,7 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
               "FATAL: Goal not acquired?");
 
     /* Check whether the foot-bot is actually on a cache */
-    int cache_id = utils::robot_on_cache(controller, m_map);
+    int cache_id = utils::robot_on_cache(controller, *m_map);
     if (-1 == cache_id) {
       return false;
     }
@@ -119,7 +122,7 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
   }
 
   // clang-format off
-  std::shared_ptr<representation::arena_map> m_map;
+  representation::arena_map* const m_map;
   // clang-format on
 };
 NS_END(depth1, support, fordyca);

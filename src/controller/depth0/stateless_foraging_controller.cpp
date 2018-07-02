@@ -27,12 +27,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -44,7 +39,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void)
-    : base_foraging_controller(), m_fsm() {}
+    : base_foraging_controller() {}
 
 stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
@@ -54,17 +49,17 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
 
-  ER_NOM("Initializing stateless_foraging controller");
+  ER_NOM("Initializing stateless foraging controller");
 
-  params::depth0::stateless_foraging_repository param_repo(client::server_ref());
+  params::depth0::stateless_param_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
-  client::server_handle()->log_stream() << param_repo;
+  client::server_ptr()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       client::server_ref(), base_foraging_controller::saa_subsystem());
-  ER_NOM("stateless_foraging controller initialization finished");
+  ER_NOM("Stateless foraging controller initialization finished");
 } /* Init() */
 
 void stateless_foraging_controller::Reset(void) {

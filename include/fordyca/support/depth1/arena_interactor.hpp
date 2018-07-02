@@ -59,9 +59,9 @@ template <typename T>
 class arena_interactor : public depth0::arena_interactor<T> {
  public:
   arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
-                   std::shared_ptr<representation::arena_map>& map_in,
-                   depth0::stateless_metrics_aggregator *metrics_agg,
-                   argos::CFloorEntity* floor_in,
+                   representation::arena_map* const map_in,
+                   depth0::stateless_metrics_aggregator *const metrics_agg,
+                   argos::CFloorEntity* const floor_in,
                    uint cache_usage_penalty)
       : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
       m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
@@ -136,7 +136,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, map());
+    int cache_id = utils::robot_on_cache(controller, *map());
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
@@ -196,7 +196,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, map());
+    int cache_id = utils::robot_on_cache(controller, *map());
 
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot drop in cache%d: No such cache",
@@ -301,7 +301,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (utils::block_drop_overlap_with_nest(controller.block(),
                                             map()->nest(),
                                             controller.robot_loc()) ||
-        utils::block_drop_near_arena_boundary(map(),
+        utils::block_drop_near_arena_boundary(*map(),
                                               controller.block(),
                                               controller.robot_loc())) {
       conflict = true;

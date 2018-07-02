@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/base_foraging_loop_functions.hpp"
 
 /*******************************************************************************
@@ -63,8 +62,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void PreStep() override;
 
  protected:
-  const std::shared_ptr<representation::arena_map>& arena_map(void) const { return m_arena_map; }
-  std::shared_ptr<representation::arena_map>& arena_map(void) { return m_arena_map; }
+  const representation::arena_map* arena_map(void) const { return m_arena_map.get(); }
+  representation::arena_map* arena_map(void) { return m_arena_map.get(); }
   const std::string& output_root(void) const { return m_output_root; }
 
   virtual void pre_step_final(void);
@@ -85,7 +84,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   // clang-format off
   std::string                                   m_output_root{""};
   std::unique_ptr<stateless_metrics_aggregator> m_metrics_agg{nullptr};
-  std::shared_ptr<representation::arena_map>    m_arena_map{nullptr};
+  std::unique_ptr<representation::arena_map>    m_arena_map;
   // clang-format on
 };
 

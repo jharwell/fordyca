@@ -53,7 +53,7 @@ class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
   base_explore_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::saa_subsystem>& saa,
+                   controller::saa_subsystem* saa,
                    uint8_t max_states);
 
   base_explore_fsm(const base_explore_fsm& fsm) = delete;
