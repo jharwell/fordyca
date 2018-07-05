@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <utility>
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/utils/color.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,10 +47,10 @@ NS_START(fordyca, representation);
  */
 class cell_entity {
  public:
-  cell_entity(double x_dim, double y_dim, argos::CColor color)
+  cell_entity(double x_dim, double y_dim, rcppsw::utils::color color)
       : cell_entity{x_dim, y_dim, color, -1} {}
 
-  cell_entity(double x_dim, double y_dim, argos::CColor color, int id)
+  cell_entity(double x_dim, double y_dim, rcppsw::utils::color color, int id)
       : m_id(id),
         m_display_id(false),
         m_x_dim(x_dim),
@@ -59,8 +59,9 @@ class cell_entity {
         m_real_loc(),
         m_discrete_loc() {}
 
-  cell_entity(double dim, argos::CColor color) : cell_entity(dim, dim, color) {}
-  cell_entity(double dim, argos::CColor color, int id)
+  cell_entity(double dim, rcppsw::utils::color color)
+      : cell_entity(dim, dim, color) {}
+  cell_entity(double dim, rcppsw::utils::color color, int id)
       : cell_entity(dim, dim, color, id) {}
 
   cell_entity(const cell_entity& other) = default;
@@ -136,7 +137,7 @@ class cell_entity {
   /**
    * @brief Get the color of the entity.
    */
-  const argos::CColor& color(void) const { return m_color; }
+  const rcppsw::utils::color& color(void) const { return m_color; }
 
  private:
   // clang-format off
@@ -144,7 +145,7 @@ class cell_entity {
   bool                  m_display_id;
   double                m_x_dim;
   double                m_y_dim;
-  argos::CColor         m_color;
+  rcppsw::utils::color  m_color;
   argos::CVector2       m_real_loc;
   rcppsw::math::dcoord2 m_discrete_loc;
   // clang-format on

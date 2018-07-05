@@ -39,13 +39,12 @@ NS_START(fordyca, metrics, tasks);
  ******************************************************************************/
 /**
  * @class management_metrics_collector
- * @ingroup metrics
+ * @ingroup metrics tasks
  *
- * @brief Collector for \ref metrics.
+ * @brief Collector for \ref management_metrics.
  *
  * Collects metrics about the allocation of tasks at the level of the task
- * executive/controller. Metrics are written out at the specified interval, or
- * every timestep, depending.
+ * executive/controller. Metrics are written out at the specified interval.
  */
 class management_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:

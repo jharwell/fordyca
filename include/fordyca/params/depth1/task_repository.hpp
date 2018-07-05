@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/xml_param_repository.hpp"
+#include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,11 +39,12 @@ NS_START(fordyca, params, depth1);
  * @ingroup params depth1
  *
  * @brief Collection of all parameter parsers and parse results needed
- * controllers using tasks.
+ * by the \ref depth1::foraging_controller.
  */
-class task_repository: public rcppsw::common::xml_param_repository {
+class task_repository: public rcppsw::params::xml_param_repository {
  public:
-  task_repository(void);
+  static constexpr char kName[] = "depth0_task_repository";
+  task_repository(const std::shared_ptr<rcppsw::er::server>& server);
 };
 
 NS_END(depth1, params, fordyca);

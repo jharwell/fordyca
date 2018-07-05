@@ -31,7 +31,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__const bool cell_entity::contains_point(const argos::CVector2& point) const {
+__rcsw_const bool cell_entity::contains_point(const argos::CVector2& point) const {
   double x = real_loc().GetX();
   double y = real_loc().GetY();
   return (point.GetX() < (x + (0.5 * xsize())) &&

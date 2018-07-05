@@ -39,9 +39,9 @@ NS_START(fordyca, metrics, tasks);
  ******************************************************************************/
 /**
  * @class execution_metrics_collector
- * @ingroup metrics
+ * @ingroup metrics tasks
  *
- * @brief Collector for \ref metrics.
+ * @brief Collector for \ref execution_metrics.
  *
  * Collects metrics about tasks as they are executed. Metrics are written out at
  * the specified interval, or every timestep, depending.

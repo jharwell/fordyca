@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/task_allocation/logical_task.hpp"
 
@@ -31,7 +32,8 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, tasks);
 namespace task_metrics = rcppsw::metrics::tasks;
-namespace tasks = fordyca::tasks;
+namespace tasks0 = fordyca::tasks::depth0;
+namespace tasks1 = fordyca::tasks::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -67,30 +69,30 @@ void execution_metrics_collector::reset(void) {
 
 void execution_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const task_metrics::execution_metrics&>(metrics);
+  auto& m = dynamic_cast<const task_metrics::execution_metrics&>(metrics);
   auto& task =
       dynamic_cast<const rcppsw::task_allocation::logical_task&>(metrics);
 
   m_count_stats.n_collectors +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
+      static_cast<uint>(task.name() == tasks1::foraging_task::kCollectorName);
   m_count_stats.n_harvesters +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
+      static_cast<uint>(task.name() == tasks1::foraging_task::kHarvesterName);
   m_count_stats.n_generalists +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kGeneralistName);
+      static_cast<uint>(task.name() == tasks0::foraging_task::kGeneralistName);
 
   if (m.at_interface()) {
     m_int_stats.cum_collector_delay +=
-        static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
+        static_cast<uint>(task.name() == tasks1::foraging_task::kCollectorName);
     m_int_stats.cum_harvester_delay +=
-        static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
+        static_cast<uint>(task.name() == tasks1::foraging_task::kHarvesterName);
   }
 
   m_count_stats.n_cum_collectors +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kCollectorName);
+      static_cast<uint>(task.name() == tasks1::foraging_task::kCollectorName);
   m_count_stats.n_cum_harvesters +=
-      static_cast<uint>(task.name() == tasks::foraging_task::kHarvesterName);
-  m_count_stats.n_cum_generalists += static_cast<uint>(
-      task.name() == fordyca::tasks::foraging_task::kGeneralistName);
+      static_cast<uint>(task.name() == tasks1::foraging_task::kHarvesterName);
+  m_count_stats.n_cum_generalists +=
+      static_cast<uint>(task.name() == tasks0::foraging_task::kGeneralistName);
 } /* collect() */
 
 bool execution_metrics_collector::csv_line_build(std::string& line) {

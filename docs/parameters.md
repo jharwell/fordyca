@@ -15,9 +15,9 @@ The following root XML tags are defined:
 
 - `task_allocation` - Parameters pertaining to task allocation variables/methods.
 
-- `sensors` -  Parameters for robot sensors.
+- `sensing` -  Parameters for robot sensors.
 
-- `actuators` - Parameters for robot actuators.
+- `actuation` - Parameters for robot actuators.
 
 - `fsm` - Parameters for state machine controlling a robot's actions.
 
@@ -101,7 +101,7 @@ The following root XML tags are defined:
 - `never_partition` - If `true`, then robots will never choose to partition a
                        task, given the chance. Has no effect if `false`.
 
-#### `init_estimates`
+#### `exec_estimates`
 
 - `enabled` - If `true`, then all estimates of task execution times are
               initialized randomly within the specified ranges, rather than with
@@ -110,17 +110,20 @@ The following root XML tags are defined:
 
 - `generalist_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the generalist task will be drawn.
+  duration of the generalist task will be drawn. Only used if `enabled` is
+  `true`.
 
 - `collector_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the collector task will be drawn.
+  duration of the collector task will be drawn. Only used if `enabled` is
+  `true`.
 
 - `harvester_range` - Takes a pair like so: `100:200` specifying the range of
   the uniform random distribution over which a robots' initial estimation of the
-  duration of the harvester task will be drawn.
+  duration of the harvester task will be drawn. Only used if `enabled` is
+  `true`.
 
-### `sensors`
+### `sensing`
 
 #### `proximity`
 
@@ -134,55 +137,64 @@ The following root XML tags are defined:
 - `delta` - The longest distance away from the robot obstacles will be
             considered.
 
-### `actuators`
+### `actuation`
 
-#### `wheels`
+#### `throttling`
 
-- `hard_turn_angle_threshold` - If actuators are told to change to a heading
-                                within a difference greater than the one
-                                specified by this parameter to the current
-                                heading, then a hard turn is executed (turn in
-                                place/opposite wheel speeds).
+- `block_carry` - The percentage (specified between 0 and 1) by which a robot's
+  speed will be decreased when it is carrying a block.
 
-- `soft_turn_angle_threshold` - If actuators are told to change to a heading
-                                within a difference greater than the one
-                                specified by this parameter to the current
-                                heading, but less than
-                                `hard_turn_angle_threshold`, then a soft turn
-                                is executed (keep moving forward and turn
-                                gradually).
+#### `kinematics2D`
 
-- `no_turn_angle_threshold` - If actuators are told to change to a heading
-                              within a difference less than the one specified
-                              by this parameter to the current heading, the
-                              heading change is ignored.
+##### `avoidance_force`
+
+- `lookahead` - How far ahead of the robot to look for obstacles. Currently
+  unused, but may be used in the future.
+
+- `max` - Max value for the force.
+
+##### `arrival_force`
+
+- `slowing_radius` - Radius around target inside which robots will slow down
+  linearly to not overshoot their target.
+
+- `slowing_speed_min` - The minimum speed robotics will linearly ramp down
+  to. Should be > 0.
+
+- `max` - Max value for the force.
+
+##### `polar_force`
+
+- `max` - Max value for the force.
+
+##### `wander_force`
+
+- `circle_distance` - Scaling factor for force; applied to current velocity.
+
+- `circle_radius` - Displacement (i.e. wander) circle radius; placed at
+                    `circle_distance` from the robot.
+
+- `max_angle_delta` -  +/- Maximum amount of heading change for the wander angle
+  (a random value is chosen in this range). Specified in degrees.
+
+##### `phototaxis_force`
+
+- `max` - Max value for the force.
+
+#### `differential_drive`
+
+- `soft_turn_max` - If actuators are told to change to a heading within a
+                    difference greater than the one specified by this parameter
+                    to the current heading, a hard turn is executed (spin in
+                    place).
 
 - `max_speed` - The maximimum speed of the robot.
 
 ### `fsm`
 
-- `unsuccessful_explore_dir_change` - For robots executing an explore FSM to
-                                      look for something, they will randomly
-                                      change direction after this many steps if
-                                      they are unsuccessful in finding what they
-                                      are looking for.
-
-- `frequent_collision_thresh` - The number of timesteps between subsequent
-                                collisions for said collisions to be considered
-                                frequent. If a collision is considered frequent,
-                                then instead of heading in the opposite
-                                direction after a collision, a robot will head
-                                in a random direction, which should hopefully
-                                help get it out of whatever situation it was in
-                                that caused the frequent collision(s) in the
-                                first place.
-
 - `nest` - The location of the nest. Again, this is a duplicate of the location
            passed to the loop functions, but it was easier to do it this way
            rather than muck about with XML tree traversal.
-
-- `speed_throttle_block_carry` - The percentage (specified between 0 and 1) by
-  which a robot's speed will be decreased when it is carrying a block.
 
 ## Loop Functions
 
@@ -278,9 +290,6 @@ The following root XML tags are defined:
     - `single_source` - Placed within a small arena opposite about 90% of the
                         way from the nest to the other side of the arena
                         (assumes horizontal, rectangular arena).
-
-- `respawn` - Whether or not blocks should be re-distributed in the arena after
-              they are brought to the nest.
 
 #### `caches`
 

@@ -30,61 +30,54 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char arena_map_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void arena_map_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct arena_map_params>();
-  argos::TConfigurationNode anode = argos::GetNode(node, "arena_map");
+void arena_map_parser::parse(const ticpp::Element& node) {
+  ticpp::Element anode =
+      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_grid_parser.parse(anode);
+  m_params->grid = *m_grid_parser.parse_results();
 
-  m_grid_parser.parse(argos::GetNode(anode, "grid"));
-  m_params->grid = *m_grid_parser.get_results();
+  m_block_parser.parse(anode);
+  m_params->block = *m_block_parser.parse_results();
 
-  m_block_parser.parse(argos::GetNode(anode, "blocks"));
-  m_params->block = *m_block_parser.get_results();
+  m_block_dist_parser.parse(anode);
+  m_params->block_dist = *m_block_dist_parser.parse_results();
+  m_params->block_dist.arena_model.x =
+      argos::CRange<double>(m_params->grid.lower.GetX(),
+                            m_params->grid.upper.GetX());
+  m_params->block_dist.arena_model.y =
+      argos::CRange<double>(m_params->grid.lower.GetY(),
+                            m_params->grid.upper.GetY());
 
-  m_cache_parser.parse(argos::GetNode(anode, "caches"));
-  m_params->cache = *m_cache_parser.get_results();
+  m_cache_parser.parse(anode);
+  if (m_cache_parser.parsed()) {
+    m_params->static_cache = *m_cache_parser.parse_results();
+  }
 
-  std::vector<std::string> res, res2;
-  rcppsw::utils::line_parser parser(' ');
+  m_nest_parser.parse(anode);
+  m_params->nest = * m_nest_parser.parse_results();
 
-  res = parser.parse(argos::GetNode(anode, "nest").GetAttribute("center"));
-  res2 = parser.parse(argos::GetNode(anode, "nest").GetAttribute("size"));
-
-  m_params->nest_center =
-      argos::CVector2(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
-  m_params->nest_x.Set(std::atof(res[0].c_str()) - std::atof(res2[0].c_str()),
-                       std::atof(res[0].c_str()) + std::atof(res2[0].c_str()));
-  m_params->nest_y.Set(std::atof(res[1].c_str()) - std::atof(res2[1].c_str()),
-                       std::atof(res[1].c_str()) + std::atof(res2[1].c_str()));
+  m_params->block_dist.nest_model.x = {0, m_params->nest.xdim};
+  m_params->block_dist.nest_model.y = {0, m_params->nest.ydim};
 } /* parse() */
 
-void arena_map_parser::show(std::ostream& stream) {
-  stream << "====================\nArena_Map params\n====================\n";
-  m_grid_parser.show(stream);
-  m_block_parser.show(stream);
-  m_cache_parser.show(stream);
-  stream << "nest_x=" << m_params->nest_x << std::endl;
-  stream << "nest_y=" << m_params->nest_y << std::endl;
-  stream << "nest_center=" << m_params->nest_center << std::endl;
+void arena_map_parser::show(std::ostream& stream) const {
+  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
+         << m_nest_parser
+         << build_footer();
 } /* show() */
 
-bool arena_map_parser::validate(void) {
-  if (!m_grid_parser.validate() || !m_block_parser.validate() ||
-      !m_cache_parser.validate()) {
-    return false;
-  }
-  if (!(m_params->nest_center.GetX() > 0) ||
-      !(m_params->nest_center.GetY() > 0)) {
-    return false;
-  }
-  if (!(m_params->nest_x.GetMin() > 0) || !(m_params->nest_x.GetMax() > 0)) {
-    return false;
-  }
-  if (!(m_params->nest_y.GetMin() > 0) || !(m_params->nest_y.GetMax() > 0)) {
-    return false;
-  }
-  return true;
+bool arena_map_parser::validate(void) const {
+  return m_grid_parser.validate() && m_block_parser.validate() &&
+      m_cache_parser.validate() && m_nest_parser.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

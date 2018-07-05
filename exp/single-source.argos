@@ -16,24 +16,24 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
-                                library="build/lib/libfordyca">
+    <stateful_foraging_controller id="ffc"
+                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
         <output>
-          <robot output_root="output"
-                 output_dir="__current_date__"
-                 />
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
@@ -42,84 +42,108 @@
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
-        <task_allocation>
-          <executive
-              estimation_alpha="0.8"
-              abort_reactivity="8"
-              abort_offset="4"
-              partition_reactivity="0.5"
-              partition_offset="2"
-              subtask_selection_method="harwell2018"
-              partition_method="pini2011"
+        <task_executive>
+          <estimation alpha="0.8"/>
+          <task_abort reactivity="8"
+                    offset="3"
+                    />
+          <task_partition
+              method="pini2011"
               always_partition="true"
               never_partition="false"
+              reactivity="1.5"
+              offset="1.0"
               />
-          <init_estimates
-              enabled="true"
-              generalist_range="2000:4000"
-              collector_range="1000:2000"
-              harvester_range="1000:2000"
+          <subtask_selection
+              method="harwell2018"
+              reactivity="8"
+              offset="1.25"
+              gamma="1.0"
               />
-        </task_allocation>
-        <sensors>
-          <proximity go_straight_angle_range="-5:5"
-                    delta="0.001" />
-        </sensors>
-        <actuators>
-          <wheels soft_turn_angle_max="30"
-                  no_turn_angle_max="5"
-                  max_speed="10" />
-        </actuators>
+        </task_executive>
+        <task_exec_estimates
+            enabled="true"
+            generalist_range="2000:4000"
+            collector_range="1000:2000"
+            harvester_range="1000:2000"
+            />
+        <sensing>
+          <proximity_sensor angle_range="-1.1:1.1"
+                            delta="0.0001" />
+        </sensing>
+        <actuation>
+          <throttling
+              block_carry="0.1"/>
+          <steering2D>
+            <avoidance_force lookahead="0.5"
+                             max="8"/>
+            <arrival_force slowing_radius="0.2"
+                           slowing_speed_min="1.0"
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="9.0"
+                          interval="1"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
+
+          <differential_drive soft_turn_max="30"
+                              max_speed="10.0" />
+        </actuation>
         <fsm
-          unsuccessful_explore_dir_change="1000"
-          frequent_collision_thresh="300"
           nest="2.0, 2.5"
-          speed_throttle_block_carry="0.1"
           />
       </params>
-    </depth1_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+  <loop_functions library="libfordyca"
+                  label="stateful_foraging_loop_functions">
     <output>
-      <sim sim_log_fname="sim.log"
+      <sim log_fname="sim.log"
            output_root="output"
            output_dir="__current_date__"
            />
       <metrics
           output_dir="metrics"
-          stateless_fname="stateless-stats.csv"
-          stateful_fname="stateful-stats.csv"
-          depth1_fname="depth1-stats.csv"
           block_fname="block-stats.csv"
-          distance_fname="distance-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
+          cache_utilization_fname="cache-utilization-stats.csv"
+          cache_lifecycle_fname="cache-lifecycle-stats.csv"
           task_execution_fname="task-execution-stats.csv"
           task_management_fname="task-management-stats.csv"
-          cache_fname="cache-stats.csv"
+          distance_fname="distance-stats.csv"
+          perception_world_model_fname="perception-world-model.csv"
           collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks n_blocks="20"
-              dimension="0.2"
-              dist_model="single_source"
-              />
-      <caches create_static="true"
-              create_dynamic="false"
-              static_size="2"
-              static_respawn_scale_factor="0.05"
-              dimension="0.8"
-              min_dist="0.8"
-              usage_penalty="10"
-              />
-      <nest size="0.5, 2.0" center="2, 2.5" />
+      <blocks dimension="0.2" />
+      <block_distribution n_blocks="20"
+                          dist_type="single_source"
+                          arena_model.shape="rectangle"
+                          arena_model.orientation="horizontal"
+                          nest_model.shape="rectangle"
+                          nest_model.orientation="horizontal"
+                          />
+      <static_caches enable="true"
+                     size="2"
+                     respawn_scale_factor="0.05"
+                     dimension="0.8"
+                     min_dist="0.8"
+                     usage_penalty="10"
+                     />
+      <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
     <penalty pen_func = "kSine"
              amp = "2"
@@ -178,9 +202,9 @@
            medium="leds" />
 
     <distribute>
-      <position method="uniform" min="1,1,0" max="9,4,0" />
+      <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="4" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -217,7 +241,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
+      <user_functions label="stateful_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

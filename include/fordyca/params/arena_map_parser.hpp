@@ -27,11 +27,14 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/params/block_distribution_parser.hpp"
 #include "fordyca/params/block_parser.hpp"
-#include "fordyca/params/depth1/cache_parser.hpp"
+#include "fordyca/params/depth1/static_cache_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
+#include "fordyca/params/nest_parser.hpp"
+
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,23 +50,45 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
  */
-class arena_map_parser : public rcppsw::common::xml_param_parser {
+class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  arena_map_parser(void)
-      : m_params(), m_grid_parser(), m_block_parser(), m_cache_parser() {}
+  arena_map_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level),
+        m_grid_parser(server, level + 1),
+        m_block_parser(server, level + 1),
+        m_block_dist_parser(server, level + 1),
+        m_cache_parser(server, level + 1),
+        m_nest_parser(server, level + 1) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct arena_map_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all arena map parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "arena_map";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+
+  std::shared_ptr<arena_map_params> parse_results(void) const {
+    return m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct arena_map_params> m_params;
-  grid_parser m_grid_parser;
-  block_parser m_block_parser;
-  depth1::cache_parser m_cache_parser;
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  std::shared_ptr<arena_map_params> m_params{nullptr};
+  grid_parser                       m_grid_parser;
+  block_parser                      m_block_parser;
+  block_distribution_parser         m_block_dist_parser;
+  depth1::static_cache_parser       m_cache_parser;
+  nest_parser                       m_nest_parser;
+  // clang-format on
 };
 
 NS_END(params, fordyca);

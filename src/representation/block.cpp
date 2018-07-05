@@ -28,20 +28,50 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-/***********************e*******************************************************
+/*******************************************************************************
+ *  Static Variables
+ ******************************************************************************/
+rcppsw::math::dcoord2 block::kOutOfSightDLoc = rcppsw::math::dcoord2(100, 100);
+argos::CVector2 block::kOutOfSightRLoc = argos::CVector2(100.0, 100.0);
+
+/******************************************************************************
  * Member Functions
  ******************************************************************************/
 void block::move_out_of_sight(void) {
-  real_loc(argos::CVector2(100.0, 100.0));
-  discrete_loc(rcppsw::math::dcoord2(100, 100));
+  real_loc(kOutOfSightRLoc);
+  discrete_loc(kOutOfSightDLoc);
 } /* move_out_of_sight() */
 
 std::unique_ptr<block> block::clone(void) const {
-  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(cell_entity::xsize());
+  std::unique_ptr<block> tmp = rcppsw::make_unique<block>(xsize());
   tmp->discrete_loc(this->discrete_loc());
   tmp->real_loc(this->real_loc());
   tmp->id(this->id());
-  tmp->reset_index();
+  tmp->reset_robot_id();
   return tmp;
 } /* clone() */
+
+void block::reset_metrics(void) {
+  m_transporters = 0;
+  m_first_pickup_time = 0.0;
+  m_first_pickup = false;
+  m_dist_time = 0.0;
+  m_nest_drop_time = 0.0;
+} /* reset_metrics(); */
+
+void block::first_pickup_time(double time) {
+  if (!m_first_pickup) {
+    m_first_pickup_time = time;
+    m_first_pickup = true;
+  }
+} /* first_pickup_time() */
+
+double block::total_transport_time(void) const {
+  return m_nest_drop_time - m_first_pickup_time;
+} /* total_transport_time() */
+
+double block::initial_wait_time(void) const {
+  return m_first_pickup_time - m_dist_time;
+} /* initial_wait_time() */
+
 NS_END(representation, fordyca);

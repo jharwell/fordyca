@@ -61,7 +61,7 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
 
 void distance_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const metrics::fsm::distance_metrics&>(metrics);
+  auto& m = dynamic_cast<const metrics::fsm::distance_metrics&>(metrics);
   m_stats.cum_distance += m.timestep_distance();
 } /* collect() */
 

@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/arena_map_parser.hpp"
-#include "fordyca/params/loop_functions_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/depth1/penalty_parser.hpp"
+#include "fordyca/params/visualization_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,11 +35,17 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
-  register_parser<output_parser>("output");
-  register_parser<arena_map_parser>("arena_map");
-  register_parser<loop_functions_parser>("loop_functions");
-  register_parser<penalty_parser>("penalty");
+loop_function_repository::loop_function_repository(
+    const std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
+  register_parser<output_parser, output_params>(
+      output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<arena_map_parser, arena_map_params>(
+      arena_map_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<visualization_parser, visualization_params>(
+      visualization_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<penalty_parser, penalty_params>("penalty")
 }
 
 NS_END(params, fordyca);

@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, fsm);
  * @brief Interface defining what metrics regarding distance traveled should be
  * collected from all robots.
  */
-class distance_metrics : public rcppsw::metrics::base_metrics {
+class distance_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   distance_metrics(void) = default;
   ~distance_metrics(void) override = default;
