@@ -26,16 +26,16 @@
  ******************************************************************************/
 #include <list>
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
-#include "fordyca/support/depth1/cache_penalty_handler.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
-#include "fordyca/params/depth1/penalty_params.hpp"
+#include "fordyca/metrics/caches/lifecycle_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 
+class metrics_aggregator;
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -45,17 +45,15 @@ NS_START(fordyca, support, depth1);
  *
  * @brief The loop functions for depth 1 foraging.
  *
- * Handles:
- *
- * - Robots picking up from/dropping in a cache
- * - Subjecting robots using caches to a penalty (only on pickup).
+ * Handles all operations robots perform relating to static caches: pickup,
+ * drop, etc.
  */
 class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
  public:
   foraging_loop_functions(void) = default;
   ~foraging_loop_functions(void) override = default;
 
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void PreStep() override;
   void Reset(void) override;
 
@@ -78,10 +76,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
             map.subgrid(robot_loc.first, robot_loc.second, 2),
             robot_loc);
 
-    /*
-     * [JRH]: TODO: Once caches are arena entities, then this make not be
-     * necessary.
-     */
     for (auto &c : map.caches()) {
       argos::CVector2 ll = math::dcoord_to_rcoord(new_los->abs_ll(),
                                                   map.grid_resolution());
@@ -108,12 +102,13 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void metric_collecting_init(const struct params::output_params *output_p);
   void cache_handling_init(const struct params::arena_map_params *arenap);
 
   // clang-format off
-  double                      mc_cache_respawn_scale_factor{0.0};
-  std::unique_ptr<interactor> m_interactor{nullptr};
+  double                              mc_cache_respawn_scale_factor{0.0};
+  std::unique_ptr<interactor>         m_interactor{nullptr};
+  metrics::caches::lifecycle_collator m_cache_collator{};
+  std::unique_ptr<metrics_aggregator> m_metrics_agg{nullptr};
   // clang-format on
 };
 

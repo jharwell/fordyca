@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "fordyca/params/block_params.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,19 +45,32 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters for related to \ref block objects into
  * \ref block_params.
  */
-class block_parser : public rcppsw::common::xml_param_parser {
+class block_parser : public rcppsw::params::xml_param_parser {
  public:
-  block_parser(void) : m_params() {}
+  block_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+      : xml_param_parser(server, level) {}
 
-  void parse(argos::TConfigurationNode& node) override;
-  const struct block_params* get_results(void) override {
-    return m_params.get();
+  /**
+   * @brief The root tag that all block parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "blocks";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  std::shared_ptr<block_params> parse_results(void) const {
+    return m_params;
   }
-  void show(std::ostream& stream) override;
-  bool validate(void) override;
 
  private:
-  std::unique_ptr<struct block_params> m_params;
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  std::shared_ptr<block_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);

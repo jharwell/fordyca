@@ -39,9 +39,9 @@ class server;
 }} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params { namespace depth0 {
+namespace params {
 struct occupancy_grid_params;
-}} // namespace params::depth0
+}
 
 NS_START(representation);
 class line_of_sight;
@@ -71,7 +71,7 @@ class perceived_arena_map
 
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
-      const struct fordyca::params::depth0::occupancy_grid_params* c_params,
+      const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
   bool pheromone_repeat_deposit(void) const {
@@ -169,6 +169,11 @@ class perceived_arena_map
    */
   void update(void) { m_grid.update(); }
 
+  /**
+   * @brief Reset all the cells in the percieved arena.
+   */
+  void reset(void) { m_grid.reset(); }
+
  private:
   // clang-format off
   std::shared_ptr<rcppsw::er::server> m_server;
@@ -181,7 +186,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  cache_list m_caches;
+  cache_list                          m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -189,7 +194,8 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  block_list m_blocks;
+  block_list                          m_blocks;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

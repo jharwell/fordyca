@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/common/xml_param_parser.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/depth1/exec_estimates_params.hpp"
 
 /*******************************************************************************
@@ -42,20 +42,39 @@ NS_START(fordyca, params, depth1);
  * @class exec_estimates_parser
  * @ingroup params depth1
  *
- * @brief Parses XML parameters used for estimation of task execution at the
- * start of simulation.
+ * @brief Parses XML parameters used for estimation of depth1 task execution
+ * times at the start of simulation.
  */
-class exec_estimates_parser: public rcppsw::common::xml_param_parser {
+class exec_estimates_parser: public rcppsw::params::xml_param_parser {
  public:
-  exec_estimates_parser(void) : m_params() {}
-  void parse(argos::TConfigurationNode& node) override;
-  const struct exec_estimates_params* get_results(void) override {
-    return m_params.get();
+  exec_estimates_parser(const std::shared_ptr<rcppsw::er::server>& server,
+                        uint level)
+      : xml_param_parser(server, level) {}
+
+  /**
+   * @brief The root tag that all cache parameters should lie under in the
+   * XML tree.
+   */
+  static constexpr char kXMLRoot[] = "task_exec_estimates";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  std::shared_ptr<exec_estimates_params> parse_results(void) const {
+    return m_params;
   }
-  void show(std::ostream& stream) override;
+  bool parsed(void) const override { return m_parsed; }
 
  private:
-  std::unique_ptr<struct exec_estimates_params> m_params;
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  bool                                   m_parsed{false};
+  std::shared_ptr<exec_estimates_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca, depth1);

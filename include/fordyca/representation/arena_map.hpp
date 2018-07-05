@@ -26,13 +26,14 @@
  ******************************************************************************/
 #include <vector>
 
-#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/support/block_distributor.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/representation/nest.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -99,8 +100,8 @@ class arena_map : public rcppsw::er::client,
    */
   void delete_caches(void);
 
-  void cache_removed(bool b) { m_cache_removed = b; }
-  bool cache_removed(void) const { return m_cache_removed; }
+  void caches_removed(uint b) { m_caches_removed += b; }
+  uint caches_removed(void) const { return m_caches_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
   cell2D& access(const rcppsw::math::dcoord2& coord) {
@@ -108,14 +109,10 @@ class arena_map : public rcppsw::er::client,
   }
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * @brief Distribute all blocks in the arena. Resets arena state. Should only
+   * be called during (re)-initialization.
    */
-  void distribute_blocks(void);
-
-  size_t xdsize(void) const { return m_grid.xdsize(); }
-  size_t ydsize(void) const { return m_grid.ydsize(); }
-  size_t xrsize(void) const { return m_grid.xrsize(); }
-  size_t yrsize(void) const { return m_grid.yrsize(); }
+  void distribute_all_blocks(void);
 
   /**
    * @brief Distribute a particular block in the arena, according to whatever
@@ -123,14 +120,21 @@ class arena_map : public rcppsw::er::client,
    *
    * @param block The block to distribute.
    */
-  void distribute_block(const std::shared_ptr<block>& block);
+  void distribute_single_block(std::shared_ptr<block>& block) {
+    m_block_distributor.distribute_block(m_grid, block);
+  }
+
+  size_t xdsize(void) const { return m_grid.xdsize(); }
+  size_t ydsize(void) const { return m_grid.ydsize(); }
+  size_t xrsize(void) const { return m_grid.xrsize(); }
+  size_t yrsize(void) const { return m_grid.yrsize(); }
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    */
   void static_cache_create(void);
 
-  bool has_static_cache(void) const { return mc_cache_params.create_static; }
+  bool has_static_cache(void) const { return mc_static_cache_params.enable; }
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -193,17 +197,18 @@ class arena_map : public rcppsw::er::client,
     return m_grid.subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
+  const representation::nest& nest(void) const { return m_nest; }
 
  private:
   // clang-format off
-  bool                                      m_cache_removed;
-  const struct params::depth1::cache_params mc_cache_params;
-  const argos::CVector2                     mc_nest_center;
-  block_vector                              m_blocks;
-  cache_vector                              m_caches;
-  support::block_distributor                m_block_distributor;
-  std::shared_ptr<rcppsw::er::server>       m_server;
-  arena_grid                                m_grid;
+  uint                                             m_caches_removed{0};
+  const struct params::depth1::static_cache_params mc_static_cache_params;
+  block_vector                                     m_blocks;
+  cache_vector                                     m_caches;
+  support::block_distributor                       m_block_distributor;
+  std::shared_ptr<rcppsw::er::server>              m_server;
+  arena_grid                                       m_grid;
+  representation::nest                             m_nest;
   // clang-format on
 };
 

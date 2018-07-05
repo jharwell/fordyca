@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/controller/actuator_manager.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/random_explore_behavior.hpp"
 #include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
@@ -36,15 +37,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
-    const struct params::fsm_params* params,
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators)
-    : base_foraging_fsm(params->times.unsuccessful_explore_dir_change,
-                        server,
-                        sensors,
-                        actuators,
-                        ST_MAX_STATES),
+    const std::shared_ptr<controller::saa_subsystem>& saa)
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
@@ -53,11 +48,11 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      m_rng(argos::CRandom::CreateRNG("argos")),
-      m_explore_fsm(params->times.unsuccessful_explore_dir_change,
-                    server,
-                    sensors,
-                    actuators),
+      m_explore_fsm(
+          server,
+          saa,
+          std::make_unique<controller::random_explore_behavior>(server, saa),
+          std::bind(&stateless_foraging_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
@@ -102,7 +97,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    actuators()->stop_wheels();
+    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();
@@ -122,19 +117,15 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
 }
 
 /*******************************************************************************
- * Base Diagnostics
+ * Metrics
  ******************************************************************************/
-bool stateless_foraging_fsm::is_exploring_for_block(void) const {
+bool stateless_foraging_fsm::is_exploring_for_goal(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
-} /* is_exploring_for_block() */
+} /* is_exploring_for_goal() */
 
-__pure bool stateless_foraging_fsm::is_avoiding_collision(void) const {
-  return m_explore_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
-
-bool stateless_foraging_fsm::is_transporting_to_nest(void) const {
-  return current_state() == ST_TRANSPORT_TO_NEST;
-} /* is_transporting_to_nest() */
+bool stateless_foraging_fsm::goal_acquired(void) const {
+  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+} /* goal_acquired() */
 
 /*******************************************************************************
  * General Member Functions
@@ -149,8 +140,23 @@ void stateless_foraging_fsm::run(void) {
                state_machine::event_type::NORMAL);
 } /* run() */
 
-bool stateless_foraging_fsm::block_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-} /* block_acquired() */
+bool stateless_foraging_fsm::block_detected(void) const {
+  return saa_subsystem()->sensing()->block_detected();
+} /* block_detected() */
+
+transport_goal_type stateless_foraging_fsm::block_transport_goal(void) const {
+  if (ST_TRANSPORT_TO_NEST == current_state()) {
+    return transport_goal_type::kNest;
+  }
+  return transport_goal_type::kNone;
+} /* block_transport_goal() */
+
+acquisition_goal_type stateless_foraging_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_BLOCK == current_state() ||
+      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return acquisition_goal_type::kBlock;
+  }
+  return acquisition_goal_type::kNone;
+} /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

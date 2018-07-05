@@ -30,7 +30,6 @@
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/control/pid_loop.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
@@ -75,10 +74,14 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
-  vector_fsm(uint frequent_collision_thresh,
-             const std::shared_ptr<rcppsw::er::server>& server,
-             const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-             const std::shared_ptr<controller::actuator_manager>& actuators);
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered to have arrived at the specified cache site.
+   */
+  constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
+
+  vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+             const std::shared_ptr<controller::saa_subsystem>& saa);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
@@ -102,7 +105,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   void init(void) override;
 
-  bool is_avoiding_collision(void) const {
+  bool is_avoiding_collision(void) const override {
     return ST_COLLISION_AVOIDANCE == current_state();
   }
 
@@ -156,6 +159,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   };
 
   struct fsm_state {
+    uint m_collision_rec_count{0};
     uint last_collision_time{0};
   };
 
@@ -164,14 +168,14 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  constexpr static uint kCOLLISION_RECOVERY_TIME = 20;
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 10;
 
   /**
-   * @brief The maximum arrival tolerance used by the FSM, for use in handling
-   * speed reduction near the target so as to not overshoot it.
+   * @brief If a robotics sees a threatening obstacle more than twice in this
+   * interval, it is considered to be colliding too frequently, and will enter
+   * collision recovery.
    */
-  constexpr static double kMAX_ARRIVAL_TOL =
-      std::max(kBLOCK_ARRIVAL_TOL, kCACHE_ARRIVAL_TOL);
+  constexpr static uint kFREQ_COLLISION_THRESH = 300;
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
@@ -223,12 +227,8 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   }
 
   // clang-format off
-  struct fsm_state                                      m_state;
-  uint                                                  m_freq_collision_thresh{0};
-  uint                                                  m_collision_rec_count{0};
-  struct goal_data                                      m_goal_data;
-  rcppsw::control::pid_loop                             m_ang_pid;
-  rcppsw::control::pid_loop                             m_lin_pid;
+  struct fsm_state m_state;
+  struct goal_data m_goal_data;
   // clang-format on
 };
 

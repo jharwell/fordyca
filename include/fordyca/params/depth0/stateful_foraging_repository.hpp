@@ -24,11 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/xml_param_repository.hpp"
+#include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
@@ -41,9 +42,9 @@ NS_START(fordyca, params, depth0);
  * @brief Collection of all parameter parsers and parse results needed by
  * \ref stateful_foraging_controller.
  */
-class stateful_foraging_repository: public rcppsw::common::xml_param_repository {
+class stateful_foraging_repository: public rcppsw::params::xml_param_repository {
  public:
-  stateful_foraging_repository(void);
+  stateful_foraging_repository(const std::shared_ptr<rcppsw::er::server>& server);
 };
 
 NS_END(depth0, params, fordyca);

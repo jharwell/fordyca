@@ -22,8 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_distributor.hpp"
-#include "fordyca/params/block_params.hpp"
+#include <assert.h>
+
+#include "fordyca/params/block_distribution_params.hpp"
 #include "fordyca/representation/block.hpp"
+#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,61 +35,114 @@
 NS_START(fordyca, support);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char block_distributor::kMODEL_SHAPE_RECT[];
+constexpr char block_distributor::kMODEL_ORIENTATION_HOR[];
+constexpr char block_distributor::kDIST_RANDOM[];
+constexpr char block_distributor::kDIST_SINGLE_SRC[];
+
+/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_distributor::block_distributor(argos::CRange<double> arena_x,
-                                     argos::CRange<double> arena_y,
-                                     argos::CRange<double> nest_x,
-                                     argos::CRange<double> nest_y,
-                                     const struct params::block_params* params)
-    : m_dist_model(params->dist_model),
-      m_arena_x(arena_x),
-      m_arena_y(arena_y),
-      m_nest_x(nest_x),
-      m_nest_y(nest_y),
-      m_rng(argos::CRandom::CreateRNG("argos")) {}
+block_distributor::block_distributor(
+    std::shared_ptr<rcppsw::er::server> server,
+    const struct params::block_distribution_params* params)
+    : client(server),
+      m_dist_type(params->dist_type),
+      m_arena_model(params->arena_model),
+      m_nest_model(params->nest_model),
+      m_rng(argos::CRandom::CreateRNG("argos")) {
+  insmod("block_distributor", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
+
+  /*
+   * @todo For now, assume horizontal rectangle--this will change in the
+   * future...eventually.
+   */
+  assert(m_arena_model.shape == kMODEL_SHAPE_RECT);
+  assert(m_arena_model.orientation == kMODEL_ORIENTATION_HOR);
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool block_distributor::distribute_block(const representation::block& block,
-                                         argos::CVector2* const coord) {
-  if (m_dist_model == "random") {
-    *coord = dist_random(block);
-    return true;
-  } else if (m_dist_model == "single_source") {
-    *coord = dist_single_src(block);
-    return true;
-  }
-  return false;
+void block_distributor::distribute_block(representation::arena_grid& grid,
+                                         std::shared_ptr<representation::block>& block) {
+  argos::CVector2 r_coord;
+  representation::cell2D* cell = nullptr;
+  while(true) {
+    if (m_dist_type == kDIST_RANDOM) {
+      r_coord = dist_random(block);
+    } else if (m_dist_type == kDIST_SINGLE_SRC) {
+      r_coord = dist_single_src(block);
+    } else {
+      ER_FATAL_SENTINEL("FATAL: Bad block distribution type");
+      break;
+    }
+    rcppsw::math::dcoord2 d_coord =
+        math::rcoord_to_dcoord(r_coord, grid.resolution());
+    cell = &grid.access(d_coord.first, d_coord.second);
+
+    /*
+     * You can only distribute blocks to cells that do not currently have
+     * anything in them.
+     */
+    if (!cell->state_has_block() && !cell->state_has_cache()) {
+      events::free_block_drop op(client::server_ref(),
+                                 block,
+                                 d_coord.first,
+                                 d_coord.second,
+                                 grid.resolution());
+      cell->accept(op);
+      break;
+    }
+  } /* while() */
+
+  /* blocks should not be out of sight after distribution... */
+  ER_ASSERT(representation::block::kOutOfSightDLoc != block->discrete_loc(),
+            "FATAL: Block%d discrete coordinates still out of sight after "
+            "distribution",
+            block->id());
+  ER_ASSERT(representation::block::kOutOfSightRLoc != block->real_loc(),
+            "FATAL: Block%d real coordinates still out of sight after distribution",
+            block->id());
+
+  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%zu, %zu) ptr=%p",
+         block->id(),
+         block->real_loc().GetX(),
+         block->real_loc().GetY(),
+         block->discrete_loc().first,
+         block->discrete_loc().second,
+         reinterpret_cast<void*>(cell->block().get()));
 } /* distribute_block() */
 
 argos::CVector2 block_distributor::dist_random(
-    const representation::block& block) {
-  return dist_outside_range(block.xsize(), m_nest_x, m_nest_y);
+    std::shared_ptr<representation::block>& block) {
+  return dist_outside_range(block->xsize(), m_nest_model.x, m_nest_model.y);
 } /* dist_random() */
 
-__pure argos::CRange<double> block_distributor::single_src_xrange(void) {
-  return argos::CRange<double>(m_arena_x.GetMax() * 0.9 - 0.75,
-                               m_arena_x.GetMax() * 0.9);
+__rcsw_pure argos::CRange<double> block_distributor::single_src_xrange(
+    double block_xdim) {
+  return argos::CRange<double>(m_arena_model.x.GetMax() * 0.9 - 4 * block_xdim,
+                               m_arena_model.x.GetMax() * 0.9);
 } /* single_src_xrange() */
 
+__rcsw_pure argos::CRange<double> block_distributor::single_src_yrange(
+    double block_ydim) {
+  return argos::CRange<double>(
+      std::max(4 * block_ydim, m_nest_model.y.GetMin() - 4 * block_ydim),
+      std::min(m_arena_model.y.GetMax() - 4 * block_ydim,
+               m_nest_model.y.GetMax() + 4 * block_ydim));
+} /* single_src_yrange() */
+
 argos::CVector2 block_distributor::dist_single_src(
-    const representation::block& block) {
+    std::shared_ptr<representation::block>& block) {
   /*
    * Find the 90% point between the nest and the source along the X (horizontal)
    * direction, and put all the blocks around there.
    */
-  argos::CRange<double> y_range(std::max(1.0, m_nest_y.GetMin() - 1.0),
-                                std::min(m_arena_y.GetMax() - 1.0,
-                                         m_nest_y.GetMax() + 1.0));
-  argos::CRange<double> x_range = single_src_xrange();
-  x_range.Set(x_range.GetMin() - block.xsize(),
-              x_range.GetMax() + block.xsize());
-  y_range.Set(y_range.GetMin() - block.xsize(),
-              y_range.GetMax() + block.xsize());
-
-  return dist_in_range(x_range, y_range);
+  return dist_in_range(single_src_xrange(block->xsize()),
+                       single_src_yrange(block->ysize()));
 } /* dist_single_src() */
 
 argos::CVector2 block_distributor::dist_in_range(argos::CRange<double> x_range,
@@ -102,12 +159,12 @@ argos::CVector2 block_distributor::dist_outside_range(
   y_range.Set(y_range.GetMin() - dimension, y_range.GetMax() + dimension);
   do {
     x = m_rng->Uniform(
-        argos::CRange<double>(m_arena_x.GetMin() + dimension * 4,
-                              m_arena_x.GetMax() - dimension * 4));
+        argos::CRange<double>(m_arena_model.x.GetMin() + dimension,
+                              m_arena_model.x.GetMax() - dimension));
     y = m_rng->Uniform(
-        argos::CRange<double>(m_arena_y.GetMin() + dimension * 4,
-                              m_arena_y.GetMax() - dimension * 4));
-  } while (x_range.WithinMinBoundIncludedMaxBoundIncluded(x) &&
+        argos::CRange<double>(m_arena_model.y.GetMin() + dimension,
+                              m_arena_model.y.GetMax() - dimension));
+  } while (x_range.WithinMinBoundIncludedMaxBoundIncluded(x) ||
            y_range.WithinMinBoundIncludedMaxBoundIncluded(y));
   return argos::CVector2(x, y);
 } /* dist_outside_range() */
