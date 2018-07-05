@@ -97,8 +97,15 @@ void tasking_initializer::depth1_tasking_init(
     std::static_pointer_cast<ta::polled_task>(collector)->init_random(
         est_params->collector_range.GetMin(),
         est_params->collector_range.GetMax());
+    /*
+     * Generalist is not partitionable in depth 0 initialization, so this has
+     * not been done.
+     */
+    std::static_pointer_cast<ta::partitionable_polled_task>(graph()->root())->init_random(
+        (random() % 2) ? collector: harvester,
+        est_params->collector_range.GetMin(),
+        est_params->collector_range.GetMax());
   }
-
   graph()->set_children(tasks::depth0::foraging_task::kGeneralistName,
                         std::list<ta::task_graph_vertex>({collector, harvester}));
 } /* depth1_tasking_init() */
@@ -106,6 +113,7 @@ void tasking_initializer::depth1_tasking_init(
 std::unique_ptr<ta::polled_executive> tasking_initializer::operator()(
     params::depth1::param_repository* const param_repo) {
   stateful_tasking_init(param_repo);
+
   depth1_tasking_init(param_repo);
 
   return rcppsw::make_unique<ta::polled_executive>(server(), std::move(graph()));

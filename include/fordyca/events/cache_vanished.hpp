@@ -45,6 +45,7 @@ class foraging_controller;
 
 namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
+class cached_block_to_nest_fsm;
 }} // namespace fsm::depth1
 namespace tasks {
 namespace depth1 {
@@ -76,7 +77,8 @@ class cache_vanished
                                 tasks::depth1::collector,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
-                                fsm::depth1::block_to_goal_fsm> {
+                                fsm::depth1::block_to_goal_fsm,
+                                fsm::depth1::cached_block_to_nest_fsm> {
  public:
   cache_vanished(const std::shared_ptr<rcppsw::er::server>& server,
                  uint cache_id);
@@ -87,6 +89,7 @@ class cache_vanished
 
   /* depth1 foraging */
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(tasks::depth1::harvester& task) override;
   void visit(controller::depth1::foraging_controller& controller) override;

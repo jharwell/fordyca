@@ -6,8 +6,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="3" />
-    <experiment length="50000"
+    <system threads="0" />
+    <experiment length="100"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -45,8 +45,8 @@
         <task_executive>
           <estimation alpha="0.8"/>
           <task_abort reactivity="8"
-                    offset="3"
-                    />
+                      offset="3"
+                      />
           <task_partition
               method="pini2011"
               always_partition="true"
@@ -95,8 +95,13 @@
         <fsm
           nest="2.0, 2.5"
           />
+        <visualization robot_id="true"
+                       robot_los="false"
+                       robot_task="true"
+                       block_id="false"
+                       />
       </params>
-    </depth1_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -104,7 +109,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -122,7 +127,7 @@
           task_management_fname="task-management-stats.csv"
           distance_fname="distance-stats.csv"
           perception_world_model_fname="perception-world-model.csv"
-          collect_interval="1000"
+          collect_interval="10"
           />
     </output>
     <arena_map>
@@ -145,11 +150,6 @@
                      />
       <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
-    <visualization robot_id="true"
-                   robot_los="false"
-                   robot_task="true"
-                   block_id="false"
-                   />
   </loop_functions>
 
   <!-- *********************** -->
@@ -174,19 +174,19 @@
       <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
-    <light id="light_1"
+    <light id="light1"
            position="2,1.25,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_2"
+    <light id="light2"
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_3"
+    <light id="light3"
            position="2,3.75,1.0"
            orientation="0,0,0"
            color="yellow"
@@ -196,7 +196,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -223,18 +223,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="stateless_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

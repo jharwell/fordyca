@@ -100,6 +100,7 @@ class arena_map : public rcppsw::er::client,
    */
   void delete_caches(void);
 
+  void caches_removed_reset(void) { m_caches_removed = 0; }
   void caches_removed(uint b) { m_caches_removed += b; }
   uint caches_removed(void) const { return m_caches_removed; }
 

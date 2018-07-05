@@ -23,7 +23,7 @@ set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
 set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS})
 
 if (BUILD_ON_MSI)
-  set(${target}_SYS_INCLUDE_DIRS ${MSI_ARGOS_INSTALL_PREFIX}/include)
+  set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS} ${MSI_ARGOS_INSTALL_PREFIX}/include)
 endif()
 
 ################################################################################

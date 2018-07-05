@@ -77,8 +77,14 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(
-        repo.parse_results<params::visualization_params>()->robot_task);
+
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_task(vparams->robot_task);
+    }
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -182,7 +188,7 @@ void foraging_loop_functions::pre_step_final(void) {
   if (arena_map()->caches_removed() > 0) {
     m_cache_collator.cache_depleted();
     floor()->SetChanged();
-    arena_map()->caches_removed(0);
+    arena_map()->caches_removed_reset();
   }
 
   stateful_foraging_loop_functions::pre_step_final();
