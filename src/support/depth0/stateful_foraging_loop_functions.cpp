@@ -71,9 +71,15 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     auto& controller =
         dynamic_cast<controller::depth0::stateful_foraging_controller&>(
             robot.GetControllableEntity().GetController());
-    auto* l_params = repo.parse_results<struct params::visualization_params>();
 
-    controller.display_los(l_params->robot_los);
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_los(vparams->robot_los);
+    }
+
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
         robot, *arena_map());
   } /* for(entity..) */

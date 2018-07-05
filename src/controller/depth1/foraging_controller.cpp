@@ -96,6 +96,14 @@ void foraging_controller::Init(ticpp::Element& node) {
   m_executive = tasking_initializer(client::server_ref(),
                                     saa_subsystem(),
                                     perception())(&param_repo);
+  m_executive->task_abort_cleanup(std::bind(
+            &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
+
+  m_executive->task_alloc_notify(std::bind(
+      &foraging_controller::task_alloc_notify, this, std::placeholders::_1));
+
+  m_executive->task_finish_notify(std::bind(
+      &foraging_controller::task_finish_notify, this, std::placeholders::_1));
 
   ER_NOM("Depth1 foraging controller initialization finished");
 } /* Init() */

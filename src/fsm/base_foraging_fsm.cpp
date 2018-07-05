@@ -55,6 +55,7 @@ base_foraging_fsm::base_foraging_fsm(
       entry_new_direction(),
       entry_wait_for_signal(),
       m_new_dir(),
+      m_rng(argos::CRandom::CreateRNG("argos")),
       m_saa(saa) {}
 
 /*******************************************************************************
