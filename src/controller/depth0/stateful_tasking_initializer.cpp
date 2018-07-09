@@ -84,7 +84,7 @@ void stateful_tasking_initializer::stateful_tasking_init(
   m_graph = std::make_unique<ta::task_decomposition_graph>(m_server);
 
   m_graph->set_root(generalist);
-  generalist->set_partitionable();
+  generalist->set_atomic();
 } /* tasking_init() */
 
 std::unique_ptr<ta::polled_executive> stateful_tasking_initializer::operator()(
