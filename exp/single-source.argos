@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="100"
+    <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -123,11 +123,13 @@
           cache_acquisition_fname="cache-acquisition-stats.csv"
           cache_utilization_fname="cache-utilization-stats.csv"
           cache_lifecycle_fname="cache-lifecycle-stats.csv"
-          task_execution_fname="task-execution-stats.csv"
-          task_management_fname="task-management-stats.csv"
+          task_execution_generalist_fname="task-execution-generalist-stats.csv"
+          task_execution_collector_fname="task-execution-collector-stats.csv"
+          task_execution_harvester_fname="task-execution-harvester-stats.csv"
+          task_generalist_tab_fname="task-genaralist-tab-stats.csv"
           distance_fname="distance-stats.csv"
           perception_world_model_fname="perception-world-model.csv"
-          collect_interval="10"
+          collect_interval="1000"
           />
     </output>
     <arena_map>

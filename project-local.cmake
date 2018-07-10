@@ -5,7 +5,9 @@ set(${target}_CHECK_LANGUAGE "CXX")
 set(${target}_HAS_RECURSIVE_DIRS NO)
 
 if(BUILD_ON_MSI)
-set(MSI_ARGOS_INSTALL_PREFIX /home/gini/shared/swarm)
+  set(ARGOS_INSTALL_PREFIX /home/gini/shared/swarm)
+else()
+  set(ARGOS_INSTALL_PREFIX /opt/data/local)
 endif()
 
 # Qt
@@ -20,11 +22,7 @@ add_subdirectory(ext/rcppsw)
 # Includes                                                                     #
 ################################################################################
 set(${target}_INCLUDE_DIRS "${${target}_INC_PATH}" ${rcppsw_INCLUDE_DIRS})
-set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS})
-
-if (BUILD_ON_MSI)
-  set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS} ${MSI_ARGOS_INSTALL_PREFIX}/include)
-endif()
+set(${target}_SYS_INCLUDE_DIRS ${rcppsw_SYS_INCLUDE_DIRS} ${ARGOS_INSTALL_PREFIX}/include)
 
 ################################################################################
 # Libraries                                                                    #
@@ -47,11 +45,7 @@ set(${target}_LIBRARIES
   Qt5::Gui)
 
 # Define link search dirs
-if (BUILD_ON_MSI)
-  set(${target}_LIBRARY_DIRS ${MSI_ARGOS_INSTALL_PREFIX}/lib/argos3 ${rcppsw_LIBRARY_DIRS})
-else()
-  set(${target}_LIBRARY_DIRS /usr/lib/argos3 /usr/local/lib/argos3 ${rcppsw_LIBRARY_DIRS})
-endif()
+  set(${target}_LIBRARY_DIRS /usr/lib/argos3 /usr/local/lib/argos3 ${ARGOS_INSTALL_PREFIX}/lib/argos3 ${rcppsw_LIBRARY_DIRS})
 link_directories(${${target}_LIBRARY_DIRS})
 
 # Force failures at build time rather than runtime

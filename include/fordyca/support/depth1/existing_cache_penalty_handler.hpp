@@ -81,7 +81,7 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
   bool penalty_init(T& controller, uint timestep) {
     if (nullptr == controller.current_task()) {
       return false;
-    } else if (nullptr == std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+    } else if (nullptr == dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task())) {
       return false;
     } else if (!controller.current_task()->goal_acquired() ||

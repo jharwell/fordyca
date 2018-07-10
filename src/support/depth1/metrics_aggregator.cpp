@@ -22,25 +22,33 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
+#include <vector>
+
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
-#include "fordyca/metrics/tasks/management_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
+#include "rcppsw/task_allocation/bifurcating_tab.hpp"
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
 #include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using task0 = tasks::depth0::foraging_task;
+using task1 = tasks::depth1::foraging_task;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -55,14 +63,22 @@ metrics_aggregator::metrics_aggregator(
       metrics_path() + "/" + params->cache_acquisition_fname,
       params->collect_interval);
 
-  register_collector<metrics::tasks::execution_metrics_collector>(
-      "tasks::execution",
-      metrics_path() + "/" + params->task_execution_fname,
+  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      "tasks::execution::" + std::string(task0::kGeneralistName),
+      metrics_path() + "/" + params->task_execution_generalist_fname,
+      params->collect_interval);
+  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      "tasks::execution::" + std::string(task1::kCollectorName),
+      metrics_path() + "/" + params->task_execution_collector_fname,
+      params->collect_interval);
+  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      "tasks::execution::" + std::string(task1::kHarvesterName),
+      metrics_path() + "/" + params->task_execution_harvester_fname,
       params->collect_interval);
 
-  register_collector<metrics::tasks::management_metrics_collector>(
-      "tasks::management",
-      metrics_path() + "/" + params->task_management_fname,
+  register_collector<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector>(
+      "tasks::generalist_tab",
+      metrics_path() + "/" + params->task_generalist_tab_fname,
       params->collect_interval);
 
   register_collector<metrics::caches::utilization_metrics_collector>(
@@ -90,17 +106,13 @@ void metrics_aggregator::collect_from_controller(
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
   collect("perception::world_model", *worldm_m);
 
-  auto taskm_m = dynamic_cast<const rcppsw::metrics::tasks::management_metrics*>(
-      controller);
-  ER_ASSERT(taskm_m,
-            "FATAL: Controller does not provide task management metrics");
-  collect("tasks::management", *taskm_m);
+  collect("tasks::generalist_tab", *(controller->active_tab()));
 
   if (nullptr != controller->current_task()) {
     collect_if(
         "blocks::acquisition",
-        dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller->current_task()),
+        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+            controller->current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
           return acquisition_goal_type::kBlock ==
                  dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
@@ -109,8 +121,8 @@ void metrics_aggregator::collect_from_controller(
         });
     collect_if(
         "caches::acquisition",
-        dynamic_cast<metrics::fsm::goal_acquisition_metrics&>(
-            *controller->current_task()),
+        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+            controller->current_task()),
         [&](const rcppsw::metrics::base_metrics& metrics) {
           return acquisition_goal_type::kExistingCache ==
                  dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
@@ -118,8 +130,9 @@ void metrics_aggregator::collect_from_controller(
                      .acquisition_goal();
         });
 
-    collect("tasks::execution",
-            dynamic_cast<rcppsw::metrics::tasks::execution_metrics&>(
+    collect("tasks::execution::" +
+            dynamic_cast<const ta::logical_task*>(controller->current_task())->name(),
+            dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(
                 *controller->current_task()));
   }
 } /* collect_from_controller() */

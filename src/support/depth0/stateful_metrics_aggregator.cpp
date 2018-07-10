@@ -66,11 +66,10 @@ void stateful_metrics_aggregator::collect_from_controller(
 
   if (controller->current_task()) {
     auto block_acq_m =
-        std::dynamic_pointer_cast<metrics::fsm::goal_acquisition_metrics>(
+        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
             controller->current_task());
-    ER_ASSERT(
-        block_acq_m,
-        "FATAL: Controller does not provide FSM block acquisition metrics");
+    ER_ASSERT(block_acq_m,
+              "FATAL: Controller does not provide FSM block acquisition metrics");
     collect("blocks::acquisition", *block_acq_m);
   }
 

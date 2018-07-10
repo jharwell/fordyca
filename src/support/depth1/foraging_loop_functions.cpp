@@ -25,7 +25,7 @@ n */
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -167,10 +167,10 @@ void foraging_loop_functions::pre_step_final(void) {
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
   if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
-    auto& collector = static_cast<metrics::tasks::execution_metrics_collector&>(
-        *(*m_metrics_agg)["tasks::execution"]);
-    int n_harvesters = collector.n_harvesters();
-    int n_collectors = collector.n_collectors();
+    auto& collector = static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
+        *(*m_metrics_agg)["tasks::generalist_tab"]);
+    int n_harvesters = collector.stats().subtask1_count;
+    int n_collectors = collector.stats().subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(random()) / RAND_MAX) {

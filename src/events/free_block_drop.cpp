@@ -119,7 +119,7 @@ void free_block_drop::visit(controller::depth1::foraging_controller& controller)
  * Depth2
  ******************************************************************************/
 void free_block_drop::visit(controller::depth2::foraging_controller& controller) {
-  std::static_pointer_cast<tasks::depth2::foraging_task>(
+  static_cast<tasks::depth2::foraging_task*>(
       controller.current_task())
       ->accept(*this);
   controller.block(nullptr);

@@ -65,7 +65,7 @@ double cache_starter::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double cache_starter::calc_interface_time(double start_time) {
-  if (at_interface()) {
+  if (task_at_interface()) {
     return current_time() - start_time;
   }
 
@@ -127,8 +127,8 @@ TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__rcsw_pure bool cache_starter::at_interface(void) const {
+__rcsw_pure bool cache_starter::task_at_interface(void) const {
   return acquisition_goal_type::kExistingCache == acquisition_goal();
-} /* at_interface()() */
+} /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);
