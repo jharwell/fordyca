@@ -34,8 +34,8 @@
 namespace rcppsw {
 namespace er { class server; }
 namespace task_allocation {
-class polled_executive;
-class task_decomposition_graph;
+class bifurcating_tdgraph_executive;
+class bifurcating_tdgraph;
 }}
 namespace ta = rcppsw::task_allocation;
 
@@ -69,24 +69,26 @@ class stateful_tasking_initializer {
   stateful_tasking_initializer& operator=(const stateful_tasking_initializer& other) = delete;
   stateful_tasking_initializer(const stateful_tasking_initializer& other) = delete;
 
-  std::unique_ptr<ta::polled_executive>
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>
   operator()(params::depth0::stateful_param_repository *const stateful_repo);
 
  protected:
   void stateful_tasking_init(params::depth0::stateful_param_repository* stateful_repo);
   const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
+  std::shared_ptr<rcppsw::er::server>& server(void) { return m_server; }
   const base_perception_subsystem* perception(void) const { return m_perception; }
   base_perception_subsystem* perception(void) { return m_perception; }
 
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
-  std::unique_ptr<ta::task_decomposition_graph>& graph(void) { return m_graph; }
+  ta::bifurcating_tdgraph* graph(void) { return m_graph; }
+  const ta::bifurcating_tdgraph* graph(void) const { return m_graph; }
 
  private:
   // clang-format off
-  std::shared_ptr<rcppsw::er::server>           m_server;
-  controller::saa_subsystem* const              m_saa;
-  base_perception_subsystem* const              m_perception;
-  std::unique_ptr<ta::task_decomposition_graph> m_graph;
+  std::shared_ptr<rcppsw::er::server> m_server;
+  controller::saa_subsystem* const    m_saa;
+  base_perception_subsystem* const    m_perception;
+  ta::bifurcating_tdgraph*            m_graph;
   // clang-format on
 };
 

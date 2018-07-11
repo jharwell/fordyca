@@ -54,7 +54,7 @@ void cache_vanished::visit(controller::depth1::foraging_controller& controller) 
   ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
          controller.GetId().c_str(),
          m_cache_id);
-  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
 } /* visit() */
@@ -84,7 +84,7 @@ void cache_vanished::visit(controller::depth2::foraging_controller& controller) 
   ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
          controller.GetId().c_str(),
          m_cache_id);
-  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
 } /* visit() */

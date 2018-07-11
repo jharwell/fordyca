@@ -35,8 +35,7 @@
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
-#include "rcppsw/task_allocation/task_decomposition_graph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,16 +48,13 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
-      m_task_collator(),
-      m_executive(),
-      m_graph() {}
+      m_executive() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
   perception()->update(depth0::stateful_foraging_controller::los());
-  m_task_collator.reset();
 
   saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
   saa_subsystem()->actuation()->block_throttle_update();
@@ -96,77 +92,16 @@ void foraging_controller::Init(ticpp::Element& node) {
   m_executive = tasking_initializer(client::server_ref(),
                                     saa_subsystem(),
                                     perception())(&param_repo);
-  m_executive->task_abort_cleanup(std::bind(
-            &foraging_controller::task_abort_cleanup, this, std::placeholders::_1));
-
-  m_executive->task_alloc_notify(std::bind(
-      &foraging_controller::task_alloc_notify, this, std::placeholders::_1));
-
-  m_executive->task_finish_notify(std::bind(
-      &foraging_controller::task_finish_notify, this, std::placeholders::_1));
-
   ER_NOM("Depth1 foraging controller initialization finished");
 } /* Init() */
 
-__rcsw_pure std::shared_ptr<tasks::base_foraging_task> foraging_controller::
-    current_task(void) const {
-  return std::dynamic_pointer_cast<tasks::base_foraging_task>(
-      m_executive->current_task());
+__rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {
+  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-/*******************************************************************************
- * Executive Callbacks
- ******************************************************************************/
-void foraging_controller::task_abort_cleanup(const ta::task_graph_vertex&) {
-  m_task_collator.task_aborted(true);
-} /* task_abort_cleanup() */
-
-void foraging_controller::task_alloc_notify(const ta::task_graph_vertex& task) {
-  m_task_collator.has_new_allocation(true);
-  if (nullptr == current_task() ||
-      task->name() != m_executive->last_task()->name()) {
-    m_task_collator.allocation_changed(true);
-  }
-} /* task_alloc_notify() */
-
-void foraging_controller::task_finish_notify(const ta::task_graph_vertex& task) {
-  m_task_collator.task_last_exec_time(task->exec_time());
-  m_task_collator.task_finished(true);
-} /* task_finish_notify() */
-
-/*******************************************************************************
- * Task Metrics
- ******************************************************************************/
-bool foraging_controller::employed_partitioning(void) const {
-  ER_ASSERT(nullptr != current_task(), "FATAL: Have not yet executed a task?");
-
-  auto task = std::dynamic_pointer_cast<ta::executable_task>(current_task());
-  auto partitionable = std::dynamic_pointer_cast<ta::partitionable_task>(task);
-
-  if (!task->is_partitionable()) {
-    partitionable = std::dynamic_pointer_cast<ta::partitionable_task>(
-        m_executive->parent_task(
-            std::dynamic_pointer_cast<ta::executable_task>(current_task())));
-  }
-  ER_ASSERT(nullptr != partitionable, "FATAL: Not partitionable task?");
-  return partitionable->employed_partitioning();
-} /* employed_partitioning() */
-
-std::string foraging_controller::subtask_selection(void) const {
-  ER_ASSERT(nullptr != current_task(),
-            "FATAL: Have not yet selected a subtask?");
-  /*
-   * If we get into this function, then employed_partitioning() must have
-   * returned TRUE, so we can just return the name of the current task, which
-   * MUST be a subtask.
-   */
-  return current_task_name();
-} /* subtask_selection() */
-
-std::string foraging_controller::current_task_name(void) const {
-  return std::dynamic_pointer_cast<ta::logical_task>(current_task())->name();
-} /* current_task_name() */
-
+__rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(void) const {
+  return const_cast<foraging_controller*>(this)->current_task();
+} /* current_task() */
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different

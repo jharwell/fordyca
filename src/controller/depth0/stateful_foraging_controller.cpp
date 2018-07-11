@@ -34,8 +34,7 @@
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
-#include "rcppsw/task_allocation/task_decomposition_graph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
@@ -58,15 +57,23 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+const ta::bifurcating_tab* stateful_foraging_controller::active_tab(void) const {
+  return m_executive->active_tab();
+}
+
 void stateful_foraging_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
 }
-__rcsw_pure std::shared_ptr<tasks::base_foraging_task> stateful_foraging_controller::
-    current_task(void) const {
-  return std::dynamic_pointer_cast<tasks::base_foraging_task>(
-      m_executive->current_task());
+__rcsw_pure tasks::base_foraging_task* stateful_foraging_controller::current_task(void) {
+  return dynamic_cast<tasks::base_foraging_task*>(
+      m_executive.get()->current_task());
 } /* current_task() */
+
+__rcsw_pure const tasks::base_foraging_task* stateful_foraging_controller::current_task(void) const {
+  return const_cast<stateful_foraging_controller*>(this)->current_task();
+} /* current_task() */
+
 
 __rcsw_pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {

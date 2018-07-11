@@ -36,7 +36,8 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
+class bifurcating_tdgraph_executive;
+class bifurcating_tab;
 class executable_task;
 using executive_params = partitionable_task_params;
 }}
@@ -100,7 +101,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  virtual std::shared_ptr<tasks::base_foraging_task> current_task(void) const;
+  virtual tasks::base_foraging_task* current_task(void);
+  virtual const tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
@@ -129,6 +131,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
 
   const base_perception_subsystem* perception(void) const { return m_perception.get(); }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
+  const ta::bifurcating_tab* active_tab(void) const;
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
@@ -138,7 +141,7 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
   std::unique_ptr<base_perception_subsystem>           m_perception;
-  std::unique_ptr<task_allocation::polled_executive>   m_executive;
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
   // clang-format on
 };
 

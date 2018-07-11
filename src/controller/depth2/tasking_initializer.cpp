@@ -26,8 +26,6 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
@@ -35,18 +33,15 @@
 #include "fordyca/params/depth2/exec_estimates_params.hpp"
 #include "fordyca/params/depth2/param_repository.hpp"
 #include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
-#include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
-#include "rcppsw/task_allocation/task_decomposition_graph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -101,42 +96,35 @@ void tasking_initializer::depth2_tasking_init(
           saa_subsystem(),
           perception()->map());
 
-  auto cache_starter = ta::make_task_graph_vertex<tasks::depth2::cache_starter>(
-      exec_params, cache_starter_fsm);
-  auto cache_finisher =
-      ta::make_task_graph_vertex<tasks::depth2::cache_finisher>(
-          exec_params, cache_finisher_fsm);
-  auto cache_transferer =
-      ta::make_task_graph_vertex<tasks::depth2::cache_transferer>(
-          exec_params, cache_transferer_fsm);
-  auto cache_collector =
-      ta::make_task_graph_vertex<tasks::depth1::collector>(exec_params,
-                                                           cache_collector_fsm);
+  auto cache_starter = new tasks::depth2::cache_starter(exec_params,
+                                                        cache_starter_fsm);
+  auto cache_finisher = new tasks::depth2::cache_finisher(exec_params,
+                                                          cache_finisher_fsm);
+  auto cache_transferer = new tasks::depth2::cache_transferer(exec_params,
+                                                              cache_transferer_fsm);
+  auto cache_collector = new tasks::depth1::collector(exec_params,
+                                                      cache_collector_fsm);
 
   if (est_params->enabled) {
-    std::static_pointer_cast<ta::polled_task>(cache_starter)
-        ->init_random(est_params->cache_starter_range.GetMin(),
-                      est_params->cache_starter_range.GetMax());
-    std::static_pointer_cast<ta::polled_task>(cache_finisher)
-        ->init_random(est_params->cache_finisher_range.GetMin(),
-                      est_params->cache_starter_range.GetMax());
-    std::static_pointer_cast<ta::polled_task>(cache_transferer)
-        ->init_random(est_params->cache_transferer_range.GetMin(),
-                      est_params->cache_transferer_range.GetMax());
-    std::static_pointer_cast<ta::polled_task>(cache_collector)
-        ->init_random(est_params->cache_collector_range.GetMin(),
-                      est_params->cache_collector_range.GetMax());
+    cache_starter->init_random(est_params->cache_starter_range.GetMin(),
+                               est_params->cache_starter_range.GetMax());
+    cache_finisher->init_random(est_params->cache_finisher_range.GetMin(),
+                                est_params->cache_starter_range.GetMax());
+    cache_transferer->init_random(est_params->cache_transferer_range.GetMin(),
+                                  est_params->cache_transferer_range.GetMax());
+    cache_collector->init_random(est_params->cache_collector_range.GetMin(),
+                                 est_params->cache_collector_range.GetMax());
   }
 
   graph()->set_children(tasks::depth1::foraging_task::kHarvesterName,
-                        std::list<ta::task_graph_vertex>(
+                        std::vector<ta::polled_task*>(
                             {cache_starter, cache_finisher}));
   graph()->set_children(tasks::depth1::foraging_task::kCollectorName,
-                        std::list<ta::task_graph_vertex>(
+                        std::vector<ta::polled_task*>(
                             {cache_transferer, cache_collector}));
 } /* depth2_tasking_init() */
 
-std::unique_ptr<ta::polled_executive> tasking_initializer::operator()(
+std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator()(
     params::depth2::param_repository* const param_repo) {
   stateful_tasking_init(param_repo);
   depth1_tasking_init(param_repo);
@@ -149,7 +137,8 @@ std::unique_ptr<ta::polled_executive> tasking_initializer::operator()(
 
   depth2_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::polled_executive>(server(), std::move(graph()));
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(server(),
+                                                                graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

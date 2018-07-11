@@ -57,7 +57,7 @@ class tasking_initializer : public depth0::stateful_tasking_initializer {
                       base_perception_subsystem* perception);
   ~tasking_initializer(void);
 
-  std::unique_ptr<ta::polled_executive>
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>
   operator()(params::depth1::param_repository *const param_repo);
 
  protected:
