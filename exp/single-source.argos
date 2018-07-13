@@ -138,10 +138,10 @@
       <blocks dimension="0.2" />
       <block_distribution n_blocks="20"
                           dist_type="single_source"
-                          arena_model.shape="rectangle"
-                          arena_model.orientation="horizontal"
-                          nest_model.shape="rectangle"
-                          nest_model.orientation="horizontal"
+                          arena_resolution="0.2"
+                          pwr_min="0"
+                          pwr_max="0"
+                          n_clusters="0"
                           />
       <static_caches enable="true"
                      size="2"

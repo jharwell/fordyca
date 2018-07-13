@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/params/block_params.hpp"
-#include "fordyca/representation/extent_model.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,9 +41,27 @@ NS_START(fordyca, params);
  */
 struct block_distribution_params : public rcppsw::params::base_params {
   uint n_blocks{0};
+
+  /**
+   * @brief Resolution of the arena the blocks are being distributed into.
+   */
+  double arena_resolution{0.0};
   std::string dist_type{""};
-  representation::extent_model arena_model{};
-  representation::extent_model nest_model{};
+
+  /**
+   * @brief Min power of 2 for distribution.
+   */
+  uint pwr_min{0};
+
+  /**
+   * @brief Max power of 2 for distribution.
+   */
+  uint pwr_max{0};
+
+  /**
+   * @brief How many clusters to allocate in the arena.
+   */
+  uint n_clusters{0};
 };
 
 NS_END(params, fordyca);

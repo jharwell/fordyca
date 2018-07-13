@@ -79,8 +79,7 @@ class free_block_drop
  public:
   free_block_drop(std::shared_ptr<rcppsw::er::server> server,
                   const std::shared_ptr<representation::block>& block,
-                  size_t x,
-                  size_t y,
+                  rcppsw::math::dcoord2 coord,
                   double resolution);
   ~free_block_drop(void) override { client::rmmod(); }
 

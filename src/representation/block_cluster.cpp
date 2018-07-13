@@ -1,7 +1,7 @@
 /**
- * @file cell_entity.cpp
+ * @file block_cluster.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/representation/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,15 +29,23 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
+ * Constructors/Destructors
+ ******************************************************************************/
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_const bool cell_entity::contains_point(const argos::CVector2& point) const {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  return (point.GetX() < (x + (0.5 * xsize())) &&
-          point.GetX() > (x - (0.5 * xsize())) &&
-          point.GetY() < (y + (0.5 * ysize())) &&
-          point.GetY() > (y - (0.5 * ysize())));
-} /* contains_point() */
+uint block_cluster::block_count(void) const {
+  uint count = 0;
+  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
+    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
+      representation::cell2D* cell = m_view[i][j];
+      assert(nullptr != cell);
+      assert(!cell->state_has_cache());
+      count += cell->state_has_block();
+    }   /* for(j..) */
+  }   /* for(i..) */
+  return count;
+} /* block_count() */
 
 NS_END(representation, fordyca);

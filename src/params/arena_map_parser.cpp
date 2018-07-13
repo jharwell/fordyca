@@ -50,12 +50,6 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 
   m_block_dist_parser.parse(anode);
   m_params->block_dist = *m_block_dist_parser.parse_results();
-  m_params->block_dist.arena_model.x =
-      argos::CRange<double>(m_params->grid.lower.GetX(),
-                            m_params->grid.upper.GetX());
-  m_params->block_dist.arena_model.y =
-      argos::CRange<double>(m_params->grid.lower.GetY(),
-                            m_params->grid.upper.GetY());
 
   m_cache_parser.parse(anode);
   if (m_cache_parser.parsed()) {
@@ -64,9 +58,6 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 
   m_nest_parser.parse(anode);
   m_params->nest = *m_nest_parser.parse_results();
-
-  m_params->block_dist.nest_model.x = {0, m_params->nest.xdim};
-  m_params->block_dist.nest_model.y = {0, m_params->nest.ydim};
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {

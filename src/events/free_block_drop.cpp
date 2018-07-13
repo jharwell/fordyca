@@ -47,10 +47,9 @@ NS_START(fordyca, events);
 free_block_drop::free_block_drop(
     std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::block>& block,
-    size_t x,
-    size_t y,
+    rcppsw::math::dcoord2 coord,
     double resolution)
-    : cell_op(x, y),
+    : cell_op(coord.first, coord.second),
       client(server),
       m_resolution(resolution),
       m_block(block),

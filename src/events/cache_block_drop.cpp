@@ -99,8 +99,7 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 void cache_block_drop::visit(representation::block& block) {
   events::free_block_drop e(m_server,
                             m_block, /* OK because we only have 1 block */
-                            cell_op::x(),
-                            cell_op::y(),
+                            rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
                             m_resolution);
   block.accept(e);
 } /* visit() */

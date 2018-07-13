@@ -308,13 +308,10 @@ class arena_interactor : public depth0::arena_interactor<T> {
                                               controller.robot_loc())) {
       conflict = true;
     }
-    rcppsw::math::dcoord2 d =
-        math::rcoord_to_dcoord(controller.robot_loc(),
-                               map()->grid_resolution());
     events::free_block_drop drop_op(rcppsw::er::g_server,
                                     controller.block(),
-                                    d.first,
-                                    d.second,
+                                    math::rcoord_to_dcoord(controller.robot_loc(),
+                                                           map()->grid_resolution()),
                                     map()->grid_resolution());
     if (!conflict) {
       controller.visitor::template visitable_any<T>::accept(drop_op);

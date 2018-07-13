@@ -1,5 +1,5 @@
 /**
- * @file extent_model.hpp
+ * @file block_cluster.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,15 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_BLOCK_CLUSTER_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_BLOCK_CLUSTER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "argos3/core/utility/math/range.h"
 #include "rcppsw/common/common.hpp"
+#include "fordyca/representation/arena_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,13 +35,32 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct extent_model {
-  std::string shape{""};
-  std::string orientation{""};
-  argos::CRange<double> x{0.0, 0.0};
-  argos::CRange<double> y{0.0, 0.0};
+/**
+ * @class block_cluster
+ * @ingroup representation
+ *
+ * @brief Represents a cluster of blocks in the arena as an entity for use
+ * during block distribution.
+ */
+class block_cluster {
+ public:
+  block_cluster(const arena_grid::view& view, uint capacity)
+      : m_view(view),
+        m_capacity(capacity) {}
+
+  uint capacity(void) const { return m_capacity; }
+  uint block_count(void) const;
+  const arena_grid::view& view(void) const { return m_view; }
+  arena_grid::view& view(void) { return m_view; }
+
+ private:
+  // clang-format off
+  arena_grid::view m_view;
+  uint             m_capacity;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_EXTENT_MODEL_HPP_ */
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_BLOCK_CLUSTER_HPP_ */

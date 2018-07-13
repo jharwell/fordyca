@@ -31,11 +31,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-// namespace rcppsw { namespace er {
-// class server;
-// }} // namespace rcppsw::er
 NS_START(fordyca, representation);
-// class cell2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -46,10 +42,12 @@ NS_START(fordyca, representation);
  *
  * @brief Representation of the cells within a grid layout
  */
-class arena_grid
-    : public rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> {
+class arena_grid : public rcppsw::ds::grid2D_ptr<cell2D,
+                                                 std::shared_ptr<rcppsw::er::server>&> {
  public:
-  arena_grid(const double& resolution,
+  using view = rcppsw::ds::grid_view<representation::cell2D*>;
+
+  arena_grid(double resolution,
              size_t x_max,
              size_t y_max,
              std::shared_ptr<rcppsw::er::server>& server)
