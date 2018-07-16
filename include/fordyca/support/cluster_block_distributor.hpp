@@ -59,7 +59,7 @@ class cluster_block_distributor : public base_block_distributor {
   cluster_block_distributor& operator=(const cluster_block_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<representation::block>& block,
-                        const entity_list& entities) override;
+                        entity_list& entities) override;
   bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
 
   const representation:: block_cluster& cluster(void) const { return m_clust; }

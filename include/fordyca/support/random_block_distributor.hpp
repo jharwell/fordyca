@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <list>
 #include <vector>
+#include <random>
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/dcoord.hpp"
@@ -80,7 +80,7 @@ class random_block_distributor : public base_block_distributor {
   bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
 
   bool distribute_block(std::shared_ptr<representation::block>& block,
-                        const entity_list& entities) override;
+                        entity_list& entities) override;
 
  private:
   /**
@@ -93,17 +93,18 @@ class random_block_distributor : public base_block_distributor {
    * @brief Find coordinates for distribution that are outside the extent of the
    * all specified entities, while also accounting for block size.
    *
-   * @param block_dim The dimension of the block (blocks are square).
-   * @param entity The entities to avoid.
+   * @param entities The entities to avoid.
+   * @param coordv A (to be filled) vector of absolute and relative coordinates
+   *               within the arena view if an available location can be found.
    */
-  rcppsw::math::dcoord2 find_avail_coord(const entity_list& entity);
+  bool find_avail_coord(const entity_list& entity, std::vector<uint>& coordv);
   bool verify_block_dist(const representation::block& block,
                          const representation::cell2D* cell);
 
   // clang-format off
-  double                           m_resolution;
-  argos::CRandom::CRNG*            m_rng;
-  representation::arena_grid::view m_grid;
+  double                              m_resolution;
+  std::default_random_engine          m_rng{};
+  representation::arena_grid::view    m_grid;
   // clang-format on
 };
 

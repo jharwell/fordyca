@@ -59,12 +59,6 @@ arena_map::arena_map(const struct params::arena_map_params* params)
          m_grid.xrsize(),
          m_grid.yrsize(),
          m_grid.resolution());
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      cell2D& cell = m_grid.access(i, j);
-      cell.loc(rcppsw::math::dcoord2(i, j));
-    } /* for(j..) */
-  }   /* for(i..) */
 
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     m_blocks[i] =
@@ -153,7 +147,8 @@ void arena_map::distribute_all_blocks(void) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
   entities.push_back(&m_nest);
-  m_block_dispatcher.distribute_blocks(m_blocks, entities);
+  ER_ASSERT(m_block_dispatcher.distribute_blocks(m_blocks, entities),
+            "FATAL: Unable to perform initial block distribution");
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been

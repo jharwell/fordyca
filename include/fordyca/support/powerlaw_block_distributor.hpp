@@ -27,10 +27,11 @@
 #include <list>
 #include <random>
 #include <vector>
+#include <map>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/cluster_block_distributor.hpp"
-#include "rcppsw/math/powerlaw_distribution.hpp"
+#include "rcppsw/math/binned_powerlaw_distribution.hpp"
 #include "fordyca/support/base_block_distributor.hpp"
 
 /*******************************************************************************
@@ -77,7 +78,7 @@ class powerlaw_block_distributor : public base_block_distributor {
   powerlaw_block_distributor& operator=(const powerlaw_block_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<representation::block>& block,
-                        const entity_list& entities) override;
+                        entity_list& entities) override;
   bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
 
  private:
@@ -121,7 +122,7 @@ class powerlaw_block_distributor : public base_block_distributor {
   // clang-format off
   std::map<uint, std::list<cluster_block_distributor>> m_dist_map;
   std::default_random_engine             m_rng{};
-  rcppsw::math::powerlaw_distribution    m_pwrdist;
+  rcppsw::math::binned_powerlaw_distribution    m_pwrdist;
   // clang-format on
 };
 

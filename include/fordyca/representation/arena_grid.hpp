@@ -55,7 +55,13 @@ class arena_grid : public rcppsw::ds::grid2D_ptr<cell2D,
             resolution,
             x_max,
             y_max,
-            server) {}
+            server) {
+    for (size_t i = 0; i < xdsize(); ++i) {
+      for (size_t j = 0; j < ydsize(); ++j) {
+        access(i, j).loc(rcppsw::math::dcoord2(i, j));
+      } /* for(j..) */
+    }   /* for(i..) */
+  }
 
   /**
     * @brief Reset all the cells within the grid, removing all

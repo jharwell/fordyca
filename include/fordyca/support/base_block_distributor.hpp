@@ -65,7 +65,7 @@ class base_block_distributor : public rcppsw::er::client {
    * otherwise.
    */
   virtual bool distribute_block(std::shared_ptr<representation::block>& block,
-                                const entity_list& entities) = 0;
+                                entity_list& entities) = 0;
 
   /**
    * @brief Calls \ref distribute_block on each block.

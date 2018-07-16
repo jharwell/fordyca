@@ -62,7 +62,7 @@ class block_distribution_dispatcher : public rcppsw::er::client {
  public:
   static constexpr char kDIST_SINGLE_SRC[] = "single_source";
   static constexpr char kDIST_RANDOM[] = "random";
-  static constexpr char kDIST_POWERLAW[] = "power_law";
+  static constexpr char kDIST_POWERLAW[] = "powerlaw";
 
   using entity_list = std::list<const representation::multicell_entity*>;
   using block_vector = std::vector<std::shared_ptr<representation::block>>;
@@ -85,7 +85,7 @@ class block_distribution_dispatcher : public rcppsw::er::client {
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
   bool distribute_block(std::shared_ptr<representation::block>& block,
-                        const entity_list& entities);
+                        entity_list& entities);
 
   /**
    * @brief Distribute all blocks in the arena.

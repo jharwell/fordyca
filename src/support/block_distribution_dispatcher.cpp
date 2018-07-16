@@ -61,20 +61,19 @@ block_distribution_dispatcher::~block_distribution_dispatcher(void) = default;
  ******************************************************************************/
 void block_distribution_dispatcher::initialize(
     const struct params::block_distribution_params* params) {
+  representation::arena_grid::view arena = m_grid.subgrid(1,
+                                                          1,
+                                                          m_grid.xdsize() - 1,
+                                                          m_grid.ydsize() - 1);
   if (kDIST_RANDOM == m_dist_type) {
-    representation::arena_grid::view arena = m_grid.subgrid(1,
-                                                            1,
-                                                            m_grid.xrsize() - 1,
-                                                            m_grid.yrsize() - 1);
-
     m_dist = rcppsw::make_unique<random_block_distributor>(client::server_ref(),
                                                            arena,
                                                            params->arena_resolution);
   } else if (kDIST_SINGLE_SRC == m_dist_type) {
-    representation::arena_grid::view area = m_grid.subgrid(m_grid.xrsize() * 0.85,
-                                                           m_grid.yrsize() * 0.05,
-                                                           m_grid.xrsize() * 0.90,
-                                                           m_grid.yrsize() * 0.95);
+    representation::arena_grid::view area = m_grid.subgrid(m_grid.xdsize() * 0.80,
+                                                           2,
+                                                           m_grid.xdsize() * 0.90,
+                                                           m_grid.ydsize() - 1);
     m_dist = rcppsw::make_unique<cluster_block_distributor>(client::server_ref(),
                                                             area,
                                                             params->arena_resolution,
@@ -88,7 +87,7 @@ void block_distribution_dispatcher::initialize(
 
 bool block_distribution_dispatcher::distribute_block(
     std::shared_ptr<representation::block>& block,
-    const entity_list& entities) {
+  entity_list& entities) {
   return m_dist->distribute_block(block, entities);
 } /* distribute_block() */
 

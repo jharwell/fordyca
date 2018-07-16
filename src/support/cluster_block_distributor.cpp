@@ -44,7 +44,9 @@ cluster_block_distributor::cluster_block_distributor(
     : base_block_distributor(server),
       m_clust(grid, maxsize),
       m_dist(server, grid, arena_resolution) {
-  insmod("cluster_block_dist", er::er_lvl::DIAG, er::er_lvl::NOM);
+  if (ERROR == client::attmod("cluster_block_dist")) {
+    insmod("cluster_block_dist", er::er_lvl::DIAG, er::er_lvl::VER);
+  }
 }
 
 /*******************************************************************************
@@ -52,10 +54,10 @@ cluster_block_distributor::cluster_block_distributor(
  ******************************************************************************/
 bool cluster_block_distributor::distribute_block(
     std::shared_ptr<representation::block>& block,
-    const entity_list& entities) {
-  if (m_clust.capacity() >= m_clust.block_count()) {
-    ER_DIAG("Could not distribute block: Cluster size (%u) reached",
-            m_clust.block_count());
+    entity_list& entities) {
+  if (m_clust.capacity() == m_clust.block_count()) {
+    ER_DIAG("Could not distribute block: Cluster capacity (%u) reached",
+            m_clust.capacity());
     return false;
   }
   return m_dist.distribute_block(block, entities);
@@ -64,9 +66,9 @@ bool cluster_block_distributor::distribute_block(
 bool cluster_block_distributor::distribute_blocks(
     block_vector& blocks,
     entity_list& entities) {
-  if (m_clust.capacity() >= m_clust.block_count()) {
-    ER_DIAG("Could not distribute block: Cluster size (%u) reached",
-            m_clust.block_count());
+  if (m_clust.capacity() == m_clust.block_count()) {
+    ER_DIAG("Could not distribute block: Cluster capacity (%u) reached",
+            m_clust.capacity());
     return false;
   }
   return m_dist.distribute_blocks(blocks, entities);

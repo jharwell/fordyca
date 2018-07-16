@@ -1,5 +1,5 @@
 /**
- * @file block_distribution_params.hpp
+ * @file powerlaw_block_dist_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/powerlaw_block_dist_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,21 +35,26 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct block_distribution_params
+ * @struct powerlaw_block_dist_params
  * @ingroup params
  */
-struct block_distribution_params : public rcppsw::params::base_params {
-  uint n_blocks{0};
+struct powerlaw_block_dist_params : public rcppsw::params::base_params {
+  /**
+   * @brief Min power of 2 for distribution.
+   */
+  uint pwr_min{0};
 
   /**
-   * @brief Resolution of the arena the blocks are being distributed into.
+   * @brief Max power of 2 for distribution.
    */
-  double arena_resolution{0.0};
-  std::string dist_type{""};
+  uint pwr_max{0};
 
-  struct powerlaw_block_dist_params powerlaw{};
+  /**
+   * @brief How many clusters to allocate in the arena.
+   */
+  uint n_clusters{0};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_ */

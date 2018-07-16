@@ -37,8 +37,7 @@
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
-                size="10, 5, 2"
-                />
+                size="10, 5, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
@@ -137,12 +136,14 @@
             size="10, 5, 2"/>
       <blocks dimension="0.2" />
       <block_distribution n_blocks="20"
-                          dist_type="single_source"
                           arena_resolution="0.2"
-                          pwr_min="0"
-                          pwr_max="0"
-                          n_clusters="0"
-                          />
+                          dist_type="powerlaw">
+        <powerlaw
+            pwr_min="0"
+            pwr_max="3"
+            n_clusters="15"
+            />
+      </block_distribution>
       <static_caches enable="true"
                      size="2"
                      respawn_scale_factor="0.05"

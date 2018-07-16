@@ -1,5 +1,5 @@
 /**
- * @file block_distribution_parser.cpp
+ * @file powerlaw_block_dist_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,9 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include "fordyca/params/block_distribution_parser.hpp"
+#include "fordyca/params/powerlaw_block_dist_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -34,37 +32,40 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char block_distribution_parser::kXMLRoot[];
+constexpr char powerlaw_block_dist_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distribution_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_powerlaw.parse(bnode);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_PARAM(bnode, m_params, n_blocks);
-  XML_PARSE_PARAM(bnode, m_params, arena_resolution);
-  XML_PARSE_PARAM(bnode, m_params, dist_type);
-  m_params->powerlaw = *m_powerlaw.parse_results();
+void powerlaw_block_dist_parser::parse(const ticpp::Element& node) {
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element bnode =
+        get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(bnode, m_params, pwr_min);
+    XML_PARSE_PARAM(bnode, m_params, pwr_max);
+    XML_PARSE_PARAM(bnode, m_params, n_clusters);
+    m_parsed = true;
+  }
 } /* parse() */
 
-void block_distribution_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, dist_type) << std::endl
-         << XML_PARAM_STR(m_params, n_blocks) << std::endl
-         << XML_PARAM_STR(m_params, arena_resolution) << std::endl
-         << XML_PARAM_STR(m_params, dist_type) << std::endl
-         << m_powerlaw
+void powerlaw_block_dist_parser::show(std::ostream& stream) const {
+  stream << build_header();
+  if (!m_parsed) {
+    stream << "<<  Not Parsed >>" << std::endl << build_footer();
+    return;
+  }
+  stream << XML_PARAM_STR(m_params, pwr_min) << std::endl
+         << XML_PARAM_STR(m_params, pwr_max) << std::endl
+         << XML_PARAM_STR(m_params, n_clusters) << std::endl
          << build_footer();
 } /* show() */
 
-bool block_distribution_parser::validate(void) const {
-  CHECK(true == m_powerlaw.validate());
-  CHECK(m_params->n_blocks > 0);
-  CHECK("" != m_params->dist_type);
+bool powerlaw_block_dist_parser::validate(void) const {
+  CHECK(m_params->pwr_min > 2);
+  CHECK(m_params->pwr_max >= m_params->pwr_min);
+  CHECK(m_params->n_clusters > 0);
   return true;
 
 error:
