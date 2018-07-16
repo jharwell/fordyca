@@ -1,7 +1,7 @@
 /**
- * @file arena_map_parser.cpp
+ * @file powerlaw_block_dist_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/arena_map_parser.hpp"
+#include "fordyca/params/powerlaw_block_dist_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -32,42 +32,44 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char arena_map_parser::kXMLRoot[];
+constexpr char powerlaw_block_dist_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  m_grid_parser.parse(anode);
-  m_params->grid = *m_grid_parser.parse_results();
-
-  m_block_parser.parse(anode);
-  m_params->block = *m_block_parser.parse_results();
-
-  m_block_dist_parser.parse(anode);
-  m_params->block_dist = *m_block_dist_parser.parse_results();
-
-  m_cache_parser.parse(anode);
-  if (m_cache_parser.parsed()) {
-    m_params->static_cache = *m_cache_parser.parse_results();
+void powerlaw_block_dist_parser::parse(const ticpp::Element& node) {
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element bnode =
+        get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_PARAM(bnode, m_params, pwr_min);
+    XML_PARSE_PARAM(bnode, m_params, pwr_max);
+    XML_PARSE_PARAM(bnode, m_params, n_clusters);
+    m_parsed = true;
   }
-
-  m_nest_parser.parse(anode);
-  m_params->nest = *m_nest_parser.parse_results();
 } /* parse() */
 
-void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
-         << m_nest_parser << build_footer();
+void powerlaw_block_dist_parser::show(std::ostream& stream) const {
+  stream << build_header();
+  if (!m_parsed) {
+    stream << "<<  Not Parsed >>" << std::endl << build_footer();
+    return;
+  }
+  stream << XML_PARAM_STR(m_params, pwr_min) << std::endl
+         << XML_PARAM_STR(m_params, pwr_max) << std::endl
+         << XML_PARAM_STR(m_params, n_clusters) << std::endl
+         << build_footer();
 } /* show() */
 
-bool arena_map_parser::validate(void) const {
-  return m_grid_parser.validate() && m_block_parser.validate() &&
-         m_cache_parser.validate() && m_nest_parser.validate();
+bool powerlaw_block_dist_parser::validate(void) const {
+  CHECK(m_params->pwr_min > 2);
+  CHECK(m_params->pwr_max >= m_params->pwr_min);
+  CHECK(m_params->n_clusters > 0);
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

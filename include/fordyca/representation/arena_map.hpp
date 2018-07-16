@@ -31,7 +31,7 @@
 #include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/block.hpp"
 #include "fordyca/representation/nest.hpp"
-#include "fordyca/support/block_distributor.hpp"
+#include "fordyca/support/block_distribution_dispatcher.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -120,10 +120,10 @@ class arena_map : public rcppsw::er::client,
    * policy was specified in the .argos file.
    *
    * @param block The block to distribute.
+   *
+   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  void distribute_single_block(std::shared_ptr<block>& block) {
-    m_block_distributor.distribute_block(m_grid, block);
-  }
+  bool distribute_single_block(std::shared_ptr<block>& block);
 
   size_t xdsize(void) const { return m_grid.xdsize(); }
   size_t ydsize(void) const { return m_grid.ydsize(); }
@@ -206,10 +206,11 @@ class arena_map : public rcppsw::er::client,
   const struct params::depth1::static_cache_params mc_static_cache_params;
   block_vector                                     m_blocks;
   cache_vector                                     m_caches;
-  support::block_distributor                       m_block_distributor;
   std::shared_ptr<rcppsw::er::server>              m_server;
   arena_grid                                       m_grid;
   representation::nest                             m_nest;
+  support::block_distribution_dispatcher           m_block_dispatcher;
+
   // clang-format on
 };
 

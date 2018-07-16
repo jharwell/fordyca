@@ -1,7 +1,7 @@
 /**
- * @file block_distribution_params.hpp
+ * @file block_cluster.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,39 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/powerlaw_block_dist_params.hpp"
+#include "fordyca/representation/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Structure Definitions
+ * Constructors/Destructors
  ******************************************************************************/
-/**
- * @struct block_distribution_params
- * @ingroup params
- */
-struct block_distribution_params : public rcppsw::params::base_params {
-  uint n_blocks{0};
 
-  /**
-   * @brief Resolution of the arena the blocks are being distributed into.
-   */
-  double arena_resolution{0.0};
-  std::string dist_type{""};
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+uint block_cluster::block_count(void) const {
+  uint count = 0;
+  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
+    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
+      representation::cell2D* cell = m_view[i][j];
+      assert(nullptr != cell);
+      assert(!cell->state_has_cache());
+      count += cell->state_has_block();
+    }   /* for(j..) */
+  }   /* for(i..) */
+  return count;
+} /* block_count() */
 
-  struct powerlaw_block_dist_params powerlaw{};
-};
-
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_DISTRIBUTION_PARAMS_HPP_ */
+NS_END(representation, fordyca);

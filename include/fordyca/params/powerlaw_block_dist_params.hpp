@@ -1,5 +1,5 @@
 /**
- * @file cell_entity.cpp
+ * @file powerlaw_block_dist_params.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,26 +18,43 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-__rcsw_const bool cell_entity::contains_point(const argos::CVector2& point) const {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  return (point.GetX() < (x + (0.5 * xsize())) &&
-          point.GetX() > (x - (0.5 * xsize())) &&
-          point.GetY() < (y + (0.5 * ysize())) &&
-          point.GetY() > (y - (0.5 * ysize())));
-} /* contains_point() */
+/**
+ * @struct powerlaw_block_dist_params
+ * @ingroup params
+ */
+struct powerlaw_block_dist_params : public rcppsw::params::base_params {
+  /**
+   * @brief Min power of 2 for distribution.
+   */
+  uint pwr_min{0};
 
-NS_END(representation, fordyca);
+  /**
+   * @brief Max power of 2 for distribution.
+   */
+  uint pwr_max{0};
+
+  /**
+   * @brief How many clusters to allocate in the arena.
+   */
+  uint n_clusters{0};
+};
+
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_POWERLAW_BLOCK_DIST_PARAMS_HPP_ */

@@ -42,33 +42,29 @@ constexpr char block_distribution_parser::kXMLRoot[];
 void block_distribution_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_powerlaw.parse(bnode);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_PARAM(bnode, m_params, dist_type);
   XML_PARSE_PARAM(bnode, m_params, n_blocks);
-  XML_PARSE_PARAM(bnode, m_params, arena_model.shape);
-  XML_PARSE_PARAM(bnode, m_params, arena_model.orientation);
-  XML_PARSE_PARAM(bnode, m_params, nest_model.shape);
-  XML_PARSE_PARAM(bnode, m_params, nest_model.orientation);
+  XML_PARSE_PARAM(bnode, m_params, arena_resolution);
+  XML_PARSE_PARAM(bnode, m_params, dist_type);
+  m_params->powerlaw = *m_powerlaw.parse_results();
 } /* parse() */
 
 void block_distribution_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, dist_type) << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params, dist_type) << std::endl
          << XML_PARAM_STR(m_params, n_blocks) << std::endl
-         << XML_PARAM_STR(m_params, arena_model.shape) << std::endl
-         << XML_PARAM_STR(m_params, arena_model.orientation) << std::endl
-         << XML_PARAM_STR(m_params, nest_model.shape) << std::endl
-         << XML_PARAM_STR(m_params, nest_model.orientation) << std::endl
+         << XML_PARAM_STR(m_params, arena_resolution) << std::endl
+         << XML_PARAM_STR(m_params, dist_type) << std::endl
+         << m_powerlaw
          << build_footer();
 } /* show() */
 
 bool block_distribution_parser::validate(void) const {
+  CHECK(true == m_powerlaw.validate());
   CHECK(m_params->n_blocks > 0);
   CHECK("" != m_params->dist_type);
-  CHECK("" != m_params->arena_model.shape);
-  CHECK("" != m_params->arena_model.orientation);
-  CHECK("" != m_params->nest_model.shape);
-  CHECK("" != m_params->nest_model.orientation);
   return true;
 
 error:
