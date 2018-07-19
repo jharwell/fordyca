@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,20 +62,26 @@ bool world_model_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line += std::to_string(m_stats[fsm::cell2D_fsm::ST_EMPTY] /
-                         static_cast<double>(timestep()+1)) + separator();
+                         static_cast<double>(timestep() + 1)) +
+          separator();
   line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] /
-                         static_cast<double>(timestep()+1)) + separator();
+                         static_cast<double>(timestep() + 1)) +
+          separator();
   line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] /
-                         static_cast<double>(timestep()+1)) + separator();
+                         static_cast<double>(timestep() + 1)) +
+          separator();
   return true;
 } /* csv_line_build() */
 
 void world_model_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const world_model_metrics&>(metrics);
-  m_stats[fsm::cell2D_fsm::ST_EMPTY] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_EMPTY);
-  m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_BLOCK);
-  m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] += m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_CACHE);
+  m_stats[fsm::cell2D_fsm::ST_EMPTY] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_EMPTY);
+  m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_BLOCK);
+  m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_CACHE);
 } /* collect() */
 
 void world_model_metrics_collector::reset_after_interval(void) {

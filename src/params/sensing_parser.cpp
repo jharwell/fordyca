@@ -42,15 +42,13 @@ void sensing_parser::parse(const ticpp::Element& node) {
       argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_params =
-  std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_proximity_parser.parse(snode);
   m_params->proximity = *m_proximity_parser.parse_results();
 } /* parse() */
 
 void sensing_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_proximity_parser
-         << build_footer();
+  stream << build_header() << m_proximity_parser << build_footer();
 } /* show() */
 
 __rcsw_pure bool sensing_parser::validate(void) const {

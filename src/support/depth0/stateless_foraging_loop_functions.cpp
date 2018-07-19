@@ -34,10 +34,11 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_parser.hpp"
+#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,7 @@ using interactor =
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server) {
+    : client(rcppsw::er::g_server), m_arena_map(nullptr) {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -71,10 +72,8 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo(server_ref());
   repo.parse_all(node);
 
-  auto* p_output = repo.parse_results<params::output_params>();
-  auto* p_vis = repo.parse_results<params::visualization_params>();
-
   /* initialize output and metrics collection */
+  auto* p_output = repo.parse_results<params::output_params>();
   output_init(p_output);
 
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
@@ -94,7 +93,14 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = static_cast<controller::base_foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_id(p_vis->robot_id);
+
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_id(vparams->robot_id);
+    }
   } /* for(&robot..) */
   ER_NOM("Stateless foraging loop functions initialization finished");
 }
@@ -142,9 +148,10 @@ void stateless_foraging_loop_functions::pre_step_iter(
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, m_arena_map, m_metrics_agg.get(), floor())(
-      controller,
-      GetSpace().GetSimulationClock());
+  interactor(rcppsw::er::g_server,
+             m_arena_map.get(),
+             m_metrics_agg.get(),
+             floor())(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
@@ -170,9 +177,15 @@ void stateless_foraging_loop_functions::arena_map_init(
 
   m_arena_map.reset(new representation::arena_map(aparams));
   m_arena_map->distribute_all_blocks();
-  for (auto& block : m_arena_map->blocks()) {
-    block->display_id(vparams->block_id);
-  } /* for(&block..) */
+
+  /*
+   * If null, visualization has been disabled.
+   */
+  if (nullptr != vparams) {
+    for (auto& block : m_arena_map->blocks()) {
+      block->display_id(vparams->block_id);
+    } /* for(&block..) */
+  }
 } /* arena_map_init() */
 
 void stateless_foraging_loop_functions::output_init(

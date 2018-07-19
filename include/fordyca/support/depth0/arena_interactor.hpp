@@ -66,9 +66,9 @@ template <typename T>
 class arena_interactor : public rcppsw::er::client {
  public:
   arena_interactor(std::shared_ptr<rcppsw::er::server> server,
-                   std::shared_ptr<representation::arena_map> map,
-                   stateless_metrics_aggregator *metrics_agg,
-                   argos::CFloorEntity* floor)
+                   representation::arena_map* const map,
+                   stateless_metrics_aggregator *const metrics_agg,
+                   argos::CFloorEntity* const floor)
       : client(server),
         m_floor(floor),
         m_metrics_agg(metrics_agg),
@@ -154,14 +154,16 @@ class arena_interactor : public rcppsw::er::client {
     return false;
   }
 
-  std::shared_ptr<representation::arena_map>& map(void) { return m_map; }
-  argos::CFloorEntity* floor(void) const { return m_floor; }
+  representation::arena_map* map(void) { return m_map; }
+  const representation::arena_map* map(void) const { return m_map; }
+  const argos::CFloorEntity* floor(void) const { return m_floor; }
+  argos::CFloorEntity* floor(void) { return m_floor; }
 
  private:
   // clang-format off
-  argos::CFloorEntity*                       m_floor;
-  stateless_metrics_aggregator*              m_metrics_agg;
-  std::shared_ptr<representation::arena_map> m_map;
+  argos::CFloorEntity*             const m_floor;
+  stateless_metrics_aggregator*    const m_metrics_agg;
+  representation::arena_map* const       m_map;
   // clang-format on
 };
 

@@ -22,20 +22,18 @@ n */
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <random>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/depth1/penalty_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+
 
 #include "rcppsw/er/server.hpp"
 
@@ -62,22 +60,21 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
+  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(rcppsw::er::g_server,
+                                                          &p_output->metrics,
+                                                          output_root());
   m_metrics_agg->reset_all();
 
   auto* penalty = static_cast<const struct params::penalty_params*>(
       repo.get_params("penalty"));
 
   /* intitialize robot interactions with environment */
-  m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                                 arena_map(),
-                                                 m_metrics_agg.get(),
-                                                 floor(),
-                                                 nest_xrange(),
-                                                 nest_yrange(),
-                                                 arenap->static_cache.usage_penalty,
-                                                 penalty);
+  m_interactor =
+      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                      arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      arenap->static_cache.usage_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -85,8 +82,14 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(
-        repo.parse_results<params::visualization_params>()->robot_task);
+
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_task(vparams->robot_task);
+    }
   } /* for(&entity..) */
   ER_NOM("depth1_foraging loop functions initialization finished");
 }
@@ -169,10 +172,10 @@ void foraging_loop_functions::pre_step_final(void) {
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
   if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
-    auto& collector = static_cast<metrics::tasks::execution_metrics_collector&>(
-        *(*m_metrics_agg)["tasks::execution"]);
-    int n_harvesters = collector.n_harvesters();
-    int n_collectors = collector.n_collectors();
+    auto& collector = static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
+        *(*m_metrics_agg)["tasks::generalist_tab"]);
+    int n_harvesters = collector.stats().subtask1_count;
+    int n_collectors = collector.stats().subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(random()) / RAND_MAX) {
@@ -190,7 +193,7 @@ void foraging_loop_functions::pre_step_final(void) {
   if (arena_map()->caches_removed() > 0) {
     m_cache_collator.cache_depleted();
     floor()->SetChanged();
-    arena_map()->caches_removed(0);
+    arena_map()->caches_removed_reset();
   }
 
   stateful_foraging_loop_functions::pre_step_final();

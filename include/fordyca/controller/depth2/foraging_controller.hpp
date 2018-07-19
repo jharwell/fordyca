@@ -27,15 +27,12 @@
 #include <string>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "rcppsw/metrics/tasks/management_metrics.hpp"
-#include "rcppsw/metrics/tasks/allocation_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
-class executable_task;
+class bifurcating_tdgraph_executive;
 }}
 
 NS_START(fordyca);
@@ -69,12 +66,8 @@ class foraging_controller : public depth1::foraging_controller,
   void ControlStep(void) override;
 
 
-  std::shared_ptr<tasks::base_foraging_task> current_task(void) const override;
-
-  /* task metrics */
-  std::string current_task_name(void) const override;
-  bool employed_partitioning(void) const override;
-  std::string subtask_selection(void) const override;
+  tasks::base_foraging_task* current_task(void) override;
+  const tasks::base_foraging_task* current_task(void) const override;
 
  private:
   void depth0_tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
@@ -88,10 +81,8 @@ class foraging_controller : public depth1::foraging_controller,
                     params::depth2::task_repository *const depth2_task_repo);
 
   // clang-format off
-  std::string                                   m_prev_task{""};
-  metrics::tasks::reactive_collator             m_task_collator;
-  std::unique_ptr<ta::polled_executive>         m_executive;
-  std::shared_ptr<ta::task_decomposition_graph> m_graph{nullptr};
+  std::string                                        m_prev_task{""};
+  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
 

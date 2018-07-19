@@ -25,8 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/block_params.hpp"
-#include "fordyca/representation/extent_model.hpp"
+#include "fordyca/params/powerlaw_block_dist_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,9 +41,14 @@ NS_START(fordyca, params);
  */
 struct block_distribution_params : public rcppsw::params::base_params {
   uint n_blocks{0};
+
+  /**
+   * @brief Resolution of the arena the blocks are being distributed into.
+   */
+  double arena_resolution{0.0};
   std::string dist_type{""};
-  representation::extent_model arena_model{};
-  representation::extent_model nest_model{};
+
+  struct powerlaw_block_dist_params powerlaw{};
 };
 
 NS_END(params, fordyca);

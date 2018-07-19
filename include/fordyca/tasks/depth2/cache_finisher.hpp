@@ -74,7 +74,11 @@ class cache_finisher : public foraging_task,
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
-  bool at_interface(void) const override;
+  bool task_at_interface(void) const override;
+  double task_last_exec_time(void) const override { return last_exec_time(); }
+  double task_last_interface_time(void) const override { return last_interface_time(); }
+  bool task_completed(void) const override { return task_finished(); }
+  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const task_allocation::taskable_argument*) override;
   double calc_abort_prob(void) override;

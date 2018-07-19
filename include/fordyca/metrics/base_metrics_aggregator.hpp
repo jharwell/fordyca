@@ -24,15 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/collector_group.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/metrics/collector_group.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct metrics_params; }
+namespace params {
+struct metrics_params;
+}
 
 NS_START(metrics);
 

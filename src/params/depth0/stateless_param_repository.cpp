@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_repository.hpp
+ * @file stateless_param_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,35 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_FORAGING_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_FORAGING_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/xml_param_repository.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "fordyca/params/actuation_parser.hpp"
+#include "fordyca/params/fsm_parser.hpp"
+#include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/sensing_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class stateful_foraging_repository
- * @ingroup params depth0
- *
- * @brief Collection of all parameter parsers and parse results needed by
- * \ref stateful_foraging_controller.
- */
-class stateful_foraging_repository: public rcppsw::params::xml_param_repository {
- public:
-  stateful_foraging_repository(const std::shared_ptr<rcppsw::er::server>& server);
-};
+stateless_param_repository::stateless_param_repository(
+    std::shared_ptr<rcppsw::er::server> server)
+    : xml_param_repository(server) {
+  register_parser<output_parser, output_params>(output_parser::kXMLRoot,
+                                                output_parser::kHeader1);
+  register_parser<actuation_parser, actuation_params>(
+      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
+  register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
+                                                  sensing_parser::kHeader1);
+  register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
+                                          fsm_parser::kHeader1);
+}
 
 NS_END(depth0, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_FORAGING_REPOSITORY_HPP_ */

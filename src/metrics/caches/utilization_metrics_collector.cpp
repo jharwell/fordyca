@@ -35,9 +35,7 @@ NS_START(fordyca, metrics, caches);
 utilization_metrics_collector::utilization_metrics_collector(
     const std::string& ofname,
     uint interval)
-    : base_metrics_collector(ofname, interval),
-      m_stats(),
-      m_cache_ids() {}
+    : base_metrics_collector(ofname, interval), m_stats(), m_cache_ids() {}
 
 /*******************************************************************************
  * Member Functions
@@ -68,27 +66,27 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
    * metrics on and use that to average the cumulative counts that we get.
    */
   line += (!m_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.n_blocks) /
-                           (m_cache_ids.size() * interval()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.n_blocks) /
+                               (m_cache_ids.size() * interval()))
+              : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.n_pickups) /
-                           (m_cache_ids.size()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.n_pickups) /
+                               (m_cache_ids.size()))
+              : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.n_drops) /
-                           (m_cache_ids.size()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.n_drops) /
+                               (m_cache_ids.size()))
+              : "0";
   line += separator();
 
   line += (!m_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
-                           (m_penalty_count))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
+                               (m_penalty_count))
+              : "0";
   line += separator();
 
   return true;

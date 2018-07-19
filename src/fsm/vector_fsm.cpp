@@ -39,7 +39,7 @@ namespace utils = rcppsw::utils;
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                       const std::shared_ptr<controller::saa_subsystem>& saa)
+                       controller::saa_subsystem* const saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),

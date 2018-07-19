@@ -64,15 +64,12 @@ void exec_estimates_parser::parse(const ticpp::Element& node) {
 
 void exec_estimates_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
-    stream << build_header()
-           << "<< Not Parsed >>"
-           << std::endl
+    stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
     return;
   }
 
-  stream << build_header()
-         << XML_PARAM_STR(m_params, enabled) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, enabled) << std::endl
          << XML_PARAM_STR(m_params, generalist_range) << std::endl
          << XML_PARAM_STR(m_params, harvester_range) << std::endl
          << XML_PARAM_STR(m_params, collector_range) << std::endl

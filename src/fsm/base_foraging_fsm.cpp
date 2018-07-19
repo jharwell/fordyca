@@ -44,7 +44,7 @@ using controller::steering_force_type;
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
+    controller::saa_subsystem* const saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
@@ -56,7 +56,7 @@ base_foraging_fsm::base_foraging_fsm(
       entry_wait_for_signal(),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_saa(std::move(saa)) {}
+      m_saa(saa) {}
 
 /*******************************************************************************
  * States

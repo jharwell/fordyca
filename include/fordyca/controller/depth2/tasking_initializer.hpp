@@ -1,5 +1,5 @@
 /**
- * @file task_repository.hpp
+ * @file tasking_initializer.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,35 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/xml_param_repository.hpp"
+#include <string>
 
+#include "fordyca/controller/depth1/tasking_initializer.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
+NS_START(fordyca);
+namespace params {
+namespace depth2 { class param_repository; }
+}
+
+NS_START(controller, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class task_repository
- * @ingroup params depth2
+ * @class tasking_initializer
+ * @ingroup controller depth2
  *
- * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth2::foraging_controller.
+ * @brief A helper class to offload initialization of the task tree for depth2
+ * foraging.
  */
-class task_repository: public rcppsw::params::xml_param_repository {
+class tasking_initializer : public depth1::tasking_initializer {
  public:
-  static constexpr char kName[] = "depth2_task_repository";
-  task_repository(const std::shared_ptr<rcppsw::er::server>& server);
+  tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
+                      controller::saa_subsystem* saa,
+                      base_perception_subsystem* perception);
+  ~tasking_initializer(void);
+
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>
+  operator()(params::depth2::param_repository *const param_repo);
+
+ protected:
+  void depth2_tasking_init(params::depth2::param_repository* param_repo);
 };
 
-NS_END(depth2, params, fordyca);
+NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_TASK_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_TASKING_INITIALIZER_HPP_ */

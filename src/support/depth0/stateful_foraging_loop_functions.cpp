@@ -35,10 +35,10 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,9 +71,15 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     auto& controller =
         dynamic_cast<controller::depth0::stateful_foraging_controller&>(
             robot.GetControllableEntity().GetController());
-    auto* l_params = repo.parse_results<struct params::visualization_params>();
 
-    controller.display_los(l_params->robot_los);
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_los(vparams->robot_los);
+    }
+
     utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
         robot, *arena_map());
   } /* for(entity..) */
@@ -97,8 +103,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
   /* Now watch it react to the environment */
   interactor(rcppsw::er::g_server, arena_map(), m_metrics_agg.get(), floor())(
-      controller,
-      GetSpace().GetSimulationClock());
+      controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(

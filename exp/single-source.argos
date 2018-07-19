@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="5000"
+    <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -37,16 +37,15 @@
         </output>
         <occupancy_grid>
           <grid resolution="0.2"
-                size="10, 5, 2"
-                />
+                size="10, 5, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
         </occupancy_grid>
         <task_executive>
           <estimation alpha="0.8"/>
           <task_abort reactivity="8"
-                    offset="3"
-                    />
+                      offset="3"
+                      />
           <task_partition
               method="pini2011"
               always_partition="true"
@@ -95,6 +94,11 @@
         <fsm
           nest="2.0, 2.5"
           />
+        <visualization robot_id="true"
+                       robot_los="false"
+                       robot_task="true"
+                       block_id="false"
+                       />
       </params>
     </stateful_foraging_controller>
 
@@ -118,8 +122,10 @@
           cache_acquisition_fname="cache-acquisition-stats.csv"
           cache_utilization_fname="cache-utilization-stats.csv"
           cache_lifecycle_fname="cache-lifecycle-stats.csv"
-          task_execution_fname="task-execution-stats.csv"
-          task_management_fname="task-management-stats.csv"
+          task_execution_generalist_fname="task-execution-generalist-stats.csv"
+          task_execution_collector_fname="task-execution-collector-stats.csv"
+          task_execution_harvester_fname="task-execution-harvester-stats.csv"
+          task_generalist_tab_fname="task-generalist-tab-stats.csv"
           distance_fname="distance-stats.csv"
           perception_world_model_fname="perception-world-model.csv"
           collect_interval="1000"
@@ -130,12 +136,14 @@
             size="10, 5, 2"/>
       <blocks dimension="0.2" />
       <block_distribution n_blocks="20"
-                          dist_type="single_source"
-                          arena_model.shape="rectangle"
-                          arena_model.orientation="horizontal"
-                          nest_model.shape="rectangle"
-                          nest_model.orientation="horizontal"
-                          />
+                          arena_resolution="0.2"
+                          dist_type="powerlaw">
+        <powerlaw
+            pwr_min="0"
+            pwr_max="3"
+            n_clusters="15"
+            />
+      </block_distribution>
       <static_caches enable="true"
                      size="2"
                      respawn_scale_factor="0.05"
@@ -145,14 +153,6 @@
                      />
       <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
-    <penalty pen_func = "kSine"
-             amp = "2"
-             per = "2"
-             phase = "1"
-             square = "2"
-             step = "2"
-             saw = "2"
-             />
     <visualization robot_id="true"
                    robot_los="false"
                    robot_task="true"
@@ -182,19 +182,19 @@
       <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
-    <light id="light_1"
+    <light id="light1"
            position="2,1.25,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_2"
+    <light id="light2"
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_3"
+    <light id="light3"
            position="2,3.75,1.0"
            orientation="0,0,0"
            color="yellow"
@@ -204,7 +204,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>

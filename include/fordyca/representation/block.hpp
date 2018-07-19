@@ -24,12 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/metrics/blocks/transport_metrics.hpp"
+#include "fordyca/representation/movable_cell_entity.hpp"
 #include "fordyca/representation/unicell_entity.hpp"
+#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/math/dcoord.hpp"
-#include "fordyca/representation/movable_cell_entity.hpp"
-#include "fordyca/metrics/blocks/transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -86,7 +86,10 @@ class block : public unicell_entity,
    * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
-  void add_transporter(uint robot_id) { ++m_transporters; m_robot_id = robot_id; }
+  void add_transporter(uint robot_id) {
+    ++m_transporters;
+    m_robot_id = robot_id;
+  }
 
   /**
    * @brief Set the time that the block is picked up for the first time after
@@ -152,7 +155,7 @@ class block : public unicell_entity,
    */
   bool contains_point(const argos::CVector2& point) const {
     return xspan(real_loc()).value_within(point.GetX()) &&
-        yspan(real_loc()).value_within(point.GetY());
+           yspan(real_loc()).value_within(point.GetY());
   }
 
  private:

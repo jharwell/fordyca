@@ -26,22 +26,18 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth1/existing_cache_penalty_handler.hpp"
-#include "fordyca/support/depth1/cache_penalty_generator.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-//<<<<<<< HEAD
-#include "fordyca/params/depth1/penalty_params.hpp"
-//=======
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-//>>>>>>> devel
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Classes
@@ -64,19 +60,12 @@ template <typename T>
 class arena_interactor : public depth0::arena_interactor<T> {
  public:
   arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
-                   std::shared_ptr<representation::arena_map>& map_in,
-                   depth0::stateless_metrics_aggregator *metrics_agg,
-                   argos::CFloorEntity* floor_in,
-                   uint cache_usage_penalty,
-                   const struct params::penalty_params* penalty)
-      : depth0::arena_interactor<T>(server, map_in, floor_in),
-    m_cache_penalty_handler(server, *map_in, cache_usage_penalty,
-      penalty->pen_func, penalty->amp, penalty->per, penalty->phase,
-                              penalty->square, penalty->step, penalty->saw),
-    // new class object for generating temporal penalty function
-    m_cache_penalty_generator(penalty->pen_func, penalty->amp,
-            penalty->per, penalty->phase, penalty->square, penalty->step,
-                                                           penalty->saw) {}
+                   representation::arena_map* const map_in,
+                   depth0::stateless_metrics_aggregator *const metrics_agg,
+                   argos::CFloorEntity* const floor_in,
+                   uint cache_usage_penalty)
+      : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
+      m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
@@ -133,7 +122,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+    auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     ER_ASSERT(acquisition_goal_type::kExistingCache ==
@@ -150,7 +139,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, map());
+    int cache_id = utils::robot_on_cache(controller, *map());
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
@@ -193,7 +182,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
     const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto task = std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+    auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
         controller.current_task());
     ER_ASSERT(task, "FATAL: Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
@@ -210,7 +199,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, map());
+    int cache_id = utils::robot_on_cache(controller, *map());
 
     if (-1 == cache_id) {
       ER_WARN("WARNING: %s cannot drop in cache%d: No such cache",
@@ -258,7 +247,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * @return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
    */
   bool handle_task_abort(T& controller) {
-    if (!controller.task_aborted()) {
+    auto task = dynamic_cast<ta::polled_task*>(controller.current_task());
+    if (!task->task_aborted()) {
       return false;
     }
 
@@ -271,14 +261,14 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (controller.is_carrying_block()) {
       ER_NOM("%s aborted task %s while carrying block%d",
              controller.GetId().c_str(),
-             std::static_pointer_cast<tasks::depth1::foraging_task>(
+             static_cast<tasks::depth1::foraging_task*>(
                  controller.current_task())->name().c_str(),
              controller.block()->id());
       task_abort_with_block(controller);
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
-             std::dynamic_pointer_cast<tasks::depth1::foraging_task>(
+             dynamic_cast<tasks::depth1::foraging_task*>(
                  controller.current_task())->name().c_str());
     }
     m_cache_penalty_handler.penalty_abort(controller);
@@ -315,18 +305,15 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (utils::block_drop_overlap_with_nest(controller.block(),
                                             map()->nest(),
                                             controller.robot_loc()) ||
-        utils::block_drop_near_arena_boundary(map(),
+        utils::block_drop_near_arena_boundary(*map(),
                                               controller.block(),
                                               controller.robot_loc())) {
       conflict = true;
     }
-    rcppsw::math::dcoord2 d =
-        math::rcoord_to_dcoord(controller.robot_loc(),
-                               map()->grid_resolution());
     events::free_block_drop drop_op(rcppsw::er::g_server,
                                     controller.block(),
-                                    d.first,
-                                    d.second,
+                                    math::rcoord_to_dcoord(controller.robot_loc(),
+                                                           map()->grid_resolution()),
                                     map()->grid_resolution());
     if (!conflict) {
       controller.visitor::template visitable_any<T>::accept(drop_op);
@@ -342,10 +329,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
  private:
   // clang-format off
   existing_cache_penalty_handler<T> m_cache_penalty_handler;
-  cache_penalty_generator      m_cache_penalty_generator;
   // clang-format on
 };
 
 NS_END(depth1, support, fordyca);
 
-#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_ARENA_INTERACTOR_HPP_
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ARENA_INTERACTOR_HPP_ */

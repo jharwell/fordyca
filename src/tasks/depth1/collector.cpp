@@ -132,8 +132,8 @@ FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__rcsw_pure bool collector::at_interface(void) const {
+__rcsw_pure bool collector::task_at_interface(void) const {
   return !(transport_goal_type::kNest == block_transport_goal());
-} /* at_interface() */
+} /* task_at_interface() */
 
 NS_END(depth1, tasks, fordyca);

@@ -206,7 +206,7 @@ void cached_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
 
@@ -216,7 +216,8 @@ void cached_block_pickup::visit(
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth1::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {

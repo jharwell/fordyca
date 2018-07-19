@@ -99,8 +99,7 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 void cache_block_drop::visit(representation::block& block) {
   events::free_block_drop e(m_server,
                             m_block, /* OK because we only have 1 block */
-                            cell_op::x(),
-                            cell_op::y(),
+                            rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
                             m_resolution);
   block.accept(e);
 } /* visit() */
@@ -113,9 +112,8 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
-  std::dynamic_pointer_cast<tasks::depth1::existing_cache_interactor>(
-      controller.current_task())
-      ->accept(*this);
+  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task())->accept(*this);
 
   ER_NOM("Depth1 foraging controller: dropped block%d in cache%d",
          m_block->id(),

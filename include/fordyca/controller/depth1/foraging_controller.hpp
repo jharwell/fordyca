@@ -27,18 +27,12 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "rcppsw/metrics/tasks/management_metrics.hpp"
-#include "rcppsw/metrics/tasks/allocation_metrics.hpp"
-#include "rcppsw/task_allocation/task_graph_vertex.hpp"
-#include "fordyca/metrics/tasks/reactive_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
-class executable_task;
-class task_decomposition_graph;
+class bifurcating_tdgraph_executive;
 }}
 
 NS_START(fordyca);
@@ -72,7 +66,6 @@ NS_START(controller, depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public virtual rcppsw::metrics::tasks::management_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
@@ -81,7 +74,8 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  std::shared_ptr<tasks::base_foraging_task> current_task(void) const override;
+  tasks::base_foraging_task* current_task(void) override;
+  const tasks::base_foraging_task* current_task(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -95,33 +89,14 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  /* task metrics */
-  bool task_aborted(void) const override { return m_task_collator.task_aborted(); }
-  bool has_new_allocation(void) const override { return m_task_collator.has_new_allocation(); }
-  bool allocation_changed(void) const override { return m_task_collator.has_new_allocation(); }
-  bool task_finished(void) const override { return m_task_collator.task_finished(); }
-  double task_last_exec_time(void) const override { return m_task_collator.task_last_exec_time(); }
-
-  std::string current_task_name(void) const override;
-  bool employed_partitioning(void) const override;
-  std::string subtask_selection(void) const override;
-
- protected:
-  /* executive callbacks */
-  void task_abort_cleanup(const ta::task_graph_vertex& task);
-  void task_alloc_notify(const ta::task_graph_vertex& task);
-  void task_finish_notify(const ta::task_graph_vertex& task);
-
  private:
   void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
                     params::depth1::task_repository* task_repo);
 
   // clang-format off
-  metrics::tasks::reactive_collator                  m_task_collator;
   bool                                               m_display_task{false};
   std::string                                        m_prev_task{""};
-  std::unique_ptr<ta::polled_executive>              m_executive;
-  std::shared_ptr<ta::task_decomposition_graph>      m_graph;
+  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
 

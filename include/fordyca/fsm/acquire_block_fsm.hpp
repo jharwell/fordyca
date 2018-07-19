@@ -56,8 +56,8 @@ class acquire_block_fsm : public acquire_goal_fsm {
  public:
   acquire_block_fsm(const struct params::fsm_params* params,
                     const std::shared_ptr<rcppsw::er::server>& server,
-                    const std::shared_ptr<controller::saa_subsystem>& saa,
-                    std::shared_ptr<representation::perceived_arena_map> map);
+                    controller::saa_subsystem* saa,
+                    representation::perceived_arena_map* map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;

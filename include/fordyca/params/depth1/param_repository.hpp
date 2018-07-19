@@ -1,7 +1,7 @@
 /**
- * @file task_repository.cpp
+ * @file task_repository.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,31 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth2/task_repository.hpp"
-#include "fordyca/params/depth2/exec_estimates_parser.hpp"
-#include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include "fordyca/params/depth0/stateful_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
-namespace ta = rcppsw::task_allocation;
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-task_repository::task_repository(
-    const std::shared_ptr<rcppsw::er::server>& server)
-    : xml_param_repository(server) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ta::executive_xml_parser, ta::executive_params>(
-      ta::executive_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-}
+/**
+ * @class param_repository
+ * @ingroup params depth1
+ *
+ * @brief Collection of all parameter parsers and parse results needed
+ * by the \ref depth1::foraging_controller.
+ */
+class param_repository: public depth0::stateful_param_repository {
+ public:
+  explicit param_repository(std::shared_ptr<rcppsw::er::server>& server);
+};
 
-NS_END(depth2, params, fordyca);
+NS_END(depth1, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_ */

@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
-#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 
@@ -53,9 +53,11 @@ stateful_metrics_aggregator::stateful_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void stateful_metrics_aggregator::collect_from_controller(
-const controller::depth0::stateful_foraging_controller* const controller) {
-  auto distance_m = dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
+    const controller::depth0::stateful_foraging_controller* const controller) {
+  auto distance_m =
+      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  ER_ASSERT(distance_m,
+            "FATAL: Controller does not provide FSM distance metrics");
   collect("fsm::distance", *distance_m);
 
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
@@ -63,13 +65,13 @@ const controller::depth0::stateful_foraging_controller* const controller) {
   collect("perception::world_model", *worldm_m);
 
   if (controller->current_task()) {
-    auto block_acq_m = std::dynamic_pointer_cast<metrics::fsm::goal_acquisition_metrics>(
-        controller->current_task());
+    auto block_acq_m =
+        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+            controller->current_task());
     ER_ASSERT(block_acq_m,
               "FATAL: Controller does not provide FSM block acquisition metrics");
     collect("blocks::acquisition", *block_acq_m);
   }
-
 
 } /* collect_from_controller() */
 

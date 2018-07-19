@@ -27,6 +27,8 @@
 #include <string>
 
 #include "fordyca/params/block_distribution_params.hpp"
+#include "fordyca/params/powerlaw_block_dist_parser.hpp"
+
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
@@ -49,7 +51,8 @@ class block_distribution_parser : public rcppsw::params::xml_param_parser {
  public:
   block_distribution_parser(const std::shared_ptr<rcppsw::er::server>& server,
                             uint level)
-      : xml_param_parser(server, level) {}
+      : xml_param_parser(server, level),
+        m_powerlaw(server, level + 1) {}
 
   /**
    * @brief The root tag that all block distribution parameters should lie under in the
@@ -67,11 +70,15 @@ class block_distribution_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 
+  // clang-format off
+  powerlaw_block_dist_parser                 m_powerlaw;
   std::shared_ptr<block_distribution_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);

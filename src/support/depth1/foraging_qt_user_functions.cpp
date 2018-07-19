@@ -27,7 +27,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
-#pragma  GCC diagnostic pop
+#pragma GCC diagnostic pop
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
@@ -55,8 +55,7 @@ void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 
   if (controller.display_task() && nullptr != controller.current_task()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.75),
-             std::dynamic_pointer_cast<ta::executable_task>(
-                 controller.current_task())
+             dynamic_cast<ta::executable_task*>(controller.current_task())
                  ->name(),
              argos::CColor::BLUE);
   }

@@ -27,21 +27,15 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/params/depth0/stateful_foraging_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
+#include "fordyca/params/depth0/stateful_param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/depth0/generalist.hpp"
+
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/polled_executive.hpp"
-#include "rcppsw/task_allocation/task_decomposition_graph.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,18 +47,33 @@ namespace ta = rcppsw::task_allocation;
  * Constructors/Destructor
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
-    : stateless_foraging_controller(), m_light_loc(), m_executive() {}
+    : stateless_foraging_controller(),
+      m_light_loc(),
+      m_perception(),
+      m_executive() {}
 
 stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure std::shared_ptr<tasks::base_foraging_task> stateful_foraging_controller::
-    current_task(void) const {
-  return std::dynamic_pointer_cast<tasks::base_foraging_task>(
-      m_executive->current_task());
+const ta::bifurcating_tab* stateful_foraging_controller::active_tab(void) const {
+  return m_executive->active_tab();
+}
+
+void stateful_foraging_controller::perception(
+    std::unique_ptr<base_perception_subsystem> perception) {
+  m_perception = std::move(perception);
+}
+__rcsw_pure tasks::base_foraging_task* stateful_foraging_controller::current_task(void) {
+  return dynamic_cast<tasks::base_foraging_task*>(
+      m_executive.get()->current_task());
 } /* current_task() */
+
+__rcsw_pure const tasks::base_foraging_task* stateful_foraging_controller::current_task(void) const {
+  return const_cast<stateful_foraging_controller*>(this)->current_task();
+} /* current_task() */
+
 
 __rcsw_pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {
@@ -75,16 +84,16 @@ void stateful_foraging_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__rcsw_pure const std::shared_ptr<const depth0::sensing_subsystem>
-stateful_foraging_controller::stateful_sensors(void) const {
-  return std::static_pointer_cast<const depth0::sensing_subsystem>(
-      saa_subsystem()->sensing());
+__rcsw_pure const depth0::sensing_subsystem* stateful_foraging_controller::
+    stateful_sensors(void) const {
+  return static_cast<const depth0::sensing_subsystem*>(
+      saa_subsystem()->sensing().get());
 }
 
-__rcsw_pure std::shared_ptr<depth0::sensing_subsystem> stateful_foraging_controller::
-    stateful_sensors(void) {
-  return std::static_pointer_cast<depth0::sensing_subsystem>(
-      saa_subsystem()->sensing());
+__rcsw_pure depth0::sensing_subsystem* stateful_foraging_controller::stateful_sensors(
+    void) {
+  return static_cast<depth0::sensing_subsystem*>(
+      saa_subsystem()->sensing().get());
 }
 
 void stateful_foraging_controller::ControlStep(void) {
@@ -102,7 +111,7 @@ void stateful_foraging_controller::ControlStep(void) {
 } /* ControlStep() */
 
 void stateful_foraging_controller::Init(ticpp::Element& node) {
-  params::depth0::stateful_foraging_repository param_repo(server_ref());
+  params::depth0::stateful_param_repository param_repo(server_ref());
 
   /*
    * Note that we do not call \ref stateless_foraging_controller::Init()--there
@@ -114,7 +123,7 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
 
   /* parse and validate parameters */
   param_repo.parse_all(node);
-  server_handle()->log_stream() << param_repo;
+  server_ptr()->log_stream() << param_repo;
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
@@ -129,9 +138,9 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       &saa_subsystem()->sensing()->sensor_list()));
 
   /* initialize tasking */
-  tasking_init(
-      param_repo.parse_results<struct params::fsm_params>(),
-      param_repo.parse_results<ta::executive_params>());
+  m_executive = stateful_tasking_initializer(client::server_ref(),
+                                             saa_subsystem(),
+                                             perception())(&param_repo);
 
   ER_NOM("stateful_foraging controller initialization finished");
 } /* Init() */
@@ -140,27 +149,6 @@ void stateful_foraging_controller::Reset(void) {
   stateless_foraging_controller::Reset();
   m_perception->reset();
 } /* Reset() */
-
-void stateful_foraging_controller::tasking_init(
-    const struct params::fsm_params* fsm_params,
-    const ta::executive_params* exec_params) {
-  std::unique_ptr<ta::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          fsm_params,
-          client::server_ref(),
-          base_foraging_controller::saa_subsystem(),
-          m_perception->map());
-  auto generalist =
-      std::make_shared<tasks::depth0::generalist>(exec_params,
-                                                  generalist_fsm);
-
-  generalist->set_atomic();
-
-  auto graph = std::make_shared<ta::task_decomposition_graph>(server_ref());
-  graph->set_root(generalist);
-
-  m_executive = rcppsw::make_unique<ta::polled_executive>(server_ref(), graph);
-} /* tasking_init() */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
                        stateful_foraging_controller,

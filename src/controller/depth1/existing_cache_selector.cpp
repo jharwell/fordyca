@@ -64,7 +64,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
      */
     if ((robot_loc - c.ent->real_loc()).Length() <=
         std::max(c.ent->xsize(), c.ent->ysize())) {
-      ER_WARN("Ignoring cache%d in search: robot currently inside it",
+      ER_WARN("WARNING: Ignoring cache%d in search: robot currently inside it",
               c.ent->id());
       continue;
     }
@@ -95,7 +95,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
            best.ent->discrete_loc().second,
            max_utility);
   } else {
-    ER_WARN("No best cache found: all known caches too close!");
+    ER_WARN("WARNING: No best cache found: all known caches too close!");
   }
 
   return best;

@@ -26,8 +26,7 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/depth0/exec_estimates_parser.hpp"
 #include "fordyca/params/depth1/exec_estimates_params.hpp"
 
 /*******************************************************************************
@@ -45,11 +44,11 @@ NS_START(fordyca, params, depth1);
  * @brief Parses XML parameters used for estimation of depth1 task execution
  * times at the start of simulation.
  */
-class exec_estimates_parser: public rcppsw::params::xml_param_parser {
+class exec_estimates_parser: public depth0::exec_estimates_parser {
  public:
-  exec_estimates_parser(const std::shared_ptr<rcppsw::er::server>& server,
+  exec_estimates_parser(std::shared_ptr<rcppsw::er::server>& server,
                         uint level)
-      : xml_param_parser(server, level) {}
+      : depth0::exec_estimates_parser(server, level) {}
 
   /**
    * @brief The root tag that all cache parameters should lie under in the
@@ -64,7 +63,6 @@ class exec_estimates_parser: public rcppsw::params::xml_param_parser {
   std::shared_ptr<exec_estimates_params> parse_results(void) const {
     return m_params;
   }
-  bool parsed(void) const override { return m_parsed; }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
@@ -72,7 +70,6 @@ class exec_estimates_parser: public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  bool                                   m_parsed{false};
   std::shared_ptr<exec_estimates_params> m_params{nullptr};
   // clang-format on
 };

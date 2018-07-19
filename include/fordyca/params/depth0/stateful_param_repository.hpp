@@ -1,5 +1,5 @@
 /**
- * @file cell_entity.cpp
+ * @file stateful_param_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,26 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+namespace rcppsw { namespace er { class server; }}
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-__rcsw_const bool cell_entity::contains_point(const argos::CVector2& point) const {
-  double x = real_loc().GetX();
-  double y = real_loc().GetY();
-  return (point.GetX() < (x + (0.5 * xsize())) &&
-          point.GetX() > (x - (0.5 * xsize())) &&
-          point.GetY() < (y + (0.5 * ysize())) &&
-          point.GetY() > (y - (0.5 * ysize())));
-} /* contains_point() */
+/**
+ * @class stateful_param_repository
+ * @ingroup params depth0
+ *
+ * @brief Collection of all parameter parsers and parse results needed by
+ * \ref stateful_foraging_controller.
+ */
+class stateful_param_repository: public stateless_param_repository {
+ public:
+  explicit stateful_param_repository(std::shared_ptr<rcppsw::er::server>& server);
+};
 
-NS_END(representation, fordyca);
+NS_END(depth0, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_ */

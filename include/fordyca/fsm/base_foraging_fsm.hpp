@@ -60,7 +60,7 @@ class base_foraging_fsm : public state_machine::hfsm,
                           public metrics::fsm::base_fsm_metrics {
  public:
   base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                    const std::shared_ptr<controller::saa_subsystem>& saa,
+                    controller::saa_subsystem* saa,
                     uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
@@ -107,7 +107,8 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
 
-  controller::saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -191,10 +192,10 @@ class base_foraging_fsm : public state_machine::hfsm,
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
   // clang-format off
-  uint                                       m_new_dir_count{0};
-  argos::CRadians                            m_new_dir;
-  argos::CRandom::CRNG*                      m_rng;
-  std::shared_ptr<controller::saa_subsystem> m_saa;
+  uint                             m_new_dir_count{0};
+  argos::CRadians                  m_new_dir;
+  argos::CRandom::CRNG*            m_rng;
+  controller::saa_subsystem* const m_saa;
   // clang-format on
 };
 

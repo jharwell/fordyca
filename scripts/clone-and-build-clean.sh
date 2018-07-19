@@ -22,5 +22,10 @@ mkdir -p ext
 ln -s ../../rcppsw ext/
 
 mkdir build && cd build
-cmake -DBUILD_ON_MSI=yes ..
+cmake -DBUILD_ON_MSI=yes -DCMAKE_BUILD_TYPE=OPT ..
 make -j 8
+
+cd ..
+git clone https://github.com/swarm-robotics/sierra.git
+cd sierra
+git checkout devel

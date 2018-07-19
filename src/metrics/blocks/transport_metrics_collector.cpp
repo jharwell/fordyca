@@ -32,9 +32,8 @@ NS_START(fordyca, metrics, blocks);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-transport_metrics_collector::transport_metrics_collector(
-    const std::string& ofname,
-    uint interval)
+transport_metrics_collector::transport_metrics_collector(const std::string& ofname,
+                                                         uint interval)
     : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************

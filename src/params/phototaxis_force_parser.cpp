@@ -43,7 +43,8 @@ void phototaxis_force_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element pnode =
         argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
-    m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_PARAM(pnode, m_params, max);
     m_parsed = true;
   }
@@ -51,9 +52,7 @@ void phototaxis_force_parser::parse(const ticpp::Element& node) {
 
 void phototaxis_force_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
-    stream << build_header()
-           << "<< Not Parsed >>"
-           << std::endl
+    stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
     return;
   }

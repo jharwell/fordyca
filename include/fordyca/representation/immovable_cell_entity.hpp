@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/dcoord.hpp"
 #include "fordyca/math/utils.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
