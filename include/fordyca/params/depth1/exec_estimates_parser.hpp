@@ -46,7 +46,7 @@ NS_START(fordyca, params, depth1);
  */
 class exec_estimates_parser: public depth0::exec_estimates_parser {
  public:
-  exec_estimates_parser(std::shared_ptr<rcppsw::er::server>& server,
+  exec_estimates_parser(std::shared_ptr<rcppsw::er::server> server,
                         uint level)
       : depth0::exec_estimates_parser(server, level) {}
 

@@ -24,8 +24,8 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/arena_map_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/depth1/penalty_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +45,9 @@ loop_function_repository::loop_function_repository(
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<penalty_parser, penalty_params>("penalty")
+  register_parser<ct::waveform_xml_parser>(std::string("static_cache_penalty_") +
+                                           ct::waveform_xml_parser::kXMLRoot,
+                                           ct::waveform_xml_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

@@ -26,11 +26,13 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
+namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
@@ -58,12 +60,6 @@ struct static_cache_params : public rcppsw::params::base_params {
   double respawn_scale_factor{0.0};
 
   /**
-   * @brief How many timesteps do robots picking up from/dropping into the cache
-   * have to wait?
-   */
-  uint usage_penalty{0};
-
-  /**
    * @brief How large is the cache (geometrical area) ?
    */
   double dimension{0.0};
@@ -73,6 +69,7 @@ struct static_cache_params : public rcppsw::params::base_params {
    * the cache?
    */
   double min_dist{0.0};
+  ct::waveform_params usage_penalty{};
 };
 
 NS_END(depth1, params, fordyca);

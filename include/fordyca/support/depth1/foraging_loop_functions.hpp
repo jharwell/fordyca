@@ -28,7 +28,6 @@
 #include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
-#include "fordyca/params/depth1/penalty_params.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
 
 /*******************************************************************************

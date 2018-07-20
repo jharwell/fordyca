@@ -35,7 +35,7 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint block_cluster::block_count(void) const {
+__rcsw_pure uint block_cluster::block_count(void) const {
   uint count = 0;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {

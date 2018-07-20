@@ -131,7 +131,7 @@ HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool,
+__rcsw_pure FSM_WRAPPER_DEFINE(bool,
                    cache_transferer_fsm,
                    is_avoiding_collision,
                    m_cache_fsm);

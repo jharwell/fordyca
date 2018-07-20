@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/actuation_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -39,10 +38,10 @@ constexpr char actuation_parser::kXMLRoot[];
  ******************************************************************************/
 void actuation_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
-  m_throttling.parse(anode);
+  m_throttling.parse(get_node(anode, "block_carry_throttle"));
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();

@@ -27,9 +27,8 @@
 #include <string>
 
 #include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/throttling_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
-
 #include "fordyca/params/steering_force2D_parser.hpp"
 
 /*******************************************************************************
@@ -81,7 +80,7 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<actuation_params>           m_params{nullptr};
   kinematics2D::differential_drive_xml_parser m_differential_drive;
   steering_force2D_parser                     m_steering;
-  throttling_parser                           m_throttling;
+  ct::waveform_xml_parser                     m_throttling;
   // clang-format on
 };
 

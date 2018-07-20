@@ -24,15 +24,19 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
+
 #include "fordyca/support/depth1/block_manipulation_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/support/depth1/cache_penalty_generator.hpp"
-#include "fordyca/params/depth1/penalty_params.hpp"
+#include "rcppsw/control/waveform_generator.hpp"
+#include "rcppsw/control/periodic_waveform.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace ct = rcppsw::control;
 NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
@@ -64,24 +68,19 @@ class base_penalty_handler : public rcppsw::er::client {
    * @Brief Initialize the penalty handler.
    *
    * @param server Server for debugging.
-   * @param penalty The minimum penalty robots will serve (can be more if it is
-   * adjusted to maintain simulation consistency).
+   * @param params Parameters for penalty waveform generation.
    */
-  base_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
-                        uint penalty,
-                        const params::penalty_function pen_func,
-                        int amp, int per, int phase, int square, int step,
-                        int saw)
-      : client(server), mc_penalty(penalty), m_penalty_list(),
-      m_cache_penalty_generator(pen_func, amp, per, phase, square, step, saw)  {
+  base_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
+                       const ct::waveform_params* const params)
+      : client(server),
+        m_penalty_list(),
+        m_penalty(ct::waveform_generator()(params->type, params)) {
     insmod("base_penalty_handler",
            rcppsw::er::er_lvl::DIAG,
            rcppsw::er::er_lvl::NOM);
   }
 
   ~base_penalty_handler(void) override { client::rmmod(); }
-
-  uint base_penalty(void) const { return mc_penalty; }
 
   /**
    * @brief Determine if a robot has satisfied the \ref block_manipulation_penalty
@@ -94,7 +93,7 @@ class base_penalty_handler : public rcppsw::er::client {
    * @return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
-  bool penalty_satisfied(const T& controller, uint timestep) const {
+  __rcsw_pure bool penalty_satisfied(const T& controller, uint timestep) const {
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const block_manipulation_penalty<T>& p) {
                              return p.controller() == &controller;
@@ -145,7 +144,7 @@ class base_penalty_handler : public rcppsw::er::client {
    * @brief If \c TRUE, then the specified robot is currently serving a cache
    * penalty.
    */
-  bool is_serving_penalty(const T& controller) const {
+  __rcsw_pure bool is_serving_penalty(const T& controller) const {
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
                            [&](const block_manipulation_penalty<T>& p) {
                              return p.controller() == &controller; });
@@ -172,7 +171,8 @@ class base_penalty_handler : public rcppsw::er::client {
    * timestep, otherwise the world is inconsistent).
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = (m_cache_penalty_generator.*penalty_func)(timestep);
+    uint penalty = m_penalty->value(timestep);
+    m_orig_penalty = penalty;
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
       if (it->start_time() + it->penalty() == timestep + penalty) {
         ++penalty;
@@ -182,10 +182,12 @@ class base_penalty_handler : public rcppsw::er::client {
     return penalty;
   }
 
+  uint original_penalty(void) const { return m_orig_penalty; }
+
   // clang-format off
-  uint                                       mc_penalty;
-  std::list<block_manipulation_penalty<T>>   m_penalty_list;
-  cache_penalty_generator    m_cache_penalty_generator;
+  mutable uint                             m_orig_penalty{0};
+  std::list<block_manipulation_penalty<T>> m_penalty_list;
+  std::unique_ptr<ct::waveform>            m_penalty;
   // clang-format on
 };
 NS_END(depth1, support, fordyca);

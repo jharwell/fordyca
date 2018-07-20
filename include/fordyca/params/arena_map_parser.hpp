@@ -52,7 +52,7 @@ NS_START(fordyca, params);
  */
 class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  arena_map_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+  arena_map_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
       : xml_param_parser(server, level),
         m_grid_parser(server, level + 1),
         m_block_parser(server, level + 1),

@@ -57,7 +57,7 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-const ta::bifurcating_tab* stateful_foraging_controller::active_tab(void) const {
+__rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(void) const {
   return m_executive->active_tab();
 }
 
@@ -104,8 +104,8 @@ void stateful_foraging_controller::ControlStep(void) {
    */
   m_perception->update(stateful_sensors()->los());
 
-  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->block_throttle_update();
+  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
+  saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
 
   m_executive->run();
 } /* ControlStep() */

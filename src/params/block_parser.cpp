@@ -21,8 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "fordyca/params/block_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -41,19 +39,29 @@ constexpr char block_parser::kXMLRoot[];
  ******************************************************************************/
 void block_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
   XML_PARSE_PARAM(bnode, m_params, dimension);
+  m_manipulation_penalty.parse(get_node(const_cast<ticpp::Element&>(bnode),
+                                        "manipulation_penalty"));
+  m_params->manipulation_penalty = *m_manipulation_penalty.parse_results();
 } /* parse() */
 
 void block_parser::show(std::ostream& stream) const {
   stream << build_header() << XML_PARAM_STR(m_params, dimension) << std::endl
+         << m_manipulation_penalty
          << build_footer();
 } /* show() */
 
-bool block_parser::validate(void) const {
-  return m_params->dimension > 0.0;
+__rcsw_pure bool block_parser::validate(void) const {
+  CHECK(m_params->dimension > 0.0);
+  CHECK(true == m_manipulation_penalty.validate());
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

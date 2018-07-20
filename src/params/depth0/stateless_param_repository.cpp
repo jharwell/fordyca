@@ -26,10 +26,13 @@
 #include "fordyca/params/fsm_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace ct = rcppsw::control;
+
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
@@ -46,6 +49,9 @@ stateless_param_repository::stateless_param_repository(
                                                   sensing_parser::kHeader1);
   register_parser<fsm_parser, fsm_params>(fsm_parser::kXMLRoot,
                                           fsm_parser::kHeader1);
+  register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
+                                           ct::waveform_xml_parser::kXMLRoot,
+                                           ct::waveform_xml_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

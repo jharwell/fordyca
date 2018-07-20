@@ -62,7 +62,7 @@ void powerlaw_block_dist_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-bool powerlaw_block_dist_parser::validate(void) const {
+__rcsw_pure bool powerlaw_block_dist_parser::validate(void) const {
   CHECK(m_params->pwr_min > 2);
   CHECK(m_params->pwr_max >= m_params->pwr_min);
   CHECK(m_params->n_clusters > 0);

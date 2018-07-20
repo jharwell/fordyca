@@ -24,10 +24,12 @@
 #include "fordyca/params/depth1/param_repository.hpp"
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/er/server.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace ct = rcppsw::control;
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
@@ -38,6 +40,9 @@ param_repository::param_repository(std::shared_ptr<rcppsw::er::server>& server)
   register_parser<exec_estimates_parser, exec_estimates_params>(
       exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<ct::waveform_xml_parser>(std::string("cache_usage_") +
+                                           ct::waveform_xml_parser::kXMLRoot,
+                                           ct::waveform_xml_parser::kHeader1);
 }
 
 NS_END(depth1, params, fordyca);

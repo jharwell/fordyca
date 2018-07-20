@@ -61,7 +61,7 @@ void nest_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-bool nest_parser::validate(void) const {
+__rcsw_pure bool nest_parser::validate(void) const {
   CHECK(m_params->center.GetX() > 0);
   CHECK(m_params->center.GetY() > 0);
   CHECK(m_params->xdim > 0);

@@ -1,5 +1,5 @@
 /**
- * @file throttling_handler.hpp
+ * @file motion_throttling_handler.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_THROTTLING_HANDLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_THROTTLING_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,55 +29,50 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct throttling_params;
-}
-
-NS_START(controller);
+namespace rcppsw { namespace control { struct waveform_params; class waveform; }}
+NS_START(fordyca, controller);
 class actuation_subsystem;
+namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class throttling_handler
+ * @class motion_throttling_handler
  * @ingroup controller
  *
- * @brief Handler for all speed throttling for the robot.
+ * @brief Handler for a type of motion_throttling for the robot actuators
  */
-class throttling_handler {
+class motion_throttling_handler {
  public:
-  explicit throttling_handler(const struct params::throttling_params* params);
+  explicit motion_throttling_handler(const ct::waveform_params* params);
+  ~motion_throttling_handler(void);
 
   /**
-   * @brief Get the current amount of throttling (a percentage between 0 and 1)
+   * @brief Get the current amount of motion_throttling (a percentage between 0 and 1)
    * that is configured for block carry.
    */
-  double block_carry(void) const { return m_block_carry; }
+  double current_throttle(void) const { return m_current; }
 
   /**
    * @brief Set the current block carry state.
    */
-  void carrying_block(bool carrying_block) {
-    m_carrying_block = carrying_block;
-  }
+  void toggle(bool en) { m_en = en; }
 
   /**
-   * @brief Update the actuators in accordance with the current throttling
-   * configuration.
+   * @brief Update the actuators in accordance with the current motion_throttling
+   * configuration and timestep.
    */
-  void update(void);
+  void update(uint timestep);
 
  private:
   // clang-format off
-  bool   m_carrying_block{false};
-  double m_block_carry{0.0};
-  double m_block_current{0.0};
+  bool   m_en{false};
+  double m_current{0.0};
+  std::unique_ptr<ct::waveform> m_waveform;
   // clang-format off
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_THROTTLING_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_ */
