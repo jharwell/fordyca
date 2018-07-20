@@ -53,10 +53,10 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 template <typename T>
 class existing_cache_penalty_handler : public base_penalty_handler<T> {
  public:
-  existing_cache_penalty_handler(const std::shared_ptr<rcppsw::er::server>&server,
+  existing_cache_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
                                  representation::arena_map* const map,
-                        uint penalty)
-      : base_penalty_handler<T>(server, penalty), m_map(map) {
+                                 const ct::waveform_params* const params)
+      : base_penalty_handler<T>(server, params), m_map(map) {
     rcppsw::er::client::insmod("existing_cache_penalty_handler",
            rcppsw::er::er_lvl::DIAG,
            rcppsw::er::er_lvl::NOM);
@@ -110,7 +110,7 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
     ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d",
            utils::robot_id(controller),
            timestep,
-           base_penalty_handler<T>::base_penalty(),
+           base_penalty_handler<T>::original_penalty(),
            penalty);
 
     base_penalty_handler<T>::penalty_list().push_back(

@@ -204,6 +204,8 @@ The following root XML tags are defined:
 
 - `arena_map` - Parameters relating to discretization of the arena.
 
+- `penalty` = Parameters relating to a temporal penalty function to simulate environmental changes.
+
 - `visualization` - Parameters for simulation visualizations, for help in
                     debugging.
 

@@ -142,7 +142,7 @@ powerlaw_block_distributor::arena_view_list powerlaw_block_distributor::guess_cl
 } /* guess_cluster_placements() */
 
 
-bool powerlaw_block_distributor::check_cluster_placements(
+__rcsw_pure bool powerlaw_block_distributor::check_cluster_placements(
     const arena_view_list& list) {
 
   for (auto &v : list) {

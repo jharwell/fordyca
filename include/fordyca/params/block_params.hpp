@@ -26,12 +26,13 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
-
+namespace ct = rcppsw::control;
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -41,6 +42,7 @@ NS_START(fordyca, params);
  */
 struct block_params : public rcppsw::params::base_params {
   double dimension{0.0};
+  ct::waveform_params manipulation_penalty{};
 };
 
 NS_END(params, fordyca);

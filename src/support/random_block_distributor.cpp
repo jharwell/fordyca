@@ -114,7 +114,7 @@ bool random_block_distributor::distribute_block(
     }
 } /* distribute_block() */
 
-bool random_block_distributor::verify_block_dist(
+__rcsw_pure bool random_block_distributor::verify_block_dist(
     const representation::block& block,
     const representation::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */

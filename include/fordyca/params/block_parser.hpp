@@ -29,6 +29,7 @@
 #include "fordyca/params/block_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,8 +48,9 @@ NS_START(fordyca, params);
  */
 class block_parser : public rcppsw::params::xml_param_parser {
  public:
-  block_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level) {}
+  block_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
+      : xml_param_parser(server, level),
+        m_manipulation_penalty(server, level + 1) {}
 
   /**
    * @brief The root tag that all block parameters should lie under in the
@@ -69,7 +71,10 @@ class block_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
+  // clang-format off
+  ct::waveform_xml_parser       m_manipulation_penalty;
   std::shared_ptr<block_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);

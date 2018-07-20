@@ -97,4 +97,4 @@ class cache_creator : public rcppsw::er::client {
 };
 NS_END(support, fordyca, depth1);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_ */
+#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_ 

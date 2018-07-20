@@ -71,8 +71,13 @@
                             delta="0.0001" />
         </sensing>
         <actuation>
-          <throttling
-              block_carry="0.1"/>
+          <block_carry_throttle>
+            <waveform
+                type="null"
+                frequency="100"
+                amplitude="0.4"
+                offset="0.1"/>
+          </block_carry_throttle>
           <steering2D>
             <avoidance_force lookahead="0.5"
                              max="8"/>
@@ -134,7 +139,15 @@
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks dimension="0.2" />
+      <blocks dimension="0.2" >
+        <manipulation_penalty>
+          <waveform
+              type="none"
+              frequency="100"
+              amplitude="500"
+              offset="10"/>
+          </manipulation_penalty>
+        </blocks>
       <block_distribution n_blocks="20"
                           arena_resolution="0.2"
                           dist_type="powerlaw">
@@ -148,11 +161,22 @@
                      size="2"
                      respawn_scale_factor="0.05"
                      dimension="0.8"
-                     min_dist="0.8"
-                     usage_penalty="10"
-                     />
+                     min_dist="0.8">
+        <usage_penalty>
+          <waveform
+              type="none"
+              frequency="100"
+              amplitude="500"
+              offset="10"/>
+        </usage_penalty>
+      </static_caches>
       <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
+    <visualization robot_id="true"
+                   robot_los="false"
+                   robot_task="true"
+                   block_id="false"
+                   />
   </loop_functions>
 
   <!-- *********************** -->

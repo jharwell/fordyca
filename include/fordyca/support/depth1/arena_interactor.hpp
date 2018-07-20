@@ -63,7 +63,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    representation::arena_map* const map_in,
                    depth0::stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor_in,
-                   uint cache_usage_penalty)
+                   const ct::waveform_params* const cache_usage_penalty)
       : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
       m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 

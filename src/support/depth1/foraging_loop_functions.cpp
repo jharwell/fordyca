@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
-n */
+ */
 
 /*******************************************************************************
  * Includes
@@ -26,12 +26,13 @@ n */
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
-#include "fordyca/params/loop_function_repository.hpp"
+#include "fordyca/params/depth0/stateful_param_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+
 
 #include "rcppsw/er/server.hpp"
 
@@ -47,7 +48,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth1 foraging loop functions");
-  params::loop_function_repository repo(server_ref());
+  params::depth0::stateful_param_repository repo(server_ref());
 
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;
@@ -69,7 +70,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
                                       arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
-                                      arenap->static_cache.usage_penalty);
+                                      &arenap->static_cache.usage_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
