@@ -135,7 +135,17 @@ class arena_interactor : public rcppsw::er::client {
        * reset.
        */
       controller.block()->nest_drop_time(timestep);
+
+      /*
+       * We are clearly performing a block drop in the nest, so mark it as
+       * such. We have to do this manually, rather than letting it happen in
+       * the nest block drop event, as we have already gathered metrics for
+       * this timestep for this block at that point.
+       */
+      controller.block()->drop_event(true);
       m_metrics_agg->collect_from_block(controller.block().get());
+      controller.block()->pickup_event(false);
+      controller.block()->drop_event(false);
 
       events::nest_block_drop drop_op(rcppsw::er::g_server,
                                       controller.block(),

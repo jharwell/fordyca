@@ -68,6 +68,18 @@ class transport_metrics : public rcppsw::metrics::base_metrics {
    * being distributed but before it is picked up for the first time.
    */
   virtual double initial_wait_time(void) const = 0;
+
+  /**
+   * @brief if \c TRUE, then the block was picked up this timestep (from a cache
+   * or as a free block--I am not tracking the difference right now).
+   */
+  virtual bool pickup_event(void) const = 0;
+
+  /**
+   * @brief if \c TRUE, then the block was drop this timestep (in a cache or as
+   * a free block--I am not tracking the difference right now).
+   */
+  virtual bool drop_event(void) const = 0;
 };
 
 NS_END(blocks, metrics, fordyca);
