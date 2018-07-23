@@ -61,13 +61,13 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid_parser << m_block_parser << m_cache_parser
+  stream << build_header() << m_grid_parser << m_block_parser << m_block_dist_parser << m_cache_parser
          << m_nest_parser << build_footer();
 } /* show() */
 
 __rcsw_pure bool arena_map_parser::validate(void) const {
   return m_grid_parser.validate() && m_block_parser.validate() &&
-         m_cache_parser.validate() && m_nest_parser.validate();
+      m_block_dist_parser.validate() && m_cache_parser.validate() && m_nest_parser.validate();
 } /* validate() */
 
 NS_END(params, fordyca);

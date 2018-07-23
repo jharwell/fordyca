@@ -43,30 +43,13 @@ namespace math = rcppsw::math;
  ******************************************************************************/
 powerlaw_block_distributor::powerlaw_block_distributor(
     std::shared_ptr<rcppsw::er::server> server,
-    representation::arena_grid& grid,
     const struct params::block_distribution_params* const params)
     : base_block_distributor(server),
+      m_arena_resolution(params->arena_resolution),
+      m_n_clusters(params->powerlaw.n_clusters),
       m_dist_map(),
       m_pwrdist(params->powerlaw.pwr_min, params->powerlaw.pwr_max, 2) {
   insmod("powerlaw_block_dist", er::er_lvl::DIAG, er::er_lvl::NOM);
-  for (auto placement : compute_cluster_placements(grid,
-                                                   params->powerlaw.n_clusters)) {
-    m_dist_map[placement.second].emplace_back(server,
-                                  placement.first,
-                                  params->arena_resolution,
-                                  placement.second);
-  } /* for(i..) */
-  for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
-    ER_NOM("Mapped %zu clusters of capacity %u",
-           it->second.size(),
-           it->first);
-    for (auto dist : it->second) {
-      ER_DIAG("Cluster with origin@(%zu, %zu): capacity=%u",
-              (*dist.cluster().view().origin())->loc().first,
-              (*dist.cluster().view().origin())->loc().second,
-              dist.cluster().capacity());
-    } /* for(dist..) */
-  } /* for(&l..) */
 }
 
 /*******************************************************************************
@@ -200,6 +183,35 @@ powerlaw_block_distributor::arena_view_list powerlaw_block_distributor::compute_
     }
   } /* for(i..) */
   ER_FATAL_SENTINEL("FATAL: Unable to place clusters in arena (impossible situation?)");
+  return arena_view_list{};
 } /* compute_cluster_placements() */
+
+bool powerlaw_block_distributor::map_clusters(representation::arena_grid& grid) {
+  arena_view_list placements = compute_cluster_placements(grid,
+                                                          m_n_clusters);
+  if (0 == placements.size()) {
+    ER_WARN("WARNING: Unable to compute all cluster placements");
+    return false;
+  }
+
+  for (auto placement : placements) {
+    m_dist_map[placement.second].emplace_back(server_ref(),
+                                              placement.first,
+                                              m_arena_resolution,
+                                              placement.second);
+  } /* for(i..) */
+  for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
+    ER_NOM("Mapped %zu clusters of capacity %u",
+           it->second.size(),
+           it->first);
+    for (auto dist : it->second) {
+      ER_DIAG("Cluster with origin@(%zu, %zu): capacity=%u",
+              (*dist.cluster().view().origin())->loc().first,
+              (*dist.cluster().view().origin())->loc().second,
+              dist.cluster().capacity());
+    } /* for(dist..) */
+  } /* for(&l..) */
+  return true;
+} /* map_clusters() */
 
 NS_END(support, fordyca);

@@ -24,7 +24,6 @@
 #include "fordyca/support/block_distribution_dispatcher.hpp"
 #include <limits>
 
-#include "fordyca/params/block_distribution_params.hpp"
 #include "fordyca/support/random_block_distributor.hpp"
 #include "fordyca/support/cluster_block_distributor.hpp"
 #include "fordyca/support/powerlaw_block_distributor.hpp"
@@ -50,17 +49,15 @@ block_distribution_dispatcher::block_distribution_dispatcher(
     const struct params::block_distribution_params* const params)
     : client(server),
       m_dist_type(params->dist_type),
+      mc_params(*params),
       m_grid(grid),
-      m_dist(nullptr) {
-  initialize(params);
-}
+      m_dist(nullptr) {}
 block_distribution_dispatcher::~block_distribution_dispatcher(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_distribution_dispatcher::initialize(
-    const struct params::block_distribution_params* params) {
+bool block_distribution_dispatcher::initialize(void) {
   representation::arena_grid::view arena = m_grid.subgrid(1,
                                                           1,
                                                           m_grid.xdsize() - 1,
@@ -68,7 +65,7 @@ void block_distribution_dispatcher::initialize(
   if (kDIST_RANDOM == m_dist_type) {
     m_dist = rcppsw::make_unique<random_block_distributor>(client::server_ref(),
                                                            arena,
-                                                           params->arena_resolution);
+                                                           mc_params.arena_resolution);
   } else if (kDIST_SINGLE_SRC == m_dist_type) {
     representation::arena_grid::view area = m_grid.subgrid(m_grid.xdsize() * 0.80,
                                                            2,
@@ -76,13 +73,17 @@ void block_distribution_dispatcher::initialize(
                                                            m_grid.ydsize() - 1);
     m_dist = rcppsw::make_unique<cluster_block_distributor>(client::server_ref(),
                                                             area,
-                                                            params->arena_resolution,
+                                                            mc_params.arena_resolution,
                                                             std::numeric_limits<uint>::max());
   } else if (kDIST_POWERLAW == m_dist_type) {
-    m_dist = rcppsw::make_unique<powerlaw_block_distributor>(client::server_ref(),
-                                                             m_grid,
-                                                             params);
+    auto p = rcppsw::make_unique<powerlaw_block_distributor>(client::server_ref(),
+                                                             &mc_params);
+    if (!p->map_clusters(m_grid)) {
+      return false;
+    }
+    m_dist = std::move(p);
   }
+  return true;
 } /* initialize() */
 
 bool block_distribution_dispatcher::distribute_block(
