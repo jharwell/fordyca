@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="10000"
+    <experiment length="1000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <__template__ id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -105,7 +105,7 @@
                        block_id="false"
                        />
       </params>
-    </__template__>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -113,7 +113,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -250,18 +250,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

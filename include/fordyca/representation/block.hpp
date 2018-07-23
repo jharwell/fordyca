@@ -81,6 +81,8 @@ class block : public unicell_entity,
   uint total_transporters(void) const override { return m_transporters; }
   double total_transport_time(void) const override;
   double initial_wait_time(void) const override;
+  bool pickup_event(void) const override { return m_pickup_event; }
+  bool drop_event(void) const override { return m_drop_event; }
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -90,6 +92,8 @@ class block : public unicell_entity,
     ++m_transporters;
     m_robot_id = robot_id;
   }
+  void pickup_event(bool pickup_event) { m_pickup_event = pickup_event; }
+  void drop_event(bool drop_event) { m_drop_event = drop_event; }
 
   /**
    * @brief Set the time that the block is picked up for the first time after
@@ -160,9 +164,11 @@ class block : public unicell_entity,
 
  private:
   // clang-format off
-  int  m_robot_id{-1};
-  uint m_transporters{0};
-  bool m_first_pickup{false};
+  int    m_robot_id{-1};
+  uint   m_transporters{0};
+  bool   m_first_pickup{false};
+  bool   m_pickup_event{false};
+  bool   m_drop_event{false};
   double m_first_pickup_time{0.0};
   double m_dist_time{0.0};
   double m_nest_drop_time{0.0};

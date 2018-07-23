@@ -196,6 +196,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
 void cached_block_pickup::visit(representation::block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
+  block.pickup_event(true);
 
   /* Move block out of sight */
   block.move_out_of_sight();
