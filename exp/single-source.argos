@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <__template__ id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -73,7 +73,7 @@
         <actuation>
           <block_carry_throttle>
             <waveform
-                type="null"
+                type="Null"
                 frequency="100"
                 amplitude="0.4"
                 offset="0.1"/>
@@ -105,7 +105,7 @@
                        block_id="false"
                        />
       </params>
-    </stateful_foraging_controller>
+    </__template__>
 
   </controllers>
 
@@ -142,7 +142,7 @@
       <blocks dimension="0.2" >
         <manipulation_penalty>
           <waveform
-              type="none"
+              type="Null"
               frequency="100"
               amplitude="500"
               offset="10"/>
@@ -150,7 +150,7 @@
         </blocks>
       <block_distribution n_blocks="20"
                           arena_resolution="0.2"
-                          dist_type="powerlaw">
+                          dist_type="random">
         <powerlaw
             pwr_min="0"
             pwr_max="3"
@@ -164,7 +164,7 @@
                      min_dist="0.8">
         <usage_penalty>
           <waveform
-              type="none"
+              type="Null"
               frequency="100"
               amplitude="500"
               offset="10"/>

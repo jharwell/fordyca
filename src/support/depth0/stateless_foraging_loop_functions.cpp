@@ -176,6 +176,10 @@ void stateless_foraging_loop_functions::arena_map_init(
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
   m_arena_map.reset(new representation::arena_map(aparams));
+  if (!m_arena_map->initialize()) {
+    ER_ERR("FATAL: Could not initialize arena map");
+    std::exit(EXIT_FAILURE);
+  }
   m_arena_map->distribute_all_blocks();
 
   /*

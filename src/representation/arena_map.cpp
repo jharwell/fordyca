@@ -37,20 +37,19 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena_map_params* params)
-    : mc_static_cache_params(params->static_cache),
+    : client(rcppsw::er::g_server),
+      mc_static_cache_params(params->static_cache),
       m_blocks(params->block_dist.n_blocks),
       m_caches(),
-      m_server(rcppsw::er::g_server),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
-             m_server),
+             server_ref()),
       m_nest(params->nest.xdim,
              params->nest.ydim,
              params->nest.center,
              params->grid.resolution),
       m_block_dispatcher(rcppsw::er::g_server, m_grid, &params->block_dist) {
-  deferred_client_init(m_server);
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
   ER_NOM("%zu x %zu/%zu x %zu @ %f resolution",
@@ -69,6 +68,10 @@ arena_map::arena_map(const struct params::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+bool arena_map::initialize(void) {
+  return m_block_dispatcher.initialize();
+} /* initialize() */
+
 __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i]->contains_point(pos)) {
@@ -92,7 +95,7 @@ void arena_map::static_cache_create(void) {
   argos::CVector2 center((m_grid.xdsize() + m_nest.real_loc().GetX()) / 2.0,
                           m_nest.real_loc().GetY());
 
-  support::depth1::static_cache_creator c(m_server,
+  support::depth1::static_cache_creator c(server_ref(),
                                           m_grid,
                                           center,
                                           mc_static_cache_params.dimension,

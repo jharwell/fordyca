@@ -39,10 +39,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace params {
-struct arena_map_params;
-}
+namespace params { struct arena_map_params; }
 
 NS_START(representation);
 
@@ -200,17 +197,17 @@ class arena_map : public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
 
+  bool initialize(void);
+
  private:
   // clang-format off
-  uint                                             m_caches_removed{0};
-  const struct params::depth1::static_cache_params mc_static_cache_params;
-  block_vector                                     m_blocks;
-  cache_vector                                     m_caches;
-  std::shared_ptr<rcppsw::er::server>              m_server;
-  arena_grid                                       m_grid;
-  representation::nest                             m_nest;
-  support::block_distribution_dispatcher           m_block_dispatcher;
-
+  uint                                      m_caches_removed{0};
+  const params::depth1::static_cache_params mc_static_cache_params;
+  block_vector                              m_blocks;
+  cache_vector                              m_caches;
+  arena_grid                                m_grid;
+  representation::nest                      m_nest;
+  support::block_distribution_dispatcher    m_block_dispatcher;
   // clang-format on
 };
 

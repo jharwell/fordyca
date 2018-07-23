@@ -29,6 +29,7 @@
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/params/block_distribution_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,10 +41,6 @@ class block;
 class arena_grid;
 class multicell_entity;
 } // namespace representation
-
-namespace params {
-struct block_distribution_params;
-}
 
 NS_START(support);
 class base_block_distributor;
@@ -76,6 +73,15 @@ class block_distribution_dispatcher : public rcppsw::er::client {
   block_distribution_dispatcher& operator=(const block_distribution_dispatcher& s) = delete;
 
   /**
+   * @brief Initialize the selected block distributor. This is a separate
+   * function, rather than happening in the constructor, so that error handling
+   * can be done without exceptions.
+   *
+   * @return \c TRUE if initialization successful, \c FALSE otherwise.
+   */
+  bool initialize(void);
+
+  /**
    * @brief Distribute a block in the arena.
    *
    * @param block The block to distribute.
@@ -95,12 +101,11 @@ class block_distribution_dispatcher : public rcppsw::er::client {
   bool distribute_blocks(block_vector& blocks, entity_list& entities);
 
  private:
-  void initialize(const struct params::block_distribution_params* params);
-
   // clang-format off
-  std::string                                 m_dist_type;
-  representation::arena_grid&                 m_grid;
-  std::unique_ptr<base_block_distributor>     m_dist;
+  std::string                                    m_dist_type;
+  const struct params::block_distribution_params mc_params;
+  representation::arena_grid&                    m_grid;
+  std::unique_ptr<base_block_distributor>        m_dist;
   // clang-format on
 };
 

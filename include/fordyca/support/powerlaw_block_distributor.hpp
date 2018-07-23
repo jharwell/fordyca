@@ -68,10 +68,8 @@ class powerlaw_block_distributor : public base_block_distributor {
    * @brief Initialize the distributor.
    *
    * @param server Debugging/logging server.
-   * @param grid The grid for the ENTIRE arena.
    */
   powerlaw_block_distributor(std::shared_ptr<rcppsw::er::server> server,
-                             representation::arena_grid& grid,
                              const struct params::block_distribution_params* params);
 
   powerlaw_block_distributor(const powerlaw_block_distributor& s) = delete;
@@ -81,13 +79,24 @@ class powerlaw_block_distributor : public base_block_distributor {
                         entity_list& entities) override;
   bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
 
+  /**
+   * @brief Computer cluster locations such that no two clusters overlap, and
+   * map locations and compositional block distributors into internal data
+   * structures.
+   *
+   * @param grid The grid for the ENTIRE arena.
+   *
+   * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
+   */
+  bool map_clusters(representation::arena_grid& grid);
+
  private:
   using arena_view_list = std::list<std::pair<representation::arena_grid::view, uint>>;
   /**
    * @brief How many times to attempt to distribute all blocks before giving up,
    * causing an assertion failure on distribution.
    */
-  static constexpr uint kMAX_DIST_TRIES = 10;
+  static constexpr uint kMAX_DIST_TRIES = 100;
 
   /**
    * @brief Assign cluster centers randomly, with the only restriction that the
@@ -120,6 +129,8 @@ class powerlaw_block_distributor : public base_block_distributor {
                                              uint n_clusters);
 
   // clang-format off
+  double                                         m_arena_resolution{0.0};
+  uint                                           m_n_clusters{0};
   std::map<uint,
            std::list<cluster_block_distributor>> m_dist_map;
   std::default_random_engine                     m_rng{std::random_device{}()};
