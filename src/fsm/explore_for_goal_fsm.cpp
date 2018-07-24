@@ -27,7 +27,6 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +38,7 @@ namespace kinematics = rcppsw::robotics::kinematics;
  * Constructors/Destructors
  ******************************************************************************/
 explore_for_goal_fsm::explore_for_goal_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
     controller::saa_subsystem* const saa,
     std::unique_ptr<controller::explore_behavior> behavior,
     std::function<bool(void)> goal_detect)

@@ -33,7 +33,7 @@
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -96,7 +96,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 
   rcppsw::math::dcoord2 coord = m_real_cache->discrete_loc();
   ER_ASSERT(coord == rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
-            "FATAL: Coordinates for cache%d (%zu, %zu)/cell(%zu, %zu) do not "
+            "FATAL: Coordinates for cache%d (%u, %u)/cell(%zu, %zu) do not "
             "agree",
             cache_id,
             coord.first,
@@ -179,7 +179,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
         cell.cache()->n_blocks());
 
   } else {
-    int id = cell.cache()->id();
+    __rcsw_unused int id = cell.cache()->id();
     cell.cache()->block_remove(m_pickup_block);
     map.cache_remove(cell.cache());
     ER_NOM(
@@ -193,7 +193,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   }
 } /* visit() */
 
-void cached_block_pickup::visit(representation::block& block) {
+void cached_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
   block.pickup_event(true);

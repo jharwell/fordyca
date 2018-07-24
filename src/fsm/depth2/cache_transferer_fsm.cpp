@@ -30,8 +30,6 @@
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -44,8 +42,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::cache_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
@@ -56,7 +54,7 @@ cache_transferer_fsm::cache_transferer_fsm(
       HFSM_CONSTRUCT_STATE(acquire_dest_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_cache_fsm(params, server, saa, map),
+      m_cache_fsm(server, sel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_src_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,

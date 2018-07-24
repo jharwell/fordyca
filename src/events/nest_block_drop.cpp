@@ -29,7 +29,7 @@
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
@@ -44,7 +44,7 @@ NS_START(fordyca, events);
  * Constructors/Destructor
  ******************************************************************************/
 nest_block_drop::nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                                 std::shared_ptr<representation::block> block,
+                                 std::shared_ptr<representation::base_block> block,
                                  uint timestep)
     : client(server), m_timestep(timestep), m_block(block) {
   client::insmod("nest_block_drop",
@@ -64,7 +64,7 @@ void nest_block_drop::visit(representation::arena_map& map) {
 /*******************************************************************************
  * Stateless Foraging
  ******************************************************************************/
-void nest_block_drop::visit(representation::block& block) {
+void nest_block_drop::visit(representation::base_block& block) {
   block.reset_metrics();
   block.distribution_time(m_timestep);
 } /* visit() */

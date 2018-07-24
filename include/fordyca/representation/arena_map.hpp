@@ -29,9 +29,9 @@
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/nest.hpp"
-#include "fordyca/support/block_distribution_dispatcher.hpp"
+#include "fordyca/support/block_dist/dispatcher.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -39,7 +39,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { struct arena_map_params; }
+namespace params { namespace arena { struct arena_map_params; }}
 
 NS_START(representation);
 
@@ -61,9 +61,9 @@ class arena_map : public rcppsw::er::client,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<block>>;
+  using block_vector = std::vector<std::shared_ptr<base_block>>;
 
-  explicit arena_map(const struct params::arena_map_params* params);
+  explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -120,7 +120,7 @@ class arena_map : public rcppsw::er::client,
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(std::shared_ptr<block>& block);
+  bool distribute_single_block(std::shared_ptr<base_block>& block);
 
   size_t xdsize(void) const { return m_grid.xdsize(); }
   size_t ydsize(void) const { return m_grid.ydsize(); }
@@ -207,7 +207,7 @@ class arena_map : public rcppsw::er::client,
   cache_vector                              m_caches;
   arena_grid                                m_grid;
   representation::nest                      m_nest;
-  support::block_distribution_dispatcher    m_block_dispatcher;
+  support::block_dist::dispatcher           m_block_dispatcher;
   // clang-format on
 };
 

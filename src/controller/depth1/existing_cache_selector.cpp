@@ -24,6 +24,7 @@
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,9 +35,9 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
+    std::shared_ptr<rcppsw::er::server> server,
+    const cache_selection_matrix* const matrix)
+    : client(server), mc_matrix(matrix) {
   insmod("existing_cache_selector",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
@@ -68,7 +69,8 @@ representation::perceived_cache existing_cache_selector::calc_best(
               c.ent->id());
       continue;
     }
-    math::existing_cache_utility u(c.ent->real_loc(), m_nest_loc);
+    math::existing_cache_utility u(c.ent->real_loc(),
+                                   boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());

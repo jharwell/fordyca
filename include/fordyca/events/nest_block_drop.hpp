@@ -93,7 +93,7 @@ class nest_block_drop
                                 tasks::depth1::collector> {
  public:
   nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                  std::shared_ptr<representation::block> block,
+                  std::shared_ptr<representation::base_block> block,
                   uint timestep);
   ~nest_block_drop(void) override { client::rmmod(); }
 
@@ -102,7 +102,7 @@ class nest_block_drop
 
   /* stateless foraging */
   void visit(representation::arena_map& map) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(
       controller::depth0::stateless_foraging_controller& controller) override;
@@ -124,12 +124,12 @@ class nest_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const { return m_block; }
 
  private:
   // clang-format off
-  uint                                   m_timestep;
-  std::shared_ptr<representation::block> m_block;
+  uint                                        m_timestep;
+  std::shared_ptr<representation::base_block> m_block;
   //clang-format on
 };
 

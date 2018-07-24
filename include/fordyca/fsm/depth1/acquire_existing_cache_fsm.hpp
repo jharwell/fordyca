@@ -47,8 +47,8 @@ NS_START(fordyca, fsm, depth1);
 class acquire_existing_cache_fsm : public base_acquire_cache_fsm {
  public:
   acquire_existing_cache_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server>& server,
+      const controller::cache_selection_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);
 

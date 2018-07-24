@@ -89,6 +89,8 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize tasking */
   m_executive = tasking_initializer(client::server_ref(),
+                                    block_sel_matrix(),
+                                    cache_sel_matrix(),
                                     saa_subsystem(),
                                     perception())(&param_repo);
 

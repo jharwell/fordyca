@@ -32,6 +32,7 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 
 
 #include "rcppsw/er/server.hpp"
@@ -53,7 +54,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;
 
-  auto* arenap = repo.parse_results<params::arena_map_params>();
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
@@ -200,7 +201,7 @@ void foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void foraging_loop_functions::cache_handling_init(
-    const struct params::arena_map_params* arenap) {
+    const struct params::arena::arena_map_params* arenap) {
   /*
    * Regardless of how many foragers/etc there are, always create an
    * initial cache.

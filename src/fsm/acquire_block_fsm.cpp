@@ -30,8 +30,7 @@
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -44,15 +43,15 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_block_fsm::acquire_block_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
     : acquire_goal_fsm(server,
                        saa,
                        map,
                        std::bind(&acquire_block_fsm::block_detected_cb, this)),
-      mc_nest_center(params->nest_center) {
+      mc_matrix(sel_matrix) {
   client::insmod("acquire_block_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -97,7 +96,8 @@ bool acquire_block_fsm::acquire_known_goal(void) {
      * vectoring toward any of them.
      */
     controller::depth0::block_selector selector(client::server_ref(),
-                                                mc_nest_center);
+                                                mc_matrix);
+
     representation::perceived_block best =
         selector.calc_best(blocks, base_sensors()->position());
     /*
@@ -107,7 +107,7 @@ bool acquire_block_fsm::acquire_known_goal(void) {
     if (nullptr == best.ent) {
       return false;
     }
-    ER_NOM("Vector towards best block: %d@(%zu, %zu)=%f",
+    ER_NOM("Vector towards best block: %d@(%u, %u)=%f",
            best.ent->id(),
            best.ent->discrete_loc().first,
            best.ent->discrete_loc().second,

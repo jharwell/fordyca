@@ -87,7 +87,7 @@ class cache_block_drop
                                 representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<representation::block>& block,
+                   const std::shared_ptr<representation::base_block>& block,
                    const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
   ~cache_block_drop(void) override { client::rmmod(); }
@@ -100,7 +100,7 @@ class cache_block_drop
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
   void visit(representation::perceived_arena_map& map) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
@@ -113,7 +113,7 @@ class cache_block_drop
  private:
   // clang-format off
   double                                       m_resolution;
-  std::shared_ptr<representation::block>       m_block;
+  std::shared_ptr<representation::base_block>  m_block;
   std::shared_ptr<representation::arena_cache> m_cache;
   std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on

@@ -25,7 +25,6 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
-#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +36,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),

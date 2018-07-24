@@ -29,7 +29,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -46,7 +46,7 @@ NS_START(fordyca, events);
  ******************************************************************************/
 free_block_drop::free_block_drop(
     std::shared_ptr<rcppsw::er::server> server,
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     rcppsw::math::dcoord2 coord,
     double resolution)
     : cell_op(coord.first, coord.second),
@@ -72,7 +72,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void free_block_drop::visit(representation::block& block) {
+void free_block_drop::visit(representation::base_block& block) {
   block.reset_robot_id();
   block.drop_event(true);
 

@@ -36,7 +36,7 @@ NS_START(fordyca, support, depth0);
  * Classes
  ******************************************************************************/
 /**
- * @class stateful_foraging_qt_user_functions
+ * @class stateless_foraging_qt_user_functions
  * @ingroup support depth0
  *
  * @brief Contains hooks for Qt to draw the robot's ID, the block they are
@@ -44,6 +44,18 @@ NS_START(fordyca, support, depth0);
  */
 class stateless_foraging_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
+  /**
+   * @brief How far above the center of the robot to draw the carried block (if
+   * the robot is carrying a block)
+   */
+  static constexpr double kBLOCK_VIS_OFFSET = 0.3;
+
+  /**
+   * @brief How far above the center of the robot to draw text (robot id, task,
+   * etc.)
+   */
+  static constexpr double kTEXT_VIS_OFFSET = 0.5;
+
   stateless_foraging_qt_user_functions(void);
 
   ~stateless_foraging_qt_user_functions(void) override = default;

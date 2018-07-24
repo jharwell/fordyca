@@ -33,7 +33,6 @@
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/params/depth1/exec_estimates_params.hpp"
 #include "fordyca/params/depth1/param_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
@@ -55,9 +54,12 @@ using representation::occupancy_grid;
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
     std::shared_ptr<rcppsw::er::server>& server,
+    const controller::block_selection_matrix* bsel_matrix,
+    const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : stateful_tasking_initializer(server, saa, perception) {}
+    : stateful_tasking_initializer(server, bsel_matrix, saa, perception),
+      mc_sel_matrix(csel_matrix) {}
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -72,15 +74,16 @@ void tasking_initializer::depth1_tasking_init(
 
   std::unique_ptr<ta::taskable> collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          cache_sel_matrix(),
           saa_subsystem(),
           perception()->map());
 
   std::unique_ptr<ta::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          block_sel_matrix(),
+          mc_sel_matrix,
           saa_subsystem(),
           perception()->map());
 

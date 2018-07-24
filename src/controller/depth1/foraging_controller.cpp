@@ -31,6 +31,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth1/param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -48,7 +49,10 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
-      m_executive() {}
+    m_cache_sel_matrix(),
+    m_executive() {}
+
+foraging_controller::~foraging_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -90,6 +94,8 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize tasking */
   m_executive = tasking_initializer(client::server_ref(),
+                                    block_sel_matrix(),
+                                    m_cache_sel_matrix.get(),
                                     saa_subsystem(),
                                     perception())(&param_repo);
   ER_NOM("Depth1 foraging controller initialization finished");

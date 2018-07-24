@@ -23,7 +23,6 @@
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -41,7 +40,7 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
       cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_block()) {
-        assert(std::dynamic_pointer_cast<block>(cell->entity()));
+        assert(cell->block());
         blocks.push_back(cell->block());
       }
     } /* for(j..) */

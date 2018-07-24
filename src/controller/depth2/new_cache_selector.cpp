@@ -24,6 +24,7 @@
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,9 +35,9 @@ NS_START(fordyca, controller, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 new_cache_selector::new_cache_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
+    std::shared_ptr<rcppsw::er::server> server,
+    const controller::cache_selection_matrix* const csel_matrix)
+    : client(server), mc_matrix(csel_matrix) {
   insmod("new_cache_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -51,7 +52,9 @@ representation::perceived_block new_cache_selector::calc_best(
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
-    math::new_cache_utility u(c.ent->real_loc(), m_nest_loc);
+    math::new_cache_utility u(c.ent->real_loc(),
+                              boost::get<argos::CVector2>(
+                                  mc_matrix->find("nest_center")->second));
 
     double utility = u.calc(robot_loc, c.density.last_result());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
@@ -70,7 +73,7 @@ representation::perceived_block new_cache_selector::calc_best(
 
   ER_ASSERT(nullptr != best.ent, "FATAL: No best new cache found?");
 
-  ER_NOM("Best utility: new_cache%d at (%zu, %zu): %f",
+  ER_NOM("Best utility: new_cache%d at (%u, %u): %f",
          best.ent->id(),
          best.ent->discrete_loc().first,
          best.ent->discrete_loc().second,

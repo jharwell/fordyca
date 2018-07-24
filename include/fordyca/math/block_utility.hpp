@@ -54,14 +54,18 @@ class block_utility : public rcppsw::math::expression<double> {
   block_utility(const argos::CVector2& block_loc,
                 const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc, double density);
-  double operator()(const argos::CVector2& rloc, double density) {
-    return calc(rloc, density);
+  double calc(const argos::CVector2& rloc, double density, double priority);
+  double operator()(const argos::CVector2& rloc,
+                    double density,
+                    double priority) {
+    return calc(rloc, density, priority);
   }
 
  private:
+  // clang-format off
   const argos::CVector2 mc_block_loc;
   const argos::CVector2 mc_nest_loc;
+  // clang-format on
 };
 
 NS_END(math, fordyca);

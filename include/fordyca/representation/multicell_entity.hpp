@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/representation/base_cell_entity.hpp"
 #include "rcppsw/common/common.hpp"
@@ -50,20 +51,13 @@ NS_START(fordyca, representation);
  */
 class multicell_entity : public base_cell_entity {
  public:
-  multicell_entity(double xdim, double ydim, const rcppsw::utils::color& color)
-      : multicell_entity{xdim, ydim, color, -1} {}
+  multicell_entity(const rcppsw::math::vector2d& dim, const rcppsw::utils::color& color)
+      : multicell_entity{dim, color, -1} {}
 
-  multicell_entity(double dim, const rcppsw::utils::color& color)
-      : multicell_entity{dim, dim, color, -1} {}
-
-  multicell_entity(double dim, const rcppsw::utils::color& color, int id)
-      : multicell_entity{dim, dim, color, id} {}
-
-  multicell_entity(double xdim,
-                   double ydim,
+  multicell_entity(const rcppsw::math::vector2d& dim,
                    const rcppsw::utils::color& color,
                    int id)
-      : base_cell_entity(color, id), m_xdim(xdim), m_ydim(ydim) {}
+      : base_cell_entity(color, id), m_dim(dim) {}
 
   /**
    * @brief Get the 2D space spanned by the multicell entity in absolute
@@ -72,8 +66,8 @@ class multicell_entity : public base_cell_entity {
    * @param loc The entities current location.
    */
   rcppsw::math::range<double> xspan(const argos::CVector2& loc) const {
-    return rcppsw::math::range<double>(loc.GetX() - 0.5 * m_xdim,
-                                       loc.GetX() + 0.5 * m_xdim);
+    return rcppsw::math::range<double>(loc.GetX() - 0.5 * m_dim.x(),
+                                       loc.GetX() + 0.5 * m_dim.x());
   }
 
   /**
@@ -84,25 +78,28 @@ class multicell_entity : public base_cell_entity {
    */
 
   rcppsw::math::range<double> yspan(const argos::CVector2& loc) const {
-    return rcppsw::math::range<double>(loc.GetY() - 0.5 * m_ydim,
-                                       loc.GetY() + 0.5 * m_ydim);
+    return rcppsw::math::range<double>(loc.GetY() - 0.5 * m_dim.y(),
+                                       loc.GetY() + 0.5 * m_dim.y());
   }
 
   /**
    * @brief Get the size of the cell entity in the X direction. This may be
    * greater than a single cell.
    */
-  double xsize(void) const { return m_xdim; }
+  double xsize(void) const { return m_dim.x(); }
 
   /**
    * @brief Get the size of the cell entity in the y direction. This may be
    * greater than a single cell.
    */
-  double ysize(void) const { return m_ydim; }
+  double ysize(void) const { return m_dim.y(); }
+
+  const rcppsw::math::vector2d& dims(void) const { return m_dim; }
 
  private:
-  double m_xdim;
-  double m_ydim;
+  // clang-format off
+  rcppsw::math::vector2d m_dim;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

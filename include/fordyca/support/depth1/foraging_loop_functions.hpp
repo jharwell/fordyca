@@ -103,7 +103,7 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void cache_handling_init(const struct params::arena_map_params *arenap);
+  void cache_handling_init(const struct params::arena::arena_map_params *arenap);
 
   // clang-format off
   double                              mc_cache_respawn_scale_factor{0.0};

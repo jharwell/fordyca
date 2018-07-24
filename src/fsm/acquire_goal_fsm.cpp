@@ -31,7 +31,6 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -44,7 +43,7 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
     controller::saa_subsystem* saa,
     const representation::perceived_arena_map* const map,
     std::function<bool(void)> goal_detect)

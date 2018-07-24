@@ -37,9 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct fsm_params;
-}
 namespace controller {
 namespace depth1 {
 class sensing_subsystem;
@@ -79,8 +76,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
   cached_block_to_nest_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server>& server,
+      const controller::cache_selection_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);
 

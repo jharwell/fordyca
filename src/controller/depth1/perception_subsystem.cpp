@@ -24,7 +24,6 @@
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -62,7 +61,7 @@ void perception_subsystem::process_los(
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
-        ER_DIAG("Correct cache%d discrepency at (%zu, %zu)",
+        ER_DIAG("Correct cache%d discrepency at (%u, %u)",
                 map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
                 d.first,
                 d.second);
@@ -81,7 +80,7 @@ void perception_subsystem::process_los(
     if (!map()
              ->access<occupancy_grid::kCellLayer>(cache->discrete_loc())
              .state_has_cache()) {
-      ER_NOM("Discovered cache%d at (%zu, %zu): %u blocks",
+      ER_NOM("Discovered cache%d at (%u, %u): %u blocks",
              cache->id(),
              cache->discrete_loc().first,
              cache->discrete_loc().second,

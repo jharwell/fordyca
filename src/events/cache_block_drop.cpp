@@ -28,7 +28,7 @@
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -46,7 +46,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     double resolution)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
@@ -81,7 +81,7 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
 
 void cache_block_drop::visit(representation::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "FATAL: undefined robot index");
-  int index = m_block->robot_id();
+  __rcsw_unused int index = m_block->robot_id();
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access(cell_op::x(), cell_op::y()).accept(*this);
@@ -96,7 +96,7 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
   map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
 } /* visit() */
 
-void cache_block_drop::visit(representation::block& block) {
+void cache_block_drop::visit(representation::base_block& block) {
   events::free_block_drop e(m_server,
                             m_block, /* OK because we only have 1 block */
                             rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),

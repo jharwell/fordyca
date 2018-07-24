@@ -65,7 +65,7 @@ class perceived_arena_map
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using block_list = std::list<std::shared_ptr<block>>;
+  using block_list = std::list<std::shared_ptr<base_block>>;
   using perceived_cache_list = std::list<perceived_cache>;
   using perceived_block_list = std::list<perceived_block>;
 
@@ -124,13 +124,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(const std::shared_ptr<block>& block);
+  bool block_add(const std::shared_ptr<base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const std::shared_ptr<block>& victim);
+  bool block_remove(const std::shared_ptr<base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -173,6 +173,8 @@ class perceived_arena_map
    * @brief Reset all the cells in the percieved arena.
    */
   void reset(void) { m_grid.reset(); }
+
+  double grid_resolution(void) const { return m_grid.resolution(); }
 
  private:
   // clang-format off

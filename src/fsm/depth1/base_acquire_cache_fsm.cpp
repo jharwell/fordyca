@@ -24,7 +24,6 @@
 #include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -38,8 +37,8 @@ namespace depth1 = controller::depth1;
  * Constructors/Destructors
  ******************************************************************************/
 base_acquire_cache_fsm::base_acquire_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
     : acquire_goal_fsm(server,
@@ -47,7 +46,7 @@ base_acquire_cache_fsm::base_acquire_cache_fsm(
                        map,
                        std::bind(&base_acquire_cache_fsm::cache_detected_cb,
                                  this)),
-      mc_nest_center(params->nest_center) {}
+      mc_sel_matrix(sel_matrix) {}
 
 /*******************************************************************************
  * Member Functions

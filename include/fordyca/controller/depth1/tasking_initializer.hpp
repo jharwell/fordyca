@@ -38,7 +38,9 @@ namespace params {
 namespace depth1 { class param_repository; }
 }
 
-NS_START(controller, depth1);
+NS_START(controller);
+class cache_selection_matrix;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -53,15 +55,25 @@ NS_START(controller, depth1);
 class tasking_initializer : public depth0::stateful_tasking_initializer {
  public:
   tasking_initializer(std::shared_ptr<rcppsw::er::server>& server,
+                      const controller::block_selection_matrix* bsel_matrix,
+                      const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
   ~tasking_initializer(void);
+  tasking_initializer& operator=(const tasking_initializer& other) = delete;
+  tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
   operator()(params::depth1::param_repository *const param_repo);
 
  protected:
   void depth1_tasking_init(params::depth1::param_repository* task_repo);
+  const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
+
+ private:
+  // clang-format off
+  const controller::cache_selection_matrix* const mc_sel_matrix;
+  // clang-format on
 };
 
 NS_END(depth1, controller, fordyca);

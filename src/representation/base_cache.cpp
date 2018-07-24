@@ -40,9 +40,10 @@ constexpr uint base_cache::kMinBlocks;
 base_cache::base_cache(double dimension,
                        double resolution,
                        argos::CVector2 center,
-                       const std::vector<std::shared_ptr<block>>& blocks,
+                       const std::vector<std::shared_ptr<base_block>>& blocks,
                        int id)
-    : multicell_entity(dimension, rcppsw::utils::color::kGRAY40),
+    : multicell_entity(rcppsw::math::vector2d(dimension, dimension),
+                       rcppsw::utils::color::kGRAY40),
       immovable_cell_entity(center, resolution),
       m_resolution(resolution),
       m_blocks(blocks) {
@@ -56,7 +57,7 @@ base_cache::base_cache(double dimension,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_cache::block_remove(const std::shared_ptr<block>& block) {
+void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
   m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
 } /* block_remove() */
 

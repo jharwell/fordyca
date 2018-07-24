@@ -32,7 +32,7 @@
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
@@ -50,7 +50,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 free_block_pickup::free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                                     std::shared_ptr<representation::block> block,
+                                     std::shared_ptr<representation::base_block> block,
                                      uint robot_index,
                                      uint timestep)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
@@ -74,7 +74,7 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void free_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
-  ER_NOM("cell2D: fb%u block%d from (%zu, %zu)",
+  ER_NOM("cell2D: fb%u block%d from (%u, %u)",
          m_robot_index,
          m_block->id(),
          m_block->discrete_loc().first,
@@ -101,7 +101,7 @@ void free_block_pickup::visit(representation::arena_map& map) {
 /*******************************************************************************
  * Stateless Foraging
  ******************************************************************************/
-void free_block_pickup::visit(representation::block& block) {
+void free_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
   block.pickup_event(true);

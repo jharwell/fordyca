@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,9 +33,9 @@ NS_START(fordyca, controller, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
+    std::shared_ptr<rcppsw::er::server> server,
+    const controller::cache_selection_matrix* const matrix)
+    : client(server), mc_matrix(matrix) {
   client::insmod("cache_site_selector",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -46,8 +47,11 @@ cache_site_selector::cache_site_selector(
 argos::CVector2 cache_site_selector::calc_best(
     const std::list<representation::perceived_cache>&,
     argos::CVector2 robot_loc) {
-  argos::CVector2 site((robot_loc.GetX() - m_nest_loc.GetX()) / 2.0,
-                       m_nest_loc.GetY());
+
+  argos::CVector2 nest_loc = boost::get<argos::CVector2>(
+      mc_matrix->find("nest_center")->second);
+  argos::CVector2 site((robot_loc.GetX() - nest_loc.GetX()) / 2.0,
+                       nest_loc.GetY());
 
   ER_NOM("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
   return site;

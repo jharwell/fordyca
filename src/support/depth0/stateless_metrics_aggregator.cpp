@@ -28,7 +28,7 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,7 +82,7 @@ void stateless_metrics_aggregator::collect_from_controller(
 } /* collect_from_controller() */
 
 void stateless_metrics_aggregator::collect_from_block(
-    const representation::block* const block) {
+    const representation::base_block* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 

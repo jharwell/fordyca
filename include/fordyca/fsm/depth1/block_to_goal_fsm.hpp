@@ -39,7 +39,6 @@ NS_START(fordyca);
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
-namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; class block; }
 NS_START(fsm);
 
@@ -68,8 +67,8 @@ class block_to_goal_fsm : public base_foraging_fsm,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
   block_to_goal_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server>& server,
+      const controller::block_selection_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);
 

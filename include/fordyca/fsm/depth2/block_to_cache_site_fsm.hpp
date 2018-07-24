@@ -50,8 +50,9 @@ NS_START(fordyca, fsm, depth2);
 class block_to_cache_site_fsm : public depth1::block_to_goal_fsm {
  public:
   block_to_cache_site_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server>& server,
+      const controller::block_selection_matrix* bsel_matrix,
+      const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);
 

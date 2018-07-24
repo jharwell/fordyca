@@ -31,6 +31,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -49,6 +50,7 @@ namespace ta = rcppsw::task_allocation;
 stateful_foraging_controller::stateful_foraging_controller(void)
     : stateless_foraging_controller(),
       m_light_loc(),
+      m_block_sel_matrix(),
       m_perception(),
       m_executive() {}
 
@@ -137,8 +139,15 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
+
+  auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
+
+  m_block_sel_matrix = rcppsw::make_unique<block_selection_matrix>(
+      ogrid->nest, &ogrid->priorities);
+
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(client::server_ref(),
+                                             m_block_sel_matrix.get(),
                                              saa_subsystem(),
                                              perception())(&param_repo);
 

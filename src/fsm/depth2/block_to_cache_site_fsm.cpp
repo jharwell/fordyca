@@ -33,12 +33,13 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_cache_site_fsm::block_to_cache_site_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::block_selection_matrix* bsel_matrix,
+    const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
-    : block_to_goal_fsm(params, server, saa, map),
-      m_cache_fsm(params, server, saa, map) {}
+    : block_to_goal_fsm(server, bsel_matrix, saa, map),
+      m_cache_fsm(server, csel_matrix, saa, map) {}
 
 /*******************************************************************************
  * FSM Metrics

@@ -1,0 +1,58 @@
+/**
+ * @file block_manifest_processor.hpp
+ *
+ * @copyright 2018 John Harwell, All rights reserved.
+ *
+ * This file is part of FORDYCA.
+ *
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ */
+
+#ifndef INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_
+#define INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_
+
+/*******************************************************************************
+ * Includes
+ ******************************************************************************/
+#include "rcppsw/patterns/factory/sharing_factory.hpp"
+#include "fordyca/params/arena/block_manifest.hpp"
+#include "rcppsw/math/vector2.hpp"
+
+/*******************************************************************************
+ * Namespaces
+ ******************************************************************************/
+NS_START(fordyca, representation);
+class base_block;
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+class block_manifest_processor :
+    private rcppsw::patterns::factory::sharing_factory<base_block,
+                                                       const rcppsw::math::vector2d&,
+                                                       int> {
+ public:
+  using block_vector = std::vector<std::shared_ptr<base_block>>;
+  explicit block_manifest_processor(const params::arena::block_manifest* const m);
+
+  block_vector create_blocks(void);
+
+ private:
+  // clang-format off
+  const params::arena::block_manifest mc_manifest;
+  // clang-format on
+};
+
+NS_END(representation, fordyca);
+
+#endif /* INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_ */

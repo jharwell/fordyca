@@ -31,6 +31,7 @@
 #include "fordyca/params/pheromone_parser.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/block_priorities_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +53,9 @@ class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
   occupancy_grid_parser(const std::shared_ptr<rcppsw::er::server>& server,
                         uint level)
       : xml_param_parser(server, level),
-        m_grid_parser(server, level + 1),
-        m_pheromone_parser(server, level + 1) {}
+        m_grid(server, level + 1),
+        m_pheromone(server, level + 1),
+        m_priorities(server, level + 1) {}
 
   /**
    * @brief The root tag that all occupancy grid parameters should lie under in
@@ -79,8 +81,9 @@ class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
   // clang-format off
   bool                                   m_parsed{false};
   std::shared_ptr<occupancy_grid_params> m_params{nullptr};
-  grid_parser                            m_grid_parser;
-  pheromone_parser                       m_pheromone_parser;
+  grid_parser                            m_grid;
+  pheromone_parser                       m_pheromone;
+  block_priorities_parser                m_priorities;
   // clang-format on
 };
 
