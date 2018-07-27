@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 

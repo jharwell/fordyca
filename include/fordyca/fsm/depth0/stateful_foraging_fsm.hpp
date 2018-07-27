@@ -37,7 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
@@ -68,11 +67,10 @@ class stateful_foraging_fsm : public base_foraging_fsm,
                               public task_allocation::taskable,
                               public visitor::visitable_any<depth0::stateful_foraging_fsm> {
  public:
-  stateful_foraging_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  stateful_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
+                        const controller::block_selection_matrix* sel_matrix,
+                        controller::saa_subsystem* saa,
+                        representation::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }

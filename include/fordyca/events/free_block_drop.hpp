@@ -78,7 +78,7 @@ class free_block_drop
                                 fsm::depth1::block_to_goal_fsm> {
  public:
   free_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                  const std::shared_ptr<representation::block>& block,
+                  const std::shared_ptr<representation::base_block>& block,
                   rcppsw::math::dcoord2 coord,
                   double resolution);
   ~free_block_drop(void) override { client::rmmod(); }
@@ -88,7 +88,7 @@ class free_block_drop
 
   /* stateless foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
 
@@ -104,13 +104,13 @@ class free_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const { return m_block; }
 
  private:
   // clang-format off
-  double                                 m_resolution;
-  std::shared_ptr<representation::block> m_block;
-  std::shared_ptr<rcppsw::er::server>    m_server;
+  double                                      m_resolution;
+  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

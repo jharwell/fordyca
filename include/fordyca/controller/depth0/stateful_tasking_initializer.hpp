@@ -47,6 +47,7 @@ namespace depth0 { class stateful_param_repository; }
 NS_START(controller);
 class saa_subsystem;
 class base_perception_subsystem;
+class block_selection_matrix;
 
 NS_START(depth0);
 
@@ -63,6 +64,7 @@ NS_START(depth0);
 class stateful_tasking_initializer {
  public:
   stateful_tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
+                               const controller::block_selection_matrix* sel_matrix,
                                saa_subsystem* saa,
                                base_perception_subsystem* perception);
   virtual ~stateful_tasking_initializer(void);
@@ -82,12 +84,14 @@ class stateful_tasking_initializer {
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   ta::bifurcating_tdgraph* graph(void) { return m_graph; }
   const ta::bifurcating_tdgraph* graph(void) const { return m_graph; }
+  const block_selection_matrix* block_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:
   // clang-format off
   std::shared_ptr<rcppsw::er::server> m_server;
   controller::saa_subsystem* const    m_saa;
   base_perception_subsystem* const    m_perception;
+  const block_selection_matrix* const mc_sel_matrix;
   ta::bifurcating_tdgraph*            m_graph;
   // clang-format on
 };

@@ -34,7 +34,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth2);
+NS_START(fordyca, controller);
+class cache_selection_matrix;
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -49,11 +51,12 @@ NS_START(fordyca, controller, depth2);
  */
 class cache_site_selector: public rcppsw::er::client {
  public:
-  cache_site_selector(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      argos::CVector2 nest_loc);
+  cache_site_selector(std::shared_ptr<rcppsw::er::server> server,
+                      const controller::cache_selection_matrix* matrix);
 
   ~cache_site_selector(void) override { client::rmmod(); }
+  cache_site_selector& operator=(const cache_site_selector& other) = delete;
+  cache_site_selector(const cache_site_selector& other) = delete;
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
@@ -66,7 +69,9 @@ class cache_site_selector: public rcppsw::er::client {
       argos::CVector2 robot_loc);
 
  private:
-  argos::CVector2 m_nest_loc;
+  // clang-format off
+  const controller::cache_selection_matrix* const mc_matrix;
+  // clang-format on
 };
 
 NS_END(depth2, controller, fordyca);

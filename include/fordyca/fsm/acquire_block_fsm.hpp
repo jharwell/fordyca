@@ -25,18 +25,15 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <map>
+
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct fsm_params;
-}
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,8 +51,8 @@ NS_START(fsm);
  */
 class acquire_block_fsm : public acquire_goal_fsm {
  public:
-  acquire_block_fsm(const struct params::fsm_params* params,
-                    const std::shared_ptr<rcppsw::er::server>& server,
+  acquire_block_fsm(std::shared_ptr<rcppsw::er::server>& server,
+                    const controller::block_selection_matrix* matrix,
                     controller::saa_subsystem* saa,
                     representation::perceived_arena_map* map);
 
@@ -88,7 +85,7 @@ class acquire_block_fsm : public acquire_goal_fsm {
   bool block_acquired_cb(bool explore_result) const;
 
   // clang-format off
-  const argos::CVector2 mc_nest_center;
+  const controller::block_selection_matrix* const mc_matrix;
   // clang-format on
 };
 

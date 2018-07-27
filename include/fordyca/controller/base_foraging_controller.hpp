@@ -35,9 +35,9 @@
 NS_START(fordyca);
 
 namespace representation {
-class block;
+class base_block;
 class line_of_sight;
-} // namespace representation
+}
 namespace params {
 struct output_params;
 }
@@ -70,8 +70,8 @@ class base_foraging_controller : public argos::CCI_Controller,
       delete;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
-  void Reset(void) override;
+ void Init(ticpp::Element& node) override;
+ void Reset(void) override;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
@@ -100,12 +100,12 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const { return m_block; }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::block>& block) {
+  void block(const std::shared_ptr<representation::base_block>& block) {
     m_block = block;
   }
 
@@ -154,10 +154,10 @@ class base_foraging_controller : public argos::CCI_Controller,
   std::string dbg_header_calc(void) const;
 
   // clang-format off
-  bool                                       m_display_id{false};
-  std::shared_ptr<representation::block>     m_block{nullptr};
-  std::unique_ptr<controller::saa_subsystem> m_saa;
-  std::shared_ptr<rcppsw::er::server>        m_server;
+  bool                                        m_display_id{false};
+  std::shared_ptr<representation::base_block> m_block{nullptr};
+  std::unique_ptr<controller::saa_subsystem>  m_saa;
+  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

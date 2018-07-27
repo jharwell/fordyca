@@ -37,7 +37,6 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace params { struct fsm_params; }
 namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
@@ -61,7 +60,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+  stateless_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
                          controller::saa_subsystem* saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;

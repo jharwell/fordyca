@@ -22,11 +22,14 @@
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/representation/cube_block.hpp"
+#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/representation/block_manifest_processor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,20 +39,19 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::arena_map_params* params)
+arena_map::arena_map(const struct params::arena::arena_map_params* params)
     : client(rcppsw::er::g_server),
       mc_static_cache_params(params->static_cache),
-      m_blocks(params->block_dist.n_blocks),
+      m_blocks(block_manifest_processor(&params->blocks.dist.manifest).create_blocks()),
       m_caches(),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
              server_ref()),
-      m_nest(params->nest.xdim,
-             params->nest.ydim,
+      m_nest(params->nest.dims,
              params->nest.center,
              params->grid.resolution),
-      m_block_dispatcher(rcppsw::er::g_server, m_grid, &params->block_dist) {
+      m_block_dispatcher(rcppsw::er::g_server, m_grid, &params->blocks.dist) {
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
   ER_NOM("%zu x %zu/%zu x %zu @ %f resolution",
@@ -58,11 +60,6 @@ arena_map::arena_map(const struct params::arena_map_params* params)
          m_grid.xrsize(),
          m_grid.yrsize(),
          m_grid.resolution());
-
-  for (size_t i = 0; i < m_blocks.size(); ++i) {
-    m_blocks[i] =
-        std::make_shared<block>(params->block.dimension, static_cast<int>(i));
-  } /* for(i..) */
 }
 
 /*******************************************************************************
@@ -101,7 +98,7 @@ void arena_map::static_cache_create(void) {
                                           mc_static_cache_params.dimension,
                                           m_grid.resolution());
 
-  std::vector<std::shared_ptr<representation::block>> blocks;
+  block_vector blocks;
 
   /*
    * Only blocks that are not:
@@ -126,8 +123,8 @@ void arena_map::static_cache_create(void) {
   c.update_host_cells(m_grid, m_caches);
 } /* static_cache_create() */
 
-bool arena_map::distribute_single_block(std::shared_ptr<block>& block) {
-  support::block_distribution_dispatcher::entity_list entities;
+bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {
+  support::block_dist::dispatcher::entity_list entities;
   for (auto &cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
@@ -145,7 +142,7 @@ void arena_map::distribute_all_blocks(void) {
   m_grid.reset();
 
   /* distribute blocks */
-  support::block_distribution_dispatcher::entity_list entities;
+  support::block_dist::dispatcher::entity_list entities;
   for (auto &cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */

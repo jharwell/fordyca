@@ -37,11 +37,11 @@ namespace depth1 = controller::depth1;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
-    : base_acquire_cache_fsm(params, server, saa, map) {}
+    : base_acquire_cache_fsm(server, sel_matrix, saa, map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -49,17 +49,17 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 bool acquire_existing_cache_fsm::select_cache_for_acquisition(
     argos::CVector2* const acquisition) {
   controller::depth1::existing_cache_selector selector(server_ref(),
-                                                       nest_center());
+                                                       sel_matrix());
   representation::perceived_cache best =
       selector.calc_best(map()->perceived_caches(), base_sensors()->position());
   /*
-   * If this happens, all the blocks we know of are too close for us to vector
+   * If this happens, all the cachess we know of are too close for us to vector
    * to.
    */
   if (nullptr == best.ent) {
     return false;
   }
-  ER_NOM("Select cache for acquisition: %d@(%zu, %zu) [utility=%f]",
+  ER_NOM("Select cache for acquisition: %d@(%u, %u) [utility=%f]",
          best.ent->id(),
          best.ent->discrete_loc().first,
          best.ent->discrete_loc().second,

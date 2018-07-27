@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************

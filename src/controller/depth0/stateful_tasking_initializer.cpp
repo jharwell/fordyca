@@ -29,7 +29,6 @@
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/exec_estimates_params.hpp"
 #include "fordyca/params/depth0/stateful_param_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 
@@ -49,9 +48,14 @@ using representation::occupancy_grid;
  ******************************************************************************/
 stateful_tasking_initializer::stateful_tasking_initializer(
     std::shared_ptr<rcppsw::er::server> server,
+    const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : m_server(server), m_saa(saa), m_perception(perception), m_graph(nullptr) {}
+    : m_server(server),
+      m_saa(saa),
+      m_perception(perception),
+      mc_sel_matrix(sel_matrix),
+      m_graph(nullptr) {}
 
 stateful_tasking_initializer::~stateful_tasking_initializer(void) = default;
 
@@ -66,8 +70,8 @@ void stateful_tasking_initializer::stateful_tasking_init(
 
   std::unique_ptr<ta::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          stateful_repo->parse_results<params::fsm_params>(),
           m_server,
+          mc_sel_matrix,
           m_saa,
           m_perception->map());
 

@@ -1,5 +1,5 @@
 /**
- * @file tasking_init.cpp
+ * @file tasking_initializer.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -32,7 +32,6 @@
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/params/depth2/exec_estimates_params.hpp"
 #include "fordyca/params/depth2/param_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -54,9 +53,15 @@ using representation::occupancy_grid;
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
     std::shared_ptr<rcppsw::er::server> server,
+    const controller::block_selection_matrix* bsel_matrix,
+    const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : depth1::tasking_initializer(server, saa, perception) {}
+    : depth1::tasking_initializer(server,
+                                  bsel_matrix,
+                                  csel_matrix,
+                                  saa,
+                                  perception) {}
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -71,28 +76,30 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_starter_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          block_sel_matrix(),
+          cache_sel_matrix(),
           saa_subsystem(),
           perception()->map());
 
   std::unique_ptr<ta::taskable> cache_finisher_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          block_sel_matrix(),
+          cache_sel_matrix(),
           saa_subsystem(),
           perception()->map());
 
   std::unique_ptr<ta::taskable> cache_transferer_fsm =
       rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          cache_sel_matrix(),
           saa_subsystem(),
           perception()->map());
   std::unique_ptr<ta::taskable> cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          param_repo->parse_results<params::fsm_params>(),
           server(),
+          cache_sel_matrix(),
           saa_subsystem(),
           perception()->map());
 

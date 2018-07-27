@@ -24,7 +24,7 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -89,7 +89,7 @@ void base_perception_subsystem::process_los(
     ER_ASSERT(!block->is_out_of_sight(), "FATAL: Block out of sight in LOS?");
     if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
              .state_has_block()) {
-      ER_NOM("Discovered block%d at (%zu, %zu)",
+      ER_NOM("Discovered block%d at (%u, %u)",
              block->id(),
              block->discrete_loc().first,
              block->discrete_loc().second);

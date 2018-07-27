@@ -97,7 +97,7 @@ class cached_block_pickup
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::perceived_arena_map& map) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
@@ -116,13 +116,13 @@ class cached_block_pickup
   /**
    * @brief The block that will be picked up by the robot.
    */
-  std::shared_ptr<representation::block>       m_pickup_block{nullptr};
+  std::shared_ptr<representation::base_block>  m_pickup_block{nullptr};
 
   /**
    * @brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  std::shared_ptr<representation::block>       m_orphan_block{nullptr};
+  std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
   std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };

@@ -40,7 +40,7 @@ NS_START(fordyca, representation);
 
 namespace visitor = rcppsw::patterns::visitor;
 class base_cache;
-class block;
+class base_block;
 class base_cell_entity;
 
 /*******************************************************************************
@@ -115,8 +115,8 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  const std::shared_ptr<representation::block> block(void) const;
-  std::shared_ptr<representation::block> block(void);
+  std::shared_ptr<const representation::base_block> block(void) const;
+  std::shared_ptr<representation::base_block> block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.

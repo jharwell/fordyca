@@ -30,7 +30,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/arena_map_params.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_parser.hpp"
@@ -123,10 +123,15 @@ __rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
   }
 
   for (auto& block : m_arena_map->blocks()) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
     if (block->contains_point(plane_pos)) {
-      return argos::CColor(block->color().red(),
-                           block->color().green(),
-                           block->color().blue());
+      return argos::CColor::BLACK;
     }
   } /* for(&block..) */
 
@@ -172,7 +177,7 @@ void stateless_foraging_loop_functions::PreStep() {
 
 void stateless_foraging_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
-  auto* aparams = repo.parse_results<struct params::arena_map_params>();
+  auto* aparams = repo.parse_results<struct params::arena::arena_map_params>();
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
   m_arena_map.reset(new representation::arena_map(aparams));

@@ -115,6 +115,13 @@ __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
     if (arena_map()->blocks()[i]->contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }

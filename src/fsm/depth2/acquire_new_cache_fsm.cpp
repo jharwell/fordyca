@@ -38,18 +38,18 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
+    const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* saa,
     representation::perceived_arena_map* const map)
-    : base_acquire_cache_fsm(params, server, saa, map) {}
+    : base_acquire_cache_fsm(server, csel_matrix, saa, map) {}
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::select_cache_for_acquisition(
     argos::CVector2* const acquisition) {
-  controller::depth2::new_cache_selector selector(server_ref(), nest_center());
+  controller::depth2::new_cache_selector selector(server_ref(), sel_matrix());
 
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =

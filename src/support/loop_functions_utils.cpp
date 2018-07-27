@@ -69,19 +69,16 @@ __rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
 }
 
 __rcsw_const bool block_drop_overlap_with_cache(
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     const argos::CVector2& drop_loc) {
-  return (
-      cache->contains_point(drop_loc + argos::CVector2(block->xsize(), 0)) ||
-      cache->contains_point(drop_loc - argos::CVector2(block->xsize(), 0)) ||
-      cache->contains_point(drop_loc + argos::CVector2(0, block->ysize())) ||
-      cache->contains_point(drop_loc - argos::CVector2(0, block->ysize())));
+  return cache->xspan(cache->real_loc()).overlaps_with(block->xspan(drop_loc)) &&
+      cache->yspan(cache->real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_cache() */
 
 __rcsw_pure bool block_drop_near_arena_boundary(
     const representation::arena_map& map,
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const argos::CVector2& drop_loc) {
   return (drop_loc.GetX() <= block->xsize() * 2 ||
           drop_loc.GetX() >= map.xrsize() - block->xsize() * 2 ||
@@ -90,14 +87,11 @@ __rcsw_pure bool block_drop_near_arena_boundary(
 } /* block_drop_overlap_with_nest() */
 
 __rcsw_pure bool block_drop_overlap_with_nest(
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const representation::nest& nest,
     const argos::CVector2& drop_loc) {
-  return (
-      nest.contains_point(drop_loc + argos::CVector2(block->xsize(), 0.0)) ||
-      nest.contains_point(drop_loc - argos::CVector2(block->xsize(), 0.0)) ||
-      nest.contains_point(drop_loc + argos::CVector2(0.0, block->ysize())) ||
-      nest.contains_point(drop_loc - argos::CVector2(0.0, block->ysize())));
+  return nest.xspan(nest.real_loc()).overlaps_with(block->xspan(drop_loc)) &&
+      nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_nest() */
 
 NS_END(utils, support, fordyca);

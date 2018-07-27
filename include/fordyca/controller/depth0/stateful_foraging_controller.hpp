@@ -51,6 +51,7 @@ namespace tasks { namespace depth0 { class foraging_task; }}
 NS_START(controller);
 
 class base_perception_subsystem;
+class block_selection_matrix;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
@@ -135,11 +136,13 @@ class stateful_foraging_controller : public stateless_foraging_controller,
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
+  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
 
  private:
   // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
+  std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem>           m_perception;
   std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
   // clang-format on

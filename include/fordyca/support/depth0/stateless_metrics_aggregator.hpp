@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_METRICS_STATELESS_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_METRICS_STATELESS_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,7 +32,7 @@
 NS_START(fordyca);
 
 namespace representation {
-class block;
+class base_block;
 } /* namespace representation */
 
 NS_START(support, depth0);
@@ -64,9 +64,9 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_block(const representation::block* block);
+  void collect_from_block(const representation::base_block* block);
 };
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_METRICS_STATELESS_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_ */

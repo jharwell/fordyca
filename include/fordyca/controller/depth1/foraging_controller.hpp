@@ -52,7 +52,9 @@ namespace depth0 { class stateful_foraging_repository; }
 namespace depth1 { class task_repository; }
 }
 
-NS_START(controller, depth1);
+NS_START(controller);
+class cache_selection_matrix;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -69,6 +71,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
+  ~foraging_controller(void);
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
@@ -89,6 +92,11 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+ protected:
+  const cache_selection_matrix*  cache_sel_matrix(void) const {
+    return m_cache_sel_matrix.get();
+  }
+
  private:
   void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
                     params::depth1::task_repository* task_repo);
@@ -96,6 +104,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
   // clang-format off
   bool                                               m_display_task{false};
   std::string                                        m_prev_task{""};
+  std::unique_ptr<cache_selection_matrix>            m_cache_sel_matrix;
   std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
