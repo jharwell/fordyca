@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/math/vector2.h>
+#include <boost/variant.hpp>
 #include <map>
 #include <string>
-#include <boost/variant.hpp>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/common/common.hpp"
 
@@ -54,8 +54,8 @@ NS_START(fordyca, controller);
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_selection_matrix : public std::map<std::string,
-                                               boost::variant<argos::CVector2>> {
+class cache_selection_matrix
+    : public std::map<std::string, boost::variant<argos::CVector2>> {
  public:
   explicit cache_selection_matrix(const argos::CVector2& nest_loc);
 };

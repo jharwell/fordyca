@@ -124,7 +124,9 @@ class nest_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::base_block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const {
+    return m_block;
+  }
 
  private:
   // clang-format off

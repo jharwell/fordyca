@@ -43,9 +43,8 @@ void base_block::move_out_of_sight(void) {
 } /* move_out_of_sight() */
 
 std::unique_ptr<base_block> base_block::clone(void) const {
-  std::unique_ptr<base_block> tmp = rcppsw::make_unique<base_block>(dims(),
-                                                                    color(),
-                                                                    id());
+  std::unique_ptr<base_block> tmp =
+      rcppsw::make_unique<base_block>(dims(), color(), id());
   tmp->discrete_loc(this->discrete_loc());
   tmp->real_loc(this->real_loc());
   tmp->reset_robot_id();

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -52,7 +52,7 @@ namespace ta = rcppsw::task_allocation;
  */
 class base_foraging_task
     : public virtual rcppsw::metrics::tasks::execution_metrics,
-      public virtual metrics::fsm::base_fsm_metrics,
+      public virtual metrics::fsm::collision_metrics,
       public virtual metrics::fsm::goal_acquisition_metrics,
       public fsm::block_transporter {
  public:

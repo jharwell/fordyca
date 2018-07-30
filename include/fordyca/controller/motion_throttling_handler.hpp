@@ -29,7 +29,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace control { struct waveform_params; class waveform; }}
+namespace rcppsw { namespace control {
+struct waveform_params;
+class waveform;
+}} // namespace rcppsw::control
 NS_START(fordyca, controller);
 class actuation_subsystem;
 namespace ct = rcppsw::control;

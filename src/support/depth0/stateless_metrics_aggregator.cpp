@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
 #include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
@@ -50,6 +52,11 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
       metrics_path() + "/" + params->distance_fname,
       params->collect_interval);
 
+  register_collector<metrics::fsm::collision_metrics_collector>(
+      "fsm::collision",
+      metrics_path() + "/" + params->collision_fname,
+      params->collect_interval);
+
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "blocks::acquisition",
       metrics_path() + "/" + params->block_acquisition_fname,
@@ -67,6 +74,8 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
  ******************************************************************************/
 void stateless_metrics_aggregator::collect_from_controller(
     const rcppsw::metrics::base_metrics* const controller) {
+  auto collision_m =
+      dynamic_cast<const metrics::fsm::collision_metrics*>(controller);
   auto distance_m =
       dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
   auto block_acq_m =
@@ -76,8 +85,11 @@ void stateless_metrics_aggregator::collect_from_controller(
             "FATAL: Controller does not provide FSM distance metrics");
   ER_ASSERT(block_acq_m,
             "FATAL: Controller does not provide FSM block acquisition metrics");
+  ER_ASSERT(collision_m,
+            "FATAL: Controller does not provide FSM collision metrics");
 
   collect("fsm::distance", *distance_m);
+  collect("fsm::collision", *collision_m);
   collect("blocks::acquisition", *block_acq_m);
 } /* collect_from_controller() */
 

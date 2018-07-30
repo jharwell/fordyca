@@ -27,8 +27,8 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <map>
 
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -25,8 +25,8 @@
 
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/occupancy_grid_params.hpp"
-#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -95,18 +95,18 @@ void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim
 } /* cache_remove() */
 
 bool perceived_arena_map::block_add(const std::shared_ptr<base_block>& block_in) {
-  auto it1 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block_in](const std::shared_ptr<representation::base_block>& b) {
-                     return b->id() == block_in->id();
-                   });
-  auto it2 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block_in](const std::shared_ptr<representation::base_block>& b) {
-                     return b->discrete_loc() == block_in->discrete_loc();
-                   });
+  auto it1 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->id() == block_in->id();
+      });
+  auto it2 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->discrete_loc() == block_in->discrete_loc();
+      });
 
   if (m_blocks.end() != it1) { /* block is known */
     /*

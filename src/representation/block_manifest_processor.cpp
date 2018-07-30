@@ -40,11 +40,11 @@ block_manifest_processor::block_manifest_processor(
   register_type<ramp_block>("ramp");
 }
 
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-block_manifest_processor::block_vector block_manifest_processor::create_blocks(void) {
+block_manifest_processor::block_vector block_manifest_processor::create_blocks(
+    void) {
   block_vector v;
   uint i;
   for (i = 0; i < mc_manifest.n_cube; ++i) {
@@ -53,9 +53,10 @@ block_manifest_processor::block_vector block_manifest_processor::create_blocks(v
                                               mc_manifest.unit_dim),
                        i));
   } /* for(i..) */
-  for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp; ++i) {
+  for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp;
+       ++i) {
     v.push_back(create("ramp",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim*2,
+                       rcppsw::math::vector2d(mc_manifest.unit_dim * 2,
                                               mc_manifest.unit_dim),
                        i));
   } /* for(i..) */

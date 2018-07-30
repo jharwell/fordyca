@@ -49,10 +49,11 @@ using representation::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                                     std::shared_ptr<representation::base_block> block,
-                                     uint robot_index,
-                                     uint timestep)
+free_block_pickup::free_block_pickup(
+    std::shared_ptr<rcppsw::er::server> server,
+    std::shared_ptr<representation::base_block> block,
+    uint robot_index,
+    uint timestep)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
       client(server),
       m_timestep(timestep),
@@ -174,10 +175,10 @@ void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  auto depth0 = dynamic_cast<tasks::depth0::foraging_task*>(
-      controller.current_task());
-  auto depth1 = dynamic_cast<tasks::depth1::foraging_task*>(
-      controller.current_task());
+  auto depth0 =
+      dynamic_cast<tasks::depth0::foraging_task*>(controller.current_task());
+  auto depth1 =
+      dynamic_cast<tasks::depth1::foraging_task*>(controller.current_task());
   if (nullptr != depth0) {
     depth0->accept(*this);
   } else if (nullptr != depth1) {

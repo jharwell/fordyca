@@ -43,7 +43,7 @@ double block_utility::calc(const argos::CVector2& rloc,
                            double priority) {
   return set_result(
       ((mc_block_loc - mc_nest_loc).Length() / (mc_block_loc - rloc).Length()) *
-      std::exp(density*priority));
+      std::exp(density * priority));
 } /* calc() */
 
 NS_END(expressions, fordyca);

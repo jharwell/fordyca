@@ -42,9 +42,8 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {
-  RegisterUserFunction<stateless_foraging_qt_user_functions,
-                       argos::CFootBotEntity>(
-                           &stateless_foraging_qt_user_functions::Draw);
+  RegisterUserFunction<stateless_foraging_qt_user_functions, argos::CFootBotEntity>(
+      &stateless_foraging_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
@@ -60,9 +59,8 @@ void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
   }
 
   if (controller.is_carrying_block()) {
-    block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET).draw(
-        controller.block().get(),
-        controller.GetId().size());
+    block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
+        .draw(controller.block().get(), controller.GetId().size());
   }
 }
 

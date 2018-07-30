@@ -37,8 +37,7 @@ constexpr char actuation_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void actuation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element anode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
   m_throttling.parse(get_node(anode, "block_carry_throttle"));

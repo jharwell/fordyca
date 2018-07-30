@@ -71,7 +71,8 @@ void stateless_foraging_controller::Reset(void) {
 
 void stateless_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
   m_fsm->run();
 } /* ControlStep() */
 

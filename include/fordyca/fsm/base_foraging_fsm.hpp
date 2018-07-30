@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/new_direction_data.hpp"
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
@@ -57,7 +57,7 @@ NS_START(fsm);
  * per-se.
  */
 class base_foraging_fsm : public state_machine::hfsm,
-                          public metrics::fsm::base_fsm_metrics {
+                          public metrics::fsm::collision_metrics {
  public:
   base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
                     controller::saa_subsystem* saa,
@@ -90,11 +90,7 @@ class base_foraging_fsm : public state_machine::hfsm,
       void) const;
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
+  /* collision metrics */
   bool is_avoiding_collision(void) const override;
 
  protected:
