@@ -37,7 +37,7 @@ NS_START(fordyca);
 namespace representation {
 class base_block;
 class line_of_sight;
-}
+} // namespace representation
 namespace params {
 struct output_params;
 }
@@ -70,8 +70,8 @@ class base_foraging_controller : public argos::CCI_Controller,
       delete;
 
   /* CCI_Controller overrides */
- void Init(ticpp::Element& node) override;
- void Reset(void) override;
+  void Init(ticpp::Element& node) override;
+  void Reset(void) override;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
@@ -100,7 +100,9 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::base_block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const {
+    return m_block;
+  }
 
   /**
    * @brief Set the block that the robot is carrying.

@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/block_priorities_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/occupancy_grid_params.hpp"
 #include "fordyca/params/pheromone_parser.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "fordyca/params/block_priorities_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

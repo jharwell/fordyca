@@ -47,7 +47,7 @@ stateless_param_repository::stateless_param_repository(
   register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
                                                   sensing_parser::kHeader1);
   register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
-                                           ct::waveform_xml_parser::kXMLRoot,
+                                               ct::waveform_xml_parser::kXMLRoot,
                                            ct::waveform_xml_parser::kHeader1);
 }
 

@@ -68,6 +68,16 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
     uint cum_collected{0};
 
     /**
+     * @brief Total # ramp blocks collected in interval.
+     */
+    uint cum_ramp_collected{0};
+
+    /**
+     * @brief Total # cube blocks collected in interval.
+     */
+    uint cum_cube_collected{0};
+
+    /**
      * @brief Total # transporters for collected blocks in interval.
      */
     uint cum_transporters{0};

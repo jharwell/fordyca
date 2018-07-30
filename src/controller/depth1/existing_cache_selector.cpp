@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +70,8 @@ representation::perceived_cache existing_cache_selector::calc_best(
       continue;
     }
     math::existing_cache_utility u(c.ent->real_loc(),
-                                   boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second));
+                                   boost::get<argos::CVector2>(
+                                       mc_matrix->find("nest_center")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());

@@ -66,7 +66,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base FSM metrics */
+  /* collision metrics */
   bool is_avoiding_collision(void) const override {
     return base_foraging_fsm::is_avoiding_collision();
   }

@@ -39,8 +39,7 @@ constexpr char occupancy_grid_parser::kXMLRoot[];
  ******************************************************************************/
 void occupancy_grid_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element onode =
-        get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element onode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     rcppsw::utils::line_parser parser(' ');
     std::string val;
     std::vector<std::string> res;
@@ -49,8 +48,7 @@ void occupancy_grid_parser::parse(const ticpp::Element& node) {
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
     res = parser.parse(onode.GetAttribute("nest"));
-    m_params->nest.Set(std::atof(res[0].c_str()),
-                       std::atof(res[1].c_str()));
+    m_params->nest.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
     m_grid.parse(onode);
     m_pheromone.parse(onode);
@@ -68,19 +66,14 @@ void occupancy_grid_parser::show(std::ostream& stream) const {
            << build_footer();
     return;
   }
-  stream << build_header()
-         << m_params->nest
-         << m_grid
-         << m_pheromone
-         << m_priorities
-         << build_footer();
+  stream << build_header() << m_params->nest << m_grid << m_pheromone
+         << m_priorities << build_footer();
 } /* show() */
 
 __rcsw_pure bool occupancy_grid_parser::validate(void) const {
   if (m_parsed) {
-    return m_grid.validate() &&
-        m_pheromone.validate() &&
-        m_priorities.validate();
+    return m_grid.validate() && m_pheromone.validate() &&
+           m_priorities.validate();
   }
   return true;
 } /* validate() */

@@ -63,9 +63,8 @@ bool cluster_distributor::distribute_block(
   return m_dist.distribute_block(block, entities);
 } /* distribute_block() */
 
-bool cluster_distributor::distribute_blocks(
-    block_vector& blocks,
-    entity_list& entities) {
+bool cluster_distributor::distribute_blocks(block_vector& blocks,
+                                            entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
     ER_DIAG("Could not distribute block: Cluster capacity (%u) reached",
             m_clust.capacity());

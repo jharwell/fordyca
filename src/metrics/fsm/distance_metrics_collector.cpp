@@ -42,7 +42,7 @@ distance_metrics_collector::distance_metrics_collector(const std::string& ofname
 std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
   std::string line;
-  line = "cum_distance";
+  line = "cum_distance" + separator();
   return base_metrics_collector::csv_header_build(header) + line;
 } /* csv_header_build() */
 

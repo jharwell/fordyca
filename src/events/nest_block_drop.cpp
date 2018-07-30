@@ -103,10 +103,10 @@ void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
-  auto depth0 = dynamic_cast<tasks::depth0::foraging_task*>(
-      controller.current_task());
-  auto depth1 = dynamic_cast<tasks::depth1::foraging_task*>(
-      controller.current_task());
+  auto depth0 =
+      dynamic_cast<tasks::depth0::foraging_task*>(controller.current_task());
+  auto depth1 =
+      dynamic_cast<tasks::depth1::foraging_task*>(controller.current_task());
 
   if (nullptr != depth0) {
     depth0->accept(*this);

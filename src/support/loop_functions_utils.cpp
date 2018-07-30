@@ -73,7 +73,7 @@ __rcsw_const bool block_drop_overlap_with_cache(
     const std::shared_ptr<representation::arena_cache>& cache,
     const argos::CVector2& drop_loc) {
   return cache->xspan(cache->real_loc()).overlaps_with(block->xspan(drop_loc)) &&
-      cache->yspan(cache->real_loc()).overlaps_with(block->yspan(drop_loc));
+         cache->yspan(cache->real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_cache() */
 
 __rcsw_pure bool block_drop_near_arena_boundary(
@@ -91,7 +91,7 @@ __rcsw_pure bool block_drop_overlap_with_nest(
     const representation::nest& nest,
     const argos::CVector2& drop_loc) {
   return nest.xspan(nest.real_loc()).overlaps_with(block->xspan(drop_loc)) &&
-      nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
+         nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_nest() */
 
 NS_END(utils, support, fordyca);
