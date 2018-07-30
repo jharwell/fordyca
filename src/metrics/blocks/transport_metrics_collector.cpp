@@ -86,8 +86,7 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
 
   } else {
     line += "0" + separator() + "0" + separator() + "0" + separator() + "0" +
-            separator() + "0" + separator() + "0" + separator() + "0" +
-            separator();
+            separator() + "0" + separator();
   }
   return true;
 } /* csv_line_build() */
