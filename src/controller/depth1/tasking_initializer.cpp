@@ -39,9 +39,9 @@
 #include "fordyca/tasks/depth1/harvester.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/executive_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,10 +74,7 @@ void tasking_initializer::depth1_tasking_init(
 
   std::unique_ptr<ta::taskable> collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          server(),
-          cache_sel_matrix(),
-          saa_subsystem(),
-          perception()->map());
+          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
 
   std::unique_ptr<ta::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
@@ -87,11 +84,10 @@ void tasking_initializer::depth1_tasking_init(
           saa_subsystem(),
           perception()->map());
 
-  tasks::depth1::collector *collector = new tasks::depth1::collector(exec_params,
-                                                                     collector_fsm);
+  tasks::depth1::collector* collector =
+      new tasks::depth1::collector(exec_params, collector_fsm);
 
-  auto harvester = new tasks::depth1::harvester(exec_params,
-                                                harvester_fsm);
+  auto harvester = new tasks::depth1::harvester(exec_params, harvester_fsm);
 
   if (est_params->enabled) {
     static_cast<ta::polled_task*>(harvester)->init_random(
@@ -105,15 +101,15 @@ void tasking_initializer::depth1_tasking_init(
      * not been done.
      */
     if (random() % 2) {
-      static_cast<ta::partitionable_polled_task*>(graph()->root())->init_random(
-          collector,
-          est_params->collector_range.GetMin(),
-          est_params->collector_range.GetMax());
+      static_cast<ta::partitionable_polled_task*>(graph()->root())
+          ->init_random(collector,
+                        est_params->collector_range.GetMin(),
+                        est_params->collector_range.GetMax());
     } else {
-      static_cast<ta::partitionable_polled_task*>(graph()->root())->init_random(
-          harvester,
-          est_params->collector_range.GetMin(),
-          est_params->collector_range.GetMax());
+      static_cast<ta::partitionable_polled_task*>(graph()->root())
+          ->init_random(harvester,
+                        est_params->collector_range.GetMin(),
+                        est_params->collector_range.GetMax());
     }
   }
   graph()->set_children(tasks::depth0::foraging_task::kGeneralistName,

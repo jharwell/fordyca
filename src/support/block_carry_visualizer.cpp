@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/support/block_carry_visualizer.hpp"
 
-#include <argos3/core/utility/math/vector3.h>
-#include <argos3/core/utility/math/quaternion.h>
 #include <argos3/core/utility/datatypes/color.h>
+#include <argos3/core/utility/math/quaternion.h>
+#include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cube_block.hpp"
@@ -44,24 +44,20 @@ void block_carry_visualizer::draw(const representation::base_block* const block,
   if (nullptr != dynamic_cast<const representation::cube_block*>(block)) {
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xsize(),
-                                  block->xsize(),
-                                  block->xsize()),
+                  argos::CVector3(block->xsize(), block->xsize(), block->xsize()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
   } else if (nullptr != dynamic_cast<const representation::ramp_block*>(block)) {
-  /*
+    /*
    * Ramp blocks are 2X as long in X as in Y. Z height is the same as X (not */
-  /* currently used/handled in the simulation; only for visualization
+    /* currently used/handled in the simulation; only for visualization
    * purposes). But, drawing ramp blocks in ARGos is a pain in the ass, so use
    * the spherical cow approach.
    */
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xsize(),
-                                  block->ysize(),
-                                  block->ysize()),
+                  argos::CVector3(block->xsize(), block->ysize(), block->ysize()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
@@ -73,7 +69,7 @@ void block_carry_visualizer::draw(const representation::base_block* const block,
   if (block->display_id()) {
     m_qt->DrawText(argos::CVector3(0.0, 0.0, m_text_vis_offset),
                    std::string(id_len + 3, ' ') + "[b" +
-                   std::to_string(block->id()) + "]",
+                       std::to_string(block->id()) + "]",
                    argos::CColor::GREEN);
   }
 }

@@ -44,6 +44,8 @@ std::string transport_metrics_collector::csv_header_build(
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "n_collected" + separator() +
+      "n_cube_collected" + separator() +
+      "n_ramp_collected" + separator() +
       "avg_transporters" + separator() +
       "avg_transport_time" + separator() +
       "avg_initial_wait_time" + separator() +
@@ -62,6 +64,9 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line += std::to_string(m_stats.cum_collected) + separator();
+  line += std::to_string(m_stats.cum_cube_collected) + separator();
+  line += std::to_string(m_stats.cum_ramp_collected) + separator();
+
   if (m_stats.cum_collected > 0) {
     line += std::to_string(m_stats.cum_collected /
                            static_cast<double>(m_stats.cum_transporters)) +
@@ -73,12 +78,16 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
                            static_cast<double>(m_stats.cum_transporters)) +
             separator();
     line += std::to_string(static_cast<double>(m_stats.cum_pickup_events) /
-                           interval()) + separator();
+                           interval()) +
+            separator();
     line += std::to_string(static_cast<double>(m_stats.cum_drop_events) /
-                           interval()) + separator();
+                           interval()) +
+            separator();
 
   } else {
-    line += "0" + separator() + "0" + separator() + "0" + separator();
+    line += "0" + separator() + "0" + separator() + "0" + separator() + "0" +
+            separator() + "0" + separator() + "0" + separator() + "0" +
+            separator();
   }
   return true;
 } /* csv_line_build() */

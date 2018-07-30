@@ -43,7 +43,7 @@ __rcsw_pure uint block_cluster::block_count(void) const {
       assert(nullptr != cell);
       assert(!cell->state_has_cache());
       count += cell->state_has_block();
-    }   /* for(j..) */
+    } /* for(j..) */
   }   /* for(i..) */
   return count;
 } /* block_count() */

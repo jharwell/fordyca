@@ -26,16 +26,16 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
@@ -59,7 +59,8 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(void) const {
+__rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(
+    void) const {
   return m_executive->active_tab();
 }
 
@@ -67,15 +68,16 @@ void stateful_foraging_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
 }
-__rcsw_pure tasks::base_foraging_task* stateful_foraging_controller::current_task(void) {
+__rcsw_pure tasks::base_foraging_task* stateful_foraging_controller::current_task(
+    void) {
   return dynamic_cast<tasks::base_foraging_task*>(
       m_executive.get()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* stateful_foraging_controller::current_task(void) const {
+__rcsw_pure const tasks::base_foraging_task* stateful_foraging_controller::
+    current_task(void) const {
   return const_cast<stateful_foraging_controller*>(this)->current_task();
 } /* current_task() */
-
 
 __rcsw_pure const representation::line_of_sight* stateful_foraging_controller::los(
     void) const {
@@ -139,11 +141,11 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
-
   auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
 
-  m_block_sel_matrix = rcppsw::make_unique<block_selection_matrix>(
-      ogrid->nest, &ogrid->priorities);
+  m_block_sel_matrix =
+      rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
+                                                  &ogrid->priorities);
 
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(client::server_ref(),

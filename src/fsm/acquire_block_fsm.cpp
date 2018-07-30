@@ -95,8 +95,7 @@ bool acquire_block_fsm::acquire_known_goal(void) {
      * If we get here, we must know of some blocks, but not be currently
      * vectoring toward any of them.
      */
-    controller::depth0::block_selector selector(client::server_ref(),
-                                                mc_matrix);
+    controller::depth0::block_selector selector(client::server_ref(), mc_matrix);
 
     representation::perceived_block best =
         selector.calc_best(blocks, base_sensors()->position());

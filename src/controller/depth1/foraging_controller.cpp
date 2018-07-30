@@ -25,18 +25,18 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth1/param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
 
 #include "rcppsw/er/server.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +49,8 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
-    m_cache_sel_matrix(),
-    m_executive() {}
+      m_cache_sel_matrix(),
+      m_executive() {}
 
 foraging_controller::~foraging_controller(void) = default;
 
@@ -61,7 +61,8 @@ void foraging_controller::ControlStep(void) {
   perception()->update(depth0::stateful_foraging_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
 
   m_executive->run();
 } /* ControlStep() */
@@ -105,7 +106,8 @@ __rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(void) const {
+__rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(
+    void) const {
   return const_cast<foraging_controller*>(this)->current_task();
 } /* current_task() */
 /*

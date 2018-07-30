@@ -51,7 +51,8 @@ NS_START(fordyca, representation);
  */
 class multicell_entity : public base_cell_entity {
  public:
-  multicell_entity(const rcppsw::math::vector2d& dim, const rcppsw::utils::color& color)
+  multicell_entity(const rcppsw::math::vector2d& dim,
+                   const rcppsw::utils::color& color)
       : multicell_entity{dim, color, -1} {}
 
   multicell_entity(const rcppsw::math::vector2d& dim,

@@ -1,5 +1,5 @@
 /**
- * @file base_fsm_metrics_collector.cpp
+ * @file collision_metrics_collector.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/base_fsm_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,14 +32,14 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_fsm_metrics_collector::base_fsm_metrics_collector(const std::string& ofname,
-                                                       uint interval)
+collision_metrics_collector::collision_metrics_collector(const std::string& ofname,
+                                                         uint interval)
     : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string base_fsm_metrics_collector::csv_header_build(
+std::string collision_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
@@ -48,34 +48,34 @@ std::string base_fsm_metrics_collector::csv_header_build(
   // clang-format on
 } /* csv_header_build() */
 
-void base_fsm_metrics_collector::reset(void) {
+void collision_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-void base_fsm_metrics_collector::collect(
+void collision_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const metrics::fsm::base_fsm_metrics&>(metrics);
+  auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
   m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
   m_stats.n_cum_avoiding_collision +=
       static_cast<uint>(m.is_avoiding_collision());
 } /* collect() */
 
-bool base_fsm_metrics_collector::csv_line_build(std::string& line) {
+bool collision_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line = std::to_string(m_stats.n_avoiding_collision) + separator() +
-         std::to_string(m_stats.n_cum_avoiding_collision) + separator();
+  line += std::to_string(m_stats.n_avoiding_collision /
+                         static_cast<double>(interval())) +
+          separator();
+  line += std::to_string(m_stats.n_cum_avoiding_collision /
+                         static_cast<double>(timestep() + 1)) +
+          separator();
   return true;
 } /* csv_line_build() */
 
-void base_fsm_metrics_collector::reset_after_interval(void) {
-  m_stats.n_cum_avoiding_collision = 0;
-} /* reset_after_interval() */
-
-void base_fsm_metrics_collector::reset_after_timestep(void) {
+void collision_metrics_collector::reset_after_interval(void) {
   m_stats.n_avoiding_collision = 0;
-} /* reset_after_timestep() */
+} /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

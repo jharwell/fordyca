@@ -38,8 +38,7 @@ constexpr char block_manifest_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_manifest_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_PARAM(bnode, m_params, n_cube);
@@ -48,8 +47,7 @@ void block_manifest_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void block_manifest_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, n_cube) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, n_cube) << std::endl
          << XML_PARAM_STR(m_params, n_ramp) << std::endl
          << XML_PARAM_STR(m_params, unit_dim) << std::endl
          << build_footer();

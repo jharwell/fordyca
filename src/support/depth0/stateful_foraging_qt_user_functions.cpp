@@ -30,11 +30,11 @@
 #pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

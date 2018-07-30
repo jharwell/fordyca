@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/params/block_priority_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "fordyca/params/pheromone_params.hpp"
 #include "rcppsw/params/base_params.hpp"
-#include "fordyca/params/block_priority_params.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -1,5 +1,5 @@
 /**
- * @file base_fsm_metrics.hpp
+ * @file collision_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -35,16 +35,16 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_fsm_metrics
+ * @class collision_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics should be collected ANY FSM as it goes
- * about whatever task it is supposed to do.
+ * @brief Interface defining what metrics should be collected regarding
+ * collision avoidance as robots go about their tasks.
  */
-class base_fsm_metrics : public virtual rcppsw::metrics::base_metrics {
+class collision_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
-  base_fsm_metrics(void) = default;
-  ~base_fsm_metrics(void) override = default;
+  collision_metrics(void) = default;
+  ~collision_metrics(void) override = default;
 
   /**
    * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
@@ -54,4 +54,4 @@ class base_fsm_metrics : public virtual rcppsw::metrics::base_metrics {
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_HPP_ */

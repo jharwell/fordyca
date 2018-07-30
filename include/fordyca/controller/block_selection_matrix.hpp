@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/math/vector2.h>
+#include <boost/variant.hpp>
 #include <map>
 #include <string>
-#include <boost/variant.hpp>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/common/common.hpp"
 
@@ -35,7 +35,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { struct block_priority_params; }
+namespace params {
+struct block_priority_params;
+}
 NS_START(controller);
 
 /*******************************************************************************
@@ -54,12 +56,12 @@ NS_START(controller);
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
 
-class block_selection_matrix : public std::map<std::string,
-                                               boost::variant<double, argos::CVector2>> {
-
+class block_selection_matrix
+    : public std::map<std::string, boost::variant<double, argos::CVector2>> {
  public:
   block_selection_matrix(const argos::CVector2& nest_loc,
-                        const params::block_priority_params* priorities);
+                         const params::block_priority_params* priorities);
+
  private:
   using mapped_type = boost::variant<double, argos::CVector2>;
 };

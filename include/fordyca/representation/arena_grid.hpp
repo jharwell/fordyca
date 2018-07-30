@@ -42,8 +42,8 @@ NS_START(fordyca, representation);
  *
  * @brief Representation of the cells within a grid layout
  */
-class arena_grid : public rcppsw::ds::grid2D_ptr<cell2D,
-                                                 std::shared_ptr<rcppsw::er::server>&> {
+class arena_grid
+    : public rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> {
  public:
   using view = rcppsw::ds::grid_view<representation::cell2D*>;
 

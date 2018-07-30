@@ -55,7 +55,7 @@ NS_START(depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
-                                      public metrics::fsm::base_fsm_metrics,
+                                      public metrics::fsm::collision_metrics,
                                       public metrics::fsm::goal_acquisition_metrics,
                                       public fsm::block_transporter,
                                       public visitor::visitable_any<stateless_foraging_controller> {
@@ -72,7 +72,7 @@ class stateless_foraging_controller : public base_foraging_controller,
   int entity_id(void) const override;
   double timestep_distance(void) const override;
 
-  /* base FSM metrics */
+  /* collision metrics */
   FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */

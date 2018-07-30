@@ -65,16 +65,15 @@ representation::perceived_block block_selector::calc_best(
      * Only two options for right now: cube blocks or ramp blocks. This will
      * undoubtedly have to change in the future.
      */
-    double priority = (dynamic_cast<representation::cube_block*>(b.ent.get())) ?
-                      boost::get<double>(mc_matrix->find("cube_priority")->second):
-                      boost::get<double>(mc_matrix->find("ramp_priority")->second);
-    argos::CVector2 nest_loc = boost::get<argos::CVector2>(
-        mc_matrix->find("nest_center")->second);
+    double priority =
+        (dynamic_cast<representation::cube_block*>(b.ent.get()))
+            ? boost::get<double>(mc_matrix->find("cube_priority")->second)
+            : boost::get<double>(mc_matrix->find("ramp_priority")->second);
+    argos::CVector2 nest_loc =
+        boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second);
 
-    double utility =
-        math::block_utility(b.ent->real_loc(), nest_loc)(robot_loc,
-                                                         b.density.last_result(),
-                                                         priority);
+    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
+        robot_loc, b.density.last_result(), priority);
 
     ER_DIAG("Utility for block%d loc=(%u, %u), density=%f: %f",
             b.ent->id(),
