@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -107,7 +107,7 @@
                        block_id="false"
                        />
       </params>
-    </stateful_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -115,7 +115,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -182,11 +182,6 @@
       </static_caches>
       <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
-    <visualization robot_id="true"
-                   robot_los="false"
-                   robot_task="true"
-                   block_id="false"
-                   />
   </loop_functions>
 
   <!-- *********************** -->
@@ -270,7 +265,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
+      <user_functions label="stateless_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 
