@@ -1,5 +1,5 @@
 /**
- * @file transport_metrics.hpp
+ * @file manipulation_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,40 +36,46 @@ NS_START(fordyca, metrics, blocks);
  ******************************************************************************/
 
 /**
- * @class transport_metrics
+ * @class manipulation_metrics
  * @ingroup metrics blocks
  *
  * @brief Defines the metrics to be collected from blocks about the process of
- * transportation from their original location in the arena after distribution
- * to the nest.
- *
- * Metrics should be collected upon deposition in nest, rather than every
- * timestep.
+ * manipulation (pickup, drop, etc.)
  */
-class transport_metrics : public rcppsw::metrics::base_metrics {
+class manipulation_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
-  transport_metrics(void) = default;
+  manipulation_metrics(void) = default;
 
   /**
-   * @brief Return the total # of robots that have carried the block since it
-   * was originally distributed in the arena until it makes it all the way back
-   * to the nest.
+   * @brief If \c TRUE, then a free block was picked up this timestep.
    */
-  virtual uint total_transporters(void) const = 0;
+  virtual bool free_pickup_event(void) const = 0;
 
   /**
-   * @brief Return the total amount of time that it took from the first pickup
-   * to when the block was deposited in the nest.
+   * @brief If \c TRUE, then a block was dropped in the arena or in the nest
+   * this timestep.
    */
-  virtual double total_transport_time(void) const = 0;
+  virtual bool free_drop_event(void) const = 0;
 
   /**
-   * @brief Return the amount of time that the block sits in the arena after
-   * being distributed but before it is picked up for the first time.
+   * @brief The penalty the robot was subjected to when picking up/dropping a
+   * block. Only valid for the specific manipulation type, as determined by
+   * calling the other members of the class.
    */
-  virtual double initial_wait_time(void) const = 0;
+  virtual uint penalty_served(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a cached block was picked up this timestep.
+   */
+  virtual bool cache_pickup_event(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a block was dropped in a cache this timestep by the
+   * robot.
+   */
+  virtual bool cache_drop_event(void) const = 0;
 };
 
 NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_HPP_ */

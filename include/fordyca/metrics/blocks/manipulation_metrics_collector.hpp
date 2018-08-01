@@ -1,5 +1,5 @@
 /**
- * @file transport_metrics_collector.hpp
+ * @file manipulation_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -40,21 +40,21 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class transport_metrics_collector
+ * @class manipulation_metrics_collector
  * @ingroup metrics blocks
  *
- * @brief Collector for \ref transport_metrics.
+ * @brief Collector for \ref manipulation_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
-class transport_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                    public visitor::visitable_any<transport_metrics_collector> {
+class manipulation_metrics_collector : public rcppsw::metrics::base_metrics_collector,
+                                       public visitor::visitable_any<manipulation_metrics_collector> {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
    */
-  transport_metrics_collector(const std::string& ofname, uint interval);
+  manipulation_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
@@ -62,27 +62,15 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
 
  private:
   struct stats {
-    /**
-     * @brief  Total # blocks collected in interval.
-     */
-    uint cum_collected{0};
+    uint free_pickup_events{0};
+    uint free_drop_events{0};
+    uint cum_free_pickup_penalty{0};
+    uint cum_free_drop_penalty{0};
 
-    /**
-     * @brief Total # transporters for collected blocks in interval.
-     */
-    uint cum_transporters{0};
-
-    /**
-     * @brief Total amount of time taken for all collected blocks to be
-     * transported from original distribution locations to the nest.
-     */
-    double cum_transport_time{0.0};
-
-    /**
-     * @brief Total amount of time between original arena distribution and first
-     * pickup for all collected blocks in interval.
-     */
-    double cum_initial_wait_time{0.0};
+    uint cache_pickup_events{0};
+    uint cache_drop_events{0};
+    uint cum_cache_pickup_penalty{0};
+    uint cum_cache_drop_penalty{0};
   };
 
   std::string csv_header_build(const std::string& header) override;
@@ -93,4 +81,4 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
 
 NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_TRANSPORT_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */

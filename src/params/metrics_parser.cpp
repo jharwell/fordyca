@@ -49,6 +49,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_PARAM(mnode, m_params, block_fname);
     XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
     XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
+    XML_PARSE_PARAM(mnode, m_params, block_manipulation_fname);
 
     XML_PARSE_PARAM(mnode, m_params, cache_acquisition_fname);
     XML_PARSE_PARAM(mnode, m_params, cache_utilization_fname);
@@ -79,11 +80,11 @@ void metrics_parser::show(std::ostream& stream) const {
   stream << XML_PARAM_STR(m_params, block_fname) << std::endl
          << XML_PARAM_STR(m_params, block_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, block_transport_fname) << std::endl
+         << XML_PARAM_STR(m_params, block_manipulation_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_utilization_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_lifecycle_fname) << std::endl
-         << XML_PARAM_STR(m_params, task_execution_generalist_fname)
-         << std::endl
+         << XML_PARAM_STR(m_params, task_execution_generalist_fname) << std::endl
          << XML_PARAM_STR(m_params, task_execution_collector_fname) << std::endl
          << XML_PARAM_STR(m_params, task_execution_harvester_fname) << std::endl
          << XML_PARAM_STR(m_params, task_generalist_tab_fname) << std::endl

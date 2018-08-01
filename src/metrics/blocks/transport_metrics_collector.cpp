@@ -44,13 +44,9 @@ std::string transport_metrics_collector::csv_header_build(
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "n_collected" + separator() +
-      "n_cube_collected" + separator() +
-      "n_ramp_collected" + separator() +
       "avg_transporters" + separator() +
       "avg_transport_time" + separator() +
-      "avg_initial_wait_time" + separator() +
-      "avg_pickup_events" + separator() +
-      "avg_drop_events" + separator();
+      "avg_initial_wait_time" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -64,8 +60,6 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line += std::to_string(m_stats.cum_collected) + separator();
-  line += std::to_string(m_stats.cum_cube_collected) + separator();
-  line += std::to_string(m_stats.cum_ramp_collected) + separator();
 
   if (m_stats.cum_collected > 0) {
     line += std::to_string(m_stats.cum_collected /
@@ -77,15 +71,9 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
     line += std::to_string(m_stats.cum_initial_wait_time /
                            static_cast<double>(m_stats.cum_transporters)) +
             separator();
-    line += std::to_string(static_cast<double>(m_stats.cum_pickup_events) /
-                           interval()) +
-            separator();
-    line += std::to_string(static_cast<double>(m_stats.cum_drop_events) /
-                           interval()) + separator();
 
   } else {
-    line += "0" + separator() + "0" + separator() + "0" + separator() + "0" +
-            separator() + "0" + separator();
+    line += "0" + separator() + "0" + separator() + "0" + separator();
   }
   return true;
 } /* csv_line_build() */
@@ -97,12 +85,10 @@ void transport_metrics_collector::collect(
   m_stats.cum_transporters += m.total_transporters();
   m_stats.cum_transport_time += m.total_transport_time();
   m_stats.cum_initial_wait_time += m.initial_wait_time();
-  m_stats.cum_pickup_events += m.pickup_event();
-  m_stats.cum_drop_events += m.drop_event();
 } /* collect() */
 
 void transport_metrics_collector::reset_after_interval(void) {
-  m_stats = {0, 0, 0, 0, 0, 0};
+  m_stats = {0, 0, 0, 0};
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

@@ -57,8 +57,6 @@ void base_block::reset_metrics(void) {
   m_first_pickup = false;
   m_dist_time = 0.0;
   m_nest_drop_time = 0.0;
-  m_pickup_event = false;
-  m_drop_event = false;
 } /* reset_metrics(); */
 
 void base_block::first_pickup_time(double time) {

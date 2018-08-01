@@ -96,23 +96,25 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
             "FATAL: ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
             "FATAL: ST_TRANSPORT_TO_NEST should never pickup blocks...");
-
+  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
+            "FATAL: ST_TRANSPORT_TO_NEST should never drop blocks");
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_TRANSPORT_TO_NEST");
   }
 
   /*
-   * We have arrived at the nest and it's time to head back out again. The
-   * loop functions need to call the drop_block() function, as they have to
-   * redistribute it (the FSM has no idea how to do that).
-   *
-   * The BLOCK_DROP signal comes from the loop functions the same timestep as we
-   * realize that we are in the nest, so we need to be sure that we return the
-   * BLOCK_DROP signal to the upper FSM, as that it what it is listening for.
+   * We have arrived at the nest so send this signal to the parent FSM that is
+   * listing for it.
    */
-  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-    ER_ASSERT(m_saa->sensing()->in_nest(), "FATAL: BLOCK_DROP outside nest");
-    return data->signal();
+  if (m_saa->sensing()->in_nest()) {
+    if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
+      m_saa->steering_force().wander();
+      m_saa->apply_steering_force(std::make_pair(false, false));
+      return controller::foraging_signal::HANDLED;
+    } else {
+      m_nest_count = 0;
+      return controller::foraging_signal::ENTERED_NEST;
+    }
   }
 
   m_saa->steering_force().phototaxis();
@@ -125,8 +127,8 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
      * velocity, and that does not play well with the arrival force
      * calculations. To fix this, and a bit of wander force.
      */
-    if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
-      saa_subsystem()->steering_force().wander();
+    if (m_saa->linear_velocity().Length() <= 0.1) {
+      m_saa->steering_force().wander();
     }
   }
 
@@ -182,6 +184,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(utils::color::kCYAN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
+  actuators()->differential_drive().stop();
   actuators()->leds_set_color(utils::color::kWHITE);
 }
 

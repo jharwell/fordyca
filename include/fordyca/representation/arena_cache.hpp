@@ -62,7 +62,6 @@ class arena_cache
   uint n_blocks(void) const override { return base_cache::n_blocks(); }
   uint total_block_pickups(void) const override { return m_block_pickups; }
   uint total_block_drops(void) const override { return m_block_drops; }
-  uint total_penalties_served(void) const override { return m_penalty_count; }
   void reset_metrics(void) override;
   uint cache_id(void) const override { return id(); }
 
