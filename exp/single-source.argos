@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -107,7 +107,7 @@
                        block_id="false"
                        />
       </params>
-    </stateful_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -115,7 +115,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -127,6 +127,7 @@
           block_fname="block-stats.csv"
           block_acquisition_fname="block-acquisition-stats.csv"
           block_transport_fname="block-transport-stats.csv"
+          block_manipulation_fname="block-manipulation-stats.csv"
           cache_acquisition_fname="cache-acquisition-stats.csv"
           cache_utilization_fname="cache-utilization-stats.csv"
           cache_lifecycle_fname="cache-lifecycle-stats.csv"
@@ -145,7 +146,7 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Null"
+              type="Constant"
               frequency="100"
               amplitude="500"
               offset="10"/>
@@ -269,7 +270,7 @@
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--     </camera> -->
-  <!--     <user_functions label="stateful_foraging_qt_user_functions" /> -->
+  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 

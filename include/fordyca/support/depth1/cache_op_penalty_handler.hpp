@@ -1,5 +1,5 @@
 /**
- * @file existing_cache_penalty_handler.hpp
+ * @file cache_op_penalty_handler.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,19 +18,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_EXISTING_CACHE_PENALTY_HANDLER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_EXISTING_CACHE_PENALTY_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_OP_PENALTY_HANDLER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_OP_PENALTY_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
-#include "fordyca/support/depth1/base_penalty_handler.hpp"
+#include "fordyca/support/temporal_penalty_handler.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/task_allocation/executable_task.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,29 +44,25 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  ******************************************************************************/
 
 /**
- * @class existing_cache_penalty_handler
+ * @class cache_op_penalty_handler
  * @ingroup support depth1
  *
- * @brief The handler for cache usage penalties for robots (i.e. how long they
- * have to wait when picking up/dropping in an existing cache).
+ * @brief The handler for existing cache usage penalties for robots (e.g. how
+ * long they have to wait when picking up/dropping in an existing cache).
  */
 template <typename T>
-class existing_cache_penalty_handler : public base_penalty_handler<T> {
+class cache_op_penalty_handler : public temporal_penalty_handler<T> {
  public:
-  existing_cache_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                                 representation::arena_map* const map,
-                                 const ct::waveform_params* const params)
-      : base_penalty_handler<T>(server, params), m_map(map) {
-    rcppsw::er::client::insmod("existing_cache_penalty_handler",
-           rcppsw::er::er_lvl::DIAG,
-           rcppsw::er::er_lvl::NOM);
-  }
+  cache_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
+                           representation::arena_map* const map,
+                           const ct::waveform_params* const params)
+      : temporal_penalty_handler<T>(server, params), m_map(map) {}
 
-  ~existing_cache_penalty_handler(void) override = default;
-  existing_cache_penalty_handler& operator=(
-      const existing_cache_penalty_handler& other) = delete;
-  existing_cache_penalty_handler(
-      const existing_cache_penalty_handler& other) = delete;
+  ~cache_op_penalty_handler(void) override = default;
+  cache_op_penalty_handler& operator=(
+      const cache_op_penalty_handler& other) = delete;
+  cache_op_penalty_handler(
+      const cache_op_penalty_handler& other) = delete;
   /**
    * @brief Check if a robot has acquired a cache, and is trying to pickup from
    * a cache, then creates a \ref block_manipulation_penalty object and
@@ -103,18 +99,18 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
 
     ER_ASSERT(!controller.block_detected(),
               "FATAL: Block detected in cache?");
-    ER_ASSERT(!base_penalty_handler<T>::is_serving_penalty(controller),
+    ER_ASSERT(!temporal_penalty_handler<T>::is_serving_penalty(controller),
               "FATAL: Robot already serving cache penalty!");
 
-    uint penalty = base_penalty_handler<T>::deconflict_penalty_finish(timestep);
+    uint penalty = temporal_penalty_handler<T>::deconflict_penalty_finish(timestep);
     ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d",
            utils::robot_id(controller),
            timestep,
-           base_penalty_handler<T>::original_penalty(),
+           temporal_penalty_handler<T>::original_penalty(),
            penalty);
 
-    base_penalty_handler<T>::penalty_list().push_back(
-        block_manipulation_penalty<T>(&controller,
+    temporal_penalty_handler<T>::penalty_list().push_back(
+        temporal_penalty<T>(&controller,
                                       cache_id,
                                       penalty,
                                       timestep));
@@ -127,4 +123,4 @@ class existing_cache_penalty_handler : public base_penalty_handler<T> {
 };
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_EXISTING_CACHE_PENALTY_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_OP_PENALTY_HANDLER_HPP_ */

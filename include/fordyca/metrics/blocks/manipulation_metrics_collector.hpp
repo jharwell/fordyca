@@ -1,5 +1,5 @@
 /**
- * @file utilization_metrics_collector.hpp
+ * @file manipulation_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,74 +18,67 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <set>
 #include <string>
+#include <vector>
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, caches);
-
+NS_START(fordyca, metrics, blocks);
 namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class utilization_metrics_collector
- * @ingroup metrics caches
+ * @class manipulation_metrics_collector
+ * @ingroup metrics blocks
  *
- * @brief Collector for \ref utilization_metrics.
+ * @brief Collector for \ref manipulation_metrics.
  *
- * Metrics are output at the specified interval.
+ * Metrics are written out at the specified collection interval.
  */
-class utilization_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<utilization_metrics_collector> {
+class manipulation_metrics_collector : public rcppsw::metrics::base_metrics_collector,
+                                       public visitor::visitable_any<manipulation_metrics_collector> {
  public:
   /**
-   * @param ofname Output file name.
+   * @param ofname The output file name.
    * @param interval Collection interval.
    */
-  utilization_metrics_collector(const std::string& ofname, uint interval);
+  manipulation_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void reset_after_interval(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
 
  private:
-  /**
-   * @brief All stats are cumulative within an interval.
-   */
   struct stats {
-    uint n_blocks{0};
-    uint n_pickups{0};
-    uint n_drops{0};
+    uint free_pickup_events{0};
+    uint free_drop_events{0};
+    uint cum_free_pickup_penalty{0};
+    uint cum_free_drop_penalty{0};
+
+    uint cache_pickup_events{0};
+    uint cache_drop_events{0};
+    uint cum_cache_pickup_penalty{0};
+    uint cum_cache_drop_penalty{0};
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
-  struct stats   m_stats{};
-
-  /**
-   * IDs of the caches that had events in the current interval, for use in
-   * averaging statistics.
-   */
-  std::set<uint> m_cache_ids{};
-  // clang-format on
+  struct stats m_stats{};
 };
 
-NS_END(caches, metrics, fordyca);
+NS_END(blocks, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_UTILIZATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BLOCKS_MANIPULATION_METRICS_COLLECTOR_HPP_ */

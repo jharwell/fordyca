@@ -31,7 +31,6 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "rcppsw/er/server.hpp"
 
@@ -39,8 +38,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using interactor =
-    arena_interactor<controller::depth0::stateless_foraging_controller>;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -81,6 +78,14 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
+
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  m_interactor =
+      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                      arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -142,16 +147,15 @@ void stateless_foraging_loop_functions::pre_step_iter(
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(
       static_cast<rcppsw::metrics::base_metrics*>(&controller));
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server,
-             m_arena_map.get(),
-             m_metrics_agg.get(),
-             floor())(controller, GetSpace().GetSimulationClock());
+  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {

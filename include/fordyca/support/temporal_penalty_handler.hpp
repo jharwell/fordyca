@@ -1,7 +1,7 @@
 /**
- * @file base_penalty_handler.hpp
+ * @file temporal_penalty_handler.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_BASE_PENALTY_HANDLER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_BASE_PENALTY_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <list>
 
-#include "fordyca/support/depth1/block_manipulation_penalty.hpp"
+#include "fordyca/support/temporal_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
@@ -37,32 +37,24 @@
  * Namespaces
  ******************************************************************************/
 namespace ct = rcppsw::control;
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 
 /**
- * @class base_penalty_handler
+ * @class temporal_penalty_handler
  * @ingroup support depth1
  *
- * @brief The base handler for block manipulation penalties for robots (i.e. how
- * long they have to wait when they pickup/drop a block).
+ * @brief The penalty handler for penalties for robots (e.g. how long they have
+ * to wait when they pickup/drop a block).
  *
  * Does not do much more than provide the penalty list, and functions for
  * manipulating it to derived classes.
- *
- *The handler for cache usage penalties for robots (i.e. how long they
- * have to wait).
- *
- * Handles:
- *
- * - Robots picking up from/dropping in a cache.
- * - Subjecting robots using caches to a penalty on both pickup/drop.
  */
 template <typename T>
-class base_penalty_handler : public rcppsw::er::client {
+class temporal_penalty_handler : public rcppsw::er::client {
  public:
   /**
    * @Brief Initialize the penalty handler.
@@ -70,20 +62,20 @@ class base_penalty_handler : public rcppsw::er::client {
    * @param server Server for debugging.
    * @param params Parameters for penalty waveform generation.
    */
-  base_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
+  temporal_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
                        const ct::waveform_params* const params)
       : client(server),
         m_penalty_list(),
         m_penalty(ct::waveform_generator()(params->type, params)) {
-    insmod("base_penalty_handler",
+    insmod("temporal_penalty_handler",
            rcppsw::er::er_lvl::DIAG,
            rcppsw::er::er_lvl::NOM);
   }
 
-  ~base_penalty_handler(void) override { client::rmmod(); }
+  ~temporal_penalty_handler(void) override { client::rmmod(); }
 
   /**
-   * @brief Determine if a robot has satisfied the \ref block_manipulation_penalty
+   * @brief Determine if a robot has satisfied the \ref temporal_penalty
    * it is currently serving yet.
    *
    * @param robot The robot to check. If the robot is not currently serving a
@@ -95,7 +87,7 @@ class base_penalty_handler : public rcppsw::er::client {
    */
   __rcsw_pure bool penalty_satisfied(const T& controller, uint timestep) const {
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
-                           [&](const block_manipulation_penalty<T>& p) {
+                           [&](const temporal_penalty<T>& p) {
                              return p.controller() == &controller;
                            });
     if (it != m_penalty_list.end()) {
@@ -106,7 +98,7 @@ class base_penalty_handler : public rcppsw::er::client {
   /**
    * @brief Get the next robot that will satisfy its penalty from the list.
    */
-  const block_manipulation_penalty<T>& next(void) const { return m_penalty_list.front(); }
+  const temporal_penalty<T>& next(void) const { return m_penalty_list.front(); }
 
   /**
    * @brief Remove the specified penalty from the list once the robot it
@@ -114,7 +106,7 @@ class base_penalty_handler : public rcppsw::er::client {
    *
    * @param victim The penalty to remove.
    */
-  void remove(const block_manipulation_penalty<T>& victim) {
+  void remove(const temporal_penalty<T>& victim) {
     return m_penalty_list.remove(victim);
   }
 
@@ -127,11 +119,7 @@ class base_penalty_handler : public rcppsw::er::client {
    * @param controller The robot to abort the penalty for.
    */
   void penalty_abort(const T& controller) {
-    auto it = std::find_if(m_penalty_list.begin(),
-                           m_penalty_list.end(),
-                           [&](const block_manipulation_penalty<T>& p) {
-                             return p.controller() == &controller;
-                           });
+    auto it = find(controller);
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
@@ -140,22 +128,29 @@ class base_penalty_handler : public rcppsw::er::client {
               "FATAL: Robot still serving penalty after abort?!");
   }
 
+  typename std::list<temporal_penalty<T>>::iterator find(const T& controller) {
+    return std::find_if(m_penalty_list.begin(),
+                        m_penalty_list.end(),
+                        [&](const temporal_penalty<T>& p) {
+                          return p.controller() == &controller;
+                        });
+  }
   /**
    * @brief If \c TRUE, then the specified robot is currently serving a cache
    * penalty.
    */
   __rcsw_pure bool is_serving_penalty(const T& controller) const {
     auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
-                           [&](const block_manipulation_penalty<T>& p) {
+                           [&](const temporal_penalty<T>& p) {
                              return p.controller() == &controller; });
     return it != m_penalty_list.end();
   }
 
  protected:
-  std::list<block_manipulation_penalty<T>>& penalty_list(void) {
+  std::list<temporal_penalty<T>>& penalty_list(void) {
     return m_penalty_list;
   }
-  const std::list<block_manipulation_penalty<T>>& penalty_list(void) const {
+  const std::list<temporal_penalty<T>>& penalty_list(void) const {
     return m_penalty_list;
   }
 
@@ -185,11 +180,11 @@ class base_penalty_handler : public rcppsw::er::client {
   uint original_penalty(void) const { return m_orig_penalty; }
 
   // clang-format off
-  mutable uint                             m_orig_penalty{0};
-  std::list<block_manipulation_penalty<T>> m_penalty_list;
-  std::unique_ptr<ct::waveform>            m_penalty;
+  mutable uint                   m_orig_penalty{0};
+  std::list<temporal_penalty<T>> m_penalty_list;
+  std::unique_ptr<ct::waveform>  m_penalty;
   // clang-format on
 };
-NS_END(depth1, support, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_BASE_PENALTY_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_ */

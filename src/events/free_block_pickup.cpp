@@ -117,6 +117,8 @@ void free_block_pickup::visit(
     controller::depth0::stateless_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
+
   ER_NOM("stateless_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
