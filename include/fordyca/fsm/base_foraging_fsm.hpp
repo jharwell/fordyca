@@ -187,7 +187,16 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
+  /**
+   * @brief When entering the nest, you want to continue to wander a bit before
+   * signaling upper FSMs that you are in the nest, so that there is (slightly)
+   * less congestion by the edge. This is a stopgap solution; a more elegant fix
+   * may be forthcoming in the future if warranted.
+   */
+  static constexpr uint kNEST_COUNT_MAX_STEPS = 25;
+
   // clang-format off
+  uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
   argos::CRadians                  m_new_dir;
   argos::CRandom::CRNG*            m_rng;

@@ -73,7 +73,8 @@ class arena_interactor : public rcppsw::er::client {
         m_floor(floor),
         m_metrics_agg(metrics_agg),
         m_map(map),
-        m_block_penalty_handler(server, map, block_penalty) {}
+        m_block_pickup_handler(server, map, block_penalty),
+        m_block_drop_handler(server, map, block_penalty){}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
@@ -94,24 +95,24 @@ class arena_interactor : public rcppsw::er::client {
 
  protected:
   void handle_free_block_pickup(T& controller, uint timestep) {
-    if (m_block_penalty_handler.is_serving_penalty(controller)) {
-      if (m_block_penalty_handler.penalty_satisfied(controller,
+    if (m_block_pickup_handler.is_serving_penalty(controller)) {
+      if (m_block_pickup_handler.penalty_satisfied(controller,
                                                     timestep)) {
         finish_free_block_pickup(controller, timestep);
       }
     } else {
-      m_block_penalty_handler.penalty_init(controller, timestep);
+      m_block_pickup_handler.penalty_init(controller, timestep);
    }
   }
 
   void handle_nest_block_drop(T& controller, uint timestep) {
-    if (m_block_penalty_handler.is_serving_penalty(controller)) {
-      if (m_block_penalty_handler.penalty_satisfied(controller,
-                                                    timestep)) {
+    if (m_block_drop_handler.is_serving_penalty(controller)) {
+      if (m_block_drop_handler.penalty_satisfied(controller,
+                                                 timestep)) {
         finish_nest_block_drop(controller, timestep);
       }
     } else {
-      m_block_penalty_handler.penalty_init(controller, timestep);
+      m_block_drop_handler.penalty_init(controller, timestep);
     }
   }
 
@@ -123,14 +124,17 @@ class arena_interactor : public rcppsw::er::client {
     ER_ASSERT(controller.goal_acquired() &&
               acquisition_goal_type::kBlock == controller.acquisition_goal(),
               "FATAL: Controller not waiting for free block pickup");
+    ER_ASSERT(m_block_pickup_handler.is_serving_penalty(controller),
+              "FATAL: Controller not serving pickup penalty");
+
     /*
      * More than 1 robot can pick up a block in a timestep, so we have to
      * search for this robot's controller
      */
-    const temporal_penalty<T>& p = *m_block_penalty_handler.find(controller);
+    const temporal_penalty<T>& p = *m_block_pickup_handler.find(controller);
 
-    /* Check whether the foot-bot is actually on a block */
     perform_free_block_pickup(controller, p, timestep);
+    m_block_pickup_handler.remove(p);
   }
 
   /**
@@ -144,9 +148,6 @@ class arena_interactor : public rcppsw::er::client {
                                         m_map->blocks()[penalty.id()],
                                         utils::robot_id(controller),
                                         timestep);
-    controller.block()->pickup_event(true);
-    m_metrics_agg->collect_from_block(controller.block().get());
-    controller.block()->pickup_event(false);
 
     /*
      * Penalty served needs to be set here rather than in the free block pickup
@@ -155,8 +156,8 @@ class arena_interactor : public rcppsw::er::client {
      */
     controller.penalty_served(penalty.penalty());
     controller.visitor::template visitable_any<T>::accept(pickup_op);
+
     m_map->accept(pickup_op);
-    controller.free_pickup_event(false);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();
@@ -167,16 +168,22 @@ class arena_interactor : public rcppsw::er::client {
    * so send it the \ref nest_block_drop event.
    */
   void finish_nest_block_drop(T& controller, uint timestep) {
-    ER_ASSERT(controller.in_nest() &&
-              transport_goal_type::kNest == controller.block_transport_goal(),
-              "FATAL: Controller not in nest/does not have nest as goal");
+    ER_ASSERT(controller.in_nest(),
+              "FATAL: Controller not in nest");
+    ER_ASSERT(transport_goal_type::kNest != controller.block_transport_goal(),
+              "FATAL: Controller still has nest as goal");
+    ER_ASSERT(m_block_drop_handler.is_serving_penalty(controller),
+              "FATAL: Controller not serving drop penalty");
     /*
      * More than 1 robot can drop a block in a timestep, so we have to
      * search for this robot's controller.
      */
-    const temporal_penalty<T>& p = *m_block_penalty_handler.find(controller);
+    const temporal_penalty<T>& p = *m_block_drop_handler.find(controller);
 
     perform_nest_block_drop(controller, p, timestep);
+    m_block_drop_handler.remove(p);
+    ER_ASSERT(!m_block_drop_handler.is_serving_penalty(controller),
+              "FATAL: Multiple instances of same controller serving drop penalty");
   }
 
   /**
@@ -186,21 +193,13 @@ class arena_interactor : public rcppsw::er::client {
   void perform_nest_block_drop(T& controller,
                                const temporal_penalty<T>& penalty,
                                uint timestep) {
-    /*
-     * Gather block transport metrics before event processing and they get
-     * reset.
-     */
-    controller.block()->nest_drop_time(timestep);
 
     /*
-     * We are clearly performing a block drop in the nest, so mark it as
-     * such. We have to do this manually, rather than letting it happen in
-     * the nest block drop event, as we have already gathered metrics for
-     * this timestep for this block at that point.
+     * We have to do this asynchronous to the rest of metric collection, because
+     * the nest block drop event resets block metrics.
      */
-    controller.block()->drop_event(true);
+    controller.block()->nest_drop_time(timestep);
     m_metrics_agg->collect_from_block(controller.block().get());
-    controller.block()->drop_event(false);
 
     /*
      * Penalty served needs to be set here rather than in the free block pickup
@@ -233,7 +232,8 @@ class arena_interactor : public rcppsw::er::client {
   argos::CFloorEntity*             const m_floor;
   stateless_metrics_aggregator*    const m_metrics_agg;
   representation::arena_map* const       m_map;
-  block_op_penalty_handler<T>            m_block_penalty_handler;
+  block_op_penalty_handler<T>            m_block_pickup_handler;
+  block_op_penalty_handler<T>            m_block_drop_handler;
   // clang-format on
 };
 

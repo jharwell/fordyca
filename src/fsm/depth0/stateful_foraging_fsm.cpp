@@ -48,6 +48,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       m_block_fsm(server, sel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
@@ -56,6 +57,10 @@ stateful_foraging_fsm::stateful_foraging_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
+                                  nullptr,
+                                  &entry_wait_for_signal,
+                                  nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
@@ -75,8 +80,8 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
     return controller::foraging_signal::HANDLED;
   }
   if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      internal_event(ST_LEAVING_NEST);
+    if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
+      internal_event(ST_WAIT_FOR_DROP);
       return controller::foraging_signal::HANDLED;
     } else if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       m_task_running = false;
@@ -90,7 +95,6 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(stateful_foraging_fsm, acquire_block) {
   if (m_block_fsm.task_finished()) {
-    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_PICKUP);
   } else {
     m_block_fsm.task_execute();
@@ -110,6 +114,15 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm,
     m_pickup_count = 0;
     m_block_fsm.task_reset();
     internal_event(ST_ACQUIRE_BLOCK);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+HFSM_STATE_DEFINE(stateful_foraging_fsm,
+                  wait_for_drop,
+                  state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    m_block_fsm.task_reset();
+    internal_event(ST_LEAVING_NEST);
   }
   return controller::foraging_signal::HANDLED;
 }

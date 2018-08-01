@@ -146,6 +146,8 @@ class temporal_penalty_handler : public rcppsw::er::client {
     return it != m_penalty_list.end();
   }
 
+  size_t list_size(void) const { return m_penalty_list.size(); }
+
  protected:
   std::list<temporal_penalty<T>>& penalty_list(void) {
     return m_penalty_list;

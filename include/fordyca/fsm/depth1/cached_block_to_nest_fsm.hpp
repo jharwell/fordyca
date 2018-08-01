@@ -132,6 +132,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
      */
     ST_WAIT_FOR_PICKUP,
 
+    ST_WAIT_FOR_DROP,
+
     /**
      * Block found--bring it back to the nest.
      */
@@ -172,11 +174,14 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* memory foraging states */
+  /* stateful foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+                     wait_for_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 

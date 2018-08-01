@@ -105,7 +105,6 @@ void free_block_pickup::visit(representation::arena_map& map) {
 void free_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
-  block.pickup_event(true);
   block.first_pickup_time(m_timestep);
 
   /* Move block out of sight */
@@ -165,6 +164,7 @@ void free_block_pickup::visit(
   static_cast<tasks::depth0::foraging_task*>(controller.current_task())
       ->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());

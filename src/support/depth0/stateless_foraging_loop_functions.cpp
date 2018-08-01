@@ -43,7 +43,7 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server), m_arena_map(nullptr) {
+    : client(rcppsw::er::g_server), m_arena_map(nullptr), m_interactor{nullptr} {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 

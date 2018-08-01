@@ -47,6 +47,7 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       m_explore_fsm(
           server,
           saa,
@@ -65,7 +66,11 @@ stateless_foraging_fsm::stateless_foraging_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
-                                               nullptr)} {
+                                               nullptr),
+      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                  nullptr,
+                                  &entry_wait_for_signal,
+                                  nullptr)} {
   client::insmod("stateless_foraging_fsm",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -85,8 +90,8 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
       m_explore_fsm.task_start(nullptr);
       internal_event(ST_ACQUIRE_BLOCK);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      internal_event(ST_LEAVING_NEST);
+    } else if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
+      internal_event(ST_WAIT_FOR_BLOCK_DROP);
       return controller::foraging_signal::HANDLED;
     }
   }
@@ -96,7 +101,6 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();
@@ -111,6 +115,17 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
     m_explore_fsm.task_reset();
     ER_NOM("Block pickup signal received");
     internal_event(ST_TRANSPORT_TO_NEST);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+HFSM_STATE_DEFINE(stateless_foraging_fsm,
+                  wait_for_block_drop,
+                  state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    m_explore_fsm.task_reset();
+    ER_NOM("Block drop signal received");
+    internal_event(ST_LEAVING_NEST);
   }
   return controller::foraging_signal::HANDLED;
 }

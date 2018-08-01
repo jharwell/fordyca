@@ -68,16 +68,6 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
     uint cum_collected{0};
 
     /**
-     * @brief Total # ramp blocks collected in interval.
-     */
-    uint cum_ramp_collected{0};
-
-    /**
-     * @brief Total # cube blocks collected in interval.
-     */
-    uint cum_cube_collected{0};
-
-    /**
      * @brief Total # transporters for collected blocks in interval.
      */
     uint cum_transporters{0};
@@ -93,9 +83,6 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
      * pickup for all collected blocks in interval.
      */
     double cum_initial_wait_time{0.0};
-
-    uint cum_pickup_events{0};
-    uint cum_drop_events{0};
   };
 
   std::string csv_header_build(const std::string& header) override;

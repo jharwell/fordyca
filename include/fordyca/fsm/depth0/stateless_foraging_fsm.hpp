@@ -100,6 +100,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
+    ST_WAIT_FOR_BLOCK_DROP,
     ST_MAX_STATES
   };
 
@@ -117,6 +118,8 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(stateless_foraging_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_drop,
                      state_machine::event_data);
 
   /**
