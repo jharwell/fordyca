@@ -41,11 +41,12 @@ base_metrics_aggregator::base_metrics_aggregator(
     const std::string& output_root)
     : client(server), collector_group() {
   m_metrics_path = output_root + "/" + params->output_dir;
+
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {
-    ER_FATAL_SENTINEL("FATAL: Output metrics path '%s' already exists",
-                      m_metrics_path.c_str());
+    ER_WARN("WARNING: Output metrics path '%s' already exists",
+            m_metrics_path.c_str());
   }
 }
 /*******************************************************************************

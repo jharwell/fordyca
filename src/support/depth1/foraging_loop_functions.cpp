@@ -70,6 +70,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
                                       arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
+                                      &arenap->blocks.manipulation_penalty,
                                       &arenap->static_cache.usage_penalty);
 
   /* configure robots */

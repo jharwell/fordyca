@@ -73,15 +73,6 @@ class utilization_metrics : public rcppsw::metrics::base_metrics {
   virtual uint total_block_drops(void) const = 0;
 
   /**
-   * @brief Should return the cumulative duration of penalties that all robots
-   * that have satisfied the cache penalty on this timestep.
-   *
-   * Currently this will only be for 1 robot, due to limitations/shortcuts taken
-   * with the block drop/pickup events.
-   */
-  virtual uint total_penalties_served(void) const = 0;
-
-  /**
    * @brief Get the ID of the cache for use in metric collection.
    */
   virtual uint cache_id(void) const = 0;
