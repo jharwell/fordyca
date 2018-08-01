@@ -12,36 +12,50 @@ This is the main entry point for getting started on the project.
 
 ## Pre-cloning Setup
 
-1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
+1. Install development packages for the project:
+
+   - catch (A unit testing framework that some unit tests use).
+
+        sudo apt install catch
+
+   - boost 1.58.
+
+        sudo apt install libboost-all-dev
+
+   - Qt5.
+
+        sudo apt install qtbase5-dev
+
+   - graphviz (For building the documentation include/dependency graphs)
+
+        sudo apt install graphviz
+
+2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
    *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
    _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
    linux. This is because those packages were compiled with gcc/g++ 5.4, and
    therefore the core ARGoS libraries that fordyca uses are ABI incompatible
-   with anything compiled with gcc >= 6.0. If you are compiling ARGoS from
-   source you can use whatever compiler/compiler version you like, so long as it
-   supports C++14.
+   with anything compiled with gcc >= 6.0. In addition, when installing ARGoS
+   from a .deb you will likely not have all dependencies met (dpkg does not
+   check them like apt does), so you need to run:
 
-2. Verify that you can run the simple foraging example that comes
+        sudo apt install -f
+
+   To fix installation issues.
+
+   If you are compiling ARGoS from source you can use whatever compiler/compiler
+   version you like, so long as it supports C++14.
+
+3. Verify that you can run the simple foraging example that comes
    packaged on the ARGoS website.
 
-3. This project uses the build scaffolding provided by
+4. This project uses the build scaffolding provided by
    [cmake-config](https://github.com/jharwell/cmake-config). Please
    look at the platform requirements for that project and install any
    needed packages/libraries.
 
-4. Install additional development packages for the project:
-
-   - catch (A unit testing framework that some unit tests use)
-
-        sudo apt install catch
-   - boost 1.58.
-
-        sudo apt install libboost-all-dev
-
-    - Qt (Qt 5 is known to work; older versions may also work)
-            sudo apt install qtbase5-dev
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:

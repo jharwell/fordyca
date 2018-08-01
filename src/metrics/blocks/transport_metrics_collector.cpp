@@ -81,13 +81,11 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
                            interval()) +
             separator();
     line += std::to_string(static_cast<double>(m_stats.cum_drop_events) /
-                           interval()) +
-            separator();
+                           interval()) + separator();
 
   } else {
     line += "0" + separator() + "0" + separator() + "0" + separator() + "0" +
-            separator() + "0" + separator() + "0" + separator() + "0" +
-            separator();
+            separator() + "0" + separator();
   }
   return true;
 } /* csv_line_build() */
