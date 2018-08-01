@@ -108,6 +108,7 @@ class stateful_foraging_fsm : public base_foraging_fsm,
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_PICKUP,
+    ST_WAIT_FOR_DROP,
     ST_TRANSPORT_TO_NEST, /* take block to nest */
     ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
     ST_FINISHED,
@@ -142,6 +143,9 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateful_foraging_fsm,
                      wait_for_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(stateful_foraging_fsm,
+                     wait_for_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, finished);
 

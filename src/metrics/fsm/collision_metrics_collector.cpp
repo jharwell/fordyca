@@ -43,8 +43,8 @@ std::string collision_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "n_avoiding_collision" + separator() +
-      "n_cum_avoiding_collision" + separator();
+      "avg_avoiding_collision" + separator() +
+      "avg_cum_avoiding_collision" + separator();
   // clang-format on
 } /* csv_header_build() */
 

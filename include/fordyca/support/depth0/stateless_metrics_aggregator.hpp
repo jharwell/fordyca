@@ -40,6 +40,7 @@ NS_START(support, depth0);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class stateless_metrics_aggregator
  * @ingroup support depth0
@@ -47,9 +48,14 @@ NS_START(support, depth0);
  * @brief Aggregates and metrics metric collection for stateless foraging. That
  * includes:
  *
- * - FSM distance/block acquisition metrics
+ * - FSM distance metrics
+ * - Block acquisition metrics
+ * - FSM collision metrics
+ * - Block transport metrics
+ * - Block manipulation metrics
+ *
+ * Metrics are *NOT* reset after collection--that is the caller's responsibility.
  */
-
 class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
  public:
   stateless_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
@@ -57,7 +63,8 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
                                const std::string& output_root);
 
   /**
-   * @brief Collect metrics from the stateless controller.
+   * @brief Collect metrics from the stateless controller synchronously (i.e. at
+   * the end of each timestep).
    */
   void collect_from_controller(const rcppsw::metrics::base_metrics* controller);
 

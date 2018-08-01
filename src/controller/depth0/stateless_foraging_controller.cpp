@@ -29,6 +29,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces

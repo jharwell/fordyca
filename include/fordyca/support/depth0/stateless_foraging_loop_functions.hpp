@@ -27,6 +27,7 @@
 #include <string>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/support/base_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,6 +77,9 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   }
 
  private:
+  using interactor =
+      arena_interactor<controller::depth0::stateless_foraging_controller>;
+
   void arena_map_init(params::loop_function_repository& repo);
   void output_init(const struct params::output_params* p_output);
   void pre_step_iter(argos::CFootBotEntity& robot);
@@ -85,6 +89,7 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   std::string                                   m_output_root{""};
   std::unique_ptr<stateless_metrics_aggregator> m_metrics_agg{nullptr};
   std::unique_ptr<representation::arena_map>    m_arena_map;
+  std::unique_ptr<interactor>                   m_interactor;
   // clang-format on
 };
 

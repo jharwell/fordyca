@@ -34,18 +34,16 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using interactor =
-    arena_interactor<controller::depth0::stateful_foraging_controller>;
 
 /*******************************************************************************
  * Member Functions
@@ -63,6 +61,15 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<const struct params::output_params>();
   m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
       rcppsw::er::g_server, &p_output->metrics, output_root());
+
+  /* intitialize robot interactions with environment */
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  m_interactor =
+      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                      arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -102,8 +109,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
   set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, arena_map(), m_metrics_agg.get(), floor())(
-      controller, GetSpace().GetSimulationClock());
+  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
