@@ -164,6 +164,7 @@ void free_block_pickup::visit(
   static_cast<tasks::depth0::foraging_task*>(controller.current_task())
       ->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());

@@ -58,7 +58,7 @@ class generalist : public ta::partitionable_polled_task,
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::nest_block_drop& visitor) override;
 
-  /* base FSM metrics */
+  /* collision metrics */
   TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */

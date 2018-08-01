@@ -133,9 +133,7 @@ class arena_interactor : public rcppsw::er::client {
      */
     const temporal_penalty<T>& p = *m_block_pickup_handler.find(controller);
 
-    /* Check whether the foot-bot is actually on a block */
     perform_free_block_pickup(controller, p, timestep);
-
     m_block_pickup_handler.remove(p);
   }
 
@@ -195,16 +193,12 @@ class arena_interactor : public rcppsw::er::client {
   void perform_nest_block_drop(T& controller,
                                const temporal_penalty<T>& penalty,
                                uint timestep) {
-    /*
-     * Gather block transport metrics before event processing and they get
-     * reset.
-     */
-    controller.block()->nest_drop_time(timestep);
 
     /*
      * We have to do this asynchronous to the rest of metric collection, because
-     * the nest block drop event resets block metrics.o
+     * the nest block drop event resets block metrics.
      */
+    controller.block()->nest_drop_time(timestep);
     m_metrics_agg->collect_from_block(controller.block().get());
 
     /*

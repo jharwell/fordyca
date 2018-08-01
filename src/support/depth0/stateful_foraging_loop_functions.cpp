@@ -101,6 +101,8 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
   /* collect metrics from robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
   utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
@@ -151,7 +153,6 @@ void stateful_foraging_loop_functions::Reset(void) {
 } /* Reset() */
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
-  stateless_foraging_loop_functions::pre_step_final();
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
