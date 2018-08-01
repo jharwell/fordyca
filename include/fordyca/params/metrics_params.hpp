@@ -42,7 +42,6 @@ NS_START(fordyca, params);
 struct metrics_params : public rcppsw::params::base_params {
   std::string collision_fname{""};
 
-  std::string block_fname{""};
   std::string block_acquisition_fname{""};
   std::string block_transport_fname{""};
   std::string block_manipulation_fname{""};
