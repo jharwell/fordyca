@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
-#include "fordyca/events/block_found.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -90,6 +91,12 @@ TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
  * Event Handling
  ******************************************************************************/
 void cache_starter::accept(events::free_block_drop& visitor) {
+  visitor.visit(*this);
+}
+void cache_starter::accept(events::free_block_pickup& visitor) {
+  visitor.visit(*this);
+}
+void cache_starter::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

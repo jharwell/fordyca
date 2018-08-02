@@ -33,15 +33,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace events {
-class free_block_drop;
-} // namespace events
-
+NS_START(fordyca, tasks, depth2);
 namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth2);
 
 /*******************************************************************************
  * Structure Definitions
@@ -59,8 +52,7 @@ NS_START(tasks, depth2);
  */
 class foraging_task
     : public base_foraging_task,
-      public ta::polled_task,
-      public visitor::polymorphic_accept_set<events::free_block_drop> {
+      public ta::polled_task {
  public:
   foraging_task(const std::string& name,
                 const struct ta::task_params *params,

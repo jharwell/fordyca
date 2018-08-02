@@ -26,6 +26,7 @@
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
@@ -80,6 +81,9 @@ void generalist::accept(events::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
 void generalist::accept(events::free_block_pickup& visitor) {
+  visitor.visit(*this);
+}
+void generalist::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

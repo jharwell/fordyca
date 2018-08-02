@@ -62,7 +62,6 @@ class collector : public foraging_task,
   void accept(events::nest_block_drop& visitor) override;
   void accept(events::cache_vanished& visitor) override;
   void accept(events::cache_block_drop&) override {}
-  void accept(events::free_block_pickup&) override {}
 
   /* base FSM metrics */
   TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);

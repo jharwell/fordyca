@@ -29,6 +29,7 @@
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
@@ -133,8 +134,28 @@ class arena_interactor : public rcppsw::er::client {
      */
     const temporal_penalty<T>& p = *m_block_pickup_handler.find(controller);
 
-    perform_free_block_pickup(controller, p, timestep);
+    /*
+     * If two robots both are serving penalties on the same ramp block (possible
+     * because a ramp block spans 2 squares), then whichever robot finishes
+     * first will correctly take the block via \ref free_block_pickup, and the
+     * second one will attempt to perform the pickup on a block that is already
+     * out of sight, resulting in a boost index out of bounds assertion. See
+     * #410.
+     */
+    if (-1 == utils::robot_on_block(controller, *map())) {
+      ER_WARN("WARNING: %s cannot pickup block%d: No such block",
+              controller.GetId().c_str(),
+              m_block_pickup_handler.find(controller)->id());
+      events::block_vanished vanished(depth0::arena_interactor<T>::server_ref(),
+                                      p.id());
+      controller.visitor::template visitable_any<T>::accept(vanished);
+    } else {
+      perform_free_block_pickup(controller, p, timestep);
+      floor()->SetChanged();
+    }
     m_block_pickup_handler.remove(p);
+    ER_ASSERT(!m_block_pickup_handler.is_serving_penalty(controller),
+              "FATAL: Multiple instances of same controller serving block pickup penalty");
   }
 
   /**
@@ -144,6 +165,9 @@ class arena_interactor : public rcppsw::er::client {
   void perform_free_block_pickup(T& controller,
                                  const temporal_penalty<T>& penalty,
                                  uint timestep) {
+    ER_ASSERT(m_map->blocks()[penalty.id()]->real_loc() !=
+              representation::base_block::kOutOfSightRLoc,
+              "FATAL: Attempt to pick up out of sight block");
     events::free_block_pickup pickup_op(rcppsw::er::g_server,
                                         m_map->blocks()[penalty.id()],
                                         utils::robot_id(controller),
@@ -170,7 +194,7 @@ class arena_interactor : public rcppsw::er::client {
   void finish_nest_block_drop(T& controller, uint timestep) {
     ER_ASSERT(controller.in_nest(),
               "FATAL: Controller not in nest");
-    ER_ASSERT(transport_goal_type::kNest != controller.block_transport_goal(),
+    ER_ASSERT(transport_goal_type::kNest == controller.block_transport_goal(),
               "FATAL: Controller still has nest as goal");
     ER_ASSERT(m_block_drop_handler.is_serving_penalty(controller),
               "FATAL: Controller not serving drop penalty");

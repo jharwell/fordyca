@@ -78,15 +78,20 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
 
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
-     * not, nothing to do. If a robot is carrying a block but has not reached
-     * the nest yet, nothing to do.
+     * not, nothing to do. If a robot is carrying a block but is still
+     * transporting it (even if it IS currently in the nest), nothing to do.3
      */
-    if (!(controller.goal_acquired() &&
+    bool precond = false;
+    if (controller.goal_acquired() &&
           acquisition_goal_type::kBlock == controller.acquisition_goal() &&
-          -1 != block_id) &&
-        !(transport_goal_type::kNest == controller.block_transport_goal() &&
-          controller.in_nest())) {
-          return false;
+          -1 != block_id) {
+      precond = true;
+    }
+    if (controller.in_nest() && controller.goal_acquired()) {
+      precond = true;
+    }
+    if (!precond) {
+      return precond;
     }
 
     ER_ASSERT(!temporal_penalty_handler<T>::is_serving_penalty(controller),
