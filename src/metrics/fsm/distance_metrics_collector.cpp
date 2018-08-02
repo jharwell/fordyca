@@ -34,16 +34,16 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
                                                        uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
-  std::string line;
-  line = "cum_distance" + separator();
-  return base_metrics_collector::csv_header_build(header) + line;
+  return base_metrics_collector::csv_header_build(header) +
+      "avg_distance" + separator() +
+      "avg_cum_distance" + separator();
 } /* csv_header_build() */
 
 void distance_metrics_collector::reset(void) {
@@ -55,7 +55,10 @@ bool distance_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.cum_distance) + separator();
+  line += std::to_string(m_stats.distance) + separator();
+  line += std::to_string(m_stats.cum_distance /
+                         (static_cast<double>(timestep() + 1) / interval())) +
+          separator();
   return true;
 } /* csv_line_build() */
 
@@ -63,10 +66,11 @@ void distance_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::distance_metrics&>(metrics);
   m_stats.cum_distance += m.timestep_distance();
+  m_stats.distance += m.timestep_distance();
 } /* collect() */
 
 void distance_metrics_collector::reset_after_interval(void) {
-  m_stats = {0};
+  m_stats.distance = 0.0;
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);
