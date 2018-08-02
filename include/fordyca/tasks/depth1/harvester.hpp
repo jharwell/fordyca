@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/tasks/free_block_interactor.hpp"
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
@@ -47,7 +48,8 @@ NS_START(fordyca, tasks, depth1);
  * cache. It is abortable, and has one task interface.
  */
 class harvester : public foraging_task,
-                  public existing_cache_interactor {
+                  public existing_cache_interactor,
+                  public free_block_interactor {
  public:
   harvester(const struct ta::task_params* params,
             std::unique_ptr<ta::taskable>& mechanism);
@@ -59,11 +61,15 @@ class harvester : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
+  void accept(events::nest_block_drop&) override {}
+
+  void accept(events::free_block_pickup& visitor) override;
+  void accept(events::free_block_drop&) override {}
+  void accept(events::block_vanished&) override;
+
   void accept(events::cache_block_drop& visitor) override;
   void accept(events::cached_block_pickup&) override {}
   void accept(events::cache_vanished& visitor) override;
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::nest_block_drop&) override {}
 
   /* base FSM metrics */
   TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
