@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateless_foraging_controller id="ffc"
+    <stateful_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -101,13 +101,8 @@
           <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
         </actuation>
-        <visualization robot_id="true"
-                       robot_los="false"
-                       robot_task="true"
-                       block_id="false"
-                       />
       </params>
-    </stateless_foraging_controller>
+    </stateful_foraging_controller>
 
   </controllers>
 
@@ -115,7 +110,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateless_foraging_loop_functions">
+                  label="stateful_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -146,10 +141,10 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Constant"
-              frequency="100"
+              type="Sine"
+              frequency="0.01"
               amplitude="50"
-              offset="10"/>
+              offset="50"/>
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
@@ -182,6 +177,11 @@
       </static_caches>
       <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
+    <visualization robot_id="true"
+                   robot_los="false"
+                   robot_task="true"
+                   block_id="false"
+                   />
   </loop_functions>
 
   <!-- *********************** -->
@@ -265,7 +265,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateless_foraging_qt_user_functions" />
+      <user_functions label="stateful_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

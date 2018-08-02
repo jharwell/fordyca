@@ -104,14 +104,20 @@ HFSM_STATE_DEFINE_ND(stateful_foraging_fsm, acquire_block) {
 HFSM_STATE_DEFINE(stateful_foraging_fsm,
                   wait_for_pickup,
                   state_machine::event_data) {
+  /**
+   * It is possible that robots can be waiting indefinitely for a block
+   * pickup signal that will never come once a block has been acquired if they
+   * "detect" a block by sprawling across multiple blocks (i.e. all ground
+   * sensors did not detect the same block). It is also possible that a robot
+   * serving a penalty for a block pickup will have the block taken by a
+   * different robot.
+   *
+   * In both cases, treat the block as vanished and try again.
+   */
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_block_fsm.task_reset();
-    m_pickup_count = 0;
     internal_event(ST_TRANSPORT_TO_NEST);
-  }
-  ++m_pickup_count;
-  if (m_pickup_count >= kPICKUP_TIMEOUT) {
-    m_pickup_count = 0;
+  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_ACQUIRE_BLOCK);
   }
@@ -153,7 +159,12 @@ acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
 } /* acquisition_goal() */
 
 bool stateful_foraging_fsm::goal_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_PICKUP;
+  if (acquisition_goal_type::kBlock == acquisition_goal()) {
+    return current_state() == ST_WAIT_FOR_PICKUP;
+  } else if (transport_goal_type::kNest == block_transport_goal()) {
+    return current_state() == ST_WAIT_FOR_DROP;
+  }
+  return false;
 } /* goal_acquired() */
 
 /*******************************************************************************
@@ -171,7 +182,8 @@ void stateful_foraging_fsm::task_execute(void) {
 } /* task_execute() */
 
 transport_goal_type stateful_foraging_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_NEST == current_state()) {
+  if (ST_TRANSPORT_TO_NEST == current_state() ||
+      ST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;

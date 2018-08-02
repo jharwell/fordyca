@@ -27,6 +27,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
@@ -102,6 +103,10 @@ void harvester::accept(events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 void harvester::accept(events::cache_vanished& visitor) {
+  visitor.visit(*this);
+}
+
+void harvester::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

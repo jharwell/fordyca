@@ -1,7 +1,7 @@
 /**
- * @file cache_vanished.hpp
+ * @file block_vanished.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CACHE_VANISHED_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CACHE_VANISHED_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_VANISHED_HPP_
+#define INCLUDE_FORDYCA_EVENTS_BLOCK_VANISHED_HPP_
 
 /*******************************************************************************
  * Includes
@@ -35,6 +35,10 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
+namespace depth0 {
+class stateless_foraging_controller;
+class stateful_foraging_controller;
+}
 namespace depth1 {
 class foraging_controller;
 }
@@ -43,17 +47,24 @@ class foraging_controller;
 }
 } // namespace controller
 
-namespace fsm { namespace depth1 {
+namespace fsm {
+namespace depth0 {
+class stateless_foraging_fsm;
+class stateful_foraging_fsm;
+}
+namespace depth1 {
 class block_to_goal_fsm;
-class cached_block_to_nest_fsm;
 }} // namespace fsm::depth1
 namespace tasks {
+namespace depth0 {
+class generalist;
+}
 namespace depth1 {
-class collector;
 class harvester;
 } // namespace depth1
 namespace depth2 {
-class cache_transferer;
+class cache_starter;
+class cache_finisher;
 }
 } // namespace tasks
 
@@ -63,45 +74,55 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 /*
- * @class cache_vanished
+ * @class block_vanished
  * @ingroup events
  *
- * @brief Created whenever a robot is serving a cache penalty, but while
- * serving the penalty the cache it is waiting in vanishes due to another
- * robot picking up the last available block.
+ * @brief Created whenever a robot is serving a block pickup penalty, but while
+ * serving the penalty the block it is waiting for vanishes due to another
+ * robot picking it up (ramp blocks only).
  */
-class cache_vanished
+class block_vanished
     : public rcppsw::er::client,
-      public visitor::visit_set<controller::depth1::foraging_controller,
+      public visitor::visit_set<controller::depth0::stateless_foraging_controller,
+                                controller::depth0::stateful_foraging_controller,
+                                controller::depth1::foraging_controller,
                                 controller::depth2::foraging_controller,
-                                tasks::depth1::collector,
+                                tasks::depth0::generalist,
                                 tasks::depth1::harvester,
-                                tasks::depth2::cache_transferer,
-                                fsm::depth1::block_to_goal_fsm,
-                                fsm::depth1::cached_block_to_nest_fsm> {
+                                tasks::depth2::cache_starter,
+                                tasks::depth2::cache_finisher,
+                                fsm::depth0::stateless_foraging_fsm,
+                                fsm::depth0::stateful_foraging_fsm,
+                                fsm::depth1::block_to_goal_fsm> {
  public:
-  cache_vanished(std::shared_ptr<rcppsw::er::server> server,
-                 uint cache_id);
-  ~cache_vanished(void) override { client::rmmod(); }
+  block_vanished(std::shared_ptr<rcppsw::er::server> server,
+                 uint block_id);
+  ~block_vanished(void) override { client::rmmod(); }
 
-  cache_vanished(const cache_vanished& op) = delete;
-  cache_vanished& operator=(const cache_vanished& op) = delete;
+  block_vanished(const block_vanished& op) = delete;
+  block_vanished& operator=(const block_vanished& op) = delete;
+
+  /* depth0 foraging */
+  void visit(controller::depth0::stateless_foraging_controller& controller) override;
+  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(tasks::depth0::generalist& task) override;
+  void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
+  void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
 
   /* depth1 foraging */
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
-  void visit(tasks::depth1::collector& task) override;
   void visit(tasks::depth1::harvester& task) override;
   void visit(controller::depth1::foraging_controller& controller) override;
 
   /* depth2 foraging */
   void visit(controller::depth2::foraging_controller& controller) override;
-  void visit(tasks::depth2::cache_transferer& controller) override;
+  void visit(tasks::depth2::cache_starter& task) override;
+  void visit(tasks::depth2::cache_finisher& task) override;
 
  private:
-  uint m_cache_id;
+  uint m_block_id;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CACHE_VANISHED_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_VANISHED_HPP_ */

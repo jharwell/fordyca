@@ -142,8 +142,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, *map());
-    if (-1 == cache_id) {
+    if (-1 == utils::robot_on_cache(controller, *map())) {
       ER_WARN("WARNING: %s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
