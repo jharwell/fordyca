@@ -43,8 +43,14 @@ std::string collision_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_avoiding_collision" + separator() +
-      "avg_cum_avoiding_collision" + separator();
+      "avg_in_avoidance" + separator() +
+      "avg_cum_in_avoidance" + separator() +
+      "avg_entered_avoidance" + separator() +
+      "avg_cum_entered_avoidance" + separator() +
+      "avg_exited_avoidance" + separator() +
+      "avg_cum_exited_avoidance" + separator() +
+      "avg_avoidance_duration" + separator() +
+      "avg_cum_avoidance_duration" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -56,26 +62,58 @@ void collision_metrics_collector::reset(void) {
 void collision_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
-  m_stats.n_avoiding_collision += static_cast<uint>(m.is_avoiding_collision());
-  m_stats.n_cum_avoiding_collision +=
-      static_cast<uint>(m.is_avoiding_collision());
+  m_stats.n_in_avoidance += static_cast<uint>(m.in_collision_avoidance());
+  m_stats.cum_in_avoidance += static_cast<uint>(m.in_collision_avoidance());
+
+  m_stats.n_entered_avoidance += static_cast<uint>(m.entered_collision_avoidance());
+  m_stats.cum_entered_avoidance += static_cast<uint>(m.entered_collision_avoidance());
+
+  m_stats.n_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
+  m_stats.cum_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
+
+  m_stats.total_avoidance_duration += m.collision_avoidance_duration();
+  m_stats.cum_avoidance_duration += m.collision_avoidance_duration();
 } /* collect() */
 
 bool collision_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.n_avoiding_collision /
+  line += std::to_string(m_stats.n_in_avoidance /
                          static_cast<double>(interval())) +
           separator();
-  line += std::to_string(m_stats.n_cum_avoiding_collision /
+  line += std::to_string(m_stats.cum_in_avoidance /
+                         static_cast<double>(timestep() + 1)) +
+          separator();
+
+  line += std::to_string(m_stats.n_entered_avoidance /
+                         static_cast<double>(interval())) +
+          separator();
+  line += std::to_string(m_stats.cum_entered_avoidance /
+                         static_cast<double>(timestep() + 1)) +
+          separator();
+
+  line += std::to_string(m_stats.n_exited_avoidance /
+                         static_cast<double>(interval())) +
+          separator();
+  line += std::to_string(m_stats.cum_exited_avoidance /
+                         static_cast<double>(timestep() + 1)) +
+          separator();
+
+  line += std::to_string(m_stats.total_avoidance_duration /
+                         static_cast<double>(interval())) +
+          separator();
+  line += std::to_string(m_stats.cum_avoidance_duration /
                          static_cast<double>(timestep() + 1)) +
           separator();
   return true;
 } /* csv_line_build() */
 
 void collision_metrics_collector::reset_after_interval(void) {
-  m_stats.n_avoiding_collision = 0;
+  m_stats.n_in_avoidance = 0;
+  m_stats.n_entered_avoidance = 0;
+  m_stats.n_exited_avoidance = 0;
+  m_stats.total_avoidance_duration = 0;
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

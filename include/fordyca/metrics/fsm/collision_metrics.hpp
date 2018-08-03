@@ -49,7 +49,27 @@ class collision_metrics : public virtual rcppsw::metrics::base_metrics {
   /**
    * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
    */
-  virtual bool is_avoiding_collision(void) const = 0;
+  virtual bool in_collision_avoidance(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot has just entered collision avoidance. This
+   * should return \c FALSE on all subsequent steps the robot is in collision
+   * avoidance.
+   */
+  virtual bool entered_collision_avoidance(void) const = 0;
+
+  /**
+   * @brief If \c TRUE, then a robot has just exited collision avoidance. This
+   * should return \c FALSE on all previous steps the robot is in collision
+   * avoidance, and all steps afterwards when it returns to normal operation.
+   */
+  virtual bool exited_collision_avoidance(void) const = 0;
+
+  /**
+   * @brief If \ref exited_collision_avoidance() returns \c TRUE, then this
+   * should return the duration of the collision avoidance in timesteps.
+   */
+  virtual uint collision_avoidance_duration(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

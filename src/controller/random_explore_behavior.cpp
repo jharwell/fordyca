@@ -32,7 +32,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 random_explore_behavior::random_explore_behavior(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa)
     : explore_behavior(server, saa) {
   insmod("random_explore_behavior",
@@ -41,7 +41,26 @@ random_explore_behavior::random_explore_behavior(
 }
 
 /*******************************************************************************
- * Member Functions
+ * Collision Metrics
+ ******************************************************************************/
+bool random_explore_behavior::in_collision_avoidance(void) const {
+  return saa_subsystem()->sensing()->threatening_obstacle_exists();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool random_explore_behavior::entered_collision_avoidance(void) const {
+  return m_entered_avoidance;
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool random_explore_behavior::exited_collision_avoidance(void) const {
+  return m_exited_avoidance;
+} /* exited_collision_avoidance() */
+
+uint random_explore_behavior::collision_avoidance_duration(void) const {
+  return saa_subsystem()->sensing()->tick() - m_avoidance_start;
+} /* collision_avoidance_duration() */
+
+/*******************************************************************************
+ * General Member Functions
  ******************************************************************************/
 void random_explore_behavior::execute(void) {
   argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
@@ -49,6 +68,12 @@ void random_explore_behavior::execute(void) {
   saa_subsystem()->steering_force().wander();
 
   if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
+    if (!m_entered_avoidance) {
+      m_entered_avoidance = true;
+      m_avoidance_start = saa_subsystem()->sensing()->tick();
+    } else {
+      m_entered_avoidance = false;
+    }
     ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
             obs.GetX(),
             obs.GetY(),
@@ -57,6 +82,11 @@ void random_explore_behavior::execute(void) {
     saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     saa_subsystem()->actuation()->leds_set_color(utils::color::kRED);
   } else {
+    if (!m_exited_avoidance) {
+      m_exited_avoidance = true;
+    } else {
+      m_exited_avoidance = false;
+    }
     ER_DIAG("No threatening obstacle found");
     saa_subsystem()->actuation()->leds_set_color(utils::color::kMAGENTA);
     argos::CVector2 force = saa_subsystem()->steering_force().value();

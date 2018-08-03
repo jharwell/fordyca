@@ -39,6 +39,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
+using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -63,7 +64,8 @@ double harvester::calc_abort_prob(void) {
    * acquires a block can cause it to get stuck and not switch to another task
    * if it cannot find a block anywhere. See #232.
    */
-  if (transport_goal_type::kExistingCache == block_transport_goal()) {
+  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
     return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
@@ -72,12 +74,14 @@ double harvester::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double harvester::calc_interface_time(double start_time) {
-  if (transport_goal_type::kExistingCache == block_transport_goal()) {
+  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  if (transport_goal_type::kExistingCache ==
+      fsm->block_transport_goal()) {
     return current_time() - start_time;
   }
 
-  if (goal_acquired() && fsm::block_transporter::goal_type::kExistingCache ==
-                             block_transport_goal()) {
+  if (fsm->goal_acquired() &&
+      fsm::block_transporter::goal_type::kExistingCache == fsm->block_transport_goal()) {
     if (!interface_complete()) {
       interface_complete(true);
       reset_interface_time();
@@ -86,12 +90,6 @@ double harvester::calc_interface_time(double start_time) {
   }
   return 0.0;
 } /* calc_interface_time() */
-
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                       harvester,
-                       block_transport_goal,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -113,39 +111,41 @@ void harvester::accept(events::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       harvester,
-                       is_avoiding_collision,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       harvester,
-                       is_exploring_for_goal,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       harvester,
-                       is_vectoring_to_goal,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        harvester,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        harvester,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                            polled_task::mechanism()));
 
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       harvester,
-                       goal_acquired,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        harvester,
+                        goal_acquired,
+                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                            polled_task::mechanism()));
 
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       harvester,
-                       acquisition_goal,
-                       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                           polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        harvester,
+                        acquisition_goal,
+                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                            polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        harvester,
+                        block_transport_goal,
+                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 __rcsw_pure bool harvester::task_at_interface(void) const {
-  return transport_goal_type::kExistingCache == block_transport_goal();
+  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  return transport_goal_type::kExistingCache == fsm->block_transport_goal();
 } /* task_at_interface()() */
 
 NS_END(depth1, tasks, fordyca);

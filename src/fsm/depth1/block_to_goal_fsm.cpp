@@ -154,13 +154,35 @@ __rcsw_const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
 }
 
 /*******************************************************************************
- * FSM Metrics
+ * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool block_to_goal_fsm::is_avoiding_collision(void) const {
-  return m_block_fsm.is_avoiding_collision() ||
-         goal_fsm().is_avoiding_collision();
-} /* is_avoiding_collision() */
+__rcsw_pure bool block_to_goal_fsm::in_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
+      (goal_fsm().task_running() && goal_fsm().in_collision_avoidance());
+} /* in_collision_avoidance() */
 
+__rcsw_pure bool block_to_goal_fsm::entered_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() && m_block_fsm.entered_collision_avoidance()) ||
+      (goal_fsm().task_running() && goal_fsm().entered_collision_avoidance());
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool block_to_goal_fsm::exited_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() && m_block_fsm.exited_collision_avoidance()) ||
+      (goal_fsm().task_running() && goal_fsm().exited_collision_avoidance());
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint block_to_goal_fsm::collision_avoidance_duration(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.collision_avoidance_duration();
+  } else if (goal_fsm().task_running()) {
+    return goal_fsm().collision_avoidance_duration();
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+/*******************************************************************************
+ * Acquisition Metrics
+ ******************************************************************************/
 __rcsw_pure bool block_to_goal_fsm::is_exploring_for_goal(void) const {
   return (m_block_fsm.is_exploring_for_goal() && m_block_fsm.task_running()) ||
          (goal_fsm().is_exploring_for_goal() && goal_fsm().task_running());

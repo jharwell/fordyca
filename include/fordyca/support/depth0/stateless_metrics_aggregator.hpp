@@ -30,7 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
+namespace controller { namespace depth0 { class stateless_foraging_controller; }}
 namespace representation {
 class base_block;
 } /* namespace representation */
@@ -66,7 +66,8 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
    * @brief Collect metrics from the stateless controller synchronously (i.e. at
    * the end of each timestep).
    */
-  void collect_from_controller(const rcppsw::metrics::base_metrics* controller);
+  void collect_from_controller(
+      const controller::depth0::stateless_foraging_controller* controller);
 
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.

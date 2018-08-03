@@ -204,7 +204,7 @@ bool powerlaw_distributor::map_clusters(representation::arena_grid& grid) {
   for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
     ER_NOM("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
     for (auto dist : it->second) {
-      ER_DIAG("Cluster with origin@(%zu, %zu): capacity=%u",
+      ER_DIAG("Cluster with origin@(%u, %u): capacity=%u",
               (*dist.cluster().view().origin())->loc().first,
               (*dist.cluster().view().origin())->loc().second,
               dist.cluster().capacity());

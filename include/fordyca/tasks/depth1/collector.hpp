@@ -63,9 +63,6 @@ class collector : public foraging_task,
   void accept(events::cache_vanished& visitor) override;
   void accept(events::cache_block_drop&) override {}
 
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);
   TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);

@@ -43,7 +43,7 @@ using controller::steering_force_type;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
     controller::saa_subsystem* const saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
@@ -79,8 +79,13 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
    * nest. Instead, wander about within the nest until you find the edge (either
    * on your own or being pushed out via collision avoidance).
    */
-  argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
-  saa_subsystem()->steering_force().avoidance(obs);
+  if (m_saa->sensing()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
+    argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+    saa_subsystem()->steering_force().avoidance(obs);
+  } else {
+    collision_avoidance_tracking_end();
+  }
   saa_subsystem()->steering_force().wander();
   m_saa->apply_steering_force(std::make_pair(false, false));
 
@@ -120,6 +125,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   m_saa->steering_force().phototaxis();
   argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
     m_saa->steering_force().avoidance(obs);
   } else {
     /*
@@ -130,6 +136,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
     if (m_saa->linear_velocity().Length() <= 0.1) {
       m_saa->steering_force().wander();
     }
+    collision_avoidance_tracking_end();
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
@@ -189,6 +196,45 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
 }
 
 /*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+bool base_foraging_fsm::in_collision_avoidance(void) const {
+  return saa_subsystem()->sensing()->threatening_obstacle_exists();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool base_foraging_fsm::entered_collision_avoidance(void) const {
+  return m_entered_avoidance;
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool base_foraging_fsm::exited_collision_avoidance(void) const {
+  return m_exited_avoidance;
+} /* exited_collision_avoidance() */
+
+uint base_foraging_fsm::collision_avoidance_duration(void) const {
+  if (m_exited_avoidance) {
+    return saa_subsystem()->sensing()->tick() - m_avoidance_start;
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+void base_foraging_fsm::collision_avoidance_tracking_begin(void) {
+  if (!m_entered_avoidance) {
+    m_entered_avoidance = true;
+    m_avoidance_start = saa_subsystem()->sensing()->tick();
+  } else {
+    m_entered_avoidance = false;
+  }
+} /* collision_avoidance_tracking_begin() */
+
+void base_foraging_fsm::collision_avoidance_tracking_end(void) {
+  if (!m_exited_avoidance) {
+    m_exited_avoidance = true;
+  } else {
+    m_exited_avoidance = false;
+  }
+} /* collision_avoidance_tracking_end() */
+
+/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void base_foraging_fsm::init(void) {
@@ -222,9 +268,5 @@ const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuat
     void) {
   return m_saa->actuation();
 } /* actuators() */
-
-bool base_foraging_fsm::is_avoiding_collision(void) const {
-  return m_saa->sensing()->threatening_obstacle_exists();
-} /* is_avoiding_collision() */
 
 NS_END(controller, fordyca);

@@ -72,14 +72,17 @@ class cache_finisher_fsm : public base_foraging_fsm,
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override;
+  bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
 
   /**
    * @brief Reset the FSM.

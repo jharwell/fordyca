@@ -58,8 +58,15 @@ class collision_metrics_collector : public rcppsw::metrics::base_metrics_collect
 
  private:
   struct stats {
-    uint n_avoiding_collision;
-    uint n_cum_avoiding_collision;
+    uint n_in_avoidance;
+    uint n_entered_avoidance;
+    uint n_exited_avoidance;
+    uint total_avoidance_duration;
+
+    uint cum_in_avoidance;
+    uint cum_entered_avoidance;
+    uint cum_exited_avoidance;
+    uint cum_avoidance_duration;
   };
 
   std::string csv_header_build(const std::string& header) override;

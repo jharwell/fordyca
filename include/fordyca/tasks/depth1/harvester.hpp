@@ -71,9 +71,6 @@ class harvester : public foraging_task,
   void accept(events::cached_block_pickup&) override {}
   void accept(events::cache_vanished& visitor) override;
 
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);
   TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);

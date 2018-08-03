@@ -79,10 +79,11 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override {
-    return base_foraging_fsm::is_avoiding_collision();
-  }
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);

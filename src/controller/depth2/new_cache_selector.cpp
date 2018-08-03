@@ -58,7 +58,7 @@ representation::perceived_block new_cache_selector::calc_best(
 
     double utility = u.calc(robot_loc, c.density.last_result());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for new_cache%d loc=(%zu, %zu), density=%f: %f",
+    ER_DIAG("Utility for new_cache%d loc=(%u, %u), density=%f: %f",
             c.ent->id(),
             c.ent->discrete_loc().first,
             c.ent->discrete_loc().second,

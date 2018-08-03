@@ -69,7 +69,7 @@ class foraging_task
                 const struct ta::task_params *params,
                 std::unique_ptr<ta::taskable>& mechanism);
 
-  /* task overrides */
+    /* task overrides */
   double current_time(void) const override;
 
  protected:

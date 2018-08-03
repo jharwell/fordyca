@@ -83,13 +83,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */

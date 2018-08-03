@@ -61,7 +61,7 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_NOM("Select new cache for acquisition: %d@(%zu, %zu) [utility=%f]",
+  ER_NOM("Select new cache for acquisition: %d@(%u, %u) [utility=%f]",
          best.ent->id(),
          best.ent->discrete_loc().first,
          best.ent->discrete_loc().second,

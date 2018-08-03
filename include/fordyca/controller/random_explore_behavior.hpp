@@ -43,7 +43,7 @@ NS_START(fordyca, controller);
  */
 class random_explore_behavior : public explore_behavior {
  public:
-  random_explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
+  random_explore_behavior(std::shared_ptr<rcppsw::er::server> server,
                           controller::saa_subsystem* saa);
 
   ~random_explore_behavior(void) override = default;
@@ -51,6 +51,19 @@ class random_explore_behavior : public explore_behavior {
   random_explore_behavior& operator=(const random_explore_behavior& fsm) = delete;
 
   void execute(void) override;
+
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
+
+ private:
+  // clang-format off
+  bool m_entered_avoidance{false};
+  bool m_exited_avoidance{false};
+  uint m_avoidance_start{0};
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

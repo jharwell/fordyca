@@ -145,8 +145,7 @@ void stateless_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_metrics_agg->collect_from_controller(
-      static_cast<rcppsw::metrics::base_metrics*>(&controller));
+  m_metrics_agg->collect_from_controller(&controller);
   controller.free_pickup_event(false);
   controller.free_drop_event(false);
 

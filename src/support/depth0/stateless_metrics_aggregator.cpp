@@ -33,6 +33,8 @@
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -80,13 +82,13 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void stateless_metrics_aggregator::collect_from_controller(
-    const rcppsw::metrics::base_metrics* const controller) {
+    const controller::depth0::stateless_foraging_controller* controller) {
   auto collision_m =
-      dynamic_cast<const metrics::fsm::collision_metrics*>(controller);
+      dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
   auto distance_m =
       dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
   auto block_acq_m =
-      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
+      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller->fsm());
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
