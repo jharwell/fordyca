@@ -62,9 +62,6 @@ class generalist : public ta::partitionable_polled_task,
   void accept(events::nest_block_drop& visitor) override;
   void accept(events::block_vanished& visitor) override;
 
-  /* collision metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);
   TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);

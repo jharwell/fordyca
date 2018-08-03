@@ -150,6 +150,33 @@ bool stateless_foraging_fsm::goal_acquired(void) const {
 } /* goal_acquired() */
 
 /*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+__rcsw_pure bool stateless_foraging_fsm::in_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() && m_explore_fsm.in_collision_avoidance()) ||
+      base_foraging_fsm::in_collision_avoidance();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool stateless_foraging_fsm::entered_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() && m_explore_fsm.entered_collision_avoidance()) ||
+      base_foraging_fsm::entered_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool stateless_foraging_fsm::exited_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() && m_explore_fsm.exited_collision_avoidance()) ||
+      base_foraging_fsm::exited_collision_avoidance();
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint stateless_foraging_fsm::collision_avoidance_duration(void) const {
+  if (m_explore_fsm.task_running()) {
+    return m_explore_fsm.collision_avoidance_duration();
+  } else {
+    return base_foraging_fsm::collision_avoidance_duration();
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void stateless_foraging_fsm::init(void) {

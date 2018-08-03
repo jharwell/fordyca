@@ -28,6 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
@@ -67,9 +68,10 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
   /* collision metrics */
-  bool is_avoiding_collision(void) const override {
-    return base_foraging_fsm::is_avoiding_collision();
-  }
+  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

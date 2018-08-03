@@ -100,8 +100,11 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
   void task_start(const task_allocation::taskable_argument*) override {}
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);

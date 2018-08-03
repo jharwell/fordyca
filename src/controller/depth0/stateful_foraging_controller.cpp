@@ -166,31 +166,14 @@ FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
                        block_transport_goal,
                        current_task());
 
-/*******************************************************************************
- * FSM Metrics
- ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool,
+FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        stateful_foraging_controller,
-                       is_avoiding_collision,
-                       current_task());
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateful_foraging_controller,
-                       is_exploring_for_goal,
-                       current_task());
-
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateful_foraging_controller,
-                       is_vectoring_to_goal,
+                       acquisition_goal,
                        current_task());
 
 FSM_WRAPPER_DEFINE_PTR(bool,
                        stateful_foraging_controller,
                        goal_acquired,
-                       current_task());
-
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       stateful_foraging_controller,
-                       acquisition_goal,
                        current_task());
 
 /*******************************************************************************

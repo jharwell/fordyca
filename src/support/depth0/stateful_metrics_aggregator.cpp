@@ -28,6 +28,8 @@
 #include "fordyca/params/metrics_params.hpp"
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,32 +56,35 @@ stateful_metrics_aggregator::stateful_metrics_aggregator(
  ******************************************************************************/
 void stateful_metrics_aggregator::collect_from_controller(
     const controller::depth0::stateful_foraging_controller* const controller) {
-  auto distance_m =
-      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  auto collision_m =
-      dynamic_cast<const metrics::fsm::collision_metrics*>(controller);
+
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  auto distance_m =
+      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
 
   ER_ASSERT(distance_m,
             "FATAL: Controller does not provide FSM distance metrics");
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
-  ER_ASSERT(collision_m,
-            "FATAL: Controller does not provide FSM collision metrics");
   ER_ASSERT(manip_m,
             "FATAL: Controller does not provide block manipulation metrics");
 
   collect("perception::world_model", *worldm_m);
-  collect("fsm::distance", *distance_m);
-  collect("fsm::collision", *collision_m);
   collect("blocks::manipulation", *manip_m);
+  collect("fsm::distance", *distance_m);
 
   if (controller->current_task()) {
-    auto block_acq_m =
-        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            controller->current_task());
+    auto *fsm = static_cast<fsm::depth0::stateful_foraging_fsm*>(
+        dynamic_cast<const ta::polled_task*>(controller->current_task())->mechanism());
+
+    auto collision_m =
+        dynamic_cast<const metrics::fsm::collision_metrics*>(fsm);
+    auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(fsm);
     ER_ASSERT(block_acq_m,
               "FATAL: Controller does not provide FSM block acquisition metrics");
+    ER_ASSERT(collision_m,
+              "FATAL: FSM does not provide collision metrics");
+
+    collect("fsm::collision", *collision_m);
     collect("blocks::acquisition", *block_acq_m);
   }
 } /* collect_from_controller() */

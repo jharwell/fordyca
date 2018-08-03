@@ -76,7 +76,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",
+    ER_DIAG("Utility for existing_cache%d loc=(%u, %u), density=%f: %f",
             c.ent->id(),
             c.ent->discrete_loc().first,
             c.ent->discrete_loc().second,
@@ -90,7 +90,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
   } /* for(existing_cache..) */
 
   if (nullptr != best.ent) {
-    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%zu, %zu]: %f",
+    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%u, %u]: %f",
            best.ent->id(),
            best.ent->real_loc().GetX(),
            best.ent->real_loc().GetY(),

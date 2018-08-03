@@ -40,7 +40,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void)
-    : base_foraging_controller() {}
+    : base_foraging_controller(), m_fsm() {}
 
 stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
@@ -82,14 +82,8 @@ void stateless_foraging_controller::ControlStep(void) {
  ******************************************************************************/
 FSM_WRAPPER_DEFINE_PTR(bool,
                        stateless_foraging_controller,
-                       is_avoiding_collision,
+                       goal_acquired,
                        m_fsm);
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateless_foraging_controller,
-                       is_exploring_for_goal,
-                       m_fsm);
-
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller, goal_acquired, m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        stateless_foraging_controller,

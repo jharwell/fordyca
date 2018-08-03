@@ -82,7 +82,7 @@ class base_block : public multicell_entity,
   double initial_wait_time(void) const override;
 
   /**
-   * @brief Increment the # of carries this base_block has undergone on its way back
+   * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
   void add_transporter(uint robot_id) {

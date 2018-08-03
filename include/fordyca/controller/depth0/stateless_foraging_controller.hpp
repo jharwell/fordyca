@@ -30,7 +30,6 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************
@@ -59,7 +58,6 @@ NS_START(depth0);
  */
 class stateless_foraging_controller : public base_foraging_controller,
                                       public metrics::fsm::distance_metrics,
-                                      public metrics::fsm::collision_metrics,
                                       public metrics::fsm::goal_acquisition_metrics,
                                       public metrics::blocks::manipulation_metrics,
                                       public fsm::block_transporter,
@@ -77,13 +75,10 @@ class stateless_foraging_controller : public base_foraging_controller,
   int entity_id(void) const override;
   double timestep_distance(void) const override;
 
-  /* collision metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
+  bool is_exploring_for_goal(void) const override{ return false; }
+  bool is_vectoring_to_goal(void) const override{ return false; }
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  bool is_vectoring_to_goal(void) const override { return false; }
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
 
   /* block manipulation metrics */

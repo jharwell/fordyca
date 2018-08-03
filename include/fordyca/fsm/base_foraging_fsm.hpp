@@ -59,7 +59,7 @@ NS_START(fsm);
 class base_foraging_fsm : public state_machine::hfsm,
                           public metrics::fsm::collision_metrics {
  public:
-  base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+  base_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
                     controller::saa_subsystem* saa,
                     uint8_t max_states);
 
@@ -91,7 +91,10 @@ class base_foraging_fsm : public state_machine::hfsm,
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
   /* collision metrics */
-  bool is_avoiding_collision(void) const override;
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
  protected:
   /**
@@ -105,6 +108,18 @@ class base_foraging_fsm : public state_machine::hfsm,
 
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
+
+  /**
+   * @brief Start tracking the state necessary for correctly gathering collision
+   * avoidance metrics.
+   */
+  void collision_avoidance_tracking_begin(void);
+
+  /**
+   * @brief Stop tracking the state necessary for correctly gathering collision
+   * avoidance metrics.
+   */
+  void collision_avoidance_tracking_end(void);
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -165,6 +180,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
+
  private:
   /**
    * @brief When changing direction, a robot is spinning at such a speed that it
@@ -196,6 +212,9 @@ class base_foraging_fsm : public state_machine::hfsm,
   static constexpr uint kNEST_COUNT_MAX_STEPS = 25;
 
   // clang-format off
+  bool                             m_entered_avoidance{false};
+  bool                             m_exited_avoidance{false};
+  uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
   argos::CRadians                  m_new_dir;

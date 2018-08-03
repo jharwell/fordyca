@@ -129,13 +129,35 @@ __rcsw_const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
 }
 
 /*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+__rcsw_pure bool cached_block_to_nest_fsm::in_collision_avoidance(void) const {
+  return (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance()) ||
+      base_foraging_fsm::in_collision_avoidance();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool cached_block_to_nest_fsm::entered_collision_avoidance(void) const {
+  return (m_cache_fsm.task_running() && m_cache_fsm.entered_collision_avoidance()) ||
+      base_foraging_fsm::entered_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool cached_block_to_nest_fsm::exited_collision_avoidance(void) const {
+  return (m_cache_fsm.task_running() && m_cache_fsm.exited_collision_avoidance()) ||
+      base_foraging_fsm::exited_collision_avoidance();
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
+  if (m_cache_fsm.task_running()) {
+    return m_cache_fsm.collision_avoidance_duration();
+  } else {
+    return base_foraging_fsm::collision_avoidance_duration();
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+/*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool,
-                   cached_block_to_nest_fsm,
-                   is_avoiding_collision,
-                   m_cache_fsm);
-
 FSM_WRAPPER_DEFINE(bool,
                    cached_block_to_nest_fsm,
                    is_exploring_for_goal,

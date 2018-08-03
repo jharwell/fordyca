@@ -100,12 +100,27 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
-__rcsw_pure bool acquire_goal_fsm::is_avoiding_collision(void) const {
-  return m_explore_fsm.is_avoiding_collision() ||
-         m_vector_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
+__rcsw_pure bool acquire_goal_fsm::in_collision_avoidance(void) const {
+  return m_explore_fsm.in_collision_avoidance() ||
+      m_vector_fsm.in_collision_avoidance();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool acquire_goal_fsm::entered_collision_avoidance(void) const {
+  return m_explore_fsm.entered_collision_avoidance() ||
+      m_vector_fsm.entered_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool acquire_goal_fsm::exited_collision_avoidance(void) const {
+  return m_explore_fsm.exited_collision_avoidance() ||
+      m_vector_fsm.exited_collision_avoidance();
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint acquire_goal_fsm::collision_avoidance_duration(void) const {
+  return m_explore_fsm.collision_avoidance_duration() ||
+         m_vector_fsm.collision_avoidance_duration();
+} /* collision_avoidance_duration() */
 
 bool acquire_goal_fsm::goal_acquired(void) const {
   return current_state() == ST_FINISHED;
