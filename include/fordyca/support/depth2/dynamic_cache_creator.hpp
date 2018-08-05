@@ -37,7 +37,7 @@ NS_START(fordyca, support, depth2);
 class dynamic_cache_creator : public depth1::cache_creator {
  public:
   dynamic_cache_creator(std::shared_ptr<rcppsw::er::server> server,
-                        representation::occupancy_grid& grid,
+                        representation::arena_grid& grid,
                         double cache_size, double resolution, double min_dist);
 
   /**
@@ -46,11 +46,10 @@ class dynamic_cache_creator : public depth1::cache_creator {
    *
    * @return The list of current caches.
    */
-  std::vector<representation::cache> create_all(
-    std::vector<representation::block*>& blocks) override;
+  cache_vector create_all(block_vector& blocks) override;
 
  private:
-  argos::CVector2 calc_center(std::list<representation::block*> blocks);
+  argos::CVector2 calc_center(const block_list& blocks);
 
   double m_min_dist;
 };

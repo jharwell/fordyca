@@ -28,16 +28,15 @@
 #include <vector>
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/representation/real_coord.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
-#include "fordyca/representation/occupancy_grid.hpp"
+#include "fordyca/representation/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca);
+namespace representation { class arena_cache; class base_block; }
+NS_START(support, depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -53,8 +52,13 @@ NS_START(fordyca, support, depth1);
  */
 class cache_creator : public rcppsw::er::client {
  public:
+  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
+  using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
+  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
+  using block_list = std::list<std::shared_ptr<representation::base_block>>;
+
   cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                representation::occupancy_grid& grid,
+                representation::arena_grid& grid,
                 double cache_size, double resolution);
 
   /**
@@ -63,8 +67,7 @@ class cache_creator : public rcppsw::er::client {
    *
    * @return A vector of created caches.
    */
-  virtual std::vector<representation::cache> create_all(
-      std::vector<representation::block*>& blocks) = 0;
+  virtual cache_vector create_all(block_vector& blocks) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -73,23 +76,24 @@ class cache_creator : public rcppsw::er::client {
    * @param grid The arena map grid.
    * @param caches Vector of newly created caches.
    */
-  static void update_host_cells(representation::occupancy_grid& grid,
-                                std::vector<representation::cache>& caches);
+  static void update_host_cells(representation::arena_grid& grid,
+                                cache_vector& caches);
 
  protected:
-  representation::occupancy_grid& grid(void) const { return m_grid; }
+  representation::arena_grid& grid(void) const { return m_grid; }
   rcppsw::er::server* server(void) const { return m_server.get(); }
-  representation::cache create_single(std::list<representation::block*> blocks,
-                                      const argos::CVector2& center);
+  std::unique_ptr<representation::arena_cache> create_single(
+      block_list blocks,
+      const argos::CVector2& center);
 
  private:
   // clang-format off
   double                              m_cache_size;
   double                              m_resolution;
-  representation::occupancy_grid&     m_grid;
+  representation::arena_grid&         m_grid;
   std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };
 NS_END(support, fordyca, depth1);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_ */
+#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_

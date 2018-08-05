@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace representation {
 class arena_map;
 class perceived_arena_map;
-}
+} // namespace representation
 
 NS_START(events);
 
@@ -65,7 +65,6 @@ class cell_empty
   void visit(representation::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(representation::perceived_arena_map& map) override;
 };
 

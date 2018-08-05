@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include <vector>
-#include "fordyca/expressions/expressions.hpp"
+#include "fordyca/math/expressions.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ class sub_area {
  private:
   size_t m_dim;
   argos::CVector2 m_center;
-  expressions::sub_area_utility m_utility;
+  math::sub_area_utility m_utility;
 };
 
 NS_END(representation, fordyca);

@@ -27,29 +27,35 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/metrics/collectible_metrics/fsm/depth1_metrics.hpp"
-#include "fordyca/metrics/collectible_metrics/task_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
-class executable_task;
+class bifurcating_tdgraph_executive;
 }}
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
+namespace ta = rcppsw::task_allocation;
 
 namespace tasks {
-class forager;
+namespace depth0 { class generalist; }
+namespace depth1 {
+class harvester;
 class collector;
-class generalist;
 class foraging_task;
 }
+}
+namespace params {
+namespace depth0 { class stateful_foraging_repository; }
+namespace depth1 { class task_repository; }
+}
 
-NS_START(controller, depth1);
+NS_START(controller);
+class cache_selection_matrix;
+NS_START(depth1);
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -58,71 +64,21 @@ NS_START(controller, depth1);
  * @ingroup controller depth1
  *
  * @brief A foraging controller that switches between \ref generalist,
- * \ref forager, and \ref collector tasks, according to dynamic changes in the
+ * \ref harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public metrics::collectible_metrics::fsm::depth1_metrics,
-                            public metrics::collectible_metrics::task_metrics,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
+  ~foraging_controller(void);
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  tasks::foraging_task* current_task(void) const;
-
-  /* distance metrics */
-  double timestep_distance(void) const override;
-
-  /* stateless metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
-
-  /* stateful metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /* depth1 metrics */
-  bool is_exploring_for_cache(void) const override;
-  bool is_vectoring_to_cache(void) const override;
-  bool is_acquiring_cache(void) const override;
-  bool is_transporting_to_cache(void) const override;
-  std::string task_name(void) const override;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a cache, meaning that it has
-   * arrived to one via some mechanism.
-   *
-   * This state corresponds to one of the FSMs within the controller waiting for
-   * a signal from the simulation that in order to move to the next stage of its
-   * task.
-   */
-  bool cache_acquired(void) const;
-
-  /**
-   * @brief If \c TRUE, then a robot has acquired a block, meaning that it has
-   * arrived to one via some mechanism.
-   *
-   * This state corresponds to one of the FSMs within the controller waiting for
-   * a signal from the simulation that in order to move to the next stage of its
-   * task.
-   */
-  bool block_acquired(void) const;
-
-  /**
-   * @brief Process the LOS for the current timestep (blocks and caches)
-   */
-  void process_los(const representation::line_of_sight* c_los) override;
-
-  /**
-   * @brief \c TRUE iff the robot aborted its current task, and only on the
-   * timestep in which the task was aborted.
-   */
-  bool task_aborted(void) const { return m_task_aborted; }
+  tasks::base_foraging_task* current_task(void) override;
+  const tasks::base_foraging_task* current_task(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -136,16 +92,20 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+ protected:
+  const cache_selection_matrix*  cache_sel_matrix(void) const {
+    return m_cache_sel_matrix.get();
+  }
+
  private:
-  void task_abort_cleanup(__unused task_allocation::executable_task*);
+  void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
+                    params::depth1::task_repository* task_repo);
 
   // clang-format off
   bool                                               m_display_task{false};
-  bool                                               m_task_aborted{false};
-  std::unique_ptr<task_allocation::polled_executive> m_executive;
-  std::unique_ptr<tasks::forager>                    m_forager;
-  std::unique_ptr<tasks::collector>                  m_collector;
-  std::unique_ptr<tasks::generalist>                 m_generalist;
+  std::string                                        m_prev_task{""};
+  std::unique_ptr<cache_selection_matrix>            m_cache_sel_matrix;
+  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
 

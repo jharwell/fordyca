@@ -50,15 +50,15 @@ argos::CRange<double> nest_y(2.5, 3.5);
 CATCH_TEST_CASE("init-test", "[line_of_sight]") {
   argos::CRandom::CreateCategory("argos", 123);
   arena_map map(&gparams, nest_x, nest_y);
-  line_of_sight los(map.subgrid(1, 1, 1), discrete_coord(1, 1));
+  line_of_sight los(map.subgrid(1, 1, 1), rcppsw::math::dcoord2(1, 1));
 }
 
 CATCH_TEST_CASE("resolution-test", "[line_of_sight]") {
   argos::CRandom::CreateCategory("argos", 123);
   arena_map map(&gparams, nest_x, nest_y);
-  line_of_sight los(map.subgrid(5, 5, 1), discrete_coord(1, 1));
+  line_of_sight los(map.subgrid(5, 5, 1), rcppsw::math::dcoord2(1, 1));
   CATCH_REQUIRE(los.size() == 9);
 
-  line_of_sight los2(map.subgrid(2, 2, 2), discrete_coord(0, 0));
+  line_of_sight los2(map.subgrid(2, 2, 2), rcppsw::math::dcoord2(0, 0));
   CATCH_REQUIRE(los2.size() == 25);
 }

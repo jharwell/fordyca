@@ -24,19 +24,22 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::base_cache;
+using representation::occupancy_grid;
+namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         std::unique_ptr<representation::cache> cache)
+                         std::unique_ptr<representation::base_cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),
       client(server),
@@ -51,33 +54,11 @@ cache_found::~cache_found(void) { client::rmmod(); }
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_found::visit(representation::perceived_cell2D& cell) {
-  /*
-   * Update the pheromone density associated with the cell BEFORE updating the
-   * state of the cell.
-   *
-   * It is possible that this cache found event was generated because we
-   * previous had a block in our LOS and now the cell that it was on is now
-   * occupied by a cache (either because we were near the static cache in the
-   * arena, or because someone else dropped a block near to this one).In that
-   * case, the cell will still be in the HAS_BLOCK state until the event is
-   * propagated all the way through, and we can use that to reset the pheromone
-   * density for the cell, which may be very high. Should be reset to 1.0 for a
-   * newly discovered cache.
-   */
-  if (cell.state_has_block()) {
-    cell.density_reset();
-  }
-  if (cell.pheromone_repeat_deposit() ||
-      (!cell.pheromone_repeat_deposit() && !cell.state_has_cache())) {
-    cell.pheromone_add(1.0);
-  }
-  cell.decoratee().accept(*this);
-} /* visit() */
-
 void cache_found::visit(representation::cell2D& cell) {
-  cell.entity(m_tmp_cache);
+  cell.entity(m_cache);
   cell.fsm().accept(*this);
+  ER_ASSERT(cell.state_has_cache(),
+            "FATAL: Cell does not have cache after cache found event");
 } /* visit() */
 
 void cache_found::visit(fsm::cell2D_fsm& fsm) {
@@ -88,20 +69,35 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
    * cell, then other robots have picked up blocks from the cache since the last
    * time we saw it. In either case, synchronize the cell with the reality of
    * the cache we have just observed.
+   *
+   * It is also possible that a robot picks up 2nd to last block in a cache,
+   * effectively removing it from its memory. If the cache reappears the same
+   * timestep because another robot/the arena did something, then the robot will
+   * think that the cache only has 1 block remaining (it has been deleted, but
+   * because we are using shared ptrs, it will not actually be deallocated until
+   * after the cell that refers to it is update (this class does said update)).
+   *
+   * As such, we need to make sure that we ALWAYS put the cell in the correct
+   * state by sending it enough block drops. (see #323).
    */
-  for (size_t i = fsm.block_count(); i < m_tmp_cache->n_blocks(); ++i) {
+  for (size_t i = fsm.block_count();
+       i < std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       ++i) {
     fsm.event_block_drop();
   } /* for(i..) */
 
-  for (size_t i = fsm.block_count(); i > m_tmp_cache->n_blocks(); --i) {
+  for (size_t i = fsm.block_count();
+       i > std::max(base_cache::kMinBlocks, m_cache->n_blocks());
+       --i) {
     fsm.event_block_pickup();
   } /* for(i..) */
 } /* visit() */
 
 void cache_found::visit(representation::perceived_arena_map& map) {
-  representation::perceived_cell2D& cell =
-      map.access(cell_op::x(), cell_op::y());
-
+  representation::cell2D& cell =
+      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+  swarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
@@ -123,22 +119,47 @@ void cache_found::visit(representation::perceived_arena_map& map) {
 
       events::cell_empty op((*it)->discrete_loc().first,
                             (*it)->discrete_loc().second);
-      map.access((*it)->discrete_loc().first, (*it)->discrete_loc().second)
-          .accept(op);
+      map.access<occupancy_grid::kCellLayer>((*it)->discrete_loc()).accept(op);
       it = map.blocks().erase(it);
     } else {
       ++it;
     }
   } /* while(it..) */
+
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
    * cell is coming back into our LOS with a block, when it contained a cache
    * the last time it was seen. Remove the cache/synchronize with reality.
+   *
+   * The density needs to be reset as well, as we are now tracking a different
+   * kind of cell entity.
    */
   if (cell.state_has_block()) {
     map.block_remove(cell.block());
   }
-  m_tmp_cache = m_cache.get();
+
+  /*
+   * If the ID of the cache we currently think resides in the cell and the ID of
+   * the one we just found that actually resides there are not the same, we need
+   * to reset the density for the cell, and start a new decay count.
+   */
+  if (cell.state_has_cache() && cell.cache()->id() != m_cache->id()) {
+    density.reset();
+  }
+
+  if (map.pheromone_repeat_deposit()) {
+    density.pheromone_add(1.0);
+  } else {
+    /*
+     * Seeing a new cache on empty square or one that used to contain a block.
+     */
+    if (!cell.state_has_cache()) {
+      density.reset();
+      density.pheromone_add(1.0);
+    } else { /* Seeing a known cache again--set its relevance to the max */
+      density.pheromone_set(1.0);
+    }
+  }
   map.cache_add(m_cache);
   cell.accept(*this);
 } /* visit() */

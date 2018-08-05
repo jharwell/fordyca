@@ -22,8 +22,7 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -34,14 +33,14 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const block*> line_of_sight::blocks(void) const {
-  std::list<const block*> blocks;
+line_of_sight::const_block_list line_of_sight::blocks(void) const {
+  const_block_list blocks;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_block()) {
-        assert(dynamic_cast<const block*>(cell->entity()));
+        assert(cell->block());
         blocks.push_back(cell->block());
       }
     } /* for(j..) */
@@ -49,15 +48,15 @@ std::list<const block*> line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-std::list<const cache*> line_of_sight::caches(void) const {
-  std::list<const cache*> caches = m_caches;
+line_of_sight::const_cache_list line_of_sight::caches(void) const {
+  const_cache_list caches = m_caches;
 
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       cell2D* cell = m_view[i][j];
       assert(cell);
       if (cell->state_has_cache()) {
-        assert(dynamic_cast<const cache*>(cell->entity()));
+        assert(std::dynamic_pointer_cast<base_cache>(cell->entity()));
         caches.push_back(cell->cache());
       }
     } /* for(j..) */
@@ -65,7 +64,7 @@ std::list<const cache*> line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-void line_of_sight::cache_add(const cache* cache) {
+void line_of_sight::cache_add(const std::shared_ptr<base_cache>& cache) {
   auto los_caches = caches();
   if (los_caches.end() ==
       std::find(los_caches.begin(), los_caches.end(), cache)) {
@@ -73,10 +72,26 @@ void line_of_sight::cache_add(const cache* cache) {
   }
 } /* cache_add() */
 
-__pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
+__rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
   return *m_view[i][j];
 }
+
+rcppsw::math::dcoord2 line_of_sight::abs_ll(void) const {
+  return cell(0, 0).loc();
+} /* abs_ll() */
+
+rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
+  return cell(0, ysize() - 1).loc();
+} /* abs_ul() */
+
+rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
+  return cell(0, ysize() - 1).loc();
+} /* abs_lr() */
+
+rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {
+  return cell(xsize() - 1, ysize() - 1).loc();
+} /* abs_ur() */
 
 NS_END(representation, fordyca);

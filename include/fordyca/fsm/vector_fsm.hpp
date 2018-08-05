@@ -24,11 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <algorithm>
+
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/control/pid_loop.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
@@ -59,7 +60,8 @@ NS_START(fsm);
  * avoid multiple robots all trying to drive to the center of the cache to
  * "arrive" at it.
  */
-class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
+class vector_fsm : public base_foraging_fsm,
+                   public task_allocation::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -73,10 +75,14 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
 
-  vector_fsm(uint frequent_collision_thresh,
-             const std::shared_ptr<rcppsw::er::server>& server,
-             const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-             const std::shared_ptr<controller::actuator_manager>& actuators);
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered to have arrived at the specified cache site.
+   */
+  constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
+
+  vector_fsm(std::shared_ptr<rcppsw::er::server> server,
+             controller::saa_subsystem* saa);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
@@ -95,13 +101,15 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
 
   /**
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
-   * goal, this function must be called before vectoring to a new goal will work.
+   * goal, this function must be called before vectoring to a new goal will
+   * work.
    */
   void init(void) override;
 
-  bool is_avoiding_collision(void) const {
-    return ST_COLLISION_AVOIDANCE == current_state();
-  }
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
 
  protected:
   enum fsm_states {
@@ -139,8 +147,6 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   };
 
  private:
-  /* types */
-
   /**
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
@@ -155,6 +161,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   };
 
   struct fsm_state {
+    uint m_collision_rec_count{0};
     uint last_collision_time{0};
   };
 
@@ -163,7 +170,14 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    * to ensure that you do not repeatedly get 2 robots butting heads as they try
    * to travel to opposite goals.
    */
-  constexpr static uint kCOLLISION_RECOVERY_TIME = 50;
+  constexpr static uint kCOLLISION_RECOVERY_TIME = 10;
+
+  /**
+   * @brief If a robotics sees a threatening obstacle more than twice in this
+   * interval, it is considered to be colliding too frequently, and will enter
+   * collision recovery.
+   */
+  constexpr static uint kFREQ_COLLISION_THRESH = 300;
 
   /**
    * @brief Calculates the relative vector from the robot to the current goal.
@@ -215,12 +229,8 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
   }
 
   // clang-format off
-  struct fsm_state                                      m_state;
-  uint                                                  m_freq_collision_thresh{0};
-  uint                                                  m_collision_rec_count{0};
-  struct goal_data                                      m_goal_data;
-  rcppsw::control::pid_loop                             m_ang_pid;
-  rcppsw::control::pid_loop                             m_lin_pid;
+  struct fsm_state m_state;
+  struct goal_data m_goal_data;
   // clang-format on
 };
 

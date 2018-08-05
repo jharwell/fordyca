@@ -24,6 +24,7 @@
 #include "fordyca/support/depth1/cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -35,7 +36,7 @@ NS_START(fordyca, support, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                             representation::occupancy_grid& grid,
+                             representation::arena_grid& grid,
                              double cache_size,
                              double resolution)
     : client(server),
@@ -51,15 +52,14 @@ cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::cache cache_creator::create_single(
-    std::list<representation::block*> blocks,
+std::unique_ptr<representation::arena_cache> cache_creator::create_single(
+    block_list blocks,
     const argos::CVector2& center) {
   /*
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  representation::discrete_coord d =
-      representation::real_to_discrete_coord(center, m_resolution);
+  rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, m_resolution);
   representation::cell2D& cell = m_grid.access(d.first, d.second);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
@@ -85,26 +85,26 @@ representation::cache cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block, d.first, d.second, m_resolution);
+    events::free_block_drop op(m_server, block, d, m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
-  ER_NOM("Create cache at (%f, %f) -> (%zu, %zu) with  %zu blocks",
+  ER_NOM("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
          center.GetX(),
          center.GetY(),
          d.first,
          d.second,
          blocks.size());
 
-  std::vector<representation::block*> blocks_list(blocks.begin(), blocks.end());
-  return representation::cache(
-      m_cache_size, m_grid.resolution(), center, blocks_list, -1);
+  block_vector block_vec(blocks.begin(), blocks.end());
+  return rcppsw::make_unique<representation::arena_cache>(
+      m_cache_size, m_grid.resolution(), center, block_vec, -1);
 } /* create_single() */
 
-void cache_creator::update_host_cells(representation::occupancy_grid& grid,
-                                      std::vector<representation::cache>& caches) {
+void cache_creator::update_host_cells(representation::arena_grid& grid,
+                                      cache_vector& caches) {
   for (auto& cache : caches) {
-    grid.access(cache.discrete_loc().first, cache.discrete_loc().second)
-        .entity(&cache);
+    grid.access(cache->discrete_loc().first, cache->discrete_loc().second)
+        .entity(cache);
   } /* for(cache..) */
 } /* update_host_cells() */
 

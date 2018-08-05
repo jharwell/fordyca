@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/base_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,16 +39,27 @@ NS_START(fordyca, params);
  * @struct metrics_params
  * @ingroup params
  */
-struct metrics_params : public rcppsw::common::base_params {
-  std::string output_dir{""};
-  std::string block_fname{""};
-  std::string stateless_fname{""};
-  std::string stateful_fname{""};
+struct metrics_params : public rcppsw::params::base_params {
+  std::string collision_fname{""};
+
+  std::string block_acquisition_fname{""};
+  std::string block_transport_fname{""};
+  std::string block_manipulation_fname{""};
+
+  std::string cache_acquisition_fname{""};
+  std::string cache_utilization_fname{""};
+  std::string cache_lifecycle_fname{""};
+
+  std::string task_execution_generalist_fname{""};
+  std::string task_execution_collector_fname{""};
+  std::string task_execution_harvester_fname{""};
+  std::string task_generalist_tab_fname{""};
+
   std::string distance_fname{""};
-  std::string depth1_fname{""};
-  std::string task_fname{""};
-  size_t n_robots{0};
-  bool collect_cum{false};
+  std::string output_dir{""};
+
+  std::string perception_world_model_fname{""};
+
   uint collect_interval{0};
 };
 

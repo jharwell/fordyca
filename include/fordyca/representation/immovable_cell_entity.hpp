@@ -1,7 +1,7 @@
 /**
  * @file immovable_cell_entity.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/cell_entity.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "fordyca/math/utils.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,49 +40,40 @@ NS_START(fordyca, representation);
  * @class immovable_cell_entity
  * @ingroup representation
  *
- * @brief A base class from which objects whose locations in the arena do not
- * change during the lifetime of the object (e.g. caches) can derive from.
+ * @brief A class representing objects that reside within one or more squares
+ * within a 2D grid whose position CANNOT change during the lifetime of the
+ * object.
  */
-class immovable_cell_entity : public cell_entity {
+class immovable_cell_entity {
  public:
   /**
-   * @param x_dim X dimension of the entity.
-   * @param y_dim Y dimension of the entity.
-   * @param color Color of the entity.
-   * @param loc The entity's permant (for its lifetime) location in the arena.
-   * @param resolution The resolution of the arena's discretization.
+   * @brief Initialize a immovable entity with an initial location in the arena.
    */
-  immovable_cell_entity(double x_dim,
-                        double y_dim,
-                        argos::CColor color,
-                        const argos::CVector2& loc,
-                        double resolution)
-      : cell_entity(x_dim, y_dim, color) {
-    cell_entity::real_loc(loc);
-    cell_entity::discrete_loc(
-        representation::real_to_discrete_coord(loc, resolution));
-  }
+  immovable_cell_entity(const argos::CVector2& loc, double resolution)
+      : m_real_loc(loc),
+        m_discrete_loc(math::rcoord_to_dcoord(loc, resolution)) {}
 
-  immovable_cell_entity(double dim,
-                        argos::CColor color,
-                        const argos::CVector2& loc,
-                        double resolution)
-      : immovable_cell_entity(dim, dim, color, loc, resolution) {}
-  ~immovable_cell_entity(void) override = default;
+  virtual ~immovable_cell_entity(void) = default;
 
-  immovable_cell_entity(const immovable_cell_entity& other) = default;
-  immovable_cell_entity& operator=(const immovable_cell_entity& other) = default;
+  /**
+   * @brief Get the real location (center) of the object.
+   */
+  const argos::CVector2& real_loc(void) const { return m_real_loc; }
 
-  const argos::CVector2& real_loc(void) const override {
-    return cell_entity::real_loc();
-  }
-  const discrete_coord& discrete_loc(void) const override {
-    return cell_entity::discrete_loc();
+  /**
+   * @brief Get the discretized coordinates of the center of the object, which
+   * can be used to index into an arena_map.
+   *
+   */
+  const rcppsw::math::dcoord2& discrete_loc(void) const {
+    return m_discrete_loc;
   }
 
  private:
-  void discrete_loc(const discrete_coord&) override {}
-  void real_loc(const argos::CVector2&) override {}
+  // clang-format off
+  argos::CVector2       m_real_loc;
+  rcppsw::math::dcoord2 m_discrete_loc;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

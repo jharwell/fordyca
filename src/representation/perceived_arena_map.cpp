@@ -24,140 +24,105 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/depth0/perceived_arena_map_params.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/representation/cache.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     std::shared_ptr<rcppsw::er::server> server,
-    const struct params::depth0::perceived_arena_map_params* c_params,
+    const struct fordyca::params::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : m_server(std::move(server)),
-      m_grid(c_params->grid.resolution,
-             static_cast<size_t>(c_params->grid.upper.GetX()),
-             static_cast<size_t>(c_params->grid.upper.GetY()),
-             m_server),
+      m_grid(m_server, c_params, robot_id),
       m_caches(),
       m_blocks() {
-  deferred_init(m_server);
+  deferred_client_init(m_server);
   insmod("perceived_arena_map",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
-  ER_NOM("%zu x%zu/%zu x %zu @ %f resolution",
-         m_grid.xdsize(),
-         m_grid.ydsize(),
-         m_grid.xrsize(),
-         m_grid.yrsize(),
-         m_grid.resolution());
-
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      perceived_cell2D& cell = m_grid.access(i, j);
-      cell.pheromone_rho(c_params->pheromone.rho);
-      cell.pheromone_repeat_deposit(c_params->pheromone.repeat_deposit);
-      cell.robot_id(robot_id);
-      cell.decoratee().loc(discrete_coord(i, j));
-    } /* for(j..) */
-  }   /* for(i..) */
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<const_perceived_block> perceived_arena_map::perceived_blocks(
+perceived_arena_map::perceived_block_list perceived_arena_map::perceived_blocks(
     void) const {
-  std::list<const_perceived_block> pblocks;
+  perceived_block_list pblocks;
 
   for (auto& b : m_blocks) {
-    representation::const_perceived_block p(
-        b.get(),
-        m_grid.access(b->discrete_loc().first, b->discrete_loc().second)
-            .density());
-    pblocks.push_back(p);
+    pblocks.push_back(perceived_block(
+        b, m_grid.access<occupancy_grid::kPheromoneLayer>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
 
-std::list<const_perceived_cache> perceived_arena_map::perceived_caches(
+perceived_arena_map::perceived_cache_list perceived_arena_map::perceived_caches(
     void) const {
-  std::list<const_perceived_cache> pcaches;
+  perceived_cache_list pcaches;
 
   for (auto& c : m_caches) {
-    representation::const_perceived_cache p(
-        c.get(),
-        m_grid.access(c->discrete_loc().first, c->discrete_loc().second)
-            .density());
-    pcaches.push_back(p);
+    pcaches.push_back(perceived_cache(
+        c, m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */
 
-void perceived_arena_map::update_density(void) {
-  for (size_t i = 0; i < m_grid.xdsize(); ++i) {
-    for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      m_grid.access(i, j).density_update();
-    } /* for(j..) */
-  }   /* for(i..) */
-} /* update_density() */
-
-void perceived_arena_map::cache_add(
-    std::unique_ptr<representation::cache>& cache) {
-  cache_remove(cache.get());
-  m_caches.push_back(std::move(cache));
+void perceived_arena_map::cache_add(const std::shared_ptr<base_cache>& cache) {
+  cache_remove(cache);
+  m_caches.push_back(cache);
 } /* cache_add() */
 
-void perceived_arena_map::cache_remove(const cache* victim) {
+void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim) {
   for (auto it = m_caches.begin(); it != m_caches.end(); ++it) {
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access(victim->discrete_loc().first, victim->discrete_loc().second)
-          .accept(op);
+      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
       m_caches.erase(it);
       return;
     }
   } /* for(it..) */
 } /* cache_remove() */
 
-bool perceived_arena_map::block_add(
-    std::unique_ptr<representation::block>& block) {
-  auto it1 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block](const std::unique_ptr<representation::block>& b) {
-                     return b->id() == block->id();
-                   });
-  auto it2 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block](const std::unique_ptr<representation::block>& b) {
-                     return b->discrete_loc() == block->discrete_loc();
-                   });
+bool perceived_arena_map::block_add(const std::shared_ptr<base_block>& block_in) {
+  auto it1 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->id() == block_in->id();
+      });
+  auto it2 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->discrete_loc() == block_in->discrete_loc();
+      });
 
   if (m_blocks.end() != it1) { /* block is known */
     /*
      * Unless a given block's location has changed, there is no need to update
      * the state of the world.
      */
-    if (block->discrete_loc() != (*it1)->discrete_loc()) {
-      ER_VER("block%d has moved: (%zu, %zu) -> (%zu, %zu)",
-             block->id(),
+    if (block_in->discrete_loc() != (*it1)->discrete_loc()) {
+      ER_VER("block%d has moved: (%u, %u) -> (%u, %u)",
+             block_in->id(),
              (*it1)->discrete_loc().first,
              (*it1)->discrete_loc().second,
-             block->discrete_loc().first,
-             block->discrete_loc().second);
-      int id = block->id();
-      block_remove((*it1).get());
-      m_blocks.push_back(std::move(block));
+             block_in->discrete_loc().first,
+             block_in->discrete_loc().second);
+      __rcsw_unused int id = block_in->id();
+      block_remove(*it1);
+      m_blocks.push_back(block_in);
       ER_VER("Add block%d (n_blocks=%zu)", id, m_blocks.size());
       return true;
     }
@@ -168,29 +133,27 @@ bool perceived_arena_map::block_add(
      * about the arena.
      */
     if (it2 != m_blocks.end()) {
-      ER_VER("Remove old block%d@(%zu, %zu): new block%d found there",
+      ER_VER("Remove old block%d@(%u, %u): new block%d found there",
              (*it2)->id(),
-             block->discrete_loc().first,
-             block->discrete_loc().second,
-             block->id());
-      block_remove((*it2).get());
+             block_in->discrete_loc().first,
+             block_in->discrete_loc().second,
+             block_in->id());
+      block_remove(*it2);
     }
-    int id = block->id();
-    m_blocks.push_back(std::move(block));
-    ER_VER("Add block%d (n_blocks=%zu)", id, m_blocks.size());
+    m_blocks.push_back(block_in);
+    ER_VER("Add block%d (n_blocks=%zu)", block_in->id(), m_blocks.size());
     return true;
   }
   return false;
 } /* block_add() */
 
-bool perceived_arena_map::block_remove(const block* victim) {
+bool perceived_arena_map::block_remove(const std::shared_ptr<base_block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
       ER_VER("Remove block%d", victim->id());
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access(victim->discrete_loc().first, victim->discrete_loc().second)
-          .accept(op);
+      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
       m_blocks.erase(it);
       return true;
     }

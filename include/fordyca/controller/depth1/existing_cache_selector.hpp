@@ -25,15 +25,17 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/cache.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
+NS_START(fordyca, controller);
+class cache_selection_matrix;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,26 +50,26 @@ NS_START(fordyca, controller, depth1);
  */
 class existing_cache_selector: public rcppsw::er::client {
  public:
-  existing_cache_selector(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      argos::CVector2 nest_loc);
+  existing_cache_selector(std::shared_ptr<rcppsw::er::server> server,
+                          const cache_selection_matrix* matrix);
 
   ~existing_cache_selector(void) override { rmmod(); }
+  existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
+  existing_cache_selector(const existing_cache_selector& other) = delete;
 
   /**
    * @brief Given a list of existing caches that a robot knows about (i.e. have
    * not faded into an unknown state), compute which is the "best", for use in
    * deciding which cache to go to and attempt to pickup from.
    *
-   * @return A pointer to the "best" existing cache, along with its utility
-   * value.
+   * @return The "best" existing cache.
    */
-  representation::const_perceived_cache calc_best(
-      const std::list<representation::const_perceived_cache>& existing_caches,
+  representation::perceived_cache calc_best(
+      const std::list<representation::perceived_cache>& existing_caches,
       argos::CVector2 robot_loc);
 
  private:
-  argos::CVector2 m_nest_loc;
+  const cache_selection_matrix* const mc_matrix;
 };
 
 NS_END(depth1, controller, fordyca);

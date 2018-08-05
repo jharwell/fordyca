@@ -36,7 +36,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, utils);
+NS_START(fordyca);
+namespace controller {
+class base_foraging_controller;
+}
+
+NS_START(support, utils);
 
 /*******************************************************************************
  * Functions
@@ -44,20 +49,45 @@ NS_START(fordyca, support, utils);
 /**
  * @brief Check if a robot is on top of a block. If, so return the block index.
  *
- * @param robot The robot to check
+ * @param robot The robot to check.
  *
  * @return The block index, or -1 if the robot is not on top of a block.
  */
-int robot_on_block(const argos::CFootBotEntity& robot,
-                   representation::arena_map& map);
+int robot_on_block(argos::CFootBotEntity& robot,
+                   const representation::arena_map& map);
+int robot_on_block(const controller::base_foraging_controller& controller,
+                   const representation::arena_map& map);
 
-int robot_on_cache(const argos::CFootBotEntity& robot,
-                   const std::shared_ptr<representation::arena_map>& map);
-
+/**
+ * @brief Check if a robot is on top of a cache. If, so return the cache index.
+ *
+ * @param robot The robot to check.
+ *
+ * @return The cache index, or -1 if the robot is not on top of a cache.
+ */
+int robot_on_cache(argos::CFootBotEntity& robot,
+                   const representation::arena_map& map);
+int robot_on_cache(const controller::base_foraging_controller& controller,
+                   const representation::arena_map& map);
 /**
  * @brief Get the ID of the robot as an integer.
  */
-int robot_id(const argos::CFootBotEntity& robot);
+int robot_id(argos::CFootBotEntity& robot);
+int robot_id(const controller::base_foraging_controller& controller);
+
+bool block_drop_overlap_with_cache(
+    const std::shared_ptr<representation::base_block>& block,
+    const std::shared_ptr<representation::arena_cache>& cache,
+    const argos::CVector2& drop_loc);
+
+bool block_drop_near_arena_boundary(
+    const representation::arena_map& map,
+    const std::shared_ptr<representation::base_block>& block,
+    const argos::CVector2& drop_loc);
+bool block_drop_overlap_with_nest(
+    const std::shared_ptr<representation::base_block>& block,
+    const representation::nest& nest,
+    const argos::CVector2& drop_loc);
 
 /**
  * @brief Set the position of the robot in the arena.
@@ -105,8 +135,8 @@ void set_robot_los(argos::CFootBotEntity& robot,
               .GetOriginAnchor()
               .Position.GetY());
 
-  representation::discrete_coord robot_loc =
-      representation::real_to_discrete_coord(pos, map.grid_resolution());
+  rcppsw::math::dcoord2 robot_loc =
+      math::rcoord_to_dcoord(pos, map.grid_resolution());
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =

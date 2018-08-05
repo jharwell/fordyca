@@ -33,7 +33,7 @@
 NS_START(fordyca);
 
 namespace representation {
-class block;
+class base_block;
 }
 
 NS_START(events);
@@ -54,7 +54,7 @@ NS_START(events);
 class block_found : public perceived_cell_op, public rcppsw::er::client {
  public:
   block_found(const std::shared_ptr<rcppsw::er::server>& server,
-              std::unique_ptr<representation::block> block);
+              std::unique_ptr<representation::base_block> block);
   ~block_found(void) override;
 
   block_found(const block_found& op) = delete;
@@ -63,7 +63,6 @@ class block_found : public perceived_cell_op, public rcppsw::er::client {
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::perceived_cell2D& cell) override;
   void visit(controller::depth0::stateful_foraging_controller&) override {}
   void visit(representation::perceived_arena_map& map) override;
 
@@ -72,8 +71,7 @@ class block_found : public perceived_cell_op, public rcppsw::er::client {
 
  private:
   // clang-format off
-  std::unique_ptr<representation::block> m_block;
-  representation::block*                 m_tmp_block;
+  std::shared_ptr<representation::base_block> m_block;
   // clang-format on
 };
 

@@ -32,21 +32,12 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace fsm {
-class block_to_nest_fsm;
-}
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-namespace depth1 {
-class foraging_controller;
-}
-}
-
 namespace representation {
 class arena_map;
 class perceived_arena_map;
-class block;
-}
+class base_block;
+} // namespace representation
 
 NS_START(events);
 
@@ -57,15 +48,13 @@ NS_START(events);
  * @class block_pickup_event
  * @ingroup events
  *
- * @brief Interface specifying the minimum set of classes that any event
- * involving picking up a block will need to visit.
+ * @brief Interface specifying the core class of classes any action involving
+ * dropping a block will need to visit (think data structures).
  */
 class block_pickup_event
-    : public visitor::visit_set<fsm::block_to_nest_fsm,
-                                representation::arena_map,
+    : public visitor::visit_set<representation::arena_map,
                                 representation::perceived_arena_map,
-                                representation::block,
-                                controller::depth1::foraging_controller> {};
+                                representation::base_block> {};
 
 NS_END(events, fordyca);
 

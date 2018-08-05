@@ -33,7 +33,7 @@
 NS_START(fordyca);
 
 namespace representation {
-class cache;
+class base_cache;
 }
 
 NS_START(events);
@@ -52,7 +52,7 @@ NS_START(events);
 class cache_found : public perceived_cell_op, public rcppsw::er::client {
  public:
   cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-              std::unique_ptr<representation::cache> cache);
+              std::unique_ptr<representation::base_cache> cache);
   ~cache_found(void) override;
 
   cache_found(const cache_found& op) = delete;
@@ -60,7 +60,6 @@ class cache_found : public perceived_cell_op, public rcppsw::er::client {
 
   /* stateful foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(representation::perceived_cell2D& cell) override;
 
   /* depth1 foraging */
   void visit(representation::perceived_arena_map& map) override;
@@ -69,8 +68,7 @@ class cache_found : public perceived_cell_op, public rcppsw::er::client {
   void visit(controller::depth0::stateful_foraging_controller&) override {}
 
  private:
-  std::unique_ptr<representation::cache> m_cache;
-  representation::cache* m_tmp_cache{nullptr};
+  std::shared_ptr<representation::base_cache> m_cache;
 };
 
 NS_END(events, fordyca);

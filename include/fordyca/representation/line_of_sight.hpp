@@ -27,15 +27,15 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "fordyca/representation/discrete_coord.hpp"
 #include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
-class block;
-class cache;
+class base_block;
+class base_cache;
 class cell2D;
 
 /*******************************************************************************
@@ -58,25 +58,23 @@ class cell2D;
  */
 class line_of_sight {
  public:
+  using block_list = std::list<std::shared_ptr<base_block>>;
+  using const_block_list = std::list<std::shared_ptr<const base_block>>;
+  using cache_list = std::list<std::shared_ptr<base_cache>>;
+  using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
+
   line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
-                discrete_coord center)
+                rcppsw::math::dcoord2 center)
       : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
-  std::list<const block*> blocks(void) const;
-  std::list<const cache*> caches(void) const;
+  const_block_list blocks(void) const;
+  const_cache_list caches(void) const;
 
   /**
-   * @brief Add a cache to the LOS, beyond those that currently exist in the
-   * LOS.
-   *
-   * This function is sometimes necessary because there unless the cell that a
-   * cache actually resides in falls within a robot's LOS, they will not
-   * actually see the cache, even if part of the cache's extent overlaps with
-   * the LOS. This can cause robots to get a \ref cached_block_pickup event from
-   * a cache that they do not currently track in their \ref perceived_arena_map,
-   * which is bad.
+   * @brief Add a cache to the LOS, beyond those whose host cell currently falls
+   * in the LOS (i.e. partial cache overlap)
    */
-  void cache_add(const cache* cache);
+  void cache_add(const std::shared_ptr<base_cache>& cache);
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -85,10 +83,10 @@ class line_of_sight {
    */
   size_t xsize(void) const { return m_view.shape()[0]; }
 
-  discrete_coord abs_ll(void) const;
-  discrete_coord abs_lr(void) const;
-  discrete_coord abs_ul(void) const;
-  discrete_coord abs_ur(void) const;
+  rcppsw::math::dcoord2 abs_ll(void) const;
+  rcppsw::math::dcoord2 abs_lr(void) const;
+  rcppsw::math::dcoord2 abs_ul(void) const;
+  rcppsw::math::dcoord2 abs_ur(void) const;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
@@ -121,16 +119,13 @@ class line_of_sight {
    *
    * @return The center coordinates (discrete version).
    */
-  const discrete_coord& center(void) const { return m_center; }
+  const rcppsw::math::dcoord2& center(void) const { return m_center; }
 
  private:
-  void add_caches_from_view(void);
-  void add_blocks_from_view(void);
-
   // clang-format off
-  discrete_coord                 m_center;
+  rcppsw::math::dcoord2          m_center;
   rcppsw::ds::grid_view<cell2D*> m_view;
-  std::list<const cache*>        m_caches;
+  const_cache_list               m_caches;
   // clang-format on
 };
 

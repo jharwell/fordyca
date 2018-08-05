@@ -25,21 +25,35 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-class block;
+class base_block;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using perceived_block = std::pair<block*, double>;
-using const_perceived_block = std::pair<const block*, double>;
+/**
+ * @struct perceived_block
+ * @ingroup representation
+ *
+ * @brief A representation of a "virtual" block in the arena, which has a
+ * pheromone density/relevance associated with it.
+ */
+struct perceived_block {
+  perceived_block(void) : density() {}
+  perceived_block(const std::shared_ptr<base_block>& b,
+                  const rcppsw::swarm::pheromone_density& d)
+      : ent(b), density(d) {}
+
+  std::shared_ptr<base_block> ent{nullptr};
+  rcppsw::swarm::pheromone_density density;
+};
 
 NS_END(representation, fordyca);
 

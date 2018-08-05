@@ -1,11 +1,5 @@
 <?xml version="1.0" ?>
 
-<!-- *************************************************** -->
-<!-- * A fully commented XML is diffusion_1.xml. Refer * -->
-<!-- * to it to have full information about what       * -->
-<!-- * these options mean.                             * -->
-<!-- *************************************************** -->
-
 <argos-configuration>
 
   <!-- ************************* -->
@@ -13,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="0"
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -22,104 +16,169 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
-                                library="build/lib/libfordyca">
+    <stateless_foraging_controller id="ffc"
+                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
         <output>
-          <robot output_root="output"
-                 output_dir="__current_date__"
-                 />
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
         </output>
-        <perceived_arena_map>
+        <occupancy_grid
+            nest="2.0, 2.5">
           <grid resolution="0.2"
-                size="10, 5, 2"
-                />
+                size="10, 5, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
-        </perceived_arena_map>
-        <task estimation_alpha="0.8"
-              abort_reactivity="8"
-              abort_offset="4"
-              partition_reactivity="0.5"
-              partition_offset="2"
-              init_random_estimates="true"
-              subtask_selection_method="harwell2018"
-              partition_method="pini2011"
+          <block_priorities
+              cube="1.0"
+              ramp="1.0"
+              />
+        </occupancy_grid>
+        <task_executive>
+          <estimation alpha="0.8"/>
+          <task_abort reactivity="8"
+                      offset="3"
+                      />
+          <task_partition
+              method="pini2011"
               always_partition="true"
-              never_partition="false"/>
-        <sensors>
-          <proximity go_straight_angle_range="-5:5"
-                    delta="0.01" />
-        </sensors>
-        <actuators>
-          <wheels soft_turn_angle_max="30"
-                  no_turn_angle_max="5"
-                  max_speed="10" />
-        </actuators>
-        <fsm
-          unsuccessful_explore_dir_change="1000"
-          frequent_collision_thresh="100"
-          nest="2.0, 2.5"
-          speed_throttle_block_carry="0.5"
-          />
+              never_partition="false"
+              reactivity="1.5"
+              offset="1.0"
+              />
+          <subtask_selection
+              method="harwell2018"
+              reactivity="8"
+              offset="1.25"
+              gamma="1.0"
+              />
+        </task_executive>
+        <task_exec_estimates
+            enabled="true"
+            generalist_range="2000:4000"
+            collector_range="1000:2000"
+            harvester_range="1000:2000"
+            />
+        <sensing>
+          <proximity_sensor angle_range="-1.1:1.1"
+                            delta="0.0001" />
+        </sensing>
+        <actuation>
+          <block_carry_throttle>
+            <waveform
+                type="Null"
+                frequency="100"
+                amplitude="0.4"
+                offset="0.1"/>
+          </block_carry_throttle>
+          <steering2D>
+            <avoidance_force lookahead="0.5"
+                             max="8"/>
+            <arrival_force slowing_radius="0.2"
+                           slowing_speed_min="1.0"
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="9.0"
+                          interval="1"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
+
+          <differential_drive soft_turn_max="30"
+                              max_speed="10.0" />
+        </actuation>
       </params>
-    </depth1_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/lib/libfordyca"
-                  label="depth1_foraging_loop_functions">
+  <loop_functions library="libfordyca"
+                  label="stateless_foraging_loop_functions">
     <output>
-      <sim sim_log_fname="sim.log"
+      <sim log_fname="sim.log"
            output_root="output"
            output_dir="__current_date__"
            />
       <metrics
           output_dir="metrics"
-          stateless_fname="stateless-stats.csv"
-          stateful_fname="stateful-stats.csv"
-          depth1_fname="depth1-stats.csv"
+          collision_fname="collision-stats.csv"
           block_fname="block-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          block_manipulation_fname="block-manipulation-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
+          cache_utilization_fname="cache-utilization-stats.csv"
+          cache_lifecycle_fname="cache-lifecycle-stats.csv"
+          task_execution_generalist_fname="task-execution-generalist-stats.csv"
+          task_execution_collector_fname="task-execution-collector-stats.csv"
+          task_execution_harvester_fname="task-execution-harvester-stats.csv"
+          task_generalist_tab_fname="task-generalist-tab-stats.csv"
           distance_fname="distance-stats.csv"
-          task_fname="task-stats.csv"
-          n_robots="20"
-          collect_cum="true"
-          collect_interval="750"
+          perception_world_model_fname="perception-world-model.csv"
+          collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
             size="10, 5, 2"/>
-      <blocks n_blocks="20"
-              dimension="0.2"
-              dist_model="single_source"
+      <blocks>
+        <manipulation_penalty>
+          <waveform
+              type="Sine"
+              frequency="0.01"
+              amplitude="50"
+              offset="50"/>
+        </manipulation_penalty>
+        <distribution
+            arena_resolution="0.2"
+            dist_type="random">
+          <powerlaw
+              pwr_min="0"
+              pwr_max="3"
+              n_clusters="15"
               />
-      <caches create_static="true"
-              create_dynamic="false"
-              static_size="2"
-              static_respawn_scale_factor="0.05"
-              dimension="0.8"
-              min_dist="0.6"
-              usage_penalty="10"
+          <manifest
+              n_cube="10"
+              n_ramp="10"
+              unit_dim="0.2"
               />
-      <nest size="0.5, 0.5" center="2, 2.5" />
+        </distribution>
+      </blocks>
+
+      <static_caches enable="true"
+                     size="2"
+                     respawn_scale_factor="0.05"
+                     dimension="0.8"
+                     min_dist="0.8">
+        <usage_penalty>
+          <waveform
+              type="Null"
+              frequency="100"
+              amplitude="500"
+              offset="10"/>
+        </usage_penalty>
+      </static_caches>
+      <nest size="1.0, 4.0" center="2, 2.5" />
     </arena_map>
     <visualization robot_id="true"
-                   robot_los="true"
+                   robot_los="false"
                    robot_task="true"
                    block_id="false"
                    />
@@ -147,16 +206,29 @@
       <body position="0,2.5,0" orientation="0,0,0" />
     </box>
 
-    <light id="light_1"
+    <light id="light1"
+           position="2,1.25,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light2"
            position="2,2.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
+    <light id="light3"
+           position="2,3.75,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="10" max_trials="100">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -183,18 +255,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth1_foraging_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>
