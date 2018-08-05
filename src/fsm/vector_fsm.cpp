@@ -100,6 +100,14 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
               obs.Angle().GetValue(),
               obs.Length());
       saa_subsystem()->steering_force().avoidance(obs);
+      /*
+       * If we are currently spinning in place (hard turn), we have 0 linear
+       * velocity, and that does not play well with the arrival force
+       * calculations. To fix this, and a bit of wander force.
+       */
+      if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+        saa_subsystem()->steering_force().wander();
+      }
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
