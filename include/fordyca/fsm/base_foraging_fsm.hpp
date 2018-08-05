@@ -214,6 +214,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   // clang-format off
   bool                             m_entered_avoidance{false};
   bool                             m_exited_avoidance{false};
+  bool                             m_in_avoidance{false};
   uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
