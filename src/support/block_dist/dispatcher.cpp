@@ -58,13 +58,13 @@ dispatcher::~dispatcher(void) = default;
  ******************************************************************************/
 bool dispatcher::initialize(void) {
   representation::arena_grid::view arena =
-      m_grid.subgrid(1, 1, m_grid.xdsize() - 1, m_grid.ydsize() - 1);
+      m_grid.subgrid(2, 3, m_grid.xdsize() - 2, m_grid.ydsize() - 2);
   if (kDIST_RANDOM == m_dist_type) {
     m_dist = rcppsw::make_unique<random_distributor>(
         client::server_ref(), arena, mc_params.arena_resolution);
   } else if (kDIST_SINGLE_SRC == m_dist_type) {
     representation::arena_grid::view area = m_grid.subgrid(
-        m_grid.xdsize() * 0.80, 2, m_grid.xdsize() * 0.90, m_grid.ydsize() - 1);
+        m_grid.xdsize() * 0.80, 2, m_grid.xdsize() * 0.90, m_grid.ydsize() - 2);
     m_dist = rcppsw::make_unique<cluster_distributor>(
         client::server_ref(),
         area,
