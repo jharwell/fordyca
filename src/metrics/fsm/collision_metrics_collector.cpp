@@ -71,8 +71,10 @@ void collision_metrics_collector::collect(
   m_stats.n_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
   m_stats.cum_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
 
-  m_stats.total_avoidance_duration += m.collision_avoidance_duration();
-  m_stats.cum_avoidance_duration += m.collision_avoidance_duration();
+  if (m.exited_collision_avoidance()) {
+    m_stats.total_avoidance_duration += m.collision_avoidance_duration();
+    m_stats.cum_avoidance_duration += m.collision_avoidance_duration();
+  }
 } /* collect() */
 
 bool collision_metrics_collector::csv_line_build(std::string& line) {

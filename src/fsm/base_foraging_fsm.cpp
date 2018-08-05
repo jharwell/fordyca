@@ -199,7 +199,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
  * Collision Metrics
  ******************************************************************************/
 bool base_foraging_fsm::in_collision_avoidance(void) const {
-  return saa_subsystem()->sensing()->threatening_obstacle_exists();
+  return m_in_avoidance;
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool base_foraging_fsm::entered_collision_avoidance(void) const {
@@ -218,20 +218,27 @@ uint base_foraging_fsm::collision_avoidance_duration(void) const {
 } /* collision_avoidance_duration() */
 
 void base_foraging_fsm::collision_avoidance_tracking_begin(void) {
-  if (!m_entered_avoidance) {
-    m_entered_avoidance = true;
-    m_avoidance_start = saa_subsystem()->sensing()->tick();
+  if (!m_in_avoidance) {
+    if (!m_entered_avoidance) {
+      m_entered_avoidance = true;
+      m_avoidance_start = saa_subsystem()->sensing()->tick();
+    }
   } else {
     m_entered_avoidance = false;
   }
+  m_in_avoidance = true;
 } /* collision_avoidance_tracking_begin() */
 
 void base_foraging_fsm::collision_avoidance_tracking_end(void) {
   if (!m_exited_avoidance) {
-    m_exited_avoidance = true;
+    if (m_in_avoidance) {
+      m_exited_avoidance = true;
+    }
   } else {
     m_exited_avoidance = false;
   }
+  m_in_avoidance = false;
+  m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
 } /* collision_avoidance_tracking_end() */
 
 /*******************************************************************************

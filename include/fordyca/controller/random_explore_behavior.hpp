@@ -62,6 +62,7 @@ class random_explore_behavior : public explore_behavior {
   // clang-format off
   bool m_entered_avoidance{false};
   bool m_exited_avoidance{false};
+  bool m_in_avoidance{false};
   uint m_avoidance_start{0};
   // clang-format on
 };

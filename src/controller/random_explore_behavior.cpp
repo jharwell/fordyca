@@ -44,7 +44,7 @@ random_explore_behavior::random_explore_behavior(
  * Collision Metrics
  ******************************************************************************/
 bool random_explore_behavior::in_collision_avoidance(void) const {
-  return saa_subsystem()->sensing()->threatening_obstacle_exists();
+  return m_in_avoidance;
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool random_explore_behavior::entered_collision_avoidance(void) const {
@@ -56,7 +56,10 @@ __rcsw_pure bool random_explore_behavior::exited_collision_avoidance(void) const
 } /* exited_collision_avoidance() */
 
 uint random_explore_behavior::collision_avoidance_duration(void) const {
-  return saa_subsystem()->sensing()->tick() - m_avoidance_start;
+  if (m_exited_avoidance) {
+    return saa_subsystem()->sensing()->tick() - m_avoidance_start;
+  }
+  return 0;
 } /* collision_avoidance_duration() */
 
 /*******************************************************************************
@@ -68,12 +71,16 @@ void random_explore_behavior::execute(void) {
   saa_subsystem()->steering_force().wander();
 
   if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
-    if (!m_entered_avoidance) {
-      m_entered_avoidance = true;
-      m_avoidance_start = saa_subsystem()->sensing()->tick();
+    if (!m_in_avoidance) {
+      if (!m_entered_avoidance) {
+        m_entered_avoidance = true;
+        m_avoidance_start = saa_subsystem()->sensing()->tick();
+      }
     } else {
       m_entered_avoidance = false;
     }
+    m_in_avoidance = true;
+
     ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
             obs.GetX(),
             obs.GetY(),
@@ -83,10 +90,15 @@ void random_explore_behavior::execute(void) {
     saa_subsystem()->actuation()->leds_set_color(utils::color::kRED);
   } else {
     if (!m_exited_avoidance) {
-      m_exited_avoidance = true;
+      if (m_in_avoidance) {
+        m_exited_avoidance = true;
+      }
     } else {
       m_exited_avoidance = false;
     }
+    m_in_avoidance = false;
+    m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
+
     ER_DIAG("No threatening obstacle found");
     saa_subsystem()->actuation()->leds_set_color(utils::color::kMAGENTA);
     argos::CVector2 force = saa_subsystem()->steering_force().value();
