@@ -110,7 +110,6 @@ class base_block : public multicell_entity,
    */
   void distribution_time(double dist_time) { m_dist_time = dist_time; }
 
-  std::unique_ptr<base_block> clone(void) const override;
 
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not

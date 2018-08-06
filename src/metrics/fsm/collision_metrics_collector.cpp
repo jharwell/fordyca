@@ -43,14 +43,14 @@ std::string collision_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_in_avoidance" + separator() +
-      "avg_cum_in_avoidance" + separator() +
-      "avg_entered_avoidance" + separator() +
-      "avg_cum_entered_avoidance" + separator() +
-      "avg_exited_avoidance" + separator() +
-      "avg_cum_exited_avoidance" + separator() +
-      "avg_avoidance_duration" + separator() +
-      "avg_cum_avoidance_duration" + separator();
+      "int_avg_in_avoidance" + separator() +
+      "cum_avg_in_avoidance" + separator() +
+      "int_avg_entered_avoidance" + separator() +
+      "cum_avg_entered_avoidance" + separator() +
+      "int_avg_exited_avoidance" + separator() +
+      "cum_avg_exited_avoidance" + separator() +
+      "int_avg_avoidance_duration" + separator() +
+      "cum_avg_avoidance_duration" + separator();
   // clang-format on
 } /* csv_header_build() */
 
