@@ -42,8 +42,8 @@ distance_metrics_collector::distance_metrics_collector(const std::string& ofname
 std::string distance_metrics_collector::csv_header_build(
     const std::string& header) {
   return base_metrics_collector::csv_header_build(header) +
-      "avg_distance" + separator() +
-      "avg_cum_distance" + separator();
+      "int_avg_distance" + separator() +
+      "cum_avg_distance" + separator();
 } /* csv_header_build() */
 
 void distance_metrics_collector::reset(void) {

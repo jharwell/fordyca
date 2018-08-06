@@ -44,14 +44,14 @@ std::string manipulation_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_free_pickup_events" + separator() +
-      "avg_free_drop_events" + separator() +
-      "avg_free_pickup_penalty" + separator() +
-      "avg_free_drop_penalty" + separator() +
-      "avg_cache_pickup_events" + separator() +
-      "avg_cache_drop_events" + separator() +
-      "avg_cache_pickup_penalty" + separator() +
-      "avg_cache_drop_penalty" + separator();
+      "int_avg_free_pickup_events" + separator() +
+      "int_avg_free_drop_events" + separator() +
+      "int_avg_free_pickup_penalty" + separator() +
+      "int_avg_free_drop_penalty" + separator() +
+      "int_avg_cache_pickup_events" + separator() +
+      "int_avg_cache_drop_events" + separator() +
+      "int_avg_cache_pickup_penalty" + separator() +
+      "int_avg_cache_drop_penalty" + separator();
   // clang-format on
 } /* csv_header_build() */
 
