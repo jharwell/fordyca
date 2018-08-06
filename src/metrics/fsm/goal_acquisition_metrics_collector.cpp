@@ -44,12 +44,12 @@ std::string goal_acquisition_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_acquiring_goal" + separator() +
-      "avg_cum_acquiring_goal" + separator() +
-      "avg_vectoring_to_goal" + separator() +
-      "avg_cum_vectoring_to_goal" + separator() +
-      "avg_exploring_for_goal" + separator() +
-      "avg_cum_exploring_for_goal" + separator();
+      "int_avg_acquiring_goal" + separator() +
+      "cum_avg_acquiring_goal" + separator() +
+      "int_avg_vectoring_to_goal" + separator() +
+      "cum_avg_vectoring_to_goal" + separator() +
+      "int_avg_exploring_for_goal" + separator() +
+      "cum_avg_exploring_for_goal" + separator();
   // clang-format on
 } /* csv_header_build() */
 

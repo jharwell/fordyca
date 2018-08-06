@@ -48,6 +48,11 @@ NS_START(fordyca, metrics, blocks);
  */
 class transport_metrics : public rcppsw::metrics::base_metrics {
  public:
+  enum block_type {
+    kCube,
+    kRamp
+  };
+
   transport_metrics(void) = default;
 
   /**
@@ -68,6 +73,11 @@ class transport_metrics : public rcppsw::metrics::base_metrics {
    * being distributed but before it is picked up for the first time.
    */
   virtual double initial_wait_time(void) const = 0;
+
+  /**
+   * @brief When a block is collected, return the type of the block
+   */
+  virtual block_type type(void) const = 0;
 };
 
 NS_END(blocks, metrics, fordyca);
