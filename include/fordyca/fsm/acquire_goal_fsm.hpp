@@ -84,8 +84,11 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
   void task_reset(void) override { init(); }
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override;

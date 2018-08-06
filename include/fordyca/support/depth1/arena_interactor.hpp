@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "fordyca/support/depth1/existing_cache_penalty_handler.hpp"
+#include "fordyca/support/depth1/cache_op_penalty_handler.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -63,8 +63,13 @@ class arena_interactor : public depth0::arena_interactor<T> {
                    representation::arena_map* const map_in,
                    depth0::stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor_in,
+                   const ct::waveform_params* const block_manip_penalty,
                    const ct::waveform_params* const cache_usage_penalty)
-      : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
+      : depth0::arena_interactor<T>(server,
+                                    map_in,
+                                    metrics_agg,
+                                    floor_in,
+                                    block_manip_penalty),
       m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
@@ -117,7 +122,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * robot for block pickup.
    */
   void finish_cached_block_pickup(T& controller) {
-    const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
+    const temporal_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
     auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
@@ -137,8 +142,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      */
-    int cache_id = utils::robot_on_cache(controller, *map());
-    if (-1 == cache_id) {
+    if (-1 == utils::robot_on_cache(controller, *map())) {
       ER_WARN("WARNING: %s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
@@ -159,7 +163,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * preconditions have been satisfied.
    */
   void perform_cached_block_pickup(T& controller,
-                                   const block_manipulation_penalty<T>& penalty) {
+                                   const temporal_penalty<T>& penalty) {
     events::cached_block_pickup pickup_op(rcppsw::er::g_server,
                                           map()->caches()[penalty.id()],
                                           utils::robot_id(controller));
@@ -177,7 +181,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const block_manipulation_penalty<T>& p = m_cache_penalty_handler.next();
+    const temporal_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
     auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
@@ -220,7 +224,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const block_manipulation_penalty<T>& penalty) {
+                                const temporal_penalty<T>& penalty) {
     events::cache_block_drop drop_op(rcppsw::er::g_server,
                                      controller.block(),
                                      map()->caches()[penalty.id()],
@@ -326,7 +330,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
 
  private:
   // clang-format off
-  existing_cache_penalty_handler<T> m_cache_penalty_handler;
+  cache_op_penalty_handler<T> m_cache_penalty_handler;
   // clang-format on
 };
 

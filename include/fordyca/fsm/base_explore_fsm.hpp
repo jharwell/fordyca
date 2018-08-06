@@ -52,7 +52,7 @@ NS_START(fsm);
 class base_explore_fsm : public base_foraging_fsm,
                          public task_allocation::taskable {
  public:
-  base_explore_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+  base_explore_fsm(std::shared_ptr<rcppsw::er::server> server,
                    controller::saa_subsystem* saa,
                    uint8_t max_states);
 

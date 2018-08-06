@@ -35,7 +35,7 @@ NS_START(fordyca, metrics, caches);
 utilization_metrics_collector::utilization_metrics_collector(
     const std::string& ofname,
     uint interval)
-    : base_metrics_collector(ofname, interval), m_stats(), m_cache_ids() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
@@ -47,7 +47,7 @@ std::string utilization_metrics_collector::csv_header_build(
       "avg_blocks" + separator() +
       "avg_pickups" + separator() +
       "avg_drops"  + separator() +
-      "avg_penalty"  + separator();
+      "avg_caches" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -83,12 +83,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
               : "0";
   line += separator();
 
-  line += (!m_cache_ids.empty())
-              ? std::to_string(static_cast<double>(m_stats.n_penalty_steps) /
-                               (m_penalty_count))
-              : "0";
-  line += separator();
-
+  line += std::to_string(m_cache_ids.size()) + separator();
   return true;
 } /* csv_line_build() */
 
@@ -99,18 +94,12 @@ void utilization_metrics_collector::collect(
   m_cache_ids.insert(m.cache_id());
   m_stats.n_pickups += m.total_block_pickups();
   m_stats.n_drops += m.total_block_drops();
-  if (m.total_penalties_served() > 0) {
-    m_stats.n_penalty_steps += m.total_penalties_served();
-    ++m_penalty_count;
-  }
 } /* collect() */
 
 void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.n_blocks = 0;
   m_stats.n_pickups = 0;
   m_stats.n_drops = 0;
-  m_stats.n_penalty_steps = 0;
-  m_penalty_count = 0;
   m_cache_ids.clear();
 } /* reset_after_interval() */
 

@@ -29,6 +29,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "rcppsw/er/server.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +40,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void)
-    : base_foraging_controller() {}
+    : base_foraging_controller(), m_fsm() {}
 
 stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
@@ -71,7 +72,8 @@ void stateless_foraging_controller::Reset(void) {
 
 void stateless_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
   m_fsm->run();
 } /* ControlStep() */
 
@@ -80,14 +82,8 @@ void stateless_foraging_controller::ControlStep(void) {
  ******************************************************************************/
 FSM_WRAPPER_DEFINE_PTR(bool,
                        stateless_foraging_controller,
-                       is_avoiding_collision,
+                       goal_acquired,
                        m_fsm);
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateless_foraging_controller,
-                       is_exploring_for_goal,
-                       m_fsm);
-
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller, goal_acquired, m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        stateless_foraging_controller,

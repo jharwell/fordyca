@@ -79,10 +79,11 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override {
-    return base_foraging_fsm::is_avoiding_collision();
-  }
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
@@ -108,6 +109,7 @@ class stateful_foraging_fsm : public base_foraging_fsm,
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_PICKUP,
+    ST_WAIT_FOR_DROP,
     ST_TRANSPORT_TO_NEST, /* take block to nest */
     ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
     ST_FINISHED,
@@ -115,19 +117,6 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   };
 
  private:
-  /**
-   * @brief It is possible that robots can be waiting indefinitely for a block
-   * pickup signal that will never come once a block has been acquired if they
-   * "detect" a block by sprawling across multiple blocks (i.e. all ground
-   * sensors did not detect the same block).
-   *
-   * In that case, this timeout will cause the robot to try again to acquire a
-   * block, and because of the decaying relevance of cells, it will eventually
-   * pick a different block than the one that got it into this predicament, and
-   * the system will be able to continue profitably.
-   */
-  constexpr static uint kPICKUP_TIMEOUT = 100;
-
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
@@ -143,6 +132,9 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(stateful_foraging_fsm,
                      wait_for_pickup,
                      state_machine::event_data);
+  HFSM_STATE_DECLARE(stateful_foraging_fsm,
+                     wait_for_drop,
+                     state_machine::event_data);
   HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, finished);
 
   /**
@@ -156,7 +148,6 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  uint              m_pickup_count{0};
   bool              m_task_running{false};
   acquire_block_fsm m_block_fsm;
   // clang-format on

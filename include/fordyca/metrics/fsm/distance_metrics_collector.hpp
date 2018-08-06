@@ -66,13 +66,14 @@ class distance_metrics_collector : public rcppsw::metrics::base_metrics_collecto
 
  private:
   struct robot_stats {
-    double cum_distance;
+    double distance{0.0};
+    double cum_distance{0.0};
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct robot_stats m_stats;
+  struct robot_stats m_stats{};
 };
 
 NS_END(fsm, metrics, fordyca);

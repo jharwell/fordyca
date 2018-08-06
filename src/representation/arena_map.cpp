@@ -24,12 +24,12 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/representation/block_manifest_processor.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/support/depth1/static_cache_creator.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
-#include "fordyca/representation/block_manifest_processor.hpp"
+#include "fordyca/support/depth1/static_cache_creator.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,15 +42,14 @@ NS_START(fordyca, representation);
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
     : client(rcppsw::er::g_server),
       mc_static_cache_params(params->static_cache),
-      m_blocks(block_manifest_processor(&params->blocks.dist.manifest).create_blocks()),
+      m_blocks(block_manifest_processor(&params->blocks.dist.manifest)
+                   .create_blocks()),
       m_caches(),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
              static_cast<size_t>(params->grid.upper.GetY()),
              server_ref()),
-      m_nest(params->nest.dims,
-             params->nest.center,
-             params->grid.resolution),
+      m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(rcppsw::er::g_server, m_grid, &params->blocks.dist) {
   insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
@@ -90,7 +89,7 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
 void arena_map::static_cache_create(void) {
   ER_DIAG("(Re)-Creating static cache");
   argos::CVector2 center((m_grid.xdsize() + m_nest.real_loc().GetX()) / 2.0,
-                          m_nest.real_loc().GetY());
+                         m_nest.real_loc().GetY());
 
   support::depth1::static_cache_creator c(server_ref(),
                                           m_grid,
@@ -110,8 +109,8 @@ void arena_map::static_cache_create(void) {
    */
   for (auto& b : m_blocks) {
     if (-1 == b->robot_id() &&
-        b->discrete_loc() != math::rcoord_to_dcoord(center,
-                                                    m_grid.resolution())) {
+        b->discrete_loc() !=
+            math::rcoord_to_dcoord(center, m_grid.resolution())) {
       blocks.push_back(b);
     }
     if (blocks.size() >= mc_static_cache_params.size) {
@@ -125,10 +124,10 @@ void arena_map::static_cache_create(void) {
 
 bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {
   support::block_dist::dispatcher::entity_list entities;
-  for (auto &cache : m_caches) {
+  for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
-  for (auto &b : m_blocks) {
+  for (auto& b : m_blocks) {
     if (b != block) {
       entities.push_back(b.get());
     }
@@ -143,7 +142,7 @@ void arena_map::distribute_all_blocks(void) {
 
   /* distribute blocks */
   support::block_dist::dispatcher::entity_list entities;
-  for (auto &cache : m_caches) {
+  for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
   entities.push_back(&m_nest);

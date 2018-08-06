@@ -29,9 +29,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace argos { class CQTOpenGLUserFunctions; }
+namespace argos {
+class CQTOpenGLUserFunctions;
+}
 NS_START(fordyca);
-namespace representation { class base_block; }
+namespace representation {
+class base_block;
+}
 NS_START(support);
 
 /*******************************************************************************
@@ -63,8 +67,7 @@ class block_carry_visualizer {
    * @param id_len The length of the robot ID. Used to ensure block ID does not
    * overlap with robot ID, if both visualizations are enabled.
    */
-  void draw(const representation::base_block* block,
-            uint robot_id);
+  void draw(const representation::base_block* block, uint robot_id);
 
   // clang-format off
   double                               m_block_vis_offset{0.0};

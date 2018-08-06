@@ -18,12 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
@@ -63,4 +65,4 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator {
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_ */

@@ -38,8 +38,7 @@ constexpr char arena_map_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element anode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_grid.parse(anode);
@@ -58,13 +57,13 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid << m_blocks << m_cache
-         << m_nest << build_footer();
+  stream << build_header() << m_grid << m_blocks << m_cache << m_nest
+         << build_footer();
 } /* show() */
 
 __rcsw_pure bool arena_map_parser::validate(void) const {
-  return m_grid.validate() && m_blocks.validate() &&
-      m_cache.validate() && m_nest.validate();
+  return m_grid.validate() && m_blocks.validate() && m_cache.validate() &&
+         m_nest.validate();
 } /* validate() */
 
 NS_END(arena, params, fordyca);

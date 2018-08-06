@@ -1,5 +1,5 @@
 /**
- * @file base_fsm_metrics.hpp
+ * @file collision_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,13 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/base_metrics.hpp"
+#include <string>
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,23 +36,45 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_fsm_metrics
+ * @class collision_metrics_collector
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics should be collected ANY FSM as it goes
- * about whatever task it is supposed to do.
+ * @brief Collector for \ref collision_metrics.
+ *
+ * Metrics are written out after the specified interval.
  */
-class base_fsm_metrics : public virtual rcppsw::metrics::base_metrics {
+class collision_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
-  base_fsm_metrics(void) = default;
-  ~base_fsm_metrics(void) override = default;
-
   /**
-   * @brief If \c TRUE, then a robot is currently engaged in collision avoidance.
+   * @param ofname Output file name.
+   * @param interval Collection interval.
    */
-  virtual bool is_avoiding_collision(void) const = 0;
+  collision_metrics_collector(const std::string& ofname,
+                             uint interval);
+
+  void reset(void) override;
+  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void reset_after_interval(void) override;
+
+ private:
+  struct stats {
+    uint n_in_avoidance;
+    uint n_entered_avoidance;
+    uint n_exited_avoidance;
+    uint total_avoidance_duration;
+
+    uint cum_in_avoidance;
+    uint cum_entered_avoidance;
+    uint cum_exited_avoidance;
+    uint cum_avoidance_duration;
+  };
+
+  std::string csv_header_build(const std::string& header) override;
+  bool csv_line_build(std::string& line) override;
+
+  struct stats m_stats;
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_BASE_FSM_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_COLLISION_METRICS_COLLECTOR_HPP_ */

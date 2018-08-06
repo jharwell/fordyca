@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/tasks/depth2/new_cache_interactor.hpp"
+#include "fordyca/tasks/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,22 +46,21 @@ namespace task_allocation = rcppsw::task_allocation;
  * start a new cache. It is abortable, and has one task interface.
  */
 class cache_starter : public foraging_task,
-                      public new_cache_interactor {
+                      public free_block_interactor {
  public:
   cache_starter(const struct task_allocation::task_params* params,
             std::unique_ptr<task_allocation::taskable>& mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref new_cache_interactor, you have no way to way
+   * because when visiting a \ref free_block_interactor, you have no way to way
    * which depth2 task the object ACTUALLY is without using a set of if()
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
   void accept(events::free_block_drop& visitor) override;
-
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  void accept(events::free_block_pickup& visitor) override;
+  void accept(events::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);

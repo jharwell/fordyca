@@ -30,17 +30,17 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics.hpp"
+#include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bifurcating_tab.hpp"
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -130,8 +130,9 @@ void metrics_aggregator::collect_from_controller(
                      .acquisition_goal();
         });
 
-    collect("tasks::execution::" +
-            dynamic_cast<const ta::logical_task*>(controller->current_task())->name(),
+    collect("tasks::execution::" + dynamic_cast<const ta::logical_task*>(
+                                       controller->current_task())
+                                       ->name(),
             dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(
                 *controller->current_task()));
   }

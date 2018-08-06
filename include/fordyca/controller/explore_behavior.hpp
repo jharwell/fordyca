@@ -27,6 +27,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,9 +44,10 @@ NS_START(fordyca, controller);
  * @brief Base class for different exploration behaviors that robots can exhibit
  * when looking for stuff.
  */
-class explore_behavior : public rcppsw::er::client {
+class explore_behavior : public rcppsw::er::client,
+                         public metrics::fsm::collision_metrics {
  public:
-  explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
+  explore_behavior(std::shared_ptr<rcppsw::er::server> server,
                    controller::saa_subsystem* const saa)
       : client(server), m_saa(saa) {}
 

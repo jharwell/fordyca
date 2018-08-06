@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/new_direction_data.hpp"
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
@@ -57,9 +57,9 @@ NS_START(fsm);
  * per-se.
  */
 class base_foraging_fsm : public state_machine::hfsm,
-                          public metrics::fsm::base_fsm_metrics {
+                          public metrics::fsm::collision_metrics {
  public:
-  base_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+  base_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
                     controller::saa_subsystem* saa,
                     uint8_t max_states);
 
@@ -90,12 +90,11 @@ class base_foraging_fsm : public state_machine::hfsm,
       void) const;
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
-  /**
-   * @brief Get if the robot is currently engaged in collision avoidance.
-   *
-   * @return \c TRUE if the condition is met, \c FALSE otherwise.
-   */
-  bool is_avoiding_collision(void) const override;
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
  protected:
   /**
@@ -109,6 +108,18 @@ class base_foraging_fsm : public state_machine::hfsm,
 
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
+
+  /**
+   * @brief Start tracking the state necessary for correctly gathering collision
+   * avoidance metrics.
+   */
+  void collision_avoidance_tracking_begin(void);
+
+  /**
+   * @brief Stop tracking the state necessary for correctly gathering collision
+   * avoidance metrics.
+   */
+  void collision_avoidance_tracking_end(void);
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -169,6 +180,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
+
  private:
   /**
    * @brief When changing direction, a robot is spinning at such a speed that it
@@ -191,7 +203,20 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   static constexpr uint kDIR_CHANGE_MAX_STEPS = 10;
 
+  /**
+   * @brief When entering the nest, you want to continue to wander a bit before
+   * signaling upper FSMs that you are in the nest, so that there is (slightly)
+   * less congestion by the edge. This is a stopgap solution; a more elegant fix
+   * may be forthcoming in the future if warranted.
+   */
+  static constexpr uint kNEST_COUNT_MAX_STEPS = 25;
+
   // clang-format off
+  bool                             m_entered_avoidance{false};
+  bool                             m_exited_avoidance{false};
+  bool                             m_in_avoidance{false};
+  uint                             m_avoidance_start{0};
+  uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
   argos::CRadians                  m_new_dir;
   argos::CRandom::CRNG*            m_rng;

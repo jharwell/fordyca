@@ -80,7 +80,7 @@ class cache_vanished
                                 fsm::depth1::block_to_goal_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm> {
  public:
-  cache_vanished(const std::shared_ptr<rcppsw::er::server>& server,
+  cache_vanished(std::shared_ptr<rcppsw::er::server> server,
                  uint cache_id);
   ~cache_vanished(void) override { client::rmmod(); }
 

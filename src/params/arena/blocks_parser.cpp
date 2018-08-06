@@ -38,23 +38,19 @@ constexpr char blocks_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void blocks_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-  m_manipulation_penalty.parse(get_node(const_cast<ticpp::Element&>(bnode),
-                                        "manipulation_penalty"));
+  m_manipulation_penalty.parse(
+      get_node(const_cast<ticpp::Element&>(bnode), "manipulation_penalty"));
   m_dist.parse(bnode);
   m_params->manipulation_penalty = *m_manipulation_penalty.parse_results();
   m_params->dist = *m_dist.parse_results();
 } /* parse() */
 
 void blocks_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << m_manipulation_penalty
-         << m_dist
-         << build_footer();
+  stream << build_header() << m_manipulation_penalty << m_dist << build_footer();
 } /* show() */
 
 __rcsw_pure bool blocks_parser::validate(void) const {

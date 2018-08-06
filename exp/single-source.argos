@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -101,13 +101,8 @@
           <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
         </actuation>
-        <visualization robot_id="true"
-                       robot_los="false"
-                       robot_task="true"
-                       block_id="false"
-                       />
       </params>
-    </stateful_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -115,7 +110,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -123,9 +118,11 @@
            />
       <metrics
           output_dir="metrics"
+          collision_fname="collision-stats.csv"
           block_fname="block-stats.csv"
           block_acquisition_fname="block-acquisition-stats.csv"
           block_transport_fname="block-transport-stats.csv"
+          block_manipulation_fname="block-manipulation-stats.csv"
           cache_acquisition_fname="cache-acquisition-stats.csv"
           cache_utilization_fname="cache-utilization-stats.csv"
           cache_lifecycle_fname="cache-lifecycle-stats.csv"
@@ -144,10 +141,10 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Null"
-              frequency="100"
-              amplitude="500"
-              offset="10"/>
+              type="Sine"
+              frequency="0.01"
+              amplitude="50"
+              offset="50"/>
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
@@ -231,7 +228,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
@@ -258,18 +255,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-      <camera>
-        <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="5,2.5,6" -->
+  <!--                  look_at="5,2.5,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

@@ -23,14 +23,17 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
+#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/block_vanished.hpp"
+#include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
-using goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = fsm::block_transporter::goal_type;
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -56,7 +59,8 @@ double cache_finisher::calc_abort_prob(void) {
    * AFTER it acquires a block can cause it to get stuck and not switch to
    * another task if it cannot find a block anywhere.
    */
-  if (transport_goal_type::kNewCache == block_transport_goal()) {
+  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
+  if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
     return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
@@ -69,8 +73,9 @@ double cache_finisher::calc_interface_time(double start_time) {
     return current_time() - start_time;
   }
 
-  if (goal_acquired() &&
-      transport_goal_type::kNewCache == block_transport_goal()) {
+  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
+  if (fsm->goal_acquired() &&
+      transport_goal_type::kNewCache == fsm->block_transport_goal()) {
     if (!interface_complete()) {
       interface_complete(true);
       reset_interface_time();
@@ -80,10 +85,36 @@ double cache_finisher::calc_interface_time(double start_time) {
   return 0.0;
 } /* calc_interface_time() */
 
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                            polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        cache_finisher,
+                        goal_acquired,
+                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                            polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        cache_finisher,
+                        acquisition_goal,
+                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                            polled_task::mechanism()));
+
 TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
                         cache_finisher,
                         block_transport_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                             polled_task::mechanism()));
 
 /*******************************************************************************
@@ -92,43 +123,19 @@ TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
 void cache_finisher::accept(events::free_block_drop& visitor) {
   visitor.visit(*this);
 }
-
-/*******************************************************************************
- * FSM Metrics
- ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        is_avoiding_collision,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        goal_acquired,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        cache_finisher,
-                        acquisition_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+void cache_finisher::accept(events::free_block_pickup& visitor) {
+  visitor.visit(*this);
+}
+void cache_finisher::accept(events::block_vanished& visitor) {
+  visitor.visit(*this);
+}
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 __rcsw_pure bool cache_finisher::task_at_interface(void) const {
-  return acquisition_goal_type::kExistingCache == acquisition_goal();
+  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
+  return acquisition_goal_type::kExistingCache == fsm->acquisition_goal();
 } /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);

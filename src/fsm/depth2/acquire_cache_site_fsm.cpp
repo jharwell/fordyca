@@ -50,7 +50,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(bool explore_result) const {
+__rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
+    bool explore_result) const {
   /*
    * At some point this will have some sanity checks/warnings about the chosen
    * cache site, but for now, just signal that everything is fine.

@@ -40,9 +40,11 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct metrics_params : public rcppsw::params::base_params {
-  std::string block_fname{""};
+  std::string collision_fname{""};
+
   std::string block_acquisition_fname{""};
   std::string block_transport_fname{""};
+  std::string block_manipulation_fname{""};
 
   std::string cache_acquisition_fname{""};
   std::string cache_utilization_fname{""};

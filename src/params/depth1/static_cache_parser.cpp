@@ -39,8 +39,7 @@ constexpr char static_cache_parser::kXMLRoot[];
  ******************************************************************************/
 void static_cache_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element cnode =
-        get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_PARAM(cnode, m_params, enable);
@@ -48,8 +47,8 @@ void static_cache_parser::parse(const ticpp::Element& node) {
     XML_PARSE_PARAM(cnode, m_params, dimension);
     XML_PARSE_PARAM(cnode, m_params, min_dist);
     XML_PARSE_PARAM(cnode, m_params, respawn_scale_factor);
-    m_waveform.parse(get_node(const_cast<ticpp::Element&>(cnode),
-                              "usage_penalty"));
+    m_waveform.parse(
+        get_node(const_cast<ticpp::Element&>(cnode), "usage_penalty"));
     m_params->usage_penalty = *m_waveform.parse_results();
 
     m_parsed = true;
@@ -69,8 +68,7 @@ void static_cache_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, dimension) << std::endl
          << XML_PARAM_STR(m_params, min_dist) << std::endl
          << XML_PARAM_STR(m_params, respawn_scale_factor) << std::endl
-         << m_waveform
-         << build_footer();
+         << m_waveform << build_footer();
 } /* show() */
 
 __rcsw_pure bool static_cache_parser::validate(void) const {

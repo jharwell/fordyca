@@ -129,10 +129,23 @@ HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_pure FSM_WRAPPER_DEFINE(bool,
+FSM_WRAPPER_DEFINE(bool,
                    cache_transferer_fsm,
-                   is_avoiding_collision,
+                   in_collision_avoidance,
                    m_cache_fsm);
+FSM_WRAPPER_DEFINE(bool,
+                   cache_transferer_fsm,
+                   entered_collision_avoidance,
+                   m_cache_fsm);
+FSM_WRAPPER_DEFINE(bool,
+                   cache_transferer_fsm,
+                   exited_collision_avoidance,
+                   m_cache_fsm);
+FSM_WRAPPER_DEFINE(uint,
+                   cache_transferer_fsm,
+                   collision_avoidance_duration,
+                   m_cache_fsm);
+
 
 FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm, goal_acquired, m_cache_fsm);
 
@@ -147,6 +160,14 @@ FSM_WRAPPER_DEFINE(acquisition_goal_type,
                    cache_transferer_fsm,
                    acquisition_goal,
                    m_cache_fsm);
+
+transport_goal_type cache_transferer_fsm::block_transport_goal(void) const {
+  if (ST_ACQUIRE_SRC_CACHE == current_state() ||
+      ST_ACQUIRE_DEST_CACHE == current_state()) {
+    return transport_goal_type::kExistingCache;
+  }
+  return transport_goal_type::kNone;
+} /* block_transport_goal() */
 
 /*******************************************************************************
  * General Member Functions

@@ -38,7 +38,7 @@ namespace utils = rcppsw::utils;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_fsm::vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+vector_fsm::vector_fsm(std::shared_ptr<rcppsw::er::server> server,
                        controller::saa_subsystem* const saa)
     : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
@@ -77,11 +77,13 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
+    collision_avoidance_tracking_end();
     internal_event(ST_COLLISION_RECOVERY);
     return controller::foraging_signal::HANDLED;
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
     if (base_sensors()->tick() - m_state.last_collision_time <
         kFREQ_COLLISION_THRESH) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
@@ -98,6 +100,14 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
               obs.Angle().GetValue(),
               obs.Length());
       saa_subsystem()->steering_force().avoidance(obs);
+      /*
+       * If we are currently spinning in place (hard turn), we have 0 linear
+       * velocity, and that does not play well with the arrival force
+       * calculations. To fix this, and a bit of wander force.
+       */
+      if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+        saa_subsystem()->steering_force().wander();
+      }
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
@@ -108,6 +118,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
+    collision_avoidance_tracking_end();
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -132,7 +143,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   auto* goal = dynamic_cast<const struct goal_data*>(data);
   if (nullptr != goal) {
     m_goal_data = *goal;
-    ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
+    ER_NOM("Target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
   if ((m_goal_data.loc - base_sensors()->position()).Length() <=
@@ -182,6 +193,23 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
   actuators()->leds_set_color(utils::color::kYELLOW);
 }
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+bool vector_fsm::in_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE == current_state();
+} /* in_collision_avoidance() */
+
+bool vector_fsm::entered_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE != last_state() &&
+      in_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+bool vector_fsm::exited_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE == last_state() &&
+      !in_collision_avoidance();
+} /* exited_collision_avoidance() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

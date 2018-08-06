@@ -65,27 +65,29 @@ class transport_metrics_collector : public rcppsw::metrics::base_metrics_collect
     /**
      * @brief  Total # blocks collected in interval.
      */
-    uint cum_collected{0};
+    uint total_collected{0};
 
     /**
      * @brief Total # transporters for collected blocks in interval.
      */
-    uint cum_transporters{0};
+    uint total_transporters{0};
 
     /**
      * @brief Total amount of time taken for all collected blocks to be
      * transported from original distribution locations to the nest.
      */
-    double cum_transport_time{0.0};
+    double total_transport_time{0.0};
 
     /**
      * @brief Total amount of time between original arena distribution and first
      * pickup for all collected blocks in interval.
      */
-    double cum_initial_wait_time{0.0};
+    double total_initial_wait_time{0.0};
 
-    uint cum_pickup_events{0};
-    uint cum_drop_events{0};
+    double cum_collected{0.0};
+    double cum_transporters{0.0};
+    double cum_transport_time{0.0};
+    double cum_initial_wait_time{0.0};
   };
 
   std::string csv_header_build(const std::string& header) override;

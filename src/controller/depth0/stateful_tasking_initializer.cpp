@@ -33,9 +33,9 @@
 #include "fordyca/tasks/depth0/generalist.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/executive_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,17 +70,14 @@ void stateful_tasking_initializer::stateful_tasking_init(
 
   std::unique_ptr<ta::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          m_server,
-          mc_sel_matrix,
-          m_saa,
-          m_perception->map());
+          m_server, mc_sel_matrix, m_saa, m_perception->map());
 
   auto generalist = new tasks::depth0::generalist(exec_params, generalist_fsm);
 
   if (est_params->enabled) {
-    static_cast<ta::polled_task*>(generalist)->init_random(
-        est_params->generalist_range.GetMin(),
-        est_params->generalist_range.GetMax());
+    static_cast<ta::polled_task*>(generalist)
+        ->init_random(est_params->generalist_range.GetMin(),
+                      est_params->generalist_range.GetMax());
   }
 
   m_graph = new ta::bifurcating_tdgraph(m_server);
@@ -89,8 +86,8 @@ void stateful_tasking_initializer::stateful_tasking_init(
   generalist->set_atomic();
 } /* tasking_init() */
 
-std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer::operator()(
-    params::depth0::stateful_param_repository* const stateful_repo) {
+std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer::
+operator()(params::depth0::stateful_param_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
   return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_server,

@@ -1,7 +1,7 @@
 /**
- * @file block_manipulation_penalty.hpp
+ * @file temporal_penalty.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_BLOCK_MANIPULATION_PENALTY_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_BLOCK_MANIPULATION_PENALTY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,21 +29,20 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_manipulation_penalty
+ * @class temporal_penalty
  * @ingroup support depth1
  *
- * @brief Handles subjecting a robot to a penalty when picking up/dropping a
- * block, whether that is in a cache or just in the arena via a specified
+ * @brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.
  */
 template<typename T>
-class block_manipulation_penalty {
+class temporal_penalty {
  public:
   /**
    * @brief Initialize the penalty.
@@ -54,7 +53,7 @@ class block_manipulation_penalty {
    * @param penalty The # of timesteps for the penalty.
    * @param start_time The timestep the penalty will start on.
    */
-  block_manipulation_penalty(const T* const controller,
+  temporal_penalty(const T* const controller,
                              uint id,
                              uint penalty,
                              uint start_time)
@@ -68,7 +67,7 @@ class block_manipulation_penalty {
   uint penalty(void) const { return mc_penalty; }
   uint id(void) const { return mc_id; }
 
-  bool operator==(const block_manipulation_penalty& other) {
+  bool operator==(const temporal_penalty& other) {
     return this->controller() == other.controller();
   }
 
@@ -89,6 +88,6 @@ class block_manipulation_penalty {
   // clang-format on
 };
 
-NS_END(depth1, support, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_BLOCK_MANIPULATION_PENALTY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_ */

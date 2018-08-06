@@ -67,24 +67,22 @@ class utilization_metrics_collector
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint n_blocks;
-    uint n_pickups;
-    uint n_drops;
-    uint n_penalty_steps;
+    uint n_blocks{0};
+    uint n_pickups{0};
+    uint n_drops{0};
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
   // clang-format off
-  uint           m_penalty_count{0};
-  struct stats   m_stats;
+  struct stats   m_stats{};
 
   /**
    * IDs of the caches that had events in the current interval, for use in
    * averaging statistics.
    */
-  std::set<uint> m_cache_ids;
+  std::set<uint> m_cache_ids{};
   // clang-format on
 };
 

@@ -43,7 +43,7 @@ using controller::steering_force_type;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
     controller::saa_subsystem* const saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),
@@ -79,8 +79,13 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
    * nest. Instead, wander about within the nest until you find the edge (either
    * on your own or being pushed out via collision avoidance).
    */
-  argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
-  saa_subsystem()->steering_force().avoidance(obs);
+  if (m_saa->sensing()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
+    argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+    saa_subsystem()->steering_force().avoidance(obs);
+  } else {
+    collision_avoidance_tracking_end();
+  }
   saa_subsystem()->steering_force().wander();
   m_saa->apply_steering_force(std::make_pair(false, false));
 
@@ -96,28 +101,31 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
             "FATAL: ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
             "FATAL: ST_TRANSPORT_TO_NEST should never pickup blocks...");
-
+  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
+            "FATAL: ST_TRANSPORT_TO_NEST should never drop blocks");
   if (current_state() != last_state()) {
     ER_DIAG("Executing ST_TRANSPORT_TO_NEST");
   }
 
   /*
-   * We have arrived at the nest and it's time to head back out again. The
-   * loop functions need to call the drop_block() function, as they have to
-   * redistribute it (the FSM has no idea how to do that).
-   *
-   * The BLOCK_DROP signal comes from the loop functions the same timestep as we
-   * realize that we are in the nest, so we need to be sure that we return the
-   * BLOCK_DROP signal to the upper FSM, as that it what it is listening for.
+   * We have arrived at the nest so send this signal to the parent FSM that is
+   * listing for it.
    */
-  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-    ER_ASSERT(m_saa->sensing()->in_nest(), "FATAL: BLOCK_DROP outside nest");
-    return data->signal();
+  if (m_saa->sensing()->in_nest()) {
+    if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
+      m_saa->steering_force().wander();
+      m_saa->apply_steering_force(std::make_pair(false, false));
+      return controller::foraging_signal::HANDLED;
+    } else {
+      m_nest_count = 0;
+      return controller::foraging_signal::ENTERED_NEST;
+    }
   }
 
   m_saa->steering_force().phototaxis();
   argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
     m_saa->steering_force().avoidance(obs);
   } else {
     /*
@@ -125,9 +133,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
      * velocity, and that does not play well with the arrival force
      * calculations. To fix this, and a bit of wander force.
      */
-    if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
-      saa_subsystem()->steering_force().wander();
+    if (m_saa->linear_velocity().Length() <= 0.1) {
+      m_saa->steering_force().wander();
     }
+    collision_avoidance_tracking_end();
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
@@ -182,8 +191,55 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(utils::color::kCYAN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
+  actuators()->differential_drive().stop();
   actuators()->leds_set_color(utils::color::kWHITE);
 }
+
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+bool base_foraging_fsm::in_collision_avoidance(void) const {
+  return m_in_avoidance;
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool base_foraging_fsm::entered_collision_avoidance(void) const {
+  return m_entered_avoidance;
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool base_foraging_fsm::exited_collision_avoidance(void) const {
+  return m_exited_avoidance;
+} /* exited_collision_avoidance() */
+
+uint base_foraging_fsm::collision_avoidance_duration(void) const {
+  if (m_exited_avoidance) {
+    return saa_subsystem()->sensing()->tick() - m_avoidance_start;
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+void base_foraging_fsm::collision_avoidance_tracking_begin(void) {
+  if (!m_in_avoidance) {
+    if (!m_entered_avoidance) {
+      m_entered_avoidance = true;
+      m_avoidance_start = saa_subsystem()->sensing()->tick();
+    }
+  } else {
+    m_entered_avoidance = false;
+  }
+  m_in_avoidance = true;
+} /* collision_avoidance_tracking_begin() */
+
+void base_foraging_fsm::collision_avoidance_tracking_end(void) {
+  if (!m_exited_avoidance) {
+    if (m_in_avoidance) {
+      m_exited_avoidance = true;
+    }
+  } else {
+    m_exited_avoidance = false;
+  }
+  m_in_avoidance = false;
+  m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
+} /* collision_avoidance_tracking_end() */
 
 /*******************************************************************************
  * General Member Functions
@@ -219,9 +275,5 @@ const std::shared_ptr<controller::actuation_subsystem> base_foraging_fsm::actuat
     void) {
   return m_saa->actuation();
 } /* actuators() */
-
-bool base_foraging_fsm::is_avoiding_collision(void) const {
-  return m_saa->sensing()->threatening_obstacle_exists();
-} /* is_avoiding_collision() */
 
 NS_END(controller, fordyca);

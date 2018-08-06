@@ -53,18 +53,14 @@ class cache_transferer : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref new_cache_interactor, you have no way to way
-   * which depth2 task the object ACTUALLY is without using a set of if()
+   * because when visiting a \ref existing_cache_interactor, you have no way to
+   * way which depth2 task the object ACTUALLY is without using a set of if()
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
   void accept(events::cache_block_drop& visitor) override;
   void accept(events::cached_block_pickup& visitor) override;
   void accept(events::cache_vanished& visitor) override;
-  void accept(events::free_block_drop&) override {}
-
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);

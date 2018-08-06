@@ -100,8 +100,11 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
   void task_start(const task_allocation::taskable_argument*) override {}
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
@@ -131,6 +134,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_PICKUP,
+
+    ST_WAIT_FOR_DROP,
 
     /**
      * Block found--bring it back to the nest.
@@ -172,11 +177,14 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* memory foraging states */
+  /* stateful foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+                     wait_for_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 

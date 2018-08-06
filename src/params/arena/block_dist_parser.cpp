@@ -38,8 +38,7 @@ constexpr char block_dist_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_dist_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode =
-      get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_powerlaw.parse(bnode);
   m_manifest.parse(bnode);
   m_params =
@@ -51,12 +50,10 @@ void block_dist_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void block_dist_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, dist_type) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, dist_type) << std::endl
          << XML_PARAM_STR(m_params, arena_resolution) << std::endl
          << XML_PARAM_STR(m_params, dist_type) << std::endl
-         << m_powerlaw
-         << build_footer();
+         << m_powerlaw << build_footer();
 } /* show() */
 
 bool block_dist_parser::validate(void) const {

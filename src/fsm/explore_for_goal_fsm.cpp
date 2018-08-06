@@ -49,7 +49,10 @@ explore_for_goal_fsm::explore_for_goal_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
-          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore,
+                                      nullptr,
+                                      &entry_explore,
+                                      nullptr),
           HFSM_STATE_MAP_ENTRY_EX(&finished)},
       m_explore_behavior(std::move(behavior)),
       m_goal_detect(goal_detect) {
@@ -79,6 +82,26 @@ HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
   }
   return controller::foraging_signal::HANDLED;
 }
+
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       in_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       entered_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       exited_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(uint,
+                       explore_for_goal_fsm,
+                       collision_avoidance_duration,
+                       m_explore_behavior);
 
 /*******************************************************************************
  * General Member Functions

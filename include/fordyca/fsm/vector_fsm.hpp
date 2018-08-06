@@ -60,7 +60,8 @@ NS_START(fsm);
  * avoid multiple robots all trying to drive to the center of the cache to
  * "arrive" at it.
  */
-class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
+class vector_fsm : public base_foraging_fsm,
+                   public task_allocation::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -80,7 +81,7 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
 
-  vector_fsm(const std::shared_ptr<rcppsw::er::server>& server,
+  vector_fsm(std::shared_ptr<rcppsw::er::server> server,
              controller::saa_subsystem* saa);
 
   vector_fsm(const vector_fsm& fsm) = delete;
@@ -105,9 +106,10 @@ class vector_fsm : public base_foraging_fsm, public task_allocation::taskable {
    */
   void init(void) override;
 
-  bool is_avoiding_collision(void) const override {
-    return ST_COLLISION_AVOIDANCE == current_state();
-  }
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
 
  protected:
   enum fsm_states {

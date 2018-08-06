@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,12 +70,13 @@ representation::perceived_cache existing_cache_selector::calc_best(
       continue;
     }
     math::existing_cache_utility u(c.ent->real_loc(),
-                                   boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second));
+                                   boost::get<argos::CVector2>(
+                                       mc_matrix->find("nest_center")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",
+    ER_DIAG("Utility for existing_cache%d loc=(%u, %u), density=%f: %f",
             c.ent->id(),
             c.ent->discrete_loc().first,
             c.ent->discrete_loc().second,
@@ -89,7 +90,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
   } /* for(existing_cache..) */
 
   if (nullptr != best.ent) {
-    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%zu, %zu]: %f",
+    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%u, %u]: %f",
            best.ent->id(),
            best.ent->real_loc().GetX(),
            best.ent->real_loc().GetY(),

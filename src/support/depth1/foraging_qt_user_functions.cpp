@@ -54,10 +54,10 @@ void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
       c_entity.GetControllableEntity().GetController());
 
   if (controller.display_task() && nullptr != controller.current_task()) {
-    DrawText(argos::CVector3(0.0, 0.0, 0.75),
-             dynamic_cast<ta::executable_task*>(controller.current_task())
-                 ->name(),
-             argos::CColor::BLUE);
+    DrawText(
+        argos::CVector3(0.0, 0.0, 0.75),
+        dynamic_cast<ta::executable_task*>(controller.current_task())->name(),
+        argos::CColor::BLUE);
   }
 }
 

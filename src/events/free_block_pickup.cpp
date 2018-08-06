@@ -49,10 +49,11 @@ using representation::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                                     std::shared_ptr<representation::base_block> block,
-                                     uint robot_index,
-                                     uint timestep)
+free_block_pickup::free_block_pickup(
+    std::shared_ptr<rcppsw::er::server> server,
+    std::shared_ptr<representation::base_block> block,
+    uint robot_index,
+    uint timestep)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
       client(server),
       m_timestep(timestep),
@@ -104,7 +105,6 @@ void free_block_pickup::visit(representation::arena_map& map) {
 void free_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
-  block.pickup_event(true);
   block.first_pickup_time(m_timestep);
 
   /* Move block out of sight */
@@ -116,6 +116,8 @@ void free_block_pickup::visit(
     controller::depth0::stateless_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
+
   ER_NOM("stateless_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
@@ -159,9 +161,10 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
-  static_cast<tasks::depth0::foraging_task*>(controller.current_task())
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
       ->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
@@ -174,16 +177,7 @@ void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  auto depth0 = dynamic_cast<tasks::depth0::foraging_task*>(
-      controller.current_task());
-  auto depth1 = dynamic_cast<tasks::depth1::foraging_task*>(
-      controller.current_task());
-  if (nullptr != depth0) {
-    depth0->accept(*this);
-  } else if (nullptr != depth1) {
-    depth1->accept(*this);
-  }
-
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())->accept(*this);
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());

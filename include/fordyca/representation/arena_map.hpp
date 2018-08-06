@@ -39,7 +39,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace arena { struct arena_map_params; }}
+namespace params { namespace arena {
+struct arena_map_params;
+}} // namespace params::arena
 
 NS_START(representation);
 

@@ -74,7 +74,6 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 
 void free_block_drop::visit(representation::base_block& block) {
   block.reset_robot_id();
-  block.drop_event(true);
 
   rcppsw::math::dcoord2 d(cell_op::x(), cell_op::y());
   block.real_loc(math::dcoord_to_rcoord(d, m_resolution));
@@ -120,8 +119,7 @@ void free_block_drop::visit(controller::depth1::foraging_controller& controller)
  * Depth2
  ******************************************************************************/
 void free_block_drop::visit(controller::depth2::foraging_controller& controller) {
-  static_cast<tasks::depth2::foraging_task*>(
-      controller.current_task())
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
       ->accept(*this);
   controller.block(nullptr);
 } /* visit() */

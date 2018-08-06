@@ -28,6 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
@@ -66,10 +67,11 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override {
-    return base_foraging_fsm::is_avoiding_collision();
-  }
+  /* collision metrics */
+  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
@@ -100,6 +102,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
+    ST_WAIT_FOR_BLOCK_DROP,
     ST_MAX_STATES
   };
 
@@ -117,6 +120,8 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE(stateless_foraging_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_drop,
                      state_machine::event_data);
 
   /**

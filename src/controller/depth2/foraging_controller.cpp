@@ -33,8 +33,8 @@
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/partitionable_task.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/partitionable_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,8 @@ void foraging_controller::ControlStep(void) {
   perception()->update(depth0::stateful_foraging_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
 
   m_executive->run();
 } /* ControlStep() */
@@ -97,12 +98,12 @@ void foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("depth2 foraging controller initialization finished");
 } /* Init() */
 
-__rcsw_pure tasks::base_foraging_task* foraging_controller::
-    current_task(void) {
+__rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(void) const {
+__rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(
+    void) const {
   return const_cast<foraging_controller*>(this)->current_task();
 } /* current_task() */
 

@@ -47,9 +47,8 @@ cache_site_selector::cache_site_selector(
 argos::CVector2 cache_site_selector::calc_best(
     const std::list<representation::perceived_cache>&,
     argos::CVector2 robot_loc) {
-
-  argos::CVector2 nest_loc = boost::get<argos::CVector2>(
-      mc_matrix->find("nest_center")->second);
+  argos::CVector2 nest_loc =
+      boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second);
   argos::CVector2 site((robot_loc.GetX() - nest_loc.GetX()) / 2.0,
                        nest_loc.GetY());
 

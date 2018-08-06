@@ -28,9 +28,9 @@
 #include "fordyca/representation/movable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
 #include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,12 +66,10 @@ class base_block : public multicell_entity,
   static argos::CVector2 kOutOfSightRLoc;
 
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color)
-      : multicell_entity(dim, color, -1),
-        movable_cell_entity() {}
+      : multicell_entity(dim, color, -1), movable_cell_entity() {}
 
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color, int id)
-      : multicell_entity(dim, color, id),
-        movable_cell_entity() {}
+      : multicell_entity(dim, color, id), movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const base_block& other) const {
     return (this->id() == other.id());
@@ -82,20 +80,15 @@ class base_block : public multicell_entity,
   uint total_transporters(void) const override { return m_transporters; }
   double total_transport_time(void) const override;
   double initial_wait_time(void) const override;
-  bool pickup_event(void) const override { return m_pickup_event; }
-  bool drop_event(void) const override { return m_drop_event; }
 
   /**
-   * @brief Increment the # of carries this base_block has undergone on its way back
+   * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
   void add_transporter(uint robot_id) {
     ++m_transporters;
     m_robot_id = robot_id;
   }
-
-  void pickup_event(bool pickup_event) { m_pickup_event = pickup_event; }
-  void drop_event(bool drop_event) { m_drop_event = drop_event; }
 
   /**
    * @brief Set the time that the base_block is picked up for the first time after
@@ -169,8 +162,6 @@ class base_block : public multicell_entity,
   int    m_robot_id{-1};
   uint   m_transporters{0};
   bool   m_first_pickup{false};
-  bool   m_pickup_event{false};
-  bool   m_drop_event{false};
   double m_first_pickup_time{0.0};
   double m_dist_time{0.0};
   double m_nest_drop_time{0.0};

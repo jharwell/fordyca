@@ -38,9 +38,9 @@
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 #include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/executive_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -92,25 +92,19 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_transferer_fsm =
       rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
-          server(),
-          cache_sel_matrix(),
-          saa_subsystem(),
-          perception()->map());
+          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
   std::unique_ptr<ta::taskable> cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          server(),
-          cache_sel_matrix(),
-          saa_subsystem(),
-          perception()->map());
+          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
 
-  auto cache_starter = new tasks::depth2::cache_starter(exec_params,
-                                                        cache_starter_fsm);
-  auto cache_finisher = new tasks::depth2::cache_finisher(exec_params,
-                                                          cache_finisher_fsm);
-  auto cache_transferer = new tasks::depth2::cache_transferer(exec_params,
-                                                              cache_transferer_fsm);
-  auto cache_collector = new tasks::depth1::collector(exec_params,
-                                                      cache_collector_fsm);
+  auto cache_starter =
+      new tasks::depth2::cache_starter(exec_params, cache_starter_fsm);
+  auto cache_finisher =
+      new tasks::depth2::cache_finisher(exec_params, cache_finisher_fsm);
+  auto cache_transferer =
+      new tasks::depth2::cache_transferer(exec_params, cache_transferer_fsm);
+  auto cache_collector =
+      new tasks::depth1::collector(exec_params, cache_collector_fsm);
 
   if (est_params->enabled) {
     cache_starter->init_random(est_params->cache_starter_range.GetMin(),

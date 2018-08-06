@@ -44,9 +44,11 @@ void metrics_parser::parse(const ticpp::Element& node) {
         argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(mnode, m_params, block_fname);
+    XML_PARSE_PARAM(mnode, m_params, collision_fname);
+
     XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
     XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
+    XML_PARSE_PARAM(mnode, m_params, block_manipulation_fname);
 
     XML_PARSE_PARAM(mnode, m_params, cache_acquisition_fname);
     XML_PARSE_PARAM(mnode, m_params, cache_utilization_fname);
@@ -74,9 +76,9 @@ void metrics_parser::show(std::ostream& stream) const {
     stream << "<<  Not Parsed >>" << std::endl << build_footer();
     return;
   }
-  stream << XML_PARAM_STR(m_params, block_fname) << std::endl
-         << XML_PARAM_STR(m_params, block_acquisition_fname) << std::endl
+  stream << XML_PARAM_STR(m_params, block_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, block_transport_fname) << std::endl
+         << XML_PARAM_STR(m_params, block_manipulation_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_utilization_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_lifecycle_fname) << std::endl

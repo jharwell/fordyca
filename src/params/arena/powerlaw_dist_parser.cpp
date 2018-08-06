@@ -39,8 +39,7 @@ constexpr char powerlaw_dist_parser::kXMLRoot[];
  ******************************************************************************/
 void powerlaw_dist_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element bnode =
-        get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_PARAM(bnode, m_params, pwr_min);

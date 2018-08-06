@@ -23,20 +23,14 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
-#include "fordyca/params/visualization_parser.hpp"
+#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "rcppsw/er/server.hpp"
 
@@ -44,14 +38,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using interactor =
-    arena_interactor<controller::depth0::stateless_foraging_controller>;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server), m_arena_map(nullptr) {
+    : client(rcppsw::er::g_server), m_arena_map(nullptr), m_interactor{nullptr} {
   insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -86,6 +78,14 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
+
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  m_interactor =
+      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
+                                      arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -145,18 +145,16 @@ void stateless_foraging_loop_functions::pre_step_iter(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_metrics_agg->collect_from_controller(
-      static_cast<rcppsw::metrics::base_metrics*>(&controller));
+  m_metrics_agg->collect_from_controller(&controller);
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server,
-             m_arena_map.get(),
-             m_metrics_agg.get(),
-             floor())(controller, GetSpace().GetSimulationClock());
+  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
