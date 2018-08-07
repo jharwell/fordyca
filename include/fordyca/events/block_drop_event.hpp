@@ -35,11 +35,8 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class arena_map;
-class block;
+class base_block;
 } // namespace representation
-namespace controller { namespace depth1 {
-class foraging_controller;
-}} // namespace controller::depth1
 
 NS_START(events);
 
@@ -50,13 +47,12 @@ NS_START(events);
  * @class block_drop_event
  * @ingroup events
  *
- * @brief Interface specifying the minimum set of classes any action involving
- * dropping a block will need to visit.
+ * @brief Interface specifying the core class of classes any action involving
+ * dropping a block will need to visit (think data structures).
  */
-class block_drop_event
-    : public visitor::visit_set<representation::arena_map,
-                                representation::block,
-                                controller::depth1::foraging_controller> {};
+class block_drop_event : public visitor::visit_set<representation::arena_map,
+                                                   representation::base_block> {
+};
 
 NS_END(events, fordyca);
 

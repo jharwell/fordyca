@@ -50,7 +50,7 @@ compile_commands.json
 build
 docs/html
 docs/latex
-ext
+ext/rcppsw
 
 # Runtime
 *.txt
@@ -58,3 +58,7 @@ ext
 *.csv
 output
 reports
+
+# Tags
+.tag*
+tags

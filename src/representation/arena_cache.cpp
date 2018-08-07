@@ -34,7 +34,7 @@ NS_START(fordyca, representation);
 arena_cache::arena_cache(double dimension,
                          double resolution,
                          argos::CVector2 center,
-                         const std::vector<std::shared_ptr<block>>& blocks,
+                         const block_vector& blocks,
                          int id)
     : base_cache(dimension, resolution, center, blocks, id) {}
 

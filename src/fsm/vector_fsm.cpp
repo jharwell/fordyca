@@ -25,24 +25,22 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/throttling_differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-vector_fsm::vector_fsm(
-    uint frequent_collision_thresh,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators)
-    : base_foraging_fsm(server, sensors, actuators, ST_MAX_STATES),
+vector_fsm::vector_fsm(std::shared_ptr<rcppsw::er::server> server,
+                       controller::saa_subsystem* const saa)
+    : base_foraging_fsm(server, saa, ST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       entry_new_direction(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -54,28 +52,14 @@ vector_fsm::vector_fsm(
       entry_collision_avoidance(),
       entry_collision_recovery(),
       m_state(),
-      m_freq_collision_thresh(frequent_collision_thresh),
-      m_collision_rec_count(0),
-      m_goal_data(),
-      m_ang_pid(4.0,
-                0,
-                0,
-                1,
-                -this->actuators()->max_wheel_speed() * 0.50,
-                this->actuators()->max_wheel_speed() * 0.50),
-      m_lin_pid(3.0,
-                0,
-                0,
-                1,
-                this->actuators()->max_wheel_speed() * 0.1,
-                this->actuators()->max_wheel_speed() * 0.7) {
+      m_goal_data() {
   insmod("vector_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
 /*******************************************************************************
  * States
  ******************************************************************************/
-__const FSM_STATE_DEFINE_ND(vector_fsm, start) {
+__rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::HANDLED;
 }
 
@@ -90,14 +74,18 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
    * new direction away from whatever is causing the problem. See #243.
    */
   if (ST_NEW_DIRECTION == previous_state()) {
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
+    actuators()->differential_drive().set_wheel_speeds(
+        actuators()->differential_drive().max_speed() * 0.7,
+        actuators()->differential_drive().max_speed() * 0.7);
+    collision_avoidance_tracking_end();
     internal_event(ST_COLLISION_RECOVERY);
     return controller::foraging_signal::HANDLED;
   }
 
   if (base_sensors()->threatening_obstacle_exists()) {
+    collision_avoidance_tracking_begin();
     if (base_sensors()->tick() - m_state.last_collision_time <
-        m_freq_collision_thresh) {
+        kFREQ_COLLISION_THRESH) {
       ER_DIAG("Frequent collision: last=%u curr=%u",
               m_state.last_collision_time,
               base_sensors()->tick());
@@ -105,14 +93,32 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
     } else {
-      actuators()->set_rel_heading(kinematics().calc_avoidance_force());
+      argos::CVector2 obs = base_sensors()->find_closest_obstacle();
+      ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
+              obs.GetX(),
+              obs.GetY(),
+              obs.Angle().GetValue(),
+              obs.Length());
+      saa_subsystem()->steering_force().avoidance(obs);
+      /*
+       * If we are currently spinning in place (hard turn), we have 0 linear
+       * velocity, and that does not play well with the arrival force
+       * calculations. To fix this, and a bit of wander force.
+       */
+      if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+        saa_subsystem()->steering_force().wander();
+      }
+      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
     m_state.last_collision_time = base_sensors()->tick();
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
-    actuators()->set_speed(actuators()->max_wheel_speed() * 0.7);
+    actuators()->differential_drive().set_wheel_speeds(
+        actuators()->differential_drive().max_speed() * 0.7,
+        actuators()->differential_drive().max_speed() * 0.7);
+    collision_avoidance_tracking_end();
     internal_event(ST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::HANDLED;
@@ -123,8 +129,8 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
     ER_DIAG("Executing ST_COLLISION_RECOVERY");
   }
 
-  if (++m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
-    m_collision_rec_count = 0;
+  if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
+    m_state.m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
   return controller::foraging_signal::HANDLED;
@@ -134,83 +140,34 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
     ER_DIAG("Executing ST_VECTOR");
   }
 
-  double ang_speed = 0;
-  double lin_speed = 0;
   auto* goal = dynamic_cast<const struct goal_data*>(data);
   if (nullptr != goal) {
     m_goal_data = *goal;
-    ER_NOM("target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
+    ER_NOM("Target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
   }
 
-  if (base_sensors()->threatening_obstacle_exists()) {
-    argos::CVector2 force = kinematics().calc_avoidance_force();
-    ER_DIAG("Found threatening obstacle: avoidance force=(%f, %f)@%f [%f]",
-            force.GetX(),
-            force.GetY(),
-            force.Angle().GetValue(),
-            force.Length());
-    internal_event(ST_COLLISION_AVOIDANCE);
-  }
-
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <=
+  if ((m_goal_data.loc - base_sensors()->position()).Length() <=
       m_goal_data.tolerance) {
-    m_ang_pid.reset();
-    m_lin_pid.reset();
     internal_event(ST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
   }
-  argos::CVector2 robot_to_goal = calc_vector_to_goal(m_goal_data.loc);
-  argos::CVector2 heading = base_sensors()->robot_heading();
 
   /*
-   * Can't use the angle obtained from the  (heading - robot_to_goal) vector
-   * directly as input into the PID loop. Because of the use of the atan2()
-   * function, the angle will always be between [-pi, pi]. However, there can be
-   * discontinuous jumps from a small positive angle to a large negative angle
-   * and vice versa which play havoc with the PID loop's ability to compensate.
+   * Only go into collision avoidance if we are not really close to our
+   * target. If we are close, then ignore obstacles (the other guy will
+   * move!). 'MURICA.
    *
-   * So, compute the angle indirectly using sine and cosine in order to account
-   * for sign differences and ensure continuity between PID inputs across
-   * timesteps.
+   * Not doing this results in robots getting stuck when they all are trying to
+   * pick up the same block in close quarters.
    */
-  double angle_to_goal =
-      std::atan2(m_goal_data.loc.GetY() - base_sensors()->robot_loc().GetY(),
-                 m_goal_data.loc.GetX() - base_sensors()->robot_loc().GetX());
-
-  double angle_diff = angle_to_goal - heading.Angle().GetValue();
-  angle_diff = std::atan2(std::sin(angle_diff), std::cos(angle_diff));
-
-  ang_speed = m_ang_pid.calculate(0, -angle_diff);
-
-  /*
-   * With left turns the robot tends to circle blocks when they get close.
-   * Decrease the PID loop input false (i.e. so it is closer to the 0 value the
-   * loop is trying to get it to). See #231.
-   */
-  if ((m_goal_data.loc - base_sensors()->robot_loc()).Length() <
-      kMAX_ARRIVAL_TOL) {
-    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff * 5.0));
+  if (base_sensors()->threatening_obstacle_exists() &&
+      !saa_subsystem()->steering_force().within_slowing_radius()) {
+    internal_event(ST_COLLISION_AVOIDANCE);
   } else {
-    lin_speed = m_lin_pid.calculate(0, -1.0 / std::fabs(angle_diff));
+    saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
+    saa_subsystem()->actuation()->leds_set_color(utils::color::kBLUE);
+    saa_subsystem()->apply_steering_force(std::make_pair(true, false));
   }
-
-  ER_VER("target: (%f, %f)@%f",
-         m_goal_data.loc.GetX(),
-         m_goal_data.loc.GetY(),
-         m_goal_data.loc.Angle().GetValue());
-  ER_VER("robot_to_target: vector=(%f, %f)@%f, len=%f\n",
-         robot_to_goal.GetX(),
-         robot_to_goal.GetY(),
-         robot_to_goal.Angle().GetValue(),
-         robot_to_goal.Length());
-  ER_VER("robot_heading=(%f, %f)@%f ang_speed=%f lin_speed=%f\n",
-         heading.GetX(),
-         heading.GetY(),
-         heading.Angle().GetValue(),
-         ang_speed,
-         lin_speed);
-
-  actuators()->set_wheel_speeds(lin_speed, ang_speed);
   return controller::foraging_signal::HANDLED;
 }
 
@@ -226,16 +183,33 @@ FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DIAG("Entering ST_VECTOR");
-  actuators()->leds_set_color(argos::CColor::BLUE);
+  actuators()->leds_set_color(utils::color::kBLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DIAG("Entering ST_COLLISION_AVOIDANCE");
-  actuators()->leds_set_color(argos::CColor::RED);
+  actuators()->leds_set_color(utils::color::kRED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DIAG("Entering ST_COLLISION_RECOVERY");
-  actuators()->leds_set_color(argos::CColor::YELLOW);
+  actuators()->leds_set_color(utils::color::kYELLOW);
 }
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+bool vector_fsm::in_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE == current_state();
+} /* in_collision_avoidance() */
+
+bool vector_fsm::entered_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE != last_state() &&
+      in_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+bool vector_fsm::exited_collision_avoidance(void) const {
+  return ST_COLLISION_AVOIDANCE == last_state() &&
+      !in_collision_avoidance();
+} /* exited_collision_avoidance() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -267,9 +241,9 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-__pure argos::CVector2 vector_fsm::calc_vector_to_goal(
+__rcsw_pure argos::CVector2 vector_fsm::calc_vector_to_goal(
     const argos::CVector2& goal) {
-  return goal - base_sensors()->robot_loc();
+  return goal - base_sensors()->position();
 } /* calc_vector_to_goal() */
 
 NS_END(fsm, fordyca);

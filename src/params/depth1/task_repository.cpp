@@ -1,7 +1,7 @@
 /**
  * @file task_repository.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/task_repository.hpp"
-#include "fordyca/params/depth1/task_allocation_parser.hpp"
+#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,8 +33,11 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-task_repository::task_repository(void) {
-  register_parser<task_allocation_parser>("task_allocation");
+task_repository::task_repository(std::shared_ptr<rcppsw::er::server>& server)
+    : xml_param_repository(server) {
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      exec_estimates_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(depth1, params, fordyca);

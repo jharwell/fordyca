@@ -26,8 +26,10 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
+#include "fordyca/fsm/explore_for_goal_fsm.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,14 +38,16 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace params { struct fsm_params; }
-namespace controller { class base_foraging_sensors; class actuator_manager;}
+namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class stateless_foraging_fsm
  * @ingroup fsm depth0
@@ -53,23 +57,30 @@ NS_START(fsm, depth0);
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
-                               public metrics::fsm::stateless_metrics,
+                               public metrics::fsm::goal_acquisition_metrics,
+                               public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(const struct params::fsm_params* params,
-                         const std::shared_ptr<rcppsw::er::server>& server,
-                         const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-                         const std::shared_ptr<controller::actuator_manager>& actuators);
+  stateless_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
+                         controller::saa_subsystem* saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override;
+  /* collision metrics */
+  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
 
-  bool block_acquired(void) const;
+  /* goal acquisition metrics */
+  acquisition_goal_type acquisition_goal(void) const override;
+  bool is_exploring_for_goal(void) const override;
+  bool is_vectoring_to_goal(void) const override { return false; }
+  bool goal_acquired(void) const override;
+
+  /* block transportation */
+  transport_goal_type block_transport_goal(void) const override;
 
   /**
    * @brief (Re)-initialize the FSM.
@@ -82,13 +93,16 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   void run(void);
 
 
- protected:
+ private:
+  bool block_detected(void) const;
+
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
+    ST_WAIT_FOR_BLOCK_DROP,
     ST_MAX_STATES
   };
 
@@ -107,6 +121,8 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
                      state_machine::event_data);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_drop,
+                     state_machine::event_data);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -119,8 +135,7 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  argos::CRandom::CRNG* m_rng;
-  explore_for_block_fsm m_explore_fsm;
+  explore_for_goal_fsm m_explore_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

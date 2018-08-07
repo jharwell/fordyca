@@ -23,7 +23,8 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/math/block_utility.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/cube_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,9 +34,9 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_selector::block_selector(const std::shared_ptr<rcppsw::er::server>& server,
-                               argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
+block_selector::block_selector(std::shared_ptr<rcppsw::er::server> server,
+                               const block_selection_matrix* const sel_matrix)
+    : client(server), mc_matrix(sel_matrix) {
   insmod("block_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 }
 
@@ -43,17 +44,38 @@ block_selector::block_selector(const std::shared_ptr<rcppsw::er::server>& server
  * Member Functions
  ******************************************************************************/
 representation::perceived_block block_selector::calc_best(
-    const std::list<representation::perceived_block>& blocks,
+    const perceived_block_list& blocks,
     argos::CVector2 robot_loc) {
   double max_utility = 0.0;
-  representation::perceived_block best;
+  representation::perceived_block best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
   for (auto& b : blocks) {
-    math::block_utility u(b.ent->real_loc(), m_nest_loc);
+    if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
+      ER_DIAG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",
+              b.ent->real_loc().GetX(),
+              b.ent->real_loc().GetY(),
+              b.ent->discrete_loc().first,
+              b.ent->discrete_loc().second,
+              (robot_loc - b.ent->real_loc()).Length(),
+              kMinDist);
+      continue;
+    }
+    /*
+     * Only two options for right now: cube blocks or ramp blocks. This will
+     * undoubtedly have to change in the future.
+     */
+    double priority =
+        (dynamic_cast<representation::cube_block*>(b.ent.get()))
+            ? boost::get<double>(mc_matrix->find("cube_priority")->second)
+            : boost::get<double>(mc_matrix->find("ramp_priority")->second);
+    argos::CVector2 nest_loc =
+        boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second);
 
-    double utility = u.calc(robot_loc, b.density.last_result());
-    ER_DIAG("Utility for block%d loc=(%zu, %zu), density=%f: %f",
+    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
+        robot_loc, b.density.last_result(), priority);
+
+    ER_DIAG("Utility for block%d loc=(%u, %u), density=%f: %f",
             b.ent->id(),
             b.ent->discrete_loc().first,
             b.ent->discrete_loc().second,
@@ -65,12 +87,17 @@ representation::perceived_block block_selector::calc_best(
     }
   } /* for(block..) */
 
-  ER_ASSERT(nullptr != best.ent, "FATAL: No best perceived block?");
-  ER_NOM("Best utility: block%d at (%zu, %zu): %f",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         max_utility);
+  if (nullptr != best.ent) {
+    ER_NOM("Best utility: block%d at (%f, %f) [%u, %u]: %f",
+           best.ent->id(),
+           best.ent->real_loc().GetX(),
+           best.ent->real_loc().GetY(),
+           best.ent->discrete_loc().first,
+           best.ent->discrete_loc().second,
+           max_utility);
+  } else {
+    ER_WARN("No best block found: all known blocks too close!");
+  }
   return best;
 } /* calc_best() */
 

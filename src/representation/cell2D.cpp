@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/block.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -44,19 +44,20 @@ cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__pure const std::shared_ptr<representation::block> cell2D::block(void) const {
-  return std::dynamic_pointer_cast<representation::block>(m_entity);
+__rcsw_pure std::shared_ptr<const representation::base_block> cell2D::block(
+    void) const {
+  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
 } /* block() */
 
-__pure std::shared_ptr<representation::block> cell2D::block(void) {
-  return std::dynamic_pointer_cast<representation::block>(m_entity);
+__rcsw_pure std::shared_ptr<representation::base_block> cell2D::block(void) {
+  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
 } /* block() */
 
-__pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
+__rcsw_pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
   return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
 } /* cache() */
 
-__pure const std::shared_ptr<representation::base_cache> cell2D::cache(
+__rcsw_pure const std::shared_ptr<representation::base_cache> cell2D::cache(
     void) const {
   return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
 } /* cache() */

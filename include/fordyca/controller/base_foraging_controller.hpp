@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <string>
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -34,7 +35,7 @@
 NS_START(fordyca);
 
 namespace representation {
-class block;
+class base_block;
 class line_of_sight;
 } // namespace representation
 namespace params {
@@ -43,8 +44,7 @@ struct output_params;
 
 NS_START(controller);
 
-class actuator_manager;
-class base_foraging_sensors;
+class saa_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -70,7 +70,7 @@ class base_foraging_controller : public argos::CCI_Controller,
       delete;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void Reset(void) override;
 
   /**
@@ -100,12 +100,14 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const {
+    return m_block;
+  }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::block>& block) {
+  void block(const std::shared_ptr<representation::base_block>& block) {
     m_block = block;
   }
 
@@ -143,52 +145,24 @@ class base_foraging_controller : public argos::CCI_Controller,
   argos::CVector2 robot_loc(void) const;
 
  protected:
-  const std::shared_ptr<actuator_manager>& actuators(void) const {
-    return m_actuators;
+  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  class saa_subsystem* saa_subsystem(void) {
+    return m_saa.get();
   }
-  const std::shared_ptr<rcppsw::er::server>& server(void) const {
-    return m_server;
-  }
-  const std::shared_ptr<base_foraging_sensors>& sensors_ref(void) const {
-    return m_sensors;
-  }
-  base_foraging_sensors* base_sensors(void) const { return m_sensors.get(); }
-  std::shared_ptr<base_foraging_sensors> base_sensors_ref(void) const {
-    return m_sensors;
-  }
-  void base_sensors(const std::shared_ptr<base_foraging_sensors>& sensors) {
-    m_sensors = sensors;
-  }
-
-  /**
-   * @brief Get the amount a robot's speed will be throttled when carrying a
-   * block.
-   */
-  double speed_throttle_block_carry(void) const {
-    return m_speed_throttle_block_carry;
-  }
-
-  /**
-   * @brief Interface for defining how loop functions can determine if a robot
-   * is currently transporting a block to the nest.
-   */
-  virtual bool is_transporting_to_nest(void) const = 0;
 
  private:
   void output_init(const struct params::output_params* params);
-  std::string log_header_calc(void);
-  std::string dbg_header_calc(void);
+  std::string log_header_calc(void) const;
+  std::string dbg_header_calc(void) const;
 
   // clang-format off
-  bool                                   m_display_id{false};
-  double                                 m_speed_throttle_block_carry{0.0};
-  std::shared_ptr<representation::block> m_block{nullptr};
-  std::shared_ptr<actuator_manager>      m_actuators;
-  std::shared_ptr<base_foraging_sensors> m_sensors;
-  std::shared_ptr<rcppsw::er::server>    m_server;
+  bool                                        m_display_id{false};
+  std::shared_ptr<representation::base_block> m_block{nullptr};
+  std::unique_ptr<controller::saa_subsystem>  m_saa;
+  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 
-NS_END(fordyca, controller);
+NS_END(controller, fordyca);
 
 #endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_CONTROLLER_HPP_ */

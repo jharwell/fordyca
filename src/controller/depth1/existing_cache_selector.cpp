@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -34,9 +35,9 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
+    std::shared_ptr<rcppsw::er::server> server,
+    const cache_selection_matrix* const matrix)
+    : client(server), mc_matrix(matrix) {
   insmod("existing_cache_selector",
          rcppsw::er::er_lvl::DIAG,
          rcppsw::er::er_lvl::NOM);
@@ -53,12 +54,29 @@ representation::perceived_cache existing_cache_selector::calc_best(
 
   double max_utility = 0.0;
   for (auto& c : existing_caches) {
-    math::existing_cache_utility u(c.ent->real_loc(), m_nest_loc);
+    /**
+     * If a robot is currently IN a cache, and wants to pick up from/drop
+     * into a cache, it should generally ignored the cache it is currently in,
+     * otherwise you have the potential for a robot to endlessly pick up from
+     * a cache, drop in the same cache ad infinitum.
+     *
+     * This threshold prevents that behavior, forcing robots to at least LEAVE
+     * the cache, even if they will then immediately return to it.
+     */
+    if ((robot_loc - c.ent->real_loc()).Length() <=
+        std::max(c.ent->xsize(), c.ent->ysize())) {
+      ER_WARN("WARNING: Ignoring cache%d in search: robot currently inside it",
+              c.ent->id());
+      continue;
+    }
+    math::existing_cache_utility u(c.ent->real_loc(),
+                                   boost::get<argos::CVector2>(
+                                       mc_matrix->find("nest_center")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
     ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",
+    ER_DIAG("Utility for existing_cache%d loc=(%u, %u), density=%f: %f",
             c.ent->id(),
             c.ent->discrete_loc().first,
             c.ent->discrete_loc().second,
@@ -71,13 +89,18 @@ representation::perceived_cache existing_cache_selector::calc_best(
     }
   } /* for(existing_cache..) */
 
-  ER_ASSERT(nullptr != best.ent, "FATAL: No best perceived cache found?");
+  if (nullptr != best.ent) {
+    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%u, %u]: %f",
+           best.ent->id(),
+           best.ent->real_loc().GetX(),
+           best.ent->real_loc().GetY(),
+           best.ent->discrete_loc().first,
+           best.ent->discrete_loc().second,
+           max_utility);
+  } else {
+    ER_WARN("WARNING: No best cache found: all known caches too close!");
+  }
 
-  ER_NOM("Best utility: existing_cache%d at (%zu, %zu): %f",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         max_utility);
   return best;
 } /* calc_best() */
 

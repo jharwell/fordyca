@@ -34,7 +34,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, representation);
-class block;
+class base_block;
 class base_cache;
 class cell2D;
 
@@ -58,8 +58,8 @@ class cell2D;
  */
 class line_of_sight {
  public:
-  using block_list = std::list<std::shared_ptr<block>>;
-  using const_block_list = std::list<std::shared_ptr<const block>>;
+  using block_list = std::list<std::shared_ptr<base_block>>;
+  using const_block_list = std::list<std::shared_ptr<const base_block>>;
   using cache_list = std::list<std::shared_ptr<base_cache>>;
   using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
 

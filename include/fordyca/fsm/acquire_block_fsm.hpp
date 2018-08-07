@@ -24,39 +24,16 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
-#include <list>
+#include <map>
 
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/explore_for_block_fsm.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/fsm/stateful_metrics.hpp"
-#include "fordyca/metrics/fsm/stateless_metrics.hpp"
-#include "fordyca/representation/perceived_block.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct fsm_params;
-}
-namespace representation {
-class perceived_arena_map;
-class block;
-} // namespace representation
-
-namespace controller {
-namespace depth0 {
-class foraging_sensors;
-}
-class actuator_manager;
-} // namespace controller
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -72,102 +49,44 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_block_fsm : public base_foraging_fsm,
-                          public metrics::fsm::stateless_metrics,
-                          public metrics::fsm::stateful_metrics,
-                          public rcppsw::task_allocation::taskable {
+class acquire_block_fsm : public acquire_goal_fsm {
  public:
-  acquire_block_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::depth0::foraging_sensors>& sensors,
-      const std::shared_ptr<controller::actuator_manager>& actuators,
-      std::shared_ptr<representation::perceived_arena_map> map);
+  acquire_block_fsm(std::shared_ptr<rcppsw::er::server>& server,
+                    const controller::block_selection_matrix* matrix,
+                    controller::saa_subsystem* saa,
+                    representation::perceived_arena_map* map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
 
-  /* taskable overrides */
-  void task_execute(void) override;
-  bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
-  }
-  void task_reset(void) override { init(); }
-  void task_start(
-      const rcppsw::task_allocation::taskable_argument* const) override {}
-  bool task_running(void) const override {
-    return ST_ACQUIRE_BLOCK == current_state();
-  }
-
-  /* base metrics */
-  bool is_exploring_for_block(void) const override;
-  bool is_avoiding_collision(void) const override;
-  bool is_transporting_to_nest(void) const override { return false; }
-
-  /* depth0 metrics */
-  bool is_acquiring_block(void) const override;
-  bool is_vectoring_to_block(void) const override;
-
-  /**
-   * @brief Reset the FSM
-   */
-  void init(void) override;
-
- protected:
-  enum fsm_states {
-    ST_START,
-    ST_ACQUIRE_BLOCK, /* superstate for finding a free block */
-    ST_FINISHED,      /* A block has been acquired; wait to be reset */
-    ST_MAX_STATES
-  };
+  /* goal acquisition metrics */
+  acquisition_goal_type acquisition_goal(void) const override;
 
  private:
-  /**
-   * @brief Acquire a free block.
-   *
-   * @return TRUE if a block has been acquired, FALSE otherwise.
-   */
-  bool acquire_any_block(void);
+  bool acquire_known_goal(void) override;
 
   /**
-   * @brief Acquire a known block. If the robot's knowledge of the chosen
-   * block's existence expires during the pursuit of a known block, that is
-   * ignored.
+   * @brief Callback for block detection used by parent class.
    *
-   * @param blocks The list of perceived blocks. This CANNOT be a reference, as
-   * the robot's list of perceived blocks can change during the course of
-   * acquiring a block, and refering to specific positions within the vector
-   * that the robot maintains leads to...interesting behavior.
+   * @return \c TRUE if a block has been detected, \c FALSE otherwise.
    */
-  bool acquire_known_block(std::list<representation::perceived_block> blocks);
-
-  HFSM_STATE_DECLARE_ND(acquire_block_fsm, start);
-  HFSM_STATE_DECLARE_ND(acquire_block_fsm, acquire_block);
-  HFSM_STATE_DECLARE_ND(acquire_block_fsm, finished);
-
-  HFSM_EXIT_DECLARE(acquire_block_fsm, exit_acquire_block);
+  bool block_detected_cb(void) const;
 
   /**
-   * @brief Defines the state map for the FSM.
+   * @brief Callback used after a block has been acquired for sanity
+   * check/verification of state.
    *
-   * Note that the order of the states in the map MUST match the order of the
-   * states in \enum fsm_states, or things will not work correctly.
+   * @param explore_result If \c TRUE, then the acquired block was obtained via
+   * exploration, rather than vectoring.
+   *
+   * @return \c TRUE if a block REALLY has been acquired, and \c FALSE
+   * otherwise.
    */
-  HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-    return &mc_state_map[index];
-  }
+  bool block_acquired_cb(bool explore_result) const;
 
   // clang-format off
-  const argos::CVector2                                      mc_nest_center;
-  std::shared_ptr<representation::block>                     m_best_block{nullptr};
-  argos::CRandom::CRNG*                                      m_rng;
-  std::shared_ptr<representation::perceived_arena_map>       m_map;
-  std::shared_ptr<rcppsw::er::server>                        m_server;
-  std::shared_ptr<controller::depth0::foraging_sensors>      m_sensors;
-  vector_fsm                                                 m_vector_fsm;
-  explore_for_block_fsm                                      m_explore_fsm;
+  const controller::block_selection_matrix* const mc_matrix;
   // clang-format on
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

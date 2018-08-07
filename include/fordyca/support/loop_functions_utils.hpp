@@ -76,18 +76,17 @@ int robot_id(argos::CFootBotEntity& robot);
 int robot_id(const controller::base_foraging_controller& controller);
 
 bool block_drop_overlap_with_cache(
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     const argos::CVector2& drop_loc);
 
 bool block_drop_near_arena_boundary(
     const representation::arena_map& map,
-    const std::shared_ptr<representation::block>& block,
+    const std::shared_ptr<representation::base_block>& block,
     const argos::CVector2& drop_loc);
 bool block_drop_overlap_with_nest(
-    const std::shared_ptr<representation::block>& block,
-    const argos::CRange<double>& xrange,
-    const argos::CRange<double>& yrange,
+    const std::shared_ptr<representation::base_block>& block,
+    const representation::nest& nest,
     const argos::CVector2& drop_loc);
 
 /**

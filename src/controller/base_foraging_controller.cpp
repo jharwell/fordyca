@@ -25,18 +25,20 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
 #include <fstream>
 
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
-#include "fordyca/params/actuator_params.hpp"
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/params/actuation_params.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "fordyca/params/output_params.hpp"
-#include "fordyca/params/sensor_params.hpp"
+#include "fordyca/params/sensing_params.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -49,13 +51,7 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
-    : client(),
-      m_actuators(),
-      m_sensors(),
-      m_server(std::make_shared<rcppsw::er::server>()) {
-  /*
-   * Initially, all robots use the RCPPSW er_server to log parameters.
-   */
+    : m_saa(nullptr), m_server(std::make_shared<rcppsw::er::server>()) {
   client::deferred_client_init(m_server);
 
   /* diagnostic for logging, nominal for printing */
@@ -66,65 +62,61 @@ base_foraging_controller::base_foraging_controller(void)
  * Member Functions
  ******************************************************************************/
 bool base_foraging_controller::in_nest(void) const {
-  return m_sensors->in_nest();
+  return m_saa->sensing()->in_nest();
 } /* in_nest() */
 
 bool base_foraging_controller::block_detected(void) const {
-  return m_sensors->block_detected();
+  return m_saa->sensing()->block_detected();
 } /* block_detected() */
 
 void base_foraging_controller::robot_loc(argos::CVector2 loc) {
-  m_sensors->robot_loc(loc);
+  m_saa->sensing()->position(loc);
 }
 
-__pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
-  return m_sensors->robot_loc();
+__rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
+  return m_saa->sensing()->position();
 }
 
-void base_foraging_controller::Init(argos::TConfigurationNode& node) {
+void base_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing base foraging controller");
-  params::depth0::stateless_foraging_repository param_repo;
+  params::depth0::stateless_param_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
-  const struct params::output_params* params =
-      static_cast<const struct params::output_params*>(
-          param_repo.get_params("output"));
-  param_repo.show_all(client::server_handle()->log_stream());
+  /* initialize output */
+  auto* params = param_repo.parse_results<struct params::output_params>();
+  client::server_ptr()->log_stream() << param_repo;
   output_init(params);
 
-  m_actuators = std::make_shared<actuator_manager>(
-      static_cast<const struct params::actuator_params*>(
-          param_repo.get_params("actuators")),
-      GetActuator<argos::CCI_DifferentialSteeringActuator>(
+  /* initialize sensing and actuation subsystem */
+  struct actuation_subsystem::actuator_list alist = {
+      .wheels = GetActuator<argos::CCI_DifferentialSteeringActuator>(
           "differential_steering"),
-      GetActuator<argos::CCI_LEDsActuator>("leds"),
-      GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"));
+      .leds = GetActuator<argos::CCI_LEDsActuator>("leds"),
+      .wifi =
+          GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")};
+  struct base_sensing_subsystem::sensor_list slist = {
+      .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
+      .proximity = hal::sensors::proximity_sensor(
+          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
+      .light = hal::sensors::light_sensor(
+          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
+      .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
+          "footbot_motor_ground")};
+  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
+      m_server,
+      param_repo.parse_results<struct params::actuation_params>(),
+      param_repo.parse_results<struct params::sensing_params>(),
+      &alist,
+      &slist);
 
-  auto* fsm_params = static_cast<const struct params::fsm_params*>(
-      param_repo.get_params("fsm"));
-
-  m_speed_throttle_block_carry = fsm_params->speed_throttling.block_carry;
-  if (m_speed_throttle_block_carry > 0) {
-    actuators()->set_throttle_percent(m_speed_throttle_block_carry);
-  }
-
-  m_sensors = std::make_shared<base_foraging_sensors>(
-      static_cast<const struct params::sensor_params*>(
-          param_repo.get_params("sensors")),
-      GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-      GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity"),
-      GetSensor<argos::CCI_FootBotLightSensor>("footbot_light"),
-      GetSensor<argos::CCI_FootBotMotorGroundSensor>("footbot_motor_ground"));
-
-  this->Reset();
   ER_NOM("Base foraging controller initialization finished");
 } /* Init() */
 
 void base_foraging_controller::Reset(void) {
   CCI_Controller::Reset();
-  m_block = nullptr;
+  m_block.reset();
 } /* Reset() */
 
 void base_foraging_controller::output_init(
@@ -146,25 +138,26 @@ void base_foraging_controller::output_init(
   }
 
   /* setup logging timestamp calculator */
-  client::server_handle()->log_ts_calculator(
+  client::server_ptr()->log_ts_calculator(
       std::bind(&base_foraging_controller::log_header_calc, this));
-  client::server_handle()->dbg_ts_calculator(
+  client::server_ptr()->dbg_ts_calculator(
       std::bind(&base_foraging_controller::dbg_header_calc, this));
 
-  client::server_handle()->change_logfile(output_root + "/" + this->GetId() +
-                                          ".log");
+  client::server_ptr()->change_logfile(output_root + "/" + this->GetId() +
+                                       ".log");
 } /* output_init() */
 
-std::string base_foraging_controller::log_header_calc(void) {
-  return "[t=" + std::to_string(m_sensors->tick()) + "," + this->GetId() + "]";
+std::string base_foraging_controller::log_header_calc(void) const {
+  return "[t=" + std::to_string(m_saa->sensing()->tick()) + "," +
+         this->GetId() + "]";
 } /* log_header_calc() */
 
-std::string base_foraging_controller::dbg_header_calc(void) {
+std::string base_foraging_controller::dbg_header_calc(void) const {
   return this->GetId();
 } /* dbg_header_calc() */
 
 void base_foraging_controller::tick(uint tick) {
-  m_sensors->tick(tick);
+  m_saa->sensing()->tick(tick);
 } /* tick() */
 
 NS_END(controller, fordyca);

@@ -26,11 +26,12 @@
  ******************************************************************************/
 #include <vector>
 
-#include "fordyca/params/depth1/cache_params.hpp"
+#include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/support/block_distributor.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/nest.hpp"
+#include "fordyca/support/block_dist/dispatcher.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -38,10 +39,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace params {
+namespace params { namespace arena {
 struct arena_map_params;
-}
+}} // namespace params::arena
 
 NS_START(representation);
 
@@ -63,9 +63,9 @@ class arena_map : public rcppsw::er::client,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<block>>;
+  using block_vector = std::vector<std::shared_ptr<base_block>>;
 
-  explicit arena_map(const struct params::arena_map_params* params);
+  explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -99,8 +99,9 @@ class arena_map : public rcppsw::er::client,
    */
   void delete_caches(void);
 
-  void cache_removed(bool b) { m_cache_removed = b; }
-  bool cache_removed(void) const { return m_cache_removed; }
+  void caches_removed_reset(void) { m_caches_removed = 0; }
+  void caches_removed(uint b) { m_caches_removed += b; }
+  uint caches_removed(void) const { return m_caches_removed; }
 
   cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
   cell2D& access(const rcppsw::math::dcoord2& coord) {
@@ -108,9 +109,20 @@ class arena_map : public rcppsw::er::client,
   }
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * @brief Distribute all blocks in the arena. Resets arena state. Should only
+   * be called during (re)-initialization.
    */
-  void distribute_blocks(void);
+  void distribute_all_blocks(void);
+
+  /**
+   * @brief Distribute a particular block in the arena, according to whatever
+   * policy was specified in the .argos file.
+   *
+   * @param block The block to distribute.
+   *
+   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
+   */
+  bool distribute_single_block(std::shared_ptr<base_block>& block);
 
   size_t xdsize(void) const { return m_grid.xdsize(); }
   size_t ydsize(void) const { return m_grid.ydsize(); }
@@ -118,19 +130,11 @@ class arena_map : public rcppsw::er::client,
   size_t yrsize(void) const { return m_grid.yrsize(); }
 
   /**
-   * @brief Distribute a particular block in the arena, according to whatever
-   * policy was specified in the .argos file.
-   *
-   * @param block The block to distribute.
-   */
-  void distribute_block(const std::shared_ptr<block>& block);
-
-  /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    */
   void static_cache_create(void);
 
-  bool has_static_cache(void) const { return mc_cache_params.create_static; }
+  bool has_static_cache(void) const { return mc_static_cache_params.enable; }
 
   /**
    * @brief Get the # of blocks available in the arena.
@@ -193,17 +197,19 @@ class arena_map : public rcppsw::er::client,
     return m_grid.subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
+  const representation::nest& nest(void) const { return m_nest; }
+
+  bool initialize(void);
 
  private:
   // clang-format off
-  bool                                      m_cache_removed;
-  const struct params::depth1::cache_params mc_cache_params;
-  const argos::CVector2                     mc_nest_center;
+  uint                                      m_caches_removed{0};
+  const params::depth1::static_cache_params mc_static_cache_params;
   block_vector                              m_blocks;
   cache_vector                              m_caches;
-  support::block_distributor                m_block_distributor;
-  std::shared_ptr<rcppsw::er::server>       m_server;
   arena_grid                                m_grid;
+  representation::nest                      m_nest;
+  support::block_dist::dispatcher           m_block_dispatcher;
   // clang-format on
 };
 

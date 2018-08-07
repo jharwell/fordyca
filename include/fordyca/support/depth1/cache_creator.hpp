@@ -28,7 +28,6 @@
 #include <vector>
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/representation/real_coord.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -36,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class arena_cache; class block; }
+namespace representation { class arena_cache; class base_block; }
 NS_START(support, depth1);
 
 /*******************************************************************************
@@ -55,8 +54,8 @@ class cache_creator : public rcppsw::er::client {
  public:
   using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<representation::block>>;
-  using block_list = std::list<std::shared_ptr<representation::block>>;
+  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
+  using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
   cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
                 representation::arena_grid& grid,
@@ -97,4 +96,4 @@ class cache_creator : public rcppsw::er::client {
 };
 NS_END(support, fordyca, depth1);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_ */
+#endif // INCLUDE_FORDYCA_SUPPORT_DEPTH1_CACHE_CREATOR_HPP_

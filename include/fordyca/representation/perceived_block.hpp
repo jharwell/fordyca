@@ -25,7 +25,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
@@ -34,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-class block;
+class base_block;
 
 /*******************************************************************************
  * Type Definitions
@@ -47,12 +46,12 @@ class block;
  * pheromone density/relevance associated with it.
  */
 struct perceived_block {
-  perceived_block(void) : ent(nullptr), density() {}
-  perceived_block(const std::shared_ptr<block>& b,
+  perceived_block(void) : density() {}
+  perceived_block(const std::shared_ptr<base_block>& b,
                   const rcppsw::swarm::pheromone_density& d)
       : ent(b), density(d) {}
 
-  std::shared_ptr<block> ent;
+  std::shared_ptr<base_block> ent{nullptr};
   rcppsw::swarm::pheromone_density density;
 };
 

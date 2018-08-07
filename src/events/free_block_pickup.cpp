@@ -22,19 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_cache_fsm.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/tasks/foraging_task.hpp"
-#include "fordyca/tasks/generalist.hpp"
-#include "fordyca/tasks/harvester.hpp"
+#include "fordyca/tasks/depth0/generalist.hpp"
+#include "fordyca/tasks/depth1/harvester.hpp"
+#include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,11 +50,13 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 free_block_pickup::free_block_pickup(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<representation::block>& block,
-    uint robot_index)
+    std::shared_ptr<rcppsw::er::server> server,
+    std::shared_ptr<representation::base_block> block,
+    uint robot_index,
+    uint timestep)
     : cell_op(block->discrete_loc().first, block->discrete_loc().second),
       client(server),
+      m_timestep(timestep),
       m_robot_index(robot_index),
       m_block(block),
       m_server(server) {
@@ -70,7 +75,7 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void free_block_pickup::visit(representation::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
-  ER_NOM("cell2D: fb%u block%d from (%zu, %zu)",
+  ER_NOM("cell2D: fb%u block%d from (%u, %u)",
          m_robot_index,
          m_block->id(),
          m_block->discrete_loc().first,
@@ -97,10 +102,10 @@ void free_block_pickup::visit(representation::arena_map& map) {
 /*******************************************************************************
  * Stateless Foraging
  ******************************************************************************/
-void free_block_pickup::visit(representation::block& block) {
+void free_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
-  block.add_carry();
-  block.robot_index(m_robot_index);
+  block.add_transporter(m_robot_index);
+  block.first_pickup_time(m_timestep);
 
   /* Move block out of sight */
   block.move_out_of_sight();
@@ -111,6 +116,8 @@ void free_block_pickup::visit(
     controller::depth0::stateless_foraging_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
+
   ER_NOM("stateless_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
@@ -153,9 +160,11 @@ void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 
 void free_block_pickup::visit(
     controller::depth0::stateful_foraging_controller& controller) {
-  controller.map()->accept(*this);
-  controller.current_task()->accept(*this);
+  controller.perception()->map()->accept(*this);
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
+      ->accept(*this);
   controller.block(m_block);
+  controller.free_pickup_event(true);
   ER_NOM("stateful_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
@@ -166,32 +175,42 @@ void free_block_pickup::visit(
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
-  controller.map()->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_block);
-  controller.current_task()->accept(*this);
-
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())->accept(*this);
   ER_NOM("depth1_foraging_controller: %s picked up block%d",
          controller.GetId().c_str(),
          m_block->id());
 } /* visit() */
 
-void free_block_pickup::visit(tasks::generalist& task) {
+void free_block_pickup::visit(tasks::depth0::generalist& task) {
   static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(tasks::harvester& task) {
-  static_cast<fsm::depth1::block_to_cache_fsm*>(task.mechanism())->accept(*this);
+void free_block_pickup::visit(tasks::depth1::harvester& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth1::block_to_cache_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void free_block_pickup::visit(
+    controller::depth2::foraging_controller& controller) {
+  ER_ASSERT(false, "FATAL: Not implemented");
+} /* visit() */
+
+void free_block_pickup::visit(tasks::depth2::cache_starter& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+
+void free_block_pickup::visit(tasks::depth2::cache_finisher& task) {
+  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

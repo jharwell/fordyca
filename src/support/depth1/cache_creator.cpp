@@ -25,7 +25,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
@@ -86,10 +85,10 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block, d.first, d.second, m_resolution);
+    events::free_block_drop op(m_server, block, d, m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
-  ER_NOM("Create cache at (%f, %f) -> (%zu, %zu) with  %zu blocks",
+  ER_NOM("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
          center.GetX(),
          center.GetY(),
          d.first,

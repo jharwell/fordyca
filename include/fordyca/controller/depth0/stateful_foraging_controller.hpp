@@ -28,25 +28,33 @@
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
+#include "rcppsw/task_allocation/partitionable_task_params.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
+class bifurcating_tdgraph_executive;
+class bifurcating_tab;
 class executable_task;
+using executive_params = partitionable_task_params;
 }}
+namespace visitor = rcppsw::patterns::visitor;
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
-namespace tasks { class generalist; class foraging_task; };
-namespace representation { class perceived_arena_map; }
+
+namespace tasks { namespace depth0 { class foraging_task; }}
 
 NS_START(controller);
-namespace visitor = rcppsw::patterns::visitor;
-namespace depth1 { class foraging_sensors; }
+
+class base_perception_subsystem;
+class block_selection_matrix;
+namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
-namespace task_allocation = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -64,44 +72,46 @@ namespace task_allocation = rcppsw::task_allocation;
  * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public stateless_foraging_controller,
+                                     public metrics::world_model_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
   stateful_foraging_controller(void);
+  ~stateful_foraging_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(argos::TConfigurationNode& node) override;
+  void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
+  void Reset(void) override;
 
-  bool block_acquired(void) const;
+  /* goal acquisition metrics */
+  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+
+  /* world model metrics */
+  uint cell_state_inaccuracies(uint state) const override;
+
+  /* block transportation */
+  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  tasks::foraging_task* current_task(void) const;
+  virtual tasks::base_foraging_task* current_task(void);
+  virtual const tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
-  /**
-   * @brief Process the LOS for a given timestep.
-   *
-   * Only handles blocks within a LOS; caches are ignored.
-   */
-  virtual void process_los(const representation::line_of_sight* los);
+  const depth0::sensing_subsystem* stateful_sensors(void) const;
+  depth0::sensing_subsystem* stateful_sensors(void);
 
   /**
    * @brief Get the current LOS for the robot.
    */
   const representation::line_of_sight* los(void) const;
-
-  std::shared_ptr<representation::perceived_arena_map>& map_ref(void) {
-    return m_map;
-  }
-  depth1::foraging_sensors* stateful_sensors(void) const;
-  std::shared_ptr<depth1::foraging_sensors> stateful_sensors_ref(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -115,16 +125,21 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  representation::perceived_arena_map* map(void) const { return m_map.get(); }
-  bool is_transporting_to_nest(void) const override;
+  const base_perception_subsystem* perception(void) const { return m_perception.get(); }
+  base_perception_subsystem* perception(void) { return m_perception.get(); }
+  const ta::bifurcating_tab* active_tab(void) const;
+
+ protected:
+  void perception(std::unique_ptr<base_perception_subsystem> perception);
+  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
 
  private:
   // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
-  std::shared_ptr<representation::perceived_arena_map> m_map;
-  std::unique_ptr<task_allocation::polled_executive>   m_executive;
-  std::unique_ptr<tasks::generalist>                   m_generalist;
+  std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
+  std::unique_ptr<base_perception_subsystem>           m_perception;
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
   // clang-format on
 };
 

@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -30,26 +32,40 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char exec_estimates_parser::kXMLRoot[];
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exec_estimates_parser::parse(argos::TConfigurationNode& node) {
-  m_params = rcppsw::make_unique<struct exec_estimates_params>();
-
-  argos::GetNodeAttribute(node, "enabled", m_params->enabled);
-  if (m_params->enabled) {
-    argos::GetNodeAttribute(node, "generalist_range", m_params->generalist_range);
-    argos::GetNodeAttribute(node, "harvester_range", m_params->harvester_range);
-    argos::GetNodeAttribute(node, "collector_range", m_params->collector_range);
+void exec_estimates_parser::parse(const ticpp::Element& node) {
+  depth0::exec_estimates_parser::parse(node);
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element enode =
+        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    *std::static_pointer_cast<depth0::exec_estimates_params>(m_params) =
+        *depth0::exec_estimates_parser::parse_results();
+    if (m_params->enabled) {
+      XML_PARSE_PARAM(enode, m_params, harvester_range);
+      XML_PARSE_PARAM(enode, m_params, collector_range);
+    }
+    parsed(true);
   }
 } /* parse() */
 
-void exec_estimates_parser::show(std::ostream& stream) {
-  stream
-      << "====================\nExec estimates params\n====================\n";
-  stream << "enabled=" << m_params->enabled << std::endl;
-  stream << "generalist_range=" << m_params->generalist_range << std::endl;
-  stream << "harvester_range=" << m_params->harvester_range << std::endl;
-  stream << "collector_range=" << m_params->collector_range << std::endl;
+void exec_estimates_parser::show(std::ostream& stream) const {
+  if (!parsed()) {
+    stream << build_header() << "<< Not Parsed >>" << std::endl
+           << build_footer();
+    return;
+  }
+  depth0::exec_estimates_parser::show(stream);
+  stream << XML_PARAM_STR(m_params, harvester_range) << std::endl
+         << XML_PARAM_STR(m_params, collector_range) << std::endl
+         << build_footer();
 } /* show() */
 
 NS_END(depth1, params, fordyca);

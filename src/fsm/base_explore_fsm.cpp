@@ -22,53 +22,38 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/base_explore_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
-#include "fordyca/controller/actuator_manager.hpp"
-#include "fordyca/controller/base_foraging_sensors.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
+namespace utils = rcppsw::utils;
+
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(
-    uint unsuccessful_dir_change_thresh,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::base_foraging_sensors>& sensors,
-    const std::shared_ptr<controller::actuator_manager>& actuators,
+    std::shared_ptr<rcppsw::er::server> server,
+    controller::saa_subsystem* const saa,
     uint8_t max_states)
-    : base_foraging_fsm(unsuccessful_dir_change_thresh,
-                        server,
-                        sensors,
-                        actuators,
-                        max_states),
-      entry_explore(),
-      m_state() {
-  insmod("base_explore_fsm", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+    : base_foraging_fsm(server, saa, max_states), entry_explore() {}
 
+/*******************************************************************************
+ * States
+ ******************************************************************************/
 HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
-  base_foraging_fsm::actuators()->leds_set_color(argos::CColor::MAGENTA);
+  base_foraging_fsm::actuators()->leds_set_color(utils::color::kMAGENTA);
 }
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void base_explore_fsm::init(void) {
-  explore_time_reset();
-  base_foraging_fsm::init();
-} /* init() */
-
-void base_explore_fsm::run(void) {
+void base_explore_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
-} /* run() */
+} /* task_execute() */
 
 NS_END(fsm, fordyca);

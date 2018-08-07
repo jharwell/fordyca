@@ -38,9 +38,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { namespace depth0 {
+namespace params {
 struct occupancy_grid_params;
-}} // namespace params::depth0
+}
 
 NS_START(representation);
 
@@ -53,13 +53,19 @@ class occupancy_grid : public rcppsw::er::client,
                        public rcppsw::ds::stacked_grid2<layer_stack> {
  public:
   occupancy_grid(std::shared_ptr<rcppsw::er::server> server,
-                 const struct params::depth0::occupancy_grid_params* c_params,
+                 const struct params::occupancy_grid_params* c_params,
                  const std::string& robot_id);
 
   /**
    * @brief Update the density of all cells in the grid.
    */
   void update(void);
+
+  /**
+   * @brief Reset all the cells in the grid
+   */
+  void reset(void);
+
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;
   }
@@ -73,7 +79,7 @@ class occupancy_grid : public rcppsw::er::client,
   // clang-format off
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
-  static constexpr double             kEpsilon{0.0001};
+  static constexpr double             kEPSILON{0.0001};
   std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };

@@ -39,9 +39,9 @@ class server;
 }} // namespace rcppsw::er
 
 NS_START(fordyca);
-namespace params { namespace depth0 {
+namespace params {
 struct occupancy_grid_params;
-}} // namespace params::depth0
+}
 
 NS_START(representation);
 class line_of_sight;
@@ -65,13 +65,13 @@ class perceived_arena_map
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using block_list = std::list<std::shared_ptr<block>>;
+  using block_list = std::list<std::shared_ptr<base_block>>;
   using perceived_cache_list = std::list<perceived_cache>;
   using perceived_block_list = std::list<perceived_block>;
 
   perceived_arena_map(
       std::shared_ptr<rcppsw::er::server> server,
-      const struct fordyca::params::depth0::occupancy_grid_params* c_params,
+      const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
   bool pheromone_repeat_deposit(void) const {
@@ -124,13 +124,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(const std::shared_ptr<block>& block);
+  bool block_add(const std::shared_ptr<base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const std::shared_ptr<block>& victim);
+  bool block_remove(const std::shared_ptr<base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -169,6 +169,13 @@ class perceived_arena_map
    */
   void update(void) { m_grid.update(); }
 
+  /**
+   * @brief Reset all the cells in the percieved arena.
+   */
+  void reset(void) { m_grid.reset(); }
+
+  double grid_resolution(void) const { return m_grid.resolution(); }
+
  private:
   // clang-format off
   std::shared_ptr<rcppsw::er::server> m_server;
@@ -190,6 +197,7 @@ class perceived_arena_map
    * contiguous array, to get better support from valgrind for debugging.
    */
   block_list m_blocks;
+  // clang-format on
 };
 
 NS_END(representation, fordyca);

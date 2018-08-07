@@ -24,9 +24,9 @@
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/depth0/occupancy_grid_params.hpp"
+#include "fordyca/params/occupancy_grid_params.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/block.hpp"
 #include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
@@ -40,7 +40,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 perceived_arena_map::perceived_arena_map(
     std::shared_ptr<rcppsw::er::server> server,
-    const struct fordyca::params::depth0::occupancy_grid_params* c_params,
+    const struct fordyca::params::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : m_server(std::move(server)),
       m_grid(m_server, c_params, robot_id),
@@ -94,19 +94,19 @@ void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim
   } /* for(it..) */
 } /* cache_remove() */
 
-bool perceived_arena_map::block_add(const std::shared_ptr<block>& block_in) {
-  auto it1 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block_in](const std::shared_ptr<representation::block>& b) {
-                     return b->id() == block_in->id();
-                   });
-  auto it2 =
-      std::find_if(m_blocks.begin(),
-                   m_blocks.end(),
-                   [&block_in](const std::shared_ptr<representation::block>& b) {
-                     return b->discrete_loc() == block_in->discrete_loc();
-                   });
+bool perceived_arena_map::block_add(const std::shared_ptr<base_block>& block_in) {
+  auto it1 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->id() == block_in->id();
+      });
+  auto it2 = std::find_if(
+      m_blocks.begin(),
+      m_blocks.end(),
+      [&block_in](const std::shared_ptr<representation::base_block>& b) {
+        return b->discrete_loc() == block_in->discrete_loc();
+      });
 
   if (m_blocks.end() != it1) { /* block is known */
     /*
@@ -114,13 +114,13 @@ bool perceived_arena_map::block_add(const std::shared_ptr<block>& block_in) {
      * the state of the world.
      */
     if (block_in->discrete_loc() != (*it1)->discrete_loc()) {
-      ER_VER("block%d has moved: (%zu, %zu) -> (%zu, %zu)",
+      ER_VER("block%d has moved: (%u, %u) -> (%u, %u)",
              block_in->id(),
              (*it1)->discrete_loc().first,
              (*it1)->discrete_loc().second,
              block_in->discrete_loc().first,
              block_in->discrete_loc().second);
-      int id = block_in->id();
+      __rcsw_unused int id = block_in->id();
       block_remove(*it1);
       m_blocks.push_back(block_in);
       ER_VER("Add block%d (n_blocks=%zu)", id, m_blocks.size());
@@ -133,7 +133,7 @@ bool perceived_arena_map::block_add(const std::shared_ptr<block>& block_in) {
      * about the arena.
      */
     if (it2 != m_blocks.end()) {
-      ER_VER("Remove old block%d@(%zu, %zu): new block%d found there",
+      ER_VER("Remove old block%d@(%u, %u): new block%d found there",
              (*it2)->id(),
              block_in->discrete_loc().first,
              block_in->discrete_loc().second,
@@ -147,7 +147,7 @@ bool perceived_arena_map::block_add(const std::shared_ptr<block>& block_in) {
   return false;
 } /* block_add() */
 
-bool perceived_arena_map::block_remove(const std::shared_ptr<block>& victim) {
+bool perceived_arena_map::block_remove(const std::shared_ptr<base_block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
       ER_VER("Remove block%d", victim->id());
