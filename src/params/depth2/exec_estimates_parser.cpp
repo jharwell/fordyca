@@ -21,8 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "fordyca/params/depth2/exec_estimates_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -41,8 +39,7 @@ constexpr char exec_estimates_parser::kXMLRoot[];
  ******************************************************************************/
 void exec_estimates_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element enode =
-        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
