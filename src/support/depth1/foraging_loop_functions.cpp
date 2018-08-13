@@ -176,7 +176,7 @@ void foraging_loop_functions::pre_step_final(void) {
     int n_collectors = collector.stats().subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
-        static_cast<double>(random()) / RAND_MAX) {
+        static_cast<double>(std::rand()) / RAND_MAX) {
       arena_map()->static_cache_create();
       representation::cell2D& cell =
           arena_map()->access(arena_map()->caches()[0]->discrete_loc());
