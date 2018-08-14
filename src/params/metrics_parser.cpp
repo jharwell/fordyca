@@ -21,8 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "fordyca/params/metrics_parser.hpp"
 
 /*******************************************************************************
@@ -40,8 +38,7 @@ constexpr char metrics_parser::kXMLRoot[];
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element mnode =
-        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_PARAM(mnode, m_params, collision_fname);

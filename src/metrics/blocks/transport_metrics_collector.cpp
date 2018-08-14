@@ -44,11 +44,11 @@ std::string transport_metrics_collector::csv_header_build(
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
       "int_collected" + separator() +
-      "cum_avg_collected" + separator() +
+      "cum_collected" + separator() +
       "int_cube_collected" + separator() +
-      "cum_avg_cube_collected" + separator() +
+      "cum_cube_collected" + separator() +
       "int_ramp_collected" + separator() +
-      "cum_avg_ramp_collected" + separator() +
+      "cum_ramp_collected" + separator() +
       "int_avg_transporters" + separator() +
       "cum_avg_transporters" + separator() +
       "int_avg_transport_time" + separator() +

@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/grid_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -40,8 +38,7 @@ constexpr char grid_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element gnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element gnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res;
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(gnode.GetAttribute("size"));
