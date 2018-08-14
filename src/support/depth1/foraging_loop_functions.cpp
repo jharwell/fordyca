@@ -26,7 +26,7 @@
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -48,7 +48,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
   ER_NOM("Initializing depth1 foraging loop functions");
-  params::depth0::stateful_param_repository repo(server_ref());
+  params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
   rcppsw::er::g_server->log_stream() << repo;

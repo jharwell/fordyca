@@ -106,9 +106,8 @@ void metrics_aggregator::collect_from_controller(
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
   collect("perception::world_model", *worldm_m);
 
-  collect("tasks::generalist_tab", *(controller->active_tab()));
-
   if (nullptr != controller->current_task()) {
+    collect("tasks::generalist_tab", *(controller->active_tab()));
     collect_if(
         "blocks::acquisition",
         *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(

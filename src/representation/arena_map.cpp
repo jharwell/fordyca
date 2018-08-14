@@ -88,7 +88,7 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
 
 void arena_map::static_cache_create(void) {
   ER_DIAG("(Re)-Creating static cache");
-  argos::CVector2 center((m_grid.xdsize() + m_nest.real_loc().GetX()) / 2.0,
+  argos::CVector2 center((m_grid.xrsize() + m_nest.real_loc().GetX()) / 2.0,
                          m_nest.real_loc().GetY());
 
   support::depth1::static_cache_creator c(server_ref(),

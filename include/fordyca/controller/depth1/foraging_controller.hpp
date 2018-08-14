@@ -103,9 +103,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
 
   // clang-format off
   bool                                               m_display_task{false};
-  std::string                                        m_prev_task{""};
   std::unique_ptr<cache_selection_matrix>            m_cache_sel_matrix;
-  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
 

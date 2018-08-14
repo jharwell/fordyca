@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/arena_interactor.hpp"
-#include "fordyca/support/depth1/cache_op_penalty_handler.hpp"
+#include "fordyca/support/cache_op_penalty_handler.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -93,7 +93,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
           finish_cache_block_drop(controller);
         }
       } else {
-        m_cache_penalty_handler.penalty_init(controller, timestep);
+        m_cache_penalty_handler.penalty_init(controller,
+                                             penalty_type::kExistingCacheDrop,
+                                             timestep);
       }
     } else { /* The foot-bot has no block item */
       handle_free_block_pickup(controller, timestep);
@@ -104,7 +106,9 @@ class arena_interactor : public depth0::arena_interactor<T> {
           finish_cached_block_pickup(controller);
         }
       } else {
-        m_cache_penalty_handler.penalty_init(controller, timestep);
+        m_cache_penalty_handler.penalty_init(controller,
+                                             penalty_type::kExistingCachePickup,
+                                             timestep);
       }
     }
   }
@@ -116,6 +120,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
   using depth0::arena_interactor<T>::handle_free_block_pickup;
 
  private:
+  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
+
   /**
    * @brief Called after a robot has satisfied the cache usage penalty, and
    * actually performs the handshaking between the cache, the arena, and the
@@ -250,7 +256,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
    */
   bool handle_task_abort(T& controller) {
     auto task = dynamic_cast<ta::polled_task*>(controller.current_task());
-    if (!task->task_aborted()) {
+    if (nullptr == task || !task->task_aborted()) {
       return false;
     }
 

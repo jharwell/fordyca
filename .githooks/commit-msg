@@ -1,0 +1,74 @@
+#!/usr/bin/python
+import sys
+import os
+import subprocess
+import re
+
+
+def check_format_rules(lineno, line, semver):
+    real_lineno = lineno + 1
+    exp = "(feature|docs|enh|refactor|bugfix|task)\(#[0-9].*\): "
+    exp2 = "(feature|docs|enh|bugfix)"
+
+    if lineno == 0:
+        if len(line) > 72:
+            return "Error %d: First line should be less than 72 characters in length." % (real_lineno)
+
+        if not re.match(exp, line):
+            return "Error %d: First line does not adhere to commit template for subject." % (real_lineno)
+
+        if re.match(exp2, line):
+            semver[0] = True
+
+    if lineno == 1:
+        if line:
+            return "Error %d: Second line should be empty." % (real_lineno)
+    if not line.startswith('#'):
+        if len(line) > 80:
+            return "Error %d: No line should be over 80 characters long." % (real_lineno)
+        if semver[0] and '+semver' in line:
+            if not re.match(exp2, line):
+                return "Error %d: Bad semver line." % (real_lineno)
+            else:
+                semver[1] = True
+
+    return False
+
+
+if os.environ.get('EDITOR') != 'none':
+    editor = os.environ['EDITOR']
+else:
+    editor = "vim"
+
+message_file = sys.argv[1]
+while True:
+    commit_msg = list()
+    errors = list()
+    semver = [False, False]
+    with open(message_file) as commit_fd:
+        for lineno, line in enumerate(commit_fd):
+            stripped_line = line.strip()
+            commit_msg.append(line)
+            e = check_format_rules(lineno, stripped_line, semver)
+            if e:
+                errors.append(e)
+    if semver[0] and not semver[1]:
+        errors.append("Error: Semver line not found.")
+
+    if errors:
+        with open(message_file, 'w') as commit_fd:
+            for line in commit_msg:
+                commit_fd.write(line)
+            commit_fd.write('%s\n' % '# GIT COMMIT MESSAGE FORMAT ERRORS:')
+            for error in errors:
+                commit_fd.write('# %s\n' % (error))
+
+        sys.stdin = open("/dev/tty")
+        user_input = subprocess.check_output(
+            "read -p \"Invalid commit message format. Press y to edit and n to cancel the commit. [y/n] \" userinput && echo \"$userinput\"", shell=True, stdin=sys.stdin).rstrip()
+
+        if user_input.lower() in ('n', 'no'):
+            sys.exit(1)
+        subprocess.call('%s %s' % (editor, message_file), shell=True)
+    else:
+        break

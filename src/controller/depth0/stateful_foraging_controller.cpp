@@ -64,6 +64,15 @@ __rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(
   return m_executive->active_tab();
 }
 
+void stateful_foraging_controller::block_sel_matrix(
+    std::unique_ptr<block_selection_matrix> m) {
+  m_block_sel_matrix = std::move(m);
+}
+void stateful_foraging_controller::executive(
+    std::unique_ptr<ta::bifurcating_tdgraph_executive> executive) {
+  m_executive = std::move(executive);
+}
+
 void stateful_foraging_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
