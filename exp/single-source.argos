@@ -17,7 +17,7 @@
   <controllers>
 
     <stateless_foraging_controller id="ffc"
-                                library="libfordyca">
+                                library="build/lib/libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -100,16 +100,16 @@
 
           <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
-        </actuation>
+	      </actuation>
+        <communication field="0.5"/>
       </params>
     </stateless_foraging_controller>
-
   </controllers>
 
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="libfordyca"
+  <loop_functions library="build/lib/libfordyca"
                   label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
@@ -255,18 +255,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="stateless_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

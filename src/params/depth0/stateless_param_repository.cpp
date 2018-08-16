@@ -25,6 +25,7 @@
 #include "fordyca/params/actuation_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/params/communication_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
@@ -49,6 +50,8 @@ stateless_param_repository::stateless_param_repository(
   register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
                                                ct::waveform_xml_parser::kXMLRoot,
                                            ct::waveform_xml_parser::kHeader1);
+  register_parser<communication_parser, communication_params>(
+      communication_parser::kXMLRoot, communication_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);
