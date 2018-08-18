@@ -65,6 +65,7 @@ class base_foraging_loop_functions : public argos::CLoopFunctions {
 
   void Init(ticpp::Element&) override {
     m_floor = &GetSpace().GetFloorEntity();
+    std::srand(std::time(nullptr));
   }
 
  protected:

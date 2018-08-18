@@ -157,18 +157,25 @@ class temporal_penalty_handler : public rcppsw::er::client {
   }
 
   /*
-   * @brief Deconflict cache penalties such that at most 1 robot finishes
-   * serving their penalty in the cache per timestep. This ensures consistency
-   * and proper processing of \ref cached_block_pickup events.
-
-   * When handling \ref cache_block_pickup events, if two robots enter the cache
-   * at the EXACT same timestep, whichever one is processed second for that
-   * timestep will trigger an assert due to the cache having a different amount
-   * of blocks than it should (i.e. only one block pickup is allowed per
-   * timestep, otherwise the world is inconsistent).
+   * @brief Deconflict penalties such that at most 1 robot finishes
+   * serving their penalty per block/cache operation.
+   *
+   * If the penalty for the robot was zero, should we still need to make the
+   * robot serve a 1 timestep penalty. Not needed for block ops (but doesn't
+   * really hurt), but IS needed for cache ops, so that if two robots that enter
+   * a cache on the same timestep and will serve 0 duration penalties things are
+   * still handled properly. You can't rely on just checking the list in that
+   * case, because 0 duration penalties are marked as served and removed from
+   * the list the SAME timestep they are added, so the handler incorrectly
+   * thinks that there is no conflict.
+   *
+   * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
     uint penalty = m_penalty->value(timestep);
+    if (0 == penalty) {
+      ++penalty;
+    }
     m_orig_penalty = penalty;
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
       if (it->start_time() + it->penalty() == timestep + penalty) {

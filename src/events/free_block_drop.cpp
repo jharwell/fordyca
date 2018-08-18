@@ -52,8 +52,7 @@ free_block_drop::free_block_drop(
     : cell_op(coord.first, coord.second),
       client(server),
       m_resolution(resolution),
-      m_block(block),
-      m_server(server) {
+      m_block(block) {
   client::insmod("free_block_drop",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -95,7 +94,7 @@ void free_block_drop::visit(representation::arena_map& map) {
    * This was a terrible bug to track down.
    */
   if (cell.state_has_cache()) {
-    cache_block_drop op(m_server,
+    cache_block_drop op(client::server_ref(),
                         m_block,
                         std::static_pointer_cast<representation::arena_cache>(
                             cell.cache()),

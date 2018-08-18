@@ -62,6 +62,10 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
     kExistingCacheDrop,
     kExistingCachePickup,
   };
+  using temporal_penalty_handler<T>::is_serving_penalty;
+  using temporal_penalty_handler<T>::deconflict_penalty_finish;
+  using temporal_penalty_handler<T>::original_penalty;
+
   cache_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
                            representation::arena_map* const map,
                            const ct::waveform_params* const params)
@@ -96,21 +100,23 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
       return false;
     }
 
-    ER_ASSERT(!temporal_penalty_handler<T>::is_serving_penalty(controller),
+    ER_ASSERT(!is_serving_penalty(controller),
               "FATAL: Robot already serving cache penalty?");
 
-    uint penalty = temporal_penalty_handler<T>::deconflict_penalty_finish(timestep);
+    uint penalty = deconflict_penalty_finish(timestep);
     ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
            utils::robot_id(controller),
            timestep,
-           temporal_penalty_handler<T>::original_penalty(),
+           original_penalty(),
            penalty,
            src);
 
     int id = utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(-1 != id, "FATAL: Robot not in cache?");
-    temporal_penalty_handler<T>::penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, timestep));
+    penalty_list().push_back(temporal_penalty<T>(&controller,
+                                                 id,
+                                                 penalty,
+                                                 timestep));
     return true;
   }
 
@@ -133,6 +139,9 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
              controller.current_task()->acquisition_goal() &&
             -1 != cache_id);
   }
+
+ protected:
+  using temporal_penalty_handler<T>::penalty_list;
 
  private:
   // clang-format off

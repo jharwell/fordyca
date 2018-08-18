@@ -33,6 +33,7 @@
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 #include "rcppsw/er/server.hpp"
 
@@ -87,8 +88,21 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
     if (nullptr != vparams) {
       controller.display_task(vparams->robot_task);
     }
+    controller.executive()->task_finish_notify(std::bind(
+        &metrics_aggregator::task_finish_or_abort_cb,
+        m_metrics_agg.get(),
+        std::placeholders::_1));
+    controller.executive()->task_abort_notify(std::bind(
+        &metrics_aggregator::task_finish_or_abort_cb,
+        m_metrics_agg.get(),
+        std::placeholders::_1));
+    controller.executive()->task_alloc_notify(std::bind(
+        &metrics_aggregator::task_alloc_cb,
+        m_metrics_agg.get(),
+        std::placeholders::_1,
+        std::placeholders::_2));
   } /* for(&entity..) */
-  ER_NOM("depth1_foraging loop functions initialization finished");
+  ER_NOM("Depth1 foraging loop functions initialization finished");
 }
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
@@ -97,6 +111,8 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* send the robot its view of the world: what it sees and where it is */
   utils::set_robot_pos<decltype(controller)>(robot);
@@ -127,10 +143,15 @@ argos::CColor foraging_loop_functions::GetFloorColor(
   } /* for(&cache..) */
 
   for (auto& block : arena_map()->blocks()) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
     if (block->contains_point(plane_pos)) {
-      return argos::CColor(block->color().red(),
-                           block->color().green(),
-                           block->color().blue());
+      return argos::CColor::BLACK;
     }
   } /* for(&block..) */
 
@@ -172,8 +193,8 @@ void foraging_loop_functions::pre_step_final(void) {
     auto& collector =
         static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
             *(*m_metrics_agg)["tasks::generalist_tab"]);
-    int n_harvesters = collector.stats().subtask1_count;
-    int n_collectors = collector.stats().subtask2_count;
+    int n_harvesters = collector.stats().int_subtask1_count;
+    int n_collectors = collector.stats().int_subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
@@ -194,7 +215,6 @@ void foraging_loop_functions::pre_step_final(void) {
     arena_map()->caches_removed_reset();
   }
 
-  stateful_foraging_loop_functions::pre_step_final();
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();

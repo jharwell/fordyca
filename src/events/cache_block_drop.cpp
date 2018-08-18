@@ -53,8 +53,7 @@ cache_block_drop::cache_block_drop(
       client(server),
       m_resolution(resolution),
       m_block(block),
-      m_cache(cache),
-      m_server(server) {
+      m_cache(cache) {
   client::insmod("cache_block_drop",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -97,7 +96,7 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::base_block& block) {
-  events::free_block_drop e(m_server,
+  events::free_block_drop e(client::server_ref(),
                             m_block, /* OK because we only have 1 block */
                             rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
                             m_resolution);

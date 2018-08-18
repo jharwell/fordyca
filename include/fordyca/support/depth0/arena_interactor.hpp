@@ -254,6 +254,8 @@ class arena_interactor : public rcppsw::er::client {
   const representation::arena_map* map(void) const { return m_map; }
   const argos::CFloorEntity* floor(void) const { return m_floor; }
   argos::CFloorEntity* floor(void) { return m_floor; }
+  block_op_penalty_handler<T>& free_pickup_penalty_handler(void) { return m_free_pickup_handler; }
+  block_op_penalty_handler<T>& nest_drop_penalty_handler(void) { return m_nest_drop_handler; }
 
  private:
   // clang-format off

@@ -42,8 +42,7 @@ cache_creator::cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
     : client(server),
       m_cache_size(cache_size),
       m_resolution(resolution),
-      m_grid(grid),
-      m_server(server) {
+      m_grid(grid) {
   client::insmod("cache_creator",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -79,13 +78,12 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
    * and all blocks be deposited in a single cell.
    */
   for (auto block : blocks) {
-    events::cell_empty op(block->discrete_loc().first,
-                          block->discrete_loc().second);
+    events::cell_empty op(block->discrete_loc());
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(m_server, block, d, m_resolution);
+    events::free_block_drop op(client::server_ref(), block, d, m_resolution);
     m_grid.access(op.x(), op.y()).accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",

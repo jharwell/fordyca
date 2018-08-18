@@ -104,7 +104,7 @@ void tasking_initializer::depth1_tasking_init(
      * Generalist is not partitionable in depth 0 initialization, so this has
      * not been done.
      */
-    if (std::rand() % 2) {
+    if (0 == std::rand() % 2) {
       static_cast<ta::partitionable_polled_task*>(graph()->root())
           ->init_random(collector,
                         est_params->collector_range.GetMin(),

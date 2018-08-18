@@ -55,6 +55,10 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
     kFreePickup,
     kNestDrop,
   };
+  using temporal_penalty_handler<T>::is_serving_penalty;
+  using temporal_penalty_handler<T>::deconflict_penalty_finish;
+  using temporal_penalty_handler<T>::original_penalty;
+
   block_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
                            representation::arena_map* const map,
                            const ct::waveform_params* const params)
@@ -90,14 +94,14 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
     } else if (kNestDrop == src && !nest_drop_filter(controller)) {
       return false;
     }
-    ER_ASSERT(!temporal_penalty_handler<T>::is_serving_penalty(controller),
+    ER_ASSERT(!is_serving_penalty(controller),
               "FATAL: Robot already serving block penalty?");
 
-    uint penalty = temporal_penalty_handler<T>::deconflict_penalty_finish(timestep);
+    uint penalty = deconflict_penalty_finish(timestep);
     ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
            utils::robot_id(controller),
            timestep,
-           temporal_penalty_handler<T>::original_penalty(),
+           original_penalty(),
            penalty,
            src);
 
@@ -107,8 +111,10 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
       ER_ASSERT(-1 != id, "FATAL: Robot not on block?");
     }
 
-    temporal_penalty_handler<T>::penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, timestep));
+    penalty_list().push_back(temporal_penalty<T>(&controller,
+                                                 id,
+                                                 penalty,
+                                                 timestep));
     return true;
   }
 
@@ -136,6 +142,9 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
   bool nest_drop_filter(const T& controller) const {
     return (controller.in_nest() && controller.goal_acquired());
   }
+
+ protected:
+  using temporal_penalty_handler<T>::penalty_list;
 
  private:
   // clang-format off

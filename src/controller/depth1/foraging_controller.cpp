@@ -64,6 +64,7 @@ void foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
 
+  m_task_aborted = false;
   executive()->run();
 } /* ControlStep() */
 
@@ -108,6 +109,9 @@ void foraging_controller::Init(ticpp::Element& node) {
                                 saa_subsystem(),
                                 perception())(&param_repo));
   ER_NOM("Depth1 foraging controller initialization finished");
+  executive()->task_abort_notify(std::bind(&foraging_controller::task_abort_cb,
+                                           this,
+                                           std::placeholders::_1));
 } /* Init() */
 
 __rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {
@@ -118,6 +122,11 @@ __rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(
     void) const {
   return const_cast<foraging_controller*>(this)->current_task();
 } /* current_task() */
+
+void foraging_controller::task_abort_cb(const ta::polled_task*) {
+  m_task_aborted = true;
+} /* task_abort_cb() */
+
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different

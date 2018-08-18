@@ -105,10 +105,9 @@ void stateful_foraging_loop_functions::pre_step_iter(
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-      robot, *arena_map());
-  set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
+  utils::set_robot_pos<decltype(controller)>(robot);
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  set_robot_tick<decltype(controller)>(robot);
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());

@@ -27,6 +27,7 @@
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
@@ -96,18 +97,31 @@ metrics_aggregator::metrics_aggregator(
  ******************************************************************************/
 void metrics_aggregator::collect_from_controller(
     const controller::depth1::foraging_controller* const controller) {
+  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
+  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
   auto distance_m =
       dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+
   ER_ASSERT(distance_m,
             "FATAL: Controller does not provide FSM distance metrics");
-  collect("fsm::distance", *distance_m);
-
-  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
+  ER_ASSERT(manip_m,
+            "FATAL: Controller does not provide block manipulation metrics");
+
+  collect("fsm::distance", *distance_m);
+  collect("blocks::manipulation", *manip_m);
   collect("perception::world_model", *worldm_m);
 
   if (nullptr != controller->current_task()) {
-    collect("tasks::generalist_tab", *(controller->active_tab()));
+    auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
+        dynamic_cast<const ta::polled_task*>(controller->current_task())->mechanism());
+    auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+        dynamic_cast<const ta::polled_task*>(controller->current_task())->mechanism());
+    ER_ASSERT(block_acq_m,
+              "FATAL: Task does not provide FSM block acquisition metrics");
+    ER_ASSERT(collision_m,
+              "FATAL: FSM does not provide collision metrics");
+
     collect_if(
         "blocks::acquisition",
         *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
@@ -129,11 +143,6 @@ void metrics_aggregator::collect_from_controller(
                      .acquisition_goal();
         });
 
-    collect("tasks::execution::" + dynamic_cast<const ta::logical_task*>(
-                                       controller->current_task())
-                                       ->name(),
-            dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(
-                *controller->current_task()));
   }
 } /* collect_from_controller() */
 
@@ -146,5 +155,16 @@ void metrics_aggregator::collect_from_cache_collator(
     const metrics::caches::lifecycle_collator* const collator) {
   collect("caches::lifecycle", *collator);
 } /* collect_from_cache() */
+
+void metrics_aggregator::task_finish_or_abort_cb(const ta::polled_task* const task) {
+  collect("tasks::execution::" + task->name(),
+          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(
+              *task));
+} /* task_finish_or_abort_cb() */
+
+void metrics_aggregator::task_alloc_cb(const ta::polled_task* const,
+                                       const ta::bifurcating_tab* const tab) {
+    collect("tasks::generalist_tab", *tab);
+} /* task_alloc_cb() */
 
 NS_END(depth1, support, fordyca);

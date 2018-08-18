@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/block_manifest_processor.hpp"
@@ -69,6 +70,13 @@ bool arena_map::initialize(void) {
 } /* initialize() */
 
 __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
+  /*
+   * Caches hide blocks, add even though a robot may technically be standing on
+   * a block, if it is also standing in a cache, that takes priority.
+   */
+  if (-1 != robot_on_cache(pos)) {
+    return -1;
+  }
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i]->contains_point(pos)) {
       return static_cast<int>(i);
@@ -91,7 +99,7 @@ void arena_map::static_cache_create(void) {
   argos::CVector2 center((m_grid.xrsize() + m_nest.real_loc().GetX()) / 2.0,
                          m_nest.real_loc().GetY());
 
-  support::depth1::static_cache_creator c(server_ref(),
+  support::depth1::static_cache_creator creator(server_ref(),
                                           m_grid,
                                           center,
                                           mc_static_cache_params.dimension,
@@ -118,8 +126,39 @@ void arena_map::static_cache_create(void) {
     }
   } /* for(b..) */
 
-  m_caches = c.create_all(blocks);
-  c.update_host_cells(m_grid, m_caches);
+  m_caches = creator.create_all(blocks);
+
+  /*
+   * Any blocks that are under where the cache currently is (i.e. will be
+   * hidden by it) need to be added to the cache so that there all blocks in the
+   * arena are accessible. This is generally only an issue at the start of
+   * simulation if random block distribution is used, but weird cases can arise
+   * due to task abort+block drop as well, so it is best to be safe.
+   */
+  for (auto &b : m_blocks) {
+    for (auto &c : m_caches) {
+      if (!c->contains_block(b) &&
+          c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
+          c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
+        events::cell_empty empty(b->discrete_loc());
+        m_grid.access(b->discrete_loc()).accept(empty);
+        events::free_block_drop op(client::server_ref(),
+                                   b,
+                                   math::rcoord_to_dcoord(c->real_loc(),
+                                                          m_grid.resolution()),
+                                   m_grid.resolution());
+        m_grid.access(op.x(), op.y()).accept(op);
+        c->block_add(b);
+        ER_NOM("Hidden block%d added to cache%d", b->id(), c->id());
+      }
+    } /* for(&c..) */
+  } /* for(&b..) */
+
+  /*
+   * Must be after fixing hidden blocks, otherwise the cache host cell will
+   * have a block as its entity!
+   */
+  creator.update_host_cells(m_grid, m_caches);
 } /* static_cache_create() */
 
 bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {
