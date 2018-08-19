@@ -54,7 +54,11 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
 
   params::depth0::stateless_param_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
+
+#ifndef ER_NREPORT
   client::server_ptr()->log_stream() << param_repo;
+#endif
+
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 

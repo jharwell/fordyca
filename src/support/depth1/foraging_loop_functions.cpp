@@ -52,7 +52,10 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
+
+#ifndef ER_NREPORT
   rcppsw::er::g_server->log_stream() << repo;
+#endif
 
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   /* initialize cache handling and create initial cache */

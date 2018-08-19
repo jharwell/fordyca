@@ -86,7 +86,9 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize output */
   auto* params = param_repo.parse_results<struct params::output_params>();
+#ifndef ER_NREPORT
   client::server_ptr()->log_stream() << param_repo;
+#endif
   output_init(params);
 
   /* initialize sensing and actuation subsystem */
@@ -143,8 +145,10 @@ void base_foraging_controller::output_init(
   client::server_ptr()->dbg_ts_calculator(
       std::bind(&base_foraging_controller::dbg_header_calc, this));
 
+#ifndef ER_NREPORT
   client::server_ptr()->change_logfile(output_root + "/" + this->GetId() +
                                        ".log");
+#endif
 } /* output_init() */
 
 std::string base_foraging_controller::log_header_calc(void) const {

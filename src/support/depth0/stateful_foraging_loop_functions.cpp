@@ -55,7 +55,9 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
+#ifndef ER_NREPORT
   rcppsw::er::g_server->log_stream() << repo;
+#endif
 
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<const struct params::output_params>();
