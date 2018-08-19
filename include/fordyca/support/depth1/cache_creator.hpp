@@ -81,7 +81,6 @@ class cache_creator : public rcppsw::er::client {
 
  protected:
   representation::arena_grid& grid(void) const { return m_grid; }
-  rcppsw::er::server* server(void) const { return m_server.get(); }
   std::unique_ptr<representation::arena_cache> create_single(
       block_list blocks,
       const argos::CVector2& center);
@@ -91,7 +90,6 @@ class cache_creator : public rcppsw::er::client {
   double                              m_cache_size;
   double                              m_resolution;
   representation::arena_grid&         m_grid;
-  std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };
 NS_END(support, fordyca, depth1);

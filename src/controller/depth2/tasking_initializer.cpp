@@ -76,7 +76,7 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_starter_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
-          server(),
+          client::server_ref(),
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -84,7 +84,7 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_finisher_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
-          server(),
+          client::server_ref(),
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -92,10 +92,16 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_transferer_fsm =
       rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
-          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
+          client::server_ref(),
+          cache_sel_matrix(),
+          saa_subsystem(),
+          perception()->map());
   std::unique_ptr<ta::taskable> cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
+          client::server_ref(),
+          cache_sel_matrix(),
+          saa_subsystem(),
+          perception()->map());
 
   auto cache_starter =
       new tasks::depth2::cache_starter(exec_params, cache_starter_fsm);
@@ -133,13 +139,14 @@ std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator
   /* collector, forager tasks are now partitionable */
   auto children = graph()->children(graph()->root());
   for (auto& t : children) {
-    t->set_partitionable();
+    t->set_partitionable(true);
   } /* for(&t..) */
 
   depth2_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(server(),
-                                                                graph());
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
+      client::server_ref(),
+      graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

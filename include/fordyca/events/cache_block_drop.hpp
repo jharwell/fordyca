@@ -115,7 +115,6 @@ class cache_block_drop
   double                                       m_resolution;
   std::shared_ptr<representation::base_block>  m_block;
   std::shared_ptr<representation::arena_cache> m_cache;
-  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

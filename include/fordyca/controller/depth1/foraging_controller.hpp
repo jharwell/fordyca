@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
 class bifurcating_tdgraph_executive;
+class polled_task;
 }}
 
 NS_START(fordyca);
@@ -92,6 +93,24 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+  /**
+   * @brief Get whether or not a task has been aborted this timestep.
+   *
+   * This functionality CANNOT use the abort state of the \ref current_task()
+   * because as soon as a task is aborted, the executive allocates a new task
+   * the *same* timestep, and so when the loop functions check if a task has
+   * been aborted, using the current task's abort status will always return
+   * false, and lead to inconsistent simulation state.
+   */
+  bool task_aborted(void) const { return m_task_aborted; }
+  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
+
+  /**
+   * @brief Callback for task abort. Task argument unused for now--only need to
+   * know that a task WAS aborted. \see \ref task_aborted().
+   */
+  void task_abort_cb(const ta::polled_task*);
+
  protected:
   const cache_selection_matrix*  cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
@@ -102,10 +121,9 @@ class foraging_controller : public depth0::stateful_foraging_controller,
                     params::depth1::task_repository* task_repo);
 
   // clang-format off
-  bool                                               m_display_task{false};
-  std::string                                        m_prev_task{""};
-  std::unique_ptr<cache_selection_matrix>            m_cache_sel_matrix;
-  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
+  bool                                    m_display_task{false};
+  bool                                    m_task_aborted{false};
+  std::unique_ptr<cache_selection_matrix> m_cache_sel_matrix;
   // clang-format on
 };
 

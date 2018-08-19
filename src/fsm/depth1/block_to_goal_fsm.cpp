@@ -107,23 +107,22 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     internal_event(ST_TRANSPORT_TO_GOAL);
     return controller::foraging_signal::HANDLED;
   }
-  /*
-   * It is possible that robots can be waiting in this wait indefinitely for a
-   * block pickup signal that will never come if they got here by "detecting" a
-   * block by sprawling across multiple blocks (i.e. all ground sensors did not
-   * detect the same block).
+  /**
+   * It is possible that robots can be waiting indefinitely for a block
+   * pickup signal that will never come once a block has been acquired if they
+   * "detect" a block by sprawling across multiple blocks (i.e. all ground
+   * sensors did not detect the same block). It is also possible that a robot
+   * serving a penalty for a block pickup will have the block taken by a
+   * different robot.
    *
-   * In that case, the timeout here will cause the robot to try again, and
-   * because of the decaying relevance of cells, it will eventually pick a
-   * different block than the one that got it into this predicament, and the
-   * system will be able to continue profitably.
+   * In both cases, treat the block as vanished and try again.
    */
-  ++m_pickup_count;
-  if (m_pickup_count >= kPICKUP_TIMEOUT) {
-    m_pickup_count = 0;
+  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+    m_block_fsm.task_reset();
+    internal_event(ST_TRANSPORT_TO_GOAL);
+  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_ACQUIRE_FREE_BLOCK);
-    return controller::foraging_signal::HANDLED;
   }
   return controller::foraging_signal::HANDLED;
 }

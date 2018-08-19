@@ -127,11 +127,30 @@ class stateful_foraging_controller : public stateless_foraging_controller,
 
   const base_perception_subsystem* perception(void) const { return m_perception.get(); }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
+
   const ta::bifurcating_tab* active_tab(void) const;
+
+  /*
+   * Public to setup metric collection from tasks.
+   */
+  const ta::bifurcating_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  ta::bifurcating_tdgraph_executive* executive(void) { return m_executive.get(); }
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
   const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
+  void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
+
+  /*
+   * The stateful foraging controller owns the executive, but derived classes
+   * can access it and set it to whatever they want. This is done to reduce the
+   * amount of function overriding that would have to be performed otherwise if
+   * derived controllers each had private executives--slightly cleaner to do it
+   * this way I think.
+   *
+   * Strategy pattern!
+   */
+  void executive(std::unique_ptr<ta::bifurcating_tdgraph_executive> executive);
 
  private:
   // clang-format off

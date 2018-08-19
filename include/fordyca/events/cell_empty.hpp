@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,6 +58,8 @@ class cell_empty
       public visitor::can_visit<representation::arena_map>,
       public visitor::can_visit<representation::perceived_arena_map> {
  public:
+  explicit cell_empty(const rcppsw::math::dcoord2& coord)
+      : cell_empty{coord.first, coord.second} {}
   cell_empty(size_t x, size_t y) : cell_op(x, y) {}
 
   /* stateless foraging */

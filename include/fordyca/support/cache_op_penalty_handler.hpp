@@ -1,5 +1,5 @@
 /**
- * @file block_op_penalty_handler.hpp
+ * @file cache_op_penalty_handler.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_PENALTY_HANDLER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_PENALTY_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_OP_PENALTY_HANDLER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_CACHE_OP_PENALTY_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,7 +32,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+namespace controller {
+namespace depth0 {
+class stateful_foraging_controller;
+class stateless_foraging_controller;
+}}
+
+NS_START(support);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
@@ -42,37 +49,37 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  ******************************************************************************/
 
 /**
- * @class block_op_penalty_handler
+ * @class cache_op_penalty_handler
  * @ingroup support
  *
  * @brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class block_op_penalty_handler : public temporal_penalty_handler<T> {
+class cache_op_penalty_handler : public temporal_penalty_handler<T> {
  public:
   enum penalty_src {
-    kFreePickup,
-    kNestDrop,
+    kExistingCacheDrop,
+    kExistingCachePickup,
   };
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
-  block_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
+  cache_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
                            representation::arena_map* const map,
                            const ct::waveform_params* const params)
       : temporal_penalty_handler<T>(server, params), m_map(map) {}
 
-  ~block_op_penalty_handler(void) override = default;
-  block_op_penalty_handler& operator=(
-      const block_op_penalty_handler& other) = delete;
-  block_op_penalty_handler(
-      const block_op_penalty_handler& other) = delete;
+  ~cache_op_penalty_handler(void) override = default;
+  cache_op_penalty_handler& operator=(
+      const cache_op_penalty_handler& other) = delete;
+  cache_op_penalty_handler(
+      const cache_op_penalty_handler& other) = delete;
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
-   * trying to drop/pickup a block. If so, create a \ref block_op_penalty object
+   * trying to drop/pickup a block. If so, create a \ref cache_op_penalty object
    * and associate it with the robot.
    *
    * @param robot The robot to check.
@@ -85,17 +92,16 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
    */
   bool penalty_init(T& controller, penalty_src src, uint timestep) {
     /*
-     * If the robot has not acquired a block, or thinks it has but actually has
-     * not, nothing to do. If a robot is carrying a block but is still
-     * transporting it (even if it IS currently in the nest), nothing to do.3
+     * If the robot has not acquired a cache, or thinks it has but actually has
+     * not, nothing to do.
      */
-    if (kFreePickup == src && !free_pickup_filter(controller)) {
-      return false;
-    } else if (kNestDrop == src && !nest_drop_filter(controller)) {
+    if ((kExistingCacheDrop == src || kExistingCachePickup == src) &&
+               !existing_cache_op_filter(controller)) {
       return false;
     }
+
     ER_ASSERT(!is_serving_penalty(controller),
-              "FATAL: Robot already serving block penalty?");
+              "FATAL: Robot already serving cache penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
     ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
@@ -105,12 +111,8 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
            penalty,
            src);
 
-    int id = -1;
-    if (kFreePickup == src) {
-      id = utils::robot_on_block(controller, *m_map);
-      ER_ASSERT(-1 != id, "FATAL: Robot not on block?");
-    }
-
+    int id = utils::robot_on_cache(controller, *m_map);
+    ER_ASSERT(-1 != id, "FATAL: Robot not in cache?");
     penalty_list().push_back(temporal_penalty<T>(&controller,
                                                  id,
                                                  penalty,
@@ -119,28 +121,23 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
   }
 
   /**
-   * @brief Filter out spurious penalty initializations for free block pickup
-   * (i.e. controller not ready/not intending to pickup a free block).
+   * @brief Filter out spurious penalty initializations for existing cache
+   * operations (e.g. pickup/drop)
+   * (i.e. controller not ready/not intending to use an existing cache).
    *
-   * @return \c TRUE if the controller has met preconditions for free block
-   * pickup, \c FALSE otherwise.
+   * @return \c TRUE if the controller has met preconditions, \c FALSE
+   * otherwise.
    */
-  bool free_pickup_filter(const T& controller) const {
-    int block_id = utils::robot_on_block(controller, *m_map);
-    return (controller.goal_acquired() &&
-            acquisition_goal_type::kBlock == controller.acquisition_goal() &&
-             -1 != block_id);
-  }
+  bool existing_cache_op_filter(const T& controller) const {
+    if (nullptr == controller.current_task()) {
+      return false;
+    }
 
-  /**
-   * @brief Filter out spurious penalty initializations for nest block drop
-   * (i.e. controller not ready/not intending to drop a block in the nest).
-   *
-   * @return \c TRUE if the controller has met preconditions for nest block
-   * drop, \c FALSE otherwise.
-   */
-  bool nest_drop_filter(const T& controller) const {
-    return (controller.in_nest() && controller.goal_acquired());
+    int cache_id = utils::robot_on_cache(controller, *m_map);
+    return (controller.current_task()->goal_acquired() &&
+            acquisition_goal_type::kExistingCache ==
+             controller.current_task()->acquisition_goal() &&
+            -1 != cache_id);
   }
 
  protected:
@@ -153,4 +150,4 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
 };
 NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_PENALTY_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_OP_PENALTY_HANDLER_HPP_ */
