@@ -68,9 +68,11 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<params::output_params>();
   output_init(p_output);
 
+#ifndef ER_NREPORT
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
                                        p_output->log_fname);
   rcppsw::er::g_server->log_stream() << repo;
+#endif
 
   /* setup logging timestamp calculator */
   rcppsw::er::g_server->log_ts_calculator(

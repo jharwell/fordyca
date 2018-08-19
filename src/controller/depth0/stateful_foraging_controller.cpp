@@ -136,7 +136,9 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
 
   /* parse and validate parameters */
   param_repo.parse_all(node);
-  server_ptr()->log_stream() << param_repo;
+#ifndef ER_NREPORT
+  client::server_ptr()->log_stream() << param_repo;
+#endif
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all parameters were validated");
 
