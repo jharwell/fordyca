@@ -74,6 +74,12 @@ class base_foraging_controller : public argos::CCI_Controller,
   void Reset(void) override;
 
   /**
+   * @brief Get the ID of the entity. Argos also provides this, but it doesn't
+   * work in gdb, so I provide my own.
+   */
+  int entity_id(void) const;
+
+  /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
    * head during simulation.
    */

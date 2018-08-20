@@ -102,11 +102,7 @@ FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
 /*******************************************************************************
  * Distance Metrics
  ******************************************************************************/
-int stateless_foraging_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str() + 2);
-} /* entity_id() */
-
-__rcsw_pure double stateless_foraging_controller::timestep_distance(void) const {
+__rcsw_pure double stateless_foraging_controller::distance(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
@@ -115,7 +111,18 @@ __rcsw_pure double stateless_foraging_controller::timestep_distance(void) const 
     return saa_subsystem()->sensing()->heading().Length();
   }
   return 0;
-} /* timestep_distance() */
+} /* distance() */
+
+argos::CVector2 stateless_foraging_controller::velocity(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->linear_velocity();
+  }
+  return argos::CVector2(0, 0);
+} /* velocity() */
 
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;

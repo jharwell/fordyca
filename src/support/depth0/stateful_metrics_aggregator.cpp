@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
@@ -59,18 +59,18 @@ void stateful_metrics_aggregator::collect_from_controller(
 
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
-  auto distance_m =
-      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  auto mov_m =
+      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
 
-  ER_ASSERT(distance_m,
-            "FATAL: Controller does not provide FSM distance metrics");
-  ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
-  ER_ASSERT(manip_m,
+  ER_ASSERT(nullptr != mov_m,
+            "FATAL: Controller does not provide FSM movement metrics");
+  ER_ASSERT(nullptr != worldm_m, "FATAL: Controller does not provide world model metrics");
+  ER_ASSERT(nullptr != manip_m,
             "FATAL: Controller does not provide block manipulation metrics");
 
   collect("perception::world_model", *worldm_m);
   collect("blocks::manipulation", *manip_m);
-  collect("fsm::distance", *distance_m);
+  collect("fsm::movement", *mov_m);
 
   if (controller->current_task()) {
     auto *fsm = static_cast<fsm::depth0::stateful_foraging_fsm*>(

@@ -25,8 +25,8 @@
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
@@ -51,14 +51,14 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
     : base_metrics_aggregator(server, params, output_root) {
   insmod("metrics_agg", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
 
-  register_collector<metrics::fsm::distance_metrics_collector>(
-      "fsm::distance",
-      metrics_path() + "/" + params->distance_fname,
+  register_collector<metrics::fsm::movement_metrics_collector>(
+      "fsm::movement",
+      metrics_path() + "/" + params->fsm_movement_fname,
       params->collect_interval);
 
   register_collector<metrics::fsm::collision_metrics_collector>(
       "fsm::collision",
-      metrics_path() + "/" + params->collision_fname,
+      metrics_path() + "/" + params->fsm_collision_fname,
       params->collect_interval);
 
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
@@ -85,16 +85,16 @@ void stateless_metrics_aggregator::collect_from_controller(
     const controller::depth0::stateless_foraging_controller* controller) {
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
-  auto distance_m =
-      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  auto mov_m =
+      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
   auto block_acq_m =
       dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller->fsm());
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
 
-  ER_ASSERT(distance_m,
-            "FATAL: Controller does not provide FSM distance metrics");
+  ER_ASSERT(mov_m,
+            "FATAL: Controller does not provide FSM movement metrics");
   ER_ASSERT(block_acq_m,
             "FATAL: Controller does not provide FSM block acquisition metrics");
   ER_ASSERT(collision_m,
@@ -102,7 +102,7 @@ void stateless_metrics_aggregator::collect_from_controller(
   ER_ASSERT(manip_m,
             "FATAL: Controller does not provide block manipulation metrics");
 
-  collect("fsm::distance", *distance_m);
+  collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);
   collect("blocks::acquisition", *block_acq_m);
   collect("blocks::manipulation", *manip_m);

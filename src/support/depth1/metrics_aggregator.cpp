@@ -26,7 +26,7 @@
 
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
@@ -99,16 +99,16 @@ void metrics_aggregator::collect_from_controller(
     const controller::depth1::foraging_controller* const controller) {
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
-  auto distance_m =
-      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
+  auto movement_m =
+      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
 
-  ER_ASSERT(distance_m,
-            "FATAL: Controller does not provide FSM distance metrics");
+  ER_ASSERT(movement_m,
+            "FATAL: Controller does not provide FSM movement metrics");
   ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
   ER_ASSERT(manip_m,
             "FATAL: Controller does not provide block manipulation metrics");
 
-  collect("fsm::distance", *distance_m);
+  collect("fsm::movement", *movement_m);
   collect("blocks::manipulation", *manip_m);
   collect("perception::world_model", *worldm_m);
 
