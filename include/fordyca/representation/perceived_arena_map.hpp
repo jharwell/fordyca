@@ -105,7 +105,8 @@ class perceived_arena_map
   cache_list& caches(void) { return m_caches; }
 
   /**
-   * @brief Add a cache to the list of perceived caches.
+   * @brief Add a cache to the list of perceived caches. If there is already a
+   * known cache at that location, it is removed and replaced with the new one.
    *
    * @param cache Cache to add.
    */

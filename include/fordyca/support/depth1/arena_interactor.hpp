@@ -87,25 +87,28 @@ class arena_interactor : public depth0::arena_interactor<T> {
     }
     if (controller.is_carrying_block()) {
       handle_nest_block_drop(controller, timestep);
-      if (!m_cache_penalty_handler.is_serving_penalty(controller)) {
+      if (m_cache_penalty_handler.is_serving_penalty(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied(controller,
+                                                      timestep)) {
+          finish_cache_block_drop(controller);
+        }
+      } else {
         m_cache_penalty_handler.penalty_init(controller,
                                              penalty_type::kExistingCacheDrop,
                                              timestep);
       }
-      if (m_cache_penalty_handler.penalty_satisfied(controller,
-                                                    timestep)) {
-        finish_cache_block_drop(controller);
-      }
+
     } else { /* The foot-bot has no block item */
       handle_free_block_pickup(controller, timestep);
-      if (!m_cache_penalty_handler.is_serving_penalty(controller)) {
+      if (m_cache_penalty_handler.is_serving_penalty(controller)) {
+        if (m_cache_penalty_handler.penalty_satisfied(controller,
+                                                      timestep)) {
+          finish_cached_block_pickup(controller);
+        }
+      } else {
         m_cache_penalty_handler.penalty_init(controller,
                                              penalty_type::kExistingCachePickup,
                                              timestep);
-      }
-      if (m_cache_penalty_handler.penalty_satisfied(controller,
-                                                    timestep)) {
-        finish_cached_block_pickup(controller);
       }
     }
   }

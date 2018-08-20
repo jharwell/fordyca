@@ -87,7 +87,7 @@ rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
 } /* abs_ul() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
-  return cell(0, ysize() - 1).loc();
+  return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {
