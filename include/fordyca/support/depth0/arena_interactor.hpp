@@ -106,7 +106,7 @@ class arena_interactor : public rcppsw::er::client {
       m_free_pickup_handler.penalty_init(controller,
                                          penalty_type::kFreePickup,
                                          timestep);
-   }
+    }
   }
 
   void handle_nest_block_drop(T& controller, uint timestep) {

@@ -9,7 +9,7 @@
     <system threads="0" />
     <experiment length="5000"
                 ticks_per_second="5"
-                random_seed="123" />
+                random_seed="39" />
   </framework>
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -227,7 +227,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="24" max_trials="1000">
+      <entity quantity="64" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
         </foot-bot>
