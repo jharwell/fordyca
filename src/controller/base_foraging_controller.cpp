@@ -164,4 +164,8 @@ void base_foraging_controller::tick(uint tick) {
   m_saa->sensing()->tick(tick);
 } /* tick() */
 
+int base_foraging_controller::entity_id(void) const {
+  return std::atoi(GetId().c_str() + 2);
+} /* entity_id() */
+
 NS_END(controller, fordyca);

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/base_foraging_controller.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
@@ -57,7 +57,7 @@ NS_START(depth0);
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class stateless_foraging_controller : public base_foraging_controller,
-                                      public metrics::fsm::distance_metrics,
+                                      public metrics::fsm::movement_metrics,
                                       public metrics::fsm::goal_acquisition_metrics,
                                       public metrics::blocks::manipulation_metrics,
                                       public fsm::block_transporter,
@@ -72,8 +72,8 @@ class stateless_foraging_controller : public base_foraging_controller,
   void Reset(void) override;
 
   /* distance metrics */
-  int entity_id(void) const override;
-  double timestep_distance(void) const override;
+  double distance(void) const override;
+  argos::CVector2 velocity(void) const override;
 
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override{ return false; }

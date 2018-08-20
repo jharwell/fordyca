@@ -155,9 +155,9 @@ void stateful_foraging_loop_functions::Reset(void) {
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 using namespace argos;

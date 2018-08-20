@@ -87,12 +87,14 @@ void block_vanished::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
  * Depth1 Foraging
  ******************************************************************************/
 void block_vanished::visit(controller::depth1::foraging_controller& controller) {
-  ER_NOM("%s abort pickup: block%d vanished",
+  ER_NOM("%s abort pickup executing task %s: block%d vanished",
          controller.GetId().c_str(),
+         dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
          m_block_id);
-  auto *task = dynamic_cast<tasks::depth1::harvester*>(controller.current_task());
-  ER_ASSERT(nullptr != task, "FATAL: Non-harvester task triggered block vanished event");
-  task->accept(*this);
+  auto *interactor = dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != interactor,
+            "FATAL: Non-free block interactor task triggered block vanished event");
+  interactor->accept(*this);
 } /* visit() */
 
 void block_vanished::visit(tasks::depth1::harvester& task) {
