@@ -73,7 +73,8 @@ void stateful_tasking_initializer::stateful_tasking_init(
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
           client::server_ref(), mc_sel_matrix, m_saa, m_perception->map());
 
-  auto generalist = new tasks::depth0::generalist(exec_params, generalist_fsm);
+  auto generalist = new tasks::depth0::generalist(exec_params,
+                                                  std::move(generalist_fsm));
 
   if (est_params->enabled) {
     static_cast<ta::polled_task*>(generalist)

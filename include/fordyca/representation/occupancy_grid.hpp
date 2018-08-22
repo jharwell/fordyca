@@ -77,9 +77,10 @@ class occupancy_grid : public rcppsw::er::client,
   void cell_init(size_t i, size_t j, double pheromone_rho);
 
   // clang-format off
+  static constexpr double             kEPSILON{0.0001};
+
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
-  static constexpr double             kEPSILON{0.0001};
   std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };

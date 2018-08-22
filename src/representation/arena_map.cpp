@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
@@ -158,7 +159,7 @@ void arena_map::static_cache_create(void) {
    * Must be after fixing hidden blocks, otherwise the cache host cell will
    * have a block as its entity!
    */
-  creator.update_host_cells(m_grid, m_caches);
+  creator.update_host_cells(m_caches);
 } /* static_cache_create() */
 
 bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {
@@ -205,7 +206,34 @@ void arena_map::distribute_all_blocks(void) {
 } /* distribute_all_blocks() */
 
 void arena_map::cache_remove(const std::shared_ptr<arena_cache>& victim) {
+  size_t before = caches().size();
+  int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
+  ER_ASSERT(caches().size() == before - 1,
+            "FATAL: cache%d not removed",
+            id);
 } /* cache_remove() */
+
+void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
+  auto xspan = victim->xspan(victim->real_loc());
+  auto yspan = victim->yspan(victim->real_loc());
+
+  /*
+   * To reset all cells covered by the cache's extent, we simply send them a
+   * CELL_EMPTY event. EXCEPT for the cell that hosted the actual cache, because
+   * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
+   * and clearing it here will trigger an assert later.
+   */
+  for (size_t i = xspan.get_min() /m_grid.resolution();
+       i < xspan.get_max() / m_grid.resolution(); ++i) {
+    for (size_t j = yspan.get_min() / m_grid.resolution();
+         j < yspan.get_max() / m_grid.resolution(); ++j) {
+      if (rcppsw::math::dcoord2(i, j) != victim->discrete_loc()) {
+        events::cell_empty e(rcppsw::math::dcoord2(i, j));
+        m_grid.access(i, j).accept(e);
+      }
+    } /* for(j..) */
+  } /* for(i..) */
+} /* cache_extent_clear() */
 
 NS_END(representation, fordyca);

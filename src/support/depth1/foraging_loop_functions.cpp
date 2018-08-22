@@ -118,7 +118,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* send the robot its view of the world: what it sees and where it is */
   utils::set_robot_pos<decltype(controller)>(robot);
-  set_robot_los<decltype(controller)>(robot, *arena_map());
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* Now watch it react to the environment */

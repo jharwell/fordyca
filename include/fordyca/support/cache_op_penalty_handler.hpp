@@ -104,14 +104,15 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
               "FATAL: Robot already serving cache penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
-    ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
+    int id = utils::robot_on_cache(controller, *m_map);
+    ER_NOM("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
            utils::robot_id(controller),
+           id,
            timestep,
            original_penalty(),
            penalty,
            src);
 
-    int id = utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(-1 != id, "FATAL: Robot not in cache?");
     penalty_list().push_back(temporal_penalty<T>(&controller,
                                                  id,
