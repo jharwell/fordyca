@@ -176,6 +176,7 @@ void free_block_pickup::visit(
 void free_block_pickup::visit(
     controller::depth1::foraging_controller& controller) {
   controller.perception()->map()->accept(*this);
+  controller.free_pickup_event(true);
   controller.block(m_block);
   dynamic_cast<tasks::free_block_interactor*>(controller.current_task())->accept(*this);
   ER_NOM("depth1_foraging_controller: %s picked up block%d",

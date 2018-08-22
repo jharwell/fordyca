@@ -73,11 +73,9 @@ class cache_creator : public rcppsw::er::client {
    * @brief Update the cells for all newly created caches to reflect the fact
    * they now contain caches.
    *
-   * @param grid The arena map grid.
    * @param caches Vector of newly created caches.
    */
-  static void update_host_cells(representation::arena_grid& grid,
-                                cache_vector& caches);
+  void update_host_cells(cache_vector& caches);
 
  protected:
   representation::arena_grid& grid(void) const { return m_grid; }

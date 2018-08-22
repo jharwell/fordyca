@@ -49,7 +49,7 @@ class cache_starter : public foraging_task,
                       public free_block_interactor {
  public:
   cache_starter(const struct task_allocation::task_params* params,
-            std::unique_ptr<task_allocation::taskable>& mechanism);
+                std::unique_ptr<task_allocation::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,

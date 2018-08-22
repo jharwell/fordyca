@@ -89,9 +89,9 @@ void tasking_initializer::depth1_tasking_init(
           perception()->map());
 
   tasks::depth1::collector* collector =
-      new tasks::depth1::collector(exec_params, collector_fsm);
+      new tasks::depth1::collector(exec_params, std::move(collector_fsm));
 
-  auto harvester = new tasks::depth1::harvester(exec_params, harvester_fsm);
+  auto harvester = new tasks::depth1::harvester(exec_params, std::move(harvester_fsm));
 
   if (est_params->enabled) {
     static_cast<ta::polled_task*>(harvester)->init_random(

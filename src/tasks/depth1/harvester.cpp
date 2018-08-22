@@ -45,8 +45,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 harvester::harvester(const struct task_allocation::task_params* params,
-                     std::unique_ptr<task_allocation::taskable>& mechanism)
-    : foraging_task(kHarvesterName, params, mechanism) {}
+                     std::unique_ptr<task_allocation::taskable> mechanism)
+    : foraging_task(kHarvesterName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

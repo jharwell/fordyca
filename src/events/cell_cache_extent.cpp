@@ -1,5 +1,5 @@
 /**
- * @file foraging_task.cpp
+ * @file cell_cache_extent.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,38 +21,44 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "fordyca/events/cell_cache_extent.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks, depth1);
-
-/*******************************************************************************
- * Constant Definitions
- ******************************************************************************/
-constexpr char foraging_task::kCollectorName[];
-constexpr char foraging_task::kHarvesterName[];
+NS_START(fordyca, events);
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-foraging_task::foraging_task(const std::string& name,
-                             const struct ta::task_params* params,
-                             std::unique_ptr<ta::taskable> mechanism)
-    : base_foraging_task(&params->abort),
-      polled_task(name, params, std::move(mechanism)) {}
+cell_cache_extent::cell_cache_extent(const rcppsw::math::dcoord2& coord,
+                                     std::shared_ptr<representation::base_cache> cache)
+    : cell_op(coord.first, coord.second),
+      m_cache(cache) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double foraging_task::current_time(void) const {
-  return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->base_sensors()
-      ->tick();
-} /* current_time() */
+void cell_cache_extent::visit(representation::cell2D& cell) {
+  cell.entity(m_cache);
+  cell.fsm().accept(*this);
+} /* visit() */
 
-NS_END(depth1, tasks, fordyca);
+void cell_cache_extent::visit(fsm::cell2D_fsm& fsm) {
+  fsm.event_cache_extent();
+} /* visit() */
+
+void cell_cache_extent::visit(representation::arena_map& map) {
+  map.access(cell_op::x(), cell_op::y()).accept(*this);
+} /* visit() */
+
+void cell_cache_extent::visit(representation::perceived_arena_map& map) {
+  map.access<occupancy_grid::kPheromoneLayer>(x(), y()).reset();
+  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
+} /* visit() */
+
+NS_END(events, fordyca);

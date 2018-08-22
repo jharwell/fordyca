@@ -89,8 +89,9 @@ void nest_block_drop::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(
     controller::depth0::stateful_foraging_controller& controller) {
-  static_cast<tasks::depth0::foraging_task*>(controller.current_task())
-      ->accept(*this);
+  auto task =
+      dynamic_cast<tasks::nest_interactor*>(controller.current_task());
+      task->accept(*this);
   controller.block(nullptr);
   controller.free_drop_event(true);
   ER_NOM("stateful_foraging_controller: dropped block%d in nest", m_block->id());
@@ -106,17 +107,14 @@ void nest_block_drop::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
-  auto depth0 =
-      dynamic_cast<tasks::depth0::foraging_task*>(controller.current_task());
-  auto depth1 =
-      dynamic_cast<tasks::depth1::foraging_task*>(controller.current_task());
-
-  if (nullptr != depth0) {
-    depth0->accept(*this);
-  } else if (nullptr != depth1) {
-    depth1->accept(*this);
-  }
-  ER_NOM("depth1_foraging_controller: dropped block%d in nest", m_block->id());
+  auto task =
+      dynamic_cast<tasks::nest_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "FATAL: Non nest-interactor task %s causing nest block drop",
+            dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+  task->accept(*this);
+  controller.free_drop_event(true);
+  ER_NOM("Depth1 foraging controller: dropped block%d in nest", m_block->id());
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth0::generalist& task) {

@@ -74,30 +74,30 @@ class arena_map : public rcppsw::er::client,
    * by robots.
    */
   block_vector& blocks(void) { return m_blocks; }
+  const block_vector& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Get the list of all the caches currently present in the arena and
    * active.
    */
   cache_vector& caches(void) { return m_caches; }
+  const cache_vector& caches(void) const { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
-   *
-   * After calling this function the victim cache is no longer active in the
-   * arena. However, it is not yet deleted, as it may be needed to gather
-   * metrics from (needed to capture block pickup from a cache with only 2
-   * blocks).
    *
    * @param victim The cache to remove.
    */
   void cache_remove(const std::shared_ptr<arena_cache>& victim);
 
   /**
-   * @brief Delete all caches that have been previously "removed", but not yet
-   * deleted.
+   * @brief Clear the cells that a cache covers while in the arena that are in
+   * CACHE_EXTENT state, resetting them to EMPTY. Called right before deleting
+   * the cache from the arena.
+   *
+   * @param victim The cache about to be deleted.
    */
-  void delete_caches(void);
+  void cache_extent_clear(const std::shared_ptr<arena_cache>& victim);
 
   void caches_removed_reset(void) { m_caches_removed = 0; }
   void caches_removed(uint b) { m_caches_removed += b; }

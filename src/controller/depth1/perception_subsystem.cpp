@@ -71,7 +71,6 @@ void perception_subsystem::process_los(
     } /* for(j..) */
   }   /* for(i..) */
 
-
   ER_VER("LOS: n_blocks=%zu, n_caches=%zu, LL=(%u, %u), LR=(%u, %u), UL=(%u, %u) UR=(%u, %u)",
          c_los->blocks().size(),
          c_los->caches().size(),
@@ -96,7 +95,7 @@ void perception_subsystem::process_los(
            cache->n_blocks());
     auto cell = map()->access<occupancy_grid::kCellLayer>(cache->discrete_loc());
     if (!cell.state_has_cache()) {
-      ER_NOM("Discovered cache%d%(%u, %u): %u blocks",
+      ER_NOM("Discovered cache%d(%u, %u): %u blocks",
              cache->id(),
              cache->discrete_loc().first,
              cache->discrete_loc().second,
@@ -145,15 +144,13 @@ void perception_subsystem::process_los(
   for (auto c1 : c_los->caches()) {
     for (auto c2 : map()->caches()) {
       if (*c1 == *c2) {
-        auto cell1 = map()->access<occupancy_grid::kCellLayer>(c1->discrete_loc());
-        auto cell2 = map()->access<occupancy_grid::kCellLayer>(c2->discrete_loc());
-        ER_ASSERT(cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
+        auto cell = map()->access<occupancy_grid::kCellLayer>(c2->discrete_loc());
+        ER_ASSERT(c1->n_blocks() == cell.cache()->n_blocks(),
                   "FATAL: LOS/PAM disagogree on # of blocks in cell at (%u, %u): %d/%d",
-                  cell1.loc().first, cell1.loc().second, cell1.cache()->n_blocks(), cell2.cache()->n_blocks());
+                  cell.loc().first, cell.loc().second, c1->n_blocks(), cell.cache()->n_blocks());
       }
     } /* for(c2..) */
   }
-
 } /* process_los() */
 
 NS_END(depth1, controller, fordyca);

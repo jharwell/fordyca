@@ -103,14 +103,14 @@ void tasking_initializer::depth2_tasking_init(
           saa_subsystem(),
           perception()->map());
 
-  auto cache_starter =
-      new tasks::depth2::cache_starter(exec_params, cache_starter_fsm);
-  auto cache_finisher =
-      new tasks::depth2::cache_finisher(exec_params, cache_finisher_fsm);
-  auto cache_transferer =
-      new tasks::depth2::cache_transferer(exec_params, cache_transferer_fsm);
-  auto cache_collector =
-      new tasks::depth1::collector(exec_params, cache_collector_fsm);
+  auto cache_starter = new tasks::depth2::cache_starter(exec_params,
+                                       std::move(cache_starter_fsm));
+  auto cache_finisher = new tasks::depth2::cache_finisher(exec_params,
+                                                          std::move(cache_finisher_fsm));
+  auto cache_transferer = new tasks::depth2::cache_transferer(exec_params,
+                                                              std::move(cache_transferer_fsm));
+  auto cache_collector = new tasks::depth1::collector(exec_params,
+                                                      std::move(cache_collector_fsm));
 
   if (est_params->enabled) {
     cache_starter->init_random(est_params->cache_starter_range.GetMin(),

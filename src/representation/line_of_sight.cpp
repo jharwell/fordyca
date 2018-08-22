@@ -55,12 +55,15 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       cell2D* cell = m_view[i][j];
       assert(cell);
-      if (cell->state_has_cache()) {
-        assert(std::dynamic_pointer_cast<base_cache>(cell->entity()));
+      if (cell->state_has_cache() || cell->state_in_cache_extent()) {
+        auto cache = std::dynamic_pointer_cast<base_cache>(cell->entity());
+        assert(nullptr != cache);
+        assert(cache->n_blocks() >= base_cache::kMinBlocks);
         caches.push_back(cell->cache());
       }
     } /* for(j..) */
   }   /* for(i..) */
+
   return caches;
 } /* caches() */
 

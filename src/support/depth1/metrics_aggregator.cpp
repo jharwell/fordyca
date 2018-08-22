@@ -90,6 +90,7 @@ metrics_aggregator::metrics_aggregator(
       "caches::lifecycle",
       metrics_path() + "/" + params->cache_lifecycle_fname,
       params->collect_interval);
+  reset_all();
 }
 
 /*******************************************************************************
@@ -122,6 +123,8 @@ void metrics_aggregator::collect_from_controller(
     ER_ASSERT(collision_m,
               "FATAL: FSM does not provide collision metrics");
 
+
+    collect("fsm::collision", *collision_m);
     collect_if(
         "blocks::acquisition",
         *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
@@ -142,7 +145,6 @@ void metrics_aggregator::collect_from_controller(
                      metrics)
                      .acquisition_goal();
         });
-
   }
 } /* collect_from_controller() */
 

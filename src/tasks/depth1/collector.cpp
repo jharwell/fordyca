@@ -42,8 +42,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 collector::collector(const struct ta::task_params* const params,
-                     std::unique_ptr<ta::taskable>& mechanism)
-    : foraging_task(kCollectorName, params, mechanism) {}
+                     std::unique_ptr<ta::taskable> mechanism)
+    : foraging_task(kCollectorName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
