@@ -67,24 +67,31 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /* state inquiry */
 
   /**
-   * @brief If TRUE, the state is currently KNOWN.
+   * @brief If \c TRUE, the state is currently KNOWN.
    */
   bool state_is_known(void) const { return m_fsm.state_is_known(); }
 
   /**
-   * @brief If TRUE, the state is currently known to contain a block.
+   * @brief If \c TRUE, the cell is currently known to contain a block.
    */
   bool state_has_block(void) const { return m_fsm.state_has_block(); }
 
   /**
-   * @brief If TRUE, the state is currently known to contain a cache.
+   * @brief If \c TRUE, the cell is currently known to contain a cache.
    */
   bool state_has_cache(void) const { return m_fsm.state_has_cache(); }
 
   /**
-   * @brief If TRUE, the state is currently known to be empty.
+   * @brief If \c TRUE, the cell is currently known to be part of a cache's
+   * extent, though does not contain a cache, but merely points to it.
+   */
+  bool state_in_cache_extent(void) const { return m_fsm.state_in_cache_extent(); }
+
+  /**
+   * @brief If \c TRUE, the cell is currently known to be empty.
    */
   bool state_is_empty(void) const { return m_fsm.state_is_empty(); }
+
 
   /**
    * @brief Reset the cell to its UNKNOWN state.

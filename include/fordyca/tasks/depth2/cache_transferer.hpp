@@ -49,7 +49,7 @@ class cache_transferer : public foraging_task,
                          public depth1::existing_cache_interactor {
  public:
   cache_transferer(const struct ta::task_params* params,
-            std::unique_ptr<ta::taskable>& mechanism);
+                   std::unique_ptr<ta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,

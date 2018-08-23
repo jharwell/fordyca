@@ -29,6 +29,7 @@
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/tasks/nest_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,10 +47,11 @@ NS_START(fordyca, tasks, depth1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public existing_cache_interactor {
+                  public existing_cache_interactor,
+                  public nest_interactor {
  public:
   collector(const struct ta::task_params* params,
-            std::unique_ptr<ta::taskable>& mechanism);
+            std::unique_ptr<ta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,

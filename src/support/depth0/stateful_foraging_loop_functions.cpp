@@ -89,8 +89,6 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
       controller.display_los(vparams->robot_los);
     }
 
-    utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-        robot, *arena_map());
   } /* for(entity..) */
   ER_NOM("stateful_foraging loop functions initialization finished");
 }

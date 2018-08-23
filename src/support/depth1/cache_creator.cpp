@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -74,7 +75,8 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
   }
 
   /*
-   * The cells for all blocks that will comprise the cache should be emptied,
+   * The cells for all blocks that will comprise the cache should be set to
+   * cache extent,
    * and all blocks be deposited in a single cell.
    */
   for (auto block : blocks) {
@@ -98,11 +100,25 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
       m_cache_size, m_grid.resolution(), center, block_vec, -1);
 } /* create_single() */
 
-void cache_creator::update_host_cells(representation::arena_grid& grid,
-                                      cache_vector& caches) {
+void cache_creator::update_host_cells(cache_vector& caches) {
+  /*
+   * To reset all cells covered by a cache's extent, we simply send them a
+   * CACHE_EXTENT event. EXCEPT for the cell that hosted the actual cache, because
+   * it is currently in the HAS_CACHE state as part of the cache creation
+   * process and setting it here will trigger an assert later.
+   */
   for (auto& cache : caches) {
-    grid.access(cache->discrete_loc().first, cache->discrete_loc().second)
-        .entity(cache);
+    m_grid.access(cache->discrete_loc()).entity(cache);
+    auto xspan = cache->xspan(cache->real_loc());
+    auto yspan = cache->yspan(cache->real_loc());
+    for (size_t i = xspan.get_min() / m_resolution; i < xspan.get_max() / m_resolution; ++i) {
+      for (size_t j = yspan.get_min() / m_resolution; j < yspan.get_max() / m_resolution; ++j) {
+        if (rcppsw::math::dcoord2(i, j) != cache->discrete_loc()) {
+          events::cell_cache_extent e(rcppsw::math::dcoord2(i, j), cache);
+          m_grid.access(i, j).accept(e);
+        }
+      } /* for(j..) */
+    } /* for(i..) */
   } /* for(cache..) */
 } /* update_host_cells() */
 

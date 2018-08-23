@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_DEPTH1_FREE_BLOCK_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_DEPTH1_FREE_BLOCK_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -58,4 +58,4 @@ class free_block_interactor
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_DEPTH1_FREE_BLOCK_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_ */

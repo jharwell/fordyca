@@ -58,45 +58,6 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions 
   void PreStep() override;
   void Reset(void) override;
 
-  /**
-   * @brief Set the LOS of a robot in the arena, INCLUDING handling caches whose
-   * extent overlaps the LOS but whose host cell is not in the LOS (see #244).
-   */
-  template<typename T>
-  void set_robot_los(argos::CFootBotEntity& robot,
-                     representation::arena_map& map) {
-    argos::CVector2 pos;
-    pos.Set(const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-            const_cast<argos::CFootBotEntity&>(robot).GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-
-    rcppsw::math::dcoord2 robot_loc =
-        math::rcoord_to_dcoord(pos, map.grid_resolution());
-    auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-    std::unique_ptr<representation::line_of_sight> new_los =
-        rcppsw::make_unique<representation::line_of_sight>(
-            map.subgrid(robot_loc.first, robot_loc.second, 2),
-            robot_loc);
-
-    for (auto &c : map.caches()) {
-      argos::CVector2 ll = math::dcoord_to_rcoord(new_los->abs_ll(),
-                                                  map.grid_resolution());
-      argos::CVector2 lr = math::dcoord_to_rcoord(new_los->abs_lr(),
-                                                  map.grid_resolution());
-      argos::CVector2 ul = math::dcoord_to_rcoord(new_los->abs_ul(),
-                                                  map.grid_resolution());
-      argos::CVector2 ur = math::dcoord_to_rcoord(new_los->abs_ur(),
-                                                  map.grid_resolution());
-      if (c->contains_point(ll) || c->contains_point(lr) ||
-          c->contains_point(ul) || c->contains_point(ur)) {
-        ER_VER("Add partially overlapping cache to %s LOS",
-                controller.GetId().c_str());
-        new_los->cache_add(c);
-      }
-    } /* for(&c..) */
-
-    controller.los(new_los);
-  }
-
  private:
   using interactor = arena_interactor<controller::depth1::foraging_controller>;
 

@@ -56,7 +56,7 @@ class foraging_task
  public:
   foraging_task(const std::string& name,
                 const struct ta::task_params *params,
-                std::unique_ptr<ta::taskable>& mechanism);
+                std::unique_ptr<ta::taskable> mechanism);
 
   static constexpr char kCacheStarterName[] = "Cache Starter";
   static constexpr char kCacheFinisherName[] = "Cache Finisher";

@@ -60,7 +60,7 @@ cache_block_drop::cache_block_drop(
 }
 
 /*******************************************************************************
- * Depth1 Foraging
+ * Depth0 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
@@ -108,6 +108,9 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
+/*******************************************************************************
+ * Depth1 Foraging
+ ******************************************************************************/
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
