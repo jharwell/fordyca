@@ -55,7 +55,7 @@ cache_creator::cache_vector static_cache_creator::create_all(
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
-            "FATAL: Cannot create static cache from <= %u blocks",
+            "FATAL: Cannot create static cache from < %u blocks",
             base_cache::kMinBlocks);
   ER_NOM("Creating static cache @(%f, %f) from %zu free blocks",
          m_center.GetX(),
