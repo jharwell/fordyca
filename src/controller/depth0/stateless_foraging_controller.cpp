@@ -74,6 +74,9 @@ void stateless_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
+  // add method for checking if the robot needs to get a cell from the arena.
+      // check for robot's internal flag
+  // add method for performing communication
   m_fsm->run();
 } /* ControlStep() */
 

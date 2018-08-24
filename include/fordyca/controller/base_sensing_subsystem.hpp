@@ -87,6 +87,9 @@ class base_sensing_subsystem {
   const hal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
+  const hal::sensors::rab_wifi_sensor& rabs(void) const {
+    return m_sensors.rabs;
+  }
 
   /**
    * @brief If \c TRUE, a block has *possibly* been detected.

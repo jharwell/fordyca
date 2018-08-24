@@ -101,7 +101,9 @@
           <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
 	      </actuation>
-        <communication field="0.5"/>
+        <communication chance_to_pass_on="0.5" 
+                       chance_to_start="0.8"
+                       max_message="10"/>
       </params>
     </stateless_foraging_controller>
   </controllers>
