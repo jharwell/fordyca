@@ -131,8 +131,14 @@ class arena_map : public rcppsw::er::client,
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
+   *
+   *
+   * @return \c TRUE iff a static cache was actually created. Non-fatal failures
+   * to create the static cache can occur if, for example, all blocks are
+   * currently being carried by robots and there are not enough free blocks with
+   * which to create a cache of the specified minimum size.
    */
-  void static_cache_create(void);
+  bool static_cache_create(void);
 
   bool has_static_cache(void) const { return mc_static_cache_params.enable; }
 
@@ -199,9 +205,27 @@ class arena_map : public rcppsw::er::client,
   double grid_resolution(void) { return m_grid.resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
 
+  /**
+   * @brief Perform deferred initialization (@todo: Fill this in...)
+   */
   bool initialize(void);
 
  private:
+  /**
+   * @brief Compute the blocks that are going to go into the static cache when
+   * it is recreated by the arena map.
+   *
+   * @param center The location for the new cache.
+   * @param blocks Empty block vector to be filled with references to the blocks
+   *               to be part of the new cache.
+   *
+   * @return \c TRUE iff the calculate of blocks was successful. It may fail if
+   * they are not enough free blocks in the arena to meet the desired initial
+   * size of the cache.
+   */
+  bool calc_blocks_for_static_cache(const argos::CVector2& center,
+                                    block_vector& blocks);
+
   // clang-format off
   uint                                      m_caches_removed{0};
   const params::depth1::static_cache_params mc_static_cache_params;

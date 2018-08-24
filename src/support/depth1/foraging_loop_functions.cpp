@@ -200,15 +200,18 @@ void foraging_loop_functions::pre_step_final(void) {
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
-      arena_map()->static_cache_create();
-      representation::cell2D& cell =
-          arena_map()->access(arena_map()->caches()[0]->discrete_loc());
-      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
-                arena_map()->caches()[0]->n_blocks(),
-                cell.block_count());
-      m_cache_collator.cache_created();
-      floor()->SetChanged();
+      if (arena_map()->static_cache_create()) {
+        representation::cell2D& cell =
+            arena_map()->access(arena_map()->caches()[0]->discrete_loc());
+        ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
+                  "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+                  arena_map()->caches()[0]->n_blocks(),
+                  cell.block_count());
+        m_cache_collator.cache_created();
+        floor()->SetChanged();
+      } else {
+        ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
+      }
     }
   }
   if (arena_map()->caches_removed() > 0) {

@@ -71,12 +71,6 @@ class line_of_sight {
   const_cache_list caches(void) const;
 
   /**
-   * @brief Add a cache to the LOS, beyond those whose host cell currently falls
-   * in the LOS (i.e. partial cache overlap)
-   */
-  void cache_add(const std::shared_ptr<base_cache>& cache);
-
-  /**
    * @brief Get the size of the X dimension for a LOS.
    *
    * @return The X dimension.

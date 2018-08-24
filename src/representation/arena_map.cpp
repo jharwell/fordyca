@@ -95,8 +95,68 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-void arena_map::static_cache_create(void) {
+bool arena_map::calc_blocks_for_static_cache(
+    const argos::CVector2& center,
+    block_vector& blocks) {
+  /*
+   * Only blocks that are not:
+   *
+   * - Currently carried by a robot
+   * - Currently placed on the cell where the cache is to be created
+   *
+   * are eligible for being used to re-create the static cache.
+   */
+  rcppsw::math::dcoord2 dcenter = math::rcoord_to_dcoord(center,
+                                                         m_grid.resolution());
+  for (auto& b : m_blocks) {
+    if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
+      blocks.push_back(b);
+    }
+    if (blocks.size() >= mc_static_cache_params.size) {
+      break;
+    }
+  } /* for(b..) */
+
+  bool ret = true;
+  if (blocks.size() < base_cache::kMinBlocks) {
+    uint count = std::accumulate(m_blocks.begin(),
+                                 m_blocks.end(),
+                                 0,
+                                 [&](uint sum,
+                                     const std::shared_ptr<base_block>& b) {
+                                   return sum + (b->is_out_of_sight() ||
+                                                 b->discrete_loc() == dcenter);
+                                 });
+
+    ER_ASSERT(count < base_cache::kMinBlocks,
+              "FATAL: For new cache @(%f, %f) [%u, %u]: %zu >= %u blocks SHOULD be available, but only %zu are",
+              center.GetX(),
+              center.GetY(),
+              dcenter.first,
+              dcenter.second,
+              m_blocks.size() - count,
+              base_cache::kMinBlocks,
+              blocks.size());
+  } else if (blocks.size() < mc_static_cache_params.size) {
+    ER_WARN("WARNING: Not enough free blocks to meet min size for new cache @(%f, %f) [%u, %u] (%zu < %u)",
+            center.GetX(),
+            center.GetY(),
+            dcenter.first,
+            dcenter.second,
+            blocks.size(),
+            mc_static_cache_params.size);
+    ret = false;
+  }
+  return ret;
+} /* calc_blocks_for_static_cache() */
+
+bool arena_map::static_cache_create(void) {
   ER_DIAG("(Re)-Creating static cache");
+  ER_ASSERT(mc_static_cache_params.size >= base_cache::kMinBlocks,
+            "FATAL: Static cache size %u < minimum %u",
+            mc_static_cache_params.size,
+            base_cache::kMinBlocks);
+
   argos::CVector2 center((m_grid.xrsize() + m_nest.real_loc().GetX()) / 2.0,
                          m_nest.real_loc().GetY());
 
@@ -107,26 +167,12 @@ void arena_map::static_cache_create(void) {
                                           m_grid.resolution());
 
   block_vector blocks;
-
-  /*
-   * Only blocks that are not:
-   *
-   * - Currently carried by a robot
-   * - Currently placed on the cell where the cache is to be created
-   *
-   * are eligible for being used to re-create the static cache.
-   */
-  for (auto& b : m_blocks) {
-    if (-1 == b->robot_id() &&
-        b->discrete_loc() !=
-            math::rcoord_to_dcoord(center, m_grid.resolution())) {
-      blocks.push_back(b);
-    }
-    if (blocks.size() >= mc_static_cache_params.size) {
-      break;
-    }
-  } /* for(b..) */
-
+  if (!calc_blocks_for_static_cache(center, blocks)) {
+    ER_WARN("WARNING: Unable to create static cache @(%f, %f): Not enough free blocks",
+            center.GetX(),
+            center.GetY());
+    return false;
+  }
   m_caches = creator.create_all(blocks);
 
   /*
@@ -160,6 +206,7 @@ void arena_map::static_cache_create(void) {
    * have a block as its entity!
    */
   creator.update_host_cells(m_caches);
+  return true;
 } /* static_cache_create() */
 
 bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {

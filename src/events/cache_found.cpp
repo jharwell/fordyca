@@ -106,10 +106,9 @@ void cache_found::visit(representation::perceived_arena_map& map) {
    * terms of cells), if we previously saw some of the leftover blocks when a
    * cache is destroyed, and left the area before a new cache could be
    * created. When we return to the arena and find a new cache there, we are
-   * tracking blocks that no longer exist in our perception. Thus, the need for
-   * this function.
+   * tracking blocks that no longer exist in our perception.
    *
-   * @note This is a hack, and once the robot computes its own LOS rather than
+   * @todo This is a hack, and once the robot computes its own LOS rather than
    * being sent it the need for this function will disappear.
    */
   auto it = map.blocks().begin();

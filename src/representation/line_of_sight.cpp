@@ -59,21 +59,21 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
         auto cache = std::dynamic_pointer_cast<base_cache>(cell->entity());
         assert(nullptr != cache);
         assert(cache->n_blocks() >= base_cache::kMinBlocks);
-        caches.push_back(cell->cache());
+        /*
+         * We can't add the cache unconditionally, because cache host cells and
+         * extent cells both refer to the same cache, and doing so will give you
+         * double references to a single cache in a LOS, which can cause
+         * problems with pheromone updating. See #433.
+         */
+        if (caches.end() == std::find(caches.begin(), caches.end(), cache)) {
+          caches.push_back(cache);
+        }
       }
     } /* for(j..) */
   }   /* for(i..) */
 
   return caches;
 } /* caches() */
-
-void line_of_sight::cache_add(const std::shared_ptr<base_cache>& cache) {
-  auto los_caches = caches();
-  if (los_caches.end() ==
-      std::find(los_caches.begin(), los_caches.end(), cache)) {
-    m_caches.push_back(cache);
-  }
-} /* cache_add() */
 
 __rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
   assert(i < m_view.shape()[0]);

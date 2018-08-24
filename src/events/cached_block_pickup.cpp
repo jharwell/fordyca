@@ -147,13 +147,10 @@ void cached_block_pickup::visit(representation::arena_map& map) {
               cell_op::y());
 
     map.cache_extent_clear(m_real_cache);
-    auto c = m_real_cache->discrete_loc();
     map.cache_remove(m_real_cache);
-    ER_ASSERT(map.access(c).state_has_block(), "FATAL: Cell not in HAS_BLOCK");
-    ER_ASSERT(nullptr == map.access(c).cache(), "FATAL: Cell not in HAS_BLOCK");
     map.caches_removed(1);
     ER_NOM(
-        "arena_map: fb%u: block%d from cache%d@(%zu, %zu) [cache empty]",
+        "arena_map: fb%u: block%d from cache%d@(%zu, %zu) [cache depleted]",
         m_robot_index,
         m_pickup_block->id(),
         cache_id,
@@ -201,7 +198,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
     map.cache_remove(cell.cache());
     ER_NOM(
         "perceived_arena_map: fb%u: block%d from cache%d@(%zu, %zu) [cache "
-        "empty]",
+        "depleted]",
         m_robot_index,
         m_pickup_block->id(),
         id,
@@ -214,7 +211,6 @@ void cached_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
 
-  /* Move block out of sight */
   block.move_out_of_sight();
   ER_NOM("block: block%d is now carried by fb%u", block.id(), m_robot_index);
 } /* visit() */

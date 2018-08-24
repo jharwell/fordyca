@@ -107,7 +107,6 @@ void free_block_pickup::visit(representation::base_block& block) {
   block.add_transporter(m_robot_index);
   block.first_pickup_time(m_timestep);
 
-  /* Move block out of sight */
   block.move_out_of_sight();
   ER_NOM("block: block%d is now carried by fb%u", m_block->id(), m_robot_index);
 } /* visit() */

@@ -95,7 +95,11 @@ void occupancy_grid::cell_update(size_t i, size_t j) {
   cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.last_result() <= 1.0,
-              "FATAL: Repeat pheromone deposit detected");
+              "FATAL: Repeat pheromone deposit detected for cell@(%zu, %zu) (%f > 1.0, state=%d)",
+              i,
+              j,
+              density.last_result(),
+              cell.fsm().current_state());
   }
 
   if (density.calc() < kEPSILON) {
