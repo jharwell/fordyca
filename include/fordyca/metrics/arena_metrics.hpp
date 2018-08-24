@@ -1,7 +1,7 @@
 /**
- * @file cell_empty.cpp
+ * @file arena_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,40 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
-using representation::occupancy_grid;
-using representation::arena_grid;
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-void cell_empty::visit(representation::cell2D& cell) {
-  cell.entity(nullptr);
-  cell.fsm().accept(*this);
-} /* visit() */
 
-void cell_empty::visit(fsm::cell2D_fsm& fsm) {
-  fsm.event_empty();
-} /* visit() */
+/**
+ * @class arena_metrics
+ * @ingroup metrics
+ *
+ * @brief Defines the metrics to be collected from the arena mapn.
+ *
+ * Metrics are collected every timestep.
+ */
+class arena_metrics : virtual public rcppsw::metrics::base_metrics {
+ public:
+  arena_metrics(void) = default;
 
-void cell_empty::visit(representation::arena_map& map) {
-  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
-} /* visit() */
+  /**
+   * @brief Should return \c TRUE iff there is currently a robot is the cell at
+   * (i,j) in the arena.
+   */
+  virtual bool has_robot(size_t i, size_t j) const = 0;
+};
 
-void cell_empty::visit(representation::perceived_arena_map& map) {
-  map.access<occupancy_grid::kPheromone>(x(), y()).reset();
-  map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
-} /* visit() */
+NS_END(metrics, fordyca);
 
-NS_END(events, fordyca);
+#endif /* INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_ */

@@ -35,6 +35,9 @@
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/metrics/arena_metrics.hpp"
+#include "fordyca/metrics/arena_metrics_collector.hpp"
+#include "fordyca/representation/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,6 +78,12 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
       "blocks::manipulation",
       metrics_path() + "/" + params->block_manipulation_fname,
       params->collect_interval);
+  register_collector<metrics::arena_metrics_collector>(
+      "arena::robot_occupancy",
+      metrics_path() + "/" + params->arena_robot_occupancy_fname,
+      params->collect_interval,
+      math::rcoord_to_dcoord(params->arena_grid.upper,
+                             params->arena_grid.resolution));
   reset_all();
 }
 
@@ -112,5 +121,10 @@ void stateless_metrics_aggregator::collect_from_block(
     const representation::base_block* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
+
+void stateless_metrics_aggregator::collect_from_arena(
+    const representation::arena_map* const arena) {
+  collect("arena::robot_occupancy", *arena);
+} /* collect_from_arena() */
 
 NS_END(depth0, support, fordyca);

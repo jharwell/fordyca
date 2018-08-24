@@ -95,9 +95,9 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 
 void cache_found::visit(representation::perceived_arena_map& map) {
   representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
@@ -118,7 +118,7 @@ void cache_found::visit(representation::perceived_arena_map& map) {
 
       events::cell_empty op((*it)->discrete_loc().first,
                             (*it)->discrete_loc().second);
-      map.access<occupancy_grid::kCellLayer>((*it)->discrete_loc()).accept(op);
+      map.access<occupancy_grid::kCell>((*it)->discrete_loc()).accept(op);
       it = map.blocks().erase(it);
     } else {
       ++it;

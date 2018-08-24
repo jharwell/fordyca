@@ -78,20 +78,20 @@ void base_perception_subsystem::process_los(
     for (size_t j = 0; j < los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (!los->cell(i, j).state_has_block() &&
-          m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
+          m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         ER_DIAG("Correct block%d discrepency at (%u, %u)",
-                m_map->access<occupancy_grid::kCellLayer>(d).block()->id(),
+                m_map->access<occupancy_grid::kCell>(d).block()->id(),
                 d.first,
                 d.second);
         m_map->block_remove(
-            m_map->access<occupancy_grid::kCellLayer>(d).block());
+            m_map->access<occupancy_grid::kCell>(d).block());
       }
     } /* for(j..) */
   }   /* for(i..) */
 
   for (auto block : los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(), "FATAL: Block out of sight in LOS?");
-    if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
+    if (!m_map->access<occupancy_grid::kCell>(block->discrete_loc())
              .state_has_block()) {
       ER_NOM("Discovered block%d at (%u, %u)",
              block->id(),
@@ -109,16 +109,16 @@ void base_perception_subsystem::update_cell_stats(
     for (size_t j = 0; j < los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (los->cell(i, j).state_is_empty() &&
-          m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-          !m_map->access<occupancy_grid::kCellLayer>(d).state_is_empty()) {
+          m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+          !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
         m_cell_stats[fsm::cell2D_fsm::ST_EMPTY]++;
       } else if (los->cell(i, j).state_has_block() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
+                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
       } else if (los->cell(i, j).state_has_cache() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_CACHE]++;
       }
     } /* for(j..) */

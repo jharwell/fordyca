@@ -34,7 +34,6 @@ NS_START(fordyca);
 
 namespace representation {
 class arena_map;
-class perceived_arena_map;
 class base_cache;
 } // namespace representation
 
@@ -55,8 +54,7 @@ NS_START(events);
  */
 class cell_cache_extent
     : public cell_op,
-      public visitor::can_visit<representation::arena_map>,
-      public visitor::can_visit<representation::perceived_arena_map> {
+      public visitor::can_visit<representation::arena_map> {
  public:
   cell_cache_extent(const rcppsw::math::dcoord2& coord,
                     const std::shared_ptr<representation::base_cache> cache);
@@ -65,9 +63,6 @@ class cell_cache_extent
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
-
-  /* stateful foraging */
-  void visit(representation::perceived_arena_map& map) override;
 
  private:
   // clang-format off

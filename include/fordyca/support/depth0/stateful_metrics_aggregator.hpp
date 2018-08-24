@@ -54,7 +54,7 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator {
  public:
   stateful_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
                                const struct params::metrics_params* params,
-                               const std::string& output_root);
+                              const std::string& output_root);
 
   /**
    * @brief Collect metrics from the stateful controller.

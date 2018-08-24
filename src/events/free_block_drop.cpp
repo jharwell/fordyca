@@ -40,6 +40,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -59,7 +60,7 @@ free_block_drop::free_block_drop(
 }
 
 /*******************************************************************************
- * Depth0/Support
+ * Depth0
  ******************************************************************************/
 void free_block_drop::visit(representation::cell2D& cell) {
   cell.entity(m_block);
@@ -80,7 +81,8 @@ void free_block_drop::visit(representation::base_block& block) {
 } /* visit() */
 
 void free_block_drop::visit(representation::arena_map& map) {
-  representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(),
+                                                               cell_op::y());
 
   /*
    * @todo We should be able to handle dropping a block on a cell in any

@@ -32,6 +32,8 @@
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
+#include "fordyca/metrics/arena_metrics.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -60,12 +62,15 @@ class arena_cache;
  * the grid and move around as the state of the arena changes.
  */
 class arena_map : public rcppsw::er::client,
+                  public metrics::arena_metrics,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<base_block>>;
-
   explicit arena_map(const struct params::arena::arena_map_params* params);
+
+  /* arena metrics */
+  bool has_robot(size_t i, size_t j) const override;
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -103,9 +108,25 @@ class arena_map : public rcppsw::er::client,
   void caches_removed(uint b) { m_caches_removed += b; }
   uint caches_removed(void) const { return m_caches_removed; }
 
-  cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  cell2D& access(const rcppsw::math::dcoord2& coord) {
-    return access(coord.first, coord.second);
+  template <int Index>
+  typename arena_grid::layer_value_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) {
+    return m_grid.access<Index>(d.first, d.second);
+  }
+  template <int Index>
+  const typename arena_grid::layer_value_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) const {
+    return m_grid. access<Index>(d.first, d.second);
+  }
+  template <int Index>
+  typename arena_grid::layer_value_type<Index>::value_type& access(
+      size_t i, size_t j) {
+    return m_grid.access<Index>(i, j);
+  }
+  template <int Index>
+  const typename arena_grid::layer_value_type<Index>::value_type& access(
+      size_t i, size_t j) const {
+    return m_grid. access<Index>(i, j);
   }
 
   /**
@@ -199,8 +220,8 @@ class arena_map : public rcppsw::er::client,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
-    return m_grid.subcircle(x, y, radius);
+  rcppsw::ds::grid_view<cell2D> subgrid(size_t x, size_t y, size_t radius) {
+    return m_grid.layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
   const representation::nest& nest(void) const { return m_nest; }

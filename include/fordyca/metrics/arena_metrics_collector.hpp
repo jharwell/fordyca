@@ -1,5 +1,5 @@
 /**
- * @file world_model_metrics_collector.hpp
+ * @file arena_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_ARENA_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_ARENA_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,6 +29,7 @@
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/ds/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,34 +41,43 @@ namespace visitor = rcppsw::patterns::visitor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class world_model_metrics_collector
+ * @class arena_metrics_collector
  * @ingroup metrics blocks
  *
- * @brief Collector for \ref world_model_metrics.
+ * @brief Collector for \ref arena_metrics.
  *
- * Metrics are written out at the specified collection interval.
+ * Arena metrics are somewhat unusual, because they output a large 2D array into
+ * a .csv each time they are written out. As such, at the specified collection
+ * interval the are written out, capturing the state of the arena for in terms
+ * of an accumulated desired quantity (i.e. metrics are always written out as
+ * cumulative averages).
  */
-class world_model_metrics_collector
+class arena_metrics_collector
     : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<world_model_metrics_collector> {
+      public visitor::visitable_any<arena_metrics_collector> {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
+   * @param dims Dimensions of arena.
    */
-  world_model_metrics_collector(const std::string& ofname, uint interval);
+  arena_metrics_collector(const std::string& ofname,
+                          uint interval,
+                          const rcppsw::math::dcoord2& dims);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
-  void reset_after_interval(void) override;
 
  private:
-  std::string csv_header_build(const std::string& header) override;
+  std::string csv_header_build(const std::string&) override;
   bool csv_line_build(std::string& line) override;
 
-  std::vector<uint> m_stats;
+  // clang-format off
+  rcppsw::ds::grid2D<uint> m_stats;
+  uint                     m_total{0};  // Total count of all robots across all timesteps
+  // clang-format on
 };
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_ARENA_METRICS_COLLECTOR_HPP_ */

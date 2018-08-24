@@ -103,7 +103,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
       if (m_cache_penalty_handler.is_serving_penalty(controller)) {
         if (m_cache_penalty_handler.penalty_satisfied(controller,
                                                       timestep)) {
-          finish_cached_block_pickup(controller);
+          finish_cached_block_pickup(controller, timestep);
         }
       } else {
         m_cache_penalty_handler.penalty_init(controller,
@@ -129,13 +129,12 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * actually performs the handshaking between the cache, the arena, and the
    * robot for block pickup.
    */
-  void finish_cached_block_pickup(T& controller) {
+  void finish_cached_block_pickup(T& controller, uint timestep) {
     const temporal_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-        controller.current_task());
-    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+    ER_ASSERT(nullptr != dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+        controller.current_task()), "FATAL: Non-cache interface task!");
     ER_ASSERT(acquisition_goal_type::kExistingCache ==
               controller.current_task()->acquisition_goal(),
               "FATAL: Controller not waiting for cached block pickup");
@@ -158,7 +157,7 @@ class arena_interactor : public depth0::arena_interactor<T> {
                                       p.id());
       controller.visitor::template visitable_any<T>::accept(vanished);
     } else {
-      perform_cached_block_pickup(controller, p);
+      perform_cached_block_pickup(controller, p, timestep);
       floor()->SetChanged();
     }
     m_cache_penalty_handler.remove(p);
@@ -171,10 +170,12 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * preconditions have been satisfied.
    */
   void perform_cached_block_pickup(T& controller,
-                                   const temporal_penalty<T>& penalty) {
+                                   const temporal_penalty<T>& penalty,
+                                   uint timestep) {
     events::cached_block_pickup pickup_op(rcppsw::er::g_server,
                                           map()->caches()[penalty.id()],
-                                          utils::robot_id(controller));
+                                          utils::robot_id(controller),
+                                          timestep);
     map()->caches()[penalty.id()]->penalty_served(penalty.penalty());
 
     /*
@@ -192,9 +193,8 @@ class arena_interactor : public depth0::arena_interactor<T> {
     const temporal_penalty<T>& p = m_cache_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "FATAL: Out of order cache penalty handling");
-    auto task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-        controller.current_task());
-    ER_ASSERT(task, "FATAL: Non-cache interface task!");
+    ER_ASSERT(nullptr != dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+        controller.current_task()), "FATAL: Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               acquisition_goal_type::kExistingCache == controller.current_task()->acquisition_goal(),
               "FATAL: Controller not waiting for cache block drop");

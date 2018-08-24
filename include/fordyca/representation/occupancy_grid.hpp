@@ -47,11 +47,14 @@ NS_START(representation);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-using layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
+using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 
 class occupancy_grid : public rcppsw::er::client,
-                       public rcppsw::ds::stacked_grid2<layer_stack> {
+                       public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
+  constexpr static uint kPheromone = 0;
+  constexpr static uint kCell = 1;
+
   occupancy_grid(std::shared_ptr<rcppsw::er::server> server,
                  const struct params::occupancy_grid_params* c_params,
                  const std::string& robot_id);
@@ -69,8 +72,6 @@ class occupancy_grid : public rcppsw::er::client,
   bool pheromone_repeat_deposit(void) const {
     return m_pheromone_repeat_deposit;
   }
-  constexpr static uint kPheromoneLayer = 0;
-  constexpr static uint kCellLayer = 1;
 
  private:
   void cell_update(size_t i, size_t j);
@@ -81,7 +82,6 @@ class occupancy_grid : public rcppsw::er::client,
 
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
-  std::shared_ptr<rcppsw::er::server> m_server;
   // clang-format on
 };
 

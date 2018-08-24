@@ -144,23 +144,23 @@ class perceived_arena_map
    * @return The cell.
    */
   template <int Index>
-  typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
-                                                                 size_t j) {
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                       size_t j) {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(
+  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       size_t i,
       size_t j) const {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  typename occupancy_grid::layer_type<Index>::value_type& access(
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) {
     return m_grid.access<Index>(d);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(
+  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) const {
     return m_grid.access<Index>(d);
   }

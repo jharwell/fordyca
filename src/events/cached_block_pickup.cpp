@@ -44,6 +44,7 @@
 NS_START(fordyca, events);
 using representation::base_cache;
 using representation::occupancy_grid;
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -51,12 +52,13 @@ using representation::occupancy_grid;
 cached_block_pickup::cached_block_pickup(
     std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::arena_cache>& cache,
-    size_t robot_index)
+    uint robot_index,
+    uint timestep)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
       client(server),
       m_robot_index(robot_index),
-      m_real_cache(cache),
-      m_server(server) {
+      m_timestep(timestep),
+      m_real_cache(cache) {
   client::insmod("cached_block_pickup",
                  rcppsw::er::er_lvl::DIAG,
                  rcppsw::er::er_lvl::NOM);
@@ -108,7 +110,8 @@ void cached_block_pickup::visit(representation::arena_map& map) {
             cell_op::y(),
             cell_op::y());
 
-  representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(),
+                                                               cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
             "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
             m_real_cache->n_blocks(),
@@ -162,7 +165,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
 
 void cached_block_pickup::visit(representation::perceived_arena_map& map) {
   representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(cell.state_has_cache(), "FATAL: Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "FATAL: perceived cache/cell disagree on # of blocks: "
@@ -210,6 +213,7 @@ void cached_block_pickup::visit(representation::perceived_arena_map& map) {
 void cached_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "FATAL: Unamed block");
   block.add_transporter(m_robot_index);
+  block.first_pickup_time(m_timestep);
 
   block.move_out_of_sight();
   ER_NOM("block: block%d is now carried by fb%u", block.id(), m_robot_index);

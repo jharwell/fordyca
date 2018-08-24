@@ -34,6 +34,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
+using representation::arena_grid;
+
 namespace er = rcppsw::er;
 namespace ds = rcppsw::ds;
 namespace math = rcppsw::math;
@@ -113,14 +115,14 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placem
     uint x_max = x + std::sqrt(clust_sizes[i]);
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
-    auto view = grid.subgrid(x, y, x_max, y_max);
+    auto view = grid.layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
     ER_VER(
         "Guess cluster%zu placement: x=[%lu-%lu], y=[%lu-%lu], size=%u",
         i,
-        (*view.origin())->loc().first + view.index_bases()[0],
-        (*view.origin())->loc().first + view.index_bases()[0] + view.shape()[0],
-        (*view.origin())->loc().second + view.index_bases()[1],
-        (*view.origin())->loc().second + view.index_bases()[1] + view.shape()[1],
+        (*view.origin()).loc().first + view.index_bases()[0],
+        (*view.origin()).loc().first + view.index_bases()[0] + view.shape()[0],
+        (*view.origin()).loc().second + view.index_bases()[1],
+        (*view.origin()).loc().second + view.index_bases()[1] + view.shape()[1],
         clust_sizes[i]);
     views.push_back(std::make_pair(view, clust_sizes[i]));
   } /* for(i..) */
@@ -137,10 +139,10 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
           if (other == v) { /* self */
             return false;
           }
-          uint v_xbase = (*v.first.origin())->loc().first;
-          uint v_ybase = (*v.first.origin())->loc().second;
-          uint other_xbase = (*other.first.origin())->loc().first;
-          uint other_ybase = (*other.first.origin())->loc().second;
+          uint v_xbase = (*v.first.origin()).loc().first;
+          uint v_ybase = (*v.first.origin()).loc().second;
+          uint other_xbase = (*other.first.origin()).loc().first;
+          uint other_ybase = (*other.first.origin()).loc().second;
           math::range<uint> v_xrange(v_xbase + v.first.index_bases()[0],
                                      v_xbase + v.first.index_bases()[0] +
                                          v.first.shape()[0]);
@@ -205,8 +207,8 @@ bool powerlaw_distributor::map_clusters(representation::arena_grid& grid) {
     ER_NOM("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
     for (auto dist : it->second) {
       ER_DIAG("Cluster with origin@(%u, %u): capacity=%u",
-              (*dist.cluster().view().origin())->loc().first,
-              (*dist.cluster().view().origin())->loc().second,
+              (*dist.cluster().view().origin()).loc().first,
+              (*dist.cluster().view().origin()).loc().second,
               dist.cluster().capacity());
     } /* for(dist..) */
   }   /* for(&l..) */

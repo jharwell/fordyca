@@ -61,7 +61,7 @@ perceived_arena_map::perceived_block_list perceived_arena_map::perceived_blocks(
 
   for (auto& b : m_blocks) {
     pblocks.push_back(perceived_block(
-        b, m_grid.access<occupancy_grid::kPheromoneLayer>(b->discrete_loc())));
+        b, m_grid.access<occupancy_grid::kPheromone>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
@@ -72,7 +72,7 @@ perceived_arena_map::perceived_cache_list perceived_arena_map::perceived_caches(
 
   for (auto& c : m_caches) {
     pcaches.push_back(perceived_cache(
-        c, m_grid.access<occupancy_grid::kPheromoneLayer>(c->discrete_loc())));
+        c, m_grid.access<occupancy_grid::kPheromone>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */
@@ -87,7 +87,7 @@ void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
+      m_grid.access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_caches.erase(it);
       return;
     }
@@ -153,7 +153,7 @@ bool perceived_arena_map::block_remove(const std::shared_ptr<base_block>& victim
       ER_VER("Remove block%d", victim->id());
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access<occupancy_grid::kCellLayer>(victim->discrete_loc()).accept(op);
+      m_grid.access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_blocks.erase(it);
       return true;
     }

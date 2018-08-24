@@ -33,7 +33,11 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { struct output_params; class loop_function_repository; }
+namespace params {
+struct output_params;
+class loop_function_repository;
+namespace arena { struct arena_map_params; }
+}
 
 NS_START(support, depth0);
 class stateless_metrics_aggregator;
@@ -81,7 +85,8 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
       arena_interactor<controller::depth0::stateless_foraging_controller>;
 
   void arena_map_init(params::loop_function_repository& repo);
-  void output_init(const struct params::output_params* p_output);
+  void output_init(const struct params::arena::arena_map_params* const arena,
+                   struct params::output_params* const output);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 

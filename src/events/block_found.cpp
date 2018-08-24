@@ -72,9 +72,9 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 
 void block_found::visit(representation::perceived_arena_map& map) {
   representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
 
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
