@@ -34,11 +34,6 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(const std::shared_ptr<rcppsw::er::server>& server)
-    : m_loc(), m_fsm(server) {
-  m_fsm.init();
-}
-
 cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 
 /*******************************************************************************

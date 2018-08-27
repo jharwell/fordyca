@@ -32,6 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -60,7 +61,7 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
    * block. If so, it should be added to the list of blocks for the cache.
    */
   rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, m_resolution);
-  representation::cell2D& cell = m_grid.access(d.first, d.second);
+  representation::cell2D& cell = m_grid.access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
 
@@ -81,12 +82,12 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
    */
   for (auto block : blocks) {
     events::cell_empty op(block->discrete_loc());
-    m_grid.access(op.x(), op.y()).accept(op);
+    m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
 
   for (auto block : blocks) {
     events::free_block_drop op(client::server_ref(), block, d, m_resolution);
-    m_grid.access(op.x(), op.y()).accept(op);
+    m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
   ER_NOM("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
          center.GetX(),
@@ -108,14 +109,14 @@ void cache_creator::update_host_cells(cache_vector& caches) {
    * process and setting it here will trigger an assert later.
    */
   for (auto& cache : caches) {
-    m_grid.access(cache->discrete_loc()).entity(cache);
+    m_grid.access<arena_grid::kCell>(cache->discrete_loc()).entity(cache);
     auto xspan = cache->xspan(cache->real_loc());
     auto yspan = cache->yspan(cache->real_loc());
     for (size_t i = xspan.get_min() / m_resolution; i < xspan.get_max() / m_resolution; ++i) {
       for (size_t j = yspan.get_min() / m_resolution; j < yspan.get_max() / m_resolution; ++j) {
         if (rcppsw::math::dcoord2(i, j) != cache->discrete_loc()) {
           events::cell_cache_extent e(rcppsw::math::dcoord2(i, j), cache);
-          m_grid.access(i, j).accept(e);
+          m_grid.access<arena_grid::kCell>(i, j).accept(e);
         }
       } /* for(j..) */
     } /* for(i..) */

@@ -135,7 +135,7 @@ void free_block_pickup::visit(representation::perceived_arena_map& map) {
                 rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "FATAL: Coordinates for block/cell do not agree");
   representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
 
   /*
    * @bug: This should just be an assert. However, due to #242, the fact that

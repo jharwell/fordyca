@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -102,7 +102,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </depth1_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -110,7 +110,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -131,6 +131,7 @@
           task_execution_harvester_fname="task-execution-harvester.csv"
           task_generalist_tab_fname="task-generalist-tab.csv"
           perception_world_model_fname="perception-world-model.csv"
+          arena_robot_occupancy_fname="arena-robot-occupancy.csv"
           collect_interval="1000"
           />
     </output>
@@ -264,7 +265,7 @@
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
+  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 

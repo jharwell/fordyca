@@ -25,8 +25,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <tuple>
+
 #include "fordyca/representation/cell2D.hpp"
-#include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/ds/stacked_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,23 +44,23 @@ NS_START(fordyca, representation);
  *
  * @brief Representation of the cells within a grid layout
  */
-class arena_grid
-    : public rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&> {
+using arena_layer_stack = std::tuple<cell2D, bool>;
+class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
  public:
-  using view = rcppsw::ds::grid_view<representation::cell2D*>;
+  using view = rcppsw::ds::grid_view<representation::cell2D>;
+
+  constexpr static uint kCell = 0;
+  constexpr static uint kRobotOccupancy = 1;
 
   arena_grid(double resolution,
              size_t x_max,
              size_t y_max,
-             std::shared_ptr<rcppsw::er::server>& server)
-      : rcppsw::ds::grid2D_ptr<cell2D, std::shared_ptr<rcppsw::er::server>&>(
-            resolution,
-            x_max,
-            y_max,
-            server) {
+             std::shared_ptr<rcppsw::er::server> server)
+      : stacked_grid(resolution, x_max, y_max) {
     for (size_t i = 0; i < xdsize(); ++i) {
       for (size_t j = 0; j < ydsize(); ++j) {
-        access(i, j).loc(rcppsw::math::dcoord2(i, j));
+        access<kCell>(i, j).loc(rcppsw::math::dcoord2(i, j));
+        access<kCell>(i, j).fsm().deferred_client_init(server);
       } /* for(j..) */
     }   /* for(i..) */
   }
@@ -70,7 +72,7 @@ class arena_grid
   void reset(void) {
     for (size_t i = 0; i < xdsize(); ++i) {
       for (size_t j = 0; j < ydsize(); ++j) {
-        cell2D& cell = access(i, j);
+        cell2D& cell = access<kCell>(i, j);
         cell.reset();
       } /* for(j..) */
     }   /* for(i..) */

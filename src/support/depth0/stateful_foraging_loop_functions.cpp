@@ -60,12 +60,14 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
 #endif
 
   /* initialize stat collecting */
-  auto* p_output = repo.parse_results<const struct params::output_params>();
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output = *repo.parse_results<const struct params::output_params>();
+  output.metrics.arena_grid = arenap->grid;
+
   m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
+      rcppsw::er::g_server, &output.metrics, output_root());
 
   /* intitialize robot interactions with environment */
-  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   m_interactor =
       rcppsw::make_unique<interactor>(rcppsw::er::g_server,
                                       arena_map(),
@@ -143,6 +145,7 @@ void stateful_foraging_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
 } /* PreStep() */
 

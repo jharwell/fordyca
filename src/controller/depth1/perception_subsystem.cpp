@@ -60,13 +60,13 @@ void perception_subsystem::process_los(
     for (size_t j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
-          map()->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+          map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         ER_DIAG("Correct cache%d discrepency at (%u, %u)",
-                map()->access<occupancy_grid::kCellLayer>(d).cache()->id(),
+                map()->access<occupancy_grid::kCell>(d).cache()->id(),
                 d.first,
                 d.second);
         map()->cache_remove(
-            map()->access<occupancy_grid::kCellLayer>(d).cache());
+            map()->access<occupancy_grid::kCell>(d).cache());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -93,14 +93,14 @@ void perception_subsystem::process_los(
            cache->discrete_loc().first,
            cache->discrete_loc().second,
            cache->n_blocks());
-    auto& cell = map()->access<occupancy_grid::kCellLayer>(cache->discrete_loc());
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
     if (!cell.state_has_cache()) {
       ER_NOM("Discovered cache%d(%u, %u): %u blocks (density=%f, state=%d)",
              cache->id(),
              cache->discrete_loc().first,
              cache->discrete_loc().second,
              cache->n_blocks(),
-             map()->access<occupancy_grid::kPheromoneLayer>(cache->discrete_loc()).last_result(),
+             map()->access<occupancy_grid::kPheromone>(cache->discrete_loc()).last_result(),
              cell.fsm().current_state());
     } else if (cell.state_has_cache() && cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_NOM("Fixed cache%d@(%u, %u) block count: %u blocks -> %u blocks",
@@ -130,7 +130,7 @@ void perception_subsystem::process_los(
     for (size_t j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       auto cell1 = c_los->cell(i, j);
-      auto cell2 = map()->access<occupancy_grid::kCellLayer>(d);
+      auto cell2 = map()->access<occupancy_grid::kCell>(d);
       ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
                 "FATAL: LOS/PAM disagree on state of cell at (%zu, %zu): %d/%d",
                 i, j, cell1.fsm().current_state(),
@@ -146,7 +146,7 @@ void perception_subsystem::process_los(
   for (auto c1 : c_los->caches()) {
     for (auto c2 : map()->caches()) {
       if (*c1 == *c2) {
-        auto cell = map()->access<occupancy_grid::kCellLayer>(c2->discrete_loc());
+        auto cell = map()->access<occupancy_grid::kCell>(c2->discrete_loc());
         ER_ASSERT(c1->n_blocks() == cell.cache()->n_blocks(),
                   "FATAL: LOS/PAM disagogree on # of blocks in cell at (%u, %u): %d/%d",
                   cell.loc().first, cell.loc().second, c1->n_blocks(), cell.cache()->n_blocks());

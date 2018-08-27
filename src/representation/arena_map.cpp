@@ -70,6 +70,10 @@ bool arena_map::initialize(void) {
   return m_block_dispatcher.initialize();
 } /* initialize() */
 
+bool arena_map::has_robot(size_t i, size_t j) const {
+  return m_grid.access<arena_grid::kRobotOccupancy>(i, j);
+} /* has_robot() */
+
 __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
@@ -188,13 +192,13 @@ bool arena_map::static_cache_create(void) {
           c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
         events::cell_empty empty(b->discrete_loc());
-        m_grid.access(b->discrete_loc()).accept(empty);
+        m_grid.access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
         events::free_block_drop op(client::server_ref(),
                                    b,
                                    math::rcoord_to_dcoord(c->real_loc(),
                                                           m_grid.resolution()),
                                    m_grid.resolution());
-        m_grid.access(op.x(), op.y()).accept(op);
+        m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);
         ER_NOM("Hidden block%d added to cache%d", b->id(), c->id());
       }
@@ -243,7 +247,7 @@ void arena_map::distribute_all_blocks(void) {
    */
   for (size_t i = 0; i < m_grid.xdsize(); ++i) {
     for (size_t j = 0; j < m_grid.ydsize(); ++j) {
-      cell2D& cell = m_grid.access(i, j);
+      cell2D& cell = m_grid.access<arena_grid::kCell>(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache()) {
         events::cell_empty op(i, j);
         cell.accept(op);
@@ -277,7 +281,7 @@ void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
          j < yspan.get_max() / m_grid.resolution(); ++j) {
       if (rcppsw::math::dcoord2(i, j) != victim->discrete_loc()) {
         events::cell_empty e(rcppsw::math::dcoord2(i, j));
-        m_grid.access(i, j).accept(e);
+        m_grid.access<arena_grid::kCell>(i, j).accept(e);
       }
     } /* for(j..) */
   } /* for(i..) */

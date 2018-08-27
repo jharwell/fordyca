@@ -60,7 +60,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_PARAM(mnode, m_params, output_dir);
 
     XML_PARSE_PARAM(mnode, m_params, perception_world_model_fname);
-
+    XML_PARSE_PARAM(mnode, m_params, arena_robot_occupancy_fname);
     XML_PARSE_PARAM(mnode, m_params, collect_interval);
 
     m_parsed = true;
@@ -86,6 +86,7 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, fsm_collision_fname) << std::endl
          << XML_PARAM_STR(m_params, fsm_movement_fname) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
+         << XML_PARAM_STR(m_params, arena_robot_occupancy_fname) << std::endl
          << XML_PARAM_STR(m_params, perception_world_model_fname) << std::endl
          << XML_PARAM_STR(m_params, collect_interval) << std::endl
          << build_footer();

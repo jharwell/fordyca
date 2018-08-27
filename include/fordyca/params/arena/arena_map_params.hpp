@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/params/arena/blocks_params.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"

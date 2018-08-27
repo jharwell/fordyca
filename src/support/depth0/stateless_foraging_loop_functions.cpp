@@ -38,6 +38,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -65,12 +66,14 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   repo.parse_all(node);
 
   /* initialize output and metrics collection */
-  auto* p_output = repo.parse_results<params::output_params>();
-  output_init(p_output);
+  auto* arena = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output = *repo.parse_results<params::output_params>();
+  output.metrics.arena_grid = arena->grid;
+  output_init(arena, &output);
 
 #ifndef ER_NREPORT
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
-                                       p_output->log_fname);
+                                       output.log_fname);
   rcppsw::er::g_server->log_stream() << repo;
 #endif
 
@@ -155,6 +158,11 @@ void stateless_foraging_loop_functions::pre_step_iter(
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      m_arena_map->grid_resolution());
+  m_arena_map->access<arena_grid::kRobotOccupancy>(coord) = true;
+
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
@@ -172,6 +180,7 @@ void stateless_foraging_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(m_arena_map.get());
   pre_step_final();
 } /* PreStep() */
 
@@ -198,20 +207,24 @@ void stateless_foraging_loop_functions::arena_map_init(
 } /* arena_map_init() */
 
 void stateless_foraging_loop_functions::output_init(
-    const struct params::output_params* params) {
-  if ("__current_date__" == params->output_dir) {
+    const struct params::arena::arena_map_params* const arena,
+    struct params::output_params* const output) {
+  if ("__current_date__" == output->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = params->output_root + "/" +
+    m_output_root = output->output_root + "/" +
                     std::to_string(now.date().year()) + "-" +
                     std::to_string(now.date().month()) + "-" +
                     std::to_string(now.date().day()) + ":" +
                     std::to_string(now.time_of_day().hours()) + "-" +
                     std::to_string(now.time_of_day().minutes());
   } else {
-    m_output_root = params->output_root + "/" + params->output_dir;
+    m_output_root = output->output_root + "/" + output->output_dir;
   }
+
+  output->metrics.arena_grid = arena->grid;
+
   m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
-      rcppsw::er::g_server, &params->metrics, m_output_root);
+      rcppsw::er::g_server, &output->metrics, output_root());
 } /* output_init() */
 
 std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {

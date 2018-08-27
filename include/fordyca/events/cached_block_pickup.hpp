@@ -86,7 +86,8 @@ class cached_block_pickup
  public:
   cached_block_pickup(std::shared_ptr<rcppsw::er::server> server,
                       const std::shared_ptr<representation::arena_cache>& cache,
-                      size_t robot_index);
+                      uint robot_index,
+                      uint timestep);
   ~cached_block_pickup(void) override { client::rmmod(); }
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
@@ -111,6 +112,7 @@ class cached_block_pickup
  private:
   // clang-format off
   uint                                         m_robot_index;
+  uint                                         m_timestep;
   std::shared_ptr<representation::arena_cache> m_real_cache;
 
   /**
@@ -123,7 +125,6 @@ class cached_block_pickup
    * block, that needs to be sent to the cell that the cache used to live on.
    */
   std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
-  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

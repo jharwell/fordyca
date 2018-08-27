@@ -58,10 +58,10 @@ bool random_distributor::distribute_blocks(block_vector& blocks,
                                            entity_list& entities) {
   ER_NOM("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
          blocks.size(),
-         (*m_grid.origin())->loc().first,
-         (*m_grid.origin())->loc().first + m_grid.shape()[0],
-         (*m_grid.origin())->loc().second,
-         (*m_grid.origin())->loc().second + m_grid.shape()[1]);
+         (*m_grid.origin()).loc().first,
+         (*m_grid.origin()).loc().first + m_grid.shape()[0],
+         (*m_grid.origin()).loc().second,
+         (*m_grid.origin()).loc().second + m_grid.shape()[1]);
   for (auto& b : blocks) {
     if (!distribute_block(b, entities)) {
       return false;
@@ -84,7 +84,7 @@ bool random_distributor::distribute_block(
           coord[2],
           coord[3]);
 
-  cell = m_grid[coord[0]][coord[1]];
+  cell = &m_grid[coord[0]][coord[1]];
 
   /*
    * You can only distribute blocks to cells that do not currently have
@@ -157,8 +157,8 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
   do {
     rel_x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
     rel_y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
-    abs_x = rel_x + (*m_grid.origin())->loc().first;
-    abs_y = rel_y + (*m_grid.origin())->loc().second;
+    abs_x = rel_x + (*m_grid.origin()).loc().first;
+    abs_y = rel_y + (*m_grid.origin()).loc().second;
   } while (
       std::any_of(
           entities.begin(),

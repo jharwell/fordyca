@@ -55,12 +55,12 @@ class base_cell_entity;
  */
 class cell2D : public visitor::visitable_any<cell2D> {
  public:
-  explicit cell2D(const std::shared_ptr<rcppsw::er::server>& server);
   cell2D(void);
 
   cell2D(const cell2D& other) = default;
   cell2D& operator=(const cell2D& other) = delete;
 
+  bool operator==(const cell2D& other) const { return other.loc() == m_loc; }
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) const { return m_robot_id; }
 

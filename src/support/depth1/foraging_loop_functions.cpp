@@ -41,6 +41,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Member Functions
@@ -174,6 +175,7 @@ void foraging_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
 } /* PreStep() */
 
@@ -201,8 +203,8 @@ void foraging_loop_functions::pre_step_final(void) {
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
       if (arena_map()->static_cache_create()) {
-        representation::cell2D& cell =
-            arena_map()->access(arena_map()->caches()[0]->discrete_loc());
+        __rcsw_unused representation::cell2D& cell =
+            arena_map()->access<arena_grid::kCell>(arena_map()->caches()[0]->discrete_loc());
         ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
                   "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                   arena_map()->caches()[0]->n_blocks(),

@@ -37,24 +37,22 @@ occupancy_grid::occupancy_grid(
     std::shared_ptr<rcppsw::er::server> server,
     const struct params::occupancy_grid_params* c_params,
     const std::string& robot_id)
-    : client(),
-      stacked_grid2(c_params->grid.resolution,
+    : client(server),
+      stacked_grid(c_params->grid.resolution,
                     static_cast<size_t>(c_params->grid.upper.GetX()),
                     static_cast<size_t>(c_params->grid.upper.GetY())),
       m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
-      m_robot_id(robot_id),
-      m_server(std::move(server)) {
-  deferred_client_init(m_server);
+      m_robot_id(robot_id) {
   insmod("occupancy_grid", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
   ER_NOM("%zu x%zu/%zu x %zu @ %f resolution",
-         stacked_grid2::xdsize(),
-         stacked_grid2::ydsize(),
-         stacked_grid2::xrsize(),
-         stacked_grid2::yrsize(),
-         stacked_grid2::resolution());
+         xdsize(),
+         ydsize(),
+         xrsize(),
+         yrsize(),
+         resolution());
 
-  for (size_t i = 0; i < stacked_grid2::xdsize(); ++i) {
-    for (size_t j = 0; j < stacked_grid2::ydsize(); ++j) {
+  for (size_t i = 0; i < xdsize(); ++i) {
+    for (size_t j = 0; j < ydsize(); ++j) {
       cell_init(i, j, c_params->pheromone.rho);
     } /* for(j..) */
   }   /* for(i..) */
@@ -65,34 +63,34 @@ occupancy_grid::occupancy_grid(
  ******************************************************************************/
 void occupancy_grid::update(void) {
 #pragma omp parallel for
-  for (size_t i = 0; i < stacked_grid2::xdsize(); ++i) {
-    for (size_t j = 0; j < stacked_grid2::ydsize(); ++j) {
+  for (size_t i = 0; i < xdsize(); ++i) {
+    for (size_t j = 0; j < ydsize(); ++j) {
       cell_update(i, j);
     } /* for(j..) */
   }   /* for(i..) */
 } /* update() */
 
 void occupancy_grid::reset(void) {
-  for (size_t i = 0; i < stacked_grid2::xdsize(); ++i) {
-    for (size_t j = 0; j < stacked_grid2::ydsize(); ++j) {
-      cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
+  for (size_t i = 0; i < xdsize(); ++i) {
+    for (size_t j = 0; j < ydsize(); ++j) {
+      cell2D& cell = access<kCell>(i, j);
       cell.reset();
     } /* for(j..) */
   }   /* for(i..) */
 } /* Reset */
 
 void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {
-  stacked_grid2::access<kPheromoneLayer>(i, j).rho(pheromone_rho);
-  cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
+  access<kPheromone>(i, j).rho(pheromone_rho);
+  cell2D& cell = access<kCell>(i, j);
   cell.robot_id(m_robot_id);
   cell.loc(rcppsw::math::dcoord2(i, j));
-  cell.fsm().deferred_client_init(m_server);
+  cell.fsm().deferred_client_init(server_ref());
 } /* cell_init() */
 
 void occupancy_grid::cell_update(size_t i, size_t j) {
   rcppsw::swarm::pheromone_density& density =
-      stacked_grid2::access<kPheromoneLayer>(i, j);
-  cell2D& cell = stacked_grid2::access<kCellLayer>(i, j);
+      access<kPheromone>(i, j);
+  cell2D& cell = access<kCell>(i, j);
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.last_result() <= 1.0,
               "FATAL: Repeat pheromone deposit detected for cell@(%zu, %zu) (%f > 1.0, state=%d)",

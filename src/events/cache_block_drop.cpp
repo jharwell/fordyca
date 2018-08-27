@@ -40,6 +40,7 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 using representation::occupancy_grid;
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -83,7 +84,7 @@ void cache_block_drop::visit(representation::arena_map& map) {
   __rcsw_unused int index = m_block->robot_id();
   m_block->accept(*this);
   m_cache->accept(*this);
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
   ER_NOM("arena_map: fb%d dropped block%d in cache%d [%u blocks total]",
          index,
          m_block->id(),
@@ -92,7 +93,7 @@ void cache_block_drop::visit(representation::arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::perceived_arena_map& map) {
-  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
+  map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(representation::base_block& block) {
