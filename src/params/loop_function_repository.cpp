@@ -37,7 +37,7 @@ namespace ct = rcppsw::control;
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(
-    const std::shared_ptr<rcppsw::er::server>& server)
+    std::shared_ptr<rcppsw::er::server> server)
     : xml_param_repository(server) {
   register_parser<output_parser, output_params>(
       output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);

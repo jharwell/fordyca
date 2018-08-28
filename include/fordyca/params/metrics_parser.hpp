@@ -47,7 +47,7 @@ NS_START(fordyca, params);
  */
 class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
-  metrics_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+  metrics_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
       : xml_param_parser(server, level) {}
 
   /**

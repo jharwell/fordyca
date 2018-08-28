@@ -66,11 +66,10 @@ class block_to_goal_fsm : public base_foraging_fsm,
                           public block_transporter,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
-  block_to_goal_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::block_selection_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  block_to_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
+                    const controller::block_selection_matrix* sel_matrix,
+                    controller::saa_subsystem* saa,
+                    representation::perceived_arena_map* map);
 
   block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
   block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;

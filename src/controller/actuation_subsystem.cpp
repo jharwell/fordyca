@@ -38,7 +38,7 @@ using kinematics2D::differential_drive;
  * Constructors/Destructor
  ******************************************************************************/
 actuation_subsystem::actuation_subsystem(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server>& server,
     const struct params::actuation_params* c_params,
     struct actuator_list* const list)
     : mc_params(*c_params),

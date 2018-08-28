@@ -37,7 +37,7 @@ namespace depth1 = controller::depth1;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)

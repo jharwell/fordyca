@@ -38,7 +38,7 @@ namespace kinematics = rcppsw::robotics::kinematics;
  * Constructors/Destructors
  ******************************************************************************/
 explore_for_goal_fsm::explore_for_goal_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa,
     std::unique_ptr<controller::explore_behavior> behavior,
     std::function<bool(void)> goal_detect)

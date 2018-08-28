@@ -33,7 +33,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 steering_force2D::steering_force2D(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     steering::boid& entity,
     const params::steering_force2D_params* const params,
     const std::shared_ptr<base_sensing_subsystem>& sensors)

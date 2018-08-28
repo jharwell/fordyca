@@ -49,7 +49,7 @@ NS_START(fordyca, params);
  */
 class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
-  actuation_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+  actuation_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
       : xml_param_parser(server, level),
         m_differential_drive(server, level + 1),
         m_steering(server, level + 1),

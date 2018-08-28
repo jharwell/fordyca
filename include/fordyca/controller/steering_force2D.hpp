@@ -59,7 +59,7 @@ class base_sensing_subsystem;
  */
 class steering_force2D : public steering::force_calculator {
  public:
-  steering_force2D(const std::shared_ptr<rcppsw::er::server>& server,
+  steering_force2D(std::shared_ptr<rcppsw::er::server> server,
                    steering::boid& entity,
                    const params::steering_force2D_params* params,
                    const std::shared_ptr<base_sensing_subsystem>& sensors);

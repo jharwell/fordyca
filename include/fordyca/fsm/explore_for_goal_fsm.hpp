@@ -61,7 +61,7 @@ class explore_for_goal_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_goal_fsm(std::shared_ptr<rcppsw::er::server>& server,
+  explore_for_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
                        controller::saa_subsystem* saa,
                        std::unique_ptr<controller::explore_behavior> behavior,
                        std::function<bool(void)> goal_detect);

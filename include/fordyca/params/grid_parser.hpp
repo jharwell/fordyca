@@ -47,7 +47,7 @@ NS_START(fordyca, params);
 
 class grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  grid_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+  grid_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
       : xml_param_parser(server, level) {}
 
   /**

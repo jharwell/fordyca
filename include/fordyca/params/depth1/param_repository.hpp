@@ -43,7 +43,7 @@ NS_START(fordyca, params, depth1);
  */
 class param_repository: public depth0::stateful_param_repository {
  public:
-  explicit param_repository(std::shared_ptr<rcppsw::er::server>& server);
+  explicit param_repository(std::shared_ptr<rcppsw::er::server> server);
 };
 
 NS_END(depth1, params, fordyca);

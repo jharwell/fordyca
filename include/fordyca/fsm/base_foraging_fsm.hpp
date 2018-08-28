@@ -59,7 +59,7 @@ NS_START(fsm);
 class base_foraging_fsm : public state_machine::hfsm,
                           public metrics::fsm::collision_metrics {
  public:
-  base_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
+  base_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
                     controller::saa_subsystem* saa,
                     uint8_t max_states);
 

@@ -86,7 +86,7 @@ class cache_block_drop
                                 representation::perceived_arena_map,
                                 representation::arena_cache> {
  public:
-  cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
+  cache_block_drop(std::shared_ptr<rcppsw::er::server> server,
                    const std::shared_ptr<representation::base_block>& block,
                    const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
