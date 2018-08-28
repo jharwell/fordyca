@@ -43,7 +43,7 @@ using controller::steering_force_type;
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa,
     uint8_t max_states)
     : state_machine::hfsm(server, max_states),

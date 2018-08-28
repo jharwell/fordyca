@@ -50,7 +50,7 @@ NS_START(fordyca, params);
  */
 class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  occupancy_grid_parser(const std::shared_ptr<rcppsw::er::server>& server,
+  occupancy_grid_parser(std::shared_ptr<rcppsw::er::server> server,
                         uint level)
       : xml_param_parser(server, level),
         m_grid(server, level + 1),

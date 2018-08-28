@@ -54,11 +54,10 @@ NS_START(fsm, depth1);
  */
 class base_acquire_cache_fsm : public acquire_goal_fsm {
  public:
-  base_acquire_cache_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::cache_selection_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  base_acquire_cache_fsm(std::shared_ptr<rcppsw::er::server> server,
+                         const controller::cache_selection_matrix* sel_matrix,
+                         controller::saa_subsystem* saa,
+                         representation::perceived_arena_map* map);
 
   base_acquire_cache_fsm(const base_acquire_cache_fsm& fsm) = delete;
   base_acquire_cache_fsm& operator=(const base_acquire_cache_fsm& fsm) = delete;

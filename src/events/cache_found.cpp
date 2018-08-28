@@ -38,7 +38,7 @@ namespace swarm = rcppsw::swarm;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
+cache_found::cache_found(std::shared_ptr<rcppsw::er::server> server,
                          std::unique_ptr<representation::base_cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),

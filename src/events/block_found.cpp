@@ -36,7 +36,7 @@ namespace swarm = rcppsw::swarm;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
+block_found::block_found(std::shared_ptr<rcppsw::er::server> server,
                          std::unique_ptr<representation::base_block> block)
     : perceived_cell_op(block->discrete_loc().first,
                         block->discrete_loc().second),

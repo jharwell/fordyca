@@ -237,8 +237,8 @@ void arena_map::distribute_all_blocks(void) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
   entities.push_back(&m_nest);
-  ER_ASSERT(m_block_dispatcher.distribute_blocks(m_blocks, entities),
-            "FATAL: Unable to perform initial block distribution");
+  bool b = m_block_dispatcher.distribute_blocks(m_blocks, entities);
+  ER_ASSERT(b, "FATAL: Unable to perform initial block distribution");
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been

@@ -46,7 +46,7 @@ NS_START(fordyca, params);
  */
 class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
  public:
-  proximity_sensor_parser(const std::shared_ptr<rcppsw::er::server>& server,
+  proximity_sensor_parser(std::shared_ptr<rcppsw::er::server> server,
                           uint level)
       : xml_param_parser(server, level) {}
 

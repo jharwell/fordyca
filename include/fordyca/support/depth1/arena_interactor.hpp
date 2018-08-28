@@ -59,7 +59,7 @@ namespace ta = rcppsw::task_allocation;
 template <typename T>
 class arena_interactor : public depth0::arena_interactor<T> {
  public:
-  arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
+  arena_interactor(std::shared_ptr<rcppsw::er::server> server,
                    representation::arena_map* const map_in,
                    depth0::stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor_in,

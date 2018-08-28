@@ -63,7 +63,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
                          public metrics::fsm::goal_acquisition_metrics,
                          public rcppsw::task_allocation::taskable {
  public:
-  acquire_goal_fsm(std::shared_ptr<rcppsw::er::server>& server,
+  acquire_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
                    controller::saa_subsystem* saa,
                    const representation::perceived_arena_map* map,
                    std::function<bool(void)> goal_detect);

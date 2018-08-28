@@ -51,7 +51,7 @@ NS_START(events);
  */
 class cache_found : public perceived_cell_op, public rcppsw::er::client {
  public:
-  cache_found(const std::shared_ptr<rcppsw::er::server>& server,
+  cache_found(std::shared_ptr<rcppsw::er::server> server,
               std::unique_ptr<representation::base_cache> cache);
   ~cache_found(void) override;
 

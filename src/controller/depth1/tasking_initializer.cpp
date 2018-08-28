@@ -53,7 +53,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,

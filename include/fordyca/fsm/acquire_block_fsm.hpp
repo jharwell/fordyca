@@ -51,7 +51,7 @@ NS_START(fordyca, fsm);
  */
 class acquire_block_fsm : public acquire_goal_fsm {
  public:
-  acquire_block_fsm(std::shared_ptr<rcppsw::er::server>& server,
+  acquire_block_fsm(std::shared_ptr<rcppsw::er::server> server,
                     const controller::block_selection_matrix* matrix,
                     controller::saa_subsystem* saa,
                     representation::perceived_arena_map* map);

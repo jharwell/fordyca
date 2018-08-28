@@ -47,7 +47,7 @@ NS_START(fordyca, params, arena);
  */
 class powerlaw_dist_parser : public rcppsw::params::xml_param_parser {
  public:
-  powerlaw_dist_parser(const std::shared_ptr<rcppsw::er::server>& server,
+  powerlaw_dist_parser(std::shared_ptr<rcppsw::er::server> server,
                             uint level)
       : xml_param_parser(server, level) {}
 

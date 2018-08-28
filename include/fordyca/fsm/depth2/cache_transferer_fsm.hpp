@@ -61,7 +61,7 @@ class cache_transferer_fsm : public base_foraging_fsm,
                              public visitor::visitable_any<depth2::cache_transferer_fsm> {
  public:
   cache_transferer_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server> server,
       const controller::cache_selection_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);

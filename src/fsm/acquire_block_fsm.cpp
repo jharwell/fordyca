@@ -42,11 +42,10 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_block_fsm::acquire_block_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
-    const controller::block_selection_matrix* const sel_matrix,
-    controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+acquire_block_fsm::acquire_block_fsm(std::shared_ptr<rcppsw::er::server> server,
+                                     const controller::block_selection_matrix* const sel_matrix,
+                                     controller::saa_subsystem* const saa,
+                                     representation::perceived_arena_map* const map)
     : acquire_goal_fsm(server,
                        saa,
                        map,

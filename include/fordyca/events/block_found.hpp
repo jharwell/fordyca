@@ -53,7 +53,7 @@ NS_START(events);
  */
 class block_found : public perceived_cell_op, public rcppsw::er::client {
  public:
-  block_found(const std::shared_ptr<rcppsw::er::server>& server,
+  block_found(std::shared_ptr<rcppsw::er::server> server,
               std::unique_ptr<representation::base_block> block);
   ~block_found(void) override;
 
