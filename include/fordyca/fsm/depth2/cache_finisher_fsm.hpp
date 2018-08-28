@@ -59,7 +59,7 @@ class cache_finisher_fsm : public base_foraging_fsm,
                            public visitor::visitable_any<depth2::cache_finisher_fsm> {
  public:
   cache_finisher_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
+      std::shared_ptr<rcppsw::er::server> server,
       const controller::block_selection_matrix* bsel_matrix,
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,

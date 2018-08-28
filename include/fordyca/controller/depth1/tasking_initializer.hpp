@@ -54,7 +54,7 @@ NS_START(depth1);
  */
 class tasking_initializer : public depth0::stateful_tasking_initializer {
  public:
-  tasking_initializer(std::shared_ptr<rcppsw::er::server>& server,
+  tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
                       const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,

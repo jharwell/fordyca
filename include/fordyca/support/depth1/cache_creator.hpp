@@ -57,7 +57,7 @@ class cache_creator : public rcppsw::er::client {
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
-  cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
+  cache_creator(std::shared_ptr<rcppsw::er::server> server,
                 representation::arena_grid& grid,
                 double cache_size, double resolution);
 

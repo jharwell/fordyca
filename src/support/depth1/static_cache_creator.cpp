@@ -36,7 +36,7 @@ using representation::base_cache;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_creator::static_cache_creator(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     representation::arena_grid& grid,
     const argos::CVector2& center,
     double cache_size,

@@ -46,7 +46,7 @@ using representation::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     double resolution)

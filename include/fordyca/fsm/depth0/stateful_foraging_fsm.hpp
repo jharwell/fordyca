@@ -67,7 +67,7 @@ class stateful_foraging_fsm : public base_foraging_fsm,
                               public task_allocation::taskable,
                               public visitor::visitable_any<depth0::stateful_foraging_fsm> {
  public:
-  stateful_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
+  stateful_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
                         const controller::block_selection_matrix* sel_matrix,
                         controller::saa_subsystem* saa,
                         representation::perceived_arena_map* map);

@@ -42,7 +42,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_finisher_fsm::cache_finisher_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* const bsel_matrix,
     const controller::cache_selection_matrix* const csel_matrix,
     controller::saa_subsystem* const saa,

@@ -47,7 +47,7 @@ NS_START(fordyca, params);
  */
 class phototaxis_force_parser : public rcppsw::params::xml_param_parser {
  public:
-  phototaxis_force_parser(const std::shared_ptr<rcppsw::er::server>& server,
+  phototaxis_force_parser(std::shared_ptr<rcppsw::er::server> server,
                           uint level)
       : xml_param_parser(server, level) {}
 

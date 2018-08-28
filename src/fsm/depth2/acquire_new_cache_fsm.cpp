@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* saa,
     representation::perceived_arena_map* const map)

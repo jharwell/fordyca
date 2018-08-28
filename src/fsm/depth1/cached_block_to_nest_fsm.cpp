@@ -36,7 +36,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)

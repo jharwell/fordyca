@@ -30,7 +30,7 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D_fsm::cell2D_fsm(const std::shared_ptr<rcppsw::er::server>& server)
+cell2D_fsm::cell2D_fsm(const std::shared_ptr<rcppsw::er::server> server)
     : state_machine::simple_fsm(server, ST_MAX_STATES, ST_UNKNOWN),
       state_unknown(),
       state_empty(),

@@ -33,7 +33,7 @@ namespace kinematics = rcppsw::robotics::kinematics;
  * Constructors/Destructors
  ******************************************************************************/
 saa_subsystem::saa_subsystem(
-    const std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const struct params::actuation_params* const aparams,
     const struct params::sensing_params* const sparams,
     struct actuation_subsystem::actuator_list* const actuator_list,

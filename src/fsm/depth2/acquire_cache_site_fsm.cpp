@@ -36,7 +36,7 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)

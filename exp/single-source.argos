@@ -94,7 +94,8 @@
                           circle_radius="100.0"
                           max_angle_delta="5"
                           max="9.0"
-                          interval="1"/>
+                          interval="1"
+                          normal_dist="true"/>
             <phototaxis_force max="8"/>
           </steering2D>
 

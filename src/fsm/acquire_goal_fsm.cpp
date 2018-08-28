@@ -43,7 +43,7 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
+    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* saa,
     const representation::perceived_arena_map* const map,
     std::function<bool(void)> goal_detect)

@@ -42,9 +42,9 @@ NS_START(controller, depth1);
  ******************************************************************************/
 class perception_subsystem : public base_perception_subsystem {
  public:
-  perception_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
-                            const params::perception_params* const params,
-                            const std::string& id);
+  perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
+                       const params::perception_params* const params,
+                       const std::string& id);
 
   void process_los(const representation::line_of_sight* const los) override;
 };

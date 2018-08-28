@@ -32,7 +32,7 @@ NS_START(fordyca, params, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-param_repository::param_repository(std::shared_ptr<rcppsw::er::server>& server)
+param_repository::param_repository(std::shared_ptr<rcppsw::er::server> server)
     : depth1::param_repository(server) {
   register_parser<exec_estimates_parser, exec_estimates_params>(
       exec_estimates_parser::kXMLRoot,
