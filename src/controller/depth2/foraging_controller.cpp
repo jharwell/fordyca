@@ -77,8 +77,10 @@ void foraging_controller::Init(ticpp::Element& node) {
   client::server_ptr()->log_stream() << param_repo;
 #endif
 
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all stateful foraging parameters were validated");
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   /* Put in new depth1 sensors and perception, ala strategy pattern */
   saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(

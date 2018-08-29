@@ -44,6 +44,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Member Functions
@@ -90,7 +91,6 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     if (nullptr != vparams) {
       controller.display_los(vparams->robot_los);
     }
-
   } /* for(entity..) */
   ER_NOM("stateful_foraging loop functions initialization finished");
 }
@@ -110,6 +110,11 @@ void stateful_foraging_loop_functions::pre_step_iter(
   utils::set_robot_pos<decltype(controller)>(robot);
   utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
+
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      arena_map()->grid_resolution());
+  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());

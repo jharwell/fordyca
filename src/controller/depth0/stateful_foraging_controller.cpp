@@ -139,8 +139,11 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
 #ifndef ER_NREPORT
   client::server_ptr()->log_stream() << param_repo;
 #endif
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all parameters were validated");
+
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   /* initialize subsystems and perception */
   m_perception = rcppsw::make_unique<base_perception_subsystem>(

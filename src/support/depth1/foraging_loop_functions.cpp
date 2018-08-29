@@ -122,6 +122,11 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      arena_map()->grid_resolution());
+  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
+
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
