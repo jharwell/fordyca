@@ -81,8 +81,11 @@ void base_foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing base foraging controller");
   params::depth0::stateless_param_repository param_repo(client::server_ref());
   param_repo.parse_all(node);
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all parameters were validated");
+
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   /* initialize output */
   auto* params = param_repo.parse_results<struct params::output_params>();

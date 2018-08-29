@@ -59,8 +59,10 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
   client::server_ptr()->log_stream() << param_repo;
 #endif
 
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all parameters were validated");
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       client::server_ref(), base_foraging_controller::saa_subsystem());
