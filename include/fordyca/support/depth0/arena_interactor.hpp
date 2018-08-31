@@ -75,7 +75,10 @@ class arena_interactor : public rcppsw::er::client {
         m_metrics_agg(metrics_agg),
         m_map(map),
         m_free_pickup_handler(server, map, block_penalty),
-        m_nest_drop_handler(server, map, block_penalty){}
+        m_nest_drop_handler(server, map, block_penalty){
+    client::insmod("arena_interactor", rcppsw::er::er_lvl::DIAG,
+                   rcppsw::er::er_lvl::NOM);
+  }
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;

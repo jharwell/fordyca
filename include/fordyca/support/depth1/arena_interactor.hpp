@@ -270,32 +270,32 @@ class arena_interactor : public depth0::arena_interactor<T> {
     if (controller.is_carrying_block()) {
       ER_NOM("%s aborted task %s while carrying block%d",
              controller.GetId().c_str(),
-             static_cast<tasks::depth1::foraging_task*>(
+             dynamic_cast<ta::logical_task*>(
                  controller.current_task())->name().c_str(),
              controller.block()->id());
       task_abort_with_block(controller);
     } else {
       ER_NOM("%s aborted task %s (no block)",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             dynamic_cast<ta::logical_task*>(
                  controller.current_task())->name().c_str());
     }
     if (m_cache_penalty_handler.is_serving_penalty(controller)) {
       m_cache_penalty_handler.penalty_abort(controller);
       ER_NOM("%s aborted task %s while serving cache penalty",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             dynamic_cast<ta::logical_task*>(
                  controller.current_task())->name().c_str());
     } else if (free_pickup_penalty_handler().is_serving_penalty(controller)) {
       free_pickup_penalty_handler().penalty_abort(controller);
       ER_NOM("%s aborted task %s while serving free pickup penalty",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             dynamic_cast<ta::logical_task*>(
                  controller.current_task())->name().c_str());
     } else if (nest_drop_penalty_handler().is_serving_penalty(controller)) {
       ER_NOM("%s aborted task %s while serving nest drop penalty",
              controller.GetId().c_str(),
-             dynamic_cast<tasks::depth1::foraging_task*>(
+             dynamic_cast<ta::logical_task*>(
                  controller.current_task())->name().c_str());
       nest_drop_penalty_handler().penalty_abort(controller);
     }
