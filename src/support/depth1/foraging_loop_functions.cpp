@@ -58,15 +58,17 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   rcppsw::er::g_server->log_stream() << repo;
 #endif
 
+  /* initialize stat collecting */
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output = *repo.parse_results<const struct params::output_params>();
+  output.metrics.arena_grid = arenap->grid;
+  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(rcppsw::er::g_server,
+                                                          &output.metrics,
+                                                          output_root());
+
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
-  /* initialize stat collecting */
-  auto* p_output = repo.parse_results<params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(rcppsw::er::g_server,
-                                                          &p_output->metrics,
-                                                          output_root());
 
   /* intitialize robot interactions with environment */
   m_interactor =

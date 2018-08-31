@@ -47,7 +47,7 @@ random_distributor::random_distributor(std::shared_ptr<rcppsw::er::server> serve
                                        double resolution)
     : base_distributor(server), m_resolution(resolution), m_grid(grid) {
   if (ERROR == client::attmod("random_dist")) {
-    insmod("random_dist", er::er_lvl::DIAG, er::er_lvl::OFF);
+    insmod("random_dist", er::er_lvl::VER, er::er_lvl::VER);
   }
 }
 
@@ -95,6 +95,8 @@ bool random_distributor::distribute_block(
             "FATAL: Destination cell already contains block");
   ER_ASSERT(!cell->state_has_cache(),
             "FATAL: Destination cell already contains cache");
+  ER_ASSERT(!cell->state_in_cache_extent(),
+            "FATAL: Destination cell part of cache extent");
 
   events::free_block_drop op(client::server_ref(),
                              block,
