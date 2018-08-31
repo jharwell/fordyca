@@ -47,7 +47,7 @@ random_distributor::random_distributor(std::shared_ptr<rcppsw::er::server> serve
                                        double resolution)
     : base_distributor(server), m_resolution(resolution), m_grid(grid) {
   if (ERROR == client::attmod("random_dist")) {
-    insmod("random_dist", er::er_lvl::VER, er::er_lvl::VER);
+    insmod("random_dist", er::er_lvl::DIAG, er::er_lvl::OFF);
   }
 }
 
