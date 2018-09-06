@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
-
+#include "rcppsw/include/rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
