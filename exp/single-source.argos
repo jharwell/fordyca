@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -28,6 +28,7 @@
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
+        <battery implementation="default" />
       </sensors>
       <params>
         <output>
@@ -103,7 +104,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </depth1_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -111,7 +112,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
       <sim log_fname="sim.log"
            output_root="output"
@@ -233,6 +234,7 @@
       <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
+          <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
     </distribute>
@@ -257,6 +259,7 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
+  <!-- </visualization> -->
   <!-- <visualization> -->
   <!--   <qt-opengl> -->
   <!--     <camera> -->
