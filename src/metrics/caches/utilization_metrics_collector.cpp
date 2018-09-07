@@ -47,7 +47,7 @@ std::string utilization_metrics_collector::csv_header_build(
       "avg_blocks" + separator() +
       "avg_pickups" + separator() +
       "avg_drops"  + separator() +
-      "avg_caches" + separator();
+      "unique_caches" + separator();
   // clang-format on
 } /* csv_header_build() */
 

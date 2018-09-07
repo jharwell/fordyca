@@ -1,7 +1,7 @@
 /**
- * @file distance_metrics_collector.cpp
+ * @file movement_metrics_collector.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,45 +32,58 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-distance_metrics_collector::distance_metrics_collector(const std::string& ofname,
+movement_metrics_collector::movement_metrics_collector(const std::string& ofname,
                                                        uint interval)
     : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string distance_metrics_collector::csv_header_build(
+std::string movement_metrics_collector::csv_header_build(
     const std::string& header) {
   return base_metrics_collector::csv_header_build(header) +
       "int_avg_distance" + separator() +
-      "cum_avg_distance" + separator();
+      "cum_avg_distance" + separator() +
+      "int_avg_velocity" + separator() +
+      "cum_avg_velocity" + separator();
 } /* csv_header_build() */
 
-void distance_metrics_collector::reset(void) {
+void movement_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool distance_metrics_collector::csv_line_build(std::string& line) {
+bool movement_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.distance) + separator();
+  line += std::to_string(m_stats.int_distance /
+                         static_cast<double>(m_stats.int_robot_count)) + separator();
   line += std::to_string(m_stats.cum_distance /
-                         (static_cast<double>(timestep() + 1) / interval())) +
+                         static_cast<double>(m_stats.cum_robot_count)) + separator();
+  line += std::to_string(m_stats.int_velocity /
+                         static_cast<double>(m_stats.int_robot_count)) + separator();
+  line += std::to_string(m_stats.cum_velocity /
+                         static_cast<double>(m_stats.cum_robot_count)) + separator();
           separator();
   return true;
 } /* csv_line_build() */
 
-void distance_metrics_collector::collect(
+void movement_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const metrics::fsm::distance_metrics&>(metrics);
-  m_stats.cum_distance += m.timestep_distance();
-  m_stats.distance += m.timestep_distance();
+  auto& m = dynamic_cast<const metrics::fsm::movement_metrics&>(metrics);
+  ++m_stats.int_robot_count;
+  ++m_stats.cum_robot_count;
+  m_stats.cum_distance += m.distance();
+  m_stats.int_distance += m.distance();
+  m_stats.cum_velocity += m.velocity().Length();
+  m_stats.int_velocity += m.velocity().Length();
 } /* collect() */
 
-void distance_metrics_collector::reset_after_interval(void) {
-  m_stats.distance = 0.0;
+void movement_metrics_collector::reset_after_interval(void) {
+  m_stats.int_distance = 0.0;
+  m_stats.int_velocity = 0.0;
+  m_stats.int_robot_count = 0;
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

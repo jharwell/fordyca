@@ -29,6 +29,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation {
+class polled_task;
+class bifurcating_tab;
+}}
+namespace ta = rcppsw::task_allocation;
+
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class foraging_controller; }}
@@ -45,19 +51,37 @@ NS_START(support, depth1);
  * @ingroup support depth1
  *
  * @brief Aggregates and metrics collection for depth1 foraging. That
- * includes:
+ * includes everything from \ref stateful_metrics_aggregator, and also:
  *
- * - FSM distance metrics
- * - FSM block acquisition metrics
  * - FSM cache acquisition metrics
- * - Task execution metrics
- * - Task managemente metrics
+ * - Cache utilization metrics
+ * - Cache lifecycle metrics
+ * - World model metrics
+ * - Task execution metrics (per task)
+ * - TAB metrics (rooted at generalist)
  */
 class metrics_aggregator : public depth0::stateful_metrics_aggregator {
  public:
   metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
                      const struct params::metrics_params* params,
                      const std::string& output_root);
+
+  /**
+   * @brief Collect metrics from a finished or aborted task.
+   *
+   * This cannot be collected synchronously per-timestep with the rest of the
+   * metrics from the controller, because by the time metric collecting occurs,
+   * the executive has already allocated a new task, and there is not any way to
+   * know if a robot's current task is the result of an abort/finish (and is
+   * therefore newly allocated and SHOULD have metrics collected from it), or is
+   * just running normally.
+   *
+   * Solution: hook into the executive callback queue in order to correctly
+   * capture statistics.
+   */
+  void task_finish_or_abort_cb(const ta::polled_task* task);
+
+  void task_alloc_cb(const ta::polled_task*, const ta::bifurcating_tab* tab);
 
   /**
    * @brief Collect metrics from the depth1 controller.

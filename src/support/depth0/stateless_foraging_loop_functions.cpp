@@ -68,9 +68,11 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   auto* p_output = repo.parse_results<params::output_params>();
   output_init(p_output);
 
+#ifndef ER_NREPORT
   rcppsw::er::g_server->change_logfile(m_output_root + "/" +
                                        p_output->log_fname);
   rcppsw::er::g_server->log_stream() << repo;
+#endif
 
   /* setup logging timestamp calculator */
   rcppsw::er::g_server->log_ts_calculator(
@@ -159,9 +161,9 @@ void stateless_foraging_loop_functions::pre_step_iter(
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
@@ -210,7 +212,6 @@ void stateless_foraging_loop_functions::output_init(
   }
   m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
       rcppsw::er::g_server, &params->metrics, m_output_root);
-  m_metrics_agg->reset_all();
 } /* output_init() */
 
 std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {

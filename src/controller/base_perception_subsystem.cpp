@@ -47,7 +47,11 @@ base_perception_subsystem::base_perception_subsystem(
       m_map(rcppsw::make_unique<representation::perceived_arena_map>(
           client::server_ref(),
           params,
-          id)) {}
+          id)) {
+  insmod("base_perception_subsystem",
+         rcppsw::er::er_lvl::DIAG,
+         rcppsw::er::er_lvl::NOM);
+}
 
 /*******************************************************************************
  * Member Functions
@@ -75,7 +79,7 @@ void base_perception_subsystem::process_los(
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (!los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
-        ER_DIAG("Correct block%d discrepency at (%zu, %zu)",
+        ER_DIAG("Correct block%d discrepency at (%u, %u)",
                 m_map->access<occupancy_grid::kCellLayer>(d).block()->id(),
                 d.first,
                 d.second);

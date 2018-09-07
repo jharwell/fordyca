@@ -55,7 +55,9 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   params::loop_function_repository repo(server_ref());
 
   repo.parse_all(node);
+#ifndef ER_NREPORT
   rcppsw::er::g_server->log_stream() << repo;
+#endif
 
   /* initialize stat collecting */
   auto* p_output = repo.parse_results<const struct params::output_params>();
@@ -105,10 +107,9 @@ void stateful_foraging_loop_functions::pre_step_iter(
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-      robot, *arena_map());
-  set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
+  utils::set_robot_pos<decltype(controller)>(robot);
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  set_robot_tick<decltype(controller)>(robot);
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
@@ -154,9 +155,9 @@ void stateful_foraging_loop_functions::Reset(void) {
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 using namespace argos;

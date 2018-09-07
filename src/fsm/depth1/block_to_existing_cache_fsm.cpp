@@ -63,4 +63,13 @@ transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) cons
   return transport_goal_type::kNone;
 } /* acquisition_goal() */
 
+bool block_to_existing_cache_fsm::goal_acquired(void) const {
+  if (acquisition_goal_type::kBlock == acquisition_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+  } else if (transport_goal_type::kExistingCache == block_transport_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+  }
+  return false;
+} /* goal_acquired() */
+
 NS_END(depth1, controller, fordyca);

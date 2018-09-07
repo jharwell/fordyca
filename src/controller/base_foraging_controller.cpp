@@ -25,6 +25,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_battery_sensor.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
@@ -86,7 +87,9 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize output */
   auto* params = param_repo.parse_results<struct params::output_params>();
+#ifndef ER_NREPORT
   client::server_ptr()->log_stream() << param_repo;
+#endif
   output_init(params);
 
   /* initialize sensing and actuation subsystem */
@@ -103,7 +106,9 @@ void base_foraging_controller::Init(ticpp::Element& node) {
       .light = hal::sensors::light_sensor(
           GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
       .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-          "footbot_motor_ground")};
+          "footbot_motor_ground"),
+        .battery = hal::sensors::battery_sensor(
+          GetSensor<argos::CCI_BatterySensor>("battery"))};
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
       m_server,
       param_repo.parse_results<struct params::actuation_params>(),
@@ -143,8 +148,10 @@ void base_foraging_controller::output_init(
   client::server_ptr()->dbg_ts_calculator(
       std::bind(&base_foraging_controller::dbg_header_calc, this));
 
+#ifndef ER_NREPORT
   client::server_ptr()->change_logfile(output_root + "/" + this->GetId() +
                                        ".log");
+#endif
 } /* output_init() */
 
 std::string base_foraging_controller::log_header_calc(void) const {
@@ -159,5 +166,9 @@ std::string base_foraging_controller::dbg_header_calc(void) const {
 void base_foraging_controller::tick(uint tick) {
   m_saa->sensing()->tick(tick);
 } /* tick() */
+
+int base_foraging_controller::entity_id(void) const {
+  return std::atoi(GetId().c_str() + 2);
+} /* entity_id() */
 
 NS_END(controller, fordyca);

@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/sensing_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -38,8 +37,7 @@ constexpr char sensing_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void sensing_parser::parse(const ticpp::Element& node) {
-  ticpp::Element snode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element snode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();

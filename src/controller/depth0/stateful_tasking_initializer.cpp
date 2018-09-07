@@ -51,7 +51,7 @@ stateful_tasking_initializer::stateful_tasking_initializer(
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : m_server(server),
+    : client(server),
       m_saa(saa),
       m_perception(perception),
       mc_sel_matrix(sel_matrix),
@@ -67,10 +67,11 @@ void stateful_tasking_initializer::stateful_tasking_init(
   auto* exec_params = stateful_repo->parse_results<ta::executive_params>();
   auto* est_params =
       stateful_repo->parse_results<params::depth0::exec_estimates_params>();
+  ER_ASSERT(block_sel_matrix(), "FATAL: NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          m_server, mc_sel_matrix, m_saa, m_perception->map());
+          client::server_ref(), mc_sel_matrix, m_saa, m_perception->map());
 
   auto generalist = new tasks::depth0::generalist(exec_params, generalist_fsm);
 
@@ -80,18 +81,19 @@ void stateful_tasking_initializer::stateful_tasking_init(
                       est_params->generalist_range.GetMax());
   }
 
-  m_graph = new ta::bifurcating_tdgraph(m_server);
+  m_graph = new ta::bifurcating_tdgraph(client::server_ref());
 
   m_graph->set_root(generalist);
-  generalist->set_atomic();
+  generalist->set_atomic(true);
 } /* tasking_init() */
 
 std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer::
 operator()(params::depth0::stateful_param_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_server,
-                                                                m_graph);
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
+      client::server_ref(),
+      m_graph);
 } /* initialize() */
 
 NS_END(depth0, controller, fordyca);

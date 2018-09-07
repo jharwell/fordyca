@@ -112,7 +112,6 @@ class free_block_drop
   // clang-format off
   double                                      m_resolution;
   std::shared_ptr<representation::base_block> m_block;
-  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

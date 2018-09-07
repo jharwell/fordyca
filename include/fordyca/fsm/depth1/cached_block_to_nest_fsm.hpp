@@ -107,7 +107,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  bool goal_acquired(void) const override;
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   acquisition_goal_type acquisition_goal(void) const override;
@@ -177,7 +177,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* stateful foraging states */
+  /* foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,

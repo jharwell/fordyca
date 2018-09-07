@@ -1,5 +1,5 @@
 /**
- * @file distance_metrics.hpp
+ * @file movement_metrics.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
+#include <argos3/core/utility/math/vector2.h>
 
 /*******************************************************************************
  * Namespaces
@@ -35,32 +36,31 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class distance_metrics
+ * @class movement_metrics
  * @ingroup metrics fsm
  *
- * @brief Interface defining what metrics regarding distance traveled should be
+ * @brief Interface defining what metrics regarding movement traveled should be
  * collected from all robots.
  */
-class distance_metrics : public virtual rcppsw::metrics::base_metrics {
+class movement_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
-  distance_metrics(void) = default;
-  ~distance_metrics(void) override = default;
+  movement_metrics(void) = default;
+  ~movement_metrics(void) override = default;
 
   /**
-   * @brief Get the distance that a robot has traveled in a single timestep.
+   * @brief Get the movement that a robot has traveled in a single timestep.
    *
-   * This will be called every timestep by the \ref distance_metrics_collector
+   * This will be called every timestep by the \ref movement_metrics_collector
    * on all robots.
    */
-  virtual double timestep_distance(void) const = 0;
+  virtual double distance(void) const = 0;
 
   /**
-   * @brief Get the ID of a robot, for use in associating gathered metrics with
-   * a specific robot.
+   * @brief Get the velocity that a robot has on a single timestep.
    */
-  virtual int entity_id(void) const = 0;
+  virtual argos::CVector2 velocity(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_DISTANCE_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_ */

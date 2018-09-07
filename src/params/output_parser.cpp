@@ -40,8 +40,7 @@ constexpr char output_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void output_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element onode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res, res2;
 
   m_params =
@@ -53,7 +52,7 @@ void output_parser::parse(const ticpp::Element& node) {
     m_params->metrics = *m_metrics_parser.parse_results();
   }
 
-  ticpp::Element snode = argos::GetNode(onode, "sim");
+  ticpp::Element snode = get_node(onode, "sim");
   XML_PARSE_PARAM(snode, m_params, output_root);
   XML_PARSE_PARAM(snode, m_params, output_dir);
 

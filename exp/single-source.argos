@@ -9,7 +9,7 @@
     <system threads="0" />
     <experiment length="5000"
                 ticks_per_second="5"
-                random_seed="123" />
+                random_seed="39" />
   </framework>
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -28,6 +28,7 @@
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
+        <battery implementation="default" />
       </sensors>
       <params>
         <output>
@@ -53,8 +54,8 @@
                       />
           <task_partition
               method="pini2011"
-              always_partition="true"
-              never_partition="false"
+              always_partition="false"
+              never_partition="true"
               reactivity="1.5"
               offset="1.0"
               />
@@ -98,7 +99,7 @@
             <phototaxis_force max="8"/>
           </steering2D>
 
-          <differential_drive soft_turn_max="30"
+          <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
       </params>
@@ -118,19 +119,18 @@
            />
       <metrics
           output_dir="metrics"
-          collision_fname="collision-stats.csv"
-          block_fname="block-stats.csv"
-          block_acquisition_fname="block-acquisition-stats.csv"
-          block_transport_fname="block-transport-stats.csv"
-          block_manipulation_fname="block-manipulation-stats.csv"
-          cache_acquisition_fname="cache-acquisition-stats.csv"
-          cache_utilization_fname="cache-utilization-stats.csv"
-          cache_lifecycle_fname="cache-lifecycle-stats.csv"
-          task_execution_generalist_fname="task-execution-generalist-stats.csv"
-          task_execution_collector_fname="task-execution-collector-stats.csv"
-          task_execution_harvester_fname="task-execution-harvester-stats.csv"
-          task_generalist_tab_fname="task-generalist-tab-stats.csv"
-          distance_fname="distance-stats.csv"
+          fsm_collision_fname="fsm-collision.csv"
+          fsm_movement_fname="fsm-movement.csv"
+          block_acquisition_fname="block-acquisition.csv"
+          block_transport_fname="block-transport.csv"
+          block_manipulation_fname="block-manipulation.csv"
+          cache_acquisition_fname="cache-acquisition.csv"
+          cache_utilization_fname="cache-utilization.csv"
+          cache_lifecycle_fname="cache-lifecycle.csv"
+          task_execution_generalist_fname="task-execution-generalist.csv"
+          task_execution_collector_fname="task-execution-collector.csv"
+          task_execution_harvester_fname="task-execution-harvester.csv"
+          task_generalist_tab_fname="task-generalist-tab.csv"
           perception_world_model_fname="perception-world-model.csv"
           collect_interval="1000"
           />
@@ -148,7 +148,7 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="random">
+            dist_type="single_source">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -228,9 +228,10 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="8,4,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="1" max_trials="1000">
+      <entity quantity="64" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
+          <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
     </distribute>
@@ -255,6 +256,7 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
+  <!-- </visualization> -->
   <!-- <visualization> -->
   <!--   <qt-opengl> -->
   <!--     <camera> -->
@@ -265,7 +267,7 @@
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--     </camera> -->
-  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 

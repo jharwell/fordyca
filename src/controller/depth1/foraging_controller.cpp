@@ -26,6 +26,7 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
@@ -49,8 +50,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
-      m_cache_sel_matrix(),
-      m_executive() {}
+      m_cache_sel_matrix() {}
 
 foraging_controller::~foraging_controller(void) = default;
 
@@ -64,7 +64,8 @@ void foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
 
-  m_executive->run();
+  m_task_aborted = false;
+  executive()->run();
 } /* ControlStep() */
 
 void foraging_controller::Init(ticpp::Element& node) {
@@ -78,7 +79,9 @@ void foraging_controller::Init(ticpp::Element& node) {
   ER_NOM("Initializing depth1 foraging controller");
 
   param_repo.parse_all(node);
-  server_ptr()->log_stream() << param_repo;
+#ifndef ER_NREPORT
+  client::server_ptr()->log_stream() << param_repo;
+#endif
 
   ER_ASSERT(param_repo.validate_all(),
             "FATAL: Not all task parameters were validated");
@@ -93,23 +96,39 @@ void foraging_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<params::perception_params>(),
       GetId()));
 
-  /* initialize tasking */
-  m_executive = tasking_initializer(client::server_ref(),
-                                    block_sel_matrix(),
-                                    m_cache_sel_matrix.get(),
-                                    saa_subsystem(),
-                                    perception())(&param_repo);
+  /*
+   * Initialize tasking by overriding stateful controller executive via
+   * strategy pattern.
+   */
+  auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
+  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
+      ogrid->nest,
+      &ogrid->priorities));
+  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
+  executive(tasking_initializer(client::server_ref(),
+                                block_sel_matrix(),
+                                m_cache_sel_matrix.get(),
+                                saa_subsystem(),
+                                perception())(&param_repo));
   ER_NOM("Depth1 foraging controller initialization finished");
+  executive()->task_abort_notify(std::bind(&foraging_controller::task_abort_cb,
+                                           this,
+                                           std::placeholders::_1));
 } /* Init() */
 
 __rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
 } /* current_task() */
 
 __rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(
     void) const {
   return const_cast<foraging_controller*>(this)->current_task();
 } /* current_task() */
+
+void foraging_controller::task_abort_cb(const ta::polled_task*) {
+  m_task_aborted = true;
+} /* task_abort_cb() */
+
 /*
  * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
  * namespaces, so if you have two classes of the same name in two different
