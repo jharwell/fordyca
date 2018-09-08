@@ -257,7 +257,6 @@ class arena_interactor : public depth0::arena_interactor<T> {
    * @return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
    */
   bool handle_task_abort(T& controller) {
-
     if (nullptr == controller.current_task() || !controller.task_aborted()) {
       return false;
     }
