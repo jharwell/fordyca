@@ -156,7 +156,6 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       &saa_subsystem()->sensing()->sensor_list()));
 
   auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
-
   m_block_sel_matrix =
       rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
                                                   &ogrid->priorities);
