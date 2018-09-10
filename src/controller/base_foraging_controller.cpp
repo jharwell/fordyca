@@ -25,6 +25,7 @@
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_battery_sensor.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
@@ -108,7 +109,9 @@ void base_foraging_controller::Init(ticpp::Element& node) {
       .light = hal::sensors::light_sensor(
           GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
       .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-          "footbot_motor_ground")};
+          "footbot_motor_ground"),
+        .battery = hal::sensors::battery_sensor(
+          GetSensor<argos::CCI_BatterySensor>("battery"))};
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
       m_server,
       param_repo.parse_results<struct params::actuation_params>(),

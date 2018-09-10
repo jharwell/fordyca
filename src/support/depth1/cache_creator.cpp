@@ -110,13 +110,26 @@ void cache_creator::update_host_cells(cache_vector& caches) {
    */
   for (auto& cache : caches) {
     m_grid.access<arena_grid::kCell>(cache->discrete_loc()).entity(cache);
+
     auto xspan = cache->xspan(cache->real_loc());
     auto yspan = cache->yspan(cache->real_loc());
-    for (size_t i = xspan.get_min() / m_resolution; i < xspan.get_max() / m_resolution; ++i) {
-      for (size_t j = yspan.get_min() / m_resolution; j < yspan.get_max() / m_resolution; ++j) {
-        if (rcppsw::math::dcoord2(i, j) != cache->discrete_loc()) {
-          events::cell_cache_extent e(rcppsw::math::dcoord2(i, j), cache);
-          m_grid.access<arena_grid::kCell>(i, j).accept(e);
+    size_t xmin = std::ceil(xspan.get_min() / m_grid.resolution());
+    size_t xmax = std::ceil(xspan.get_max() / m_grid.resolution());
+    size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
+    size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
+    for (size_t i = xmin; i < xmax; ++i) {
+      for (size_t j = ymin; j < ymax; ++j) {
+        rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
+        if (c != cache->discrete_loc()) {
+          ER_ASSERT(cache->contains_point(math::dcoord_to_rcoord(c, m_grid.resolution())),
+                    "FATAL: Cache%d does not contain point (%zu, %zu) within its extent",
+                    cache->id(), i, j);
+          auto& cell = m_grid.access<arena_grid::kCell>(i, j);
+          ER_ASSERT(!cell.state_in_cache_extent(), "FATAL: cell(%zu, %zu) already in CACHE_EXTENT",
+                    i,
+                    j);
+          events::cell_cache_extent e(c, cache);
+          cell.accept(e);
         }
       } /* for(j..) */
     } /* for(i..) */

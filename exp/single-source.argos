@@ -9,7 +9,7 @@
     <system threads="0" />
     <experiment length="5000"
                 ticks_per_second="5"
-                random_seed="39" />
+                random_seed="123" />
   </framework>
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -28,6 +28,7 @@
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
+        <battery implementation="default" />
       </sensors>
       <params>
         <output>
@@ -36,9 +37,9 @@
                />
         </output>
         <occupancy_grid
-            nest="2.0, 2.5">
+            nest="2.0, 3">
           <grid resolution="0.2"
-                size="10, 5, 2"/>
+                size="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
           <block_priorities
@@ -54,8 +55,8 @@
           <task_partition
               method="pini2011"
               always_partition="false"
-              never_partition="true"
-              reactivity="1.5"
+              never_partition="false"
+              reactivity="4"
               offset="1.0"
               />
           <subtask_selection
@@ -95,11 +96,11 @@
                           max_angle_delta="5"
                           max="9.0"
                           interval="1"
-                          normal_dist="true"/>
+                          normal_dist="false"/>
             <phototaxis_force max="8"/>
           </steering2D>
 
-          <differential_drive soft_turn_max="15"
+          <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
         </actuation>
       </params>
@@ -121,6 +122,7 @@
           output_dir="metrics"
           fsm_collision_fname="fsm-collision.csv"
           fsm_movement_fname="fsm-movement.csv"
+          block_fname="block.csv"
           block_acquisition_fname="block-acquisition.csv"
           block_transport_fname="block-transport.csv"
           block_manipulation_fname="block-manipulation.csv"
@@ -138,7 +140,7 @@
     </output>
     <arena_map>
       <grid resolution="0.2"
-            size="10, 5, 2"/>
+            size="12, 6, 2"/>
       <blocks>
         <manipulation_penalty>
           <waveform
@@ -149,7 +151,7 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="random">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -176,7 +178,7 @@
               offset="10"/>
         </usage_penalty>
       </static_caches>
-      <nest size="1.0, 4.0" center="2, 2.5" />
+      <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
     <visualization robot_id="true"
                    robot_los="false"
@@ -188,50 +190,51 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 5, 2" center="5,2.5,1">
+  <arena size="12, 6, 2" center="6,3,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="10,0.1,0.5" movable="false">
-      <body position="5,5,0" orientation="0,0,0" />
+    <box id="wall_north" size="12`2`,0.1,0.5" movable="false">
+      <body position="6,6,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="10,0.1,0.5" movable="false">
-      <body position="5,0,0" orientation="0,0,0" />
+    <box id="wall_south" size="12,0.1,0.5" movable="false">
+      <body position="6,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="10,2.5,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,6,0.5" movable="false">
+      <body position="12,3,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,5,0.5" movable="false">
-      <body position="0,2.5,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,6,0.5" movable="false">
+      <body position="0,3,0" orientation="0,0,0" />
     </box>
 
     <light id="light1"
-           position="2,1.25,1.0"
+           position="2,1.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
     <light id="light2"
-           position="2,2.5,1.0"
+           position="2,3,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
     <light id="light3"
-           position="2,3.75,1.0"
+           position="2,4.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
 
     <distribute>
-      <position method="uniform" min="1,1,0" max="8,4,0" />
+      <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="64" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
+          <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
     </distribute>
@@ -256,6 +259,7 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
+  <!-- </visualization> -->
   <!-- <visualization> -->
   <!--   <qt-opengl> -->
   <!--     <camera> -->
@@ -266,7 +270,7 @@
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--     </camera> -->
-  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 
