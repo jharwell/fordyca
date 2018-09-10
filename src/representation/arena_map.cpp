@@ -275,20 +275,23 @@ void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  size_t xmin = std::floor(xspan.get_min() / m_grid.resolution());
+  size_t xmin = std::ceil(xspan.get_min() / m_grid.resolution());
   size_t xmax = std::ceil(xspan.get_max() / m_grid.resolution());
-  size_t ymin = std::floor(yspan.get_min() / m_grid.resolution());
+  size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
   size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
 
   for (size_t i = xmin;i < xmax; ++i) {
     for (size_t j = ymin; j < ymax; ++j) {
-      if (rcppsw::math::dcoord2(i, j) != victim->discrete_loc()) {
-        events::cell_empty e(rcppsw::math::dcoord2(i, j));
-        ER_ASSERT(victim->contains_point(argos::CVector2(i, j)),
-                  "FATAL: Cache does not contain point within its extent");
+      rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
+      if (c != victim->discrete_loc()) {
+        ER_ASSERT(victim->contains_point(math::dcoord_to_rcoord(c, m_grid.resolution())),
+                  "FATAL: Cache%d does not contain point (%zu, %zu) within its extent",
+                  victim->id(), i, j);
+
         auto& cell = m_grid.access<arena_grid::kCell>(i, j);
-        ER_ASSERT(cell.state_has_cache_extent(), "FATAL: cell(%zu, %zu) not in CACHE_EXTENT [state=%d]",
-                  i, j, cell.current_state());
+        ER_ASSERT(cell.state_in_cache_extent(), "FATAL: cell(%zu, %zu) not in CACHE_EXTENT [state=%d]",
+                  i, j, cell.fsm().current_state());
+        events::cell_empty e(c);
         cell.accept(e);
       }
     } /* for(j..) */
