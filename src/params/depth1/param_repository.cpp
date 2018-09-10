@@ -24,7 +24,6 @@
 #include "fordyca/params/depth1/param_repository.hpp"
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,8 +34,7 @@ NS_START(fordyca, params, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-param_repository::param_repository(std::shared_ptr<rcppsw::er::server> server)
-    : stateful_param_repository(server) {
+param_repository::param_repository(void) {
   register_parser<exec_estimates_parser, exec_estimates_params>(
       exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);

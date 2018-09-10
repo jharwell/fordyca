@@ -40,7 +40,6 @@
 #include "fordyca/params/depth0/stateless_param_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,12 +51,7 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_foraging_controller::base_foraging_controller(void)
-    : m_saa(nullptr), m_server(std::make_shared<rcppsw::er::server>()) {
-  client::deferred_client_init(m_server);
-
-  /* diagnostic for logging, nominal for printing */
-  client::insmod("controller", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+    : ER_CLIENT_INIT("fordyca.controller.base"), m_saa(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -79,20 +73,26 @@ __rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
 }
 
 void base_foraging_controller::Init(ticpp::Element& node) {
-  ER_NOM("Initializing base foraging controller");
-  params::depth0::stateless_param_repository param_repo(client::server_ref());
+#ifndef ER_NREPORT
+  if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
+    client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
+  } else {
+    std::cerr << "LOG4CXX_CONFIGURATION not defined" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+#endif
+
+  params::depth0::stateless_param_repository param_repo;
   param_repo.parse_all(node);
 
+  ndc_push();
   if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
   /* initialize output */
   auto* params = param_repo.parse_results<struct params::output_params>();
-#ifndef ER_NREPORT
-  client::server_ptr()->log_stream() << param_repo;
-#endif
   output_init(params);
 
   /* initialize sensing and actuation subsystem */
@@ -110,16 +110,14 @@ void base_foraging_controller::Init(ticpp::Element& node) {
           GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
       .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
           "footbot_motor_ground"),
-        .battery = hal::sensors::battery_sensor(
+      .battery = hal::sensors::battery_sensor(
           GetSensor<argos::CCI_BatterySensor>("battery"))};
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
-      m_server,
       param_repo.parse_results<struct params::actuation_params>(),
       param_repo.parse_results<struct params::sensing_params>(),
       &alist,
       &slist);
-
-  ER_NOM("Base foraging controller initialization finished");
+  ndc_pop();
 } /* Init() */
 
 void base_foraging_controller::Reset(void) {
@@ -145,26 +143,20 @@ void base_foraging_controller::output_init(
     fs::create_directories(output_root);
   }
 
-  /* setup logging timestamp calculator */
-  client::server_ptr()->log_ts_calculator(
-      std::bind(&base_foraging_controller::log_header_calc, this));
-  client::server_ptr()->dbg_ts_calculator(
-      std::bind(&base_foraging_controller::dbg_header_calc, this));
-
 #ifndef ER_NREPORT
-  client::server_ptr()->change_logfile(output_root + "/" + this->GetId() +
-                                       ".log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller"),
+      output_root + "/controller.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.fsm"), output_root + "/fsm.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.saa_subsystem"),
+      output_root + "/saa.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+      output_root + "/saa.log");
 #endif
 } /* output_init() */
-
-std::string base_foraging_controller::log_header_calc(void) const {
-  return "[t=" + std::to_string(m_saa->sensing()->tick()) + "," +
-         this->GetId() + "]";
-} /* log_header_calc() */
-
-std::string base_foraging_controller::dbg_header_calc(void) const {
-  return this->GetId();
-} /* dbg_header_calc() */
 
 void base_foraging_controller::tick(uint tick) {
   m_saa->sensing()->tick(tick);

@@ -67,25 +67,29 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats.free_pickup_events) + separator();
   line += std::to_string(m_stats.free_drop_events) + separator();
 
-  line += (m_stats.free_pickup_events > 0) ?
-          std::to_string(m_stats.cum_free_pickup_penalty /
-                         static_cast<double>(m_stats.free_pickup_events)): "0";
+  line += (m_stats.free_pickup_events > 0)
+              ? std::to_string(m_stats.cum_free_pickup_penalty /
+                               static_cast<double>(m_stats.free_pickup_events))
+              : "0";
   line += separator();
-  line += (m_stats.free_drop_events > 0) ?
-          std::to_string(m_stats.cum_free_drop_penalty /
-                         static_cast<double>(m_stats.free_drop_events)): "0";
+  line += (m_stats.free_drop_events > 0)
+              ? std::to_string(m_stats.cum_free_drop_penalty /
+                               static_cast<double>(m_stats.free_drop_events))
+              : "0";
   line += separator();
 
   line += std::to_string(m_stats.cache_pickup_events) + separator();
   line += std::to_string(m_stats.cache_drop_events) + separator();
 
-  line += (m_stats.cache_pickup_events > 0) ?
-          std::to_string(m_stats.cum_cache_pickup_penalty /
-                         static_cast<double>(m_stats.cache_pickup_events)): "0";
+  line += (m_stats.cache_pickup_events > 0)
+              ? std::to_string(m_stats.cum_cache_pickup_penalty /
+                               static_cast<double>(m_stats.cache_pickup_events))
+              : "0";
   line += separator();
-  line += (m_stats.cache_drop_events > 0) ?
-          std::to_string(m_stats.cum_cache_drop_penalty /
-                         static_cast<double>(m_stats.cache_drop_events)): "0";
+  line += (m_stats.cache_drop_events > 0)
+              ? std::to_string(m_stats.cum_cache_drop_penalty /
+                               static_cast<double>(m_stats.cache_drop_events))
+              : "0";
   line += separator();
   return true;
 } /* csv_line_build() */

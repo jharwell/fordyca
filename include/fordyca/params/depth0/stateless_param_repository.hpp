@@ -43,7 +43,7 @@ NS_START(fordyca, params, depth0);
  */
 class stateless_param_repository: public rcppsw::params::xml_param_repository {
  public:
-  explicit stateless_param_repository(std::shared_ptr<rcppsw::er::server> server);
+  stateless_param_repository();
 };
 
 NS_END(params, fordyca, depth0);

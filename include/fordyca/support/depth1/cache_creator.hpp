@@ -37,6 +37,7 @@
 NS_START(fordyca);
 namespace representation { class arena_cache; class base_block; }
 NS_START(support, depth1);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -50,15 +51,14 @@ NS_START(support, depth1);
  * Used by the arena to actually create caches, and by robots to create
  * "virtual" caches in their on-board representation of the arena.
  */
-class cache_creator : public rcppsw::er::client {
+class cache_creator : public er::client<cache_creator> {
  public:
   using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
-  cache_creator(std::shared_ptr<rcppsw::er::server> server,
-                representation::arena_grid& grid,
+  cache_creator(representation::arena_grid& grid,
                 double cache_size, double resolution);
 
   /**

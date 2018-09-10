@@ -42,12 +42,12 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_finisher_fsm::cache_finisher_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* const bsel_matrix,
     const controller::cache_selection_matrix* const csel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("forydca.fsm.depth2.cache_finisher"),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
@@ -55,8 +55,8 @@ cache_finisher_fsm::cache_finisher_fsm(
       HFSM_CONSTRUCT_STATE(acquire_new_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_block_fsm(server, bsel_matrix, saa, map),
-      m_cache_fsm(server, csel_matrix, saa, map),
+      m_block_fsm(bsel_matrix, saa, map),
+      m_cache_fsm(csel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
@@ -68,11 +68,7 @@ cache_finisher_fsm::cache_finisher_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  client::insmod("cache_finisher_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
@@ -80,7 +76,7 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
 }
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_block) {
-  ER_DIAG("Executing ST_ACQUIRE_BLOCK");
+  ER_DEBUG("Executing ST_ACQUIRE_BLOCK");
   if (m_block_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
@@ -108,7 +104,7 @@ HFSM_STATE_DEFINE(cache_finisher_fsm,
 }
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_new_cache) {
-  ER_DIAG("Executing ST_ACQUIRE_NEW_CACHE");
+  ER_DEBUG("Executing ST_ACQUIRE_NEW_CACHE");
   if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_DROP);
@@ -130,7 +126,7 @@ HFSM_STATE_DEFINE(cache_finisher_fsm,
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
   if (ST_FINISHED != last_state()) {
-    ER_DIAG("Executing ST_FINISHED");
+    ER_DEBUG("Executing ST_FINISHED");
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -140,17 +136,21 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
  ******************************************************************************/
 __rcsw_pure bool cache_finisher_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
-      (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance());
+         (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance());
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool cache_finisher_fsm::entered_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.entered_collision_avoidance()) ||
-      (m_cache_fsm.task_running() && m_cache_fsm.entered_collision_avoidance());
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.entered_collision_avoidance()) ||
+         (m_cache_fsm.task_running() &&
+          m_cache_fsm.entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool cache_finisher_fsm::exited_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.exited_collision_avoidance()) ||
-      (m_cache_fsm.task_running() && m_cache_fsm.exited_collision_avoidance());
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.exited_collision_avoidance()) ||
+         (m_cache_fsm.task_running() &&
+          m_cache_fsm.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint cache_finisher_fsm::collision_avoidance_duration(void) const {

@@ -1,5 +1,5 @@
 /**
- * @file task_repository.hpp
+ * @file param_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -43,7 +43,7 @@ NS_START(fordyca, params, depth1);
  */
 class param_repository: public depth0::stateful_param_repository {
  public:
-  explicit param_repository(std::shared_ptr<rcppsw::er::server> server);
+  param_repository(void);
 };
 
 NS_END(depth1, params, fordyca);

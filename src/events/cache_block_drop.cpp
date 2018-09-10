@@ -39,57 +39,52 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
 using representation::arena_grid;
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     double resolution)
     : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
-      client(server),
+      ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
       m_resolution(resolution),
       m_block(block),
-      m_cache(cache) {
-  client::insmod("cache_block_drop",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+      m_cache(cache) {}
 
 /*******************************************************************************
- * Depth0 Foraging
+ * Depth1 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(representation::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
-            "FATAL: Cell does not have coordinates");
+            "Cell does not have coordinates");
 
   cell.fsm().accept(*this);
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
-            "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+            "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
             m_cache->n_blocks(),
             cell.block_count());
 } /* visit() */
 
 void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
-  ER_ASSERT(fsm.state_has_cache(), "FATAL: cell does not contain a cache");
+  ER_ASSERT(fsm.state_has_cache(), "cell does not contain a cache");
   fsm.event_block_drop();
 } /* visit() */
 
 void cache_block_drop::visit(representation::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_id(), "FATAL: undefined robot index");
+  ER_ASSERT(-1 != m_block->robot_id(), "undefined robot index");
   __rcsw_unused int index = m_block->robot_id();
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
-  ER_NOM("arena_map: fb%d dropped block%d in cache%d [%u blocks total]",
-         index,
-         m_block->id(),
-         m_cache->id(),
-         m_cache->n_blocks());
+  ER_INFO("arena_map: fb%d dropped block%d in cache%d [%u blocks total]",
+          index,
+          m_block->id(),
+          m_cache->id(),
+          m_cache->n_blocks());
 } /* visit() */
 
 void cache_block_drop::visit(representation::perceived_arena_map& map) {
@@ -97,8 +92,7 @@ void cache_block_drop::visit(representation::perceived_arena_map& map) {
 } /* visit() */
 
 void cache_block_drop::visit(representation::base_block& block) {
-  events::free_block_drop e(client::server_ref(),
-                            m_block, /* OK because we only have 1 block */
+  events::free_block_drop e(m_block, /* OK because we only have 1 block */
                             rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
                             m_resolution);
   block.accept(e);
@@ -109,19 +103,16 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
-/*******************************************************************************
- * Depth1 Foraging
- ******************************************************************************/
 void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
+  controller.ndc_push();
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
   dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
 
-  ER_NOM("Depth1 foraging controller: dropped block%d in cache%d",
-         m_block->id(),
-         m_cache->id());
+  ER_INFO("Dropped block%d in cache%d", m_block->id(), m_cache->id());
+  controller.ndc_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fsm::depth1::block_to_goal_fsm& fsm) {
@@ -137,7 +128,7 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(controller::depth2::foraging_controller& controller) {
-  ER_ASSERT(false, "FATAL: Not implemented");
+  ER_ASSERT(false, "Not implemented");
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {

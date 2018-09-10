@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/cache_creator.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cell2D.hpp"
@@ -37,18 +37,13 @@ using representation::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_creator::cache_creator(std::shared_ptr<rcppsw::er::server> server,
-                             representation::arena_grid& grid,
+cache_creator::cache_creator(representation::arena_grid& grid,
                              double cache_size,
                              double resolution)
-    : client(server),
+    : ER_CLIENT_INIT("fordyca.support.depth1.cache_creator"),
       m_cache_size(cache_size),
       m_resolution(resolution),
-      m_grid(grid) {
-  client::insmod("cache_creator",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+      m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions
@@ -63,7 +58,7 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
   rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, m_resolution);
   representation::cell2D& cell = m_grid.access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
-    ER_ASSERT(cell.block(), "FATAL: Cell does not have block");
+    ER_ASSERT(cell.block(), "Cell does not have block");
 
     /*
      * We use insert() instead of push_back() here so that it there was a
@@ -86,15 +81,15 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
   } /* for(block..) */
 
   for (auto block : blocks) {
-    events::free_block_drop op(client::server_ref(), block, d, m_resolution);
+    events::free_block_drop op(block, d, m_resolution);
     m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
-  ER_NOM("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
-         center.GetX(),
-         center.GetY(),
-         d.first,
-         d.second,
-         blocks.size());
+  ER_INFO("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
+          center.GetX(),
+          center.GetY(),
+          d.first,
+          d.second,
+          blocks.size());
 
   block_vector block_vec(blocks.begin(), blocks.end());
   return rcppsw::make_unique<representation::arena_cache>(
@@ -121,19 +116,24 @@ void cache_creator::update_host_cells(cache_vector& caches) {
       for (size_t j = ymin; j < ymax; ++j) {
         rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
         if (c != cache->discrete_loc()) {
-          ER_ASSERT(cache->contains_point(math::dcoord_to_rcoord(c, m_grid.resolution())),
-                    "FATAL: Cache%d does not contain point (%zu, %zu) within its extent",
-                    cache->id(), i, j);
+          ER_ASSERT(
+              cache->contains_point(
+                  math::dcoord_to_rcoord(c, m_grid.resolution())),
+              "Cache%d does not contain point (%zu, %zu) within its extent",
+              cache->id(),
+              i,
+              j);
           auto& cell = m_grid.access<arena_grid::kCell>(i, j);
-          ER_ASSERT(!cell.state_in_cache_extent(), "FATAL: cell(%zu, %zu) already in CACHE_EXTENT",
+          ER_ASSERT(!cell.state_in_cache_extent(),
+                    "cell(%zu, %zu) already in CACHE_EXTENT",
                     i,
                     j);
           events::cell_cache_extent e(c, cache);
           cell.accept(e);
         }
       } /* for(j..) */
-    } /* for(i..) */
-  } /* for(cache..) */
+    }   /* for(i..) */
+  }     /* for(cache..) */
 } /* update_host_cells() */
 
 NS_END(depth1, support, fordyca);

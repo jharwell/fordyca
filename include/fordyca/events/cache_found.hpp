@@ -49,11 +49,11 @@ NS_START(events);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public perceived_cell_op, public rcppsw::er::client {
+class cache_found : public perceived_cell_op,
+                    public rcppsw::er::client<cache_found> {
  public:
-  cache_found(std::shared_ptr<rcppsw::er::server> server,
-              std::unique_ptr<representation::base_cache> cache);
-  ~cache_found(void) override;
+  explicit cache_found(std::unique_ptr<representation::base_cache> cache);
+  ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
   cache_found& operator=(const cache_found& op) = delete;

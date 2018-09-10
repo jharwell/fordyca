@@ -41,11 +41,9 @@ movement_metrics_collector::movement_metrics_collector(const std::string& ofname
  ******************************************************************************/
 std::string movement_metrics_collector::csv_header_build(
     const std::string& header) {
-  return base_metrics_collector::csv_header_build(header) +
-      "int_avg_distance" + separator() +
-      "cum_avg_distance" + separator() +
-      "int_avg_velocity" + separator() +
-      "cum_avg_velocity" + separator();
+  return base_metrics_collector::csv_header_build(header) + "int_avg_distance" +
+         separator() + "cum_avg_distance" + separator() + "int_avg_velocity" +
+         separator() + "cum_avg_velocity" + separator();
 } /* csv_header_build() */
 
 void movement_metrics_collector::reset(void) {
@@ -58,14 +56,18 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line += std::to_string(m_stats.int_distance /
-                         static_cast<double>(m_stats.int_robot_count)) + separator();
-  line += std::to_string(m_stats.cum_distance /
-                         static_cast<double>(m_stats.cum_robot_count)) + separator();
-  line += std::to_string(m_stats.int_velocity /
-                         static_cast<double>(m_stats.int_robot_count)) + separator();
-  line += std::to_string(m_stats.cum_velocity /
-                         static_cast<double>(m_stats.cum_robot_count)) + separator();
+                         static_cast<double>(m_stats.int_robot_count)) +
           separator();
+  line += std::to_string(m_stats.cum_distance /
+                         static_cast<double>(m_stats.cum_robot_count)) +
+          separator();
+  line += std::to_string(m_stats.int_velocity /
+                         static_cast<double>(m_stats.int_robot_count)) +
+          separator();
+  line += std::to_string(m_stats.cum_velocity /
+                         static_cast<double>(m_stats.cum_robot_count)) +
+          separator();
+  separator();
   return true;
 } /* csv_line_build() */
 

@@ -49,9 +49,12 @@ class metrics_aggregator;
  * Handles all operations robots perform relating to static caches: pickup,
  * drop, etc.
  */
-class foraging_loop_functions : public depth0::stateful_foraging_loop_functions {
+class foraging_loop_functions : public depth0::stateful_foraging_loop_functions,
+                                public er::client<foraging_loop_functions> {
  public:
-  foraging_loop_functions(void) : m_metrics_agg(nullptr) {}
+  foraging_loop_functions(void)
+      : ER_CLIENT_INIT("fordyca.loop.depth1"),
+        m_metrics_agg(nullptr) {}
   ~foraging_loop_functions(void) override = default;
 
   void Init(ticpp::Element& node) override;

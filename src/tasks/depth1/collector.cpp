@@ -29,8 +29,8 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/tasks/argument.hpp"
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -122,11 +122,11 @@ TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    transport_goal_type,
-    collector,
-    block_transport_goal,
-    static_cast<fsm::depth1::cached_block_to_nest_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        collector,
+                        block_transport_goal,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

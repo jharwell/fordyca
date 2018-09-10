@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include "rcppsw/math/dcoord.hpp"
 
@@ -40,6 +38,7 @@ class arena_map;
 } /* namespace representation */
 
 NS_START(support, depth0);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,10 +59,10 @@ NS_START(support, depth0);
  *
  * Metrics are *NOT* reset after collection--that is the caller's responsibility.
  */
-class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
+class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
+                                     public er::client<stateless_metrics_aggregator> {
  public:
-  stateless_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                               const struct params::metrics_params* params,
+  stateless_metrics_aggregator(const struct params::metrics_params* params,
                                const std::string& output_root);
 
   /**

@@ -25,19 +25,21 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
 
-#include "fordyca/support/temporal_penalty.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/control/waveform_generator.hpp"
+#include "fordyca/support/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
+#include "rcppsw/control/waveform_generator.hpp"
 #include "rcppsw/control/waveform_params.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
 NS_START(fordyca, support);
+namespace ct = rcppsw::control;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -45,7 +47,7 @@ NS_START(fordyca, support);
 
 /**
  * @class temporal_penalty_handler
- * @ingroup support depth1
+ * @ingroup support
  *
  * @brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).
@@ -54,7 +56,8 @@ NS_START(fordyca, support);
  * manipulating it to derived classes.
  */
 template <typename T>
-class temporal_penalty_handler : public rcppsw::er::client {
+class temporal_penalty_handler
+    : public er::client<temporal_penalty_handler<T>> {
  public:
   /**
    * @Brief Initialize the penalty handler.
@@ -62,17 +65,12 @@ class temporal_penalty_handler : public rcppsw::er::client {
    * @param server Server for debugging.
    * @param params Parameters for penalty waveform generation.
    */
-  temporal_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                       const ct::waveform_params* const params)
-      : client(server),
+  temporal_penalty_handler(const ct::waveform_params* const params)
+      : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
         m_penalty_list(),
-        m_penalty(ct::waveform_generator()(params->type, params)) {
-    insmod("temporal_penalty_handler",
-           rcppsw::er::er_lvl::DIAG,
-           rcppsw::er::er_lvl::NOM);
-  }
+        m_penalty(ct::waveform_generator()(params->type, params)) {}
 
-  ~temporal_penalty_handler(void) override { client::rmmod(); }
+  ~temporal_penalty_handler(void) override = default;
 
   /**
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
@@ -86,7 +84,8 @@ class temporal_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   __rcsw_pure bool penalty_satisfied(const T& controller, uint timestep) const {
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+    auto it = std::find_if(m_penalty_list.begin(),
+                           m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
                              return p.controller() == &controller;
                            });
@@ -123,9 +122,9 @@ class temporal_penalty_handler : public rcppsw::er::client {
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
-    ER_NOM("fb%d", utils::robot_id(controller));
+    ER_INFO("fb%d", utils::robot_id(controller));
     ER_ASSERT(!is_serving_penalty(controller),
-              "FATAL: Robot still serving penalty after abort?!");
+              "Robot still serving penalty after abort?!");
   }
 
   typename std::list<temporal_penalty<T>>::iterator find(const T& controller) {
@@ -140,18 +139,18 @@ class temporal_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   __rcsw_pure bool is_serving_penalty(const T& controller) const {
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+    auto it = std::find_if(m_penalty_list.begin(),
+                           m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
-                             return p.controller() == &controller; });
+                             return p.controller() == &controller;
+                           });
     return it != m_penalty_list.end();
   }
 
   size_t list_size(void) const { return m_penalty_list.size(); }
 
  protected:
-  std::list<temporal_penalty<T>>& penalty_list(void) {
-    return m_penalty_list;
-  }
+  std::list<temporal_penalty<T>>& penalty_list(void) { return m_penalty_list; }
   const std::list<temporal_penalty<T>>& penalty_list(void) const {
     return m_penalty_list;
   }

@@ -79,7 +79,8 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, cache_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_utilization_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_lifecycle_fname) << std::endl
-         << XML_PARAM_STR(m_params, task_execution_generalist_fname) << std::endl
+         << XML_PARAM_STR(m_params, task_execution_generalist_fname)
+         << std::endl
          << XML_PARAM_STR(m_params, task_execution_collector_fname) << std::endl
          << XML_PARAM_STR(m_params, task_execution_harvester_fname) << std::endl
          << XML_PARAM_STR(m_params, task_generalist_tab_fname) << std::endl

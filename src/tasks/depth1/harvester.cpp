@@ -24,10 +24,10 @@
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
@@ -64,7 +64,8 @@ double harvester::calc_abort_prob(void) {
    * acquires a block can cause it to get stuck and not switch to another task
    * if it cannot find a block anywhere. See #232.
    */
-  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  auto* fsm =
+      static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
   if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
     return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
@@ -74,14 +75,14 @@ double harvester::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double harvester::calc_interface_time(double start_time) {
-  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  if (transport_goal_type::kExistingCache ==
-      fsm->block_transport_goal()) {
+  auto* fsm =
+      static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
     return current_time() - start_time;
   }
 
-  if (fsm->goal_acquired() &&
-      fsm::block_transporter::goal_type::kExistingCache == fsm->block_transport_goal()) {
+  if (fsm->goal_acquired() && fsm::block_transporter::goal_type::kExistingCache ==
+                                  fsm->block_transport_goal()) {
     if (!interface_complete()) {
       interface_complete(true);
       reset_interface_time();
@@ -144,7 +145,8 @@ TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
  * Task Metrics
  ******************************************************************************/
 __rcsw_pure bool harvester::task_at_interface(void) const {
-  auto* fsm = static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
+  auto* fsm =
+      static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
   return transport_goal_type::kExistingCache == fsm->block_transport_goal();
 } /* task_at_interface()() */
 

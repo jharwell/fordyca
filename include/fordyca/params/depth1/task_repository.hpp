@@ -44,7 +44,7 @@ NS_START(fordyca, params, depth1);
 class task_repository: public rcppsw::params::xml_param_repository {
  public:
   static constexpr char kName[] = "task_repository";
-  explicit task_repository(std::shared_ptr<rcppsw::er::server> server);
+  task_repository(void);
 };
 
 NS_END(depth1, params, fordyca);

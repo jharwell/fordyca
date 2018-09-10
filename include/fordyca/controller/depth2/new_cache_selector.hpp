@@ -48,12 +48,11 @@ NS_START(depth2);
  * arena) which are presumed to still exist at this point, although that may not
  * be true as a robot's knowledge of the arena is imperfect).
  */
-class new_cache_selector: public rcppsw::er::client {
+class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
  public:
-  new_cache_selector(std::shared_ptr<rcppsw::er::server> server,
-                     const controller::cache_selection_matrix* csel_matrix);
+  explicit new_cache_selector(const controller::cache_selection_matrix* csel_matrix);
 
-  ~new_cache_selector(void) override { rmmod(); }
+  ~new_cache_selector(void) override = default;
   new_cache_selector& operator=(const new_cache_selector& other) = delete;
   new_cache_selector(const new_cache_selector& other) = delete;
 

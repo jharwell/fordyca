@@ -21,8 +21,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
@@ -31,7 +31,6 @@
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,25 +41,22 @@ NS_START(fordyca, representation);
  * Constructors/Destructor
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
-    : client(rcppsw::er::g_server),
+    : ER_CLIENT_INIT("fordyca.representation.arena_map"),
       mc_static_cache_params(params->static_cache),
       m_blocks(block_manifest_processor(&params->blocks.dist.manifest)
                    .create_blocks()),
       m_caches(),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
-             static_cast<size_t>(params->grid.upper.GetY()),
-             server_ref()),
+             static_cast<size_t>(params->grid.upper.GetY())),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(rcppsw::er::g_server, m_grid, &params->blocks.dist) {
-  insmod("arena_map", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-
-  ER_NOM("%zu x %zu/%zu x %zu @ %f resolution",
-         m_grid.xdsize(),
-         m_grid.ydsize(),
-         m_grid.xrsize(),
-         m_grid.yrsize(),
-         m_grid.resolution());
+      m_block_dispatcher(m_grid, &params->blocks.dist) {
+  ER_INFO("%zu x %zu/%zu x %zu @ %f resolution",
+          m_grid.xdsize(),
+          m_grid.ydsize(),
+          m_grid.xrsize(),
+          m_grid.yrsize(),
+          m_grid.resolution());
 }
 
 /*******************************************************************************
@@ -99,9 +95,8 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-bool arena_map::calc_blocks_for_static_cache(
-    const argos::CVector2& center,
-    block_vector& blocks) {
+bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
+                                             block_vector& blocks) {
   /*
    * Only blocks that are not:
    *
@@ -110,8 +105,8 @@ bool arena_map::calc_blocks_for_static_cache(
    *
    * are eligible for being used to re-create the static cache.
    */
-  rcppsw::math::dcoord2 dcenter = math::rcoord_to_dcoord(center,
-                                                         m_grid.resolution());
+  rcppsw::math::dcoord2 dcenter =
+      math::rcoord_to_dcoord(center, m_grid.resolution());
   for (auto& b : m_blocks) {
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
       blocks.push_back(b);
@@ -123,17 +118,18 @@ bool arena_map::calc_blocks_for_static_cache(
 
   bool ret = true;
   if (blocks.size() < base_cache::kMinBlocks) {
-    uint count = std::accumulate(m_blocks.begin(),
-                                 m_blocks.end(),
-                                 0,
-                                 [&](uint sum,
-                                     const std::shared_ptr<base_block>& b) {
-                                   return sum + (b->is_out_of_sight() ||
-                                                 b->discrete_loc() == dcenter);
-                                 });
+    uint count =
+        std::accumulate(m_blocks.begin(),
+                        m_blocks.end(),
+                        0,
+                        [&](uint sum, const std::shared_ptr<base_block>& b) {
+                          return sum + (b->is_out_of_sight() ||
+                                        b->discrete_loc() == dcenter);
+                        });
 
     ER_ASSERT(count < base_cache::kMinBlocks,
-              "FATAL: For new cache @(%f, %f) [%u, %u]: %zu >= %u blocks SHOULD be available, but only %zu are",
+              "For new cache @(%f, %f) [%u, %u]: %zu >= %u blocks SHOULD be "
+              "available, but only %zu are",
               center.GetX(),
               center.GetY(),
               dcenter.first,
@@ -142,37 +138,36 @@ bool arena_map::calc_blocks_for_static_cache(
               base_cache::kMinBlocks,
               blocks.size());
   } else if (blocks.size() < mc_static_cache_params.size) {
-    ER_WARN("WARNING: Not enough free blocks to meet min size for new cache @(%f, %f) [%u, %u] (%zu < %u)",
-            center.GetX(),
-            center.GetY(),
-            dcenter.first,
-            dcenter.second,
-            blocks.size(),
-            mc_static_cache_params.size);
+    ER_WARN(
+        "Not enough free blocks to meet min size for new cache @(%f, %f) [%u, "
+        "%u] (%zu < %u)",
+        center.GetX(),
+        center.GetY(),
+        dcenter.first,
+        dcenter.second,
+        blocks.size(),
+        mc_static_cache_params.size);
     ret = false;
   }
   return ret;
 } /* calc_blocks_for_static_cache() */
 
 bool arena_map::static_cache_create(void) {
-  ER_DIAG("(Re)-Creating static cache");
+  ER_DEBUG("(Re)-Creating static cache");
   ER_ASSERT(mc_static_cache_params.size >= base_cache::kMinBlocks,
-            "FATAL: Static cache size %u < minimum %u",
+            "Static cache size %u < minimum %u",
             mc_static_cache_params.size,
             base_cache::kMinBlocks);
 
   argos::CVector2 center((m_grid.xrsize() + m_nest.real_loc().GetX()) / 2.0,
                          m_nest.real_loc().GetY());
 
-  support::depth1::static_cache_creator creator(server_ref(),
-                                          m_grid,
-                                          center,
-                                          mc_static_cache_params.dimension,
-                                          m_grid.resolution());
+  support::depth1::static_cache_creator creator(
+      m_grid, center, mc_static_cache_params.dimension, m_grid.resolution());
 
   block_vector blocks;
   if (!calc_blocks_for_static_cache(center, blocks)) {
-    ER_WARN("WARNING: Unable to create static cache @(%f, %f): Not enough free blocks",
+    ER_WARN("Unable to create static cache @(%f, %f): Not enough free blocks",
             center.GetX(),
             center.GetY());
     return false;
@@ -186,24 +181,23 @@ bool arena_map::static_cache_create(void) {
    * simulation if random block distribution is used, but weird cases can arise
    * due to task abort+block drop as well, so it is best to be safe.
    */
-  for (auto &b : m_blocks) {
-    for (auto &c : m_caches) {
+  for (auto& b : m_blocks) {
+    for (auto& c : m_caches) {
       if (!c->contains_block(b) &&
           c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
         events::cell_empty empty(b->discrete_loc());
         m_grid.access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(client::server_ref(),
-                                   b,
+        events::free_block_drop op(b,
                                    math::rcoord_to_dcoord(c->real_loc(),
                                                           m_grid.resolution()),
                                    m_grid.resolution());
         m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);
-        ER_NOM("Hidden block%d added to cache%d", b->id(), c->id());
+        ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
       }
     } /* for(&c..) */
-  } /* for(&b..) */
+  }   /* for(&b..) */
 
   /*
    * Must be after fixing hidden blocks, otherwise the cache host cell will
@@ -238,7 +232,7 @@ void arena_map::distribute_all_blocks(void) {
   } /* for(&cache..) */
   entities.push_back(&m_nest);
   bool b = m_block_dispatcher.distribute_blocks(m_blocks, entities);
-  ER_ASSERT(b, "FATAL: Unable to perform initial block distribution");
+  ER_ASSERT(b, "Unable to perform initial block distribution");
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been
@@ -258,11 +252,9 @@ void arena_map::distribute_all_blocks(void) {
 
 void arena_map::cache_remove(const std::shared_ptr<arena_cache>& victim) {
   size_t before = caches().size();
-  int id = victim->id();
+  __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
-  ER_ASSERT(caches().size() == before - 1,
-            "FATAL: cache%d not removed",
-            id);
+  ER_ASSERT(caches().size() == before - 1, "cache%d not removed", id);
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
@@ -280,22 +272,28 @@ void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
   size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
   size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
 
-  for (size_t i = xmin;i < xmax; ++i) {
+  for (size_t i = xmin; i < xmax; ++i) {
     for (size_t j = ymin; j < ymax; ++j) {
       rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
       if (c != victim->discrete_loc()) {
-        ER_ASSERT(victim->contains_point(math::dcoord_to_rcoord(c, m_grid.resolution())),
-                  "FATAL: Cache%d does not contain point (%zu, %zu) within its extent",
-                  victim->id(), i, j);
+        ER_ASSERT(victim->contains_point(
+                      math::dcoord_to_rcoord(c, m_grid.resolution())),
+                  "Cache%d does not contain point (%zu, %zu) within its extent",
+                  victim->id(),
+                  i,
+                  j);
 
         auto& cell = m_grid.access<arena_grid::kCell>(i, j);
-        ER_ASSERT(cell.state_in_cache_extent(), "FATAL: cell(%zu, %zu) not in CACHE_EXTENT [state=%d]",
-                  i, j, cell.fsm().current_state());
+        ER_ASSERT(cell.state_in_cache_extent(),
+                  "cell(%zu, %zu) not in CACHE_EXTENT [state=%d]",
+                  i,
+                  j,
+                  cell.fsm().current_state());
         events::cell_empty e(c);
         cell.accept(e);
       }
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
 } /* cache_extent_clear() */
 
 NS_END(representation, fordyca);

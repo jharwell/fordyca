@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
+#include <string>
+
 #include "fordyca/controller/motion_throttling_handler.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
@@ -46,14 +48,12 @@ class throttling_differential_drive : public kinematics2D::differential_drive {
   static constexpr double kInterWheelDistance = 0.14;
 
   throttling_differential_drive(
-      std::shared_ptr<rcppsw::er::server> server,
       kinematics2D::differential_drive::drive_type type,
       double max_speed,
       argos::CRadians soft_turn_max,
       const hal::actuators::differential_drive_actuator& wheels,
       const ct::waveform_params* params)
-      : differential_drive(server,
-                           wheels,
+      : differential_drive(wheels,
                            type,
                            kWheelRadius,
                            kInterWheelDistance,

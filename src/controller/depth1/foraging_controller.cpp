@@ -25,8 +25,8 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
@@ -34,7 +34,6 @@
 #include "fordyca/params/depth1/param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
@@ -50,6 +49,7 @@ using representation::occupancy_grid;
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
     : depth0::stateful_foraging_controller(),
+      ER_CLIENT_INIT("fordyca.controller.depth1"),
       m_cache_sel_matrix() {}
 
 foraging_controller::~foraging_controller(void) = default;
@@ -58,6 +58,7 @@ foraging_controller::~foraging_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
+  ndc_push();
   perception()->update(depth0::stateful_foraging_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
@@ -66,25 +67,24 @@ void foraging_controller::ControlStep(void) {
 
   m_task_aborted = false;
   executive()->run();
+  ndc_pop();
 } /* ControlStep() */
 
 void foraging_controller::Init(ticpp::Element& node) {
-  params::depth1::param_repository param_repo(client::server_ref());
-
   /*
    * Note that we do not call \ref stateful_foraging_controller::Init()--there
    * is nothing in there that we need.
    */
   base_foraging_controller::Init(node);
-  ER_NOM("Initializing depth1 foraging controller");
+
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::depth1::param_repository param_repo;
 
   param_repo.parse_all(node);
-#ifndef ER_NREPORT
-  client::server_ptr()->log_stream() << param_repo;
-#endif
 
   if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
@@ -94,9 +94,7 @@ void foraging_controller::Init(ticpp::Element& node) {
       &saa_subsystem()->sensing()->sensor_list()));
 
   perception(rcppsw::make_unique<perception_subsystem>(
-      client::server_ref(),
-      param_repo.parse_results<params::perception_params>(),
-      GetId()));
+      param_repo.parse_results<params::perception_params>(), GetId()));
 
   /*
    * Initialize tasking by overriding stateful controller executive via
@@ -104,18 +102,16 @@ void foraging_controller::Init(ticpp::Element& node) {
    */
   auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
   block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
-      ogrid->nest,
-      &ogrid->priorities));
+      ogrid->nest, &ogrid->priorities));
   m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
-  executive(tasking_initializer(client::server_ref(),
-                                block_sel_matrix(),
+  executive(tasking_initializer(block_sel_matrix(),
                                 m_cache_sel_matrix.get(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
-  ER_NOM("Depth1 foraging controller initialization finished");
-  executive()->task_abort_notify(std::bind(&foraging_controller::task_abort_cb,
-                                           this,
-                                           std::placeholders::_1));
+  ER_INFO("Initialization finished");
+  executive()->task_abort_notify(std::bind(
+      &foraging_controller::task_abort_cb, this, std::placeholders::_1));
+  ndc_pop();
 } /* Init() */
 
 __rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {

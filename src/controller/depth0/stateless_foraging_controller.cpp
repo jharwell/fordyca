@@ -23,13 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
-#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/depth0/stateless_param_repository.hpp"
-#include "rcppsw/er/server.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +39,9 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void)
-    : base_foraging_controller(), m_fsm() {}
+    : base_foraging_controller(),
+      ER_CLIENT_INIT("fordyca.controller.depth0.stateless"),
+      m_fsm() {}
 
 stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
@@ -49,24 +50,20 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
  ******************************************************************************/
 void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
-
-  ER_NOM("Initializing stateless foraging controller");
-
-  params::depth0::stateless_param_repository param_repo(client::server_ref());
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::depth0::stateless_param_repository param_repo;
   param_repo.parse_all(node);
 
-#ifndef ER_NREPORT
-  client::server_ptr()->log_stream() << param_repo;
-#endif
-
   if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      client::server_ref(), base_foraging_controller::saa_subsystem());
-  ER_NOM("Stateless foraging controller initialization finished");
+      base_foraging_controller::saa_subsystem());
+  ER_INFO("Initialization finished");
+  ndc_pop();
 } /* Init() */
 
 void stateless_foraging_controller::Reset(void) {
@@ -77,19 +74,20 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
+  ER_NDC_PUSH("[" + this->GetId() +
+              ",t=" + std::to_string(saa_subsystem()->sensing()->tick()) + "]");
+
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
   m_fsm->run();
+  ER_NDC_POP();
 } /* ControlStep() */
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateless_foraging_controller,
-                       goal_acquired,
-                       m_fsm);
+FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller, goal_acquired, m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        stateless_foraging_controller,

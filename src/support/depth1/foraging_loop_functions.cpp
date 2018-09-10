@@ -35,8 +35,6 @@
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
-#include "rcppsw/er/server.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -49,31 +47,25 @@ using representation::arena_grid;
 void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing depth1 foraging loop functions");
-  params::loop_function_repository repo(server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::loop_function_repository repo;
   repo.parse_all(node);
-
-#ifndef ER_NREPORT
-  rcppsw::er::g_server->log_stream() << repo;
-#endif
 
   /* initialize stat collecting */
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
-  params::output_params output = *repo.parse_results<const struct params::output_params>();
+  params::output_params output =
+      *repo.parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(rcppsw::er::g_server,
-                                                          &output.metrics,
-                                                          output_root());
+  m_metrics_agg =
+      rcppsw::make_unique<metrics_aggregator>(&output.metrics, output_root());
 
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
-
   /* intitialize robot interactions with environment */
   m_interactor =
-      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                      arena_map(),
+      rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
@@ -93,21 +85,22 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
     if (nullptr != vparams) {
       controller.display_task(vparams->robot_task);
     }
-    controller.executive()->task_finish_notify(std::bind(
-        &metrics_aggregator::task_finish_or_abort_cb,
-        m_metrics_agg.get(),
-        std::placeholders::_1));
-    controller.executive()->task_abort_notify(std::bind(
-        &metrics_aggregator::task_finish_or_abort_cb,
-        m_metrics_agg.get(),
-        std::placeholders::_1));
-    controller.executive()->task_alloc_notify(std::bind(
-        &metrics_aggregator::task_alloc_cb,
-        m_metrics_agg.get(),
-        std::placeholders::_1,
-        std::placeholders::_2));
+    controller.executive()->task_finish_notify(
+        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1));
+    controller.executive()->task_abort_notify(
+        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1));
+    controller.executive()->task_alloc_notify(
+        std::bind(&metrics_aggregator::task_alloc_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1,
+                  std::placeholders::_2));
   } /* for(&entity..) */
-  ER_NOM("Depth1 foraging loop functions initialization finished");
+  ndc_pop();
+  ER_INFO("Initialization finished");
 }
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
@@ -211,9 +204,10 @@ void foraging_loop_functions::pre_step_final(void) {
         static_cast<double>(std::rand()) / RAND_MAX) {
       if (arena_map()->static_cache_create()) {
         __rcsw_unused representation::cell2D& cell =
-            arena_map()->access<arena_grid::kCell>(arena_map()->caches()[0]->discrete_loc());
+            arena_map()->access<arena_grid::kCell>(
+                arena_map()->caches()[0]->discrete_loc());
         ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                  "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+                  "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                   arena_map()->caches()[0]->n_blocks(),
                   cell.block_count());
         m_cache_collator.cache_created();

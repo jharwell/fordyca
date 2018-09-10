@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <string>
-
 #include "fordyca/params/arena/nest_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
@@ -47,8 +46,7 @@ NS_START(fordyca, params, arena);
  */
 class nest_parser : public rcppsw::params::xml_param_parser {
  public:
-  nest_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
-      : xml_param_parser(server, level) {}
+  explicit nest_parser(uint level) : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all nest parameters should lie under in the

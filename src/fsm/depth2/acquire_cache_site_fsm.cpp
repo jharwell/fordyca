@@ -36,15 +36,14 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
-    : acquire_goal_fsm(server,
-                       saa,
+    : acquire_goal_fsm(saa,
                        map,
                        std::bind(&acquire_cache_site_fsm::site_detected_cb,
                                  this)),
+      ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       mc_matrix(csel_matrix) {}
 
 /*******************************************************************************
@@ -56,7 +55,7 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
    * At some point this will have some sanity checks/warnings about the chosen
    * cache site, but for now, just signal that everything is fine.
    */
-  ER_ASSERT(!explore_result, "FATAL: Found cache site by exploring?");
+  ER_ASSERT(!explore_result, "Found cache site by exploring?");
   return true;
 } /* site_acquired_cb() */
 
@@ -70,7 +69,7 @@ bool acquire_cache_site_fsm::acquire_known_goal(void) {
 
   /* Start vectoring towards our chosen site */
   if (!vector_fsm().task_running() && !vector_fsm().task_finished()) {
-    controller::depth2::cache_site_selector s(server_ref(), mc_matrix);
+    controller::depth2::cache_site_selector s(mc_matrix);
     tasks::vector_argument v(
         vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
         s.calc_best(std::list<representation::perceived_cache>(),

@@ -59,8 +59,9 @@ class saa_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_foraging_controller : public argos::CCI_Controller,
-                                 public rcppsw::er::client {
+class base_foraging_controller
+    : public argos::CCI_Controller,
+      public rcppsw::er::client<base_foraging_controller> {
  public:
   base_foraging_controller(void);
   ~base_foraging_controller(void) override = default;
@@ -150,6 +151,9 @@ class base_foraging_controller : public argos::CCI_Controller,
   void robot_loc(argos::CVector2 loc);
   argos::CVector2 robot_loc(void) const;
 
+  void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
+  void ndc_pop(void) { ER_NDC_POP(); }
+
  protected:
   const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
   class saa_subsystem* saa_subsystem(void) {
@@ -158,14 +162,11 @@ class base_foraging_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
-  std::string log_header_calc(void) const;
-  std::string dbg_header_calc(void) const;
 
   // clang-format off
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
-  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

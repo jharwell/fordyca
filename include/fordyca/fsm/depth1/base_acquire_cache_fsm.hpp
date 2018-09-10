@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <string>
 
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
@@ -52,10 +53,10 @@ NS_START(fsm, depth1);
  * via random exploration). Once a cache has been acquired, it signals that it
  * has completed its task.
  */
-class base_acquire_cache_fsm : public acquire_goal_fsm {
+class base_acquire_cache_fsm : public acquire_goal_fsm,
+                               public er::client<base_acquire_cache_fsm> {
  public:
-  base_acquire_cache_fsm(std::shared_ptr<rcppsw::er::server> server,
-                         const controller::cache_selection_matrix* sel_matrix,
+  base_acquire_cache_fsm(const controller::cache_selection_matrix* sel_matrix,
                          controller::saa_subsystem* saa,
                          representation::perceived_arena_map* map);
 

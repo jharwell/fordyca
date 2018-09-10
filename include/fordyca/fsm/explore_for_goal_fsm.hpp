@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <functional>
 #include "fordyca/controller/explore_behavior.hpp"
 #include "fordyca/fsm/base_explore_fsm.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
@@ -46,7 +47,8 @@ NS_START(fordyca, fsm);
  * instance of their goal. Once they have found one, the FSM will signal that
  * its task is complete.
  */
-class explore_for_goal_fsm : public base_explore_fsm {
+class explore_for_goal_fsm : public base_explore_fsm,
+                             public er::client<explore_for_goal_fsm> {
  public:
   enum fsm_states {
     ST_START,
@@ -61,8 +63,7 @@ class explore_for_goal_fsm : public base_explore_fsm {
     ST_MAX_STATES
   };
 
-  explore_for_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
-                       controller::saa_subsystem* saa,
+  explore_for_goal_fsm(controller::saa_subsystem* saa,
                        std::unique_ptr<controller::explore_behavior> behavior,
                        std::function<bool(void)> goal_detect);
 

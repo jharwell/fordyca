@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <string>
 
 #include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
@@ -34,10 +33,6 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw { namespace er {
-class server;
-}} // namespace rcppsw::er
-
 NS_START(fordyca);
 namespace params {
 struct occupancy_grid_params;
@@ -61,7 +56,7 @@ class line_of_sight;
  * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
 class perceived_arena_map
-    : public rcppsw::er::client,
+    : public rcppsw::er::client<perceived_arena_map>,
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<base_cache>>;
@@ -70,7 +65,6 @@ class perceived_arena_map
   using perceived_block_list = std::list<perceived_block>;
 
   perceived_arena_map(
-      std::shared_ptr<rcppsw::er::server> server,
       const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
@@ -179,7 +173,6 @@ class perceived_arena_map
 
  private:
   // clang-format off
-  std::shared_ptr<rcppsw::er::server> m_server;
   occupancy_grid                      m_grid;
   // clang-format on
 

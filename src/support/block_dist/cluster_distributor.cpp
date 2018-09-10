@@ -36,18 +36,13 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cluster_distributor::cluster_distributor(
-    std::shared_ptr<rcppsw::er::server> server,
-    representation::arena_grid::view& grid,
-    double arena_resolution,
-    uint maxsize)
-    : base_distributor(server),
+cluster_distributor::cluster_distributor(representation::arena_grid::view& grid,
+                                         double arena_resolution,
+                                         uint maxsize)
+    : base_distributor(),
+      ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
       m_clust(grid, maxsize),
-      m_dist(server, grid, arena_resolution) {
-  if (ERROR == client::attmod("cluster_dist")) {
-    insmod("cluster_dist", er::er_lvl::DIAG, er::er_lvl::VER);
-  }
-}
+      m_dist(grid, arena_resolution) {}
 
 /*******************************************************************************
  * Member Functions
@@ -56,8 +51,8 @@ bool cluster_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
     entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
-    ER_DIAG("Could not distribute block: Cluster capacity (%u) reached",
-            m_clust.capacity());
+    ER_DEBUG("Could not distribute block: Cluster capacity (%u) reached",
+             m_clust.capacity());
     return false;
   }
   return m_dist.distribute_block(block, entities);
@@ -66,8 +61,8 @@ bool cluster_distributor::distribute_block(
 bool cluster_distributor::distribute_blocks(block_vector& blocks,
                                             entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
-    ER_DIAG("Could not distribute block: Cluster capacity (%u) reached",
-            m_clust.capacity());
+    ER_DEBUG("Could not distribute block: Cluster capacity (%u) reached",
+             m_clust.capacity());
     return false;
   }
   return m_dist.distribute_blocks(blocks, entities);

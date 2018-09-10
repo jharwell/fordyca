@@ -27,9 +27,9 @@
 #include <string>
 #include <vector>
 
+#include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/ds/grid2D.hpp"
 
 /*******************************************************************************
  * Namespaces

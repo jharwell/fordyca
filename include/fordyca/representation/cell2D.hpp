@@ -64,6 +64,9 @@ class cell2D : public visitor::visitable_any<cell2D> {
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) const { return m_robot_id; }
 
+  fsm::cell2D_fsm& fsm(void) { return m_fsm; }
+  const fsm::cell2D_fsm& fsm(void) const { return m_fsm; }
+
   /* state inquiry */
 
   /**
@@ -85,13 +88,14 @@ class cell2D : public visitor::visitable_any<cell2D> {
    * @brief If \c TRUE, the cell is currently known to be part of a cache's
    * extent, though does not contain a cache, but merely points to it.
    */
-  bool state_in_cache_extent(void) const { return m_fsm.state_in_cache_extent(); }
+  bool state_in_cache_extent(void) const {
+    return m_fsm.state_in_cache_extent();
+  }
 
   /**
    * @brief If \c TRUE, the cell is currently known to be empty.
    */
   bool state_is_empty(void) const { return m_fsm.state_is_empty(); }
-
 
   /**
    * @brief Reset the cell to its UNKNOWN state.
@@ -133,8 +137,6 @@ class cell2D : public visitor::visitable_any<cell2D> {
    */
   const std::shared_ptr<representation::base_cache> cache(void) const;
   std::shared_ptr<representation::base_cache> cache(void);
-
-  fsm::cell2D_fsm& fsm(void) { return m_fsm; }
 
  private:
   // clang-format off

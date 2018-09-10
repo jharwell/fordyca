@@ -22,22 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/params/metrics_params.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/arena_metrics.hpp"
 #include "fordyca/metrics/arena_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/representation/arena_map.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,12 +48,10 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 stateless_metrics_aggregator::stateless_metrics_aggregator(
-    std::shared_ptr<rcppsw::er::server> server,
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : base_metrics_aggregator(server, params, output_root) {
-  insmod("metrics_agg", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-
+    : base_metrics_aggregator(params, output_root),
+      ER_CLIENT_INIT("fordyca.support.depth0.stateless_aggregator") {
   register_collector<metrics::fsm::movement_metrics_collector>(
       "fsm::movement",
       metrics_path() + "/" + params->fsm_movement_fname,
@@ -94,22 +92,17 @@ void stateless_metrics_aggregator::collect_from_controller(
     const controller::depth0::stateless_foraging_controller* controller) {
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
-  auto mov_m =
-      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-  auto block_acq_m =
-      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller->fsm());
+  auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
+  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+      controller->fsm());
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
-
-  ER_ASSERT(mov_m,
-            "FATAL: Controller does not provide FSM movement metrics");
+  ER_ASSERT(mov_m, "Controller does not provide FSM movement metrics");
   ER_ASSERT(block_acq_m,
-            "FATAL: Controller does not provide FSM block acquisition metrics");
-  ER_ASSERT(collision_m,
-            "FATAL: Controller does not provide FSM collision metrics");
-  ER_ASSERT(manip_m,
-            "FATAL: Controller does not provide block manipulation metrics");
+            "Controller does not provide FSM block acquisition metrics");
+  ER_ASSERT(collision_m, "Controller does not provide FSM collision metrics");
+  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);

@@ -45,14 +45,13 @@ NS_START(fordyca, controller, depth0);
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector: public rcppsw::er::client {
+class block_selector: public rcppsw::er::client<block_selector> {
  public:
   using perceived_block_list = std::list<representation::perceived_block>;
 
-  block_selector(std::shared_ptr<rcppsw::er::server> server,
-                 const block_selection_matrix* sel_matrix);
+  explicit block_selector(const block_selection_matrix* sel_matrix);
 
-  ~block_selector(void) override { rmmod(); }
+  ~block_selector(void) override = default;
 
   block_selector& operator=(const block_selector& other) = delete;
   block_selector(const block_selector& other) = delete;

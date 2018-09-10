@@ -38,7 +38,6 @@
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -53,12 +52,12 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : stateful_tasking_initializer(server, bsel_matrix, saa, perception),
+    : stateful_tasking_initializer(bsel_matrix, saa, perception),
+      ER_CLIENT_INIT("fordyca.controller.depth1.tasking_initializer"),
       mc_sel_matrix(csel_matrix) {}
 
 tasking_initializer::~tasking_initializer(void) = default;
@@ -71,18 +70,14 @@ void tasking_initializer::depth1_tasking_init(
   auto* exec_params = param_repo->parse_results<ta::executive_params>();
   auto* est_params =
       param_repo->parse_results<params::depth1::exec_estimates_params>();
-  ER_ASSERT(block_sel_matrix(), "FATAL: NULL block selection matrix");
-  ER_ASSERT(cache_sel_matrix(), "FATAL: NULL cache selection matrix");
+  ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
+  ER_ASSERT(cache_sel_matrix(), "NULL cache selection matrix");
   std::unique_ptr<ta::taskable> collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          client::server_ref(),
-          cache_sel_matrix(),
-          saa_subsystem(),
-          perception()->map());
+          cache_sel_matrix(), saa_subsystem(), perception()->map());
 
   std::unique_ptr<ta::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
-          client::server_ref(),
           block_sel_matrix(),
           mc_sel_matrix,
           saa_subsystem(),
@@ -91,7 +86,8 @@ void tasking_initializer::depth1_tasking_init(
   tasks::depth1::collector* collector =
       new tasks::depth1::collector(exec_params, std::move(collector_fsm));
 
-  auto harvester = new tasks::depth1::harvester(exec_params, std::move(harvester_fsm));
+  auto harvester =
+      new tasks::depth1::harvester(exec_params, std::move(harvester_fsm));
 
   if (est_params->enabled) {
     static_cast<ta::polled_task*>(harvester)->init_random(
@@ -128,9 +124,7 @@ std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator
 
   depth1_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
-      client::server_ref(),
-      graph());
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(graph());
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

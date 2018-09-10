@@ -49,11 +49,11 @@ NS_START(fordyca, params);
  */
 class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
-  actuation_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
-      : xml_param_parser(server, level),
-        m_differential_drive(server, level + 1),
-        m_steering(server, level + 1),
-        m_throttling(server, level + 1) {}
+  explicit actuation_parser(uint level)
+      : xml_param_parser(level),
+        m_differential_drive(level + 1),
+        m_steering(level + 1),
+        m_throttling(level + 1) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the

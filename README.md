@@ -14,21 +14,7 @@ This is the main entry point for getting started on the project.
 
 1. Install development packages for the project:
 
-   - catch (A unit testing framework that some unit tests use).
-
-        sudo apt install catch
-
-   - boost 1.58.
-
-        sudo apt install libboost-all-dev
-
-   - Qt5.
-
-        sudo apt install qtbase5-dev
-
-   - graphviz (For building the documentation include/dependency graphs)
-
-        sudo apt install graphviz
+   - Qt5 (`qtbase5-dev` on ubuntu)
 
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
@@ -94,8 +80,12 @@ After successful compilation, follow these steps to run a foraging scenario:
 
         export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
 
+2. Unless you disable event reporting, you will need to set the path to the
+   log4cxx configuration file. On bash that is:
 
-2. cd to the ROOT of the fordyca repo, and run the experiment:
+        export LOG4CXX_CONFIGURATION=/path/to=fordyca/log4cxx.xml
+
+3. cd to the ROOT of the fordyca repo, and run the experiment:
 
         argos3 -c exp/single-source.argos
 
@@ -125,9 +115,6 @@ access to that directory as part of the gini group.
    If you need to checkout a particular branch in the repo you can do that after
    running the script and then re-running make.
 
-3. Once the script finishes, set `ARGOS_PLUGIN_PATH` as before and you should be
-   able to run experiments.
-
 # Troubleshooting
 
 - If you are having trouble building, try:
@@ -154,6 +141,8 @@ access to that directory as part of the gini group.
      version, anaconda loads a DIFFERENT version of the Qt than fordyca uses,
      resulting in a dynamic linking error.
 
+  3. Make sure you have the necessary environment variables set correctly.
+  
 ## Contributing
 
 For contributing to `fordyca`, see

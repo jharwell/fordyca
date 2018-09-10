@@ -55,13 +55,13 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * one found via random exploration) and drop it.
  */
 class cache_transferer_fsm : public base_foraging_fsm,
+                             public er::client<cache_transferer_fsm>,
                              public fsm::block_transporter,
                              public metrics::fsm::goal_acquisition_metrics,
                              public task_allocation::taskable,
                              public visitor::visitable_any<depth2::cache_transferer_fsm> {
  public:
   cache_transferer_fsm(
-      std::shared_ptr<rcppsw::er::server> server,
       const controller::cache_selection_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       representation::perceived_arena_map* map);

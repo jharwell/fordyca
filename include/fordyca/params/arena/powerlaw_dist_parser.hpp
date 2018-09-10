@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "fordyca/params/arena/powerlaw_dist_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
@@ -47,9 +45,7 @@ NS_START(fordyca, params, arena);
  */
 class powerlaw_dist_parser : public rcppsw::params::xml_param_parser {
  public:
-  powerlaw_dist_parser(std::shared_ptr<rcppsw::er::server> server,
-                            uint level)
-      : xml_param_parser(server, level) {}
+  explicit powerlaw_dist_parser(uint level) : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all powerlaw dist parameters should lie

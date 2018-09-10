@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/temporal_penalty_handler.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/support/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,6 +36,7 @@ NS_START(fordyca, support);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -49,7 +50,9 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class block_op_penalty_handler : public temporal_penalty_handler<T> {
+class block_op_penalty_handler
+    : public temporal_penalty_handler<T>,
+      public er::client<block_op_penalty_handler<T>> {
  public:
   enum penalty_src {
     kFreePickup,
@@ -59,16 +62,16 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
-  block_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                           representation::arena_map* const map,
+  block_op_penalty_handler(representation::arena_map* const map,
                            const ct::waveform_params* const params)
-      : temporal_penalty_handler<T>(server, params), m_map(map) {}
+      : temporal_penalty_handler<T>(params),
+        ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
+        m_map(map) {}
 
   ~block_op_penalty_handler(void) override = default;
-  block_op_penalty_handler& operator=(
-      const block_op_penalty_handler& other) = delete;
-  block_op_penalty_handler(
-      const block_op_penalty_handler& other) = delete;
+  block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
+      delete;
+  block_op_penalty_handler(const block_op_penalty_handler& other) = delete;
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
@@ -95,26 +98,24 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
       return false;
     }
     ER_ASSERT(!is_serving_penalty(controller),
-              "FATAL: Robot already serving block penalty?");
+              "Robot already serving block penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
-    ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
-           utils::robot_id(controller),
-           timestep,
-           original_penalty(),
-           penalty,
-           src);
+    ER_INFO("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
+            utils::robot_id(controller),
+            timestep,
+            original_penalty(),
+            penalty,
+            src);
 
     int id = -1;
     if (kFreePickup == src) {
       id = utils::robot_on_block(controller, *m_map);
-      ER_ASSERT(-1 != id, "FATAL: Robot not on block?");
+      ER_ASSERT(-1 != id, "Robot not on block?");
     }
 
-    penalty_list().push_back(temporal_penalty<T>(&controller,
-                                                 id,
-                                                 penalty,
-                                                 timestep));
+    penalty_list().push_back(
+        temporal_penalty<T>(&controller, id, penalty, timestep));
     return true;
   }
 
@@ -129,7 +130,7 @@ class block_op_penalty_handler : public temporal_penalty_handler<T> {
     int block_id = utils::robot_on_block(controller, *m_map);
     return (controller.goal_acquired() &&
             acquisition_goal_type::kBlock == controller.acquisition_goal() &&
-             -1 != block_id);
+            -1 != block_id);
   }
 
   /**

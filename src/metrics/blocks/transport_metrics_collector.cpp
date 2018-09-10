@@ -74,32 +74,38 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats.int_ramp_collected) + separator();
   line += std::to_string(m_stats.cum_ramp_collected) + separator();
 
-  line += (m_stats.int_collected > 0) ?
-          std::to_string(m_stats.int_transporters /
-                         static_cast<double>(m_stats.int_collected)): "0";
+  line += (m_stats.int_collected > 0)
+              ? std::to_string(m_stats.int_transporters /
+                               static_cast<double>(m_stats.int_collected))
+              : "0";
   line += separator();
 
-  line += (m_stats.cum_collected > 0) ?
-          std::to_string(m_stats.cum_transporters /
-                         static_cast<double>(m_stats.cum_collected)): "0";
+  line += (m_stats.cum_collected > 0)
+              ? std::to_string(m_stats.cum_transporters /
+                               static_cast<double>(m_stats.cum_collected))
+              : "0";
   line += separator();
 
-  line += (m_stats.int_collected > 0) ?
-          std::to_string(m_stats.int_transport_time /
-                         static_cast<double>(m_stats.int_collected)): "0";
+  line += (m_stats.int_collected > 0)
+              ? std::to_string(m_stats.int_transport_time /
+                               static_cast<double>(m_stats.int_collected))
+              : "0";
   line += separator();
 
-  line += (m_stats.cum_collected > 0) ?
-          std::to_string(m_stats.cum_transport_time /
-                         static_cast<double>(m_stats.cum_collected)): "0";
+  line += (m_stats.cum_collected > 0)
+              ? std::to_string(m_stats.cum_transport_time /
+                               static_cast<double>(m_stats.cum_collected))
+              : "0";
   line += separator();
-  line += (m_stats.int_collected > 0) ?
-          std::to_string(m_stats.int_initial_wait_time /
-                         static_cast<double>(m_stats.int_collected)): "0";
+  line += (m_stats.int_collected > 0)
+              ? std::to_string(m_stats.int_initial_wait_time /
+                               static_cast<double>(m_stats.int_collected))
+              : "0";
   line += separator();
-  line += (m_stats.cum_collected > 0) ?
-          std::to_string(m_stats.cum_initial_wait_time /
-                         static_cast<double>(m_stats.cum_collected)): "0";
+  line += (m_stats.cum_collected > 0)
+              ? std::to_string(m_stats.cum_initial_wait_time /
+                               static_cast<double>(m_stats.cum_collected))
+              : "0";
   line += separator();
 
   return true;
@@ -110,15 +116,15 @@ void transport_metrics_collector::collect(
   auto& m = dynamic_cast<const transport_metrics&>(metrics);
   ++m_stats.int_collected;
   m_stats.int_cube_collected +=
-      (transport_metrics::block_type::kCube  == m.type());
+      (transport_metrics::block_type::kCube == m.type());
   m_stats.int_ramp_collected +=
-      (transport_metrics::block_type::kRamp  == m.type());
+      (transport_metrics::block_type::kRamp == m.type());
 
   ++m_stats.cum_collected;
   m_stats.cum_cube_collected +=
-      (transport_metrics::block_type::kCube  == m.type());
+      (transport_metrics::block_type::kCube == m.type());
   m_stats.cum_ramp_collected +=
-      (transport_metrics::block_type::kRamp  == m.type());
+      (transport_metrics::block_type::kRamp == m.type());
 
   m_stats.int_transporters += m.total_transporters();
   m_stats.cum_transporters += m.total_transporters();

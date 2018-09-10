@@ -52,9 +52,8 @@ NS_START(events);
  * state in order to avoid corner cases when picking up from/dropping in a cache
  * (See #432).
  */
-class cell_cache_extent
-    : public cell_op,
-      public visitor::can_visit<representation::arena_map> {
+class cell_cache_extent : public cell_op,
+                          public visitor::can_visit<representation::arena_map> {
  public:
   cell_cache_extent(const rcppsw::math::dcoord2& coord,
                     const std::shared_ptr<representation::base_cache> cache);

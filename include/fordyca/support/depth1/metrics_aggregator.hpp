@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_METRICS_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_METRICS_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -34,7 +34,6 @@ class polled_task;
 class bifurcating_tab;
 }}
 namespace ta = rcppsw::task_allocation;
-
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class foraging_controller; }}
@@ -42,6 +41,7 @@ namespace representation { class arena_cache; }
 namespace metrics { namespace caches { class lifecycle_collator; }}
 
 NS_START(support, depth1);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,10 +60,10 @@ NS_START(support, depth1);
  * - Task execution metrics (per task)
  * - TAB metrics (rooted at generalist)
  */
-class metrics_aggregator : public depth0::stateful_metrics_aggregator {
+class metrics_aggregator : public depth0::stateful_metrics_aggregator,
+                           public er::client<metrics_aggregator> {
  public:
-  metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                     const struct params::metrics_params* params,
+  metrics_aggregator(const struct params::metrics_params* params,
                      const std::string& output_root);
 
   /**
@@ -104,4 +104,4 @@ class metrics_aggregator : public depth0::stateful_metrics_aggregator {
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_METRICS_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_METRICS_AGGREGATOR_HPP_ */
