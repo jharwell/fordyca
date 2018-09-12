@@ -32,7 +32,6 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,9 +43,9 @@ using representation::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server), m_arena_map(nullptr), m_interactor{nullptr} {
-  insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+    : ER_CLIENT_INIT("fordyca.loop.stateless"),
+      m_arena_map(nullptr),
+      m_interactor(nullptr) {}
 
 stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
     default;
@@ -56,13 +55,11 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
  ******************************************************************************/
 void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   base_foraging_loop_functions::Init(node);
-
-  rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
-  rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);
-  ER_NOM("Initializing stateless foraging loop functions");
+  ndc_push();
+  ER_INFO("Initializing...");
 
   /* parse all environment parameters and capture in logfile */
-  params::loop_function_repository repo(server_ref());
+  params::loop_function_repository repo;
   repo.parse_all(node);
 
   /* initialize output and metrics collection */
@@ -71,23 +68,12 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   output.metrics.arena_grid = arena->grid;
   output_init(arena, &output);
 
-#ifndef ER_NREPORT
-  rcppsw::er::g_server->change_logfile(m_output_root + "/" +
-                                       output.log_fname);
-  rcppsw::er::g_server->log_stream() << repo;
-#endif
-
-  /* setup logging timestamp calculator */
-  rcppsw::er::g_server->log_ts_calculator(
-      std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
-
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
 
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   m_interactor =
-      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                      arena_map(),
+      rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty);
@@ -107,7 +93,8 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
       controller.display_id(vparams->robot_id);
     }
   } /* for(&robot..) */
-  ER_NOM("Stateless foraging loop functions initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void stateless_foraging_loop_functions::Reset() {
@@ -175,6 +162,7 @@ void stateless_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
+  ndc_push();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -182,6 +170,7 @@ void stateless_foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   m_metrics_agg->collect_from_arena(m_arena_map.get());
   pre_step_final();
+  ndc_pop();
 } /* PreStep() */
 
 void stateless_foraging_loop_functions::arena_map_init(
@@ -191,7 +180,7 @@ void stateless_foraging_loop_functions::arena_map_init(
 
   m_arena_map.reset(new representation::arena_map(aparams));
   if (!m_arena_map->initialize()) {
-    ER_ERR("FATAL: Could not initialize arena map");
+    ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
   }
   m_arena_map->distribute_all_blocks();
@@ -222,14 +211,19 @@ void stateless_foraging_loop_functions::output_init(
   }
 
   output->metrics.arena_grid = arena->grid;
+  m_metrics_agg =
+      rcppsw::make_unique<stateless_metrics_aggregator>(&output->metrics,
+                                                        output_root());
 
-  m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
-      rcppsw::er::g_server, &output->metrics, output_root());
+#ifndef ER_NREPORT
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      m_output_root + "/sim.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.events"), m_output_root + "/sim.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.support"), m_output_root + "/sim.log");
+#endif
 } /* output_init() */
-
-std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {
-  return "[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]";
-} /* log_timestamp_calc() */
 
 using namespace argos;
 REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions,

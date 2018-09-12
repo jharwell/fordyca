@@ -42,11 +42,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     representation::perceived_arena_map* const map)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.depth2.cache_transferer"),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_src_cache, hfsm::top_state()),
@@ -54,7 +54,7 @@ cache_transferer_fsm::cache_transferer_fsm(
       HFSM_CONSTRUCT_STATE(acquire_dest_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_cache_fsm(server, sel_matrix, saa, map),
+      m_cache_fsm(sel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_src_cache),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
@@ -66,11 +66,7 @@ cache_transferer_fsm::cache_transferer_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  client::insmod("cache_transferer_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE_ND(cache_transferer_fsm, start) {
   internal_event(ST_ACQUIRE_SRC_CACHE);
@@ -78,7 +74,7 @@ HFSM_STATE_DEFINE_ND(cache_transferer_fsm, start) {
 }
 
 HFSM_STATE_DEFINE_ND(cache_transferer_fsm, acquire_src_cache) {
-  ER_DIAG("Executing ST_ACQUIRE_SRC_CACHE");
+  ER_DEBUG("Executing ST_ACQUIRE_SRC_CACHE");
   if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
@@ -99,7 +95,7 @@ HFSM_STATE_DEFINE(cache_transferer_fsm,
 }
 
 HFSM_STATE_DEFINE_ND(cache_transferer_fsm, acquire_dest_cache) {
-  ER_DIAG("Executing ST_ACQUIRE_DEST_CACHE");
+  ER_DEBUG("Executing ST_ACQUIRE_DEST_CACHE");
   if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_DROP);
@@ -121,7 +117,7 @@ HFSM_STATE_DEFINE(cache_transferer_fsm,
 
 HFSM_STATE_DEFINE_ND(cache_transferer_fsm, finished) {
   if (ST_FINISHED != last_state()) {
-    ER_DIAG("Executing ST_FINISHED");
+    ER_DEBUG("Executing ST_FINISHED");
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -145,7 +141,6 @@ FSM_WRAPPER_DEFINE(uint,
                    cache_transferer_fsm,
                    collision_avoidance_duration,
                    m_cache_fsm);
-
 
 FSM_WRAPPER_DEFINE(bool, cache_transferer_fsm, goal_acquired, m_cache_fsm);
 

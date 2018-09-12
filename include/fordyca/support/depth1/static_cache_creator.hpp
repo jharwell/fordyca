@@ -42,10 +42,10 @@ NS_START(fordyca, support, depth1);
  * free blocks and grouping them together into a cache at the specified
  * location.
  */
-class static_cache_creator : public cache_creator {
+class static_cache_creator : public cache_creator,
+                             public er::client<static_cache_creator> {
  public:
-  static_cache_creator(std::shared_ptr<rcppsw::er::server> server,
-                       representation::arena_grid& grid,
+  static_cache_creator(representation::arena_grid& grid,
                        const argos::CVector2& center,
                        double cache_size, double resolution);
 

@@ -30,8 +30,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
 using representation::arena_grid;
+using representation::occupancy_grid;
 
 /*******************************************************************************
  * Member Functions

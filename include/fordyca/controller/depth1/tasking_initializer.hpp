@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 
@@ -52,10 +50,10 @@ NS_START(depth1);
  * @brief A helper class to offload initialization of the task tree for depth1
  * foraging.
  */
-class tasking_initializer : public depth0::stateful_tasking_initializer {
+class tasking_initializer : public depth0::stateful_tasking_initializer,
+                            public er::client<tasking_initializer> {
  public:
-  tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
-                      const controller::block_selection_matrix* bsel_matrix,
+  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);

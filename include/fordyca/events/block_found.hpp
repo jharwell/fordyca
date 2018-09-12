@@ -51,11 +51,11 @@ NS_START(events);
  * are not processed by the \ref arena_map, and exist only in a robot's
  * perception.
  */
-class block_found : public perceived_cell_op, public rcppsw::er::client {
+class block_found : public perceived_cell_op,
+                    public rcppsw::er::client<block_found> {
  public:
-  block_found(std::shared_ptr<rcppsw::er::server> server,
-              std::unique_ptr<representation::base_block> block);
-  ~block_found(void) override;
+  explicit block_found(std::unique_ptr<representation::base_block> block);
+  ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;

@@ -74,7 +74,7 @@ NS_START(events);
  */
 class cached_block_pickup
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<cached_block_pickup>,
       public block_pickup_event,
       public visitor::visit_set<controller::depth1::foraging_controller,
                                 controller::depth2::foraging_controller,
@@ -84,11 +84,10 @@ class cached_block_pickup
                                 tasks::depth2::cache_transferer,
                                 representation::arena_cache> {
  public:
-  cached_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                      const std::shared_ptr<representation::arena_cache>& cache,
+  cached_block_pickup(const std::shared_ptr<representation::arena_cache>& cache,
                       uint robot_index,
                       uint timestep);
-  ~cached_block_pickup(void) override { client::rmmod(); }
+  ~cached_block_pickup(void) override = default;
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;

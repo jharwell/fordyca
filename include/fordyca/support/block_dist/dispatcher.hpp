@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <list>
 
 #include "rcppsw/common/common.hpp"
@@ -55,7 +54,7 @@ class base_distributor;
  * @brief Dispatches call to distribute blocks (or a single block a specific
  * distributer, as configured in simulation input file.
  */
-class dispatcher : public rcppsw::er::client {
+class dispatcher {
  public:
   static constexpr char kDIST_SINGLE_SRC[] = "single_source";
   static constexpr char kDIST_RANDOM[] = "random";
@@ -64,8 +63,7 @@ class dispatcher : public rcppsw::er::client {
   using entity_list = std::list<const representation::multicell_entity*>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
 
-  dispatcher(std::shared_ptr<rcppsw::er::server> server,
-             representation::arena_grid& grid,
+  dispatcher(representation::arena_grid& grid,
              const struct params::arena::block_dist_params* params);
   ~dispatcher(void);
 
@@ -102,10 +100,11 @@ class dispatcher : public rcppsw::er::client {
 
  private:
   // clang-format off
-  std::string                                    m_dist_type;
   const struct params::arena::block_dist_params  mc_params;
+  std::string                                    m_dist_type;
   representation::arena_grid&                    m_grid;
   std::unique_ptr<base_distributor>              m_dist;
+
   // clang-format on
 };
 

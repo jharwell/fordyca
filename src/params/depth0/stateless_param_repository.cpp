@@ -37,9 +37,7 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_param_repository::stateless_param_repository(
-    std::shared_ptr<rcppsw::er::server> server)
-    : xml_param_repository(server) {
+stateless_param_repository::stateless_param_repository(void) {
   register_parser<output_parser, output_params>(output_parser::kXMLRoot,
                                                 output_parser::kHeader1);
   register_parser<actuation_parser, actuation_params>(

@@ -1,5 +1,5 @@
 /**
- * @file param_repository.hpp
+nnnnnnn * @file param_repository.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/params/depth1/param_repository.hpp"
 
 /*******************************************************************************
@@ -43,7 +44,7 @@ NS_START(fordyca, params, depth2);
  */
 class param_repository: public depth1::param_repository {
  public:
-  explicit param_repository(std::shared_ptr<rcppsw::er::server> server);
+  param_repository(void);
 };
 
 NS_END(depth2, params, fordyca);

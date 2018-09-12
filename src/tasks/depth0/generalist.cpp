@@ -24,11 +24,10 @@
 #include "fordyca/tasks/depth0/generalist.hpp"
 
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
@@ -41,10 +40,7 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 generalist::generalist(const struct ta::partitionable_task_params* const params,
                        std::unique_ptr<ta::taskable> mechanism)
-    : partitionable_polled_task(rcppsw::er::g_server,
-                                kGeneralistName,
-                                params,
-                                std::move(mechanism)),
+    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)),
       foraging_task(params) {}
 
 /*******************************************************************************

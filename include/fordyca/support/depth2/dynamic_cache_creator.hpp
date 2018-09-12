@@ -30,14 +30,15 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_cache_creator : public depth1::cache_creator {
+class dynamic_cache_creator : public depth1::cache_creator,
+                              public er::client<dynamic_cache_creator> {
  public:
-  dynamic_cache_creator(std::shared_ptr<rcppsw::er::server> server,
-                        representation::arena_grid& grid,
+  dynamic_cache_creator(representation::arena_grid& grid,
                         double cache_size, double resolution, double min_dist);
 
   /**

@@ -48,9 +48,12 @@ class stateful_metrics_aggregator;
  * - Sending robots their position each timestep.
  * - Sending robot the current simulation tick each timestep.
  */
-class stateful_foraging_loop_functions : public stateless_foraging_loop_functions {
+class stateful_foraging_loop_functions : public stateless_foraging_loop_functions,
+                                         public er::client<stateful_foraging_loop_functions> {
  public:
-  stateful_foraging_loop_functions(void) = default;
+  stateful_foraging_loop_functions(void)
+      : ER_CLIENT_INIT("fordyca.loop.stateful") {}
+
   ~stateful_foraging_loop_functions(void) override = default;
 
   void Init(ticpp::Element& node) override;

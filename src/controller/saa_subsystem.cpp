@@ -33,41 +33,33 @@ namespace kinematics = rcppsw::robotics::kinematics;
  * Constructors/Destructors
  ******************************************************************************/
 saa_subsystem::saa_subsystem(
-    std::shared_ptr<rcppsw::er::server> server,
     const struct params::actuation_params* const aparams,
     const struct params::sensing_params* const sparams,
     struct actuation_subsystem::actuator_list* const actuator_list,
     struct base_sensing_subsystem::sensor_list* const sensor_list)
-    : client(server),
-      m_actuation(
-          std::make_shared<actuation_subsystem>(server, aparams, actuator_list)),
+    : ER_CLIENT_INIT("fordyca.controller.saa_subsystem"),
+      m_actuation(std::make_shared<actuation_subsystem>(aparams, actuator_list)),
       m_sensing(std::make_shared<base_sensing_subsystem>(sparams, sensor_list)),
-      m_steering(server, *this, &aparams->steering, m_sensing) {
-  if (ERROR == client::attmod("saa_subsystem")) {
-    client::insmod("saa_subsystem",
-                   rcppsw::er::er_lvl::DIAG,
-                   rcppsw::er::er_lvl::NOM);
-  }
-}
+      m_steering(*this, &aparams->steering, m_sensing) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
-  ER_DIAG("position=(%f, %f)",
-          m_sensing->position().GetX(),
-          m_sensing->position().GetY())
-  ER_DIAG("linear_vel=(%f,%f)@%f [%f] angular_vel=%f",
-          linear_velocity().GetX(),
-          linear_velocity().GetY(),
-          linear_velocity().Angle().GetValue(),
-          linear_velocity().Length(),
-          angular_velocity());
-  ER_DIAG("steering_force=(%f,%f)@%f [%f]",
-          m_steering.value().GetX(),
-          m_steering.value().GetY(),
-          m_steering.value().Angle().GetValue(),
-          m_steering.value().Length());
+  ER_DEBUG("position=(%f, %f)",
+           m_sensing->position().GetX(),
+           m_sensing->position().GetY())
+  ER_DEBUG("linear_vel=(%f,%f)@%f [%f] angular_vel=%f",
+           linear_velocity().GetX(),
+           linear_velocity().GetY(),
+           linear_velocity().Angle().GetValue(),
+           linear_velocity().Length(),
+           angular_velocity());
+  ER_DEBUG("steering_force=(%f,%f)@%f [%f]",
+           m_steering.value().GetX(),
+           m_steering.value().GetY(),
+           m_steering.value().Angle().GetValue(),
+           m_steering.value().Length());
 
   m_actuation->differential_drive().fsm_drive(m_steering.value().Length(),
                                               m_steering.value().Angle(),

@@ -62,15 +62,15 @@ NS_START(support, block_dist);
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor : public base_distributor {
+class powerlaw_distributor : public base_distributor,
+                             public er::client<powerlaw_distributor> {
  public:
   /**
    * @brief Initialize the distributor.
    *
    * @param server Debugging/logging server.
    */
-  powerlaw_distributor(std::shared_ptr<rcppsw::er::server> server,
-                       const struct params::arena::block_dist_params* params);
+  explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;

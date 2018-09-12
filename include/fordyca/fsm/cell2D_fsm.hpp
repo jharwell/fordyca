@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcsw/common/common.h"
@@ -62,7 +64,6 @@ class cell2D_fsm : public state_machine::simple_fsm,
     ST_MAX_STATES
   };
 
-  explicit cell2D_fsm(std::shared_ptr<rcppsw::er::server> server);
   cell2D_fsm(void);
   ~cell2D_fsm(void) override = default;
   cell2D_fsm(const cell2D_fsm& other) = default;
@@ -72,7 +73,9 @@ class cell2D_fsm : public state_machine::simple_fsm,
   bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
   bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
-  bool state_in_cache_extent(void) const { return current_state() == ST_CACHE_EXTENT; }
+  bool state_in_cache_extent(void) const {
+    return current_state() == ST_CACHE_EXTENT;
+  }
   bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
 
   /* events */
@@ -102,7 +105,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_block),
         FSM_STATE_MAP_ENTRY(&state_cache),
-            FSM_STATE_MAP_ENTRY(&state_cache_extent),
+        FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];

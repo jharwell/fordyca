@@ -72,6 +72,7 @@ NS_START(depth0);
  * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public stateless_foraging_controller,
+                                     public er::client<stateful_foraging_controller>,
                                      public metrics::world_model_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:

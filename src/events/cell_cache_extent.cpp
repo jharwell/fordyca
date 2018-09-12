@@ -34,10 +34,10 @@ using representation::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell_cache_extent::cell_cache_extent(const rcppsw::math::dcoord2& coord,
-                                     std::shared_ptr<representation::base_cache> cache)
-    : cell_op(coord.first, coord.second),
-      m_cache(cache) {}
+cell_cache_extent::cell_cache_extent(
+    const rcppsw::math::dcoord2& coord,
+    std::shared_ptr<representation::base_cache> cache)
+    : cell_op(coord.first, coord.second), m_cache(cache) {}
 
 /*******************************************************************************
  * Member Functions

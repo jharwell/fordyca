@@ -42,18 +42,15 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_block_fsm::acquire_block_fsm(std::shared_ptr<rcppsw::er::server> server,
-                                     const controller::block_selection_matrix* const sel_matrix,
-                                     controller::saa_subsystem* const saa,
-                                     representation::perceived_arena_map* const map)
-    : acquire_goal_fsm(server,
-                       saa,
+acquire_block_fsm::acquire_block_fsm(
+    const controller::block_selection_matrix* const sel_matrix,
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
+    : acquire_goal_fsm(saa,
                        map,
                        std::bind(&acquire_block_fsm::block_detected_cb, this)),
+      ER_CLIENT_INIT("fordyca.fsm.acquire_block"),
       mc_matrix(sel_matrix) {
-  client::insmod("acquire_block_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
   goal_acquired_cb(std::bind(
       &acquire_block_fsm::block_acquired_cb, this, std::placeholders::_1));
 }
@@ -67,13 +64,13 @@ bool acquire_block_fsm::block_detected_cb(void) const {
 bool acquire_block_fsm::block_acquired_cb(bool explore_result) const {
   if (explore_result) {
     ER_ASSERT(saa_subsystem()->sensing()->block_detected(),
-              "FATAL: No block detected after successful exploration?");
+              "No block detected after successful exploration?");
     return true;
   } else {
     if (saa_subsystem()->sensing()->block_detected()) {
       return true;
     }
-    ER_WARN("WARNING: Robot arrived at goal, but no block was detected.");
+    ER_WARN("Robot arrived at goal, but no block was detected.");
     return false;
   }
 } /* block_acquired_cb() */
@@ -94,7 +91,7 @@ bool acquire_block_fsm::acquire_known_goal(void) {
      * If we get here, we must know of some blocks, but not be currently
      * vectoring toward any of them.
      */
-    controller::depth0::block_selector selector(client::server_ref(), mc_matrix);
+    controller::depth0::block_selector selector(mc_matrix);
 
     representation::perceived_block best =
         selector.calc_best(blocks, base_sensors()->position());
@@ -105,11 +102,11 @@ bool acquire_block_fsm::acquire_known_goal(void) {
     if (nullptr == best.ent) {
       return false;
     }
-    ER_NOM("Vector towards best block: %d@(%u, %u)=%f",
-           best.ent->id(),
-           best.ent->discrete_loc().first,
-           best.ent->discrete_loc().second,
-           best.density.last_result());
+    ER_INFO("Vector towards best block: %d@(%u, %u)=%f",
+            best.ent->id(),
+            best.ent->discrete_loc().first,
+            best.ent->discrete_loc().second,
+            best.density.last_result());
     tasks::vector_argument v(vector_fsm::kBLOCK_ARRIVAL_TOL,
                              best.ent->real_loc());
     explore_fsm().task_reset();

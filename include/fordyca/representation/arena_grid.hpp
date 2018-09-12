@@ -52,15 +52,11 @@ class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
   constexpr static uint kCell = 0;
   constexpr static uint kRobotOccupancy = 1;
 
-  arena_grid(double resolution,
-             size_t x_max,
-             size_t y_max,
-             std::shared_ptr<rcppsw::er::server> server)
+  arena_grid(double resolution, size_t x_max, size_t y_max)
       : stacked_grid(resolution, x_max, y_max) {
     for (size_t i = 0; i < xdsize(); ++i) {
       for (size_t j = 0; j < ydsize(); ++j) {
         access<kCell>(i, j).loc(rcppsw::math::dcoord2(i, j));
-        access<kCell>(i, j).fsm().deferred_client_init(server);
       } /* for(j..) */
     }   /* for(i..) */
   }

@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/params/base_params.hpp"
 #include "fordyca/params/grid_params.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,28 +42,28 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct metrics_params : public rcppsw::params::base_params {
-  std::string           fsm_movement_fname{""};
-  std::string           fsm_collision_fname{""};
+  std::string fsm_movement_fname{""};
+  std::string fsm_collision_fname{""};
 
-  std::string           block_acquisition_fname{""};
-  std::string           block_transport_fname{""};
-  std::string           block_manipulation_fname{""};
+  std::string block_acquisition_fname{""};
+  std::string block_transport_fname{""};
+  std::string block_manipulation_fname{""};
 
-  std::string           cache_acquisition_fname{""};
-  std::string           cache_utilization_fname{""};
-  std::string           cache_lifecycle_fname{""};
+  std::string cache_acquisition_fname{""};
+  std::string cache_utilization_fname{""};
+  std::string cache_lifecycle_fname{""};
 
-  std::string           task_execution_generalist_fname{""};
-  std::string           task_execution_collector_fname{""};
-  std::string           task_execution_harvester_fname{""};
-  std::string           task_generalist_tab_fname{""};
+  std::string task_execution_generalist_fname{""};
+  std::string task_execution_collector_fname{""};
+  std::string task_execution_harvester_fname{""};
+  std::string task_generalist_tab_fname{""};
 
-  std::string           output_dir{""};
+  std::string output_dir{""};
 
-  std::string           perception_world_model_fname{""};
-  std::string           arena_robot_occupancy_fname{""};
-  grid_params           arena_grid{};
-  uint                  collect_interval{0};
+  std::string perception_world_model_fname{""};
+  std::string arena_robot_occupancy_fname{""};
+  grid_params arena_grid{};
+  uint collect_interval{0};
 };
 
 NS_END(params, fordyca);

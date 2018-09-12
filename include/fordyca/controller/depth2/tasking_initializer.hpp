@@ -49,8 +49,7 @@ NS_START(controller, depth2);
  */
 class tasking_initializer : public depth1::tasking_initializer {
  public:
-  tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
-                      const controller::block_selection_matrix* bsel_matrix,
+  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);

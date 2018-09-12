@@ -70,13 +70,13 @@ using transport_goal_type = block_transporter::goal_type;
  * one.
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
+                                 er::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  cached_block_to_nest_fsm(std::shared_ptr<rcppsw::er::server> server,
-                           const controller::cache_selection_matrix* sel_matrix,
+  cached_block_to_nest_fsm(const controller::cache_selection_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
                            representation::perceived_arena_map* map);
 

@@ -38,18 +38,11 @@ namespace swarm = rcppsw::swarm;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(std::shared_ptr<rcppsw::er::server> server,
-                         std::unique_ptr<representation::base_cache> cache)
+cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),
-      client(server),
-      m_cache(std::move(cache)) {
-  client::insmod("cache_found",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
-
-cache_found::~cache_found(void) { client::rmmod(); }
+      ER_CLIENT_INIT("fordyca.events.cache_found"),
+      m_cache(std::move(cache)) {}
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -58,7 +51,7 @@ void cache_found::visit(representation::cell2D& cell) {
   cell.entity(m_cache);
   cell.fsm().accept(*this);
   ER_ASSERT(cell.state_has_cache(),
-            "FATAL: Cell does not have cache after cache found event");
+            "Cell does not have cache after cache found event");
 } /* visit() */
 
 void cache_found::visit(fsm::cell2D_fsm& fsm) {
@@ -114,7 +107,9 @@ void cache_found::visit(representation::perceived_arena_map& map) {
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {
     if (m_cache->contains_point((*it)->real_loc())) {
-      ER_VER("Remove block%d hidden behind cache%d", (*it)->id(), m_cache->id());
+      ER_TRACE("Remove block%d hidden behind cache%d",
+               (*it)->id(),
+               m_cache->id());
 
       events::cell_empty op((*it)->discrete_loc().first,
                             (*it)->discrete_loc().second);

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include <utility>
+
 #include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
@@ -49,12 +50,11 @@ NS_START(depth2);
  * and the nest (ideally the halfway point), subject to constraints such as it
  * can't be too near other known caches.
  */
-class cache_site_selector: public rcppsw::er::client {
+class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
  public:
-  cache_site_selector(std::shared_ptr<rcppsw::er::server> server,
-                      const controller::cache_selection_matrix* matrix);
+  explicit cache_site_selector(const controller::cache_selection_matrix* matrix);
 
-  ~cache_site_selector(void) override { client::rmmod(); }
+  ~cache_site_selector(void) override = default;
   cache_site_selector& operator=(const cache_site_selector& other) = delete;
   cache_site_selector(const cache_site_selector& other) = delete;
 

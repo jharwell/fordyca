@@ -34,11 +34,9 @@ NS_START(fordyca, controller, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_selector::block_selector(std::shared_ptr<rcppsw::er::server> server,
-                               const block_selection_matrix* const sel_matrix)
-    : client(server), mc_matrix(sel_matrix) {
-  insmod("block_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+block_selector::block_selector(const block_selection_matrix* const sel_matrix)
+    : ER_CLIENT_INIT("fordyca.controller.depth0.block_selector"),
+      mc_matrix(sel_matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -49,16 +47,16 @@ representation::perceived_block block_selector::calc_best(
   double max_utility = 0.0;
   representation::perceived_block best{nullptr, {}};
 
-  ER_ASSERT(!blocks.empty(), "FATAL: no known perceived blocks");
+  ER_ASSERT(!blocks.empty(), "no known perceived blocks");
   for (auto& b : blocks) {
     if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
-      ER_DIAG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",
-              b.ent->real_loc().GetX(),
-              b.ent->real_loc().GetY(),
-              b.ent->discrete_loc().first,
-              b.ent->discrete_loc().second,
-              (robot_loc - b.ent->real_loc()).Length(),
-              kMinDist);
+      ER_DEBUG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",
+               b.ent->real_loc().GetX(),
+               b.ent->real_loc().GetY(),
+               b.ent->discrete_loc().first,
+               b.ent->discrete_loc().second,
+               (robot_loc - b.ent->real_loc()).Length(),
+               kMinDist);
       continue;
     }
     /*
@@ -75,12 +73,12 @@ representation::perceived_block block_selector::calc_best(
     double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
         robot_loc, b.density.last_result(), priority);
 
-    ER_DIAG("Utility for block%d loc=(%u, %u), density=%f: %f",
-            b.ent->id(),
-            b.ent->discrete_loc().first,
-            b.ent->discrete_loc().second,
-            b.density.last_result(),
-            utility);
+    ER_DEBUG("Utility for block%d loc=(%u, %u), density=%f: %f",
+             b.ent->id(),
+             b.ent->discrete_loc().first,
+             b.ent->discrete_loc().second,
+             b.density.last_result(),
+             utility);
     if (utility > max_utility) {
       best = b;
       max_utility = utility;
@@ -88,13 +86,13 @@ representation::perceived_block block_selector::calc_best(
   } /* for(block..) */
 
   if (nullptr != best.ent) {
-    ER_NOM("Best utility: block%d at (%f, %f) [%u, %u]: %f",
-           best.ent->id(),
-           best.ent->real_loc().GetX(),
-           best.ent->real_loc().GetY(),
-           best.ent->discrete_loc().first,
-           best.ent->discrete_loc().second,
-           max_utility);
+    ER_INFO("Best utility: block%d at (%f, %f) [%u, %u]: %f",
+            best.ent->id(),
+            best.ent->real_loc().GetX(),
+            best.ent->real_loc().GetY(),
+            best.ent->discrete_loc().first,
+            best.ent->discrete_loc().second,
+            max_utility);
   } else {
     ER_WARN("No best block found: all known blocks too close!");
   }

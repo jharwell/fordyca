@@ -33,7 +33,6 @@
 #include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -25,14 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <sstream>
+#include <string>
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
-#include "rcppsw/common/common.hpp"
-#include <sstream>
-#include <string>
 
 /*******************************************************************************
  * Namespaces

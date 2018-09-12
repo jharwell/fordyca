@@ -46,18 +46,13 @@ using representation::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 free_block_drop::free_block_drop(
-    std::shared_ptr<rcppsw::er::server> server,
     const std::shared_ptr<representation::base_block>& block,
     rcppsw::math::dcoord2 coord,
     double resolution)
     : cell_op(coord.first, coord.second),
-      client(server),
+      ER_CLIENT_INIT("fordyca.events.free_block_drop"),
       m_resolution(resolution),
-      m_block(block) {
-  client::insmod("free_block_drop",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+      m_block(block) {}
 
 /*******************************************************************************
  * Depth0
@@ -81,8 +76,8 @@ void free_block_drop::visit(representation::base_block& block) {
 } /* visit() */
 
 void free_block_drop::visit(representation::arena_map& map) {
-  representation::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(),
-                                                               cell_op::y());
+  representation::cell2D& cell =
+      map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
 
   /*
    * @todo We should be able to handle dropping a block on a cell in any
@@ -96,8 +91,7 @@ void free_block_drop::visit(representation::arena_map& map) {
    * This was a terrible bug to track down.
    */
   if (cell.state_has_cache()) {
-    cache_block_drop op(client::server_ref(),
-                        m_block,
+    cache_block_drop op(m_block,
                         std::static_pointer_cast<representation::arena_cache>(
                             cell.cache()),
                         m_resolution);

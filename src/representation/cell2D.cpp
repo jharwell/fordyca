@@ -24,7 +24,6 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces

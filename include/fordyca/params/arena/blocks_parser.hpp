@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "fordyca/params/arena/blocks_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
@@ -49,10 +47,10 @@ NS_START(fordyca, params, arena);
  */
 class blocks_parser : public rcppsw::params::xml_param_parser {
  public:
-  blocks_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
-      : xml_param_parser(server, level),
-        m_manipulation_penalty(server, level + 1),
-        m_dist(server, level + 1) {}
+  explicit blocks_parser(uint level)
+      : xml_param_parser(level),
+        m_manipulation_penalty(level + 1),
+        m_dist(level + 1) {}
 
   /**
    * @brief The root tag that all block parameters should lie under in the

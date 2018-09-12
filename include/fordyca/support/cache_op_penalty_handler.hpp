@@ -24,20 +24,19 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/temporal_penalty_handler.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/support/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller {
-namespace depth0 {
+namespace controller { namespace depth0 {
 class stateful_foraging_controller;
 class stateless_foraging_controller;
-}}
+}} // namespace controller::depth0
 
 NS_START(support);
 
@@ -56,7 +55,9 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class cache_op_penalty_handler : public temporal_penalty_handler<T> {
+class cache_op_penalty_handler
+    : public temporal_penalty_handler<T>,
+      public er::client<cache_op_penalty_handler<T>> {
  public:
   enum penalty_src {
     kExistingCacheDrop,
@@ -66,16 +67,16 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
-  cache_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                           representation::arena_map* const map,
+  cache_op_penalty_handler(representation::arena_map* const map,
                            const ct::waveform_params* const params)
-      : temporal_penalty_handler<T>(server, params), m_map(map) {}
+      : temporal_penalty_handler<T>(params),
+        ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
+        m_map(map) {}
 
   ~cache_op_penalty_handler(void) override = default;
-  cache_op_penalty_handler& operator=(
-      const cache_op_penalty_handler& other) = delete;
-  cache_op_penalty_handler(
-      const cache_op_penalty_handler& other) = delete;
+  cache_op_penalty_handler& operator=(const cache_op_penalty_handler& other) =
+      delete;
+  cache_op_penalty_handler(const cache_op_penalty_handler& other) = delete;
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
@@ -96,28 +97,26 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
      * not, nothing to do.
      */
     if ((kExistingCacheDrop == src || kExistingCachePickup == src) &&
-               !existing_cache_op_filter(controller)) {
+        !existing_cache_op_filter(controller)) {
       return false;
     }
 
     ER_ASSERT(!is_serving_penalty(controller),
-              "FATAL: Robot already serving cache penalty?");
+              "Robot already serving cache penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
     int id = utils::robot_on_cache(controller, *m_map);
-    ER_NOM("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-           utils::robot_id(controller),
-           id,
-           timestep,
-           original_penalty(),
-           penalty,
-           src);
+    ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+            utils::robot_id(controller),
+            id,
+            timestep,
+            original_penalty(),
+            penalty,
+            src);
 
-    ER_ASSERT(-1 != id, "FATAL: Robot not in cache?");
-    penalty_list().push_back(temporal_penalty<T>(&controller,
-                                                 id,
-                                                 penalty,
-                                                 timestep));
+    ER_ASSERT(-1 != id, "Robot not in cache?");
+    penalty_list().push_back(
+        temporal_penalty<T>(&controller, id, penalty, timestep));
     return true;
   }
 
@@ -137,7 +136,7 @@ class cache_op_penalty_handler : public temporal_penalty_handler<T> {
     int cache_id = utils::robot_on_cache(controller, *m_map);
     return (controller.current_task()->goal_acquired() &&
             acquisition_goal_type::kExistingCache ==
-             controller.current_task()->acquisition_goal() &&
+                controller.current_task()->acquisition_goal() &&
             -1 != cache_id);
   }
 

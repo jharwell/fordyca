@@ -69,6 +69,7 @@ NS_START(depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
+                            public er::client<foraging_controller>,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);

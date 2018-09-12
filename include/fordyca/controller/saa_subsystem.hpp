@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <utility>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
@@ -56,10 +57,9 @@ NS_START(controller);
  * than wrap the two components.
  */
 class saa_subsystem : public rcppsw::robotics::steering2D::boid,
-                      rcppsw::er::client {
+                      rcppsw::er::client<saa_subsystem> {
  public:
-  saa_subsystem(std::shared_ptr<rcppsw::er::server> server,
-                const struct params::actuation_params* aparams,
+  saa_subsystem(const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,
                 struct actuation_subsystem::actuator_list* actuator_list,
                 struct base_sensing_subsystem::sensor_list* sensor_list);

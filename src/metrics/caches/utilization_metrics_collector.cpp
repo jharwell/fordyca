@@ -76,9 +76,9 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   line += separator();
 
   line += (!m_cum_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                           (m_cum_cache_ids.size()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
+                               (m_cum_cache_ids.size()))
+              : "0";
   line += separator();
 
   line += (!m_int_cache_ids.empty())
@@ -87,9 +87,9 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
               : "0";
   line += separator();
   line += (!m_cum_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                           (m_cum_cache_ids.size()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
+                               (m_cum_cache_ids.size()))
+              : "0";
   line += separator();
 
   line += (!m_int_cache_ids.empty())
@@ -99,9 +99,9 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   line += separator();
 
   line += (!m_cum_cache_ids.empty())
-          ? std::to_string(static_cast<double>(m_stats.cum_drops) /
-                           (m_cum_cache_ids.size()))
-          : "0";
+              ? std::to_string(static_cast<double>(m_stats.cum_drops) /
+                               (m_cum_cache_ids.size()))
+              : "0";
   line += separator();
 
   line += std::to_string(m_int_cache_ids.size()) + separator();

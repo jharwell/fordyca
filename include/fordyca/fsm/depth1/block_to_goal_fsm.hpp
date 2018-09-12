@@ -61,13 +61,13 @@ NS_START(depth1);
  * goal. Once it has done that it will signal that its task is complete.
  */
 class block_to_goal_fsm : public base_foraging_fsm,
+                          public er::client<block_to_goal_fsm>,
                           public metrics::fsm::goal_acquisition_metrics,
                           public task_allocation::taskable,
                           public block_transporter,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
-  block_to_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
-                    const controller::block_selection_matrix* sel_matrix,
+  block_to_goal_fsm(const controller::block_selection_matrix* sel_matrix,
                     controller::saa_subsystem* saa,
                     representation::perceived_arena_map* map);
 

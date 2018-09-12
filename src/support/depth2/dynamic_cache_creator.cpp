@@ -35,13 +35,12 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dynamic_cache_creator::dynamic_cache_creator(
-    std::shared_ptr<rcppsw::er::server> server,
-    representation::arena_grid& grid,
-    double cache_size,
-    double resolution,
-    double min_dist)
-    : cache_creator(server, grid, cache_size, resolution),
+dynamic_cache_creator::dynamic_cache_creator(representation::arena_grid& grid,
+                                             double cache_size,
+                                             double resolution,
+                                             double min_dist)
+    : cache_creator(grid, cache_size, resolution),
+      ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_creator"),
       m_min_dist(min_dist) {}
 
 /*******************************************************************************
@@ -51,7 +50,7 @@ depth1::cache_creator::cache_vector dynamic_cache_creator::create_all(
     block_vector& blocks) {
   cache_vector caches;
 
-  ER_NOM("Dynamically creating caches: %zu free blocks", blocks.size());
+  ER_INFO("Dynamically creating caches: %zu free blocks", blocks.size());
 
   for (size_t i = 0; i < blocks.size() - 1; ++i) {
     block_list starter_blocks;
@@ -60,17 +59,17 @@ depth1::cache_creator::cache_vector dynamic_cache_creator::create_all(
           m_min_dist) {
         if (std::find(starter_blocks.begin(), starter_blocks.end(), blocks[i]) ==
             starter_blocks.end()) {
-          ER_DIAG("Add block %zu: (%f, %f)",
-                  i,
-                  blocks[i]->real_loc().GetX(),
-                  blocks[i]->real_loc().GetY());
+          ER_DEBUG("Add block %zu: (%f, %f)",
+                   i,
+                   blocks[i]->real_loc().GetX(),
+                   blocks[i]->real_loc().GetY());
           starter_blocks.push_back(blocks[i]);
         }
         starter_blocks.push_back(blocks[j]);
-        ER_DIAG("Add block %zu: (%f, %f)",
-                j,
-                blocks[j]->real_loc().GetX(),
-                blocks[j]->real_loc().GetY());
+        ER_DEBUG("Add block %zu: (%f, %f)",
+                 j,
+                 blocks[j]->real_loc().GetX(),
+                 blocks[j]->real_loc().GetY());
       }
     } /* for(j..) */
     if (starter_blocks.size()) {

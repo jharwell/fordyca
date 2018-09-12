@@ -29,7 +29,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er { class server; }}
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
@@ -44,7 +43,7 @@ NS_START(fordyca, params, depth0);
  */
 class stateful_param_repository: public stateless_param_repository {
  public:
-  explicit stateful_param_repository(std::shared_ptr<rcppsw::er::server> server);
+  stateful_param_repository(void);
 };
 
 NS_END(depth0, params, fordyca);

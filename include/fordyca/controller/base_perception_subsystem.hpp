@@ -24,8 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
+#include <vector>
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception_params.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
@@ -55,11 +54,11 @@ NS_START(controller);
  * take what the sensors read and turn it into a useful internal
  * representation.
  */
-class base_perception_subsystem : public rcppsw::er::client,
-                                  public metrics::world_model_metrics {
+class base_perception_subsystem
+    : public rcppsw::er::client<base_perception_subsystem>,
+      public metrics::world_model_metrics {
  public:
-  base_perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
-                            const params::perception_params* const params,
+  base_perception_subsystem(const params::perception_params* const params,
                             const std::string& id);
 
   /**

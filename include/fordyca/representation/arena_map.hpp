@@ -26,13 +26,13 @@
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/metrics/arena_metrics.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
-#include "fordyca/metrics/arena_metrics.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -61,13 +61,13 @@ class arena_cache;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map : public rcppsw::er::client,
+class arena_map : public rcppsw::er::client<arena_map>,
                   public metrics::arena_metrics,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<base_block>>;
-  explicit arena_map(const struct params::arena::arena_map_params* params);
+  arena_map(const struct params::arena::arena_map_params* params);
 
   /* arena metrics */
   bool has_robot(size_t i, size_t j) const override;
@@ -116,17 +116,18 @@ class arena_map : public rcppsw::er::client,
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) const {
-    return m_grid. access<Index>(d.first, d.second);
+    return m_grid.access<Index>(d.first, d.second);
   }
   template <int Index>
-  typename arena_grid::layer_value_type<Index>::value_type& access(
-      size_t i, size_t j) {
+  typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                   size_t j) {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
-      size_t i, size_t j) const {
-    return m_grid. access<Index>(i, j);
+      size_t i,
+      size_t j) const {
+    return m_grid.access<Index>(i, j);
   }
 
   /**

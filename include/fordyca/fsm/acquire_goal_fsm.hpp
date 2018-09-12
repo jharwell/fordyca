@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <functional>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
@@ -60,11 +61,11 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * acquired, it signals that it has completed its task.
  */
 class acquire_goal_fsm : public base_foraging_fsm,
+                         public er::client<acquire_goal_fsm>,
                          public metrics::fsm::goal_acquisition_metrics,
                          public rcppsw::task_allocation::taskable {
  public:
-  acquire_goal_fsm(std::shared_ptr<rcppsw::er::server> server,
-                   controller::saa_subsystem* saa,
+  acquire_goal_fsm(controller::saa_subsystem* saa,
                    const representation::perceived_arena_map* map,
                    std::function<bool(void)> goal_detect);
 

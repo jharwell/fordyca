@@ -41,7 +41,7 @@ NS_START(fordyca, support);
  * @brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.
  */
-template<typename T>
+template <typename T>
 class temporal_penalty {
  public:
   /**
@@ -54,9 +54,9 @@ class temporal_penalty {
    * @param start_time The timestep the penalty will start on.
    */
   temporal_penalty(const T* const controller,
-                             uint id,
-                             uint penalty,
-                             uint start_time)
+                   uint id,
+                   uint penalty,
+                   uint start_time)
       : mc_id(id),
         mc_penalty(penalty),
         mc_start_time(start_time),

@@ -110,7 +110,6 @@ class base_block : public multicell_entity,
    */
   void distribution_time(double dist_time) { m_dist_time = dist_time; }
 
-
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not
    * carried by a robot anymore, but has not yet made it back to the nest

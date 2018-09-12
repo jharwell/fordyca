@@ -43,12 +43,12 @@ NS_START(fordyca, support, block_dist);
  * @brief Distributes a block or set of blocks within the specified cluster
  * bounds randomly, using \ref random_block_distributor.
  */
-class cluster_distributor : public base_distributor {
+class cluster_distributor : public base_distributor,
+                            public er::client<cluster_distributor> {
  public:
-  cluster_distributor(std::shared_ptr<rcppsw::er::server> server,
-                            representation::arena_grid::view& grid,
-                            double arena_resolution,
-                            uint maxsize);
+  cluster_distributor(representation::arena_grid::view& grid,
+                      double arena_resolution,
+                      uint maxsize);
 
   cluster_distributor& operator=(const cluster_distributor& s) = delete;
 

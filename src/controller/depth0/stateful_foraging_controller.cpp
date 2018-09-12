@@ -33,7 +33,6 @@
 #include "fordyca/params/depth0/stateful_param_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
@@ -49,6 +48,7 @@ namespace ta = rcppsw::task_allocation;
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
     : stateless_foraging_controller(),
+      ER_CLIENT_INIT("fordyca.controller.stateful"),
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
@@ -110,6 +110,7 @@ __rcsw_pure depth0::sensing_subsystem* stateful_foraging_controller::stateful_se
 }
 
 void stateful_foraging_controller::ControlStep(void) {
+  ndc_push();
   /*
    * Update the robot's model of the world with the current line-of-sight, and
    * update the relevance of information within it. Then, you can run the main
@@ -121,35 +122,31 @@ void stateful_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
 
   m_executive->run();
+  ndc_pop();
 } /* ControlStep() */
 
 void stateful_foraging_controller::Init(ticpp::Element& node) {
-  params::depth0::stateful_param_repository param_repo(server_ref());
-
   /*
    * Note that we do not call \ref stateless_foraging_controller::Init()--there
    * is nothing in there that we need.
    */
   base_foraging_controller::Init(node);
 
-  ER_NOM("Initializing stateful_foraging controller");
+  ndc_push();
+  ER_INFO("Initializing...");
 
   /* parse and validate parameters */
+  params::depth0::stateful_param_repository param_repo;
   param_repo.parse_all(node);
-#ifndef ER_NREPORT
-  client::server_ptr()->log_stream() << param_repo;
-#endif
 
   if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
   /* initialize subsystems and perception */
   m_perception = rcppsw::make_unique<base_perception_subsystem>(
-      client::server_ref(),
-      param_repo.parse_results<params::perception_params>(),
-      GetId());
+      param_repo.parse_results<params::perception_params>(), GetId());
 
   saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
       param_repo.parse_results<struct params::sensing_params>(),
@@ -161,12 +158,12 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
                                                   &ogrid->priorities);
 
   /* initialize tasking */
-  m_executive = stateful_tasking_initializer(client::server_ref(),
-                                             m_block_sel_matrix.get(),
+  m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
                                              saa_subsystem(),
                                              perception())(&param_repo);
 
-  ER_NOM("stateful_foraging controller initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 } /* Init() */
 
 void stateful_foraging_controller::Reset(void) {

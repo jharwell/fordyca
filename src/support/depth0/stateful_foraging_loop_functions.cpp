@@ -30,6 +30,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -37,8 +38,6 @@
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,27 +50,24 @@ using representation::arena_grid;
  ******************************************************************************/
 void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
-
-  ER_NOM("Initializing depth0_foraging loop functions");
-  params::loop_function_repository repo(server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::loop_function_repository repo;
   repo.parse_all(node);
-#ifndef ER_NREPORT
-  rcppsw::er::g_server->log_stream() << repo;
-#endif
 
   /* initialize stat collecting */
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
-  params::output_params output = *repo.parse_results<const struct params::output_params>();
+  params::output_params output =
+      *repo.parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
 
-  m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
-      rcppsw::er::g_server, &output.metrics, output_root());
+  m_metrics_agg =
+      rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
+                                                       output_root());
 
   /* intitialize robot interactions with environment */
   m_interactor =
-      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                      arena_map(),
+      rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty);
@@ -92,7 +88,8 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
       controller.display_los(vparams->robot_los);
     }
   } /* for(entity..) */
-  ER_NOM("stateful_foraging loop functions initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void stateful_foraging_loop_functions::pre_step_iter(

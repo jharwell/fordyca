@@ -48,12 +48,11 @@ NS_START(depth1);
  * this point, although that may not be true as a robot's knowledge of the arena
  * is imperfect).
  */
-class existing_cache_selector: public rcppsw::er::client {
+class existing_cache_selector: public rcppsw::er::client<existing_cache_selector> {
  public:
-  existing_cache_selector(std::shared_ptr<rcppsw::er::server> server,
-                          const cache_selection_matrix* matrix);
+  explicit existing_cache_selector(const cache_selection_matrix* matrix);
 
-  ~existing_cache_selector(void) override { rmmod(); }
+  ~existing_cache_selector(void) override = default;
   existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
   existing_cache_selector(const existing_cache_selector& other) = delete;
 

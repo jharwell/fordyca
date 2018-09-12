@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <string>
 #include "fordyca/fsm/new_direction_data.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
@@ -41,6 +42,7 @@ class base_sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace er = rcppsw::er;
 NS_START(fsm);
 
 /*******************************************************************************
@@ -57,11 +59,10 @@ NS_START(fsm);
  * per-se.
  */
 class base_foraging_fsm : public state_machine::hfsm,
+                          public er::client<base_foraging_fsm>,
                           public metrics::fsm::collision_metrics {
  public:
-  base_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
-                    controller::saa_subsystem* saa,
-                    uint8_t max_states);
+  base_foraging_fsm(controller::saa_subsystem* saa, uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
 
@@ -179,7 +180,6 @@ class base_foraging_fsm : public state_machine::hfsm,
    * change LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
-
 
  private:
   /**

@@ -57,12 +57,12 @@ using transport_goal_type = block_transporter::goal_type;
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
+                               public er::client<stateless_foraging_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(std::shared_ptr<rcppsw::er::server> server,
-                         controller::saa_subsystem* saa);
+  explicit stateless_foraging_fsm(controller::saa_subsystem* saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;

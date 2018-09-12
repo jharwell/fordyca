@@ -25,7 +25,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <tuple>
 
 #include "fordyca/representation/cell2D.hpp"
@@ -49,14 +48,13 @@ NS_START(representation);
  ******************************************************************************/
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 
-class occupancy_grid : public rcppsw::er::client,
+class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   constexpr static uint kPheromone = 0;
   constexpr static uint kCell = 1;
 
-  occupancy_grid(std::shared_ptr<rcppsw::er::server> server,
-                 const struct params::occupancy_grid_params* c_params,
+  occupancy_grid(const struct params::occupancy_grid_params* c_params,
                  const std::string& robot_id);
 
   /**

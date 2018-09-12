@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -48,7 +46,7 @@ NS_START(controller);
 class saa_subsystem;
 class base_perception_subsystem;
 class block_selection_matrix;
-
+namespace er = rcppsw::er;
 NS_START(depth0);
 
 /*******************************************************************************
@@ -61,10 +59,9 @@ NS_START(depth0);
  * @brief A helper class to offload initialization of the task tree for depth0
  * foraging.
  */
-class stateful_tasking_initializer : public rcppsw::er::client {
+class stateful_tasking_initializer : public er::client<stateful_tasking_initializer> {
  public:
-  stateful_tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
-                               const controller::block_selection_matrix* sel_matrix,
+  stateful_tasking_initializer(const controller::block_selection_matrix* sel_matrix,
                                saa_subsystem* saa,
                                base_perception_subsystem* perception);
   virtual ~stateful_tasking_initializer(void);

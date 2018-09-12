@@ -32,7 +32,6 @@
 #include "fordyca/params/sensing_params.hpp"
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
 
@@ -46,7 +45,7 @@ using representation::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
-    : depth1::foraging_controller(), m_executive() {}
+    : depth1::foraging_controller(), ER_CLIENT_INIT(GetId()), m_executive() {}
 
 /*******************************************************************************
  * Member Functions
@@ -68,17 +67,13 @@ void foraging_controller::Init(ticpp::Element& node) {
    */
   base_foraging_controller::Init(node);
 
-  ER_NOM("Initializing depth2 foraging controller");
-
-  params::depth2::param_repository param_repo(client::server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::depth2::param_repository param_repo;
   param_repo.parse_all(node);
-#ifndef ER_NREPORT
-  client::server_ptr()->log_stream() << param_repo;
-#endif
 
   if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("FATAL: Not all parameters were validated");
+    ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
@@ -88,18 +83,16 @@ void foraging_controller::Init(ticpp::Element& node) {
       &saa_subsystem()->sensing()->sensor_list()));
 
   perception(rcppsw::make_unique<depth1::perception_subsystem>(
-      client::server_ref(),
-      param_repo.parse_results<params::perception_params>(),
-      GetId()));
+      param_repo.parse_results<params::perception_params>(), GetId()));
 
   /* initialize tasking */
-  m_executive = tasking_initializer(client::server_ref(),
-                                    block_sel_matrix(),
+  m_executive = tasking_initializer(block_sel_matrix(),
                                     cache_sel_matrix(),
                                     saa_subsystem(),
                                     perception())(&param_repo);
 
-  ER_NOM("depth2 foraging controller initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 } /* Init() */
 
 __rcsw_pure tasks::base_foraging_task* foraging_controller::current_task(void) {

@@ -31,7 +31,6 @@
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,26 +41,24 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-random_distributor::random_distributor(std::shared_ptr<rcppsw::er::server> server,
-                                       representation::arena_grid::view& grid,
+random_distributor::random_distributor(representation::arena_grid::view& grid,
                                        double resolution)
-    : base_distributor(server), m_resolution(resolution), m_grid(grid) {
-  if (ERROR == client::attmod("random_dist")) {
-    insmod("random_dist", er::er_lvl::VER, er::er_lvl::VER);
-  }
-}
+    : base_distributor(),
+      ER_CLIENT_INIT("fordyca.support.block_dist.random"),
+      m_resolution(resolution),
+      m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool random_distributor::distribute_blocks(block_vector& blocks,
                                            entity_list& entities) {
-  ER_NOM("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
-         blocks.size(),
-         (*m_grid.origin()).loc().first,
-         (*m_grid.origin()).loc().first + m_grid.shape()[0],
-         (*m_grid.origin()).loc().second,
-         (*m_grid.origin()).loc().second + m_grid.shape()[1]);
+  ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
+          blocks.size(),
+          (*m_grid.origin()).loc().first,
+          (*m_grid.origin()).loc().first + m_grid.shape()[0],
+          (*m_grid.origin()).loc().second,
+          (*m_grid.origin()).loc().second + m_grid.shape()[1]);
   for (auto& b : blocks) {
     if (!distribute_block(b, entities)) {
       return false;
@@ -78,11 +75,11 @@ bool random_distributor::distribute_block(
   if (!find_avail_coord(entities, coord)) {
     return false;
   }
-  ER_DIAG("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
-          coord[0],
-          coord[1],
-          coord[2],
-          coord[3]);
+  ER_DEBUG("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
+           coord[0],
+           coord[1],
+           coord[2],
+           coord[3]);
 
   cell = &m_grid[coord[0]][coord[1]];
 
@@ -91,15 +88,12 @@ bool random_distributor::distribute_block(
    * anything in them. If there is already something there, then our
    * distribution algorithm has a bug.
    */
-  ER_ASSERT(!cell->state_has_block(),
-            "FATAL: Destination cell already contains block");
-  ER_ASSERT(!cell->state_has_cache(),
-            "FATAL: Destination cell already contains cache");
+  ER_ASSERT(!cell->state_has_block(), "Destination cell already contains block");
+  ER_ASSERT(!cell->state_has_cache(), "Destination cell already contains cache");
   ER_ASSERT(!cell->state_in_cache_extent(),
-            "FATAL: Destination cell part of cache extent");
+            "Destination cell part of cache extent");
 
-  events::free_block_drop op(client::server_ref(),
-                             block,
+  events::free_block_drop op(block,
                              rcppsw::math::dcoord2(coord[2], coord[3]),
                              m_resolution);
   cell->accept(op);
@@ -120,21 +114,20 @@ __rcsw_pure bool random_distributor::verify_block_dist(
     __rcsw_unused const representation::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
   ER_CHECK(representation::base_block::kOutOfSightDLoc != block.discrete_loc(),
-           "ERROR: Block%d discrete coordinates still out of sight after "
+           "Block%d discrete coordinates still out of sight after "
            "distribution",
            block.id());
-  ER_CHECK(
-      representation::base_block::kOutOfSightRLoc != block.real_loc(),
-      "ERROR: Block%d real coordinates still out of sight after distribution",
-      block.id());
+  ER_CHECK(representation::base_block::kOutOfSightRLoc != block.real_loc(),
+           "Block%d real coordinates still out of sight after distribution",
+           block.id());
 
-  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
-         block.id(),
-         block.real_loc().GetX(),
-         block.real_loc().GetY(),
-         block.discrete_loc().first,
-         block.discrete_loc().second,
-         reinterpret_cast<const void*>(cell->block().get()));
+  ER_INFO("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
+          block.id(),
+          block.real_loc().GetX(),
+          block.real_loc().GetY(),
+          block.discrete_loc().first,
+          block.discrete_loc().second,
+          reinterpret_cast<const void*>(cell->block().get()));
   return true;
 
 error:
@@ -174,7 +167,7 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
             if (nullptr != movable) {
               auto ent_xspan = ent->xspan(movable->real_loc());
               auto ent_yspan = ent->yspan(movable->real_loc());
-              ER_VER(
+              ER_TRACE(
                   "(movable entity) rcoord=(%f, %f), xspan=[%f-%f], "
                   "yspan=[%f-%f]",
                   coord.GetX(),
@@ -189,11 +182,11 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
             auto immovable =
                 dynamic_cast<const representation::immovable_cell_entity*>(ent);
             ER_ASSERT(nullptr != immovable,
-                      "FATAL: Cell entity is neither movable nor immovable");
+                      "Cell entity is neither movable nor immovable");
             auto ent_xspan = ent->xspan(immovable->real_loc());
             auto ent_yspan = ent->yspan(immovable->real_loc());
 
-            ER_VER(
+            ER_TRACE(
                 "(immovable entity) rcoord=(%f, %f), xspan=[%f-%f], "
                 "yspan=[%f-%f]",
                 coord.GetX(),

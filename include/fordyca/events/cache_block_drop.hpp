@@ -76,7 +76,7 @@ NS_START(events);
  */
 class cache_block_drop
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<cache_block_drop>,
       public block_drop_event,
       public visitor::visit_set<controller::depth1::foraging_controller,
                                 controller::depth2::foraging_controller,
@@ -86,11 +86,10 @@ class cache_block_drop
                                 representation::perceived_arena_map,
                                 representation::arena_cache> {
  public:
-  cache_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                   const std::shared_ptr<representation::base_block>& block,
+  cache_block_drop(const std::shared_ptr<representation::base_block>& block,
                    const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
-  ~cache_block_drop(void) override { client::rmmod(); }
+  ~cache_block_drop(void) override = default;
 
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;

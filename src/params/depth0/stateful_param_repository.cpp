@@ -35,9 +35,7 @@ namespace ta = rcppsw::task_allocation;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_param_repository::stateful_param_repository(
-    std::shared_ptr<rcppsw::er::server> server)
-    : stateless_param_repository(server) {
+stateful_param_repository::stateful_param_repository(void) {
   register_parser<occupancy_grid_parser, occupancy_grid_params>(
       occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
   register_parser<ta::executive_xml_parser, ta::executive_params>(

@@ -56,7 +56,7 @@ class stateless_metrics_aggregator;
  * - Handling block distribution.
  */
 class stateless_foraging_loop_functions : public base_foraging_loop_functions,
-                                          public rcppsw::er::client {
+                                          public er::client<stateless_foraging_loop_functions>  {
  public:
   stateless_foraging_loop_functions(void);
   ~stateless_foraging_loop_functions(void) override;
@@ -72,7 +72,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   const std::string& output_root(void) const { return m_output_root; }
 
   virtual void pre_step_final(void);
-  std::string log_timestamp_calc(void);
 
   template<typename T>
   void set_robot_tick(argos::CFootBotEntity& robot) {
@@ -80,6 +79,10 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
     controller.tick(GetSpace().GetSimulationClock());
   }
 
+  void ndc_push(void) {
+    ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
+  }
+  void ndc_pop(void) { ER_NDC_POP(); }
  private:
   using interactor =
       arena_interactor<controller::depth0::stateless_foraging_controller>;
