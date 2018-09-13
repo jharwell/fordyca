@@ -101,7 +101,9 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
-    ST_MAX_STATES
+    ST_MAX_STATES,
+    ST_RETREATING,
+    ST_CHARGING
   };
 
   /* inherited states */
@@ -119,6 +121,10 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
                      state_machine::event_data);
+
+  /* energy optimization states */
+  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, retreating);
+  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, charging);
 
   /**
    * @brief Defines the state map for the FSM.

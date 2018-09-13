@@ -1,0 +1,253 @@
+<?xml version="1.0" ?>
+
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="5000"
+                ticks_per_second="5"
+                random_seed="123" />
+  </framework>
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <energy_max_controller id="ffc"
+                                library="libfordyca">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <range_and_bearing implementation="default" />
+      </actuators>
+      <sensors>
+        <footbot_proximity implementation="default" show_rays="true" />
+        <footbot_light implementation="rot_z_only" show_rays="false" />
+        <footbot_motor_ground implementation="rot_z_only" />
+        <range_and_bearing implementation="medium" medium="rab" />
+      </sensors>
+      <params>
+        <energy max_energy="100.0"
+                threshold="20.0">
+        
+        </energy>
+        <output>
+          <sim output_root="output"
+               output_dir="__current_date__"
+               />
+        </output>
+        <occupancy_grid>
+          <grid resolution="0.2"
+                size="10, 5, 2"
+                />
+          <pheromone rho="0.00001"
+                     repeat_deposit="false"/>
+        </occupancy_grid>
+        <task_executive>
+          <estimation alpha="0.8"/>
+          <task_abort reactivity="8"
+                    offset="3"
+                    />
+          <task_partition
+              method="pini2011"
+              always_partition="true"
+              never_partition="false"
+              reactivity="1.5"
+              offset="1.0"
+              />
+          <subtask_selection
+              method="harwell2018"
+              reactivity="8"
+              offset="1.25"
+              gamma="1.0"
+              />
+        </task_executive>
+        <task_exec_estimates
+            enabled="true"
+            generalist_range="2000:4000"
+            collector_range="1000:2000"
+            harvester_range="1000:2000"
+            />
+        <sensing>
+          <proximity_sensor angle_range="-1.1:1.1"
+                            delta="0.0001" />
+        </sensing>
+        <actuation>
+          <throttling
+              block_carry="0.1"/>
+          <steering2D>
+            <avoidance_force lookahead="0.5"
+                             max="8"/>
+            <arrival_force slowing_radius="0.2"
+                           slowing_speed_min="1.0"
+                           max="8"/>
+            <polar_force max="8"/>
+            <wander_force circle_distance="4.0"
+                          circle_radius="100.0"
+                          max_angle_delta="5"
+                          max="9.0"
+                          interval="1"/>
+            <phototaxis_force max="8"/>
+          </steering2D>
+
+          <differential_drive soft_turn_max="30"
+                              max_speed="10.0" />
+        </actuation>
+        <fsm
+          nest="2.0, 2.5"
+          />
+      </params>
+    </energy_max_controller>
+
+  </controllers>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions library="libfordyca"
+                  label="stateless_foraging_loop_functions">
+    <output>
+      <sim log_fname="sim.log"
+           output_root="output"
+           output_dir="__current_date__"
+           />
+      <metrics
+          output_dir="metrics"
+          energy_optimization_fname="energy-optimization.csv"  // energy-opt
+          block_fname="block-stats.csv"
+          block_acquisition_fname="block-acquisition-stats.csv"
+          block_transport_fname="block-transport-stats.csv"
+          cache_acquisition_fname="cache-acquisition-stats.csv"
+          cache_utilization_fname="cache-utilization-stats.csv"
+          cache_lifecycle_fname="cache-lifecycle-stats.csv"
+          task_execution_fname="task-execution-stats.csv"
+          task_management_fname="task-management-stats.csv"
+          distance_fname="distance-stats.csv"
+          perception_world_model_fname="perception-world-model.csv"
+          collect_interval="1000"
+          />
+    </output>
+    <arena_map>
+      <grid resolution="0.2"
+            size="10, 5, 2"/>
+      <blocks dimension="0.2" />
+      <block_distribution n_blocks="20"
+                          dist_type="single_source"
+                          arena_model.shape="rectangle"
+                          arena_model.orientation="horizontal"
+                          nest_model.shape="rectangle"
+                          nest_model.orientation="horizontal"
+                          />
+      <static_caches enable="true"
+                     size="2"
+                     respawn_scale_factor="0.05"
+                     dimension="0.8"
+                     min_dist="0.8"
+                     usage_penalty="10"
+                     />
+      <nest size="1.0, 4.0" center="2, 2.5" />
+    </arena_map>
+    <penalty pen_func = "kSine"
+             amp = "2"
+             per = "2"
+             phase = "1"
+             square = "2"
+             step = "2"
+             saw = "2"
+             />
+    <visualization robot_id="true"
+                   robot_los="false"
+                   robot_task="true"
+                   block_id="false"
+                   />
+  </loop_functions>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="10, 5, 2" center="5,2.5,1">
+
+    <floor id="floor"
+           source="loop_functions"
+           pixels_per_meter="50" />
+
+    <box id="wall_north" size="10,0.1,0.5" movable="false">
+      <body position="5,5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="10,0.1,0.5" movable="false">
+      <body position="5,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.1,5,0.5" movable="false">
+      <body position="10,2.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.1,5,0.5" movable="false">
+      <body position="0,2.5,0" orientation="0,0,0" />
+    </box>
+
+    <light id="light_1"
+           position="2,1.25,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_2"
+           position="2,2.5,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+    <light id="light_3"
+           position="2,3.75,1.0"
+           orientation="0,0,0"
+           color="yellow"
+           intensity="10.0"
+           medium="leds" />
+
+    <distribute>
+      <position method="uniform" min="1,1,0" max="8,4,0" />
+      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <entity quantity="4" max_trials="1000">
+        <foot-bot id="fb">
+          <controller config="ffc" />
+        </foot-bot>
+      </entity>
+    </distribute>
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <range_and_bearing id="rab" />
+    <led id="leds" />
+  </media>
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="stateless_foraging_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

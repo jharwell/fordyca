@@ -48,6 +48,8 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(retreating, hfsm::top_state()),  //max energy
+      HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),   //max energy
       m_explore_fsm(
           server,
           saa,
@@ -112,6 +114,26 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
     m_explore_fsm.task_reset();
     ER_NOM("Block pickup signal received");
     internal_event(ST_TRANSPORT_TO_NEST);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+/* Energy Optimization */
+HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, retreating) {
+  if ( /* charge below threshold */) {
+    m_explore_fsm.task_reset();
+    ER_NOM("Robot needs to recharge");
+    internal_event(ST_RETREATING);
+  } else {
+    m_explore_fsm.task_execute();
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+// Define more here
+HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, charging) {
+  if ( /* charge rises diff threshold */) {
+    m_explore_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
 }

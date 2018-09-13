@@ -1,7 +1,7 @@
 /**
- * @file metrics_params.hpp
+ * @file energy_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,14 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ENERGY_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ENERGY_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/params/base_params.hpp"
+
+#include "fordyca/params/energy_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,34 +36,39 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct metrics_params
+ * @class energy_parser
  * @ingroup params
+ *
+ * @brief .
  */
-struct metrics_params : public rcppsw::params::base_params {
-  std::string block_fname{""};
-  std::string block_acquisition_fname{""};
-  std::string block_transport_fname{""};
 
-  std::string cache_acquisition_fname{""};
-  std::string cache_utilization_fname{""};
-  std::string cache_lifecycle_fname{""};
+class energy_parser : public rcppsw::params::xml_param_parser {
+ public:
+   energy_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
+       : xml_param_parser(server, level) {}
 
-  std::string task_execution_fname{""};
-  std::string task_management_fname{""};
+   static constexpr char kXMLRoot[] = "energy";
 
-  std::string energy_optimization_fname{""};  // energy-opt
+   void show(std::ostream& stream) const override;
+   bool validate(void) const override;
+   void parse(const ticpp::Element& node) override;
 
-  std::string distance_fname{""};
-  std::string output_dir{""};
+   std::string xml_root(void) const override { return kXMLRoot; }
+   std::shared_ptr<energy_params> parse_results(void) const {
+     return m_params;
+   }
 
-  std::string perception_world_model_fname{""};
+ private:
+  std::shared_ptr<rcppsw::params::energy_params> parse_results_impl(void) const override {
+    return m_params;
+  }
 
-  uint collect_interval{0};
+  std::shared_ptr<energy_params> m_params{nullptr};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ENERGY_PARSER_HPP_ */

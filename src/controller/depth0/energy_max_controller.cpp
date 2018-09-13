@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/saa_subsystem.hpp"
+
 
  /*******************************************************************************
   * Namespaces
@@ -57,3 +59,16 @@
        base_foraging_controller::actuators());
    ER_NOM("stateless_foraging controller initialization finished");
  } /* Init() */
+
+ void energy_max_controller::Reset(void) {
+   base_foraging_controller::Reset();
+   if (nullptr != m_fsm) {
+     m_fsm->init();
+   }
+ } /* Reset() */
+
+ void stateless_foraging_controller::ControlStep(void) {
+   saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
+   saa_subsystem()->actuation()->block_throttle_update();
+   m_fsm->run();
+ } /* ControlStep() */
