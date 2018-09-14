@@ -1,7 +1,7 @@
 /**
- * @file arena_map.hpp
+ * @file perceived_arena_map.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
 
 #include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
@@ -48,12 +49,14 @@ class line_of_sight;
  * @class perceived_arena_map
  * @ingroup representation
  *
- * @brief The arena map stores a logical representation of the state of the
- * arena, from the perspective of the robot.
+ * @brief The perceived arena map (PAM) stores a logical representation of the
+ * state of the arena, from the perspective of the robot.
  *
  * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
  * where they actually live (clone not reference), which decouples/simplifies a
- * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
+ * lot of the tricky handshaking logic for picking up/dropping blocks in
+ * caches. The PAM also does *NOT* track which cells are in CACHE_EXTENT, as
+ * that is irrelevant for what the robots need (as of 9/14/18 anyway).
  */
 class perceived_arena_map
     : public rcppsw::er::client<perceived_arena_map>,
@@ -84,6 +87,7 @@ class perceived_arena_map
    * @brief Get a list of all blocks the robot is currently aware of.
    */
   block_list& blocks(void) { return m_blocks; }
+  const block_list& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Get a list of all cache the robot is currently aware of and their
@@ -97,6 +101,7 @@ class perceived_arena_map
    * @brief Get a list of all caches the robot is currently aware of.
    */
   cache_list& caches(void) { return m_caches; }
+  const cache_list& caches(void) const { return m_caches; }
 
   /**
    * @brief Add a cache to the list of perceived caches. If there is already a
