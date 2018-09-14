@@ -22,22 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/cache_creator.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_creator::cache_creator(representation::arena_grid& grid,
+cache_creator::cache_creator(ds::arena_grid& grid,
                              double cache_size,
                              double resolution)
     : ER_CLIENT_INIT("fordyca.support.depth1.cache_creator"),
@@ -56,7 +56,7 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
    * block. If so, it should be added to the list of blocks for the cache.
    */
   rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, m_resolution);
-  representation::cell2D& cell = m_grid.access<arena_grid::kCell>(d);
+  ds::cell2D& cell = m_grid.access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "Cell does not have block");
 

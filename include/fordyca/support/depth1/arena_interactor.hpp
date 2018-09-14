@@ -60,7 +60,7 @@ template <typename T>
 class arena_interactor : public depth0::arena_interactor<T>,
                          public er::client<arena_interactor<T>> {
  public:
-  arena_interactor(representation::arena_map* const map_in,
+  arena_interactor(ds::arena_map* const map_in,
                    depth0::stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor_in,
                    const ct::waveform_params* const block_manip_penalty,

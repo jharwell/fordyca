@@ -51,7 +51,7 @@ class block_to_existing_cache_fsm : public block_to_goal_fsm {
   block_to_existing_cache_fsm(const controller::block_selection_matrix* bsel_matrix,
                               const controller::cache_selection_matrix* csel_matrix,
                               controller::saa_subsystem* saa,
-                              representation::perceived_arena_map* map);
+                              ds::perceived_arena_map* map);
 
   block_to_existing_cache_fsm(const block_to_existing_cache_fsm& fsm) = delete;
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;

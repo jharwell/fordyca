@@ -24,12 +24,12 @@
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
@@ -39,7 +39,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Member Functions
@@ -205,9 +205,8 @@ void foraging_loop_functions::pre_step_final(void) {
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
       if (arena_map()->static_cache_create()) {
-        __rcsw_unused representation::cell2D& cell =
-            arena_map()->access<arena_grid::kCell>(
-                arena_map()->caches()[0]->discrete_loc());
+        __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
+            arena_map()->caches()[0]->discrete_loc());
         ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
                   "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
                   arena_map()->caches()[0]->n_blocks(),

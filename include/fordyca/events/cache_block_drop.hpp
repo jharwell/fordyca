@@ -45,9 +45,12 @@ class foraging_controller;
 } // namespace controller
 
 namespace representation {
-class perceived_arena_map;
 class arena_cache;
 } // namespace representation
+
+namespace ds {
+class perceived_arena_map;
+} // namespace ds
 namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
 }} // namespace fsm::depth1
@@ -83,7 +86,7 @@ class cache_block_drop
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
                                 fsm::depth1::block_to_goal_fsm,
-                                representation::perceived_arena_map,
+                                ds::perceived_arena_map,
                                 representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<representation::base_block>& block,
@@ -95,10 +98,10 @@ class cache_block_drop
   cache_block_drop& operator=(const cache_block_drop& op) = delete;
 
   /* depth1 foraging */
-  void visit(class representation::cell2D& cell) override;
+  void visit(class ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map& map) override;
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
   void visit(controller::depth1::foraging_controller& controller) override;

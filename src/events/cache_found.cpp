@@ -23,16 +23,16 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using ds::occupancy_grid;
 using representation::base_cache;
-using representation::occupancy_grid;
 namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
@@ -47,7 +47,7 @@ cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_found::visit(representation::cell2D& cell) {
+void cache_found::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
   cell.fsm().accept(*this);
   ER_ASSERT(cell.state_has_cache(),
@@ -86,8 +86,8 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
   } /* for(i..) */
 } /* visit() */
 
-void cache_found::visit(representation::perceived_arena_map& map) {
-  representation::cell2D& cell =
+void cache_found::visit(ds::perceived_arena_map& map) {
+  ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());

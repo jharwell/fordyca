@@ -93,10 +93,10 @@ class cached_block_pickup
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   /* depth1 foraging */
-  void visit(representation::arena_map& map) override;
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;

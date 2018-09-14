@@ -26,18 +26,17 @@
 #include <cmath>
 #include <random>
 
+#include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
-#include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-using representation::arena_grid;
+using fordyca::ds::arena_grid;
 
 namespace er = rcppsw::er;
-namespace ds = rcppsw::ds;
 namespace math = rcppsw::math;
 
 /*******************************************************************************
@@ -98,7 +97,7 @@ bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
 } /* distribute_blocks() */
 
 powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placements(
-    representation::arena_grid& grid,
+    ds::arena_grid& grid,
     const std::vector<uint>& clust_sizes) {
   arena_view_list views;
 
@@ -133,7 +132,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
     bool overlap = std::any_of(
         list.begin(),
         list.end(),
-        [&](const std::pair<representation::arena_grid::view, uint>& other) {
+        [&](const std::pair<ds::arena_grid::view, uint>& other) {
           if (other == v) { /* self */
             return false;
           }
@@ -167,8 +166,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
 } /* check_cluster_placements() */
 
 powerlaw_distributor::arena_view_list powerlaw_distributor::
-    compute_cluster_placements(representation::arena_grid& grid,
-                               uint n_clusters) {
+    compute_cluster_placements(ds::arena_grid& grid, uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
   std::vector<uint> clust_sizes;
@@ -190,7 +188,7 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::
   return arena_view_list{};
 } /* compute_cluster_placements() */
 
-bool powerlaw_distributor::map_clusters(representation::arena_grid& grid) {
+bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
   arena_view_list placements = compute_cluster_placements(grid, m_n_clusters);
   if (0 == placements.size()) {
     ER_WARN("Unable to compute all cluster placements");

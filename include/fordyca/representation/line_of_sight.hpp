@@ -33,10 +33,14 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace ds {
+class cell2D;
+}
+NS_START(representation);
 class base_block;
 class base_cache;
-class cell2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,7 +67,7 @@ class line_of_sight {
   using cache_list = std::list<std::shared_ptr<base_cache>>;
   using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
 
-  line_of_sight(const rcppsw::ds::grid_view<cell2D>& c_view,
+  line_of_sight(const rcppsw::ds::grid_view<ds::cell2D>& c_view,
                 rcppsw::math::dcoord2 center)
       : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
@@ -106,8 +110,8 @@ class line_of_sight {
    *
    * @return A reference to the cell.
    */
-  const cell2D& cell(size_t i, size_t j) const;
-  cell2D& cell(size_t i, size_t j);
+  const ds::cell2D& cell(size_t i, size_t j) const;
+  ds::cell2D& cell(size_t i, size_t j);
 
   /**
    * @brief Get the coordinates for the center of the LOS.
@@ -118,9 +122,9 @@ class line_of_sight {
 
  private:
   // clang-format off
-  rcppsw::math::dcoord2         m_center;
-  rcppsw::ds::grid_view<cell2D> m_view;
-  const_cache_list              m_caches;
+  rcppsw::math::dcoord2             m_center;
+  rcppsw::ds::grid_view<ds::cell2D> m_view;
+  const_cache_list                  m_caches;
   // clang-format on
 };
 

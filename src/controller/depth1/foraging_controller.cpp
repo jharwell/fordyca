@@ -42,7 +42,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor

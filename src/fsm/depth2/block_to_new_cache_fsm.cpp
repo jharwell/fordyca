@@ -36,7 +36,7 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : block_to_goal_fsm(bsel_matrix, saa, map),
       m_cache_fsm(csel_matrix, saa, map) {}
 

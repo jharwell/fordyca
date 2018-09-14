@@ -26,14 +26,14 @@
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -44,7 +44,7 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -66,7 +66,7 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_pickup();
 } /* visit() */
 
-void free_block_pickup::visit(representation::cell2D& cell) {
+void free_block_pickup::visit(ds::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
   ER_INFO("cell2D: fb%u block%d from (%u, %u)",
@@ -76,7 +76,7 @@ void free_block_pickup::visit(representation::cell2D& cell) {
           m_block->discrete_loc().second);
 } /* visit() */
 
-void free_block_pickup::visit(representation::arena_map& map) {
+void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
                 rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
@@ -124,11 +124,11 @@ void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
 /*******************************************************************************
  * Stateful Foraging
  ******************************************************************************/
-void free_block_pickup::visit(representation::perceived_arena_map& map) {
+void free_block_pickup::visit(ds::perceived_arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
                 rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  representation::cell2D& cell =
+  ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
 
   /*

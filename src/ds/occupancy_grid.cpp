@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/occupancy_grid.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/events/cell_unknown.hpp"
 #include "fordyca/params/occupancy_grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -36,7 +36,7 @@ NS_START(fordyca, representation);
 occupancy_grid::occupancy_grid(
     const struct params::occupancy_grid_params* c_params,
     const std::string& robot_id)
-    : ER_CLIENT_INIT("fordyca.representation.occupancy_grid"),
+    : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
       stacked_grid(c_params->grid.resolution,
                    static_cast<size_t>(c_params->grid.upper.GetX()),
                    static_cast<size_t>(c_params->grid.upper.GetY())),
@@ -108,4 +108,4 @@ void occupancy_grid::cell_update(size_t i, size_t j) {
   }
 } /* cell_update() */
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);

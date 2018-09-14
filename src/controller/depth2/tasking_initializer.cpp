@@ -30,8 +30,8 @@
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
-#include "fordyca/params/depth2/exec_estimates_params.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
+#include "fordyca/params/depth2/exec_estimates_params.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -45,7 +45,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor

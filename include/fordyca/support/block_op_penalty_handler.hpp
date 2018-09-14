@@ -62,7 +62,7 @@ class block_op_penalty_handler
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
-  block_op_penalty_handler(representation::arena_map* const map,
+  block_op_penalty_handler(ds::arena_map* const map,
                            const ct::waveform_params* const params)
       : temporal_penalty_handler<T>(params),
         ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
@@ -149,7 +149,7 @@ class block_op_penalty_handler
 
  private:
   // clang-format off
-  representation::arena_map* const m_map;
+  ds::arena_map* const m_map;
   // clang-format on
 };
 NS_END(support, fordyca);

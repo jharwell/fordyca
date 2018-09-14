@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,7 +32,7 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_unknown::visit(representation::cell2D& cell) {
+void cell_unknown::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */

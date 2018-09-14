@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth1.cached_block_to_nest"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),

@@ -22,17 +22,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -156,8 +156,8 @@ void perception_subsystem::processed_los_verify(
                   "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
                   d.first,
                   d.second,
-            cell1.cache()->n_blocks(),
-            cell2.cache()->n_blocks());
+                  cell1.cache()->n_blocks(),
+                  cell2.cache()->n_blocks());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -166,13 +166,12 @@ void perception_subsystem::processed_los_verify(
     for (auto& c2 : map()->caches()) {
       if (*c1 == *c2) {
         auto& cell = map()->access<occupancy_grid::kCell>(c2->discrete_loc());
-        ER_ASSERT(
-            c1->n_blocks() == cell.cache()->n_blocks(),
-            "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
-            cell.loc().first,
-            cell.loc().second,
-            c1->n_blocks(),
-            cell.cache()->n_blocks());
+        ER_ASSERT(c1->n_blocks() == cell.cache()->n_blocks(),
+                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
+                  cell.loc().first,
+                  cell.loc().second,
+                  c1->n_blocks(),
+                  cell.cache()->n_blocks());
       }
     } /* for(c2..) */
   }

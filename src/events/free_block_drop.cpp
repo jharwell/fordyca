@@ -26,11 +26,11 @@
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/controller/depth2/foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -40,7 +40,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -57,7 +57,7 @@ free_block_drop::free_block_drop(
 /*******************************************************************************
  * Depth0
  ******************************************************************************/
-void free_block_drop::visit(representation::cell2D& cell) {
+void free_block_drop::visit(ds::cell2D& cell) {
   cell.entity(m_block);
   m_block->accept(*this);
   cell.fsm().accept(*this);
@@ -75,9 +75,8 @@ void free_block_drop::visit(representation::base_block& block) {
   block.discrete_loc(d);
 } /* visit() */
 
-void free_block_drop::visit(representation::arena_map& map) {
-  representation::cell2D& cell =
-      map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
+void free_block_drop::visit(ds::arena_map& map) {
+  ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
 
   /*
    * @todo We should be able to handle dropping a block on a cell in any

@@ -1,7 +1,7 @@
 /**
- * @file block_manifest_processor.cpp
+ * @file cell2D.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,46 +21,39 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/block_manifest_processor.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_manifest_processor::block_manifest_processor(
-    const params::arena::block_manifest* const m)
-    : mc_manifest(*m) {
-  register_type<cube_block>("cube");
-  register_type<ramp_block>("ramp");
-}
+cell2D::cell2D(void) : m_loc(), m_fsm() { m_fsm.init(); }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-block_manifest_processor::block_vector block_manifest_processor::create_blocks(
-    void) {
-  block_vector v;
-  uint i;
-  for (i = 0; i < mc_manifest.n_cube; ++i) {
-    v.push_back(create("cube",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim,
-                                              mc_manifest.unit_dim),
-                       i));
-  } /* for(i..) */
-  for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp;
-       ++i) {
-    v.push_back(create("ramp",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim * 2,
-                                              mc_manifest.unit_dim),
-                       i));
-  } /* for(i..) */
-  return v;
-} /* create_blocks() */
+__rcsw_pure std::shared_ptr<const representation::base_block> cell2D::block(
+    void) const {
+  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
+} /* block() */
 
-NS_END(representation, fordyca);
+__rcsw_pure std::shared_ptr<representation::base_block> cell2D::block(void) {
+  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
+} /* block() */
+
+__rcsw_pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+} /* cache() */
+
+__rcsw_pure const std::shared_ptr<representation::base_cache> cell2D::cache(
+    void) const {
+  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+} /* cache() */
+
+NS_END(ds, fordyca);

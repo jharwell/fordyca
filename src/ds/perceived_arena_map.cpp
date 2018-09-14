@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/occupancy_grid_params.hpp"
@@ -31,8 +31,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-using representation::occupancy_grid;
+NS_START(fordyca, ds);
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -40,7 +40,7 @@ using representation::occupancy_grid;
 perceived_arena_map::perceived_arena_map(
     const struct fordyca::params::occupancy_grid_params* c_params,
     const std::string& robot_id)
-    : ER_CLIENT_INIT("fordyca.representation.perceived_arena_map"),
+    : ER_CLIENT_INIT("fordyca.ds.perceived_arena_map"),
       m_grid(c_params, robot_id),
       m_caches(),
       m_blocks() {}
@@ -53,7 +53,7 @@ perceived_arena_map::perceived_block_list perceived_arena_map::perceived_blocks(
   perceived_block_list pblocks;
 
   for (auto& b : m_blocks) {
-    pblocks.push_back(perceived_block(
+    pblocks.push_back(representation::perceived_block(
         b, m_grid.access<occupancy_grid::kPheromone>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
@@ -64,18 +64,20 @@ perceived_arena_map::perceived_cache_list perceived_arena_map::perceived_caches(
   perceived_cache_list pcaches;
 
   for (auto& c : m_caches) {
-    pcaches.push_back(perceived_cache(
+    pcaches.push_back(representation::perceived_cache(
         c, m_grid.access<occupancy_grid::kPheromone>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */
 
-void perceived_arena_map::cache_add(const std::shared_ptr<base_cache>& cache) {
+void perceived_arena_map::cache_add(
+    const std::shared_ptr<representation::base_cache>& cache) {
   cache_remove(cache);
   m_caches.push_back(cache);
 } /* cache_add() */
 
-void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim) {
+void perceived_arena_map::cache_remove(
+    const std::shared_ptr<representation::base_cache>& victim) {
   for (auto it = m_caches.begin(); it != m_caches.end(); ++it) {
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
@@ -87,7 +89,8 @@ void perceived_arena_map::cache_remove(const std::shared_ptr<base_cache>& victim
   } /* for(it..) */
 } /* cache_remove() */
 
-bool perceived_arena_map::block_add(const std::shared_ptr<base_block>& block_in) {
+bool perceived_arena_map::block_add(
+    const std::shared_ptr<representation::base_block>& block_in) {
   auto it1 = std::find_if(
       m_blocks.begin(),
       m_blocks.end(),
@@ -140,7 +143,8 @@ bool perceived_arena_map::block_add(const std::shared_ptr<base_block>& block_in)
   return false;
 } /* block_add() */
 
-bool perceived_arena_map::block_remove(const std::shared_ptr<base_block>& victim) {
+bool perceived_arena_map::block_remove(
+    const std::shared_ptr<representation::base_block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
       ER_TRACE("Remove block%d", victim->id());
@@ -154,4 +158,4 @@ bool perceived_arena_map::block_remove(const std::shared_ptr<base_block>& victim
   return false;
 } /* block_remove() */
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);

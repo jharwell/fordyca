@@ -86,10 +86,10 @@ class free_block_drop
   free_block_drop& operator=(const free_block_drop& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::cell2D& cell) override;
   void visit(representation::base_block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map& map) override;
+  void visit(ds::arena_map& map) override;
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller&) override;

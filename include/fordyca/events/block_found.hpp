@@ -61,10 +61,10 @@ class block_found : public perceived_cell_op,
   block_found& operator=(const block_found& op) = delete;
 
   /* stateful foraging */
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(controller::depth0::stateful_foraging_controller&) override {}
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
 
   /* depth1 foraging */
   void visit(controller::depth1::foraging_controller&) override {}

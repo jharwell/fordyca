@@ -39,7 +39,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 block_to_goal_fsm::block_to_goal_fsm(
     const controller::block_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth1.block_to_goal"),
       entry_wait_for_signal(),

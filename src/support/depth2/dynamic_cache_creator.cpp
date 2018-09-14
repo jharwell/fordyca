@@ -35,7 +35,7 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dynamic_cache_creator::dynamic_cache_creator(representation::arena_grid& grid,
+dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid& grid,
                                              double cache_size,
                                              double resolution,
                                              double min_dist)

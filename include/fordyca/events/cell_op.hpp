@@ -32,7 +32,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
+namespace ds {
 class cell2D;
 }
 namespace fsm {
@@ -54,9 +54,8 @@ NS_START(events);
  * Also provided are the (x, y) coordinates of the cell to which the event is
  * directed. Not all derived events may need them, but they are there.
  */
-class cell_op
-    : public visitor::visitor,
-      public visitor::visit_set<representation::cell2D, fsm::cell2D_fsm> {
+class cell_op : public visitor::visitor,
+                public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
  public:
   cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
   ~cell_op(void) override = default;

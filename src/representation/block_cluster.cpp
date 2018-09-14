@@ -29,17 +29,13 @@
 NS_START(fordyca, representation);
 
 /*******************************************************************************
- * Constructors/Destructors
- ******************************************************************************/
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 __rcsw_pure uint block_cluster::block_count(void) const {
   uint count = 0;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const representation::cell2D& cell = m_view[i][j];
+      const ds::cell2D& cell = m_view[i][j];
       assert(!cell.state_has_cache());
       count += cell.state_has_block();
     } /* for(j..) */

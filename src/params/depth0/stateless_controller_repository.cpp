@@ -36,7 +36,7 @@ NS_START(fordyca, params, depth0);
  ******************************************************************************/
 stateless_controller_repository::stateless_controller_repository(void) {
   register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
-                                           ct::waveform_xml_parser::kXMLRoot,
+                                               ct::waveform_xml_parser::kXMLRoot,
                                            ct::waveform_xml_parser::kHeader1);
 }
 

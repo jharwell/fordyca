@@ -22,15 +22,15 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ block_found::block_found(std::unique_ptr<representation::base_block> block)
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_found::visit(representation::cell2D& cell) {
+void block_found::visit(ds::cell2D& cell) {
   ER_ASSERT(nullptr != m_block, "nullptr block?");
   cell.entity(m_block);
   cell.fsm().accept(*this);
@@ -63,8 +63,8 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
             "Perceived cell in incorrect state after block found event");
 } /* visit() */
 
-void block_found::visit(representation::perceived_arena_map& map) {
-  representation::cell2D& cell =
+void block_found::visit(ds::perceived_arena_map& map) {
+  ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());

@@ -30,7 +30,7 @@
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 cache_transferer_fsm::cache_transferer_fsm(
     const controller::cache_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth2.cache_transferer"),
       entry_wait_for_signal(),

@@ -41,7 +41,7 @@ NS_START(fordyca, params);
  * @brief Collection of all parameter parsers and parse results needed by
  * all foraging controllers.
  */
-class base_controller_repository: public rcppsw::params::xml_param_repository {
+class base_controller_repository : public rcppsw::params::xml_param_repository {
  public:
   base_controller_repository();
 };

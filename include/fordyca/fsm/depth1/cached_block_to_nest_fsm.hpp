@@ -44,9 +44,12 @@ class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
 namespace representation {
-class perceived_arena_map;
 class block;
 } // namespace representation
+
+namespace ds {
+class perceived_arena_map;
+} // namespace ds
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
@@ -78,7 +81,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
  public:
   cached_block_to_nest_fsm(const controller::cache_selection_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
-                           representation::perceived_arena_map* map);
+                           ds::perceived_arena_map* map);
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
   cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
