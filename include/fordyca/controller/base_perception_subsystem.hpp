@@ -91,7 +91,15 @@ class base_perception_subsystem
    * update the relevance of information (density) within it, and fix any blocks
    * that should be hidden from our awareness.
    */
-  virtual void process_los(const representation::line_of_sight* const los);
+  virtual void process_los(const representation::line_of_sight* const c_los);
+
+  /**
+   * @brief The processing of the current LOS after processing (i.e. does the
+   * PAM now accurately reflect what was in the LOS)?
+   *
+   * @param c_los Current LOS.
+   */
+  virtual void processed_los_verify(const representation::line_of_sight* const c_los) const;
 
  private:
   /**

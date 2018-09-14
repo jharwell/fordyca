@@ -142,6 +142,7 @@ __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void stateful_foraging_loop_functions::PreStep() {
+  ndc_push();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -149,6 +150,7 @@ void stateful_foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
+  ndc_pop();
 } /* PreStep() */
 
 void stateful_foraging_loop_functions::Reset(void) {
