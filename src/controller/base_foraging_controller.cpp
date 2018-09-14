@@ -37,7 +37,7 @@
 
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
@@ -82,7 +82,7 @@ void base_foraging_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  params::depth0::stateless_param_repository param_repo;
+  params::base_controller_repository param_repo;
   param_repo.parse_all(node);
 
   ndc_push();

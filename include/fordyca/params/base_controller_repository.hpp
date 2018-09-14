@@ -1,7 +1,7 @@
 /**
- * @file task_repository.hpp
+ * @file base_controller_repository.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,24 +29,23 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class task_repository
- * @ingroup params depth1
+ * @class base_controller_repository
+ * @ingroup params
  *
- * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth1::foraging_controller.
+ * @brief Collection of all parameter parsers and parse results needed by
+ * all foraging controllers.
  */
-class task_repository: public rcppsw::params::xml_param_repository {
+class base_controller_repository: public rcppsw::params::xml_param_repository {
  public:
-  static constexpr char kName[] = "task_repository";
-  task_repository(void);
+  base_controller_repository();
 };
 
-NS_END(depth1, params, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_TASK_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BASE_CONTROLLER_REPOSITORY_HPP_ */

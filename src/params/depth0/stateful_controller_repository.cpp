@@ -1,7 +1,7 @@
 /**
- * @file task_repository.cpp
+ * @file stateful_controller_repository.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,26 +21,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/param_repository.hpp"
-#include "fordyca/params/depth1/exec_estimates_parser.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
+#include "fordyca/params/depth0/stateful_controller_repository.hpp"
+#include "fordyca/params/depth0/exec_estimates_parser.hpp"
+#include "fordyca/params/occupancy_grid_parser.hpp"
+#include "rcppsw/task_allocation/executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, depth0);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-param_repository::param_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      exec_estimates_parser::kXMLRoot,
+stateful_controller_repository::stateful_controller_repository(void) {
+  register_parser<occupancy_grid_parser, occupancy_grid_params>(
+      occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
+  register_parser<ta::executive_xml_parser, ta::executive_params>(
+      ta::executive_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ct::waveform_xml_parser>(std::string("cache_usage_") +
-                                               ct::waveform_xml_parser::kXMLRoot,
-                                           ct::waveform_xml_parser::kHeader1);
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      std::string("stateful_") + exec_estimates_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
-NS_END(depth1, params, fordyca);
+NS_END(depth0, params, fordyca);

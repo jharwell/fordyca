@@ -39,7 +39,7 @@ namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
 namespace params {
-namespace depth0 { class stateful_param_repository; }
+namespace depth0 { class stateful_controller_repository; }
 }
 
 NS_START(controller);
@@ -69,10 +69,10 @@ class stateful_tasking_initializer : public er::client<stateful_tasking_initiali
   stateful_tasking_initializer(const stateful_tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
-  operator()(params::depth0::stateful_param_repository *const stateful_repo);
+  operator()(params::depth0::stateful_controller_repository *const stateful_repo);
 
  protected:
-  void stateful_tasking_init(params::depth0::stateful_param_repository* stateful_repo);
+  void stateful_tasking_init(params::depth0::stateful_controller_repository* stateful_repo);
   const base_perception_subsystem* perception(void) const { return m_perception; }
   base_perception_subsystem* perception(void) { return m_perception; }
 

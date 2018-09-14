@@ -28,7 +28,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/exec_estimates_params.hpp"
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
+#include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 
@@ -61,7 +61,7 @@ stateful_tasking_initializer::~stateful_tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 void stateful_tasking_initializer::stateful_tasking_init(
-    params::depth0::stateful_param_repository* const stateful_repo) {
+    params::depth0::stateful_controller_repository* const stateful_repo) {
   auto* exec_params = stateful_repo->parse_results<ta::executive_params>();
   auto* est_params =
       stateful_repo->parse_results<params::depth0::exec_estimates_params>();
@@ -87,7 +87,7 @@ void stateful_tasking_initializer::stateful_tasking_init(
 } /* tasking_init() */
 
 std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer::
-operator()(params::depth0::stateful_param_repository* const stateful_repo) {
+operator()(params::depth0::stateful_controller_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
   return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_graph);
