@@ -1,7 +1,7 @@
 /**
- * @file stateless_param_repository.hpp
+ * @file controller_repository.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_PARAM_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_PARAM_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH2_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/xml_param_repository.hpp"
+#include <string>
+#include "fordyca/params/depth1/controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateless_param_repository
- * @ingroup params depth0
+ * @class controller_repository
+ * @ingroup params depth2
  *
- * @brief Collection of all parameter parsers and parse results needed by
- * \ref stateless_foraging_controller.
+ * @brief Collection of all parameter parsers and parse results needed
+ * by the \ref depth2::foraging_controller.
  */
-class stateless_param_repository: public rcppsw::params::xml_param_repository {
+class controller_repository: public depth1::controller_repository {
  public:
-  stateless_param_repository();
+  controller_repository(void);
 };
 
-NS_END(params, fordyca, depth0);
+NS_END(depth2, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_PARAM_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_CONTROLLER_REPOSITORY_HPP_ */

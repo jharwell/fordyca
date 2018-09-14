@@ -32,7 +32,7 @@
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/params/depth1/exec_estimates_params.hpp"
-#include "fordyca/params/depth1/param_repository.hpp"
+#include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
@@ -66,7 +66,7 @@ tasking_initializer::~tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 void tasking_initializer::depth1_tasking_init(
-    params::depth1::param_repository* const param_repo) {
+    params::depth1::controller_repository* const param_repo) {
   auto* exec_params = param_repo->parse_results<ta::executive_params>();
   auto* est_params =
       param_repo->parse_results<params::depth1::exec_estimates_params>();
@@ -119,7 +119,7 @@ void tasking_initializer::depth1_tasking_init(
 } /* depth1_tasking_init() */
 
 std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator()(
-    params::depth1::param_repository* const param_repo) {
+    params::depth1::controller_repository* const param_repo) {
   stateful_tasking_init(param_repo);
 
   depth1_tasking_init(param_repo);

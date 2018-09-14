@@ -1,5 +1,5 @@
 /**
- * @file stateless_param_repository.cpp
+ * @file stateless_controller_repository.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,10 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_param_repository.hpp"
-#include "fordyca/params/actuation_parser.hpp"
-#include "fordyca/params/output_parser.hpp"
-#include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/params/depth0/stateless_controller_repository.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
@@ -37,13 +34,7 @@ NS_START(fordyca, params, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_param_repository::stateless_param_repository(void) {
-  register_parser<output_parser, output_params>(output_parser::kXMLRoot,
-                                                output_parser::kHeader1);
-  register_parser<actuation_parser, actuation_params>(
-      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
-  register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
-                                                  sensing_parser::kHeader1);
+stateless_controller_repository::stateless_controller_repository(void) {
   register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
                                            ct::waveform_xml_parser::kXMLRoot,
                                            ct::waveform_xml_parser::kHeader1);

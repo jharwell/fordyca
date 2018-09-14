@@ -1,5 +1,5 @@
 /**
-nnnnnnn * @file param_repository.hpp
+ * @file base_controller_repository.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,35 +18,31 @@ nnnnnnn * @file param_repository.hpp
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH2_PARAM_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH2_PARAM_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/depth1/param_repository.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
+#include "fordyca/params/actuation_parser.hpp"
+#include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/sensing_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
+namespace ct = rcppsw::control;
+
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class param_repository
- * @ingroup params depth2
- *
- * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth2::foraging_controller.
- */
-class param_repository: public depth1::param_repository {
- public:
-  param_repository(void);
-};
+base_controller_repository::base_controller_repository(void) {
+  register_parser<output_parser, output_params>(output_parser::kXMLRoot,
+                                                output_parser::kHeader1);
+  register_parser<actuation_parser, actuation_params>(
+      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
+  register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
+                                                  sensing_parser::kHeader1);
+}
 
-NS_END(depth2, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH2_PARAM_REPOSITORY_HPP_ */
+NS_END(params, fordyca);

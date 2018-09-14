@@ -30,7 +30,7 @@
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
+#include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
@@ -136,7 +136,7 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  params::depth0::stateful_param_repository param_repo;
+  params::depth0::stateful_controller_repository param_repo;
   param_repo.parse_all(node);
 
   if (!param_repo.validate_all()) {

@@ -33,7 +33,7 @@
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 namespace params {
-namespace depth1 { class param_repository; }
+namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
@@ -62,10 +62,10 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
   tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
-  operator()(params::depth1::param_repository *const param_repo);
+  operator()(params::depth1::controller_repository *const controller_repo);
 
  protected:
-  void depth1_tasking_init(params::depth1::param_repository* task_repo);
+  void depth1_tasking_init(params::depth1::controller_repository* task_repo);
   const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:

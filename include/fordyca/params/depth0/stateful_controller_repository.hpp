@@ -1,5 +1,5 @@
 /**
- * @file param_repository.hpp
+ * @file stateful_controller_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,34 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
+#include "fordyca/params/depth0/stateless_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class param_repository
- * @ingroup params depth1
+ * @class stateful_controller_repository
+ * @ingroup params depth0
  *
- * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth1::foraging_controller.
+ * @brief Collection of all parameter parsers and parse results needed by
+ * \ref stateful_foraging_controller.
  */
-class param_repository: public depth0::stateful_param_repository {
+class stateful_controller_repository: public stateless_controller_repository {
  public:
-  param_repository(void);
+  stateful_controller_repository(void);
 };
 
-NS_END(depth1, params, fordyca);
+NS_END(depth0, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_PARAM_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_CONTROLLER_REPOSITORY_HPP_ */

@@ -31,7 +31,7 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/depth1/param_repository.hpp"
+#include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
@@ -79,7 +79,7 @@ void foraging_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth1::param_repository param_repo;
+  params::depth1::controller_repository param_repo;
 
   param_repo.parse_all(node);
 

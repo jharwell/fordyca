@@ -1,7 +1,7 @@
 /**
- * @file stateful_param_repository.hpp
+ * @file controller_repository.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "fordyca/params/depth2/controller_repository.hpp"
+#include "fordyca/params/depth2/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, depth2);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-/**
- * @class stateful_param_repository
- * @ingroup params depth0
- *
- * @brief Collection of all parameter parsers and parse results needed by
- * \ref stateful_foraging_controller.
- */
-class stateful_param_repository: public stateless_param_repository {
- public:
-  stateful_param_repository(void);
-};
+controller_repository::controller_repository(void) {
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      exec_estimates_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+}
 
-NS_END(depth0, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATEFUL_PARAM_REPOSITORY_HPP_ */
+NS_END(depth2, params, fordyca);

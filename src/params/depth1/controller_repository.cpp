@@ -1,5 +1,5 @@
 /**
- * @file param_repository.cpp
+ * @file controller_repository.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,21 +21,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth2/param_repository.hpp"
-#include "fordyca/params/depth2/exec_estimates_parser.hpp"
+#include "fordyca/params/depth1/controller_repository.hpp"
+#include "fordyca/params/depth1/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth2);
+NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-param_repository::param_repository(void) {
+controller_repository::controller_repository(void) {
   register_parser<exec_estimates_parser, exec_estimates_params>(
       exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 
-NS_END(depth2, params, fordyca);
+NS_END(depth1, params, fordyca);

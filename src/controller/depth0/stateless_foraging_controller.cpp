@@ -27,7 +27,7 @@
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "fordyca/params/depth0/stateless_controller_repository.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth0::stateless_param_repository param_repo;
+  params::depth0::stateless_controller_repository param_repo;
   param_repo.parse_all(node);
 
   if (!param_repo.validate_all()) {
