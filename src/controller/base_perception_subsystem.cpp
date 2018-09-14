@@ -22,19 +22,19 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -44,8 +44,7 @@ base_perception_subsystem::base_perception_subsystem(
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.perception"),
       m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
-      m_map(rcppsw::make_unique<representation::perceived_arena_map>(params,
-                                                                     id)) {}
+      m_map(rcppsw::make_unique<ds::perceived_arena_map>(params, id)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -81,9 +80,7 @@ void base_perception_subsystem::process_los(
         m_map->block_remove(m_map->access<occupancy_grid::kCell>(d).block());
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
-        ER_TRACE("Cell (%u, %u) now known to be empty",
-                 d.first,
-                 d.second);
+        ER_TRACE("Cell (%u, %u) now known to be empty", d.first, d.second);
         events::cell_empty e(d);
         m_map->accept(e);
       }
@@ -106,7 +103,7 @@ void base_perception_subsystem::process_los(
 
 void base_perception_subsystem::processed_los_verify(
     const representation::line_of_sight* const c_los) const {
-    /*
+  /*
    * Verify that for each cell in LOS that was empty or contained a block, that
    * it matches the PAM.
    */

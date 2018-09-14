@@ -25,10 +25,10 @@
 #include <algorithm>
 
 #include <boost/uuid/uuid_io.hpp>
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/utils.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
 
@@ -41,7 +41,7 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-random_distributor::random_distributor(representation::arena_grid::view& grid,
+random_distributor::random_distributor(ds::arena_grid::view& grid,
                                        double resolution)
     : base_distributor(),
       ER_CLIENT_INIT("fordyca.support.block_dist.random"),
@@ -70,7 +70,7 @@ bool random_distributor::distribute_blocks(block_vector& blocks,
 bool random_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
     entity_list& entities) {
-  representation::cell2D* cell = nullptr;
+  ds::cell2D* cell = nullptr;
   std::vector<uint> coord;
   if (!find_avail_coord(entities, coord)) {
     return false;
@@ -111,7 +111,7 @@ bool random_distributor::distribute_block(
 
 __rcsw_pure bool random_distributor::verify_block_dist(
     const representation::base_block& block,
-    __rcsw_unused const representation::cell2D* const cell) {
+    __rcsw_unused const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
   ER_CHECK(representation::base_block::kOutOfSightDLoc != block.discrete_loc(),
            "Block%d discrete coordinates still out of sight after "
@@ -122,12 +122,12 @@ __rcsw_pure bool random_distributor::verify_block_dist(
            block.id());
 
   ER_DEBUG("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
-          block.id(),
-          block.real_loc().GetX(),
-          block.real_loc().GetY(),
-          block.discrete_loc().first,
-          block.discrete_loc().second,
-          reinterpret_cast<const void*>(cell->block().get()));
+           block.id(),
+           block.real_loc().GetX(),
+           block.real_loc().GetY(),
+           block.discrete_loc().first,
+           block.discrete_loc().second,
+           reinterpret_cast<const void*>(cell->block().get()));
   return true;
 
 error:

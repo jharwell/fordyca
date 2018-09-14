@@ -60,7 +60,7 @@ class acquire_cache_site_fsm : public acquire_goal_fsm,
   acquire_cache_site_fsm(
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;

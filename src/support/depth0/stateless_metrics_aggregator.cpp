@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/metrics/arena_metrics.hpp"
 #include "fordyca/metrics/arena_metrics_collector.hpp"
@@ -36,7 +37,6 @@
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -116,7 +116,7 @@ void stateless_metrics_aggregator::collect_from_block(
 } /* collect_from_block() */
 
 void stateless_metrics_aggregator::collect_from_arena(
-    const representation::arena_map* const arena) {
+    const ds::arena_map* const arena) {
   collect("arena::robot_occupancy", *arena);
 } /* collect_from_arena() */
 

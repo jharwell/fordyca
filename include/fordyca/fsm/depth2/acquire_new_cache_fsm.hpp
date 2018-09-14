@@ -50,7 +50,7 @@ class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm,
   acquire_new_cache_fsm(
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* actuators,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_
+#ifndef INCLUDE_FORDYCA_DS_CELL2D_HPP_
+#define INCLUDE_FORDYCA_DS_CELL2D_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,24 +33,25 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace er {
-class server;
-}} // namespace rcppsw::er
-NS_START(fordyca, representation);
-
-namespace visitor = rcppsw::patterns::visitor;
+NS_START(fordyca);
+namespace representation {
 class base_cache;
 class base_block;
 class base_cell_entity;
+} // namespace representation
+
+NS_START(ds);
+
+namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cell2D
- * @ingroup representation
+ * @ingroup ds
  *
- * @brief Base representation of a cell on a 2D grid. A combination of FSM +
+ * @brief Base ds of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref cell_entity the cell contains, if any.
  */
 class cell2D : public visitor::visitable_any<cell2D> {
@@ -110,10 +111,10 @@ class cell2D : public visitor::visitable_any<cell2D> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<base_cell_entity>& entity) {
+  void entity(const std::shared_ptr<representation::base_cell_entity>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<base_cell_entity>& entity(void) const {
+  const std::shared_ptr<representation::base_cell_entity>& entity(void) const {
     return m_entity;
   }
 
@@ -140,13 +141,13 @@ class cell2D : public visitor::visitable_any<cell2D> {
 
  private:
   // clang-format off
-  std::string                       m_robot_id{""};
-  std::shared_ptr<base_cell_entity> m_entity{nullptr};
-  rcppsw::math::dcoord2             m_loc;
-  fsm::cell2D_fsm                   m_fsm;
+  std::string                                       m_robot_id{""};
+  std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
+  rcppsw::math::dcoord2                             m_loc;
+  fsm::cell2D_fsm                                   m_fsm;
   // clang-format on
 };
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_CELL2D_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_CELL2D_HPP_ */

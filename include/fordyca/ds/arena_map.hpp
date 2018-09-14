@@ -18,18 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_ARENA_MAP_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_ARENA_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_DS_ARENA_MAP_HPP_
+#define INCLUDE_FORDYCA_DS_ARENA_MAP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/metrics/arena_metrics.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/arena_grid.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
@@ -45,19 +45,21 @@ namespace params { namespace arena {
 struct arena_map_params;
 }} // namespace params::arena
 
-NS_START(representation);
+namespace representation {
+class arena_cache;
+}
+NS_START(ds);
 
 class cell2D;
-class arena_cache;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class arena_map
- * @ingroup representation
+ * @ingroup ds
  *
- * @brief The arena map stores a logical representation of the state of the
+ * @brief The arena map stores a logical ds of the state of the
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
@@ -65,8 +67,8 @@ class arena_map : public rcppsw::er::client<arena_map>,
                   public metrics::arena_metrics,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
-  using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<base_block>>;
+  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
+  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   arena_map(const struct params::arena::arena_map_params* params);
 
   /* arena metrics */
@@ -93,7 +95,7 @@ class arena_map : public rcppsw::er::client<arena_map>,
    *
    * @param victim The cache to remove.
    */
-  void cache_remove(const std::shared_ptr<arena_cache>& victim);
+  void cache_remove(const std::shared_ptr<representation::arena_cache>& victim);
 
   /**
    * @brief Clear the cells that a cache covers while in the arena that are in
@@ -102,7 +104,8 @@ class arena_map : public rcppsw::er::client<arena_map>,
    *
    * @param victim The cache about to be deleted.
    */
-  void cache_extent_clear(const std::shared_ptr<arena_cache>& victim);
+  void cache_extent_clear(
+      const std::shared_ptr<representation::arena_cache>& victim);
 
   void caches_removed_reset(void) { m_caches_removed = 0; }
   void caches_removed(uint b) { m_caches_removed += b; }
@@ -144,7 +147,8 @@ class arena_map : public rcppsw::er::client<arena_map>,
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(std::shared_ptr<base_block>& block);
+  bool distribute_single_block(
+      std::shared_ptr<representation::base_block>& block);
 
   size_t xdsize(void) const { return m_grid.xdsize(); }
   size_t ydsize(void) const { return m_grid.ydsize(); }
@@ -259,6 +263,6 @@ class arena_map : public rcppsw::er::client<arena_map>,
   // clang-format on
 };
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_ARENA_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_ARENA_MAP_HPP_ */

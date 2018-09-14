@@ -28,7 +28,7 @@
 #include <vector>
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ class cache_creator : public er::client<cache_creator> {
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
-  cache_creator(representation::arena_grid& grid,
+  cache_creator(ds::arena_grid& grid,
                 double cache_size, double resolution);
 
   /**
@@ -78,16 +78,16 @@ class cache_creator : public er::client<cache_creator> {
   void update_host_cells(cache_vector& caches);
 
  protected:
-  representation::arena_grid& grid(void) const { return m_grid; }
+  ds::arena_grid& grid(void) const { return m_grid; }
   std::unique_ptr<representation::arena_cache> create_single(
       block_list blocks,
       const argos::CVector2& center);
 
  private:
   // clang-format off
-  double                              m_cache_size;
-  double                              m_resolution;
-  representation::arena_grid&         m_grid;
+  double          m_cache_size;
+  double          m_resolution;
+  ds::arena_grid& m_grid;
   // clang-format on
 };
 NS_END(support, fordyca, depth1);

@@ -39,7 +39,8 @@ NS_START(fordyca);
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class perceived_arena_map; class block; }
+namespace ds { class perceived_arena_map; }
+
 NS_START(fsm);
 
 using transport_goal_type = block_transporter::goal_type;
@@ -69,7 +70,7 @@ class block_to_goal_fsm : public base_foraging_fsm,
  public:
   block_to_goal_fsm(const controller::block_selection_matrix* sel_matrix,
                     controller::saa_subsystem* saa,
-                    representation::perceived_arena_map* map);
+                    ds::perceived_arena_map* map);
 
   block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
   block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;

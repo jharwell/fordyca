@@ -53,7 +53,7 @@ class block_to_cache_site_fsm : public depth1::block_to_goal_fsm {
       const controller::block_selection_matrix* bsel_matrix,
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   block_to_cache_site_fsm(const block_to_cache_site_fsm& fsm) = delete;
   block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm& fsm) = delete;

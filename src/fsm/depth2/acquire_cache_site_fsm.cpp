@@ -25,7 +25,7 @@
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ NS_START(fordyca, fsm, depth2);
 acquire_cache_site_fsm::acquire_cache_site_fsm(
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
                        std::bind(&acquire_cache_site_fsm::site_detected_cb,

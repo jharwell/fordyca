@@ -31,8 +31,8 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,10 +42,9 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_goal_fsm::acquire_goal_fsm(
-    controller::saa_subsystem* saa,
-    const representation::perceived_arena_map* const map,
-    std::function<bool(void)> goal_detect)
+acquire_goal_fsm::acquire_goal_fsm(controller::saa_subsystem* saa,
+                                   const ds::perceived_arena_map* const map,
+                                   std::function<bool(void)> goal_detect)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),

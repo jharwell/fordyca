@@ -31,7 +31,7 @@
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/dcoord.hpp"
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 
 /*******************************************************************************
@@ -41,7 +41,6 @@ NS_START(fordyca);
 
 namespace representation {
 class multicell_entity;
-class arena_grid;
 class cell2D;
 } // namespace representation
 
@@ -67,7 +66,7 @@ namespace er = rcppsw::er;
 class random_distributor : public base_distributor,
                            public er::client<random_distributor> {
  public:
-  random_distributor(representation::arena_grid::view& grid,
+  random_distributor(ds::arena_grid::view& grid,
                      double resolution);
 
   random_distributor& operator=(const random_distributor& s) = delete;
@@ -94,12 +93,12 @@ class random_distributor : public base_distributor,
    */
   bool find_avail_coord(const entity_list& entity, std::vector<uint>& coordv);
   bool verify_block_dist(const representation::base_block& block,
-                         const representation::cell2D* cell);
+                         const ds::cell2D* cell);
 
   // clang-format off
-  double                              m_resolution;
-  std::default_random_engine          m_rng{std::random_device{}()};
-  representation::arena_grid::view    m_grid;
+  double                     m_resolution;
+  std::default_random_engine m_rng{std::random_device{}()};
+  ds::arena_grid::view       m_grid;
   // clang-format on
 };
 

@@ -34,12 +34,12 @@ NS_START(fordyca, support, utils);
  ******************************************************************************/
 __rcsw_pure int robot_on_block(
     const controller::base_foraging_controller& controller,
-    const representation::arena_map& map) {
+    const ds::arena_map& map) {
   return map.robot_on_block(controller.robot_loc());
 } /* robot_on_block() */
 
 __rcsw_pure int robot_on_block(argos::CFootBotEntity& robot,
-                               const representation::arena_map& map) {
+                               const ds::arena_map& map) {
   return robot_on_block(dynamic_cast<controller::base_foraging_controller&>(
                             robot.GetControllableEntity().GetController()),
                         map);
@@ -57,12 +57,12 @@ int robot_id(const controller::base_foraging_controller& controller) {
 
 __rcsw_pure int robot_on_cache(
     const controller::base_foraging_controller& controller,
-    const representation::arena_map& map) {
+    const ds::arena_map& map) {
   return map.robot_on_cache(controller.robot_loc());
 } /* robot_on_cache() */
 
 __rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
-                               const representation::arena_map& map) {
+                               const ds::arena_map& map) {
   return robot_on_cache(dynamic_cast<controller::base_foraging_controller&>(
                             robot.GetControllableEntity().GetController()),
                         map);
@@ -77,7 +77,7 @@ __rcsw_const bool block_drop_overlap_with_cache(
 } /* block_drop_overlap_with_cache() */
 
 __rcsw_pure bool block_drop_near_arena_boundary(
-    const representation::arena_map& map,
+    const ds::arena_map& map,
     const std::shared_ptr<representation::base_block>& block,
     const argos::CVector2& drop_loc) {
   return (drop_loc.GetX() <= block->xsize() * 2 ||

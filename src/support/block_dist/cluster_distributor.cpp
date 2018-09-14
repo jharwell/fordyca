@@ -24,8 +24,8 @@
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
 #include <algorithm>
 
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cluster_distributor::cluster_distributor(representation::arena_grid::view& grid,
+cluster_distributor::cluster_distributor(ds::arena_grid::view& grid,
                                          double arena_resolution,
                                          uint maxsize)
     : base_distributor(),

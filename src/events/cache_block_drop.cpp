@@ -24,13 +24,13 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
@@ -39,8 +39,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::arena_grid;
-using representation::occupancy_grid;
+using ds::arena_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -58,7 +58,7 @@ cache_block_drop::cache_block_drop(
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(representation::cell2D& cell) {
+void cache_block_drop::visit(ds::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "Cell does not have coordinates");
 
@@ -74,7 +74,7 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(representation::arena_map& map) {
+void cache_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "undefined robot index");
   __rcsw_unused int index = m_block->robot_id();
   m_block->accept(*this);
@@ -87,7 +87,7 @@ void cache_block_drop::visit(representation::arena_map& map) {
           m_cache->n_blocks());
 } /* visit() */
 
-void cache_block_drop::visit(representation::perceived_arena_map& map) {
+void cache_block_drop::visit(ds::perceived_arena_map& map) {
   map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 

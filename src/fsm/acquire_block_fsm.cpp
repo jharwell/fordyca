@@ -30,8 +30,8 @@
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +45,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_block_fsm::acquire_block_fsm(
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
                        std::bind(&acquire_block_fsm::block_detected_cb, this)),

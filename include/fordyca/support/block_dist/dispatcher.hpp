@@ -37,9 +37,12 @@ NS_START(fordyca);
 
 namespace representation {
 class base_block;
-class arena_grid;
 class multicell_entity;
 } // namespace representation
+
+namespace ds {
+class arena_grid;
+} // namespace ds
 
 NS_START(support, block_dist);
 class base_distributor;
@@ -63,7 +66,7 @@ class dispatcher {
   using entity_list = std::list<const representation::multicell_entity*>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
 
-  dispatcher(representation::arena_grid& grid,
+  dispatcher(ds::arena_grid& grid,
              const struct params::arena::block_dist_params* params);
   ~dispatcher(void);
 
@@ -100,10 +103,10 @@ class dispatcher {
 
  private:
   // clang-format off
-  const struct params::arena::block_dist_params  mc_params;
-  std::string                                    m_dist_type;
-  representation::arena_grid&                    m_grid;
-  std::unique_ptr<base_distributor>              m_dist;
+  const struct params::arena::block_dist_params mc_params;
+  std::string                                   m_dist_type;
+  ds::arena_grid&                               m_grid;
+  std::unique_ptr<base_distributor>             m_dist;
 
   // clang-format on
 };

@@ -25,12 +25,12 @@
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -52,7 +52,7 @@ nest_block_drop::nest_block_drop(std::shared_ptr<representation::base_block> blo
 /*******************************************************************************
  * Foraging Support
  ******************************************************************************/
-void nest_block_drop::visit(representation::arena_map& map) {
+void nest_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "undefined robot index");
   map.distribute_single_block(m_block);
   m_block->accept(*this);

@@ -22,8 +22,8 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,7 +37,7 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
   const_block_list blocks;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const cell2D& cell = m_view[i][j];
+      const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_block()) {
         assert(cell.block());
         blocks.push_back(cell.block());
@@ -52,7 +52,7 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
 
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const cell2D& cell = m_view[i][j];
+      const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
         assert(nullptr != cache);
@@ -73,11 +73,11 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-__rcsw_pure const cell2D& line_of_sight::cell(size_t i, size_t j) const {
+__rcsw_pure const ds::cell2D& line_of_sight::cell(size_t i, size_t j) const {
   return const_cast<line_of_sight*>(this)->cell(i, j);
 }
 
-__rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) {
+__rcsw_pure ds::cell2D& line_of_sight::cell(size_t i, size_t j) {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
   return m_view[i][j];

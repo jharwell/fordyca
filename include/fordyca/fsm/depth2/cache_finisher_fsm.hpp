@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class perceived_arena_map; }
+namespace ds { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -63,7 +63,7 @@ class cache_finisher_fsm : public base_foraging_fsm,
       const controller::block_selection_matrix* bsel_matrix,
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }

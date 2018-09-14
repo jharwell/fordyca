@@ -46,7 +46,7 @@ NS_START(fordyca, support, block_dist);
 class cluster_distributor : public base_distributor,
                             public er::client<cluster_distributor> {
  public:
-  cluster_distributor(representation::arena_grid::view& grid,
+  cluster_distributor(ds::arena_grid::view& grid,
                       double arena_resolution,
                       uint maxsize);
 

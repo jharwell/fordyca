@@ -26,18 +26,18 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -178,7 +178,7 @@ void stateless_foraging_loop_functions::arena_map_init(
   auto* aparams = repo.parse_results<struct params::arena::arena_map_params>();
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
-  m_arena_map.reset(new representation::arena_map(aparams));
+  m_arena_map.reset(new ds::arena_map(aparams));
   if (!m_arena_map->initialize()) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);

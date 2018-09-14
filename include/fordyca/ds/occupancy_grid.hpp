@@ -1,6 +1,6 @@
 /**
  * @file occupancy_grid.hpp
- * @ingroup representation
+ * @ingroup ds
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,15 +19,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_
+#ifndef INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_
+#define INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <tuple>
 
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
@@ -41,7 +41,7 @@ namespace params {
 struct occupancy_grid_params;
 }
 
-NS_START(representation);
+NS_START(ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -83,6 +83,6 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
   // clang-format on
 };
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_OCCUPANCY_GRID_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_OCCUPANCY_GRID_HPP_ */

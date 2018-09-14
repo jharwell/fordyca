@@ -20,14 +20,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/block_manifest_processor.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/support/block_manifest_processor.hpp"
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -35,16 +35,16 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
-    : ER_CLIENT_INIT("fordyca.representation.arena_map"),
+    : ER_CLIENT_INIT("fordyca.ds.arena_map"),
       mc_static_cache_params(params->static_cache),
-      m_blocks(block_manifest_processor(&params->blocks.dist.manifest)
-                   .create_blocks()),
+      m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
+               .create_blocks()),
       m_caches(),
       m_grid(params->grid.resolution,
              static_cast<size_t>(params->grid.upper.GetX()),
@@ -117,17 +117,16 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
   } /* for(b..) */
 
   bool ret = true;
-  if (blocks.size() < base_cache::kMinBlocks) {
-    uint count =
-        std::accumulate(m_blocks.begin(),
-                        m_blocks.end(),
-                        0,
-                        [&](uint sum, const std::shared_ptr<base_block>& b) {
-                          return sum + (b->is_out_of_sight() ||
-                                        b->discrete_loc() == dcenter);
-                        });
+  if (blocks.size() < representation::base_cache::kMinBlocks) {
+    uint count = std::accumulate(
+        m_blocks.begin(),
+        m_blocks.end(),
+        0,
+        [&](uint sum, const std::shared_ptr<representation::base_block>& b) {
+          return sum + (b->is_out_of_sight() || b->discrete_loc() == dcenter);
+        });
 
-    ER_ASSERT(count < base_cache::kMinBlocks,
+    ER_ASSERT(count < representation::base_cache::kMinBlocks,
               "For new cache @(%f, %f) [%u, %u]: %zu >= %u blocks SHOULD be "
               "available, but only %zu are",
               center.GetX(),
@@ -135,7 +134,7 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
               dcenter.first,
               dcenter.second,
               m_blocks.size() - count,
-              base_cache::kMinBlocks,
+              representation::base_cache::kMinBlocks,
               blocks.size());
   } else if (blocks.size() < mc_static_cache_params.size) {
     ER_WARN(
@@ -154,10 +153,11 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
 
 bool arena_map::static_cache_create(void) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_static_cache_params.size >= base_cache::kMinBlocks,
+  ER_ASSERT(mc_static_cache_params.size >=
+                representation::base_cache::kMinBlocks,
             "Static cache size %u < minimum %u",
             mc_static_cache_params.size,
-            base_cache::kMinBlocks);
+            representation::base_cache::kMinBlocks);
 
   argos::CVector2 center((m_grid.xrsize() + m_nest.real_loc().GetX()) / 2.0,
                          m_nest.real_loc().GetY());
@@ -207,7 +207,8 @@ bool arena_map::static_cache_create(void) {
   return true;
 } /* static_cache_create() */
 
-bool arena_map::distribute_single_block(std::shared_ptr<base_block>& block) {
+bool arena_map::distribute_single_block(
+    std::shared_ptr<representation::base_block>& block) {
   support::block_dist::dispatcher::entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
@@ -250,14 +251,16 @@ void arena_map::distribute_all_blocks(void) {
   }   /* for(i..) */
 } /* distribute_all_blocks() */
 
-void arena_map::cache_remove(const std::shared_ptr<arena_cache>& victim) {
+void arena_map::cache_remove(
+    const std::shared_ptr<representation::arena_cache>& victim) {
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
   ER_ASSERT(caches().size() == before - 1, "cache%d not removed", id);
 } /* cache_remove() */
 
-void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
+void arena_map::cache_extent_clear(
+    const std::shared_ptr<representation::arena_cache>& victim) {
   auto xspan = victim->xspan(victim->real_loc());
   auto yspan = victim->yspan(victim->real_loc());
 
@@ -296,4 +299,4 @@ void arena_map::cache_extent_clear(const std::shared_ptr<arena_cache>& victim) {
   }   /* for(i..) */
 } /* cache_extent_clear() */
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);

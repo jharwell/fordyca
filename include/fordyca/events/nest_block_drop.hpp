@@ -100,7 +100,7 @@ class nest_block_drop
   nest_block_drop& operator=(const nest_block_drop& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::arena_map& map) override;
+  void visit(ds::arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(
@@ -131,7 +131,7 @@ class nest_block_drop
   // clang-format off
   uint                                        m_timestep;
   std::shared_ptr<representation::base_block> m_block;
-  //clang-format on
+  // clang-format on
 };
 
 NS_END(events, fordyca);

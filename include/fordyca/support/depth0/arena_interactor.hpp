@@ -30,7 +30,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
@@ -65,7 +65,7 @@ namespace er = rcppsw::er;
 template <typename T>
 class arena_interactor : public er::client<arena_interactor<T>> {
  public:
-  arena_interactor(representation::arena_map* const map,
+  arena_interactor(ds::arena_map* const map,
                    stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor,
                    const ct::waveform_params* const block_penalty)
@@ -244,8 +244,8 @@ class arena_interactor : public er::client<arena_interactor<T>> {
     m_floor->SetChanged();
   }
 
-  representation::arena_map* map(void) { return m_map; }
-  const representation::arena_map* map(void) const { return m_map; }
+  ds::arena_map* map(void) { return m_map; }
+  const ds::arena_map* map(void) const { return m_map; }
   const argos::CFloorEntity* floor(void) const { return m_floor; }
   argos::CFloorEntity* floor(void) { return m_floor; }
   block_op_penalty_handler<T>& free_pickup_penalty_handler(void) { return m_free_pickup_handler; }
@@ -255,7 +255,7 @@ class arena_interactor : public er::client<arena_interactor<T>> {
   // clang-format off
   argos::CFloorEntity*             const m_floor;
   stateless_metrics_aggregator*    const m_metrics_agg;
-  representation::arena_map* const       m_map;
+  ds::arena_map* const                   m_map;
   block_op_penalty_handler<T>            m_free_pickup_handler;
   block_op_penalty_handler<T>            m_nest_drop_handler;
   // clang-format on

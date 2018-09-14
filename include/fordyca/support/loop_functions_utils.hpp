@@ -30,7 +30,7 @@
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
-#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -53,10 +53,9 @@ NS_START(support, utils);
  *
  * @return The block index, or -1 if the robot is not on top of a block.
  */
-int robot_on_block(argos::CFootBotEntity& robot,
-                   const representation::arena_map& map);
+int robot_on_block(argos::CFootBotEntity& robot, const ds::arena_map& map);
 int robot_on_block(const controller::base_foraging_controller& controller,
-                   const representation::arena_map& map);
+                   const ds::arena_map& map);
 
 /**
  * @brief Check if a robot is on top of a cache. If, so return the cache index.
@@ -65,10 +64,9 @@ int robot_on_block(const controller::base_foraging_controller& controller,
  *
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */
-int robot_on_cache(argos::CFootBotEntity& robot,
-                   const representation::arena_map& map);
+int robot_on_cache(argos::CFootBotEntity& robot, const ds::arena_map& map);
 int robot_on_cache(const controller::base_foraging_controller& controller,
-                   const representation::arena_map& map);
+                   const ds::arena_map& map);
 /**
  * @brief Get the ID of the robot as an integer.
  */
@@ -81,7 +79,7 @@ bool block_drop_overlap_with_cache(
     const argos::CVector2& drop_loc);
 
 bool block_drop_near_arena_boundary(
-    const representation::arena_map& map,
+    const ds::arena_map& map,
     const std::shared_ptr<representation::base_block>& block,
     const argos::CVector2& drop_loc);
 bool block_drop_overlap_with_nest(
@@ -123,8 +121,7 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
  * the robot, probably using on-board cameras.
  */
 template <typename T>
-void set_robot_los(argos::CFootBotEntity& robot,
-                   representation::arena_map& map) {
+void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
   argos::CVector2 pos;
   pos.Set(const_cast<argos::CFootBotEntity&>(robot)
               .GetEmbodiedEntity()

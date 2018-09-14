@@ -25,8 +25,8 @@
 
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : base_acquire_cache_fsm(csel_matrix, saa, map),
       ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache") {}
 

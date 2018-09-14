@@ -28,12 +28,12 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/params/depth1/exec_estimates_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/params/depth1/exec_estimates_params.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
@@ -46,7 +46,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth1);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor

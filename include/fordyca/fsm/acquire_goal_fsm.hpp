@@ -39,7 +39,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace ds {
 class perceived_arena_map;
 }
 
@@ -66,7 +66,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
                          public rcppsw::task_allocation::taskable {
  public:
   acquire_goal_fsm(controller::saa_subsystem* saa,
-                   const representation::perceived_arena_map* map,
+                   const ds::perceived_arena_map* map,
                    std::function<bool(void)> goal_detect);
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
@@ -109,7 +109,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
     ST_MAX_STATES
   };
 
-  const representation::perceived_arena_map* map(void) const { return mc_map; }
+  const ds::perceived_arena_map* map(void) const { return mc_map; }
   void goal_acquired_cb(std::function<bool(bool)> goal_acquired_cb) {
     m_goal_acquired_cb = goal_acquired_cb;
   }
@@ -157,10 +157,10 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  const representation::perceived_arena_map* mc_map;
-  class vector_fsm                           m_vector_fsm;
-  explore_for_goal_fsm                       m_explore_fsm;
-  std::function<bool (bool)>                 m_goal_acquired_cb;
+  const ds::perceived_arena_map* mc_map;
+  class vector_fsm               m_vector_fsm;
+  explore_for_goal_fsm           m_explore_fsm;
+  std::function<bool(bool)>      m_goal_acquired_cb;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

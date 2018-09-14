@@ -1,6 +1,6 @@
 /**
  * @file arena_grid.hpp
- * @ingroup representation
+ * @ingroup ds
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -19,35 +19,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_
+#ifndef INCLUDE_FORDYCA_DS_ARENA_GRID_HPP_
+#define INCLUDE_FORDYCA_DS_ARENA_GRID_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <tuple>
 
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class arena_grid
- * @ingroup representation
+ * @ingroup ds
  *
- * @brief Representation of the cells within a grid layout
+ * @brief Ds of the cells within a grid layout
  */
 using arena_layer_stack = std::tuple<cell2D, bool>;
 class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
  public:
-  using view = rcppsw::ds::grid_view<representation::cell2D>;
+  using view = rcppsw::ds::grid_view<ds::cell2D>;
 
   constexpr static uint kCell = 0;
   constexpr static uint kRobotOccupancy = 1;
@@ -75,6 +75,6 @@ class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
   }     /* reset */
 };
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_ARENA_GRID_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_ARENA_GRID_HPP_ */

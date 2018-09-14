@@ -24,8 +24,8 @@
 #include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ namespace depth1 = controller::depth1;
 base_acquire_cache_fsm::base_acquire_cache_fsm(
     const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
                        std::bind(&base_acquire_cache_fsm::cache_detected_cb,

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_DS_PERCEIVED_ARENA_MAP_HPP_
+#define INCLUDE_FORDYCA_DS_PERCEIVED_ARENA_MAP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,7 +27,7 @@
 #include <list>
 #include <string>
 
-#include "fordyca/representation/occupancy_grid.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 
@@ -39,17 +39,16 @@ namespace params {
 struct occupancy_grid_params;
 }
 
-NS_START(representation);
-class line_of_sight;
+NS_START(ds);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class perceived_arena_map
- * @ingroup representation
+p * @class perceived_arena_map
+ * @ingroup ds
  *
- * @brief The perceived arena map (PAM) stores a logical representation of the
+ * @brief The perceived arena map (PAM) stores a logical ds of the
  * state of the arena, from the perspective of the robot.
  *
  * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
@@ -62,10 +61,10 @@ class perceived_arena_map
     : public rcppsw::er::client<perceived_arena_map>,
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
-  using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using block_list = std::list<std::shared_ptr<base_block>>;
-  using perceived_cache_list = std::list<perceived_cache>;
-  using perceived_block_list = std::list<perceived_block>;
+  using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
+  using block_list = std::list<std::shared_ptr<representation::base_block>>;
+  using perceived_cache_list = std::list<representation::perceived_cache>;
+  using perceived_block_list = std::list<representation::perceived_block>;
 
   perceived_arena_map(
       const struct fordyca::params::occupancy_grid_params* c_params,
@@ -109,13 +108,13 @@ class perceived_arena_map
    *
    * @param cache Cache to add.
    */
-  void cache_add(const std::shared_ptr<base_cache>& cache);
+  void cache_add(const std::shared_ptr<representation::base_cache>& cache);
 
   /**
    * @brief Remove a cache from the list of perceived caches, and update its
    * cell to be empty.
    */
-  void cache_remove(const std::shared_ptr<base_cache>& victim);
+  void cache_remove(const std::shared_ptr<representation::base_cache>& victim);
 
   /*
    * @brief Add a free block to the list of known blocks.
@@ -124,13 +123,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(const std::shared_ptr<base_block>& block);
+  bool block_add(const std::shared_ptr<representation::base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const std::shared_ptr<base_block>& victim);
+  bool block_remove(const std::shared_ptr<representation::base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -199,6 +198,6 @@ class perceived_arena_map
   // clang-format on
 };
 
-NS_END(representation, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_PERCEIVED_ARENA_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_PERCEIVED_ARENA_MAP_HPP_ */

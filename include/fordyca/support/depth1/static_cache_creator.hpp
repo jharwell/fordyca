@@ -45,7 +45,7 @@ NS_START(fordyca, support, depth1);
 class static_cache_creator : public cache_creator,
                              public er::client<static_cache_creator> {
  public:
-  static_cache_creator(representation::arena_grid& grid,
+  static_cache_creator(ds::arena_grid& grid,
                        const argos::CVector2& center,
                        double cache_size, double resolution);
 

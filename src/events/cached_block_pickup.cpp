@@ -25,15 +25,15 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
@@ -42,9 +42,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::arena_grid;
+using ds::arena_grid;
+using ds::occupancy_grid;
 using representation::base_cache;
-using representation::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -72,7 +72,7 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_pickup();
 } /* visit() */
 
-void cached_block_pickup::visit(representation::cell2D& cell) {
+void cached_block_pickup::visit(ds::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "Cell does not have coordinates");
   ER_ASSERT(cell.state_has_cache(), "cell does not have cache");
@@ -91,7 +91,7 @@ void cached_block_pickup::visit(representation::arena_cache& cache) {
   cache.has_block_pickup();
 } /* visit() */
 
-void cached_block_pickup::visit(representation::arena_map& map) {
+void cached_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %d blocks in cache",
             base_cache::kMinBlocks);
@@ -108,8 +108,7 @@ void cached_block_pickup::visit(representation::arena_map& map) {
             cell_op::y(),
             cell_op::y());
 
-  representation::cell2D& cell =
-      map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
             "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
             m_real_cache->n_blocks(),
@@ -161,8 +160,8 @@ void cached_block_pickup::visit(representation::arena_map& map) {
   m_pickup_block->accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(representation::perceived_arena_map& map) {
-  representation::cell2D& cell =
+void cached_block_pickup::visit(ds::perceived_arena_map& map) {
+  ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),

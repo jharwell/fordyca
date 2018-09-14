@@ -43,7 +43,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Member Functions

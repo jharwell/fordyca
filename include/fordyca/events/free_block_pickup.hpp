@@ -107,8 +107,8 @@ class free_block_pickup
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::arena_map& map) override;
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::base_block& block) override;
   void visit(
@@ -116,7 +116,7 @@ class free_block_pickup
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
   void visit(
       controller::depth0::stateful_foraging_controller& controller) override;

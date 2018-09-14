@@ -37,7 +37,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 stateful_foraging_fsm::stateful_foraging_fsm(
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
+    ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.stateful"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),

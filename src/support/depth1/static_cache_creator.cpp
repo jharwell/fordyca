@@ -35,7 +35,7 @@ using representation::base_cache;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-static_cache_creator::static_cache_creator(representation::arena_grid& grid,
+static_cache_creator::static_cache_creator(ds::arena_grid& grid,
                                            const argos::CVector2& center,
                                            double cache_size,
                                            double resolution)

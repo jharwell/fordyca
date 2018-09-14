@@ -34,8 +34,11 @@ NS_START(fordyca);
 namespace controller { namespace depth0 { class stateless_foraging_controller; }}
 namespace representation {
 class base_block;
-class arena_map;
 } /* namespace representation */
+
+namespace ds {
+class arena_map;
+} /* namespace ds */
 
 NS_START(support, depth0);
 namespace er = rcppsw::er;
@@ -80,7 +83,7 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
   /**
    * @brief Collect metrics from the arena each timestep.
    */
-  void collect_from_arena(const representation::arena_map* arena);
+  void collect_from_arena(const ds::arena_map* arena);
 };
 
 NS_END(depth0, support, fordyca);

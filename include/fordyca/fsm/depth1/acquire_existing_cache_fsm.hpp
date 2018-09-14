@@ -48,7 +48,7 @@ class acquire_existing_cache_fsm : public base_acquire_cache_fsm,
  public:
   acquire_existing_cache_fsm(const controller::cache_selection_matrix* sel_matrix,
                              controller::saa_subsystem* saa,
-                             representation::perceived_arena_map* map);
+                             ds::perceived_arena_map* map);
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) = delete;

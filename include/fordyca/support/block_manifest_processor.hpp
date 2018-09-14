@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,17 +31,18 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
-class base_block;
+NS_START(fordyca);
+namespace representation { class base_block; }
+NS_START(support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class block_manifest_processor
     : private rcppsw::patterns::factory::
-          sharing_factory<base_block, const rcppsw::math::vector2d&, int> {
+          sharing_factory<representation::base_block, const rcppsw::math::vector2d&, int> {
  public:
-  using block_vector = std::vector<std::shared_ptr<base_block>>;
+  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   explicit block_manifest_processor(const params::arena::block_manifest* const m);
 
   block_vector create_blocks(void);
@@ -52,6 +53,6 @@ class block_manifest_processor
   // clang-format on
 };
 
-NS_END(representation, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_BLOCK_MANIFEST_PROCESSOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_ */

@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Global Variables
@@ -44,7 +44,7 @@ constexpr char dispatcher::kDIST_POWERLAW[];
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dispatcher::dispatcher(representation::arena_grid& grid,
+dispatcher::dispatcher(ds::arena_grid& grid,
                        const struct params::arena::block_dist_params* const params)
     : mc_params(*params),
       m_dist_type(params->dist_type),
@@ -56,18 +56,14 @@ dispatcher::~dispatcher(void) = default;
  * Member Functions
  ******************************************************************************/
 bool dispatcher::initialize(void) {
-  representation::arena_grid::view arena =
-      m_grid.layer<arena_grid::kCell>()->subgrid(
-          2, 3, m_grid.xdsize() - 2, m_grid.ydsize() - 2);
+  ds::arena_grid::view arena = m_grid.layer<arena_grid::kCell>()->subgrid(
+      2, 3, m_grid.xdsize() - 2, m_grid.ydsize() - 2);
   if (kDIST_RANDOM == m_dist_type) {
     m_dist = rcppsw::make_unique<random_distributor>(arena,
                                                      mc_params.arena_resolution);
   } else if (kDIST_SINGLE_SRC == m_dist_type) {
-    representation::arena_grid::view area =
-        m_grid.layer<arena_grid::kCell>()->subgrid(m_grid.xdsize() * 0.80,
-                                                   2,
-                                                   m_grid.xdsize() * 0.90,
-                                                   m_grid.ydsize() - 2);
+    ds::arena_grid::view area = m_grid.layer<arena_grid::kCell>()->subgrid(
+        m_grid.xdsize() * 0.80, 2, m_grid.xdsize() * 0.90, m_grid.ydsize() - 2);
     m_dist = rcppsw::make_unique<cluster_distributor>(
         area, mc_params.arena_resolution, std::numeric_limits<uint>::max());
   } else if (kDIST_POWERLAW == m_dist_type) {
