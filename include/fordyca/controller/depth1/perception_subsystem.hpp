@@ -46,7 +46,9 @@ class perception_subsystem : public base_perception_subsystem,
   perception_subsystem(const params::perception_params* const params,
                        const std::string& id);
 
-  void process_los(const representation::line_of_sight* const los) override;
+
+  void process_los(const representation::line_of_sight* const c_los) override;
+  void processed_los_verify(const representation::line_of_sight* const c_los) const override;
 };
 
 NS_END(depth1, controller, fordyca);

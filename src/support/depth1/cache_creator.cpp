@@ -99,9 +99,9 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
 void cache_creator::update_host_cells(cache_vector& caches) {
   /*
    * To reset all cells covered by a cache's extent, we simply send them a
-   * CACHE_EXTENT event. EXCEPT for the cell that hosted the actual cache, because
-   * it is currently in the HAS_CACHE state as part of the cache creation
-   * process and setting it here will trigger an assert later.
+   * CACHE_EXTENT event. EXCEPT for the cell that hosted the actual cache,
+   * because it is currently in the HAS_CACHE state as part of the cache
+   * creation process and setting it here will trigger an assert later.
    */
   for (auto& cache : caches) {
     m_grid.access<arena_grid::kCell>(cache->discrete_loc()).entity(cache);
@@ -112,6 +112,7 @@ void cache_creator::update_host_cells(cache_vector& caches) {
     size_t xmax = std::ceil(xspan.get_max() / m_grid.resolution());
     size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
     size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
+
     for (size_t i = xmin; i < xmax; ++i) {
       for (size_t j = ymin; j < ymax; ++j) {
         rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);

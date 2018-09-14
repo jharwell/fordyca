@@ -25,6 +25,9 @@
   <category name="fordyca.fsm.depth0" >
     <priority value ="all" />
   </category>
+    <category name="fordyca.loop.support.block_dist" >
+    <priority value ="info" />
+  </category>
   <!-- <category name="foobar.test.child" > -->
   <!-- </category> -->
 

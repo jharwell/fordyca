@@ -42,11 +42,11 @@ occupancy_grid::occupancy_grid(
                    static_cast<size_t>(c_params->grid.upper.GetY())),
       m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
-  ER_INFO("%zu x%zu/%zu x %zu @ %f resolution",
-          xdsize(),
-          ydsize(),
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
+          xdsize(),
+          ydsize(),
           resolution());
 
   for (size_t i = 0; i < xdsize(); ++i) {

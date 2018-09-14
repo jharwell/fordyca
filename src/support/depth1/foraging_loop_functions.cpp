@@ -162,6 +162,7 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void foraging_loop_functions::PreStep() {
+  ndc_push();
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());
@@ -177,6 +178,7 @@ void foraging_loop_functions::PreStep() {
   } /* for(&entity..) */
   m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
+  ndc_pop();
 } /* PreStep() */
 
 void foraging_loop_functions::Reset() {

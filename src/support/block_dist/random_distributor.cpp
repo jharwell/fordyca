@@ -121,7 +121,7 @@ __rcsw_pure bool random_distributor::verify_block_dist(
            "Block%d real coordinates still out of sight after distribution",
            block.id());
 
-  ER_INFO("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
+  ER_DEBUG("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
           block.id(),
           block.real_loc().GetX(),
           block.real_loc().GetY(),

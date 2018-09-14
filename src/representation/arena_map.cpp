@@ -51,11 +51,11 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
              static_cast<size_t>(params->grid.upper.GetY())),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(m_grid, &params->blocks.dist) {
-  ER_INFO("%zu x %zu/%zu x %zu @ %f resolution",
-          m_grid.xdsize(),
-          m_grid.ydsize(),
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           m_grid.xrsize(),
           m_grid.yrsize(),
+          m_grid.xdsize(),
+          m_grid.ydsize(),
           m_grid.resolution());
 }
 

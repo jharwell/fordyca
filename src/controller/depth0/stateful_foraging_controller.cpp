@@ -1,7 +1,7 @@
 /**
- * @file foraging_controller.cpp
+ * @file stateful_foraging_controller.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

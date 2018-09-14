@@ -83,6 +83,7 @@ void perception_subsystem::process_los(
       c_los->abs_ul().second,
       c_los->abs_ur().first,
       c_los->abs_ur().second);
+
   for (auto cache : c_los->caches()) {
     /*
      * The state of a cache can change between when the robot saw it last
@@ -129,37 +130,45 @@ void perception_subsystem::process_los(
     events::cache_found op(cache->clone());
     map()->accept(op);
   } /* for(cache..) */
+} /* process_los() */
 
+void perception_subsystem::processed_los_verify(
+    const representation::line_of_sight* const c_los) const {
+  base_perception_subsystem::processed_los_verify(c_los);
+
+  /*
+   * Verify processing (cache part, other parts done by parent class). We do not
+   * check the CACHE_EXTENT state because the PAM does not need that information.
+   */
   for (size_t i = 0; i < c_los->xsize(); ++i) {
     for (size_t j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
       auto& cell2 = map()->access<occupancy_grid::kCell>(d);
-      ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
-                "LOS/PAM disagree on state of cell at (%zu, %zu): %d/%d",
-                i,
-                j,
-                cell1.fsm().current_state(),
-                cell2.fsm().current_state());
       if (cell1.state_has_cache()) {
-        ER_ASSERT(
-            cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
-            "LOS/PAM disagogree on # of blocks in cell at (%zu, %zu): %d/%d",
-            i,
-            j,
+        ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
+                  "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
+                  d.first,
+                  d.second,
+                  cell1.fsm().current_state(),
+                  cell2.fsm().current_state());
+        ER_ASSERT(cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
+                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
+                  d.first,
+                  d.second,
             cell1.cache()->n_blocks(),
             cell2.cache()->n_blocks());
       }
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto c1 : c_los->caches()) {
-    for (auto c2 : map()->caches()) {
+  for (auto& c1 : c_los->caches()) {
+    for (auto& c2 : map()->caches()) {
       if (*c1 == *c2) {
         auto& cell = map()->access<occupancy_grid::kCell>(c2->discrete_loc());
         ER_ASSERT(
             c1->n_blocks() == cell.cache()->n_blocks(),
-            "LOS/PAM disagogree on # of blocks in cell at (%u, %u): %d/%d",
+            "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
             cell.loc().first,
             cell.loc().second,
             c1->n_blocks(),
@@ -167,6 +176,6 @@ void perception_subsystem::process_los(
       }
     } /* for(c2..) */
   }
-} /* process_los() */
+} /* processed_los_verify() */
 
 NS_END(depth1, controller, fordyca);
