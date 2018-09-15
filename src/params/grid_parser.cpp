@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/grid_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -40,21 +38,20 @@ constexpr char grid_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element gnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element gnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res;
   rcppsw::utils::line_parser parser(' ');
   res = parser.parse(gnode.GetAttribute("size"));
 
-  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_PARAM(gnode, m_params, resolution);
   m_params->lower.Set(0, 0);
   m_params->upper.Set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
 } /* parse() */
 
 void grid_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_PARAM_STR(m_params, resolution) << std::endl
+  stream << build_header() << XML_PARAM_STR(m_params, resolution) << std::endl
          << "lower=" << m_params->lower << std::endl
          << "upper=" << m_params->upper << std::endl
          << build_footer();

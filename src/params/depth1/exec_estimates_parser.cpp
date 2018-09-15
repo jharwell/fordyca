@@ -21,8 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -40,35 +38,29 @@ constexpr char exec_estimates_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void exec_estimates_parser::parse(const ticpp::Element& node) {
+  depth0::exec_estimates_parser::parse(node);
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element enode =
-        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(enode, m_params, enabled);
+    *std::static_pointer_cast<depth0::exec_estimates_params>(m_params) =
+        *depth0::exec_estimates_parser::parse_results();
     if (m_params->enabled) {
-      XML_PARSE_PARAM(enode, m_params, generalist_range);
-
       XML_PARSE_PARAM(enode, m_params, harvester_range);
       XML_PARSE_PARAM(enode, m_params, collector_range);
     }
-    m_parsed = true;
+    parsed(true);
   }
 } /* parse() */
 
 void exec_estimates_parser::show(std::ostream& stream) const {
-    if (!m_parsed) {
-    stream << build_header()
-           << "<< Not Parsed >>"
-           << std::endl
+  if (!parsed()) {
+    stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
     return;
   }
-
-  stream << build_header()
-         << XML_PARAM_STR(m_params, enabled) << std::endl
-         << XML_PARAM_STR(m_params, generalist_range) << std::endl
-         << XML_PARAM_STR(m_params, harvester_range) << std::endl
+  depth0::exec_estimates_parser::show(stream);
+  stream << XML_PARAM_STR(m_params, harvester_range) << std::endl
          << XML_PARAM_STR(m_params, collector_range) << std::endl
          << build_footer();
 } /* show() */

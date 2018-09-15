@@ -46,8 +46,7 @@ NS_START(fordyca, params);
  */
 class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
  public:
-  proximity_sensor_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level) {}
+  explicit proximity_sensor_parser(uint level) : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all robot proximity_sensor parameters should lie under in
@@ -66,7 +65,8 @@ class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

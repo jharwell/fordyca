@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/controller/explore_behavior.hpp"
 
 /*******************************************************************************
@@ -41,16 +42,30 @@ NS_START(fordyca, controller);
  *
  * @brief Perform random walk exploration: wander force + avoidance force.
  */
-class random_explore_behavior : public explore_behavior {
+class random_explore_behavior : public explore_behavior,
+                                er::client<random_explore_behavior> {
  public:
-  random_explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
-                          const std::shared_ptr<controller::saa_subsystem>& saa);
+  explicit random_explore_behavior(controller::saa_subsystem* saa);
 
   ~random_explore_behavior(void) override = default;
   random_explore_behavior(const random_explore_behavior& fsm) = delete;
   random_explore_behavior& operator=(const random_explore_behavior& fsm) = delete;
 
   void execute(void) override;
+
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
+
+ private:
+  // clang-format off
+  bool m_entered_avoidance{false};
+  bool m_exited_avoidance{false};
+  bool m_in_avoidance{false};
+  uint m_avoidance_start{0};
+  // clang-format on
 };
 
 NS_END(controller, fordyca);

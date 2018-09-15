@@ -32,11 +32,9 @@ NS_START(fordyca, metrics, caches);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-lifecycle_metrics_collector::lifecycle_metrics_collector(
-    const std::string& ofname,
-    uint interval)
-    : base_metrics_collector(ofname, interval),
-      m_stats() {}
+lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofname,
+                                                         uint interval)
+    : base_metrics_collector(ofname, interval), m_stats() {}
 
 /*******************************************************************************
  * Member Functions
@@ -45,8 +43,8 @@ std::string lifecycle_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_created" + separator() +
-      "avg_depleted" + separator();
+      "int_created" + separator() +
+      "int_depleted" + separator();
   // clang-format on
 } /* csv_header_build() */
 

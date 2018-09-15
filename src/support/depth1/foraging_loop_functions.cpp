@@ -16,32 +16,30 @@
  *
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
-n */
+ */
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/foraging_loop_functions.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <random>
 
 #include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/cell2D.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/metrics/tasks/execution_metrics_collector.hpp"
 #include "fordyca/support/depth1/metrics_aggregator.hpp"
-
-#include "rcppsw/er/server.hpp"
+#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Member Functions
@@ -49,31 +47,29 @@ NS_START(fordyca, support, depth1);
 void foraging_loop_functions::Init(ticpp::Element& node) {
   depth0::stateful_foraging_loop_functions::Init(node);
 
-  ER_NOM("Initializing depth1 foraging loop functions");
-  params::loop_function_repository repo(server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::loop_function_repository repo;
   repo.parse_all(node);
-  rcppsw::er::g_server->log_stream() << repo;
 
-  auto* arenap = repo.parse_results<params::arena_map_params>();
+  /* initialize stat collecting */
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output =
+      *repo.parse_results<const struct params::output_params>();
+  output.metrics.arena_grid = arenap->grid;
+  m_metrics_agg =
+      rcppsw::make_unique<metrics_aggregator>(&output.metrics, output_root());
+
   /* initialize cache handling and create initial cache */
   cache_handling_init(arenap);
 
-  /* initialize stat collecting */
-  auto* p_output = repo.parse_results<params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
-  m_metrics_agg->reset_all();
-
-  auto* penalty = static_cast<const struct params::penalty_params*>(
-      repo.get_params("penalty"));
-
   /* intitialize robot interactions with environment */
-  m_interactor = rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                                 arena_map(),
-                                                 m_metrics_agg.get(),
-                                                 floor(),
-                                                 arenap->static_cache.usage_penalty);
+  m_interactor =
+      rcppsw::make_unique<interactor>(arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty,
+                                      &arenap->static_cache.usage_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -81,10 +77,30 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
         robot.GetControllableEntity().GetController());
-    controller.display_task(
-        repo.parse_results<params::visualization_params>()->robot_task);
+
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_task(vparams->robot_task);
+    }
+    controller.executive()->task_finish_notify(
+        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1));
+    controller.executive()->task_abort_notify(
+        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1));
+    controller.executive()->task_alloc_notify(
+        std::bind(&metrics_aggregator::task_alloc_cb,
+                  m_metrics_agg.get(),
+                  std::placeholders::_1,
+                  std::placeholders::_2));
   } /* for(&entity..) */
-  ER_NOM("depth1_foraging loop functions initialization finished");
+  ndc_pop();
+  ER_INFO("Initialization finished");
 }
 
 void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
@@ -93,11 +109,18 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* send the robot its view of the world: what it sees and where it is */
   utils::set_robot_pos<decltype(controller)>(robot);
-  set_robot_los<decltype(controller)>(robot, *arena_map());
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
+
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      arena_map()->grid_resolution());
+  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
@@ -123,10 +146,15 @@ argos::CColor foraging_loop_functions::GetFloorColor(
   } /* for(&cache..) */
 
   for (auto& block : arena_map()->blocks()) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
     if (block->contains_point(plane_pos)) {
-      return argos::CColor(block->color().red(),
-                           block->color().green(),
-                           block->color().blue());
+      return argos::CColor::BLACK;
     }
   } /* for(&block..) */
 
@@ -147,6 +175,7 @@ void foraging_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
 } /* PreStep() */
 
@@ -165,39 +194,43 @@ void foraging_loop_functions::pre_step_final(void) {
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
   if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
-    auto& collector = static_cast<metrics::tasks::execution_metrics_collector&>(
-        *(*m_metrics_agg)["tasks::execution"]);
-    int n_harvesters = collector.n_harvesters();
-    int n_collectors = collector.n_collectors();
+    auto& collector =
+        static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
+            *(*m_metrics_agg)["tasks::generalist_tab"]);
+    int n_harvesters = collector.stats().int_subtask1_count;
+    int n_collectors = collector.stats().int_subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
-        static_cast<double>(random()) / RAND_MAX) {
-      arena_map()->static_cache_create();
-      representation::cell2D& cell =
-          arena_map()->access(arena_map()->caches()[0]->discrete_loc());
-      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                "FATAL: Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
-                arena_map()->caches()[0]->n_blocks(),
-                cell.block_count());
-      m_cache_collator.cache_created();
-      floor()->SetChanged();
+        static_cast<double>(std::rand()) / RAND_MAX) {
+      if (arena_map()->static_cache_create()) {
+        __rcsw_unused representation::cell2D& cell =
+            arena_map()->access<arena_grid::kCell>(
+                arena_map()->caches()[0]->discrete_loc());
+        ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
+                  "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+                  arena_map()->caches()[0]->n_blocks(),
+                  cell.block_count());
+        m_cache_collator.cache_created();
+        floor()->SetChanged();
+      } else {
+        ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
+      }
     }
   }
   if (arena_map()->caches_removed() > 0) {
     m_cache_collator.cache_depleted();
     floor()->SetChanged();
-    arena_map()->caches_removed(0);
+    arena_map()->caches_removed_reset();
   }
 
-  stateful_foraging_loop_functions::pre_step_final();
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 void foraging_loop_functions::cache_handling_init(
-    const struct params::arena_map_params* arenap) {
+    const struct params::arena::arena_map_params* arenap) {
   /*
    * Regardless of how many foragers/etc there are, always create an
    * initial cache.

@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/dcoord.hpp"
 #include "fordyca/math/utils.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,8 +50,7 @@ class movable_cell_entity {
    */
   movable_cell_entity(const argos::CVector2& initial_loc, double resolution)
       : m_real_loc(initial_loc),
-        m_discrete_loc(math::rcoord_to_dcoord(initial_loc,
-                                              resolution)) {}
+        m_discrete_loc(math::rcoord_to_dcoord(initial_loc, resolution)) {}
 
   /**
    * @brief Initialize a movable entity with an initial location in the arena.
@@ -74,9 +73,7 @@ class movable_cell_entity {
     return m_discrete_loc;
   }
   void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  void discrete_loc(const rcppsw::math::dcoord2& loc) {
-    m_discrete_loc = loc;
-  }
+  void discrete_loc(const rcppsw::math::dcoord2& loc) { m_discrete_loc = loc; }
 
  private:
   // clang-format off

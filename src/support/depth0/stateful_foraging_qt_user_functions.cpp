@@ -22,15 +22,17 @@
  * Includes
  ******************************************************************************/
 /*
- * @todo Figure out how to work remove this warning properly.
+ * @todo Figure out how to remove this warning properly.
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
-#pragma  GCC diagnostic pop
+#pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
@@ -59,7 +61,7 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) 
 
   if (controller.display_los()) {
     const representation::line_of_sight* los = controller.los();
-    const double resolution = 0.2;
+    const double resolution = controller.perception()->map()->grid_resolution();
     std::vector<argos::CVector2> points;
     points.emplace_back(-resolution * los->xsize() / 2,
                         -resolution * los->ysize() / 2);

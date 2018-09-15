@@ -49,10 +49,8 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class steering_force2D_parser : public steering::force_calculator_xml_parser {
  public:
-  steering_force2D_parser(const std::shared_ptr<rcppsw::er::server>& server,
-                          uint level)
-      : force_calculator_xml_parser(server, level),
-        m_phototaxis(server, level + 1) {}
+  explicit steering_force2D_parser(uint level)
+      : force_calculator_xml_parser(level), m_phototaxis(level + 1) {}
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
@@ -65,7 +63,8 @@ class steering_force2D_parser : public steering::force_calculator_xml_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

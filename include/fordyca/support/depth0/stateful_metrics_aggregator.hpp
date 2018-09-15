@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -48,11 +48,11 @@ NS_START(support, depth0);
  * - FSM distance/block acquisition metrics
  */
 
-class stateful_metrics_aggregator : public stateless_metrics_aggregator {
+class stateful_metrics_aggregator : public stateless_metrics_aggregator,
+                                    public er::client<stateful_metrics_aggregator> {
  public:
-  stateful_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                               const struct params::metrics_params* params,
-                               const std::string& output_root);
+  stateful_metrics_aggregator(const struct params::metrics_params* params,
+                              const std::string& output_root);
 
   /**
    * @brief Collect metrics from the stateful controller.
@@ -63,4 +63,4 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator {
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_METRICS_STATEFUL_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_METRICS_AGGREGATOR_HPP_ */

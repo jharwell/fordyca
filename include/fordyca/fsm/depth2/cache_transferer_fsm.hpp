@@ -28,18 +28,19 @@
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
 namespace representation { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm, depth2);
+using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,15 +55,16 @@ NS_START(fsm, depth2);
  * one found via random exploration) and drop it.
  */
 class cache_transferer_fsm : public base_foraging_fsm,
+                             public er::client<cache_transferer_fsm>,
+                             public fsm::block_transporter,
                              public metrics::fsm::goal_acquisition_metrics,
                              public task_allocation::taskable,
                              public visitor::visitable_any<depth2::cache_transferer_fsm> {
  public:
   cache_transferer_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      const std::shared_ptr<representation::perceived_arena_map>& map);
+      const controller::cache_selection_matrix* sel_matrix,
+      controller::saa_subsystem* saa,
+      representation::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }
@@ -71,14 +73,20 @@ class cache_transferer_fsm : public base_foraging_fsm,
   bool task_finished(void) const override { return ST_FINISHED == current_state(); }
   bool task_running(void) const override { return m_task_running; }
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  /* collision metrics */
+  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
   FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
+
+  /* block transportation */
+  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Reset the FSM.

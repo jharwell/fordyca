@@ -22,15 +22,16 @@
  * Includes
  ******************************************************************************/
 /*
- * @todo Figure out how to work remove this warning properly.
+ * @todo Figure out how to remove this warning properly.
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth0/stateless_foraging_qt_user_functions.hpp"
-#pragma  GCC diagnostic pop
+#pragma GCC diagnostic pop
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/support/block_carry_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,18 +59,8 @@ void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
   }
 
   if (controller.is_carrying_block()) {
-    DrawBox(argos::CVector3(0.0, 0.0, 0.3),
-            argos::CQuaternion(),
-            argos::CVector3(controller.block()->xsize(),
-                            controller.block()->ysize(),
-                            controller.block()->xsize()), /* assuming a cube */
-            argos::CColor::BLACK);
-    if (controller.block()->display_id()) {
-      DrawText(argos::CVector3(0.0, 0.0, 0.5),
-               std::string(controller.GetId().size() + 3, ' ') + "[b" +
-                   std::to_string(controller.block()->id()) + "]",
-               argos::CColor::GREEN);
-    }
+    block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
+        .draw(controller.block().get(), controller.GetId().size());
   }
 }
 

@@ -52,14 +52,13 @@ class generalist : public ta::partitionable_polled_task,
                    public foraging_task {
  public:
   generalist(const struct ta::partitionable_task_params* params,
-             std::unique_ptr<ta::taskable>& mechanism);
+             std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */
   void accept(events::free_block_pickup& visitor) override;
+  void accept(events::free_block_drop&) override {}
   void accept(events::nest_block_drop& visitor) override;
-
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  void accept(events::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);
@@ -71,7 +70,11 @@ class generalist : public ta::partitionable_polled_task,
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
-  bool at_interface(void) const override { return false; }
+  bool task_at_interface(void) const override { return false; }
+  double task_last_exec_time(void) const override { return last_exec_time(); }
+  double task_last_interface_time(void) const override { return last_interface_time(); }
+  bool task_completed(void) const override { return task_finished(); }
+  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument* const) override {}
 

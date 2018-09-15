@@ -28,6 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
@@ -37,7 +38,6 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace params { struct fsm_params; }
 namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
@@ -57,20 +57,21 @@ using transport_goal_type = block_transporter::goal_type;
  * block back to the nest, and drops it.
  */
 class stateless_foraging_fsm : public base_foraging_fsm,
+                               public er::client<stateless_foraging_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
                                public visitor::visitable_any<stateless_foraging_fsm> {
  public:
-  stateless_foraging_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                         const std::shared_ptr<controller::saa_subsystem>& saa);
+  explicit stateless_foraging_fsm(controller::saa_subsystem* saa);
 
   stateless_foraging_fsm(const stateless_foraging_fsm& fsm) = delete;
   stateless_foraging_fsm& operator=(const stateless_foraging_fsm& fsm) = delete;
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override {
-    return base_foraging_fsm::is_avoiding_collision();
-  }
+  /* collision metrics */
+  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
@@ -101,9 +102,11 @@ class stateless_foraging_fsm : public base_foraging_fsm,
     ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
+    ST_WAIT_FOR_BLOCK_DROP,
+    ST_MAX_STATES
     ST_MAX_STATES,
-    ST_RETREATING,
-    ST_CHARGING
+    ST_RETREAT_TO_NEST,
+    ST_CHARGE_AT_NEST
   };
 
   /* inherited states */
@@ -121,10 +124,15 @@ class stateless_foraging_fsm : public base_foraging_fsm,
   HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, acquire_block);
   HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_pickup,
                      state_machine::event_data);
+  HFSM_STATE_DECLARE(stateless_foraging_fsm, wait_for_block_drop,
+                     state_machine::event_data);
 
   /* energy optimization states */
-  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, retreating);
-  HFSM_STATE_DECLARE_ND(stateless_foraging_fsm, charging);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, retreat_to_nest);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, charge_at_nest);
+
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, entry_retreat_to_nest);
+  HFSM_STATE_INHERIT_ND(base_foraging_fsm, entry_charge_at_nest);
 
   /**
    * @brief Defines the state map for the FSM.

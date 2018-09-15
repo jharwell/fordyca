@@ -25,18 +25,15 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <map>
+
+#include "fordyca/controller/block_selection_matrix.hpp"
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct fsm_params;
-}
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -52,12 +49,12 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_block_fsm : public acquire_goal_fsm {
+class acquire_block_fsm : public acquire_goal_fsm,
+                          public er::client<acquire_block_fsm> {
  public:
-  acquire_block_fsm(const struct params::fsm_params* params,
-                    const std::shared_ptr<rcppsw::er::server>& server,
-                    const std::shared_ptr<controller::saa_subsystem>& saa,
-                    std::shared_ptr<representation::perceived_arena_map> map);
+  acquire_block_fsm(const controller::block_selection_matrix* matrix,
+                    controller::saa_subsystem* saa,
+                    representation::perceived_arena_map* map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;
@@ -88,7 +85,7 @@ class acquire_block_fsm : public acquire_goal_fsm {
   bool block_acquired_cb(bool explore_result) const;
 
   // clang-format off
-  const argos::CVector2 mc_nest_center;
+  const controller::block_selection_matrix* const mc_matrix;
   // clang-format on
 };
 

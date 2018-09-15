@@ -29,6 +29,7 @@
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/tasks/nest_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,10 +47,11 @@ NS_START(fordyca, tasks, depth1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public existing_cache_interactor {
+                  public existing_cache_interactor,
+                  public nest_interactor {
  public:
   collector(const struct ta::task_params* params,
-            std::unique_ptr<ta::taskable>& mechanism);
+            std::unique_ptr<ta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -62,10 +64,6 @@ class collector : public foraging_task,
   void accept(events::nest_block_drop& visitor) override;
   void accept(events::cache_vanished& visitor) override;
   void accept(events::cache_block_drop&) override {}
-  void accept(events::free_block_pickup&) override {}
-
-  /* base FSM metrics */
-  TASK_WRAPPER_DECLARE(bool, is_avoiding_collision);
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);
@@ -77,7 +75,11 @@ class collector : public foraging_task,
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
-  bool at_interface(void) const override;
+  bool task_at_interface(void) const override;
+  double task_last_exec_time(void) const override { return last_exec_time(); }
+  double task_last_interface_time(void) const override { return last_interface_time(); }
+  bool task_completed(void) const override { return task_finished(); }
+  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument*) override;
   double calc_abort_prob(void) override;

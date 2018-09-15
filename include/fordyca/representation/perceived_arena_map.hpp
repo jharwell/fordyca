@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <string>
 
 #include "fordyca/representation/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
@@ -34,10 +33,6 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw { namespace er {
-class server;
-}} // namespace rcppsw::er
-
 NS_START(fordyca);
 namespace params {
 struct occupancy_grid_params;
@@ -61,16 +56,15 @@ class line_of_sight;
  * lot of the tricky handshaking logic for picking up/dropping blocks in caches.
  */
 class perceived_arena_map
-    : public rcppsw::er::client,
+    : public rcppsw::er::client<perceived_arena_map>,
       public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using block_list = std::list<std::shared_ptr<block>>;
+  using block_list = std::list<std::shared_ptr<base_block>>;
   using perceived_cache_list = std::list<perceived_cache>;
   using perceived_block_list = std::list<perceived_block>;
 
   perceived_arena_map(
-      std::shared_ptr<rcppsw::er::server> server,
       const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
@@ -105,7 +99,8 @@ class perceived_arena_map
   cache_list& caches(void) { return m_caches; }
 
   /**
-   * @brief Add a cache to the list of perceived caches.
+   * @brief Add a cache to the list of perceived caches. If there is already a
+   * known cache at that location, it is removed and replaced with the new one.
    *
    * @param cache Cache to add.
    */
@@ -124,13 +119,13 @@ class perceived_arena_map
    * removed, because the new version we just got from our LOS is more up to
    * date.
    */
-  bool block_add(const std::shared_ptr<block>& block);
+  bool block_add(const std::shared_ptr<base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
    */
-  bool block_remove(const std::shared_ptr<block>& victim);
+  bool block_remove(const std::shared_ptr<base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
@@ -143,23 +138,23 @@ class perceived_arena_map
    * @return The cell.
    */
   template <int Index>
-  typename occupancy_grid::layer_type<Index>::value_type& access(size_t i,
-                                                                 size_t j) {
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                       size_t j) {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(
+  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       size_t i,
       size_t j) const {
     return m_grid.access<Index>(i, j);
   }
   template <int Index>
-  typename occupancy_grid::layer_type<Index>::value_type& access(
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) {
     return m_grid.access<Index>(d);
   }
   template <int Index>
-  const typename occupancy_grid::layer_type<Index>::value_type& access(
+  const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) const {
     return m_grid.access<Index>(d);
   }
@@ -174,9 +169,10 @@ class perceived_arena_map
    */
   void reset(void) { m_grid.reset(); }
 
+  double grid_resolution(void) const { return m_grid.resolution(); }
+
  private:
   // clang-format off
-  std::shared_ptr<rcppsw::er::server> m_server;
   occupancy_grid                      m_grid;
   // clang-format on
 
@@ -186,7 +182,7 @@ class perceived_arena_map
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  cache_list                          m_caches;
+  cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -194,7 +190,7 @@ class perceived_arena_map
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  block_list                          m_blocks;
+  block_list m_blocks;
   // clang-format on
 };
 

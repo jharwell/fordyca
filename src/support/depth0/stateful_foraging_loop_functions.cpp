@@ -30,39 +30,47 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using interactor =
-    arena_interactor<controller::depth0::stateful_foraging_controller>;
+using representation::arena_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
-
-  ER_NOM("Initializing depth0_foraging loop functions");
-  params::loop_function_repository repo(server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::loop_function_repository repo;
   repo.parse_all(node);
-  rcppsw::er::g_server->log_stream() << repo;
 
   /* initialize stat collecting */
-  auto* p_output = repo.parse_results<const struct params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output =
+      *repo.parse_results<const struct params::output_params>();
+  output.metrics.arena_grid = arenap->grid;
+
+  m_metrics_agg =
+      rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
+                                                       output_root());
+
+  /* intitialize robot interactions with environment */
+  m_interactor =
+      rcppsw::make_unique<interactor>(arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -71,13 +79,17 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     auto& controller =
         dynamic_cast<controller::depth0::stateful_foraging_controller&>(
             robot.GetControllableEntity().GetController());
-    auto* l_params = repo.parse_results<struct params::visualization_params>();
 
-    controller.display_los(l_params->robot_los);
-    utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-        robot, *arena_map());
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      controller.display_los(vparams->robot_los);
+    }
   } /* for(entity..) */
-  ER_NOM("stateful_foraging loop functions initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void stateful_foraging_loop_functions::pre_step_iter(
@@ -88,17 +100,21 @@ void stateful_foraging_loop_functions::pre_step_iter(
 
   /* collect metrics from robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
+  controller.free_pickup_event(false);
+  controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-      robot, *arena_map());
-  set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
+  utils::set_robot_pos<decltype(controller)>(robot);
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  set_robot_tick<decltype(controller)>(robot);
+
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      arena_map()->grid_resolution());
+  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */
-  interactor(rcppsw::er::g_server, arena_map(), m_metrics_agg.get(), floor())(
-      controller,
-      GetSpace().GetSimulationClock());
+  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
@@ -110,6 +126,13 @@ __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
   }
 
   for (size_t i = 0; i < arena_map()->blocks().size(); ++i) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
     if (arena_map()->blocks()[i]->contains_point(plane_pos)) {
       return argos::CColor::BLACK;
     }
@@ -124,6 +147,7 @@ void stateful_foraging_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
 } /* PreStep() */
 
@@ -133,11 +157,10 @@ void stateful_foraging_loop_functions::Reset(void) {
 } /* Reset() */
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
-  stateless_foraging_loop_functions::pre_step_final();
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 using namespace argos;

@@ -29,16 +29,16 @@
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
-#include "fordyca/metrics/fsm/base_fsm_metrics.hpp"
+#include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
 namespace visitor = rcppsw::patterns::visitor;
+namespace ta = rcppsw::task_allocation;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Structure Definitions
@@ -50,10 +50,10 @@ namespace ta = rcppsw::task_allocation;
  * @brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
-class base_foraging_task : public virtual rcppsw::metrics::tasks::execution_metrics,
-                           public virtual metrics::fsm::base_fsm_metrics,
-                           public virtual metrics::fsm::goal_acquisition_metrics,
-                           public fsm::block_transporter {
+class base_foraging_task
+    : public virtual rcppsw::metrics::tasks::execution_metrics,
+      public fsm::block_transporter,
+      public metrics::fsm::goal_acquisition_metrics {
  public:
   explicit base_foraging_task(const struct ta::abort_params* params);
 

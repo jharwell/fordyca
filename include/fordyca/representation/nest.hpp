@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/multicell_entity.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
+#include "fordyca/representation/multicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,9 +44,10 @@ NS_START(fordyca, representation);
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
-  explicit nest(double xdim, double ydim, const argos::CVector2& loc,
-                double resolution)
-      : multicell_entity(xdim, ydim, rcppsw::utils::color::kGRAY70),
+  nest(const rcppsw::math::vector2d& dim,
+       const argos::CVector2& loc,
+       double resolution)
+      : multicell_entity(dim, rcppsw::utils::color::kGRAY70),
         immovable_cell_entity(loc, resolution) {}
 
   /**
@@ -62,7 +63,7 @@ class nest : public multicell_entity, public immovable_cell_entity {
    */
   bool contains_point(const argos::CVector2& point) const {
     return xspan(real_loc()).value_within(point.GetX()) &&
-        yspan(real_loc()).value_within(point.GetY());
+           yspan(real_loc()).value_within(point.GetY());
   }
 };
 

@@ -40,11 +40,11 @@ constexpr char output_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void output_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element onode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   std::vector<std::string> res, res2;
 
-  m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
   /* only present for loop functions */
   if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
@@ -52,21 +52,15 @@ void output_parser::parse(const ticpp::Element& node) {
     m_params->metrics = *m_metrics_parser.parse_results();
   }
 
-  ticpp::Element snode = argos::GetNode(onode, "sim");
+  ticpp::Element snode = get_node(onode, "sim");
   XML_PARSE_PARAM(snode, m_params, output_root);
   XML_PARSE_PARAM(snode, m_params, output_dir);
-
-  /* only present for loop functions */
-  if (snode.HasAttribute("log_fname")) {
-    XML_PARSE_PARAM(snode, m_params, log_fname);
-  }
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
   stream << build_header() << m_metrics_parser
          << XML_PARAM_STR(m_params, output_root) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
-         << XML_PARAM_STR(m_params, log_fname) << std::endl
          << build_footer();
 } /* show() */
 

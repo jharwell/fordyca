@@ -54,9 +54,7 @@ class base_cell_entity {
    * @brief Initialize an entity with a color and a unique identifier.
    */
   base_cell_entity(const rcppsw::utils::color& color, int id)
-      : m_id(id),
-        m_display_id(false),
-        m_color(color) {}
+      : m_id(id), m_display_id(false), m_color(color) {}
 
   base_cell_entity(const base_cell_entity& other) = default;
   base_cell_entity& operator=(const base_cell_entity& other) = default;

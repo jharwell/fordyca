@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
+#include <functional>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
@@ -60,12 +61,12 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * acquired, it signals that it has completed its task.
  */
 class acquire_goal_fsm : public base_foraging_fsm,
+                         public er::client<acquire_goal_fsm>,
                          public metrics::fsm::goal_acquisition_metrics,
                          public rcppsw::task_allocation::taskable {
  public:
-  acquire_goal_fsm(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::saa_subsystem>& saa,
-                   std::shared_ptr<const representation::perceived_arena_map> map,
+  acquire_goal_fsm(controller::saa_subsystem* saa,
+                   const representation::perceived_arena_map* map,
                    std::function<bool(void)> goal_detect);
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
@@ -73,7 +74,9 @@ class acquire_goal_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(__rcsw_unused const rcppsw::task_allocation::taskable_argument*) override {}
+  void task_start(
+      __rcsw_unused const rcppsw::task_allocation::taskable_argument*) override {
+  }
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }
@@ -82,8 +85,11 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
   void task_reset(void) override { init(); }
 
-  /* base FSM metrics */
-  bool is_avoiding_collision(void) const override;
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override;
@@ -103,9 +109,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
     ST_MAX_STATES
   };
 
-  std::shared_ptr<const representation::perceived_arena_map> map(void) const {
-    return mc_map;
-  }
+  const representation::perceived_arena_map* map(void) const { return mc_map; }
   void goal_acquired_cb(std::function<bool(bool)> goal_acquired_cb) {
     m_goal_acquired_cb = goal_acquired_cb;
   }
@@ -153,10 +157,10 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  std::shared_ptr<const representation::perceived_arena_map> mc_map;
-  class vector_fsm                                           m_vector_fsm;
-  explore_for_goal_fsm                                       m_explore_fsm;
-  std::function<bool (bool)>                                 m_goal_acquired_cb;
+  const representation::perceived_arena_map* mc_map;
+  class vector_fsm                           m_vector_fsm;
+  explore_for_goal_fsm                       m_explore_fsm;
+  std::function<bool (bool)>                 m_goal_acquired_cb;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

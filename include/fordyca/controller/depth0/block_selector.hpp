@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/perceived_block.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,14 +45,16 @@ NS_START(fordyca, controller, depth0);
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector: public rcppsw::er::client {
+class block_selector: public rcppsw::er::client<block_selector> {
  public:
-  block_selector(
-      const std::shared_ptr<rcppsw::er::server>& server,
-      argos::CVector2 nest_loc);
+  using perceived_block_list = std::list<representation::perceived_block>;
 
-  ~block_selector(void) override { rmmod(); }
+  explicit block_selector(const block_selection_matrix* sel_matrix);
 
+  ~block_selector(void) override = default;
+
+  block_selector& operator=(const block_selector& other) = delete;
+  block_selector(const block_selector& other) = delete;
   /**
    * @brief Given a list of blocks that a robot knows about (i.e. have not faded
    * into an unknown state), compute which is the "best", for use in deciding
@@ -61,7 +63,7 @@ class block_selector: public rcppsw::er::client {
    * @return A pointer to the "best" block, along with its utility value.
    */
   representation::perceived_block calc_best(
-      const std::list<representation::perceived_block>& blocks,
+      const perceived_block_list& blocks,
       argos::CVector2 robot_loc);
 
  private:
@@ -74,7 +76,9 @@ class block_selector: public rcppsw::er::client {
    */
   static constexpr double kMinDist = 0.2;
 
-  argos::CVector2 m_nest_loc;
+  // clang-format off
+  const block_selection_matrix* const mc_matrix;
+  // clang-format on
 };
 
 NS_END(depth0, fordyca, controller);

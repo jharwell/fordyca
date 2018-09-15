@@ -12,36 +12,36 @@ This is the main entry point for getting started on the project.
 
 ## Pre-cloning Setup
 
-1. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
+1. Install development packages for the project:
+
+   - Qt5 (`qtbase5-dev` on ubuntu)
+
+2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
    *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
    _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
    linux. This is because those packages were compiled with gcc/g++ 5.4, and
    therefore the core ARGoS libraries that fordyca uses are ABI incompatible
-   with anything compiled with gcc >= 6.0. If you are compiling ARGoS from
-   source you can use whatever compiler/compiler version you like, so long as it
-   supports C++14.
+   with anything compiled with gcc >= 6.0. In addition, when installing ARGoS
+   from a .deb you will likely not have all dependencies met (dpkg does not
+   check them like apt does), so you need to run:
 
-2. Verify that you can run the simple foraging example that comes
+        sudo apt install -f
+
+   To fix installation issues.
+
+   If you are compiling ARGoS from source you can use whatever compiler/compiler
+   version you like, so long as it supports C++14.
+
+3. Verify that you can run the simple foraging example that comes
    packaged on the ARGoS website.
 
-3. This project uses the build scaffolding provided by
+4. This project uses the build scaffolding provided by
    [cmake-config](https://github.com/jharwell/cmake-config). Please
    look at the platform requirements for that project and install any
    needed packages/libraries.
 
-4. Install additional development packages for the project:
-
-   - catch (A unit testing framework that some unit tests use)
-
-        sudo apt install catch
-   - boost 1.58.
-
-        sudo apt install libboost-all-dev
-
-    - Qt (Qt 5 is known to work; older versions may also work)
-            sudo apt install qtbase5-dev
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
@@ -80,8 +80,12 @@ After successful compilation, follow these steps to run a foraging scenario:
 
         export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
 
+2. Unless you disable event reporting, you will need to set the path to the
+   log4cxx configuration file. On bash that is:
 
-2. cd to the ROOT of the fordyca repo, and run the experiment:
+        export LOG4CXX_CONFIGURATION=/path/to=fordyca/log4cxx.xml
+
+3. cd to the ROOT of the fordyca repo, and run the experiment:
 
         argos3 -c exp/single-source.argos
 
@@ -111,9 +115,6 @@ access to that directory as part of the gini group.
    If you need to checkout a particular branch in the repo you can do that after
    running the script and then re-running make.
 
-3. Once the script finishes, set `ARGOS_PLUGIN_PATH` as before and you should be
-   able to run experiments.
-
 # Troubleshooting
 
 - If you are having trouble building, try:
@@ -140,6 +141,8 @@ access to that directory as part of the gini group.
      version, anaconda loads a DIFFERENT version of the Qt than fordyca uses,
      resulting in a dynamic linking error.
 
+  3. Make sure you have the necessary environment variables set correctly.
+  
 ## Contributing
 
 For contributing to `fordyca`, see

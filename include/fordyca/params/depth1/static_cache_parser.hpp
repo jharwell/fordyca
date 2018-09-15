@@ -29,6 +29,7 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,9 +47,9 @@ NS_START(fordyca, params, depth1);
  */
 class static_cache_parser: public rcppsw::params::xml_param_parser {
  public:
-  static_cache_parser(const std::shared_ptr<rcppsw::er::server>& server,
-                      uint level)
-      : xml_param_parser(server, level) {}
+  explicit static_cache_parser(uint level)
+      : xml_param_parser(level),
+        m_waveform(level + 1) {}
 
   /**
    * @brief The root tag that all static cache parameters should lie under in
@@ -72,10 +73,10 @@ class static_cache_parser: public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
- private:
   // clang-format off
   bool                                 m_parsed{false};
   std::shared_ptr<static_cache_params> m_params{nullptr};
+  ct::waveform_xml_parser              m_waveform;
   // clang-format on
 };
 

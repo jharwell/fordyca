@@ -84,7 +84,7 @@ NS_START(events);
  */
 class free_block_pickup
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<free_block_pickup>,
       public block_pickup_event,
       public visitor::visit_set<controller::depth0::stateless_foraging_controller,
                                 controller::depth0::stateful_foraging_controller,
@@ -98,11 +98,10 @@ class free_block_pickup
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher> {
  public:
-  free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                    std::shared_ptr<representation::block> block,
+  free_block_pickup(std::shared_ptr<representation::base_block> block,
                     uint robot_index,
                     uint timestep);
-  ~free_block_pickup(void) override { client::rmmod(); }
+  ~free_block_pickup(void) override = default;
 
   free_block_pickup(const free_block_pickup& op) = delete;
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
@@ -111,7 +110,7 @@ class free_block_pickup
   void visit(representation::arena_map& map) override;
   void visit(representation::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(
       controller::depth0::stateless_foraging_controller& controller) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
@@ -135,10 +134,9 @@ class free_block_pickup
 
  private:
   // clang-format off
-  uint                                   m_timestep;
-  uint                                   m_robot_index;
-  std::shared_ptr<representation::block> m_block;
-  std::shared_ptr<rcppsw::er::server>    m_server;
+  uint                                        m_timestep;
+  uint                                        m_robot_index;
+  std::shared_ptr<representation::base_block> m_block;
   // clang-format on
 };
 

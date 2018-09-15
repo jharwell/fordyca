@@ -23,17 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include <fstream>
-
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/depth0/stateless_foraging_repository.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "rcppsw/er/server.hpp"
+#include "fordyca/params/depth0/stateless_param_repository.hpp"
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +39,9 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_controller::stateless_foraging_controller(void)
-    : base_foraging_controller(), m_fsm() {}
+    : base_foraging_controller(),
+      ER_CLIENT_INIT("fordyca.controller.depth0.stateless"),
+      m_fsm() {}
 
 stateless_foraging_controller::~stateless_foraging_controller(void) = default;
 
@@ -53,18 +50,20 @@ stateless_foraging_controller::~stateless_foraging_controller(void) = default;
  ******************************************************************************/
 void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
-
-  ER_NOM("Initializing stateless_foraging controller");
-
-  params::depth0::stateless_foraging_repository param_repo(client::server_ref());
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::depth0::stateless_param_repository param_repo;
   param_repo.parse_all(node);
-  client::server_handle()->log_stream() << param_repo;
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all parameters were validated");
+
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
-      client::server_ref(), base_foraging_controller::saa_subsystem());
-  ER_NOM("stateless_foraging controller initialization finished");
+      base_foraging_controller::saa_subsystem());
+  ER_INFO("Initialization finished");
+  ndc_pop();
 } /* Init() */
 
 void stateless_foraging_controller::Reset(void) {
@@ -75,23 +74,19 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
-  saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->block_throttle_update();
+  ER_NDC_PUSH("[" + this->GetId() +
+              ",t=" + std::to_string(saa_subsystem()->sensing()->tick()) + "]");
+
+  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
   m_fsm->run();
+  ER_NDC_POP();
 } /* ControlStep() */
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateless_foraging_controller,
-                       is_avoiding_collision,
-                       m_fsm);
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateless_foraging_controller,
-                       is_exploring_for_goal,
-                       m_fsm);
-
 FSM_WRAPPER_DEFINE_PTR(bool, stateless_foraging_controller, goal_acquired, m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
@@ -107,11 +102,7 @@ FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
 /*******************************************************************************
  * Distance Metrics
  ******************************************************************************/
-int stateless_foraging_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str() + 2);
-} /* entity_id() */
-
-__rcsw_pure double stateless_foraging_controller::timestep_distance(void) const {
+__rcsw_pure double stateless_foraging_controller::distance(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
@@ -120,7 +111,18 @@ __rcsw_pure double stateless_foraging_controller::timestep_distance(void) const 
     return saa_subsystem()->sensing()->heading().Length();
   }
   return 0;
-} /* timestep_distance() */
+} /* distance() */
+
+argos::CVector2 stateless_foraging_controller::velocity(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->linear_velocity();
+  }
+  return argos::CVector2(0, 0);
+} /* velocity() */
 
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;

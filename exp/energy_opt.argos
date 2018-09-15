@@ -32,7 +32,6 @@
       <params>
         <energy max_energy="100.0"
                 threshold="20.0">
-        
         </energy>
         <output>
           <sim output_root="output"

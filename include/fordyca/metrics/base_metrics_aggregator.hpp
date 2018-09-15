@@ -18,21 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_METRICS_BASE_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_METRICS_BASE_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_BASE_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_BASE_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/metrics/collector_group.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/metrics/collector_group.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct metrics_params; }
+namespace params {
+struct metrics_params;
+}
 
 NS_START(metrics);
 
@@ -47,11 +49,11 @@ NS_START(metrics);
  * sources. Extends \ref rcppsw::metrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
-class base_metrics_aggregator : public rcppsw::er::client,
-                                public rcppsw::metrics::collector_group {
+class base_metrics_aggregator
+    : public rcppsw::er::client<base_metrics_aggregator>,
+      public rcppsw::metrics::collector_group {
  public:
-  base_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                          const struct params::metrics_params* params,
+  base_metrics_aggregator(const struct params::metrics_params* params,
                           const std::string& output_root);
   virtual ~base_metrics_aggregator(void) = default;
 
@@ -66,4 +68,4 @@ class base_metrics_aggregator : public rcppsw::er::client,
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_METRICS_BASE_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_BASE_METRICS_AGGREGATOR_HPP_ */

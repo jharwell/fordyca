@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <string>
-
 #include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
@@ -36,15 +35,16 @@ NS_START(fordyca);
 namespace representation { class line_of_sight; class perceived_arena_map; }
 
 NS_START(controller, depth1);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class perception_subsystem : public base_perception_subsystem {
+class perception_subsystem : public base_perception_subsystem,
+                             public er::client<perception_subsystem> {
  public:
-  perception_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
-                            const params::perception_params* const params,
-                            const std::string& id);
+  perception_subsystem(const params::perception_params* const params,
+                       const std::string& id);
 
   void process_los(const representation::line_of_sight* const los) override;
 };

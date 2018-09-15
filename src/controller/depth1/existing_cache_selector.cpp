@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -34,13 +35,9 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
-  insmod("existing_cache_selector",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
-}
+    const cache_selection_matrix* const matrix)
+    : ER_CLIENT_INIT("fordyca.controller.depth0.existing_cache_selector"),
+      mc_matrix(matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -49,7 +46,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
     const std::list<representation::perceived_cache>& existing_caches,
     argos::CVector2 robot_loc) {
   representation::perceived_cache best;
-  ER_ASSERT(!existing_caches.empty(), "FATAL: no known existing caches");
+  ER_ASSERT(!existing_caches.empty(), "no known existing caches");
 
   double max_utility = 0.0;
   for (auto& c : existing_caches) {
@@ -68,17 +65,19 @@ representation::perceived_cache existing_cache_selector::calc_best(
               c.ent->id());
       continue;
     }
-    math::existing_cache_utility u(c.ent->real_loc(), m_nest_loc);
+    math::existing_cache_utility u(c.ent->real_loc(),
+                                   boost::get<argos::CVector2>(
+                                       mc_matrix->find("nest_center")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
-    ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for existing_cache%d loc=(%zu, %zu), density=%f: %f",
-            c.ent->id(),
-            c.ent->discrete_loc().first,
-            c.ent->discrete_loc().second,
-            c.density.last_result(),
-            utility);
+    ER_ASSERT(utility > 0.0, "Bad utility calculation");
+    ER_DEBUG("Utility for existing_cache%d loc=(%u, %u), density=%f: %f",
+             c.ent->id(),
+             c.ent->discrete_loc().first,
+             c.ent->discrete_loc().second,
+             c.density.last_result(),
+             utility);
 
     if (utility > max_utility) {
       best = c;
@@ -87,13 +86,13 @@ representation::perceived_cache existing_cache_selector::calc_best(
   } /* for(existing_cache..) */
 
   if (nullptr != best.ent) {
-    ER_NOM("Best utility: existing_cache%d at (%f, %f) [%zu, %zu]: %f",
-           best.ent->id(),
-           best.ent->real_loc().GetX(),
-           best.ent->real_loc().GetY(),
-           best.ent->discrete_loc().first,
-           best.ent->discrete_loc().second,
-           max_utility);
+    ER_INFO("Best utility: existing_cache%d at (%f, %f) [%u, %u]: %f",
+            best.ent->id(),
+            best.ent->real_loc().GetX(),
+            best.ent->real_loc().GetY(),
+            best.ent->discrete_loc().first,
+            best.ent->discrete_loc().second,
+            max_utility);
   } else {
     ER_WARN("No best cache found: all known caches too close!");
   }

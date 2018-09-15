@@ -24,7 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -43,11 +46,11 @@ NS_START(fordyca, controller);
  * @brief Base class for different exploration behaviors that robots can exhibit
  * when looking for stuff.
  */
-class explore_behavior : public rcppsw::er::client {
+class explore_behavior : public rcppsw::er::client<explore_behavior>,
+                         public metrics::fsm::collision_metrics {
  public:
-  explore_behavior(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<controller::saa_subsystem>& saa)
-      : client(server), m_saa(saa) {}
+  explicit explore_behavior(controller::saa_subsystem* const saa)
+      : ER_CLIENT_INIT("fordyca.controller.explore_behavior"), m_saa(saa) {}
 
   virtual ~explore_behavior(void) = default;
 
@@ -60,15 +63,11 @@ class explore_behavior : public rcppsw::er::client {
   virtual void execute(void) = 0;
 
  protected:
-  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
-    return m_saa;
-  }
-  std::shared_ptr<const controller::saa_subsystem> saa_subsystem(void) const {
-    return m_saa;
-  }
+  const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
 
  private:
-  std::shared_ptr<controller::saa_subsystem> m_saa;
+  controller::saa_subsystem* const m_saa;
 };
 
 NS_END(controller, fordyca);

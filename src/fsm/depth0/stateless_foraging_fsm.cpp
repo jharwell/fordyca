@@ -25,7 +25,6 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
-#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,24 +36,24 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    controller::saa_subsystem* const saa)
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.depth0.stateless"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
       entry_leaving_nest(),
       entry_wait_for_signal(),
+      entry_retreat_to_nest(),
+      entry_charge_at_nest(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(retreating, hfsm::top_state()),  //max energy
-      HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),   //max energy
-      m_explore_fsm(
-          server,
-          saa,
-          std::make_unique<controller::random_explore_behavior>(server, saa),
-          std::bind(&stateless_foraging_fsm::block_detected, this)),
+      HFSM_CONSTRUCT_STATE(retreat_to_nest, &start),  //max energy
+      HFSM_CONSTRUCT_STATE(charge_at_nest, &start),   //max energy
+      m_explore_fsm(saa,
+                    std::make_unique<controller::random_explore_behavior>(saa),
+                    std::bind(&stateless_foraging_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
@@ -68,11 +67,19 @@ stateless_foraging_fsm::stateless_foraging_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
-                                               nullptr)} {
-  client::insmod("stateless_foraging_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
+                   HFMS_STATE_MAP_ENTRY_EX_ALL(&retreat_to_nest,
+                                               nullptr,
+                                               &entry_retreat_to_nest,
+                                               nullptr),
+                   HFMS_STATE_MAP_ENTRY_EX_ALL(&charge_at_nest,
+                                               nullptr,
+                                               &entry_charge_at_nest,
+                                               nullptr)} {}
 
 /*******************************************************************************
  * States
@@ -88,18 +95,17 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
       m_explore_fsm.task_start(nullptr);
       internal_event(ST_ACQUIRE_BLOCK);
       return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-      internal_event(ST_LEAVING_NEST);
+    } else if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
+      internal_event(ST_WAIT_FOR_BLOCK_DROP);
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();
@@ -112,15 +118,30 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
-    ER_NOM("Block pickup signal received");
+    ER_INFO("Block pickup signal received");
     internal_event(ST_TRANSPORT_TO_NEST);
+  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
+    m_explore_fsm.task_reset();
+    internal_event(ST_ACQUIRE_BLOCK);
   }
   return controller::foraging_signal::HANDLED;
 }
 
-/* Energy Optimization */
-HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, retreating) {
-  if ( /* charge below threshold */) {
+HFSM_STATE_DEFINE(stateless_foraging_fsm,
+                  wait_for_block_drop,
+                  state_machine::event_data) {
+  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+    m_explore_fsm.task_reset();
+    ER_INFO("Block drop signal received");
+    internal_event(ST_LEAVING_NEST);
+  }
+  return controller::foraging_signal::HANDLED;
+}
+
+
+/* Energy Optimization
+HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, retreat_to_nest) {
+  if (  charge below threshold ) {
     m_explore_fsm.task_reset();
     ER_NOM("Robot needs to recharge");
     internal_event(ST_RETREATING);
@@ -132,11 +153,11 @@ HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, retreating) {
 
 // Define more here
 HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, charging) {
-  if ( /* charge rises diff threshold */) {
+  if ( charge rises diff threshold ) {
     m_explore_fsm.task_execute();
   }
   return controller::foraging_signal::HANDLED;
-}
+} */
 
 /*******************************************************************************
  * Metrics
@@ -146,8 +167,43 @@ bool stateless_foraging_fsm::is_exploring_for_goal(void) const {
 } /* is_exploring_for_goal() */
 
 bool stateless_foraging_fsm::goal_acquired(void) const {
-  return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+  if (acquisition_goal_type::kBlock == acquisition_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+  } else if (transport_goal_type::kNest == block_transport_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+  }
+  return false;
 } /* goal_acquired() */
+
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+__rcsw_pure bool stateless_foraging_fsm::in_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.in_collision_avoidance()) ||
+         base_foraging_fsm::in_collision_avoidance();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool stateless_foraging_fsm::entered_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.entered_collision_avoidance()) ||
+         base_foraging_fsm::entered_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool stateless_foraging_fsm::exited_collision_avoidance(void) const {
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.exited_collision_avoidance()) ||
+         base_foraging_fsm::exited_collision_avoidance();
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint stateless_foraging_fsm::collision_avoidance_duration(void) const {
+  if (m_explore_fsm.task_running()) {
+    return m_explore_fsm.collision_avoidance_duration();
+  } else {
+    return base_foraging_fsm::collision_avoidance_duration();
+  }
+  return 0;
+} /* collision_avoidance_duration() */
 
 /*******************************************************************************
  * General Member Functions
@@ -167,7 +223,8 @@ bool stateless_foraging_fsm::block_detected(void) const {
 } /* block_detected() */
 
 transport_goal_type stateless_foraging_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_NEST == current_state()) {
+  if (ST_TRANSPORT_TO_NEST == current_state() ||
+      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;

@@ -72,3 +72,15 @@
    saa_subsystem()->actuation()->block_throttle_update();
    m_fsm->run();
  } /* ControlStep() */
+
+ /*******************************************************************************
+  * Add Metrics
+  ******************************************************************************/
+
+
+ /* Notifiy ARGoS of the existence of the controller. */
+ using namespace argos;
+ REGISTER_CONTROLLER(energy_max_controller,
+                     "energy_max_controller"); // NOLINT
+
+ NS_END(depth0, controller, fordyca);

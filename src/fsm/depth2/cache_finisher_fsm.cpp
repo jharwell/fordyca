@@ -30,8 +30,6 @@
 #include "fordyca/controller/depth0/block_selector.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/params/fsm_params.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
@@ -44,11 +42,12 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_finisher_fsm::cache_finisher_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    const std::shared_ptr<representation::perceived_arena_map>& map)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    const controller::block_selection_matrix* const bsel_matrix,
+    const controller::cache_selection_matrix* const csel_matrix,
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("forydca.fsm.depth2.cache_finisher"),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
@@ -56,8 +55,8 @@ cache_finisher_fsm::cache_finisher_fsm(
       HFSM_CONSTRUCT_STATE(acquire_new_cache, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_block_fsm(params, server, saa, map),
-      m_cache_fsm(params, server, saa, map),
+      m_block_fsm(bsel_matrix, saa, map),
+      m_cache_fsm(csel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
@@ -69,11 +68,7 @@ cache_finisher_fsm::cache_finisher_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  client::insmod("cache_finisher_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
   internal_event(ST_ACQUIRE_BLOCK);
@@ -81,7 +76,7 @@ HFSM_STATE_DEFINE_ND(cache_finisher_fsm, start) {
 }
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_block) {
-  ER_DIAG("Executing ST_ACQUIRE_BLOCK");
+  ER_DEBUG("Executing ST_ACQUIRE_BLOCK");
   if (m_block_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
@@ -109,7 +104,7 @@ HFSM_STATE_DEFINE(cache_finisher_fsm,
 }
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, acquire_new_cache) {
-  ER_DIAG("Executing ST_ACQUIRE_NEW_CACHE");
+  ER_DEBUG("Executing ST_ACQUIRE_NEW_CACHE");
   if (m_cache_fsm.task_finished()) {
     actuators()->differential_drive().stop();
     internal_event(ST_WAIT_FOR_BLOCK_DROP);
@@ -131,24 +126,59 @@ HFSM_STATE_DEFINE(cache_finisher_fsm,
 
 HFSM_STATE_DEFINE_ND(cache_finisher_fsm, finished) {
   if (ST_FINISHED != last_state()) {
-    ER_DIAG("Executing ST_FINISHED");
+    ER_DEBUG("Executing ST_FINISHED");
   }
   return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
- * FSM Metrics
+ * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool cache_finisher_fsm::is_avoiding_collision(void) const {
-  return m_block_fsm.is_avoiding_collision() ||
-         m_cache_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
+__rcsw_pure bool cache_finisher_fsm::in_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
+         (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance());
+} /* in_collision_avoidance() */
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, goal_acquired, m_block_fsm);
+__rcsw_pure bool cache_finisher_fsm::entered_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.entered_collision_avoidance()) ||
+         (m_cache_fsm.task_running() &&
+          m_cache_fsm.entered_collision_avoidance());
+} /* entered_collision_avoidance() */
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, is_vectoring_to_goal, m_block_fsm);
+__rcsw_pure bool cache_finisher_fsm::exited_collision_avoidance(void) const {
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.exited_collision_avoidance()) ||
+         (m_cache_fsm.task_running() &&
+          m_cache_fsm.exited_collision_avoidance());
+} /* exited_collision_avoidance() */
 
-FSM_WRAPPER_DEFINE(bool, cache_finisher_fsm, is_exploring_for_goal, m_block_fsm);
+__rcsw_pure uint cache_finisher_fsm::collision_avoidance_duration(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.collision_avoidance_duration();
+  } else if (m_cache_fsm.task_running()) {
+    return m_cache_fsm.collision_avoidance_duration();
+  }
+  return 0;
+} /* collision_avoidance_duration() */
+
+/*******************************************************************************
+ * Acquisition Metrics
+ ******************************************************************************/
+__rcsw_pure bool cache_finisher_fsm::is_exploring_for_goal(void) const {
+  return (m_block_fsm.is_exploring_for_goal() && m_block_fsm.task_running()) ||
+         (m_cache_fsm.is_exploring_for_goal() && m_cache_fsm.task_running());
+} /* is_exploring_for_goal() */
+
+__rcsw_pure bool cache_finisher_fsm::is_vectoring_to_goal(void) const {
+  return (m_block_fsm.is_vectoring_to_goal() && m_block_fsm.task_running()) ||
+         (m_cache_fsm.is_vectoring_to_goal() && m_cache_fsm.task_running());
+} /* is_vectoring_to_block */
+
+bool cache_finisher_fsm::goal_acquired(void) const {
+  return (ST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
+         (ST_WAIT_FOR_BLOCK_DROP == current_state());
+} /* goal_acquired() */
 
 acquisition_goal_type cache_finisher_fsm::acquisition_goal(void) const {
   if (m_block_fsm.task_running()) {
@@ -156,7 +186,7 @@ acquisition_goal_type cache_finisher_fsm::acquisition_goal(void) const {
   } else if (m_cache_fsm.task_running()) {
     return m_cache_fsm.acquisition_goal();
   }
-  return goal_type::kNone;
+  return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
 
 /*******************************************************************************

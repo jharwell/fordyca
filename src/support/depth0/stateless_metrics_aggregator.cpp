@@ -22,13 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "fordyca/params/metrics_params.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/metrics/arena_metrics.hpp"
+#include "fordyca/metrics/arena_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/representation/arena_map.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,17 +48,18 @@ NS_START(fordyca, support, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 stateless_metrics_aggregator::stateless_metrics_aggregator(
-    std::shared_ptr<rcppsw::er::server> server,
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : base_metrics_aggregator(server, params, output_root) {
-  insmod("metrics_agg",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
+    : base_metrics_aggregator(params, output_root),
+      ER_CLIENT_INIT("fordyca.support.depth0.stateless_aggregator") {
+  register_collector<metrics::fsm::movement_metrics_collector>(
+      "fsm::movement",
+      metrics_path() + "/" + params->fsm_movement_fname,
+      params->collect_interval);
 
-  register_collector<metrics::fsm::distance_metrics_collector>(
-      "fsm::distance",
-      metrics_path() + "/" + params->distance_fname,
+  register_collector<metrics::fsm::collision_metrics_collector>(
+      "fsm::collision",
+      metrics_path() + "/" + params->fsm_collision_fname,
       params->collect_interval);
 
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
@@ -61,6 +71,17 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
       "blocks::transport",
       metrics_path() + "/" + params->block_transport_fname,
       params->collect_interval);
+
+  register_collector<metrics::blocks::manipulation_metrics_collector>(
+      "blocks::manipulation",
+      metrics_path() + "/" + params->block_manipulation_fname,
+      params->collect_interval);
+  register_collector<metrics::arena_metrics_collector>(
+      "arena::robot_occupancy",
+      metrics_path() + "/" + params->arena_robot_occupancy_fname,
+      params->collect_interval,
+      math::rcoord_to_dcoord(params->arena_grid.upper,
+                             params->arena_grid.resolution));
   reset_all();
 }
 
@@ -68,20 +89,35 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void stateless_metrics_aggregator::collect_from_controller(
-    const rcppsw::metrics::base_metrics* const controller) {
-  auto distance_m = dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
+    const controller::depth0::stateless_foraging_controller* controller) {
+  auto collision_m =
+      dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
+  auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
+  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+      controller->fsm());
+  auto manip_m =
+      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
-  ER_ASSERT(distance_m, "FATAL: Controller does not provide FSM distance metrics");
-  ER_ASSERT(block_acq_m, "FATAL: Controller does not provide FSM block acquisition metrics");
+  ER_ASSERT(mov_m, "Controller does not provide FSM movement metrics");
+  ER_ASSERT(block_acq_m,
+            "Controller does not provide FSM block acquisition metrics");
+  ER_ASSERT(collision_m, "Controller does not provide FSM collision metrics");
+  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
-  collect("fsm::distance", *distance_m);
+  collect("fsm::movement", *mov_m);
+  collect("fsm::collision", *collision_m);
   collect("blocks::acquisition", *block_acq_m);
+  collect("blocks::manipulation", *manip_m);
 } /* collect_from_controller() */
 
 void stateless_metrics_aggregator::collect_from_block(
-    const representation::block* const block) {
+    const representation::base_block* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
+
+void stateless_metrics_aggregator::collect_from_arena(
+    const representation::arena_map* const arena) {
+  collect("arena::robot_occupancy", *arena);
+} /* collect_from_arena() */
 
 NS_END(depth0, support, fordyca);

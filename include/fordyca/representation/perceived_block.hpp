@@ -33,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 
-class block;
+class base_block;
 
 /*******************************************************************************
  * Type Definitions
@@ -47,11 +47,11 @@ class block;
  */
 struct perceived_block {
   perceived_block(void) : density() {}
-  perceived_block(const std::shared_ptr<block>& b,
+  perceived_block(const std::shared_ptr<base_block>& b,
                   const rcppsw::swarm::pheromone_density& d)
       : ent(b), density(d) {}
 
-  std::shared_ptr<block> ent{nullptr};
+  std::shared_ptr<base_block> ent{nullptr};
   rcppsw::swarm::pheromone_density density;
 };
 

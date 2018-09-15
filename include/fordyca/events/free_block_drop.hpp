@@ -69,7 +69,7 @@ NS_START(events);
  */
 class free_block_drop
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<free_block_drop>,
       public block_drop_event,
       public visitor::visit_set<controller::depth1::foraging_controller,
                                 controller::depth2::foraging_controller,
@@ -77,19 +77,17 @@ class free_block_drop
                                 tasks::depth2::cache_finisher,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
-  free_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                  const std::shared_ptr<representation::block>& block,
-                  size_t x,
-                  size_t y,
+  free_block_drop(const std::shared_ptr<representation::base_block>& block,
+                  rcppsw::math::dcoord2 coord,
                   double resolution);
-  ~free_block_drop(void) override { client::rmmod(); }
+  ~free_block_drop(void) override = default;
 
   free_block_drop(const free_block_drop& op) = delete;
   free_block_drop& operator=(const free_block_drop& op) = delete;
 
   /* stateless foraging */
   void visit(representation::cell2D& cell) override;
-  void visit(representation::block& block) override;
+  void visit(representation::base_block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::arena_map& map) override;
 
@@ -105,13 +103,14 @@ class free_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const {
+    return m_block;
+  }
 
  private:
   // clang-format off
-  double                                 m_resolution;
-  std::shared_ptr<representation::block> m_block;
-  std::shared_ptr<rcppsw::er::server>    m_server;
+  double                                      m_resolution;
+  std::shared_ptr<representation::base_block> m_block;
   // clang-format on
 };
 

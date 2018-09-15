@@ -35,6 +35,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions

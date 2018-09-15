@@ -29,7 +29,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -40,28 +40,22 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 free_block_drop::free_block_drop(
-    std::shared_ptr<rcppsw::er::server> server,
-    const std::shared_ptr<representation::block>& block,
-    size_t x,
-    size_t y,
+    const std::shared_ptr<representation::base_block>& block,
+    rcppsw::math::dcoord2 coord,
     double resolution)
-    : cell_op(x, y),
-      client(server),
+    : cell_op(coord.first, coord.second),
+      ER_CLIENT_INIT("fordyca.events.free_block_drop"),
       m_resolution(resolution),
-      m_block(block),
-      m_server(server) {
-  client::insmod("free_block_drop",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+      m_block(block) {}
 
 /*******************************************************************************
- * Depth0/Support
+ * Depth0
  ******************************************************************************/
 void free_block_drop::visit(representation::cell2D& cell) {
   cell.entity(m_block);
@@ -73,15 +67,17 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void free_block_drop::visit(representation::block& block) {
+void free_block_drop::visit(representation::base_block& block) {
   block.reset_robot_id();
+
   rcppsw::math::dcoord2 d(cell_op::x(), cell_op::y());
   block.real_loc(math::dcoord_to_rcoord(d, m_resolution));
   block.discrete_loc(d);
 } /* visit() */
 
 void free_block_drop::visit(representation::arena_map& map) {
-  representation::cell2D& cell = map.access(cell_op::x(), cell_op::y());
+  representation::cell2D& cell =
+      map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
 
   /*
    * @todo We should be able to handle dropping a block on a cell in any
@@ -95,8 +91,7 @@ void free_block_drop::visit(representation::arena_map& map) {
    * This was a terrible bug to track down.
    */
   if (cell.state_has_cache()) {
-    cache_block_drop op(m_server,
-                        m_block,
+    cache_block_drop op(m_block,
                         std::static_pointer_cast<representation::arena_cache>(
                             cell.cache()),
                         m_resolution);
@@ -119,8 +114,7 @@ void free_block_drop::visit(controller::depth1::foraging_controller& controller)
  * Depth2
  ******************************************************************************/
 void free_block_drop::visit(controller::depth2::foraging_controller& controller) {
-  std::static_pointer_cast<tasks::depth2::foraging_task>(
-      controller.current_task())
+  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
       ->accept(*this);
   controller.block(nullptr);
 } /* visit() */

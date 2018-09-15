@@ -26,21 +26,24 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
+using transport_goal_type = fsm::block_transporter::goal_type;
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_transferer::cache_transferer(
     const struct task_allocation::task_params* params,
-    std::unique_ptr<task_allocation::taskable>& mechanism)
-    : foraging_task(kCacheTransfererName, params, mechanism) {}
+    std::unique_ptr<task_allocation::taskable> mechanism)
+    : foraging_task(kCacheTransfererName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -60,7 +63,8 @@ double cache_transferer::calc_abort_prob(void) {
    * until AFTER it acquires a block from a cache can cause it to get stuck and
    * not switch to another task if it cannot find a cache anywhere.
    */
-  if (transport_goal_type::kExistingCache == block_transport_goal()) {
+  auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
+  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
     return abort_prob().calc(executable_task::interface_time(),
                              executable_task::interface_estimate());
   }
@@ -69,11 +73,12 @@ double cache_transferer::calc_abort_prob(void) {
 } /* calc_abort_prob() */
 
 double cache_transferer::calc_interface_time(double start_time) {
-  if (at_interface()) {
+  if (task_at_interface()) {
     return current_time() - start_time;
   }
 
-  if (goal_acquired() && at_interface()) {
+  auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
+  if (fsm->goal_acquired() && task_at_interface()) {
     if (!interface_complete()) {
       interface_complete(true);
       reset_interface_time();
@@ -82,12 +87,6 @@ double cache_transferer::calc_interface_time(double start_time) {
   }
   return 0.0;
 } /* calc_interface_time() */
-
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        cache_transferer,
-                        block_transport_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -107,39 +106,41 @@ void cache_transferer::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_transferer,
-                        is_avoiding_collision,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_transferer,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_transferer,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(
+    bool,
+    cache_transferer,
+    is_exploring_for_goal,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(
+    bool,
+    cache_transferer,
+    is_vectoring_to_goal,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_transferer,
-                        goal_acquired,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(
+    bool,
+    cache_transferer,
+    goal_acquired,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        cache_transferer,
-                        acquisition_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(
+    acquisition_goal_type,
+    cache_transferer,
+    acquisition_goal,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINE_PTR(
+    transport_goal_type,
+    cache_transferer,
+    block_transport_goal,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__rcsw_pure bool cache_transferer::at_interface(void) const {
-  return acquisition_goal_type::kExistingCache == acquisition_goal();
-} /* at_interface()() */
+__rcsw_pure bool cache_transferer::task_at_interface(void) const {
+  auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
+  return acquisition_goal_type::kExistingCache == fsm->acquisition_goal();
+} /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);

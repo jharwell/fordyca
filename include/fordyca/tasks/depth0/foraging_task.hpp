@@ -26,17 +26,14 @@
  ******************************************************************************/
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "fordyca/tasks/nest_interactor.hpp"
+#include "fordyca/tasks/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation {struct task_params; }}
 NS_START(fordyca);
-
-namespace events {
-class free_block_pickup;
-class nest_block_drop;
-} // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -58,8 +55,8 @@ NS_START(tasks, depth0);
  */
 class foraging_task
     : public base_foraging_task,
-      public visitor::polymorphic_accept_set<events::free_block_pickup,
-                                             events::nest_block_drop> {
+      public nest_interactor,
+      public free_block_interactor {
  public:
   static constexpr char kGeneralistName[] = "Generalist";
 

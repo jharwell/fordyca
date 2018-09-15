@@ -70,8 +70,7 @@ class actuation_subsystem {
    * @param list List of handles to actuator devices.
    * @param steering Handle for steering force calculator.
    */
-  actuation_subsystem(const std::shared_ptr<rcppsw::er::server>& server,
-                      const struct params::actuation_params* c_params,
+  actuation_subsystem(const struct params::actuation_params* c_params,
                       struct actuator_list* list);
 
   /**
@@ -90,13 +89,13 @@ class actuation_subsystem {
    * @brief Set whether or not temporary throttling of overall maximum speed is
    * enabled when a robot is carrying a block.
    */
-  void block_throttle_toggle(bool en) { m_drive.throttle_toggle(en); }
+  void block_carry_throttle(bool en) { m_drive.block_carry_throttle(en); }
 
   /**
    * @brief Update the currently applied amount of throttling based on
    * presumably new configuration.
    */
-  void block_throttle_update(void) { m_drive.throttling_update(); }
+  void throttling_update(uint timestep) { m_drive.throttling_update(timestep); }
 
   /**
    * @brief Reset the actuations, including stopping the robot.

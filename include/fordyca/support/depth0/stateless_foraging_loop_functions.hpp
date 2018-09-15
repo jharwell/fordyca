@@ -26,14 +26,18 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/base_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { struct output_params; class loop_function_repository; }
+namespace params {
+struct output_params;
+class loop_function_repository;
+namespace arena { struct arena_map_params; }
+}
 
 NS_START(support, depth0);
 class stateless_metrics_aggregator;
@@ -52,7 +56,7 @@ class stateless_metrics_aggregator;
  * - Handling block distribution.
  */
 class stateless_foraging_loop_functions : public base_foraging_loop_functions,
-                                          public rcppsw::er::client {
+                                          public er::client<stateless_foraging_loop_functions>  {
  public:
   stateless_foraging_loop_functions(void);
   ~stateless_foraging_loop_functions(void) override;
@@ -63,12 +67,11 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
   void PreStep() override;
 
  protected:
-  const std::shared_ptr<representation::arena_map>& arena_map(void) const { return m_arena_map; }
-  std::shared_ptr<representation::arena_map>& arena_map(void) { return m_arena_map; }
+  const representation::arena_map* arena_map(void) const { return m_arena_map.get(); }
+  representation::arena_map* arena_map(void) { return m_arena_map.get(); }
   const std::string& output_root(void) const { return m_output_root; }
 
   virtual void pre_step_final(void);
-  std::string log_timestamp_calc(void);
 
   template<typename T>
   void set_robot_tick(argos::CFootBotEntity& robot) {
@@ -76,16 +79,25 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
     controller.tick(GetSpace().GetSimulationClock());
   }
 
+  void ndc_push(void) {
+    ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
+  }
+  void ndc_pop(void) { ER_NDC_POP(); }
  private:
+  using interactor =
+      arena_interactor<controller::depth0::stateless_foraging_controller>;
+
   void arena_map_init(params::loop_function_repository& repo);
-  void output_init(const struct params::output_params* p_output);
+  void output_init(const struct params::arena::arena_map_params* const arena,
+                   struct params::output_params* const output);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
   std::string                                   m_output_root{""};
   std::unique_ptr<stateless_metrics_aggregator> m_metrics_agg{nullptr};
-  std::shared_ptr<representation::arena_map>    m_arena_map{nullptr};
+  std::unique_ptr<representation::arena_map>    m_arena_map;
+  std::unique_ptr<interactor>                   m_interactor;
   // clang-format on
 };
 

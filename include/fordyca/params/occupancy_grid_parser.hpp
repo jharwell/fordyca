@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/block_priorities_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/occupancy_grid_params.hpp"
 #include "fordyca/params/pheromone_parser.hpp"
@@ -49,11 +50,11 @@ NS_START(fordyca, params);
  */
 class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
  public:
-  occupancy_grid_parser(const std::shared_ptr<rcppsw::er::server>& server,
-                        uint level)
-      : xml_param_parser(server, level),
-        m_grid_parser(server, level + 1),
-        m_pheromone_parser(server, level + 1) {}
+  explicit occupancy_grid_parser(uint level)
+      : xml_param_parser(level),
+        m_grid(level + 1),
+        m_pheromone(level + 1),
+        m_priorities(level + 1) {}
 
   /**
    * @brief The root tag that all occupancy grid parameters should lie under in
@@ -71,15 +72,17 @@ class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 
   // clang-format off
   bool                                   m_parsed{false};
   std::shared_ptr<occupancy_grid_params> m_params{nullptr};
-  grid_parser                            m_grid_parser;
-  pheromone_parser                       m_pheromone_parser;
+  grid_parser                            m_grid;
+  pheromone_parser                       m_pheromone;
+  block_priorities_parser                m_priorities;
   // clang-format on
 };
 

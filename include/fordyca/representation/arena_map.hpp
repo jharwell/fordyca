@@ -26,23 +26,24 @@
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/metrics/arena_metrics.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/arena_grid.hpp"
-#include "fordyca/representation/block.hpp"
-#include "fordyca/support/block_distributor.hpp"
+#include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/nest.hpp"
+#include "fordyca/support/block_dist/dispatcher.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/representation/nest.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace params {
+namespace params { namespace arena {
 struct arena_map_params;
-}
+}} // namespace params::arena
 
 NS_START(representation);
 
@@ -60,13 +61,16 @@ class arena_cache;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map : public rcppsw::er::client,
+class arena_map : public rcppsw::er::client<arena_map>,
+                  public metrics::arena_metrics,
                   public rcppsw::patterns::visitor::visitable_any<arena_map> {
  public:
   using cache_vector = std::vector<std::shared_ptr<arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<block>>;
+  using block_vector = std::vector<std::shared_ptr<base_block>>;
+  arena_map(const struct params::arena::arena_map_params* params);
 
-  explicit arena_map(const struct params::arena_map_params* params);
+  /* arena metrics */
+  bool has_robot(size_t i, size_t j) const override;
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -75,37 +79,55 @@ class arena_map : public rcppsw::er::client,
    * by robots.
    */
   block_vector& blocks(void) { return m_blocks; }
+  const block_vector& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Get the list of all the caches currently present in the arena and
    * active.
    */
   cache_vector& caches(void) { return m_caches; }
+  const cache_vector& caches(void) const { return m_caches; }
 
   /**
    * @brief Remove a cache from the list of caches.
-   *
-   * After calling this function the victim cache is no longer active in the
-   * arena. However, it is not yet deleted, as it may be needed to gather
-   * metrics from (needed to capture block pickup from a cache with only 2
-   * blocks).
    *
    * @param victim The cache to remove.
    */
   void cache_remove(const std::shared_ptr<arena_cache>& victim);
 
   /**
-   * @brief Delete all caches that have been previously "removed", but not yet
-   * deleted.
+   * @brief Clear the cells that a cache covers while in the arena that are in
+   * CACHE_EXTENT state, resetting them to EMPTY. Called right before deleting
+   * the cache from the arena.
+   *
+   * @param victim The cache about to be deleted.
    */
-  void delete_caches(void);
+  void cache_extent_clear(const std::shared_ptr<arena_cache>& victim);
 
+  void caches_removed_reset(void) { m_caches_removed = 0; }
   void caches_removed(uint b) { m_caches_removed += b; }
   uint caches_removed(void) const { return m_caches_removed; }
 
-  cell2D& access(size_t i, size_t j) { return m_grid.access(i, j); }
-  cell2D& access(const rcppsw::math::dcoord2& coord) {
-    return access(coord.first, coord.second);
+  template <int Index>
+  typename arena_grid::layer_value_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) {
+    return m_grid.access<Index>(d.first, d.second);
+  }
+  template <int Index>
+  const typename arena_grid::layer_value_type<Index>::value_type& access(
+      const rcppsw::math::dcoord2& d) const {
+    return m_grid.access<Index>(d.first, d.second);
+  }
+  template <int Index>
+  typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                   size_t j) {
+    return m_grid.access<Index>(i, j);
+  }
+  template <int Index>
+  const typename arena_grid::layer_value_type<Index>::value_type& access(
+      size_t i,
+      size_t j) const {
+    return m_grid.access<Index>(i, j);
   }
 
   /**
@@ -119,10 +141,10 @@ class arena_map : public rcppsw::er::client,
    * policy was specified in the .argos file.
    *
    * @param block The block to distribute.
+   *
+   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  void distribute_single_block(std::shared_ptr<block>& block) {
-    m_block_distributor.distribute_block(m_grid, block);
-  }
+  bool distribute_single_block(std::shared_ptr<base_block>& block);
 
   size_t xdsize(void) const { return m_grid.xdsize(); }
   size_t ydsize(void) const { return m_grid.ydsize(); }
@@ -131,8 +153,14 @@ class arena_map : public rcppsw::er::client,
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
+   *
+   *
+   * @return \c TRUE iff a static cache was actually created. Non-fatal failures
+   * to create the static cache can occur if, for example, all blocks are
+   * currently being carried by robots and there are not enough free blocks with
+   * which to create a cache of the specified minimum size.
    */
-  void static_cache_create(void);
+  bool static_cache_create(void);
 
   bool has_static_cache(void) const { return mc_static_cache_params.enable; }
 
@@ -193,22 +221,41 @@ class arena_map : public rcppsw::er::client,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::grid_view<cell2D*> subgrid(size_t x, size_t y, size_t radius) {
-    return m_grid.subcircle(x, y, radius);
+  rcppsw::ds::grid_view<cell2D> subgrid(size_t x, size_t y, size_t radius) {
+    return m_grid.layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) { return m_grid.resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
 
+  /**
+   * @brief Perform deferred initialization (@todo: Fill this in...)
+   */
+  bool initialize(void);
+
  private:
+  /**
+   * @brief Compute the blocks that are going to go into the static cache when
+   * it is recreated by the arena map.
+   *
+   * @param center The location for the new cache.
+   * @param blocks Empty block vector to be filled with references to the blocks
+   *               to be part of the new cache.
+   *
+   * @return \c TRUE iff the calculate of blocks was successful. It may fail if
+   * they are not enough free blocks in the arena to meet the desired initial
+   * size of the cache.
+   */
+  bool calc_blocks_for_static_cache(const argos::CVector2& center,
+                                    block_vector& blocks);
+
   // clang-format off
-  uint                                             m_caches_removed{0};
-  const struct params::depth1::static_cache_params mc_static_cache_params;
-  block_vector                                     m_blocks;
-  cache_vector                                     m_caches;
-  support::block_distributor                       m_block_distributor;
-  std::shared_ptr<rcppsw::er::server>              m_server;
-  arena_grid                                       m_grid;
-  representation::nest                             m_nest;
+  uint                                      m_caches_removed{0};
+  const params::depth1::static_cache_params mc_static_cache_params;
+  block_vector                              m_blocks;
+  cache_vector                              m_caches;
+  arena_grid                                m_grid;
+  representation::nest                      m_nest;
+  support::block_dist::dispatcher           m_block_dispatcher;
   // clang-format on
 };
 

@@ -27,18 +27,13 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "rcppsw/metrics/tasks/management_metrics.hpp"
-#include "rcppsw/metrics/tasks/allocation_metrics.hpp"
-#include "rcppsw/task_allocation/task_graph_vertex.hpp"
-#include "fordyca/metrics/tasks/reactive_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
-class executable_task;
-class task_decomposition_graph;
+class bifurcating_tdgraph_executive;
+class polled_task;
 }}
 
 NS_START(fordyca);
@@ -58,7 +53,9 @@ namespace depth0 { class stateful_foraging_repository; }
 namespace depth1 { class task_repository; }
 }
 
-NS_START(controller, depth1);
+NS_START(controller);
+class cache_selection_matrix;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -72,16 +69,18 @@ NS_START(controller, depth1);
  * environment and/or execution/interface times of the tasks.
  */
 class foraging_controller : public depth0::stateful_foraging_controller,
-                            public virtual rcppsw::metrics::tasks::management_metrics,
+                            public er::client<foraging_controller>,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
+  ~foraging_controller(void);
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  std::shared_ptr<tasks::base_foraging_task> current_task(void) const override;
+  tasks::base_foraging_task* current_task(void) override;
+  const tasks::base_foraging_task* current_task(void) const override;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -95,33 +94,37 @@ class foraging_controller : public depth0::stateful_foraging_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  /* task metrics */
-  bool task_aborted(void) const override { return m_task_collator.task_aborted(); }
-  bool has_new_allocation(void) const override { return m_task_collator.has_new_allocation(); }
-  bool allocation_changed(void) const override { return m_task_collator.has_new_allocation(); }
-  bool task_finished(void) const override { return m_task_collator.task_finished(); }
-  double task_last_exec_time(void) const override { return m_task_collator.task_last_exec_time(); }
+  /**
+   * @brief Get whether or not a task has been aborted this timestep.
+   *
+   * This functionality CANNOT use the abort state of the \ref current_task()
+   * because as soon as a task is aborted, the executive allocates a new task
+   * the *same* timestep, and so when the loop functions check if a task has
+   * been aborted, using the current task's abort status will always return
+   * false, and lead to inconsistent simulation state.
+   */
+  bool task_aborted(void) const { return m_task_aborted; }
+  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
 
-  std::string current_task_name(void) const override;
-  bool employed_partitioning(void) const override;
-  std::string subtask_selection(void) const override;
+  /**
+   * @brief Callback for task abort. Task argument unused for now--only need to
+   * know that a task WAS aborted. \see \ref task_aborted().
+   */
+  void task_abort_cb(const ta::polled_task*);
 
  protected:
-  /* executive callbacks */
-  void task_abort_cleanup(const ta::task_graph_vertex& task);
-  void task_alloc_notify(const ta::task_graph_vertex& task);
-  void task_finish_notify(const ta::task_graph_vertex& task);
+  const cache_selection_matrix*  cache_sel_matrix(void) const {
+    return m_cache_sel_matrix.get();
+  }
 
  private:
   void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
                     params::depth1::task_repository* task_repo);
 
   // clang-format off
-  metrics::tasks::reactive_collator                  m_task_collator;
-  bool                                               m_display_task{false};
-  std::string                                        m_prev_task{""};
-  std::unique_ptr<ta::polled_executive>              m_executive;
-  std::shared_ptr<ta::task_decomposition_graph>      m_graph;
+  bool                                    m_display_task{false};
+  bool                                    m_task_aborted{false};
+  std::unique_ptr<cache_selection_matrix> m_cache_sel_matrix;
   // clang-format on
 };
 

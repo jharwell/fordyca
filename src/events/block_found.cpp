@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
@@ -36,24 +36,17 @@ namespace swarm = rcppsw::swarm;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         std::unique_ptr<representation::block> block)
+block_found::block_found(std::unique_ptr<representation::base_block> block)
     : perceived_cell_op(block->discrete_loc().first,
                         block->discrete_loc().second),
-      client(server),
-      m_block(std::move(block)) {
-  client::insmod("block_found",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
-
-block_found::~block_found(void) { client::rmmod(); }
+      ER_CLIENT_INIT("fordyca.events.block_found"),
+      m_block(std::move(block)) {}
 
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(representation::cell2D& cell) {
-  ER_ASSERT(nullptr != m_block, "FATAL: nullptr block?");
+  ER_ASSERT(nullptr != m_block, "nullptr block?");
   cell.entity(m_block);
   cell.fsm().accept(*this);
 } /* visit() */
@@ -67,14 +60,14 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
     fsm.event_block_drop();
   }
   ER_ASSERT(fsm.state_has_block(),
-            "FATAL: Perceived cell in incorrect state after block found event");
+            "Perceived cell in incorrect state after block found event");
 } /* visit() */
 
 void block_found::visit(representation::perceived_arena_map& map) {
   representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
 
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this

@@ -25,12 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <sstream>
+#include <string>
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
-
-#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,6 +64,7 @@ class base_sensing_subsystem {
     hal::sensors::proximity_sensor proximity;
     hal::sensors::light_sensor light;
     hal::sensors::ground_sensor ground;
+    hal::sensors::battery_sensor battery;
   };
 
   /**
@@ -87,6 +90,9 @@ class base_sensing_subsystem {
   const hal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
+  const hal::sensors::battery_sensor& battery(void) const {
+    return m_sensors.battery;
+  }
 
   /**
    * @brief If \c TRUE, a block has *possibly* been detected.
@@ -94,13 +100,13 @@ class base_sensing_subsystem {
    * Only possibly, because there are some false positives, such as the first
    * timestep, before ARGoS has finished initializing things.
    */
-  bool block_detected(void);
+  bool block_detected(void) const;
 
   /**
    * @brief If \c TRUE, the robot is currently in the nest, as reported by 3/4
    * of its ground sensors.
    */
-  bool in_nest(void);
+  bool in_nest(void) const;
 
   /**
    * @brief Get the robot's current location.

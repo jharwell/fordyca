@@ -37,9 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct fsm_params;
-}
 namespace controller {
 namespace depth1 {
 class sensing_subsystem;
@@ -73,16 +70,15 @@ using transport_goal_type = block_transporter::goal_type;
  * one.
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
+                                 er::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  cached_block_to_nest_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      const std::shared_ptr<representation::perceived_arena_map>& map);
+  cached_block_to_nest_fsm(const controller::cache_selection_matrix* sel_matrix,
+                           controller::saa_subsystem* saa,
+                           representation::perceived_arena_map* map);
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
   cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
@@ -103,11 +99,14 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
   void task_start(const task_allocation::taskable_argument*) override {}
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
+  /* collision metrics */
+  bool in_collision_avoidance(void) const override;
+  bool entered_collision_avoidance(void) const override;
+  bool exited_collision_avoidance(void) const override;
+  uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
+  bool goal_acquired(void) const override;
   FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   acquisition_goal_type acquisition_goal(void) const override;
@@ -134,6 +133,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
      * of handshaking/off by one issues regarding the timing of doing so.
      */
     ST_WAIT_FOR_PICKUP,
+
+    ST_WAIT_FOR_DROP,
 
     /**
      * Block found--bring it back to the nest.
@@ -175,11 +176,14 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* memory foraging states */
+  /* foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
+                     state_machine::event_data);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
+                     wait_for_drop,
                      state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 

@@ -31,7 +31,6 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -44,22 +43,20 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map,
+    controller::saa_subsystem* saa,
+    const representation::perceived_arena_map* const map,
     std::function<bool(void)> goal_detect)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(fsm_acquire_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       exit_fsm_acquire_goal(),
-      mc_map(std::move(map)),
-      m_vector_fsm(server, saa),
-      m_explore_fsm(
-          server,
-          saa,
-          std::make_unique<controller::random_explore_behavior>(server, saa),
-          goal_detect),
+      mc_map(map),
+      m_vector_fsm(saa),
+      m_explore_fsm(saa,
+                    std::make_unique<controller::random_explore_behavior>(saa),
+                    goal_detect),
       m_goal_acquired_cb(nullptr),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
@@ -72,14 +69,14 @@ acquire_goal_fsm::acquire_goal_fsm(
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, start) {
-  ER_DIAG("Executing ST_START");
+  ER_DEBUG("Executing ST_START");
   internal_event(ST_ACQUIRE_GOAL);
   return controller::foraging_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, fsm_acquire_goal) {
   if (ST_ACQUIRE_GOAL != last_state()) {
-    ER_DIAG("Executing ST_ACQUIRE_GOAL");
+    ER_DEBUG("Executing ST_ACQUIRE_GOAL");
   }
 
   if (acquire_goal()) {
@@ -94,19 +91,34 @@ HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
 }
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
   if (ST_FINISHED != last_state()) {
-    ER_DIAG("Executing ST_FINISHED");
+    ER_DEBUG("Executing ST_FINISHED");
   }
 
   return state_machine::event_signal::HANDLED;
 }
 
 /*******************************************************************************
- * Metrics
+ * FSM Metrics
  ******************************************************************************/
-__rcsw_pure bool acquire_goal_fsm::is_avoiding_collision(void) const {
-  return m_explore_fsm.is_avoiding_collision() ||
-         m_vector_fsm.is_avoiding_collision();
-} /* is_avoiding_collision() */
+__rcsw_pure bool acquire_goal_fsm::in_collision_avoidance(void) const {
+  return m_explore_fsm.in_collision_avoidance() ||
+         m_vector_fsm.in_collision_avoidance();
+} /* in_collision_avoidance() */
+
+__rcsw_pure bool acquire_goal_fsm::entered_collision_avoidance(void) const {
+  return m_explore_fsm.entered_collision_avoidance() ||
+         m_vector_fsm.entered_collision_avoidance();
+} /* entered_collision_avoidance() */
+
+__rcsw_pure bool acquire_goal_fsm::exited_collision_avoidance(void) const {
+  return m_explore_fsm.exited_collision_avoidance() ||
+         m_vector_fsm.exited_collision_avoidance();
+} /* exited_collision_avoidance() */
+
+__rcsw_pure uint acquire_goal_fsm::collision_avoidance_duration(void) const {
+  return m_explore_fsm.collision_avoidance_duration() ||
+         m_vector_fsm.collision_avoidance_duration();
+} /* collision_avoidance_duration() */
 
 bool acquire_goal_fsm::goal_acquired(void) const {
   return current_state() == ST_FINISHED;

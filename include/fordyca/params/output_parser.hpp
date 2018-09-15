@@ -50,8 +50,8 @@ NS_START(fordyca, params);
  */
 class output_parser : public rcppsw::params::xml_param_parser {
  public:
-  output_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level), m_metrics_parser(server, level + 1) {}
+  explicit output_parser(uint level)
+      : xml_param_parser(level), m_metrics_parser(level + 1) {}
 
   /**
    * @brief The root tag that all output loop functions parameters should lie
@@ -65,12 +65,11 @@ class output_parser : public rcppsw::params::xml_param_parser {
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<output_params> parse_results(void) const {
-    return m_params;
-  }
+  std::shared_ptr<output_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

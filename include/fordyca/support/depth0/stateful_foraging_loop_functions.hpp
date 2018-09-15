@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,9 +48,12 @@ class stateful_metrics_aggregator;
  * - Sending robots their position each timestep.
  * - Sending robot the current simulation tick each timestep.
  */
-class stateful_foraging_loop_functions : public stateless_foraging_loop_functions {
+class stateful_foraging_loop_functions : public stateless_foraging_loop_functions,
+                                         public er::client<stateful_foraging_loop_functions> {
  public:
-  stateful_foraging_loop_functions(void) = default;
+  stateful_foraging_loop_functions(void)
+      : ER_CLIENT_INIT("fordyca.loop.stateful") {}
+
   ~stateful_foraging_loop_functions(void) override = default;
 
   void Init(ticpp::Element& node) override;
@@ -60,10 +64,17 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
   void pre_step_final(void) override;
 
  private:
+  using interactor =
+      arena_interactor<controller::depth0::stateful_foraging_controller>;
+
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
+  // clang-format off
   std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg{nullptr};
+  std::unique_ptr<interactor> m_interactor{nullptr};
+  // clang-format on
+
 };
 
 NS_END(depth0, support, fordyca);

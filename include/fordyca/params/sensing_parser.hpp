@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/proximity_sensor_parser.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "fordyca/params/proximity_sensor_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,9 +47,8 @@ NS_START(fordyca, params);
  */
 class sensing_parser : public rcppsw::params::xml_param_parser {
  public:
-  sensing_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level),
-        m_proximity_parser(server, level + 1) {}
+  explicit sensing_parser(uint level)
+      : xml_param_parser(level), m_proximity_parser(level + 1) {}
 
   /**
    * @brief The root tag that all robot sensing parameters should lie under in
@@ -63,12 +62,11 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<sensing_params> parse_results(void) const {
-    return m_params;
-  }
+  std::shared_ptr<sensing_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

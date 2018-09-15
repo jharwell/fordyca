@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,8 +27,8 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,8 +47,9 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are written out at the specified collection interval.
  */
-class world_model_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                      public visitor::visitable_any<world_model_metrics_collector> {
+class world_model_metrics_collector
+    : public rcppsw::metrics::base_metrics_collector,
+      public visitor::visitable_any<world_model_metrics_collector> {
  public:
   /**
    * @param ofname The output file name.
@@ -61,7 +62,6 @@ class world_model_metrics_collector : public rcppsw::metrics::base_metrics_colle
   void reset_after_interval(void) override;
 
  private:
-
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
@@ -70,4 +70,4 @@ class world_model_metrics_collector : public rcppsw::metrics::base_metrics_colle
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */

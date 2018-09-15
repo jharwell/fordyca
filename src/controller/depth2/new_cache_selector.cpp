@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -34,11 +35,9 @@ NS_START(fordyca, controller, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 new_cache_selector::new_cache_selector(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    argos::CVector2 nest_loc)
-    : client(server), m_nest_loc(nest_loc) {
-  insmod("new_cache_selector", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+    const controller::cache_selection_matrix* const csel_matrix)
+    : ER_CLIENT_INIT("fordyca.controller.depth2.new_cache_selector"),
+      mc_matrix(csel_matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -47,20 +46,22 @@ representation::perceived_block new_cache_selector::calc_best(
     const std::list<representation::perceived_block>& new_caches,
     argos::CVector2 robot_loc) {
   representation::perceived_block best;
-  ER_ASSERT(!new_caches.empty(), "FATAL: no known new caches");
+  ER_ASSERT(!new_caches.empty(), "no known new caches");
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
-    math::new_cache_utility u(c.ent->real_loc(), m_nest_loc);
+    math::new_cache_utility u(c.ent->real_loc(),
+                              boost::get<argos::CVector2>(
+                                  mc_matrix->find("nest_center")->second));
 
     double utility = u.calc(robot_loc, c.density.last_result());
-    ER_ASSERT(utility > 0.0, "FATAL: Bad utility calculation");
-    ER_DIAG("Utility for new_cache%d loc=(%zu, %zu), density=%f: %f",
-            c.ent->id(),
-            c.ent->discrete_loc().first,
-            c.ent->discrete_loc().second,
-            c.density.last_result(),
-            utility);
+    ER_ASSERT(utility > 0.0, "Bad utility calculation");
+    ER_DEBUG("Utility for new_cache%d loc=(%u, %u), density=%f: %f",
+             c.ent->id(),
+             c.ent->discrete_loc().first,
+             c.ent->discrete_loc().second,
+             c.density.last_result(),
+             utility);
 
     if (utility > max_utility) {
       best = c;
@@ -68,13 +69,13 @@ representation::perceived_block new_cache_selector::calc_best(
     }
   } /* for(new_cache..) */
 
-  ER_ASSERT(nullptr != best.ent, "FATAL: No best new cache found?");
+  ER_ASSERT(nullptr != best.ent, "No best new cache found?");
 
-  ER_NOM("Best utility: new_cache%d at (%zu, %zu): %f",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         max_utility);
+  ER_INFO("Best utility: new_cache%d at (%u, %u): %f",
+          best.ent->id(),
+          best.ent->discrete_loc().first,
+          best.ent->discrete_loc().second,
+          max_utility);
   return best;
 } /* calc_best() */
 

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <string>
 
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
@@ -34,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
+namespace controller { class cache_selection_matrix; }
 namespace representation { class perceived_arena_map; class cache; }
 
 NS_START(fsm, depth1);
@@ -52,13 +53,12 @@ NS_START(fsm, depth1);
  * via random exploration). Once a cache has been acquired, it signals that it
  * has completed its task.
  */
-class base_acquire_cache_fsm : public acquire_goal_fsm {
+class base_acquire_cache_fsm : public acquire_goal_fsm,
+                               public er::client<base_acquire_cache_fsm> {
  public:
-  base_acquire_cache_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      std::shared_ptr<const representation::perceived_arena_map> map);
+  base_acquire_cache_fsm(const controller::cache_selection_matrix* sel_matrix,
+                         controller::saa_subsystem* saa,
+                         representation::perceived_arena_map* map);
 
   base_acquire_cache_fsm(const base_acquire_cache_fsm& fsm) = delete;
   base_acquire_cache_fsm& operator=(const base_acquire_cache_fsm& fsm) = delete;
@@ -74,8 +74,8 @@ class base_acquire_cache_fsm : public acquire_goal_fsm {
    * be too close to our chosen "cache" to vector to it if it is a block).
    */
   virtual bool select_cache_for_acquisition(argos::CVector2* acquisition) = 0;
+  const controller::cache_selection_matrix* sel_matrix(void) const { return mc_sel_matrix; }
 
-  argos::CVector2 nest_center(void) const { return mc_nest_center; }
 
  private:
   bool acquire_known_goal(void) override;
@@ -83,7 +83,7 @@ class base_acquire_cache_fsm : public acquire_goal_fsm {
   bool cache_detected_cb(void) const;
 
   // clang-format off
-  const argos::CVector2 mc_nest_center;
+  const controller::cache_selection_matrix* mc_sel_matrix;
   // clang-format on
 };
 

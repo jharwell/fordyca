@@ -36,7 +36,8 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class polled_executive;
+class bifurcating_tdgraph_executive;
+class bifurcating_tab;
 class executable_task;
 using executive_params = partitionable_task_params;
 }}
@@ -50,6 +51,7 @@ namespace tasks { namespace depth0 { class foraging_task; }}
 NS_START(controller);
 
 class base_perception_subsystem;
+class block_selection_matrix;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
@@ -70,6 +72,7 @@ NS_START(depth0);
  * block) and then bring the block to the nest.
  */
 class stateful_foraging_controller : public stateless_foraging_controller,
+                                     public er::client<stateful_foraging_controller>,
                                      public metrics::world_model_metrics,
                                      public visitor::visitable_any<stateful_foraging_controller> {
  public:
@@ -81,13 +84,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* base FSM metrics */
-  FSM_WRAPPER_DECLARE(bool, is_avoiding_collision);
-
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */
@@ -100,15 +98,16 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    * @brief Get the current task the controller is executing. For this
    * controller, that is always the \ref generalist task.
    */
-  virtual std::shared_ptr<tasks::base_foraging_task> current_task(void) const;
+  virtual tasks::base_foraging_task* current_task(void);
+  virtual const tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
 
-  const std::shared_ptr<const depth0::sensing_subsystem> stateful_sensors(void) const;
-  std::shared_ptr<depth0::sensing_subsystem> stateful_sensors(void);
+  const depth0::sensing_subsystem* stateful_sensors(void) const;
+  depth0::sensing_subsystem* stateful_sensors(void);
 
   /**
    * @brief Get the current LOS for the robot.
@@ -127,28 +126,40 @@ class stateful_foraging_controller : public stateless_foraging_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  const std::shared_ptr<const base_perception_subsystem> perception(void) const {
-    return m_perception;
-  }
-  std::shared_ptr<base_perception_subsystem> perception(void) { return m_perception; }
+  const base_perception_subsystem* perception(void) const { return m_perception.get(); }
+  base_perception_subsystem* perception(void) { return m_perception.get(); }
+
+  const ta::bifurcating_tab* active_tab(void) const;
+
+  /*
+   * Public to setup metric collection from tasks.
+   */
+  const ta::bifurcating_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  ta::bifurcating_tdgraph_executive* executive(void) { return m_executive.get(); }
 
  protected:
-  void perception(const std::shared_ptr<base_perception_subsystem>& perception) {
-    m_perception = perception;
-  }
+  void perception(std::unique_ptr<base_perception_subsystem> perception);
+  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
+  void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
+
+  /*
+   * The stateful foraging controller owns the executive, but derived classes
+   * can access it and set it to whatever they want. This is done to reduce the
+   * amount of function overriding that would have to be performed otherwise if
+   * derived controllers each had private executives--slightly cleaner to do it
+   * this way I think.
+   *
+   * Strategy pattern!
+   */
+  void executive(std::unique_ptr<ta::bifurcating_tdgraph_executive> executive);
 
  private:
-  /**
-   * @brief Initialize the task executive and all tasks for this controller.
-   */
-  void tasking_init(const struct params::fsm_params* fsm_params,
-                    const ta::executive_params* exec_params);
-
   // clang-format off
   bool                                                 m_display_los{false};
   argos::CVector2                                      m_light_loc;
-  std::unique_ptr<task_allocation::polled_executive>   m_executive;
-  std::shared_ptr<base_perception_subsystem>           m_perception{nullptr};
+  std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
+  std::unique_ptr<base_perception_subsystem>           m_perception;
+  std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
   // clang-format on
 };
 

@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/block.hpp"
 #include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -31,6 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using representation::arena_grid;
 using representation::occupancy_grid;
 
 /*******************************************************************************
@@ -46,12 +46,12 @@ void cell_empty::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cell_empty::visit(representation::arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
 } /* visit() */
 
 void cell_empty::visit(representation::perceived_arena_map& map) {
-  map.access<occupancy_grid::kPheromoneLayer>(x(), y()).reset();
-  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
+  map.access<occupancy_grid::kPheromone>(x(), y()).reset();
+  map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -33,12 +33,12 @@ NS_START(fordyca, fsm, depth1);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    const std::shared_ptr<representation::perceived_arena_map>& map)
-    : block_to_goal_fsm(params, server, saa, map),
-      m_cache_fsm(params, server, saa, map) {}
+    const controller::block_selection_matrix* bsel_matrix,
+    const controller::cache_selection_matrix* csel_matrix,
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
+    : block_to_goal_fsm(bsel_matrix, saa, map),
+      m_cache_fsm(csel_matrix, saa, map) {}
 
 /*******************************************************************************
  * FSM Metrics
@@ -61,5 +61,14 @@ transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) cons
   }
   return transport_goal_type::kNone;
 } /* acquisition_goal() */
+
+bool block_to_existing_cache_fsm::goal_acquired(void) const {
+  if (acquisition_goal_type::kBlock == acquisition_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+  } else if (transport_goal_type::kExistingCache == block_transport_goal()) {
+    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+  }
+  return false;
+} /* goal_acquired() */
 
 NS_END(depth1, controller, fordyca);

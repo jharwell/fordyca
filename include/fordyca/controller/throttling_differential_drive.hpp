@@ -25,7 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include "fordyca/controller/throttling_handler.hpp"
+#include <string>
+
+#include "fordyca/controller/motion_throttling_handler.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive.hpp"
@@ -46,30 +48,24 @@ class throttling_differential_drive : public kinematics2D::differential_drive {
   static constexpr double kInterWheelDistance = 0.14;
 
   throttling_differential_drive(
-      const std::shared_ptr<rcppsw::er::server>& server,
       kinematics2D::differential_drive::drive_type type,
       double max_speed,
       argos::CRadians soft_turn_max,
       const hal::actuators::differential_drive_actuator& wheels,
-      const struct params::throttling_params* params)
-      : differential_drive(server,
-                           wheels,
+      const ct::waveform_params* params)
+      : differential_drive(wheels,
                            type,
                            kWheelRadius,
                            kInterWheelDistance,
                            max_speed,
                            soft_turn_max),
-        m_throttling(params) {}
+        m_block_carry(params) {}
 
-  throttling_differential_drive(const throttling_differential_drive& fsm) =
-      delete;
-  throttling_differential_drive& operator=(
-      const throttling_differential_drive& fsm) = delete;
-  void throttle_toggle(bool en) { m_throttling.carrying_block(en); }
-  void throttling_update(void) { m_throttling.update(); }
+  void block_carry_throttle(bool en) { m_block_carry.toggle(en); }
+  void throttling_update(uint timestep) { m_block_carry.update(timestep); }
 
  private:
-  throttling_handler m_throttling;
+  motion_throttling_handler m_block_carry;
 };
 
 NS_END(controller, fordyca);

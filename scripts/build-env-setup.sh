@@ -12,6 +12,9 @@ module load qt/5.9.1
 module load boost/1.65.1/gnu-7.2.0
 module load gcc/7.2.0
 module load llvm/5.0.0
+module load python3
+module load parallel
+module unload python2/2.7.8
 
 # Set compiler vars so that cmake uses the correct version of the
 # compiler. You would think that this would not be required...
@@ -21,4 +24,5 @@ export CXX=g++
 # Add argos to our path
 gcc_prefix=$(gcc -v 2>&1  |grep prefix | awk -F'=' '{print $2}' | awk '{print $1}')
 export PATH=$PATH:$SWARM_ROOT/bin
+export ARGOS_PLUGIN_PATH=$SWARM_ROOT/lib/argos3
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWARM_ROOT/lib/argos3:$gcc_prefix/lib64

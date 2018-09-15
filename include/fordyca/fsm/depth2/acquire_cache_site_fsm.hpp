@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { struct fsm_params; }
+namespace controller { class cache_selection_matrix; }
 
 NS_START(fsm, depth2);
 
@@ -54,13 +54,13 @@ NS_START(fsm, depth2);
  * robot arrives at its chosen site and there is already a cache there or there
  * is one very close by.
  */
-class acquire_cache_site_fsm : public acquire_goal_fsm {
+class acquire_cache_site_fsm : public acquire_goal_fsm,
+                               public er::client<acquire_cache_site_fsm> {
  public:
   acquire_cache_site_fsm(
-      const struct params::fsm_params* params,
-      const std::shared_ptr<rcppsw::er::server>& server,
-      const std::shared_ptr<controller::saa_subsystem>& saa,
-      std::shared_ptr<const representation::perceived_arena_map> map);
+      const controller::cache_selection_matrix* csel_matrix,
+      controller::saa_subsystem* saa,
+      representation::perceived_arena_map* map);
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;
@@ -82,7 +82,7 @@ class acquire_cache_site_fsm : public acquire_goal_fsm {
   bool site_detected_cb(void) const { return true; }
 
   // clang-format off
-  const argos::CVector2 mc_nest_center;
+  const controller::cache_selection_matrix* const mc_matrix;
   // clang-format on
 };
 

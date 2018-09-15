@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_foraging_controller id="ffc"
+    <stateless_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -28,6 +28,7 @@
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
+        <battery implementation="default" />
       </sensors>
       <params>
         <output>
@@ -35,23 +36,27 @@
                output_dir="__current_date__"
                />
         </output>
-        <occupancy_grid>
+        <occupancy_grid
+            nest="2.0, 3">
           <grid resolution="0.2"
-                size="10, 5, 2"
-                />
+                size="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
+          <block_priorities
+              cube="1.0"
+              ramp="1.0"
+              />
         </occupancy_grid>
         <task_executive>
           <estimation alpha="0.8"/>
           <task_abort reactivity="8"
-                    offset="3"
-                    />
+                      offset="3"
+                      />
           <task_partition
               method="pini2011"
-              always_partition="true"
+              always_partition="false"
               never_partition="false"
-              reactivity="1.5"
+              reactivity="4"
               offset="1.0"
               />
           <subtask_selection
@@ -72,8 +77,13 @@
                             delta="0.0001" />
         </sensing>
         <actuation>
-          <throttling
-              block_carry="0.1"/>
+          <block_carry_throttle>
+            <waveform
+                type="Null"
+                frequency="100"
+                amplitude="0.4"
+                offset="0.1"/>
+          </block_carry_throttle>
           <steering2D>
             <avoidance_force lookahead="0.5"
                              max="8"/>
@@ -85,18 +95,16 @@
                           circle_radius="100.0"
                           max_angle_delta="5"
                           max="9.0"
-                          interval="1"/>
+                          interval="1"
+                          normal_dist="false"/>
             <phototaxis_force max="8"/>
           </steering2D>
 
           <differential_drive soft_turn_max="30"
                               max_speed="10.0" />
         </actuation>
-        <fsm
-          nest="2.0, 2.5"
-          />
       </params>
-    </stateful_foraging_controller>
+    </stateless_foraging_controller>
 
   </controllers>
 
@@ -104,55 +112,73 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_foraging_loop_functions">
+                  label="stateless_foraging_loop_functions">
     <output>
-      <sim log_fname="sim.log"
-           output_root="output"
+      <sim output_root="output"
            output_dir="__current_date__"
            />
       <metrics
           output_dir="metrics"
-          block_fname="block-stats.csv"
-          block_acquisition_fname="block-acquisition-stats.csv"
-          block_transport_fname="block-transport-stats.csv"
-          cache_acquisition_fname="cache-acquisition-stats.csv"
-          cache_utilization_fname="cache-utilization-stats.csv"
-          cache_lifecycle_fname="cache-lifecycle-stats.csv"
-          task_execution_fname="task-execution-stats.csv"
-          task_management_fname="task-management-stats.csv"
-          distance_fname="distance-stats.csv"
+          fsm_collision_fname="fsm-collision.csv"
+          fsm_movement_fname="fsm-movement.csv"
+          block_fname="block.csv"
+          block_acquisition_fname="block-acquisition.csv"
+          block_transport_fname="block-transport.csv"
+          block_manipulation_fname="block-manipulation.csv"
+          cache_acquisition_fname="cache-acquisition.csv"
+          cache_utilization_fname="cache-utilization.csv"
+          cache_lifecycle_fname="cache-lifecycle.csv"
+          task_execution_generalist_fname="task-execution-generalist.csv"
+          task_execution_collector_fname="task-execution-collector.csv"
+          task_execution_harvester_fname="task-execution-harvester.csv"
+          task_generalist_tab_fname="task-generalist-tab.csv"
           perception_world_model_fname="perception-world-model.csv"
+          arena_robot_occupancy_fname="arena-robot-occupancy.csv"
           collect_interval="1000"
           />
     </output>
     <arena_map>
       <grid resolution="0.2"
-            size="10, 5, 2"/>
-      <blocks dimension="0.2" />
-      <block_distribution n_blocks="20"
-                          dist_type="single_source"
-                          arena_model.shape="rectangle"
-                          arena_model.orientation="horizontal"
-                          nest_model.shape="rectangle"
-                          nest_model.orientation="horizontal"
-                          />
+            size="12, 6, 2"/>
+      <blocks>
+        <manipulation_penalty>
+          <waveform
+              type="Sine"
+              frequency="0.01"
+              amplitude="50"
+              offset="50"/>
+        </manipulation_penalty>
+        <distribution
+            arena_resolution="0.2"
+            dist_type="random">
+          <powerlaw
+              pwr_min="0"
+              pwr_max="3"
+              n_clusters="15"
+              />
+          <manifest
+              n_cube="10"
+              n_ramp="10"
+              unit_dim="0.2"
+              />
+        </distribution>
+      </blocks>
+
       <static_caches enable="true"
                      size="2"
                      respawn_scale_factor="0.05"
                      dimension="0.8"
-                     min_dist="0.8"
-                     usage_penalty="10"
-                     />
-      <nest size="1.0, 4.0" center="2, 2.5" />
+                     min_dist="0.8">
+        <usage_penalty>
+          <waveform
+              type="Null"
+              frequency="100"
+              amplitude="500"
+              offset="10"/>
+        </usage_penalty>
+      </static_caches>
+      <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
-    <penalty pen_func = "kSine"
-             amp = "2"
-             per = "2"
-             phase = "1"
-             square = "2"
-             step = "2"
-             saw = "2"
-             />
     <visualization robot_id="true"
                    robot_los="false"
                    robot_task="true"
@@ -163,50 +189,51 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 5, 2" center="5,2.5,1">
+  <arena size="12, 6, 2" center="6,3,1">
 
     <floor id="floor"
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="10,0.1,0.5" movable="false">
-      <body position="5,5,0" orientation="0,0,0" />
+    <box id="wall_north" size="12`2`,0.1,0.5" movable="false">
+      <body position="6,6,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="10,0.1,0.5" movable="false">
-      <body position="5,0,0" orientation="0,0,0" />
+    <box id="wall_south" size="12,0.1,0.5" movable="false">
+      <body position="6,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,5,0.5" movable="false">
-      <body position="10,2.5,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,6,0.5" movable="false">
+      <body position="12,3,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,5,0.5" movable="false">
-      <body position="0,2.5,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,6,0.5" movable="false">
+      <body position="0,3,0" orientation="0,0,0" />
     </box>
 
-    <light id="light_1"
-           position="2,1.25,1.0"
+    <light id="light1"
+           position="2,1.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_2"
-           position="2,2.5,1.0"
+    <light id="light2"
+           position="2,3,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
-    <light id="light_3"
-           position="2,3.75,1.0"
+    <light id="light3"
+           position="2,4.5,1.0"
            orientation="0,0,0"
            color="yellow"
            intensity="10.0"
            medium="leds" />
 
     <distribute>
-      <position method="uniform" min="1,1,0" max="8,4,0" />
+      <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
+      <entity quantity="2" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
+          <!-- <battery model= "time_motion"/> -->
         </foot-bot>
       </entity>
     </distribute>
@@ -241,7 +268,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_foraging_qt_user_functions" />
+      <user_functions label="stateless_foraging_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

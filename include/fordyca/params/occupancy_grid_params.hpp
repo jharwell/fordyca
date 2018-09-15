@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/params/block_priority_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "fordyca/params/pheromone_params.hpp"
 #include "rcppsw/params/base_params.hpp"
@@ -38,11 +39,13 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct occupancy_grid_params
- * @ingroup params depth0
+ * @ingroup params
  */
 struct occupancy_grid_params : public rcppsw::params::base_params {
   struct grid_params grid {};
   struct pheromone_params pheromone {};
+  struct block_priority_params priorities {};
+  argos::CVector2 nest{};
 };
 
 NS_END(params, fordyca);

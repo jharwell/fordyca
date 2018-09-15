@@ -27,10 +27,9 @@
 #include <string>
 
 #include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/throttling_parser.hpp"
-#include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
-
 #include "fordyca/params/steering_force2D_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
+#include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,11 +49,11 @@ NS_START(fordyca, params);
  */
 class actuation_parser : public rcppsw::params::xml_param_parser {
  public:
-  actuation_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level),
-        m_differential_drive(server, level + 1),
-        m_steering(server, level + 1),
-        m_throttling(server, level + 1) {}
+  explicit actuation_parser(uint level)
+      : xml_param_parser(level),
+        m_differential_drive(level + 1),
+        m_steering(level + 1),
+        m_throttling(level + 1) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the
@@ -72,7 +71,8 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 
@@ -80,7 +80,7 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<actuation_params>           m_params{nullptr};
   kinematics2D::differential_drive_xml_parser m_differential_drive;
   steering_force2D_parser                     m_steering;
-  throttling_parser                           m_throttling;
+  ct::waveform_xml_parser                     m_throttling;
   // clang-format on
 };
 

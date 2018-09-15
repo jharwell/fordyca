@@ -36,7 +36,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
 class arena_map;
 class perceived_arena_map;
-class block;
+class base_block;
 } // namespace representation
 
 NS_START(events);
@@ -54,7 +54,7 @@ NS_START(events);
 class block_pickup_event
     : public visitor::visit_set<representation::arena_map,
                                 representation::perceived_arena_map,
-                                representation::block> {};
+                                representation::base_block> {};
 
 NS_END(events, fordyca);
 

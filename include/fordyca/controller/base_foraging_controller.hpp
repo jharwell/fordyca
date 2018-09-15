@@ -35,7 +35,7 @@
 NS_START(fordyca);
 
 namespace representation {
-class block;
+class base_block;
 class line_of_sight;
 } // namespace representation
 namespace params {
@@ -59,8 +59,9 @@ class saa_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_foraging_controller : public argos::CCI_Controller,
-                                 public rcppsw::er::client {
+class base_foraging_controller
+    : public argos::CCI_Controller,
+      public rcppsw::er::client<base_foraging_controller> {
  public:
   base_foraging_controller(void);
   ~base_foraging_controller(void) override = default;
@@ -72,6 +73,12 @@ class base_foraging_controller : public argos::CCI_Controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void Reset(void) override;
+
+  /**
+   * @brief Get the ID of the entity. Argos also provides this, but it doesn't
+   * work in gdb, so I provide my own.
+   */
+  int entity_id(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
@@ -100,12 +107,14 @@ class base_foraging_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::block> block(void) const { return m_block; }
+  std::shared_ptr<representation::base_block> block(void) const {
+    return m_block;
+  }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::block>& block) {
+  void block(const std::shared_ptr<representation::base_block>& block) {
     m_block = block;
   }
 
@@ -142,25 +151,22 @@ class base_foraging_controller : public argos::CCI_Controller,
   void robot_loc(argos::CVector2 loc);
   argos::CVector2 robot_loc(void) const;
 
+  void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
+  void ndc_pop(void) { ER_NDC_POP(); }
+
  protected:
-  const std::shared_ptr<const controller::saa_subsystem> saa_subsystem(
-      void) const {
-    return m_saa;
-  }
-  std::shared_ptr<controller::saa_subsystem> saa_subsystem(void) {
-    return m_saa;
+  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  class saa_subsystem* saa_subsystem(void) {
+    return m_saa.get();
   }
 
  private:
   void output_init(const struct params::output_params* params);
-  std::string log_header_calc(void) const;
-  std::string dbg_header_calc(void) const;
 
   // clang-format off
-  bool                                       m_display_id{false};
-  std::shared_ptr<representation::block>     m_block{nullptr};
-  std::shared_ptr<controller::saa_subsystem> m_saa{nullptr};
-  std::shared_ptr<rcppsw::er::server>        m_server;
+  bool                                        m_display_id{false};
+  std::shared_ptr<representation::base_block> m_block{nullptr};
+  std::unique_ptr<controller::saa_subsystem>  m_saa;
   // clang-format on
 };
 

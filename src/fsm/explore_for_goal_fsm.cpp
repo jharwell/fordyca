@@ -27,7 +27,6 @@
 #include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/fsm_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,24 +38,21 @@ namespace kinematics = rcppsw::robotics::kinematics;
  * Constructors/Destructors
  ******************************************************************************/
 explore_for_goal_fsm::explore_for_goal_fsm(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
+    controller::saa_subsystem* const saa,
     std::unique_ptr<controller::explore_behavior> behavior,
     std::function<bool(void)> goal_detect)
-    : base_explore_fsm(server, saa, ST_MAX_STATES),
+    : base_explore_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.explore_for_goal"),
       entry_explore(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)},
+      mc_state_map{
+          HFSM_STATE_MAP_ENTRY_EX(&start),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
+          HFSM_STATE_MAP_ENTRY_EX(&finished)},
       m_explore_behavior(std::move(behavior)),
-      m_goal_detect(goal_detect) {
-  insmod("explore_for_goal_fsm",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
-}
+      m_goal_detect(goal_detect) {}
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
   internal_event(ST_EXPLORE);
@@ -69,7 +65,7 @@ __rcsw_const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
   if (ST_EXPLORE != last_state()) {
-    ER_DIAG("Executing ST_EXPLORE");
+    ER_DEBUG("Executing ST_EXPLORE");
   }
 
   if (m_goal_detect()) {
@@ -79,6 +75,26 @@ HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
   }
   return controller::foraging_signal::HANDLED;
 }
+
+/*******************************************************************************
+ * Collision Metrics
+ ******************************************************************************/
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       in_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       entered_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(bool,
+                       explore_for_goal_fsm,
+                       exited_collision_avoidance,
+                       m_explore_behavior);
+FSM_WRAPPER_DEFINE_PTR(uint,
+                       explore_for_goal_fsm,
+                       collision_avoidance_duration,
+                       m_explore_behavior);
 
 /*******************************************************************************
  * General Member Functions

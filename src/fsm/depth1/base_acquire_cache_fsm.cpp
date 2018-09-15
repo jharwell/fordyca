@@ -24,7 +24,6 @@
 #include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
-#include "fordyca/params/fsm_params.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_arena_map.hpp"
 
@@ -38,16 +37,15 @@ namespace depth1 = controller::depth1;
  * Constructors/Destructors
  ******************************************************************************/
 base_acquire_cache_fsm::base_acquire_cache_fsm(
-    const struct params::fsm_params* params,
-    const std::shared_ptr<rcppsw::er::server>& server,
-    const std::shared_ptr<controller::saa_subsystem>& saa,
-    std::shared_ptr<const representation::perceived_arena_map> map)
-    : acquire_goal_fsm(server,
-                       saa,
+    const controller::cache_selection_matrix* sel_matrix,
+    controller::saa_subsystem* const saa,
+    representation::perceived_arena_map* const map)
+    : acquire_goal_fsm(saa,
                        map,
                        std::bind(&base_acquire_cache_fsm::cache_detected_cb,
                                  this)),
-      mc_nest_center(params->nest_center) {}
+      ER_CLIENT_INIT("fordyca.fsm.depth1.base_acquire_cache"),
+      mc_sel_matrix(sel_matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -63,13 +61,13 @@ bool base_acquire_cache_fsm::cache_acquired_cb(bool explore_result) const {
       std::static_pointer_cast<const depth1::sensing_subsystem>(base_sensors());
   if (explore_result) {
     ER_ASSERT(sensors->cache_detected(),
-              "FATAL: No cache detected after successful exploration?");
+              "No cache detected after successful exploration?");
     return true;
   } else {
     if (sensors->cache_detected()) {
       return true;
     }
-    ER_WARN("WARNING: Robot arrived at goal, but no cache was detected.");
+    ER_WARN("Robot arrived at goal, but no cache was detected.");
     return false;
   }
 } /* cache_acquired_cb() */
@@ -98,8 +96,7 @@ bool base_acquire_cache_fsm::acquire_known_goal(void) {
       if (!select_cache_for_acquisition(&best)) {
         return false;
       }
-      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL,
-                               best);
+      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, best);
       explore_fsm().task_reset();
       vector_fsm().task_reset();
       vector_fsm().task_start(&v);

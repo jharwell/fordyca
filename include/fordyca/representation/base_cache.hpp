@@ -29,10 +29,10 @@
 #include <utility>
 #include <vector>
 
-#include "fordyca/representation/block.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
+#include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,6 +58,7 @@ class base_cache : public multicell_entity,
                    public immovable_cell_entity,
                    public prototype::clonable<base_cache> {
  public:
+  using block_vector = std::vector<std::shared_ptr<base_block>>;
   /**
    * @brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks)
@@ -77,7 +78,7 @@ class base_cache : public multicell_entity,
   base_cache(double dimension,
              double resolution,
              argos::CVector2 center,
-             const std::vector<std::shared_ptr<block>>& blocks,
+             const std::vector<std::shared_ptr<base_block>>& blocks,
              int id);
 
   __rcsw_pure bool operator==(const base_cache& other) const {
@@ -87,7 +88,8 @@ class base_cache : public multicell_entity,
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    */
-  __rcsw_pure bool contains_block(const std::shared_ptr<block> c_block) const {
+  __rcsw_pure bool contains_block(
+      const std::shared_ptr<base_block> c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
@@ -96,17 +98,15 @@ class base_cache : public multicell_entity,
   /**
    * @brief Get a list of the blocks currently in the cache.
    */
-  std::vector<std::shared_ptr<block>>& blocks(void) { return m_blocks; }
-  const std::vector<std::shared_ptr<block>>& blocks(void) const {
-    return m_blocks;
-  }
+  block_vector& blocks(void) { return m_blocks; }
+  const block_vector& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Add a new block to the cache's list of blocks.
    *
    * Does not update the block's location.
    */
-  void block_add(const std::shared_ptr<block>& block) {
+  void block_add(const std::shared_ptr<base_block>& block) {
     m_blocks.push_back(block);
   }
 
@@ -123,7 +123,7 @@ class base_cache : public multicell_entity,
    */
   bool contains_point(const argos::CVector2& point) const {
     return xspan(real_loc()).value_within(point.GetX()) &&
-        yspan(real_loc()).value_within(point.GetY());
+           yspan(real_loc()).value_within(point.GetY());
   }
 
   /**
@@ -131,23 +131,22 @@ class base_cache : public multicell_entity,
    *
    * Does not update the block's location.
    */
-  void block_remove(const std::shared_ptr<block>& block);
+  void block_remove(const std::shared_ptr<base_block>& block);
 
   /**
    * @brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
-  std::shared_ptr<block> block_get(void) { return m_blocks.front(); }
+  std::shared_ptr<base_block> block_get(void) { return m_blocks.front(); }
 
   std::unique_ptr<base_cache> clone(void) const override;
 
  private:
   // clang-format off
-  static int          m_next_id;
+  static int   m_next_id;
 
-
-  double                              m_resolution;
-  std::vector<std::shared_ptr<block>> m_blocks;
+  double       m_resolution;
+  block_vector m_blocks;
   // clang-format on
 };
 
