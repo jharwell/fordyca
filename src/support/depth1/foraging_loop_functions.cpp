@@ -199,8 +199,8 @@ void foraging_loop_functions::pre_step_final(void) {
     auto& collector =
         static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
             *(*m_metrics_agg)["tasks::generalist_tab"]);
-    int n_harvesters = collector.stats().int_subtask1_count;
-    int n_collectors = collector.stats().int_subtask2_count;
+    uint n_harvesters = collector.stats().int_subtask1_count;
+    uint n_collectors = collector.stats().int_subtask2_count;
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
@@ -208,7 +208,7 @@ void foraging_loop_functions::pre_step_final(void) {
         __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
             arena_map()->caches()[0]->discrete_loc());
         ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                  "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+                  "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
                   arena_map()->caches()[0]->n_blocks(),
                   cell.block_count());
         m_cache_collator.cache_created();
@@ -251,7 +251,11 @@ void foraging_loop_functions::cache_handling_init(
  */
 using namespace argos;
 typedef foraging_loop_functions depth1_foraging_loop_functions;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 REGISTER_LOOP_FUNCTIONS(depth1_foraging_loop_functions,
                         "depth1_foraging_loop_functions");
-
+#pragma clang diagnostic pop
 NS_END(depth1, support, fordyca);

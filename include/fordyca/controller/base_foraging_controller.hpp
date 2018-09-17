@@ -151,7 +151,21 @@ class base_foraging_controller
   void robot_loc(argos::CVector2 loc);
   argos::CVector2 robot_loc(void) const;
 
+  /**
+   * @brief Convenience function to add footbot ID to salient messages during
+   * loop function execution (timestep is already there).
+   */
   void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
+
+  /**
+   * @brief Convenience function to add footbot ID+timestep to messages during
+   * \ref ControlStep().
+   */
+  void ndc_pusht(void);
+
+  /**
+   * @brief Remove the last NDC.
+   */
   void ndc_pop(void) { ER_NDC_POP(); }
 
  protected:

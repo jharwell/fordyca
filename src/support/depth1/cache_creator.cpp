@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/cache_creator.hpp"
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -75,21 +76,30 @@ std::unique_ptr<representation::arena_cache> cache_creator::create_single(
    * cache extent,
    * and all blocks be deposited in a single cell.
    */
-  for (auto block : blocks) {
+  for (auto& block : blocks) {
     events::cell_empty op(block->discrete_loc());
     m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
 
-  for (auto block : blocks) {
+  for (auto& block : blocks) {
     events::free_block_drop op(block, d, m_resolution);
     m_grid.access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
-  ER_INFO("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks",
+
+  std::string s = std::accumulate(blocks.begin(),
+                                  blocks.end(),
+                                  std::string(),
+                                  [&](const std::string& a,
+                                      const std::shared_ptr<representation::base_block>& b) {
+                                    return a + "b" + std::to_string(b->id()) + ",";
+                                  });
+  ER_INFO("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks [%s]",
           center.GetX(),
           center.GetY(),
           d.first,
           d.second,
-          blocks.size());
+          blocks.size(),
+          s.c_str());
 
   block_vector block_vec(blocks.begin(), blocks.end());
   return rcppsw::make_unique<representation::arena_cache>(
@@ -108,25 +118,25 @@ void cache_creator::update_host_cells(cache_vector& caches) {
 
     auto xspan = cache->xspan(cache->real_loc());
     auto yspan = cache->yspan(cache->real_loc());
-    size_t xmin = std::ceil(xspan.get_min() / m_grid.resolution());
-    size_t xmax = std::ceil(xspan.get_max() / m_grid.resolution());
-    size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
-    size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
+    uint xmin = static_cast<uint>(std::ceil(xspan.get_min() / m_grid.resolution()));
+    uint xmax = static_cast<uint>(std::ceil(xspan.get_max() / m_grid.resolution()));
+    uint ymin = static_cast<uint>(std::ceil(yspan.get_min() / m_grid.resolution()));
+    uint ymax = static_cast<uint>(std::ceil(yspan.get_max() / m_grid.resolution()));
 
-    for (size_t i = xmin; i < xmax; ++i) {
-      for (size_t j = ymin; j < ymax; ++j) {
+    for (uint i = xmin; i < xmax; ++i) {
+      for (uint j = ymin; j < ymax; ++j) {
         rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
         if (c != cache->discrete_loc()) {
           ER_ASSERT(
               cache->contains_point(
                   math::dcoord_to_rcoord(c, m_grid.resolution())),
-              "Cache%d does not contain point (%zu, %zu) within its extent",
+              "Cache%d does not contain point (%u, %u) within its extent",
               cache->id(),
               i,
               j);
           auto& cell = m_grid.access<arena_grid::kCell>(i, j);
           ER_ASSERT(!cell.state_in_cache_extent(),
-                    "cell(%zu, %zu) already in CACHE_EXTENT",
+                    "cell(%u, %u) already in CACHE_EXTENT",
                     i,
                     j);
           events::cell_cache_extent e(c, cache);

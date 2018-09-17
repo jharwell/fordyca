@@ -46,7 +46,7 @@ NS_START(fordyca, params, depth0);
 struct exec_estimates_params : public rcppsw::params::base_params {
   bool enabled{false};
 
-  argos::CRange<double> generalist_range{};
+  argos::CRange<uint> generalist_range{};
 };
 
 NS_END(depth0, params, fordyca);

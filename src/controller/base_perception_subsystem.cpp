@@ -68,8 +68,8 @@ void base_perception_subsystem::process_los(
    * between then and now, and it needs to update its internal representation
    * accordingly.
    */
-  for (size_t i = 0; i < c_los->xsize(); ++i) {
-    for (size_t j = 0; j < c_los->ysize(); ++j) {
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
@@ -107,8 +107,8 @@ void base_perception_subsystem::processed_los_verify(
    * Verify that for each cell in LOS that was empty or contained a block, that
    * it matches the PAM.
    */
-  for (size_t i = 0; i < c_los->xsize(); ++i) {
-    for (size_t j = 0; j < c_los->ysize(); ++j) {
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
       auto& cell2 = map()->access<occupancy_grid::kCell>(d);
@@ -135,8 +135,8 @@ void base_perception_subsystem::processed_los_verify(
 
 void base_perception_subsystem::update_cell_stats(
     const representation::line_of_sight* const los) {
-  for (size_t i = 0; i < los->xsize(); ++i) {
-    for (size_t j = 0; j < los->ysize(); ++j) {
+  for (uint i = 0; i < los->xsize(); ++i) {
+    for (uint j = 0; j < los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&

@@ -110,7 +110,7 @@ __rcsw_pure depth0::sensing_subsystem* stateful_foraging_controller::stateful_se
 }
 
 void stateful_foraging_controller::ControlStep(void) {
-  ndc_push();
+  ndc_pusht();
   /*
    * Update the robot's model of the world with the current line-of-sight, and
    * update the relevance of information within it. Then, you can run the main
@@ -194,7 +194,12 @@ uint stateful_foraging_controller::cell_state_inaccuracies(uint state) const {
 } /* cell_state_inaccuracies() */
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_CONTROLLER(stateful_foraging_controller,
                     "stateful_foraging_controller"); // NOLINT
+#pragma clang diagnostic pop
 
 NS_END(depth0, controller, fordyca);

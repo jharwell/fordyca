@@ -69,7 +69,7 @@ class arena_map : public rcppsw::er::client<arena_map>,
  public:
   using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-  arena_map(const struct params::arena::arena_map_params* params);
+  explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /* arena metrics */
   bool has_robot(size_t i, size_t j) const override;
@@ -150,10 +150,10 @@ class arena_map : public rcppsw::er::client<arena_map>,
   bool distribute_single_block(
       std::shared_ptr<representation::base_block>& block);
 
-  size_t xdsize(void) const { return m_grid.xdsize(); }
-  size_t ydsize(void) const { return m_grid.ydsize(); }
-  size_t xrsize(void) const { return m_grid.xrsize(); }
-  size_t yrsize(void) const { return m_grid.yrsize(); }
+  double xdsize(void) const { return m_grid.xdsize(); }
+  double ydsize(void) const { return m_grid.ydsize(); }
+  double xrsize(void) const { return m_grid.xrsize(); }
+  double yrsize(void) const { return m_grid.yrsize(); }
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).

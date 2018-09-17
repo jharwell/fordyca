@@ -108,7 +108,7 @@ class base_perception_subsystem
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
    * arena map for this timestep.
    *
-   * @param los
+   * @param los The current LOS
    */
   void update_cell_stats(const representation::line_of_sight* const los);
 
