@@ -44,10 +44,10 @@ NS_START(fordyca, params, depth2);
  * swarm convergence a fair bit.
  */
 struct exec_estimates_params : public depth1::exec_estimates_params {
-  argos::CRange<double> cache_starter_range{};
-  argos::CRange<double> cache_finisher_range{};
-  argos::CRange<double> cache_transferer_range{};
-  argos::CRange<double> cache_collector_range{};
+  argos::CRange<uint> cache_starter_range{};
+  argos::CRange<uint> cache_finisher_range{};
+  argos::CRange<uint> cache_transferer_range{};
+  argos::CRange<uint> cache_collector_range{};
 };
 
 NS_END(depth2, params, fordyca);

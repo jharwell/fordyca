@@ -166,7 +166,11 @@ void stateful_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
                         "stateful_foraging_loop_functions"); // NOLINT
-
+#pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

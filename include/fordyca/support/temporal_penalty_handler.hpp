@@ -60,12 +60,12 @@ class temporal_penalty_handler
     : public er::client<temporal_penalty_handler<T>> {
  public:
   /**
-   * @Brief Initialize the penalty handler.
+   * @brief Initialize the penalty handler.
    *
    * @param server Server for debugging.
    * @param params Parameters for penalty waveform generation.
    */
-  temporal_penalty_handler(const ct::waveform_params* const params)
+  explicit temporal_penalty_handler(const ct::waveform_params* const params)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
         m_penalty_list(),
         m_penalty(ct::waveform_generator()(params->type, params)) {}
@@ -171,7 +171,7 @@ class temporal_penalty_handler
    * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = m_penalty->value(timestep);
+    uint penalty = static_cast<uint>(m_penalty->value(timestep));
     if (0 == penalty) {
       ++penalty;
     }

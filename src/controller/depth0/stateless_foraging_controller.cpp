@@ -74,14 +74,13 @@ void stateless_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateless_foraging_controller::ControlStep(void) {
-  ER_NDC_PUSH("[" + this->GetId() +
-              ",t=" + std::to_string(saa_subsystem()->sensing()->tick()) + "]");
+  ndc_pusht();
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
   m_fsm->run();
-  ER_NDC_POP();
+  ndc_pop();
 } /* ControlStep() */
 
 /*******************************************************************************
@@ -126,7 +125,11 @@ argos::CVector2 stateless_foraging_controller::velocity(void) const {
 
 /* Notifiy ARGoS of the existence of the controller. */
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_CONTROLLER(stateless_foraging_controller,
                     "stateless_foraging_controller"); // NOLINT
-
+#pragma clang diagnostic pop
 NS_END(depth0, controller, fordyca);

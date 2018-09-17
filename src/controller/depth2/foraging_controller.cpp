@@ -112,8 +112,12 @@ __rcsw_pure const tasks::base_foraging_task* foraging_controller::current_task(
  */
 using namespace argos;
 using depth2_foraging_controller = foraging_controller;
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_CONTROLLER(depth2_foraging_controller,
                     "depth2_foraging_controller"); // NOLINT
+#pragma clang diagnostic pop
 
 NS_END(depth2, controller, fordyca);

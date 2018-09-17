@@ -97,21 +97,28 @@ void base_foraging_controller::Init(ticpp::Element& node) {
 
   /* initialize sensing and actuation subsystem */
   struct actuation_subsystem::actuator_list alist = {
-      .wheels = GetActuator<argos::CCI_DifferentialSteeringActuator>(
-          "differential_steering"),
-      .leds = GetActuator<argos::CCI_LEDsActuator>("leds"),
+    .wheels = hal::actuators::differential_drive_actuator(
+        GetActuator<argos::CCI_DifferentialSteeringActuator>(
+            "differential_steering")),
+    .leds = hal::actuators::led_actuator(
+        GetActuator<argos::CCI_LEDsActuator>("leds")),
       .wifi =
-          GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")};
+    hal::actuators::wifi_actuator(
+        GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing"))
+  };
   struct base_sensing_subsystem::sensor_list slist = {
-      .rabs = GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing"),
-      .proximity = hal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = hal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
-      .ground = GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-          "footbot_motor_ground"),
-      .battery = hal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>("battery"))};
+    .rabs = hal::sensors::rab_wifi_sensor(
+        GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
+    .proximity = hal::sensors::proximity_sensor(
+        GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
+    .light = hal::sensors::light_sensor(
+        GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
+    .ground = hal::sensors::ground_sensor(
+        GetSensor<argos::CCI_FootBotMotorGroundSensor>(
+            "footbot_motor_ground")),
+    .battery = hal::sensors::battery_sensor(
+        GetSensor<argos::CCI_BatterySensor>("battery"))
+  };
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
       param_repo.parse_results<struct params::actuation_params>(),
       param_repo.parse_results<struct params::sensing_params>(),
@@ -165,5 +172,10 @@ void base_foraging_controller::tick(uint tick) {
 int base_foraging_controller::entity_id(void) const {
   return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
+
+void base_foraging_controller::ndc_pusht(void) {
+  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) +
+              "] [" + GetId() + "]");
+}
 
 NS_END(controller, fordyca);

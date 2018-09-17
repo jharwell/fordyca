@@ -65,7 +65,11 @@ void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity)
 }
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 REGISTER_QTOPENGL_USER_FUNCTIONS(stateless_foraging_qt_user_functions,
                                  "stateless_foraging_qt_user_functions"); // NOLINT
-
+#pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

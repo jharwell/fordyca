@@ -61,30 +61,30 @@ occupancy_grid::occupancy_grid(
  ******************************************************************************/
 void occupancy_grid::update(void) {
 #pragma omp parallel for
-  for (size_t i = 0; i < xdsize(); ++i) {
-    for (size_t j = 0; j < ydsize(); ++j) {
+  for (uint i = 0; i < xdsize(); ++i) {
+    for (uint j = 0; j < ydsize(); ++j) {
       cell_update(i, j);
     } /* for(j..) */
   }   /* for(i..) */
 } /* update() */
 
 void occupancy_grid::reset(void) {
-  for (size_t i = 0; i < xdsize(); ++i) {
-    for (size_t j = 0; j < ydsize(); ++j) {
+  for (uint i = 0; i < xdsize(); ++i) {
+    for (uint j = 0; j < ydsize(); ++j) {
       cell2D& cell = access<kCell>(i, j);
       cell.reset();
     } /* for(j..) */
   }   /* for(i..) */
 } /* Reset */
 
-void occupancy_grid::cell_init(size_t i, size_t j, double pheromone_rho) {
+void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
   access<kPheromone>(i, j).rho(pheromone_rho);
   cell2D& cell = access<kCell>(i, j);
   cell.robot_id(m_robot_id);
   cell.loc(rcppsw::math::dcoord2(i, j));
 } /* cell_init() */
 
-void occupancy_grid::cell_update(size_t i, size_t j) {
+void occupancy_grid::cell_update(uint i, uint j) {
   rcppsw::swarm::pheromone_density& density = access<kPheromone>(i, j);
   cell2D& cell = access<kCell>(i, j);
   if (!m_pheromone_repeat_deposit) {
