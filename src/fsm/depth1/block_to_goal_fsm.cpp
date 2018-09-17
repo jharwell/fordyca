@@ -217,7 +217,7 @@ void block_to_goal_fsm::init(void) {
 
 void block_to_goal_fsm::task_start(
     const rcppsw::task_allocation::taskable_argument* const arg) {
-  auto* a = dynamic_cast<const tasks::foraging_signal_argument* const>(arg);
+  auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(a, "bad argument passed");
   inject_event(a->signal(), state_machine::event_type::NORMAL);
 }

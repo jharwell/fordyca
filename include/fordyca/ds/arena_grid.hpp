@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, ds);
+using arena_layer_stack = std::tuple<cell2D, bool>;
 
 /*******************************************************************************
  * Class Definitions
@@ -44,7 +45,6 @@ NS_START(fordyca, ds);
  *
  * @brief Ds of the cells within a grid layout
  */
-using arena_layer_stack = std::tuple<cell2D, bool>;
 class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
  public:
   using view = rcppsw::ds::grid_view<ds::cell2D>;

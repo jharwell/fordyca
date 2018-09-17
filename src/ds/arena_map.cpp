@@ -51,7 +51,7 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
              static_cast<size_t>(params->grid.upper.GetY())),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(m_grid, &params->blocks.dist) {
-  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
+  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           m_grid.xrsize(),
           m_grid.yrsize(),
           m_grid.xdsize(),
@@ -76,6 +76,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
    * a block, if it is also standing in a cache, that takes priority.
    */
   if (-1 != robot_on_cache(pos)) {
+    ER_TRACE("Block hidden by cache%d", robot_on_cache(pos));
     return -1;
   }
   for (size_t i = 0; i < m_blocks.size(); ++i) {
@@ -127,7 +128,7 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
         });
 
     ER_ASSERT(count < representation::base_cache::kMinBlocks,
-              "For new cache @(%f, %f) [%u, %u]: %zu >= %u blocks SHOULD be "
+              "For new cache @(%f, %f) [%u, %u]: %zu >= %zu blocks SHOULD be "
               "available, but only %zu are",
               center.GetX(),
               center.GetY(),
@@ -153,9 +154,8 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
 
 bool arena_map::static_cache_create(void) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_static_cache_params.size >=
-                representation::base_cache::kMinBlocks,
-            "Static cache size %u < minimum %u",
+  ER_ASSERT(mc_static_cache_params.size >= representation::base_cache::kMinBlocks,
+            "Static cache size %u < minimum %zu",
             mc_static_cache_params.size,
             representation::base_cache::kMinBlocks);
 
@@ -173,6 +173,8 @@ bool arena_map::static_cache_create(void) {
     return false;
   }
   m_caches = creator.create_all(blocks);
+  ER_ASSERT(1 == m_caches.size(), "Wrong # caches after static create: %zu",
+            m_caches.size());
 
   /*
    * Any blocks that are under where the cache currently is (i.e. will be
@@ -270,25 +272,25 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  size_t xmin = std::ceil(xspan.get_min() / m_grid.resolution());
-  size_t xmax = std::ceil(xspan.get_max() / m_grid.resolution());
-  size_t ymin = std::ceil(yspan.get_min() / m_grid.resolution());
-  size_t ymax = std::ceil(yspan.get_max() / m_grid.resolution());
+  uint xmin = static_cast<uint>(std::ceil(xspan.get_min() / m_grid.resolution()));
+  uint xmax = static_cast<uint>(std::ceil(xspan.get_max() / m_grid.resolution()));
+  uint ymin = static_cast<uint>(std::ceil(yspan.get_min() / m_grid.resolution()));
+  uint ymax = static_cast<uint>(std::ceil(yspan.get_max() / m_grid.resolution()));
 
-  for (size_t i = xmin; i < xmax; ++i) {
-    for (size_t j = ymin; j < ymax; ++j) {
+  for (uint i = xmin; i < xmax; ++i) {
+    for (uint j = ymin; j < ymax; ++j) {
       rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
       if (c != victim->discrete_loc()) {
         ER_ASSERT(victim->contains_point(
                       math::dcoord_to_rcoord(c, m_grid.resolution())),
-                  "Cache%d does not contain point (%zu, %zu) within its extent",
+                  "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,
                   j);
 
         auto& cell = m_grid.access<arena_grid::kCell>(i, j);
         ER_ASSERT(cell.state_in_cache_extent(),
-                  "cell(%zu, %zu) not in CACHE_EXTENT [state=%d]",
+                  "cell(%u, %u) not in CACHE_EXTENT [state=%d]",
                   i,
                   j,
                   cell.fsm().current_state());

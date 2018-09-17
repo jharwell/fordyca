@@ -38,7 +38,7 @@ NS_START(fordyca, metrics);
 base_metrics_aggregator::base_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : ER_CLIENT_INIT("fordyca.metrics.aggregator"), collector_group() {
+    : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"), collector_group() {
   m_metrics_path = output_root + "/" + params->output_dir;
 
   if (!fs::exists(m_metrics_path)) {

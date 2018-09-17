@@ -73,7 +73,7 @@ class foraging_controller : public depth0::stateful_foraging_controller,
                             public visitor::visitable_any<foraging_controller> {
  public:
   foraging_controller(void);
-  ~foraging_controller(void);
+  ~foraging_controller(void) override;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;

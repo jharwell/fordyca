@@ -58,7 +58,7 @@ foraging_controller::~foraging_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void foraging_controller::ControlStep(void) {
-  ndc_push();
+  ndc_pusht();
   perception()->update(depth0::stateful_foraging_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
@@ -135,8 +135,11 @@ void foraging_controller::task_abort_cb(const ta::polled_task*) {
  */
 using namespace argos;
 using depth1_foraging_controller = foraging_controller;
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_CONTROLLER(depth1_foraging_controller,
                     "depth1_foraging_controller"); // NOLINT
-
+#pragma clang diagnostic pop
 NS_END(depth1, controller, fordyca);

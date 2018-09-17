@@ -63,7 +63,7 @@ class base_cache : public multicell_entity,
    * @brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks)
    */
-  static constexpr uint kMinBlocks = 2;
+  static constexpr size_t kMinBlocks = 2;
 
   /**
    * @param dimension The size of the cache. Does not have to be a multiple of
@@ -93,7 +93,7 @@ class base_cache : public multicell_entity,
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
-  uint n_blocks(void) const { return blocks().size(); }
+  virtual size_t n_blocks(void) const { return blocks().size(); }
 
   /**
    * @brief Get a list of the blocks currently in the cache.

@@ -32,7 +32,7 @@ NS_START(fordyca, representation);
  * Static Members
  ******************************************************************************/
 int base_cache::m_next_id = 0;
-constexpr uint base_cache::kMinBlocks;
+constexpr size_t base_cache::kMinBlocks;
 
 /*******************************************************************************
  * Constructors/Destructor

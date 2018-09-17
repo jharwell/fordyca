@@ -42,12 +42,17 @@ struct occupancy_grid_params;
 }
 
 NS_START(ds);
+using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
-
+/**
+ * @class occupancy_grid
+ * @ingroup ds
+ *
+ * @brief Multilayered grid of \ref cell2D and \ref rcppsw::swarm::pheromone_density.
+ */
 class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
@@ -72,8 +77,8 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
   }
 
  private:
-  void cell_update(size_t i, size_t j);
-  void cell_init(size_t i, size_t j, double pheromone_rho);
+  void cell_update(uint i, uint j);
+  void cell_init(uint i, uint j, double pheromone_rho);
 
   // clang-format off
   static constexpr double             kEPSILON{0.0001};

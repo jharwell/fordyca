@@ -56,8 +56,8 @@ void perception_subsystem::process_los(
    * the cell does not contain a cache, then the cache was depleted between then
    * and now, and it needs to update its internal representation accordingly.
    */
-  for (size_t i = 0; i < c_los->xsize(); ++i) {
-    for (size_t j = 0; j < c_los->ysize(); ++j) {
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
@@ -90,14 +90,14 @@ void perception_subsystem::process_los(
      * (i.e. different # of blocks in it), and so you need to always process
      * caches in the LOS, even if you already know about them.
      */
-    ER_DEBUG("LOS: Cache%d@(%u,%u): %d blocks",
+    ER_DEBUG("LOS: Cache%d@(%u,%u): %zu blocks",
              cache->id(),
              cache->discrete_loc().first,
              cache->discrete_loc().second,
              cache->n_blocks());
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
     if (!cell.state_has_cache()) {
-      ER_INFO("Discovered cache%d(%u, %u): %u blocks (density=%f, state=%d)",
+      ER_INFO("Discovered cache%d(%u, %u): %zu blocks (density=%f, state=%d)",
               cache->id(),
               cache->discrete_loc().first,
               cache->discrete_loc().second,
@@ -108,7 +108,7 @@ void perception_subsystem::process_los(
               cell.fsm().current_state());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
-      ER_INFO("Fixed cache%d@(%u, %u) block count: %u blocks -> %u blocks",
+      ER_INFO("Fixed cache%d@(%u, %u) block count: %zu blocks -> %zu blocks",
               cache->id(),
               cache->discrete_loc().first,
               cache->discrete_loc().second,
@@ -140,8 +140,8 @@ void perception_subsystem::processed_los_verify(
    * Verify processing (cache part, other parts done by parent class). We do not
    * check the CACHE_EXTENT state because the PAM does not need that information.
    */
-  for (size_t i = 0; i < c_los->xsize(); ++i) {
-    for (size_t j = 0; j < c_los->ysize(); ++j) {
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
       auto& cell2 = map()->access<occupancy_grid::kCell>(d);
@@ -153,7 +153,7 @@ void perception_subsystem::processed_los_verify(
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         ER_ASSERT(cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
-                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
+                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %zu/%zu",
                   d.first,
                   d.second,
                   cell1.cache()->n_blocks(),
@@ -167,7 +167,7 @@ void perception_subsystem::processed_los_verify(
       if (*c1 == *c2) {
         auto& cell = map()->access<occupancy_grid::kCell>(c2->discrete_loc());
         ER_ASSERT(c1->n_blocks() == cell.cache()->n_blocks(),
-                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %d/%d",
+                  "LOS/PAM disagree on # of blocks in cell at (%u, %u): %zu/%zu",
                   cell.loc().first,
                   cell.loc().second,
                   c1->n_blocks(),

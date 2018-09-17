@@ -197,7 +197,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool base_foraging_fsm::in_collision_avoidance(void) const {
+__rcsw_pure bool base_foraging_fsm::in_collision_avoidance(void) const {
   return m_in_avoidance;
 } /* in_collision_avoidance() */
 

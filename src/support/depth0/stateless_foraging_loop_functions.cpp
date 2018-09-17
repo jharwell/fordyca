@@ -23,12 +23,10 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
@@ -58,20 +56,19 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-  /* parse all environment parameters and capture in logfile */
-  params::loop_function_repository repo;
-  repo.parse_all(node);
-
   /* initialize output and metrics collection */
-  auto* arena = repo.parse_results<params::arena::arena_map_params>();
-  params::output_params output = *repo.parse_results<params::output_params>();
+  auto* arena = params().parse_results<params::arena::arena_map_params>();
+  params::output_params output = *params().parse_results<params::output_params>();
   output.metrics.arena_grid = arena->grid;
-  output_init(arena, &output);
+
+  m_metrics_agg =
+      rcppsw::make_unique<stateless_metrics_aggregator>(&output.metrics,
+                                                        output_root());
 
   /* initialize arena map and distribute blocks */
-  arena_map_init(repo);
+  arena_map_init(params());
 
-  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  auto* arenap = params().parse_results<params::arena::arena_map_params>();
   m_interactor =
       rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
@@ -88,7 +85,7 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
     /*
      * If NULL, then visualization has been disabled.
      */
-    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    auto* vparams = params().parse_results<struct params::visualization_params>();
     if (nullptr != vparams) {
       controller.display_id(vparams->robot_id);
     }
@@ -195,38 +192,12 @@ void stateless_foraging_loop_functions::arena_map_init(
   }
 } /* arena_map_init() */
 
-void stateless_foraging_loop_functions::output_init(
-    const struct params::arena::arena_map_params* const arena,
-    struct params::output_params* const output) {
-  if ("__current_date__" == output->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = output->output_root + "/" +
-                    std::to_string(now.date().year()) + "-" +
-                    std::to_string(now.date().month()) + "-" +
-                    std::to_string(now.date().day()) + ":" +
-                    std::to_string(now.time_of_day().hours()) + "-" +
-                    std::to_string(now.time_of_day().minutes());
-  } else {
-    m_output_root = output->output_root + "/" + output->output_dir;
-  }
-
-  output->metrics.arena_grid = arena->grid;
-  m_metrics_agg =
-      rcppsw::make_unique<stateless_metrics_aggregator>(&output->metrics,
-                                                        output_root());
-
-#ifndef ER_NREPORT
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.events"), m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.support"), m_output_root + "/sim.log");
-#endif
-} /* output_init() */
-
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions,
                         "stateless_foraging_loop_functions"); // NOLINT
-
+#pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

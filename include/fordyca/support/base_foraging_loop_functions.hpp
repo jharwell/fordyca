@@ -1,7 +1,7 @@
 /**
  * @file base_foraging_loop_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -27,17 +27,19 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/simulator/loop_functions.h>
 #include <string>
-
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
+#include "rcppsw/er/client.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+
+namespace params {
+struct output_params;
+}
+
+NS_START(support);
 
 /*******************************************************************************
  * Classes
@@ -54,24 +56,36 @@ NS_START(fordyca, support);
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_foraging_loop_functions : public argos::CLoopFunctions {
+class base_foraging_loop_functions : public argos::CLoopFunctions,
+                                     public rcppsw::er::client<base_foraging_loop_functions> {
  public:
-  base_foraging_loop_functions(void) = default;
-
+  base_foraging_loop_functions(void);
   base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
   base_foraging_loop_functions& operator=(
       const base_foraging_loop_functions& s) = delete;
 
-  void Init(ticpp::Element&) override {
-    m_floor = &GetSpace().GetFloorEntity();
-    std::srand(std::time(nullptr));
-  }
+  /* CLoopFunctions overrides */
+  void Init(ticpp::Element&) override;
 
  protected:
   argos::CFloorEntity* floor(void) const { return m_floor; }
+  const std::string& output_root(void) const { return m_output_root; }
+  const params::loop_function_repository& params(void) const { return m_params; }
+  params::loop_function_repository& params(void) { return m_params; }
 
  private:
-  argos::CFloorEntity* m_floor{nullptr};
+  /**
+   * @brief Initialize logging for all support/loop function code.
+   *
+   * @param output Parsed output parameters.n
+   */
+  void output_init(const struct params::output_params* const output);
+
+  // clang-format off
+  argos::CFloorEntity*             m_floor{nullptr};
+  std::string                      m_output_root{""};
+  params::loop_function_repository m_params{};
+  // clang-format on
 };
 
 NS_END(support, fordyca);

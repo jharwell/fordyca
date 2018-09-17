@@ -59,11 +59,11 @@ class arena_cache
               int id);
 
   /* metrics */
-  uint n_blocks(void) const override { return base_cache::n_blocks(); }
+  size_t n_blocks(void) const override { return base_cache::n_blocks(); }
   uint total_block_pickups(void) const override { return m_block_pickups; }
   uint total_block_drops(void) const override { return m_block_drops; }
   void reset_metrics(void) override;
-  uint cache_id(void) const override { return id(); }
+  int cache_id(void) const override { return id(); }
 
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }

@@ -153,7 +153,6 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
   } else {
     return base_foraging_fsm::collision_avoidance_duration();
   }
-  return 0;
 } /* collision_avoidance_duration() */
 
 /*******************************************************************************

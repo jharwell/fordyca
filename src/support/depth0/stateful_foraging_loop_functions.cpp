@@ -31,7 +31,6 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
@@ -52,13 +51,11 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
-  params::loop_function_repository repo;
-  repo.parse_all(node);
 
   /* initialize stat collecting */
-  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  auto* arenap = params().parse_results<params::arena::arena_map_params>();
   params::output_params output =
-      *repo.parse_results<const struct params::output_params>();
+      *params().parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
 
   m_metrics_agg =
@@ -83,7 +80,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     /*
      * If NULL, then visualization has been disabled.
      */
-    auto* vparams = repo.parse_results<struct params::visualization_params>();
+    auto* vparams = params().parse_results<struct params::visualization_params>();
     if (nullptr != vparams) {
       controller.display_los(vparams->robot_los);
     }
@@ -166,7 +163,11 @@ void stateful_foraging_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
                         "stateful_foraging_loop_functions"); // NOLINT
-
+#pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

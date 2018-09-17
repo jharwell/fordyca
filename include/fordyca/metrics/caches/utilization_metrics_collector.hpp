@@ -67,7 +67,7 @@ class utilization_metrics_collector
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint int_blocks{0};
+    size_t int_blocks{0};
     uint int_pickups{0};
     uint int_drops{0};
     uint cum_blocks{0};
@@ -85,9 +85,9 @@ class utilization_metrics_collector
    * IDs of the caches that had events in the current interval, for use in
    * averaging statistics.
    */
-  std::set<uint> m_int_cache_ids{};
+  std::set<int>  m_int_cache_ids{};
 
-  std::set<uint> m_cum_cache_ids{};
+  std::set<int>  m_cum_cache_ids{};
   // clang-format on
 };
 

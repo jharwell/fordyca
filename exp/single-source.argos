@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="5000"
+    <experiment length="1000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateless_foraging_controller id="ffc"
+    <depth1_foraging_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -104,7 +104,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </stateless_foraging_controller>
+    </depth1_foraging_controller>
 
   </controllers>
 
@@ -112,7 +112,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateless_foraging_loop_functions">
+                  label="depth1_foraging_loop_functions">
     <output>
       <sim output_root="output"
            output_dir="__current_date__"
@@ -230,7 +230,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="2" max_trials="1000">
+      <entity quantity="64" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
@@ -268,7 +268,7 @@
   <!--                  up="0,1,0" -->
   <!--                  /> -->
   <!--     </camera> -->
-  <!--     <user_functions label="stateless_foraging_qt_user_functions" /> -->
+  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
   <!--   </qt-opengl> -->
   <!-- </visualization> -->
 

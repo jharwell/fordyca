@@ -58,8 +58,7 @@ class cache_creator : public er::client<cache_creator> {
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
-  cache_creator(ds::arena_grid& grid,
-                double cache_size, double resolution);
+  cache_creator(ds::arena_grid& grid, double cache_size, double resolution);
 
   /**
    * @brief Create caches from all blocks in the provided list that are close
