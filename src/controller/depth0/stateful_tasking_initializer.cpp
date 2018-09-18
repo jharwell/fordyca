@@ -26,13 +26,12 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
 #include "fordyca/params/depth0/exec_estimates_params.hpp"
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -41,17 +40,16 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 stateful_tasking_initializer::stateful_tasking_initializer(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : m_server(server),
+    : ER_CLIENT_INIT("fordyca.controller.depth0.tasking_initializer"),
       m_saa(saa),
       m_perception(perception),
       mc_sel_matrix(sel_matrix),
@@ -63,16 +61,18 @@ stateful_tasking_initializer::~stateful_tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 void stateful_tasking_initializer::stateful_tasking_init(
-    params::depth0::stateful_param_repository* const stateful_repo) {
+    params::depth0::stateful_controller_repository* const stateful_repo) {
   auto* exec_params = stateful_repo->parse_results<ta::executive_params>();
   auto* est_params =
       stateful_repo->parse_results<params::depth0::exec_estimates_params>();
+  ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
-          m_server, mc_sel_matrix, m_saa, m_perception->map());
+          mc_sel_matrix, m_saa, m_perception->map());
 
-  auto generalist = new tasks::depth0::generalist(exec_params, generalist_fsm);
+  auto generalist =
+      new tasks::depth0::generalist(exec_params, std::move(generalist_fsm));
 
   if (est_params->enabled) {
     static_cast<ta::polled_task*>(generalist)
@@ -80,18 +80,17 @@ void stateful_tasking_initializer::stateful_tasking_init(
                       est_params->generalist_range.GetMax());
   }
 
-  m_graph = new ta::bifurcating_tdgraph(m_server);
+  m_graph = new ta::bifurcating_tdgraph();
 
   m_graph->set_root(generalist);
-  generalist->set_atomic();
+  generalist->set_atomic(true);
 } /* tasking_init() */
 
 std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer::
-operator()(params::depth0::stateful_param_repository* const stateful_repo) {
+operator()(params::depth0::stateful_controller_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_server,
-                                                                m_graph);
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_graph);
 } /* initialize() */
 
 NS_END(depth0, controller, fordyca);

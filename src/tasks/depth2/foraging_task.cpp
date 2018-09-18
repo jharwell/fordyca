@@ -43,7 +43,7 @@ constexpr char foraging_task::kCacheTransfererName[];
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
                              const struct ta::task_params* params,
-                             std::unique_ptr<ta::taskable>& mechanism)
+                             std::unique_ptr<ta::taskable> mechanism)
     : base_foraging_task(&params->abort),
       polled_task(name, params, std::move(mechanism)) {}
 

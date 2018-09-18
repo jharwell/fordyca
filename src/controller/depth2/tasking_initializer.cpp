@@ -30,14 +30,13 @@
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
+#include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/depth2/exec_estimates_params.hpp"
-#include "fordyca/params/depth2/param_repository.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -46,22 +45,17 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : depth1::tasking_initializer(server,
-                                  bsel_matrix,
-                                  csel_matrix,
-                                  saa,
-                                  perception) {}
+    : depth1::tasking_initializer(bsel_matrix, csel_matrix, saa, perception) {}
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -69,14 +63,13 @@ tasking_initializer::~tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 void tasking_initializer::depth2_tasking_init(
-    params::depth2::param_repository* const param_repo) {
+    params::depth2::controller_repository* const param_repo) {
   auto* est_params =
       param_repo->parse_results<params::depth2::exec_estimates_params>();
   auto* exec_params = param_repo->parse_results<ta::executive_params>();
 
   std::unique_ptr<ta::taskable> cache_starter_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
-          server(),
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -84,7 +77,6 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_finisher_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
-          server(),
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -92,19 +84,22 @@ void tasking_initializer::depth2_tasking_init(
 
   std::unique_ptr<ta::taskable> cache_transferer_fsm =
       rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
-          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
+          cache_sel_matrix(), saa_subsystem(), perception()->map());
   std::unique_ptr<ta::taskable> cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          server(), cache_sel_matrix(), saa_subsystem(), perception()->map());
+          cache_sel_matrix(), saa_subsystem(), perception()->map());
 
   auto cache_starter =
-      new tasks::depth2::cache_starter(exec_params, cache_starter_fsm);
+      new tasks::depth2::cache_starter(exec_params,
+                                       std::move(cache_starter_fsm));
   auto cache_finisher =
-      new tasks::depth2::cache_finisher(exec_params, cache_finisher_fsm);
+      new tasks::depth2::cache_finisher(exec_params,
+                                        std::move(cache_finisher_fsm));
   auto cache_transferer =
-      new tasks::depth2::cache_transferer(exec_params, cache_transferer_fsm);
+      new tasks::depth2::cache_transferer(exec_params,
+                                          std::move(cache_transferer_fsm));
   auto cache_collector =
-      new tasks::depth1::collector(exec_params, cache_collector_fsm);
+      new tasks::depth1::collector(exec_params, std::move(cache_collector_fsm));
 
   if (est_params->enabled) {
     cache_starter->init_random(est_params->cache_starter_range.GetMin(),
@@ -126,20 +121,19 @@ void tasking_initializer::depth2_tasking_init(
 } /* depth2_tasking_init() */
 
 std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator()(
-    params::depth2::param_repository* const param_repo) {
+    params::depth2::controller_repository* const param_repo) {
   stateful_tasking_init(param_repo);
   depth1_tasking_init(param_repo);
 
   /* collector, forager tasks are now partitionable */
   auto children = graph()->children(graph()->root());
   for (auto& t : children) {
-    t->set_partitionable();
+    t->set_partitionable(true);
   } /* for(&t..) */
 
   depth2_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(server(),
-                                                                graph());
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

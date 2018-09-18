@@ -25,8 +25,8 @@
 
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,18 +38,18 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* saa,
-    representation::perceived_arena_map* const map)
-    : base_acquire_cache_fsm(server, csel_matrix, saa, map) {}
+    ds::perceived_arena_map* const map)
+    : base_acquire_cache_fsm(csel_matrix, saa, map),
+      ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache") {}
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::select_cache_for_acquisition(
     argos::CVector2* const acquisition) {
-  controller::depth2::new_cache_selector selector(server_ref(), sel_matrix());
+  controller::depth2::new_cache_selector selector(sel_matrix());
 
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
@@ -61,11 +61,11 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_NOM("Select new cache for acquisition: %d@(%u, %u) [utility=%f]",
-         best.ent->id(),
-         best.ent->discrete_loc().first,
-         best.ent->discrete_loc().second,
-         best.density.last_result());
+  ER_INFO("Select new cache for acquisition: %d@(%u, %u) [utility=%f]",
+          best.ent->id(),
+          best.ent->discrete_loc().first,
+          best.ent->discrete_loc().second,
+          best.density.last_result());
   *acquisition = best.ent->real_loc();
   return true;
 } /* select_cache() */

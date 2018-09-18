@@ -49,20 +49,20 @@ NS_START(events);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public perceived_cell_op, public rcppsw::er::client {
+class cache_found : public perceived_cell_op,
+                    public rcppsw::er::client<cache_found> {
  public:
-  cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-              std::unique_ptr<representation::base_cache> cache);
-  ~cache_found(void) override;
+  explicit cache_found(std::unique_ptr<representation::base_cache> cache);
+  ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
   cache_found& operator=(const cache_found& op) = delete;
 
   /* stateful foraging */
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::cell2D& cell) override;
 
   /* depth1 foraging */
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(controller::depth1::foraging_controller&) override {}
   void visit(controller::depth0::stateful_foraging_controller&) override {}

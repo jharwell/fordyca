@@ -25,16 +25,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace ds {
 class arena_map;
 class perceived_arena_map;
-} // namespace representation
+} // namespace ds
 
 NS_START(events);
 
@@ -52,20 +53,21 @@ NS_START(events);
  * square that the block was on is now  (probably) empty. It might not be if in
  * the same timestep a new cache is created on that same cell.
  */
-class cell_empty
-    : public cell_op,
-      public visitor::can_visit<representation::arena_map>,
-      public visitor::can_visit<representation::perceived_arena_map> {
+class cell_empty : public cell_op,
+                   public visitor::can_visit<ds::arena_map>,
+                   public visitor::can_visit<ds::perceived_arena_map> {
  public:
+  explicit cell_empty(const rcppsw::math::dcoord2& coord)
+      : cell_empty{coord.first, coord.second} {}
   cell_empty(size_t x, size_t y) : cell_op(x, y) {}
 
   /* stateless foraging */
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map& map) override;
+  void visit(ds::arena_map& map) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
 };
 
 NS_END(events, fordyca);

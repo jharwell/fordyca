@@ -26,26 +26,26 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/representation/arena_map.hpp"
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
-    : client(rcppsw::er::g_server), m_arena_map(nullptr), m_interactor{nullptr} {
-  insmod("loop_functions", rcppsw::er::er_lvl::DIAG, rcppsw::er::er_lvl::NOM);
-}
+    : ER_CLIENT_INIT("fordyca.loop.stateless"),
+      m_arena_map(nullptr),
+      m_interactor(nullptr) {}
 
 stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
     default;
@@ -55,34 +55,25 @@ stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
  ******************************************************************************/
 void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   base_foraging_loop_functions::Init(node);
-
-  rcppsw::er::g_server->dbglvl(rcppsw::er::er_lvl::NOM);
-  rcppsw::er::g_server->loglvl(rcppsw::er::er_lvl::DIAG);
-  ER_NOM("Initializing stateless foraging loop functions");
+  ndc_push();
+  ER_INFO("Initializing...");
 
   /* parse all environment parameters and capture in logfile */
-  params::loop_function_repository repo(server_ref());
+  params::loop_function_repository repo;
   repo.parse_all(node);
 
   /* initialize output and metrics collection */
-  auto* p_output = repo.parse_results<params::output_params>();
-  output_init(p_output);
-
-  rcppsw::er::g_server->change_logfile(m_output_root + "/" +
-                                       p_output->log_fname);
-  rcppsw::er::g_server->log_stream() << repo;
-
-  /* setup logging timestamp calculator */
-  rcppsw::er::g_server->log_ts_calculator(
-      std::bind(&stateless_foraging_loop_functions::log_timestamp_calc, this));
+  auto* arena = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output = *repo.parse_results<params::output_params>();
+  output.metrics.arena_grid = arena->grid;
+  output_init(arena, &output);
 
   /* initialize arena map and distribute blocks */
   arena_map_init(repo);
 
   auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   m_interactor =
-      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                      arena_map(),
+      rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty);
@@ -102,7 +93,8 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
       controller.display_id(vparams->robot_id);
     }
   } /* for(&robot..) */
-  ER_NOM("Stateless foraging loop functions initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void stateless_foraging_loop_functions::Reset() {
@@ -153,24 +145,32 @@ void stateless_foraging_loop_functions::pre_step_iter(
   set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
   utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
 
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      m_arena_map->grid_resolution());
+  m_arena_map->access<arena_grid::kRobotOccupancy>(coord) = true;
+
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
 void stateless_foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 void stateless_foraging_loop_functions::PreStep() {
+  ndc_push();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(m_arena_map.get());
   pre_step_final();
+  ndc_pop();
 } /* PreStep() */
 
 void stateless_foraging_loop_functions::arena_map_init(
@@ -178,9 +178,9 @@ void stateless_foraging_loop_functions::arena_map_init(
   auto* aparams = repo.parse_results<struct params::arena::arena_map_params>();
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
-  m_arena_map.reset(new representation::arena_map(aparams));
+  m_arena_map.reset(new ds::arena_map(aparams));
   if (!m_arena_map->initialize()) {
-    ER_ERR("FATAL: Could not initialize arena map");
+    ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
   }
   m_arena_map->distribute_all_blocks();
@@ -196,29 +196,41 @@ void stateless_foraging_loop_functions::arena_map_init(
 } /* arena_map_init() */
 
 void stateless_foraging_loop_functions::output_init(
-    const struct params::output_params* params) {
-  if ("__current_date__" == params->output_dir) {
+    const struct params::arena::arena_map_params* const arena,
+    struct params::output_params* const output) {
+  if ("__current_date__" == output->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = params->output_root + "/" +
+    m_output_root = output->output_root + "/" +
                     std::to_string(now.date().year()) + "-" +
                     std::to_string(now.date().month()) + "-" +
                     std::to_string(now.date().day()) + ":" +
                     std::to_string(now.time_of_day().hours()) + "-" +
                     std::to_string(now.time_of_day().minutes());
   } else {
-    m_output_root = params->output_root + "/" + params->output_dir;
+    m_output_root = output->output_root + "/" + output->output_dir;
   }
-  m_metrics_agg = rcppsw::make_unique<stateless_metrics_aggregator>(
-      rcppsw::er::g_server, &params->metrics, m_output_root);
-  m_metrics_agg->reset_all();
+
+  output->metrics.arena_grid = arena->grid;
+  m_metrics_agg =
+      rcppsw::make_unique<stateless_metrics_aggregator>(&output->metrics,
+                                                        output_root());
+
+#ifndef ER_NREPORT
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      m_output_root + "/sim.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.events"), m_output_root + "/sim.log");
+  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.support"), m_output_root + "/sim.log");
+#endif
 } /* output_init() */
 
-std::string stateless_foraging_loop_functions::log_timestamp_calc(void) {
-  return "[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]";
-} /* log_timestamp_calc() */
-
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions,
                         "stateless_foraging_loop_functions"); // NOLINT
-
+#pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

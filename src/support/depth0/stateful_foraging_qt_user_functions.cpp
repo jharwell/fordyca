@@ -32,8 +32,6 @@
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -82,7 +80,12 @@ void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) 
 }
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 REGISTER_QTOPENGL_USER_FUNCTIONS(stateful_foraging_qt_user_functions,
                                  "stateful_foraging_qt_user_functions"); // NOLINT
+#pragma clang diagnostic pop
 
 NS_END(depth0, support, fordyca);

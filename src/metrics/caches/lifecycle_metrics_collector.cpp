@@ -43,8 +43,8 @@ std::string lifecycle_metrics_collector::csv_header_build(
     const std::string& header) {
   // clang-format off
   return base_metrics_collector::csv_header_build(header) +
-      "avg_created" + separator() +
-      "avg_depleted" + separator();
+      "int_created" + separator() +
+      "int_depleted" + separator();
   // clang-format on
 } /* csv_header_build() */
 

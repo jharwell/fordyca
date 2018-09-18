@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
 
 /*******************************************************************************
@@ -44,13 +43,12 @@ NS_START(fordyca, fsm, depth1);
  * acquired (either a known existing cache or via random exploration), it
  * signals that it has completed its task.
  */
-class acquire_existing_cache_fsm : public base_acquire_cache_fsm {
+class acquire_existing_cache_fsm : public base_acquire_cache_fsm,
+                                   public er::client<acquire_existing_cache_fsm> {
  public:
-  acquire_existing_cache_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::cache_selection_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  acquire_existing_cache_fsm(const controller::cache_selection_matrix* sel_matrix,
+                             controller::saa_subsystem* saa,
+                             ds::perceived_arena_map* map);
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) = delete;

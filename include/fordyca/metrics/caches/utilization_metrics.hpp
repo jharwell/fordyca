@@ -52,7 +52,7 @@ class utilization_metrics : public rcppsw::metrics::base_metrics {
    * @brief Get the # of blocks currently in the cache (independent of any
    * calls to \ref reset_metrics()).
    */
-  virtual uint n_blocks(void) const = 0;
+  virtual size_t n_blocks(void) const = 0;
 
   /**
    * @brief Should return the # of blocks a given cache has had picked up from
@@ -75,7 +75,7 @@ class utilization_metrics : public rcppsw::metrics::base_metrics {
   /**
    * @brief Get the ID of the cache for use in metric collection.
    */
-  virtual uint cache_id(void) const = 0;
+  virtual int cache_id(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

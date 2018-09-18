@@ -52,7 +52,7 @@ class harvester : public foraging_task,
                   public free_block_interactor {
  public:
   harvester(const struct ta::task_params* params,
-            std::unique_ptr<ta::taskable>& mechanism);
+            std::unique_ptr<ta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -61,8 +61,6 @@ class harvester : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::nest_block_drop&) override {}
-
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::free_block_drop&) override {}
   void accept(events::block_vanished&) override;

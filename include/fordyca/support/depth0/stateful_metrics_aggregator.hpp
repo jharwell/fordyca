@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 
 /*******************************************************************************
@@ -50,11 +48,11 @@ NS_START(support, depth0);
  * - FSM distance/block acquisition metrics
  */
 
-class stateful_metrics_aggregator : public stateless_metrics_aggregator {
+class stateful_metrics_aggregator : public stateless_metrics_aggregator,
+                                    public er::client<stateful_metrics_aggregator> {
  public:
-  stateful_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                               const struct params::metrics_params* params,
-                               const std::string& output_root);
+  stateful_metrics_aggregator(const struct params::metrics_params* params,
+                              const std::string& output_root);
 
   /**
    * @brief Collect metrics from the stateful controller.

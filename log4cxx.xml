@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+  <!-- Output the log message to system console. -->
+  <appender
+      name="__console__"
+  class="log4cxx.ConsoleAppender">
+    <param name="Target" value="System.out"/>
+        <layout class="log4cxx.PatternLayout">
+            <param name="ConversionPattern" value="%x [%-5p] %c - %m%n"/>
+        </layout>
+  </appender>
+
+  <root>
+        <priority value="info" />
+        <appender-ref ref="__console__"/>
+  </root>
+
+  <!-- Specify the level for some specific categories -->
+  <category name="fordyca.events" >
+    <priority value ="all" />
+  </category>
+  <category name="fordyca.controller" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.fsm.depth0" >
+    <priority value ="all" />
+  </category>
+    <category name="fordyca.loop.support.block_dist" >
+    <priority value ="info" />
+  </category>
+  <!-- <category name="foobar.test.child" > -->
+  <!-- </category> -->
+
+ </log4j:configuration>

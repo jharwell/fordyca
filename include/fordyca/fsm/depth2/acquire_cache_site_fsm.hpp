@@ -54,13 +54,13 @@ NS_START(fsm, depth2);
  * robot arrives at its chosen site and there is already a cache there or there
  * is one very close by.
  */
-class acquire_cache_site_fsm : public acquire_goal_fsm {
+class acquire_cache_site_fsm : public acquire_goal_fsm,
+                               public er::client<acquire_cache_site_fsm> {
  public:
   acquire_cache_site_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;

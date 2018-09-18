@@ -25,12 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include <sstream>
+#include <string>
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
-
-#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,6 +64,7 @@ class base_sensing_subsystem {
     hal::sensors::proximity_sensor proximity;
     hal::sensors::light_sensor light;
     hal::sensors::ground_sensor ground;
+    hal::sensors::battery_sensor battery;
   };
 
   /**
@@ -89,6 +92,9 @@ class base_sensing_subsystem {
   }
   const hal::sensors::rab_wifi_sensor& rabs(void) const {
     return m_sensors.rabs;
+  }
+  const hal::sensors::battery_sensor& battery(void) const {
+    return m_sensors.battery;
   }
 
   /**

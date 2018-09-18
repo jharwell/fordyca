@@ -30,6 +30,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -37,36 +38,36 @@
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/er/server.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+using ds::arena_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   stateless_foraging_loop_functions::Init(node);
-
-  ER_NOM("Initializing depth0_foraging loop functions");
-  params::loop_function_repository repo(server_ref());
-
+  ndc_push();
+  ER_INFO("Initializing...");
+  params::loop_function_repository repo;
   repo.parse_all(node);
-  rcppsw::er::g_server->log_stream() << repo;
 
   /* initialize stat collecting */
-  auto* p_output = repo.parse_results<const struct params::output_params>();
-  m_metrics_agg = rcppsw::make_unique<stateful_metrics_aggregator>(
-      rcppsw::er::g_server, &p_output->metrics, output_root());
+  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
+  params::output_params output =
+      *repo.parse_results<const struct params::output_params>();
+  output.metrics.arena_grid = arenap->grid;
+
+  m_metrics_agg =
+      rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
+                                                       output_root());
 
   /* intitialize robot interactions with environment */
-  auto* arenap = repo.parse_results<params::arena::arena_map_params>();
   m_interactor =
-      rcppsw::make_unique<interactor>(rcppsw::er::g_server,
-                                      arena_map(),
+      rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty);
@@ -86,11 +87,9 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     if (nullptr != vparams) {
       controller.display_los(vparams->robot_los);
     }
-
-    utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-        robot, *arena_map());
   } /* for(entity..) */
-  ER_NOM("stateful_foraging loop functions initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void stateful_foraging_loop_functions::pre_step_iter(
@@ -105,10 +104,14 @@ void stateful_foraging_loop_functions::pre_step_iter(
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<controller::depth0::stateful_foraging_controller>(robot);
-  utils::set_robot_los<controller::depth0::stateful_foraging_controller>(
-      robot, *arena_map());
-  set_robot_tick<controller::depth0::stateful_foraging_controller>(robot);
+  utils::set_robot_pos<decltype(controller)>(robot);
+  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  set_robot_tick<decltype(controller)>(robot);
+
+  /* update arena map metrics with robot position */
+  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+                                      arena_map()->grid_resolution());
+  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
@@ -139,12 +142,15 @@ __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
 } /* GetFloorColor() */
 
 void stateful_foraging_loop_functions::PreStep() {
+  ndc_push();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
+  m_metrics_agg->collect_from_arena(arena_map());
   pre_step_final();
+  ndc_pop();
 } /* PreStep() */
 
 void stateful_foraging_loop_functions::Reset(void) {
@@ -154,13 +160,17 @@ void stateful_foraging_loop_functions::Reset(void) {
 
 void stateful_foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
-  m_metrics_agg->timestep_inc_all();
 } /* pre_step_final() */
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
                         "stateful_foraging_loop_functions"); // NOLINT
-
+#pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

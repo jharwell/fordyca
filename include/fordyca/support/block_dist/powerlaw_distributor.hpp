@@ -41,7 +41,6 @@ NS_START(fordyca);
 
 namespace representation {
 class block;
-class arena_grid;
 } // namespace representation
 
 namespace params { namespace arena { struct block_dist_params; }}
@@ -62,15 +61,15 @@ NS_START(support, block_dist);
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor : public base_distributor {
+class powerlaw_distributor : public base_distributor,
+                             public er::client<powerlaw_distributor> {
  public:
   /**
    * @brief Initialize the distributor.
    *
    * @param server Debugging/logging server.
    */
-  powerlaw_distributor(std::shared_ptr<rcppsw::er::server> server,
-                       const struct params::arena::block_dist_params* params);
+  explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
@@ -88,10 +87,10 @@ class powerlaw_distributor : public base_distributor {
    *
    * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
    */
-  bool map_clusters(representation::arena_grid& grid);
+  bool map_clusters(ds::arena_grid& grid);
 
  private:
-  using arena_view_list = std::list<std::pair<representation::arena_grid::view, uint>>;
+  using arena_view_list = std::list<std::pair<ds::arena_grid::view, uint>>;
   /**
    * @brief How many times to attempt to distribute all blocks before giving up,
    * causing an assertion failure on distribution.
@@ -105,7 +104,7 @@ class powerlaw_distributor : public base_distributor {
    * @param grid Arena grid.
    * @param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
-  arena_view_list guess_cluster_placements(representation::arena_grid& grid,
+  arena_view_list guess_cluster_placements(ds::arena_grid& grid,
                                              const std::vector<uint>& clust_sizes);
 
   /**
@@ -125,7 +124,7 @@ class powerlaw_distributor : public base_distributor {
    *
    * Cluster sizes are drawn from the internally stored power law distribution.
    */
-  arena_view_list compute_cluster_placements(representation::arena_grid& grid,
+  arena_view_list compute_cluster_placements(ds::arena_grid& grid,
                                              uint n_clusters);
 
   // clang-format off

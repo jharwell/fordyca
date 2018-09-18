@@ -25,13 +25,12 @@
 #include <algorithm>
 
 #include <boost/uuid/uuid_io.hpp>
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/utils.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
-#include "rcppsw/er/server.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,26 +41,24 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-random_distributor::random_distributor(std::shared_ptr<rcppsw::er::server> server,
-                                       representation::arena_grid::view& grid,
+random_distributor::random_distributor(ds::arena_grid::view& grid,
                                        double resolution)
-    : base_distributor(server), m_resolution(resolution), m_grid(grid) {
-  if (ERROR == client::attmod("random_dist")) {
-    insmod("random_dist", er::er_lvl::DIAG, er::er_lvl::OFF);
-  }
-}
+    : base_distributor(),
+      ER_CLIENT_INIT("fordyca.support.block_dist.random"),
+      m_resolution(resolution),
+      m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool random_distributor::distribute_blocks(block_vector& blocks,
                                            entity_list& entities) {
-  ER_NOM("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
-         blocks.size(),
-         (*m_grid.origin())->loc().first,
-         (*m_grid.origin())->loc().first + m_grid.shape()[0],
-         (*m_grid.origin())->loc().second,
-         (*m_grid.origin())->loc().second + m_grid.shape()[1]);
+  ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
+          blocks.size(),
+          (*m_grid.origin()).loc().first,
+          (*m_grid.origin()).loc().first + m_grid.shape()[0],
+          (*m_grid.origin()).loc().second,
+          (*m_grid.origin()).loc().second + m_grid.shape()[1]);
   for (auto& b : blocks) {
     if (!distribute_block(b, entities)) {
       return false;
@@ -73,31 +70,30 @@ bool random_distributor::distribute_blocks(block_vector& blocks,
 bool random_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
     entity_list& entities) {
-  representation::cell2D* cell = nullptr;
+  ds::cell2D* cell = nullptr;
   std::vector<uint> coord;
   if (!find_avail_coord(entities, coord)) {
     return false;
   }
-  ER_DIAG("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
-          coord[0],
-          coord[1],
-          coord[2],
-          coord[3]);
+  ER_DEBUG("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
+           coord[0],
+           coord[1],
+           coord[2],
+           coord[3]);
 
-  cell = m_grid[coord[0]][coord[1]];
+  cell = &m_grid[coord[0]][coord[1]];
 
   /*
    * You can only distribute blocks to cells that do not currently have
    * anything in them. If there is already something there, then our
    * distribution algorithm has a bug.
    */
-  ER_ASSERT(!cell->state_has_block(),
-            "FATAL: Destination cell already contains block");
-  ER_ASSERT(!cell->state_has_cache(),
-            "FATAL: Destination cell already contains cache");
+  ER_ASSERT(!cell->state_has_block(), "Destination cell already contains block");
+  ER_ASSERT(!cell->state_has_cache(), "Destination cell already contains cache");
+  ER_ASSERT(!cell->state_in_cache_extent(),
+            "Destination cell part of cache extent");
 
-  events::free_block_drop op(client::server_ref(),
-                             block,
+  events::free_block_drop op(block,
                              rcppsw::math::dcoord2(coord[2], coord[3]),
                              m_resolution);
   cell->accept(op);
@@ -115,24 +111,23 @@ bool random_distributor::distribute_block(
 
 __rcsw_pure bool random_distributor::verify_block_dist(
     const representation::base_block& block,
-    __rcsw_unused const representation::cell2D* const cell) {
+    __rcsw_unused const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
   ER_CHECK(representation::base_block::kOutOfSightDLoc != block.discrete_loc(),
-           "ERROR: Block%d discrete coordinates still out of sight after "
+           "Block%d discrete coordinates still out of sight after "
            "distribution",
            block.id());
-  ER_CHECK(
-      representation::base_block::kOutOfSightRLoc != block.real_loc(),
-      "ERROR: Block%d real coordinates still out of sight after distribution",
-      block.id());
+  ER_CHECK(representation::base_block::kOutOfSightRLoc != block.real_loc(),
+           "Block%d real coordinates still out of sight after distribution",
+           block.id());
 
-  ER_NOM("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
-         block.id(),
-         block.real_loc().GetX(),
-         block.real_loc().GetY(),
-         block.discrete_loc().first,
-         block.discrete_loc().second,
-         reinterpret_cast<const void*>(cell->block().get()));
+  ER_DEBUG("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
+           block.id(),
+           block.real_loc().GetX(),
+           block.real_loc().GetY(),
+           block.discrete_loc().first,
+           block.discrete_loc().second,
+           reinterpret_cast<const void*>(cell->block().get()));
   return true;
 
 error:
@@ -157,8 +152,8 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
   do {
     rel_x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
     rel_y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
-    abs_x = rel_x + (*m_grid.origin())->loc().first;
-    abs_y = rel_y + (*m_grid.origin())->loc().second;
+    abs_x = rel_x + (*m_grid.origin()).loc().first;
+    abs_y = rel_y + (*m_grid.origin()).loc().second;
   } while (
       std::any_of(
           entities.begin(),
@@ -172,7 +167,7 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
             if (nullptr != movable) {
               auto ent_xspan = ent->xspan(movable->real_loc());
               auto ent_yspan = ent->yspan(movable->real_loc());
-              ER_VER(
+              ER_TRACE(
                   "(movable entity) rcoord=(%f, %f), xspan=[%f-%f], "
                   "yspan=[%f-%f]",
                   coord.GetX(),
@@ -187,11 +182,11 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
             auto immovable =
                 dynamic_cast<const representation::immovable_cell_entity*>(ent);
             ER_ASSERT(nullptr != immovable,
-                      "FATAL: Cell entity is neither movable nor immovable");
+                      "Cell entity is neither movable nor immovable");
             auto ent_xspan = ent->xspan(immovable->real_loc());
             auto ent_yspan = ent->yspan(immovable->real_loc());
 
-            ER_VER(
+            ER_TRACE(
                 "(immovable entity) rcoord=(%f, %f), xspan=[%f-%f], "
                 "yspan=[%f-%f]",
                 coord.GetX(),

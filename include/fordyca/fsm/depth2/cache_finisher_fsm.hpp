@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation { class perceived_arena_map; }
+namespace ds { class perceived_arena_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -54,16 +54,16 @@ NS_START(fsm, depth2);
  * one found via random exploration) and drop it to create a new cache.
  */
 class cache_finisher_fsm : public base_foraging_fsm,
+                           public er::client<cache_finisher_fsm>,
                            public metrics::fsm::goal_acquisition_metrics,
                            public task_allocation::taskable,
                            public visitor::visitable_any<depth2::cache_finisher_fsm> {
  public:
   cache_finisher_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
       const controller::block_selection_matrix* bsel_matrix,
       const controller::cache_selection_matrix* csel_matrix,
       controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+      ds::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }

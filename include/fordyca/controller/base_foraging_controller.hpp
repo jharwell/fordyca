@@ -59,8 +59,9 @@ class saa_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_foraging_controller : public argos::CCI_Controller,
-                                 public rcppsw::er::client {
+class base_foraging_controller
+    : public argos::CCI_Controller,
+      public rcppsw::er::client<base_foraging_controller> {
  public:
   base_foraging_controller(void);
   ~base_foraging_controller(void) override = default;
@@ -72,6 +73,12 @@ class base_foraging_controller : public argos::CCI_Controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void Reset(void) override;
+
+  /**
+   * @brief Get the ID of the entity. Argos also provides this, but it doesn't
+   * work in gdb, so I provide my own.
+   */
+  int entity_id(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's ID above its
@@ -144,6 +151,23 @@ class base_foraging_controller : public argos::CCI_Controller,
   void robot_loc(argos::CVector2 loc);
   argos::CVector2 robot_loc(void) const;
 
+  /**
+   * @brief Convenience function to add footbot ID to salient messages during
+   * loop function execution (timestep is already there).
+   */
+  void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
+
+  /**
+   * @brief Convenience function to add footbot ID+timestep to messages during
+   * \ref ControlStep().
+   */
+  void ndc_pusht(void);
+
+  /**
+   * @brief Remove the last NDC.
+   */
+  void ndc_pop(void) { ER_NDC_POP(); }
+
  protected:
   const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
   class saa_subsystem* saa_subsystem(void) {
@@ -152,14 +176,11 @@ class base_foraging_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
-  std::string log_header_calc(void) const;
-  std::string dbg_header_calc(void) const;
 
   // clang-format off
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
-  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

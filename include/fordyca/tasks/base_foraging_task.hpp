@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"

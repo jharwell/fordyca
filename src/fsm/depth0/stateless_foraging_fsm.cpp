@@ -36,9 +36,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateless_foraging_fsm::stateless_foraging_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.depth0.stateless"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
@@ -48,11 +48,9 @@ stateless_foraging_fsm::stateless_foraging_fsm(
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
-      m_explore_fsm(
-          server,
-          saa,
-          std::make_unique<controller::random_explore_behavior>(server, saa),
-          std::bind(&stateless_foraging_fsm::block_detected, this)),
+      m_explore_fsm(saa,
+                    std::make_unique<controller::random_explore_behavior>(saa),
+                    std::bind(&stateless_foraging_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
@@ -67,14 +65,10 @@ stateless_foraging_fsm::stateless_foraging_fsm(
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
-                                  nullptr,
-                                  &entry_wait_for_signal,
-                                  nullptr)} {
-  client::insmod("stateless_foraging_fsm",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr)} {}
 
 /*******************************************************************************
  * States
@@ -95,7 +89,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 
@@ -113,7 +107,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
-    ER_NOM("Block pickup signal received");
+    ER_INFO("Block pickup signal received");
     internal_event(ST_TRANSPORT_TO_NEST);
   } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
@@ -127,7 +121,7 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
-    ER_NOM("Block drop signal received");
+    ER_INFO("Block drop signal received");
     internal_event(ST_LEAVING_NEST);
   }
   return controller::foraging_signal::HANDLED;
@@ -153,18 +147,21 @@ bool stateless_foraging_fsm::goal_acquired(void) const {
  * Collision Metrics
  ******************************************************************************/
 __rcsw_pure bool stateless_foraging_fsm::in_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.in_collision_avoidance()) ||
-      base_foraging_fsm::in_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.in_collision_avoidance()) ||
+         base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool stateless_foraging_fsm::entered_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.entered_collision_avoidance()) ||
-      base_foraging_fsm::entered_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.entered_collision_avoidance()) ||
+         base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool stateless_foraging_fsm::exited_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() && m_explore_fsm.exited_collision_avoidance()) ||
-      base_foraging_fsm::exited_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.exited_collision_avoidance()) ||
+         base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint stateless_foraging_fsm::collision_avoidance_duration(void) const {

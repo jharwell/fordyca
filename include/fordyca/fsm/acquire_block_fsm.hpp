@@ -49,12 +49,12 @@ NS_START(fordyca, fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_block_fsm : public acquire_goal_fsm {
+class acquire_block_fsm : public acquire_goal_fsm,
+                          public er::client<acquire_block_fsm> {
  public:
-  acquire_block_fsm(std::shared_ptr<rcppsw::er::server>& server,
-                    const controller::block_selection_matrix* matrix,
+  acquire_block_fsm(const controller::block_selection_matrix* matrix,
                     controller::saa_subsystem* saa,
-                    representation::perceived_arena_map* map);
+                    ds::perceived_arena_map* map);
 
   acquire_block_fsm(const acquire_block_fsm& fsm) = delete;
   acquire_block_fsm& operator=(const acquire_block_fsm& fsm) = delete;

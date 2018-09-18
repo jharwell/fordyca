@@ -36,11 +36,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
     const controller::cache_selection_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    ds::perceived_arena_map* const map)
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.depth1.cached_block_to_nest"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
@@ -51,17 +51,17 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_cache_fsm(server, sel_matrix, saa, map),
+      m_cache_fsm(sel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
-                                  nullptr,
-                                  &entry_wait_for_signal,
-                                  nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
@@ -85,7 +85,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 
@@ -116,10 +116,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_cache_fsm.task_reset();
-    internal_event(ST_LEAVING_NEST);
-  } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
-    m_cache_fsm.task_reset();
-    internal_event(ST_ACQUIRE_BLOCK);
+    internal_event(ST_FINISHED);
   }
   return controller::foraging_signal::HANDLED;
 }
@@ -133,26 +130,29 @@ __rcsw_const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
  ******************************************************************************/
 __rcsw_pure bool cached_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance()) ||
-      base_foraging_fsm::in_collision_avoidance();
+         base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool cached_block_to_nest_fsm::entered_collision_avoidance(void) const {
-  return (m_cache_fsm.task_running() && m_cache_fsm.entered_collision_avoidance()) ||
-      base_foraging_fsm::entered_collision_avoidance();
+__rcsw_pure bool cached_block_to_nest_fsm::entered_collision_avoidance(
+    void) const {
+  return (m_cache_fsm.task_running() &&
+          m_cache_fsm.entered_collision_avoidance()) ||
+         base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool cached_block_to_nest_fsm::exited_collision_avoidance(void) const {
-  return (m_cache_fsm.task_running() && m_cache_fsm.exited_collision_avoidance()) ||
-      base_foraging_fsm::exited_collision_avoidance();
+  return (m_cache_fsm.task_running() &&
+          m_cache_fsm.exited_collision_avoidance()) ||
+         base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure uint
+cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.collision_avoidance_duration();
   } else {
     return base_foraging_fsm::collision_avoidance_duration();
   }
-  return 0;
 } /* collision_avoidance_duration() */
 
 /*******************************************************************************
@@ -168,11 +168,21 @@ FSM_WRAPPER_DEFINE(bool,
                    is_vectoring_to_goal,
                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool, cached_block_to_nest_fsm, goal_acquired, m_cache_fsm);
+bool cached_block_to_nest_fsm::goal_acquired(void) const {
+  if (acquisition_goal_type::kExistingCache == acquisition_goal()) {
+    return current_state() == ST_WAIT_FOR_PICKUP;
+  } else if (transport_goal_type::kNest == block_transport_goal()) {
+    return current_state() == ST_WAIT_FOR_DROP;
+  }
+  return false;
+}
 
 acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||
       ST_WAIT_FOR_PICKUP == current_state()) {
+    return acquisition_goal_type::kExistingCache;
+  } else if (ST_ACQUIRE_BLOCK == current_state() ||
+             ST_WAIT_FOR_PICKUP == current_state()) {
     return acquisition_goal_type::kExistingCache;
   }
   return acquisition_goal_type::kNone;
@@ -182,7 +192,8 @@ acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
  * General Member Functions
  ******************************************************************************/
 transport_goal_type cached_block_to_nest_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_NEST == current_state()) {
+  if (ST_TRANSPORT_TO_NEST == current_state() ||
+      ST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;

@@ -36,17 +36,15 @@ NS_START(fordyca, metrics);
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    std::shared_ptr<rcppsw::er::server> server,
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : client(server), collector_group() {
+    : ER_CLIENT_INIT("fordyca.metrics.aggregator"), collector_group() {
   m_metrics_path = output_root + "/" + params->output_dir;
 
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {
-    ER_WARN("WARNING: Output metrics path '%s' already exists",
-            m_metrics_path.c_str());
+    ER_WARN("Output metrics path '%s' already exists", m_metrics_path.c_str());
   }
 }
 /*******************************************************************************

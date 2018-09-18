@@ -22,8 +22,8 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -35,13 +35,12 @@ NS_START(fordyca, representation);
  ******************************************************************************/
 line_of_sight::const_block_list line_of_sight::blocks(void) const {
   const_block_list blocks;
-  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
-    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      cell2D* cell = m_view[i][j];
-      assert(cell);
-      if (cell->state_has_block()) {
-        assert(cell->block());
-        blocks.push_back(cell->block());
+  for (uint i = 0; i < m_view.shape()[0]; ++i) {
+    for (uint j = 0; j < m_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = m_view[i][j];
+      if (cell.state_has_block()) {
+        assert(cell.block());
+        blocks.push_back(cell.block());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -51,31 +50,37 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
 line_of_sight::const_cache_list line_of_sight::caches(void) const {
   const_cache_list caches = m_caches;
 
-  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
-    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      cell2D* cell = m_view[i][j];
-      assert(cell);
-      if (cell->state_has_cache()) {
-        assert(std::dynamic_pointer_cast<base_cache>(cell->entity()));
-        caches.push_back(cell->cache());
+  for (uint i = 0; i < m_view.shape()[0]; ++i) {
+    for (uint j = 0; j < m_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = m_view[i][j];
+      if (cell.state_has_cache() || cell.state_in_cache_extent()) {
+        auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
+        assert(nullptr != cache);
+        assert(cache->n_blocks() >= base_cache::kMinBlocks);
+        /*
+         * We can't add the cache unconditionally, because cache host cells and
+         * extent cells both refer to the same cache, and doing so will give you
+         * double references to a single cache in a LOS, which can cause
+         * problems with pheromone updating. See #433.
+         */
+        if (caches.end() == std::find(caches.begin(), caches.end(), cache)) {
+          caches.push_back(cache);
+        }
       }
     } /* for(j..) */
   }   /* for(i..) */
+
   return caches;
 } /* caches() */
 
-void line_of_sight::cache_add(const std::shared_ptr<base_cache>& cache) {
-  auto los_caches = caches();
-  if (los_caches.end() ==
-      std::find(los_caches.begin(), los_caches.end(), cache)) {
-    m_caches.push_back(cache);
-  }
-} /* cache_add() */
+__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
+  return const_cast<line_of_sight*>(this)->cell(i, j);
+}
 
-__rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) const {
+__rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
   assert(i < m_view.shape()[0]);
   assert(j < m_view.shape()[1]);
-  return *m_view[i][j];
+  return m_view[i][j];
 }
 
 rcppsw::math::dcoord2 line_of_sight::abs_ll(void) const {
@@ -87,7 +92,7 @@ rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
 } /* abs_ul() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
-  return cell(0, ysize() - 1).loc();
+  return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
 rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {

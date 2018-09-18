@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -44,18 +44,18 @@ NS_START(fordyca, representation);
  */
 class block_cluster {
  public:
-  block_cluster(const arena_grid::view& view, uint capacity)
+  block_cluster(const ds::arena_grid::view& view, uint capacity)
       : m_view(view), m_capacity(capacity) {}
 
   uint capacity(void) const { return m_capacity; }
   uint block_count(void) const;
-  const arena_grid::view& view(void) const { return m_view; }
-  arena_grid::view& view(void) { return m_view; }
+  const ds::arena_grid::view& view(void) const { return m_view; }
+  ds::arena_grid::view& view(void) { return m_view; }
 
  private:
   // clang-format off
-  arena_grid::view m_view;
-  uint             m_capacity;
+  ds::arena_grid::view m_view;
+  uint                 m_capacity;
   // clang-format on
 };
 

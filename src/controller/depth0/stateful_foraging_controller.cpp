@@ -1,7 +1,7 @@
 /**
- * @file foraging_controller.cpp
+ * @file stateful_foraging_controller.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -30,10 +30,9 @@
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/depth0/stateful_param_repository.hpp"
+#include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
-#include "rcppsw/er/server.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
@@ -51,6 +50,7 @@ namespace ta = rcppsw::task_allocation;
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
     : stateless_foraging_controller(),
+      ER_CLIENT_INIT("fordyca.controller.stateful"),
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
@@ -64,6 +64,15 @@ stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 __rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(
     void) const {
   return m_executive->active_tab();
+}
+
+void stateful_foraging_controller::block_sel_matrix(
+    std::unique_ptr<block_selection_matrix> m) {
+  m_block_sel_matrix = std::move(m);
+}
+void stateful_foraging_controller::executive(
+    std::unique_ptr<ta::bifurcating_tdgraph_executive> executive) {
+  m_executive = std::move(executive);
 }
 
 void stateful_foraging_controller::perception(
@@ -103,6 +112,7 @@ __rcsw_pure depth0::sensing_subsystem* stateful_foraging_controller::stateful_se
 }
 
 void stateful_foraging_controller::ControlStep(void) {
+  ndc_pusht();
   /*
    * Update the robot's model of the world with the current line-of-sight, and
    * update the relevance of information within it. Then, you can run the main
@@ -116,48 +126,48 @@ void stateful_foraging_controller::ControlStep(void) {
   perform_communication();
 
   m_executive->run();
+  ndc_pop();
 } /* ControlStep() */
 
 void stateful_foraging_controller::Init(ticpp::Element& node) {
-  params::depth0::stateful_param_repository param_repo(server_ref());
-
   /*
    * Note that we do not call \ref stateless_foraging_controller::Init()--there
    * is nothing in there that we need.
    */
   base_foraging_controller::Init(node);
 
-  ER_NOM("Initializing stateful_foraging controller");
+  ndc_push();
+  ER_INFO("Initializing...");
 
   /* parse and validate parameters */
+  params::depth0::stateful_controller_repository param_repo;
   param_repo.parse_all(node);
-  server_ptr()->log_stream() << param_repo;
-  ER_ASSERT(param_repo.validate_all(),
-            "FATAL: Not all parameters were validated");
+
+  if (!param_repo.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   /* initialize subsystems and perception */
   m_perception = rcppsw::make_unique<base_perception_subsystem>(
-      client::server_ref(),
-      param_repo.parse_results<params::perception_params>(),
-      GetId());
+      param_repo.parse_results<params::perception_params>(), GetId());
 
   saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
   auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
-
   m_block_sel_matrix =
       rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
                                                   &ogrid->priorities);
 
   /* initialize tasking */
-  m_executive = stateful_tasking_initializer(client::server_ref(),
-                                             m_block_sel_matrix.get(),
+  m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
                                              saa_subsystem(),
                                              perception())(&param_repo);
 
-  ER_NOM("stateful_foraging controller initialization finished");
+  ER_INFO("Initialization finished");
+  ndc_pop();
 } /* Init() */
 
 void stateful_foraging_controller::Reset(void) {
@@ -183,11 +193,11 @@ void stateful_foraging_controller::perform_communication(void) {
     // TODO: random x and y for the cell within the limits of the arena
     int x_coord = 2;
     int y_coord = 2;
-    representation::cell2D cell = m_perception->map()->
-      access<representation::occupancy_grid::kCellLayer>(x_coord, y_coord);
+    ds::cell2D cell = m_perception->map()->
+      access<ds::occupancy_grid::kCell>(x_coord, y_coord);
     packet.data.push_back(2); // X Coord of cell
     packet.data.push_back(2); // Y Coord of cell
-    
+
     auto entity = cell.entity();
     int id = -1;
     if (entity) {
@@ -207,10 +217,10 @@ void stateful_foraging_controller::perform_communication(void) {
       }
     }
     // Type of entity (block / cache) (will be -1 if the cell state is unknown)
-    packet.data.push_back(state); 
+    packet.data.push_back(state);
 
     // TODO: Need to get the relevancy for the cell
-    packet.data.push_back(-1); 
+    packet.data.push_back(-1);
 
     saa_subsystem()->actuation()->start_sending_message(packet);
   } else {
@@ -241,7 +251,12 @@ uint stateful_foraging_controller::cell_state_inaccuracies(uint state) const {
 } /* cell_state_inaccuracies() */
 
 using namespace argos;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 REGISTER_CONTROLLER(stateful_foraging_controller,
                     "stateful_foraging_controller"); // NOLINT
+#pragma clang diagnostic pop
 
 NS_END(depth0, controller, fordyca);

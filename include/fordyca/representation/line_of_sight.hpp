@@ -27,16 +27,20 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "rcppsw/ds/grid2D_ptr.hpp"
+#include "rcppsw/ds/base_grid2D.hpp"
 #include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace ds {
+class cell2D;
+}
+NS_START(representation);
 class base_block;
 class base_cache;
-class cell2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -62,19 +66,13 @@ class line_of_sight {
   using const_block_list = std::list<std::shared_ptr<const base_block>>;
   using cache_list = std::list<std::shared_ptr<base_cache>>;
   using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
+  using grid_view = rcppsw::ds::grid_view<ds::cell2D>;
 
-  line_of_sight(const rcppsw::ds::grid_view<cell2D*>& c_view,
-                rcppsw::math::dcoord2 center)
+  line_of_sight(const grid_view& c_view, rcppsw::math::dcoord2 center)
       : m_center(std::move(center)), m_view(c_view), m_caches() {}
 
   const_block_list blocks(void) const;
   const_cache_list caches(void) const;
-
-  /**
-   * @brief Add a cache to the LOS, beyond those whose host cell currently falls
-   * in the LOS (i.e. partial cache overlap)
-   */
-  void cache_add(const std::shared_ptr<base_cache>& cache);
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -93,14 +91,14 @@ class line_of_sight {
    *
    * @return The Y dimension.
    */
-  size_t ysize(void) const { return m_view.shape()[1]; }
+  grid_view::size_type ysize(void) const { return m_view.shape()[1]; }
 
   /**
    * @brief Get the # elements in a LOS.
    *
    * @return # elements.
    */
-  size_t size(void) const { return m_view.num_elements(); }
+  grid_view::size_type size(void) const { return m_view.num_elements(); }
 
   /**
    * @brief Get the cell associated with a particular grid location within the
@@ -112,7 +110,8 @@ class line_of_sight {
    *
    * @return A reference to the cell.
    */
-  cell2D& cell(size_t i, size_t j) const;
+  const ds::cell2D& cell(uint i, uint j) const;
+  ds::cell2D& cell(uint i, uint j);
 
   /**
    * @brief Get the coordinates for the center of the LOS.
@@ -123,9 +122,9 @@ class line_of_sight {
 
  private:
   // clang-format off
-  rcppsw::math::dcoord2          m_center;
-  rcppsw::ds::grid_view<cell2D*> m_view;
-  const_cache_list               m_caches;
+  rcppsw::math::dcoord2             m_center;
+  grid_view                         m_view;
+  const_cache_list                  m_caches;
   // clang-format on
 };
 

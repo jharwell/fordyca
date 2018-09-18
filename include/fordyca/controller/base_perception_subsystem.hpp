@@ -24,11 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
+#include <vector>
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception_params.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -39,8 +38,11 @@ NS_START(fordyca);
 
 namespace representation {
 class line_of_sight;
-class perceived_arena_map;
 } // namespace representation
+
+namespace ds {
+class perceived_arena_map;
+} // namespace ds
 
 NS_START(controller);
 
@@ -55,11 +57,11 @@ NS_START(controller);
  * take what the sensors read and turn it into a useful internal
  * representation.
  */
-class base_perception_subsystem : public rcppsw::er::client,
-                                  public metrics::world_model_metrics {
+class base_perception_subsystem
+    : public rcppsw::er::client<base_perception_subsystem>,
+      public metrics::world_model_metrics {
  public:
-  base_perception_subsystem(std::shared_ptr<rcppsw::er::server> server,
-                            const params::perception_params* const params,
+  base_perception_subsystem(const params::perception_params* const params,
                             const std::string& id);
 
   /**
@@ -75,10 +77,8 @@ class base_perception_subsystem : public rcppsw::er::client,
    */
   void reset(void);
 
-  const representation::perceived_arena_map* map(void) const {
-    return m_map.get();
-  }
-  representation::perceived_arena_map* map(void) { return m_map.get(); }
+  const ds::perceived_arena_map* map(void) const { return m_map.get(); }
+  ds::perceived_arena_map* map(void) { return m_map.get(); }
 
   /* metrics */
   uint cell_state_inaccuracies(uint state) const override {
@@ -92,20 +92,29 @@ class base_perception_subsystem : public rcppsw::er::client,
    * update the relevance of information (density) within it, and fix any blocks
    * that should be hidden from our awareness.
    */
-  virtual void process_los(const representation::line_of_sight* const los);
+  virtual void process_los(const representation::line_of_sight* const c_los);
+
+  /**
+   * @brief The processing of the current LOS after processing (i.e. does the
+   * PAM now accurately reflect what was in the LOS)?
+   *
+   * @param c_los Current LOS.
+   */
+  virtual void processed_los_verify(
+      const representation::line_of_sight* const c_los) const;
 
  private:
   /**
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
    * arena map for this timestep.
    *
-   * @param los
+   * @param los The current LOS
    */
   void update_cell_stats(const representation::line_of_sight* const los);
 
   // clang-format off
-  std::vector<uint>                                    m_cell_stats;
-  std::unique_ptr<representation::perceived_arena_map> m_map;
+  std::vector<uint>                        m_cell_stats;
+  std::unique_ptr<ds::perceived_arena_map> m_map;
   // clang-format on
 };
 

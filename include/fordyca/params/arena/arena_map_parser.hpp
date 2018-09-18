@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/arena/blocks_parser.hpp"
 #include "fordyca/params/depth1/static_cache_parser.hpp"
@@ -49,12 +50,12 @@ NS_START(fordyca, params, arena);
  */
 class arena_map_parser : public rcppsw::params::xml_param_parser {
  public:
-  arena_map_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
-      : xml_param_parser(server, level),
-        m_grid(server, level + 1),
-        m_blocks(server, level + 1),
-        m_cache(server, level + 1),
-        m_nest(server, level + 1) {}
+  explicit arena_map_parser(uint level)
+      : xml_param_parser(level),
+        m_grid(level + 1),
+        m_blocks(level + 1),
+        m_cache(level + 1),
+        m_nest(level + 1) {}
 
   /**
    * @brief The root tag that all arena map parameters should lie under in the

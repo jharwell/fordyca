@@ -48,13 +48,12 @@ NS_START(support, block_dist);
  *
  * @brief Base class for block distributors to enable use of strategy pattern.
  */
-class base_distributor : public rcppsw::er::client {
+class base_distributor {
  public:
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using entity_list = std::list<const representation::multicell_entity*>;
 
-  explicit base_distributor(std::shared_ptr<rcppsw::er::server> server)
-      : client(server) {}
+  base_distributor(void) = default;
   virtual ~base_distributor(void) = default;
 
   /**

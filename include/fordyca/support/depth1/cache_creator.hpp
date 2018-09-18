@@ -28,7 +28,7 @@
 #include <vector>
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -37,6 +37,7 @@
 NS_START(fordyca);
 namespace representation { class arena_cache; class base_block; }
 NS_START(support, depth1);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -50,16 +51,14 @@ NS_START(support, depth1);
  * Used by the arena to actually create caches, and by robots to create
  * "virtual" caches in their on-board representation of the arena.
  */
-class cache_creator : public rcppsw::er::client {
+class cache_creator : public er::client<cache_creator> {
  public:
   using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
-  cache_creator(const std::shared_ptr<rcppsw::er::server>& server,
-                representation::arena_grid& grid,
-                double cache_size, double resolution);
+  cache_creator(ds::arena_grid& grid, double cache_size, double resolution);
 
   /**
    * @brief Create caches from all blocks in the provided list that are close
@@ -73,25 +72,21 @@ class cache_creator : public rcppsw::er::client {
    * @brief Update the cells for all newly created caches to reflect the fact
    * they now contain caches.
    *
-   * @param grid The arena map grid.
    * @param caches Vector of newly created caches.
    */
-  static void update_host_cells(representation::arena_grid& grid,
-                                cache_vector& caches);
+  void update_host_cells(cache_vector& caches);
 
  protected:
-  representation::arena_grid& grid(void) const { return m_grid; }
-  rcppsw::er::server* server(void) const { return m_server.get(); }
+  ds::arena_grid& grid(void) const { return m_grid; }
   std::unique_ptr<representation::arena_cache> create_single(
       block_list blocks,
       const argos::CVector2& center);
 
  private:
   // clang-format off
-  double                              m_cache_size;
-  double                              m_resolution;
-  representation::arena_grid&         m_grid;
-  std::shared_ptr<rcppsw::er::server> m_server;
+  double          m_cache_size;
+  double          m_resolution;
+  ds::arena_grid& m_grid;
   // clang-format on
 };
 NS_END(support, fordyca, depth1);

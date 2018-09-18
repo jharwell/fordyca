@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,7 +36,12 @@ namespace representation {
 class base_block;
 } /* namespace representation */
 
+namespace ds {
+class arena_map;
+} /* namespace ds */
+
 NS_START(support, depth0);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,10 +62,10 @@ NS_START(support, depth0);
  *
  * Metrics are *NOT* reset after collection--that is the caller's responsibility.
  */
-class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
+class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
+                                     public er::client<stateless_metrics_aggregator> {
  public:
-  stateless_metrics_aggregator(std::shared_ptr<rcppsw::er::server> server,
-                               const struct params::metrics_params* params,
+  stateless_metrics_aggregator(const struct params::metrics_params* params,
                                const std::string& output_root);
 
   /**
@@ -73,6 +79,11 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator {
    * @brief Collect metrics from a block right before it is dropped in the nest.
    */
   void collect_from_block(const representation::base_block* block);
+
+  /**
+   * @brief Collect metrics from the arena each timestep.
+   */
+  void collect_from_arena(const ds::arena_map* arena);
 };
 
 NS_END(depth0, support, fordyca);

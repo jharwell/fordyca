@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "rcppsw/task_allocation/partitionable_polled_task.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,11 +49,10 @@ NS_START(fordyca, tasks, depth0);
  * execution time takes too long (as configured by parameters).
  */
 class generalist : public ta::partitionable_polled_task,
-                   public foraging_task,
-                   public free_block_interactor {
+                   public foraging_task {
  public:
   generalist(const struct ta::partitionable_task_params* params,
-             std::unique_ptr<ta::taskable>& mechanism);
+             std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */
   void accept(events::free_block_pickup& visitor) override;

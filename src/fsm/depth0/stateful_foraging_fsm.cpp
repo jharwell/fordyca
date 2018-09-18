@@ -35,11 +35,11 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateful_foraging_fsm::stateful_foraging_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    ds::perceived_arena_map* const map)
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("fordyca.fsm.depth0.stateful"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       entry_wait_for_signal(),
@@ -50,17 +50,17 @@ stateful_foraging_fsm::stateful_foraging_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_block_fsm(server, sel_matrix, saa, map),
+      m_block_fsm(sel_matrix, saa, map),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
-                                  nullptr,
-                                  &entry_wait_for_signal,
-                                  nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_drop,
+                                               nullptr,
+                                               &entry_wait_for_signal,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
@@ -89,7 +89,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
       return controller::foraging_signal::HANDLED;
     }
   }
-  ER_FATAL_SENTINEL("FATAL: Unhandled signal");
+  ER_FATAL_SENTINEL("Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
 
@@ -142,17 +142,19 @@ __rcsw_const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
  ******************************************************************************/
 __rcsw_pure bool stateful_foraging_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
-      base_foraging_fsm::in_collision_avoidance();
+         base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool stateful_foraging_fsm::entered_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.entered_collision_avoidance()) ||
-      base_foraging_fsm::entered_collision_avoidance();
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.entered_collision_avoidance()) ||
+         base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool stateful_foraging_fsm::exited_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.exited_collision_avoidance()) ||
-      base_foraging_fsm::exited_collision_avoidance();
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.exited_collision_avoidance()) ||
+         base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint stateful_foraging_fsm::collision_avoidance_duration(void) const {

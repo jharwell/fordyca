@@ -52,7 +52,7 @@ void block_priorities_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-bool block_priorities_parser::validate(void) const {
+__rcsw_pure bool block_priorities_parser::validate(void) const {
   CHECK(m_params->cube >= 1.0);
   CHECK(m_params->ramp >= 1.0);
   return true;

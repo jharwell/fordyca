@@ -24,15 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw {
-namespace er { class server; }
 namespace task_allocation {
 class bifurcating_tdgraph_executive;
 class bifurcating_tdgraph;
@@ -41,14 +39,14 @@ namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
 namespace params {
-namespace depth0 { class stateful_param_repository; }
+namespace depth0 { class stateful_controller_repository; }
 }
 
 NS_START(controller);
 class saa_subsystem;
 class base_perception_subsystem;
 class block_selection_matrix;
-
+namespace er = rcppsw::er;
 NS_START(depth0);
 
 /*******************************************************************************
@@ -61,10 +59,9 @@ NS_START(depth0);
  * @brief A helper class to offload initialization of the task tree for depth0
  * foraging.
  */
-class stateful_tasking_initializer {
+class stateful_tasking_initializer : public er::client<stateful_tasking_initializer> {
  public:
-  stateful_tasking_initializer(std::shared_ptr<rcppsw::er::server> server,
-                               const controller::block_selection_matrix* sel_matrix,
+  stateful_tasking_initializer(const controller::block_selection_matrix* sel_matrix,
                                saa_subsystem* saa,
                                base_perception_subsystem* perception);
   virtual ~stateful_tasking_initializer(void);
@@ -72,12 +69,10 @@ class stateful_tasking_initializer {
   stateful_tasking_initializer(const stateful_tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
-  operator()(params::depth0::stateful_param_repository *const stateful_repo);
+  operator()(params::depth0::stateful_controller_repository *const stateful_repo);
 
  protected:
-  void stateful_tasking_init(params::depth0::stateful_param_repository* stateful_repo);
-  const std::shared_ptr<rcppsw::er::server>& server(void) const { return m_server; }
-  std::shared_ptr<rcppsw::er::server>& server(void) { return m_server; }
+  void stateful_tasking_init(params::depth0::stateful_controller_repository* stateful_repo);
   const base_perception_subsystem* perception(void) const { return m_perception; }
   base_perception_subsystem* perception(void) { return m_perception; }
 
@@ -88,7 +83,6 @@ class stateful_tasking_initializer {
 
  private:
   // clang-format off
-  std::shared_ptr<rcppsw::er::server> m_server;
   controller::saa_subsystem* const    m_saa;
   base_perception_subsystem* const    m_perception;
   const block_selection_matrix* const mc_sel_matrix;

@@ -23,42 +23,35 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using ds::occupancy_grid;
 using representation::base_cache;
-using representation::occupancy_grid;
 namespace swarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(const std::shared_ptr<rcppsw::er::server>& server,
-                         std::unique_ptr<representation::base_cache> cache)
+cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
     : perceived_cell_op(cache->discrete_loc().first,
                         cache->discrete_loc().second),
-      client(server),
-      m_cache(std::move(cache)) {
-  client::insmod("cache_found",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
-
-cache_found::~cache_found(void) { client::rmmod(); }
+      ER_CLIENT_INIT("fordyca.events.cache_found"),
+      m_cache(std::move(cache)) {}
 
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_found::visit(representation::cell2D& cell) {
+void cache_found::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
   cell.fsm().accept(*this);
   ER_ASSERT(cell.state_has_cache(),
-            "FATAL: Cell does not have cache after cache found event");
+            "Cell does not have cache after cache found event");
 } /* visit() */
 
 void cache_found::visit(fsm::cell2D_fsm& fsm) {
@@ -93,11 +86,11 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
   } /* for(i..) */
 } /* visit() */
 
-void cache_found::visit(representation::perceived_arena_map& map) {
-  representation::cell2D& cell =
-      map.access<occupancy_grid::kCellLayer>(cell_op::x(), cell_op::y());
+void cache_found::visit(ds::perceived_arena_map& map) {
+  ds::cell2D& cell =
+      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromoneLayer>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
@@ -106,20 +99,21 @@ void cache_found::visit(representation::perceived_arena_map& map) {
    * terms of cells), if we previously saw some of the leftover blocks when a
    * cache is destroyed, and left the area before a new cache could be
    * created. When we return to the arena and find a new cache there, we are
-   * tracking blocks that no longer exist in our perception. Thus, the need for
-   * this function.
+   * tracking blocks that no longer exist in our perception.
    *
-   * @note This is a hack, and once the robot computes its own LOS rather than
+   * @todo This is a hack, and once the robot computes its own LOS rather than
    * being sent it the need for this function will disappear.
    */
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {
     if (m_cache->contains_point((*it)->real_loc())) {
-      ER_VER("Remove block%d hidden behind cache%d", (*it)->id(), m_cache->id());
+      ER_TRACE("Remove block%d hidden behind cache%d",
+               (*it)->id(),
+               m_cache->id());
 
       events::cell_empty op((*it)->discrete_loc().first,
                             (*it)->discrete_loc().second);
-      map.access<occupancy_grid::kCellLayer>((*it)->discrete_loc()).accept(op);
+      map.access<occupancy_grid::kCell>((*it)->discrete_loc()).accept(op);
       it = map.blocks().erase(it);
     } else {
       ++it;

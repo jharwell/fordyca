@@ -41,7 +41,8 @@ void metrics_parser::parse(const ticpp::Element& node) {
     ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(mnode, m_params, collision_fname);
+    XML_PARSE_PARAM(mnode, m_params, fsm_collision_fname);
+    XML_PARSE_PARAM(mnode, m_params, fsm_movement_fname);
 
     XML_PARSE_PARAM(mnode, m_params, block_transport_fname);
     XML_PARSE_PARAM(mnode, m_params, block_acquisition_fname);
@@ -56,11 +57,10 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_PARAM(mnode, m_params, task_execution_harvester_fname);
     XML_PARSE_PARAM(mnode, m_params, task_generalist_tab_fname);
 
-    XML_PARSE_PARAM(mnode, m_params, distance_fname);
     XML_PARSE_PARAM(mnode, m_params, output_dir);
 
     XML_PARSE_PARAM(mnode, m_params, perception_world_model_fname);
-
+    XML_PARSE_PARAM(mnode, m_params, arena_robot_occupancy_fname);
     XML_PARSE_PARAM(mnode, m_params, collect_interval);
 
     m_parsed = true;
@@ -79,12 +79,15 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_PARAM_STR(m_params, cache_acquisition_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_utilization_fname) << std::endl
          << XML_PARAM_STR(m_params, cache_lifecycle_fname) << std::endl
-         << XML_PARAM_STR(m_params, task_execution_generalist_fname) << std::endl
+         << XML_PARAM_STR(m_params, task_execution_generalist_fname)
+         << std::endl
          << XML_PARAM_STR(m_params, task_execution_collector_fname) << std::endl
          << XML_PARAM_STR(m_params, task_execution_harvester_fname) << std::endl
          << XML_PARAM_STR(m_params, task_generalist_tab_fname) << std::endl
-         << XML_PARAM_STR(m_params, distance_fname) << std::endl
+         << XML_PARAM_STR(m_params, fsm_collision_fname) << std::endl
+         << XML_PARAM_STR(m_params, fsm_movement_fname) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
+         << XML_PARAM_STR(m_params, arena_robot_occupancy_fname) << std::endl
          << XML_PARAM_STR(m_params, perception_world_model_fname) << std::endl
          << XML_PARAM_STR(m_params, collect_interval) << std::endl
          << build_footer();

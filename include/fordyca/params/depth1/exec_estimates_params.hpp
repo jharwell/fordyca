@@ -42,8 +42,8 @@ NS_START(fordyca, params, depth1);
  * tasks involved in depth1.
  */
 struct exec_estimates_params : public depth0::exec_estimates_params {
-  argos::CRange<double> harvester_range{};
-  argos::CRange<double> collector_range{};
+  argos::CRange<uint> harvester_range{};
+  argos::CRange<uint> collector_range{};
 };
 
 NS_END(depth1, params, fordyca);

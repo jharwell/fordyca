@@ -65,11 +65,15 @@ void collision_metrics_collector::collect(
   m_stats.n_in_avoidance += static_cast<uint>(m.in_collision_avoidance());
   m_stats.cum_in_avoidance += static_cast<uint>(m.in_collision_avoidance());
 
-  m_stats.n_entered_avoidance += static_cast<uint>(m.entered_collision_avoidance());
-  m_stats.cum_entered_avoidance += static_cast<uint>(m.entered_collision_avoidance());
+  m_stats.n_entered_avoidance +=
+      static_cast<uint>(m.entered_collision_avoidance());
+  m_stats.cum_entered_avoidance +=
+      static_cast<uint>(m.entered_collision_avoidance());
 
-  m_stats.n_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
-  m_stats.cum_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
+  m_stats.n_exited_avoidance +=
+      static_cast<uint>(m.exited_collision_avoidance());
+  m_stats.cum_exited_avoidance +=
+      static_cast<uint>(m.exited_collision_avoidance());
 
   if (m.exited_collision_avoidance()) {
     m_stats.total_avoidance_duration += m.collision_avoidance_duration();
@@ -81,9 +85,9 @@ bool collision_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.n_in_avoidance /
-                         static_cast<double>(interval())) +
-          separator();
+  line +=
+      std::to_string(m_stats.n_in_avoidance / static_cast<double>(interval())) +
+      separator();
   line += std::to_string(m_stats.cum_in_avoidance /
                          static_cast<double>(timestep() + 1)) +
           separator();

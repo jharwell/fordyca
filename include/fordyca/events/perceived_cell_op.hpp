@@ -42,7 +42,7 @@ class foraging_controller;
 }
 } // namespace controller
 
-namespace representation {
+namespace ds {
 class perceived_arena_map;
 }
 
@@ -62,7 +62,7 @@ class perceived_cell_op
     : public cell_op,
       public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                 controller::depth1::foraging_controller,
-                                representation::perceived_arena_map> {
+                                ds::perceived_arena_map> {
  public:
   perceived_cell_op(size_t x, size_t y) : cell_op(x, y) {}
   ~perceived_cell_op(void) override = default;

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_RANDOM_DISTRIBUTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_RANDOM_DISTRIBUTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_DIST_RANDOM_DISTRIBUTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BLOCK_DIST_RANDOM_DISTRIBUTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,7 +31,7 @@
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/dcoord.hpp"
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 
 /*******************************************************************************
@@ -41,11 +41,11 @@ NS_START(fordyca);
 
 namespace representation {
 class multicell_entity;
-class arena_grid;
 class cell2D;
 } // namespace representation
 
 NS_START(support, block_dist);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,18 +63,13 @@ NS_START(support, block_dist);
  *   the arena map the blocks are being distributed into some part of (this is
  *   not checked).
  */
-class random_distributor : public base_distributor {
+class random_distributor : public base_distributor,
+                           public er::client<random_distributor> {
  public:
-  random_distributor(std::shared_ptr<rcppsw::er::server> server,
-                           representation::arena_grid::view& grid,
-                           double resolution);
+  random_distributor(ds::arena_grid::view& grid,
+                     double resolution);
 
   random_distributor& operator=(const random_distributor& s) = delete;
-  random_distributor(const random_distributor& s)
-      : base_distributor(s.server_ref()),
-        m_resolution(s.m_resolution),
-        m_rng(s.m_rng),
-        m_grid(s.m_grid) {}
 
   bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
 
@@ -98,15 +93,15 @@ class random_distributor : public base_distributor {
    */
   bool find_avail_coord(const entity_list& entity, std::vector<uint>& coordv);
   bool verify_block_dist(const representation::base_block& block,
-                         const representation::cell2D* cell);
+                         const ds::cell2D* cell);
 
   // clang-format off
-  double                              m_resolution;
-  std::default_random_engine          m_rng{std::random_device{}()};
-  representation::arena_grid::view    m_grid;
+  double                     m_resolution;
+  std::default_random_engine m_rng{std::random_device{}()};
+  ds::arena_grid::view       m_grid;
   // clang-format on
 };
 
 NS_END(block_dist, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_RANDOM_DISTRIBUTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_DIST_RANDOM_DISTRIBUTOR_HPP_ */

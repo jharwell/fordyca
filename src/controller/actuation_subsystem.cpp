@@ -26,8 +26,6 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include "fordyca/params/actuation_params.hpp"
 
-#include "rcppsw/er/server.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -38,13 +36,11 @@ using kinematics2D::differential_drive;
  * Constructors/Destructor
  ******************************************************************************/
 actuation_subsystem::actuation_subsystem(
-    const std::shared_ptr<rcppsw::er::server>& server,
     const struct params::actuation_params* c_params,
     struct actuator_list* const list)
     : mc_params(*c_params),
       m_actuators(*list),
-      m_drive(server,
-              differential_drive::kFSMDrive,
+      m_drive(differential_drive::kFSMDrive,
               c_params->differential_drive.max_speed,
               c_params->differential_drive.soft_turn_max,
               m_actuators.wheels,

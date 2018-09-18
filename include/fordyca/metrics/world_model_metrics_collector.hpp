@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -70,4 +70,4 @@ class world_model_metrics_collector
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */

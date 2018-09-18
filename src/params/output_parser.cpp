@@ -55,18 +55,12 @@ void output_parser::parse(const ticpp::Element& node) {
   ticpp::Element snode = get_node(onode, "sim");
   XML_PARSE_PARAM(snode, m_params, output_root);
   XML_PARSE_PARAM(snode, m_params, output_dir);
-
-  /* only present for loop functions */
-  if (snode.HasAttribute("log_fname")) {
-    XML_PARSE_PARAM(snode, m_params, log_fname);
-  }
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
   stream << build_header() << m_metrics_parser
          << XML_PARAM_STR(m_params, output_root) << std::endl
          << XML_PARAM_STR(m_params, output_dir) << std::endl
-         << XML_PARAM_STR(m_params, log_fname) << std::endl
          << build_footer();
 } /* show() */
 

@@ -34,10 +34,13 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace representation {
-class arena_map;
-class perceived_arena_map;
 class base_block;
 } // namespace representation
+
+namespace ds {
+class arena_map;
+class perceived_arena_map;
+} // namespace ds
 
 NS_START(events);
 
@@ -52,8 +55,8 @@ NS_START(events);
  * dropping a block will need to visit (think data structures).
  */
 class block_pickup_event
-    : public visitor::visit_set<representation::arena_map,
-                                representation::perceived_arena_map,
+    : public visitor::visit_set<ds::arena_map,
+                                ds::perceived_arena_map,
                                 representation::base_block> {};
 
 NS_END(events, fordyca);

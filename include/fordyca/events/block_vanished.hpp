@@ -38,7 +38,7 @@ namespace controller {
 namespace depth0 {
 class stateless_foraging_controller;
 class stateful_foraging_controller;
-}
+} // namespace depth0
 namespace depth1 {
 class foraging_controller;
 }
@@ -51,10 +51,11 @@ namespace fsm {
 namespace depth0 {
 class stateless_foraging_fsm;
 class stateful_foraging_fsm;
-}
+} // namespace depth0
 namespace depth1 {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+}
+} // namespace fsm
 namespace tasks {
 namespace depth0 {
 class generalist;
@@ -65,7 +66,7 @@ class harvester;
 namespace depth2 {
 class cache_starter;
 class cache_finisher;
-}
+} // namespace depth2
 } // namespace tasks
 
 NS_START(events);
@@ -82,7 +83,7 @@ NS_START(events);
  * robot picking it up (ramp blocks only).
  */
 class block_vanished
-    : public rcppsw::er::client,
+    : public rcppsw::er::client<block_vanished>,
       public visitor::visit_set<controller::depth0::stateless_foraging_controller,
                                 controller::depth0::stateful_foraging_controller,
                                 controller::depth1::foraging_controller,
@@ -95,16 +96,17 @@ class block_vanished
                                 fsm::depth0::stateful_foraging_fsm,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
-  block_vanished(std::shared_ptr<rcppsw::er::server> server,
-                 uint block_id);
-  ~block_vanished(void) override { client::rmmod(); }
+  explicit block_vanished(uint block_id);
+  ~block_vanished(void) override = default;
 
   block_vanished(const block_vanished& op) = delete;
   block_vanished& operator=(const block_vanished& op) = delete;
 
   /* depth0 foraging */
-  void visit(controller::depth0::stateless_foraging_controller& controller) override;
-  void visit(controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateless_foraging_controller& controller) override;
+  void visit(
+      controller::depth0::stateful_foraging_controller& controller) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;

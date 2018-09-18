@@ -61,6 +61,7 @@ NS_START(fsm);
  * "arrive" at it.
  */
 class vector_fsm : public base_foraging_fsm,
+                   public er::client<vector_fsm>,
                    public task_allocation::taskable {
  public:
   /**
@@ -81,8 +82,7 @@ class vector_fsm : public base_foraging_fsm,
    */
   constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
 
-  vector_fsm(std::shared_ptr<rcppsw::er::server> server,
-             controller::saa_subsystem* saa);
+  explicit vector_fsm(controller::saa_subsystem* saa);
 
   vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;

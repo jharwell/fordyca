@@ -22,32 +22,29 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cell2D.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-using representation::occupancy_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 base_perception_subsystem::base_perception_subsystem(
-    std::shared_ptr<rcppsw::er::server> server,
     const params::perception_params* const params,
     const std::string& id)
-    : client(server),
+    : ER_CLIENT_INIT("fordyca.controller.perception"),
       m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
-      m_map(rcppsw::make_unique<representation::perceived_arena_map>(
-          client::server_ref(),
-          params,
-          id)) {}
+      m_map(rcppsw::make_unique<ds::perceived_arena_map>(params, id)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -56,13 +53,14 @@ void base_perception_subsystem::update(
     const representation::line_of_sight* const los) {
   update_cell_stats(los);
   process_los(los);
+  processed_los_verify(los);
   m_map->update();
 } /* update() */
 
 void base_perception_subsystem::reset(void) { m_map->reset(); }
 
 void base_perception_subsystem::process_los(
-    const representation::line_of_sight* const los) {
+    const representation::line_of_sight* const c_los) {
   /*
    * If the robot thinks that a cell contains a block, because the cell had one
    * the last time it passed nearby, but when coming near the cell a second time
@@ -70,51 +68,87 @@ void base_perception_subsystem::process_los(
    * between then and now, and it needs to update its internal representation
    * accordingly.
    */
-  for (size_t i = 0; i < los->xsize(); ++i) {
-    for (size_t j = 0; j < los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = los->cell(i, j).loc();
-      if (!los->cell(i, j).state_has_block() &&
-          m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
-        ER_DIAG("Correct block%d discrepency at (%zu, %zu)",
-                m_map->access<occupancy_grid::kCellLayer>(d).block()->id(),
-                d.first,
-                d.second);
-        m_map->block_remove(
-            m_map->access<occupancy_grid::kCellLayer>(d).block());
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
+      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      if (!c_los->cell(i, j).state_has_block() &&
+          m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
+        ER_DEBUG("Correct block%d discrepency at (%u, %u)",
+                 m_map->access<occupancy_grid::kCell>(d).block()->id(),
+                 d.first,
+                 d.second);
+        m_map->block_remove(m_map->access<occupancy_grid::kCell>(d).block());
+      } else if (c_los->cell(i, j).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
+        ER_TRACE("Cell (%u, %u) now known to be empty", d.first, d.second);
+        events::cell_empty e(d);
+        m_map->accept(e);
       }
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto block : los->blocks()) {
-    ER_ASSERT(!block->is_out_of_sight(), "FATAL: Block out of sight in LOS?");
-    if (!m_map->access<occupancy_grid::kCellLayer>(block->discrete_loc())
+  for (auto block : c_los->blocks()) {
+    ER_ASSERT(!block->is_out_of_sight(), "Block out of sight in LOS?");
+    if (!m_map->access<occupancy_grid::kCell>(block->discrete_loc())
              .state_has_block()) {
-      ER_NOM("Discovered block%d at (%u, %u)",
-             block->id(),
-             block->discrete_loc().first,
-             block->discrete_loc().second);
+      ER_INFO("Discovered block%d at (%u, %u)",
+              block->id(),
+              block->discrete_loc().first,
+              block->discrete_loc().second);
     }
-    events::block_found op(client::server_ref(), block->clone());
+    events::block_found op(block->clone());
     m_map->accept(op);
   } /* for(block..) */
 } /* process_los() */
 
+void base_perception_subsystem::processed_los_verify(
+    const representation::line_of_sight* const c_los) const {
+  /*
+   * Verify that for each cell in LOS that was empty or contained a block, that
+   * it matches the PAM.
+   */
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
+      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      auto& cell1 = c_los->cell(i, j);
+      auto& cell2 = map()->access<occupancy_grid::kCell>(d);
+
+      if (cell1.state_has_block() || cell1.state_is_empty()) {
+        ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
+                  "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
+                  d.first,
+                  d.second,
+                  cell1.fsm().current_state(),
+                  cell2.fsm().current_state());
+        if (cell1.state_has_block()) {
+          ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
+                    "LOS/PAM disagree on block id in cell at (%u, %u): %d/%d",
+                    d.first,
+                    d.second,
+                    cell1.block()->id(),
+                    cell2.block()->id());
+        }
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
+} /* processed_los_verify() */
+
 void base_perception_subsystem::update_cell_stats(
     const representation::line_of_sight* const los) {
-  for (size_t i = 0; i < los->xsize(); ++i) {
-    for (size_t j = 0; j < los->ysize(); ++j) {
+  for (uint i = 0; i < los->xsize(); ++i) {
+    for (uint j = 0; j < los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = los->cell(i, j).loc();
       if (los->cell(i, j).state_is_empty() &&
-          m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-          !m_map->access<occupancy_grid::kCellLayer>(d).state_is_empty()) {
+          m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+          !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
         m_cell_stats[fsm::cell2D_fsm::ST_EMPTY]++;
       } else if (los->cell(i, j).state_has_block() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_block()) {
+                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
       } else if (los->cell(i, j).state_has_cache() &&
-                 m_map->access<occupancy_grid::kCellLayer>(d).state_is_known() &&
-                 !m_map->access<occupancy_grid::kCellLayer>(d).state_has_cache()) {
+                 m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
+                 !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
         m_cell_stats[fsm::cell2D_fsm::ST_HAS_CACHE]++;
       }
     } /* for(j..) */

@@ -33,13 +33,9 @@ NS_START(fordyca, controller, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
-    std::shared_ptr<rcppsw::er::server> server,
     const controller::cache_selection_matrix* const matrix)
-    : client(server), mc_matrix(matrix) {
-  client::insmod("cache_site_selector",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+    : client("fordyca.controller.depth2.cache_site_selector"),
+      mc_matrix(matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -52,7 +48,7 @@ argos::CVector2 cache_site_selector::calc_best(
   argos::CVector2 site((robot_loc.GetX() - nest_loc.GetX()) / 2.0,
                        nest_loc.GetY());
 
-  ER_NOM("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
+  ER_INFO("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
   return site;
 } /* calc_best() */
 

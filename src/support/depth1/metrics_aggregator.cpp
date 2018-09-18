@@ -26,9 +26,10 @@
 
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/distance_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
@@ -53,11 +54,10 @@ using task1 = tasks::depth1::foraging_task;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-metrics_aggregator::metrics_aggregator(
-    std::shared_ptr<rcppsw::er::server> server,
-    const struct params::metrics_params* params,
-    const std::string& output_root)
-    : stateful_metrics_aggregator(server, params, output_root) {
+metrics_aggregator::metrics_aggregator(const struct params::metrics_params* params,
+                                       const std::string& output_root)
+    : stateful_metrics_aggregator(params, output_root),
+      ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",
       metrics_path() + "/" + params->cache_acquisition_fname,
@@ -89,6 +89,7 @@ metrics_aggregator::metrics_aggregator(
       "caches::lifecycle",
       metrics_path() + "/" + params->cache_lifecycle_fname,
       params->collect_interval);
+  reset_all();
 }
 
 /*******************************************************************************
@@ -96,19 +97,33 @@ metrics_aggregator::metrics_aggregator(
  ******************************************************************************/
 void metrics_aggregator::collect_from_controller(
     const controller::depth1::foraging_controller* const controller) {
-  auto distance_m =
-      dynamic_cast<const metrics::fsm::distance_metrics*>(controller);
-  ER_ASSERT(distance_m,
-            "FATAL: Controller does not provide FSM distance metrics");
-  collect("fsm::distance", *distance_m);
-
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
-  ER_ASSERT(worldm_m, "FATAL: Controller does not provide world model metrics");
+  auto manip_m =
+      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  auto movement_m =
+      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
+
+  ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
+  ER_ASSERT(worldm_m, "Controller does not provide world model metrics");
+  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
+
+  collect("fsm::movement", *movement_m);
+  collect("blocks::manipulation", *manip_m);
   collect("perception::world_model", *worldm_m);
 
-  collect("tasks::generalist_tab", *(controller->active_tab()));
-
   if (nullptr != controller->current_task()) {
+    auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
+        dynamic_cast<const ta::polled_task*>(controller->current_task())
+            ->mechanism());
+    auto block_acq_m =
+        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+            dynamic_cast<const ta::polled_task*>(controller->current_task())
+                ->mechanism());
+    ER_ASSERT(block_acq_m,
+              "Task does not provide FSM block acquisition metrics");
+    ER_ASSERT(collision_m, "FSM does not provide collision metrics");
+
+    collect("fsm::collision", *collision_m);
     collect_if(
         "blocks::acquisition",
         *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
@@ -129,12 +144,6 @@ void metrics_aggregator::collect_from_controller(
                      metrics)
                      .acquisition_goal();
         });
-
-    collect("tasks::execution::" + dynamic_cast<const ta::logical_task*>(
-                                       controller->current_task())
-                                       ->name(),
-            dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(
-                *controller->current_task()));
   }
 } /* collect_from_controller() */
 
@@ -147,5 +156,16 @@ void metrics_aggregator::collect_from_cache_collator(
     const metrics::caches::lifecycle_collator* const collator) {
   collect("caches::lifecycle", *collator);
 } /* collect_from_cache() */
+
+void metrics_aggregator::task_finish_or_abort_cb(
+    const ta::polled_task* const task) {
+  collect("tasks::execution::" + task->name(),
+          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+} /* task_finish_or_abort_cb() */
+
+void metrics_aggregator::task_alloc_cb(const ta::polled_task* const,
+                                       const ta::bifurcating_tab* const tab) {
+  collect("tasks::generalist_tab", *tab);
+} /* task_alloc_cb() */
 
 NS_END(depth1, support, fordyca);

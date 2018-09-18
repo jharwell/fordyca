@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -40,8 +40,8 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  ******************************************************************************/
 cache_finisher::cache_finisher(
     const struct task_allocation::task_params* params,
-    std::unique_ptr<task_allocation::taskable>& mechanism)
-    : foraging_task(kCacheFinisherName, params, mechanism) {}
+    std::unique_ptr<task_allocation::taskable> mechanism)
+    : foraging_task(kCacheFinisherName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

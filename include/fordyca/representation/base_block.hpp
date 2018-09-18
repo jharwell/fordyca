@@ -85,7 +85,7 @@ class base_block : public multicell_entity,
    * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
-  void add_transporter(uint robot_id) {
+  void add_transporter(int robot_id) {
     ++m_transporters;
     m_robot_id = robot_id;
   }
@@ -94,14 +94,14 @@ class base_block : public multicell_entity,
    * @brief Set the time that the base_block is picked up for the first time after
    * being distributed in the arena.
    *
-   * @param current_time The current simulation time.
+   * @param time The current simulation time.
    */
   void first_pickup_time(double time);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
-   * @param current_time The current simulation time.
+   * @param time The current simulation time.
    */
   void nest_drop_time(double time) { m_nest_drop_time = time; }
 
@@ -109,7 +109,6 @@ class base_block : public multicell_entity,
    * @brief Set the time that the base_block was distributed in the arena.
    */
   void distribution_time(double dist_time) { m_dist_time = dist_time; }
-
 
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not

@@ -39,24 +39,19 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_vanished::cache_vanished(std::shared_ptr<rcppsw::er::server> server,
-                               uint cache_id)
-    : client(server), m_cache_id(cache_id) {
-  client::insmod("cache_vanished",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+cache_vanished::cache_vanished(uint cache_id)
+    : ER_CLIENT_INIT("fordyca.events.cache_vanished"), m_cache_id(cache_id) {}
 
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
 void cache_vanished::visit(controller::depth1::foraging_controller& controller) {
-  ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
-         controller.GetId().c_str(),
-         m_cache_id);
+  controller.ndc_push();
+  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
   dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
+  controller.ndc_pop();
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth1::collector& task) {
@@ -82,12 +77,12 @@ void cache_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_vanished::visit(controller::depth2::foraging_controller& controller) {
-  ER_NOM("%s abort pickup/drop from/in cache: cache%d vanished",
-         controller.GetId().c_str(),
-         m_cache_id);
+  controller.ndc_pop();
+  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
   dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task())
       ->accept(*this);
+  controller.ndc_pop();
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth2::cache_transferer& task) {

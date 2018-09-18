@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -39,8 +39,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 cache_starter::cache_starter(const struct task_allocation::task_params* params,
-                             std::unique_ptr<task_allocation::taskable>& mechanism)
-    : foraging_task(kCacheStarterName, params, mechanism) {}
+                             std::unique_ptr<task_allocation::taskable> mechanism)
+    : foraging_task(kCacheStarterName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -127,7 +127,6 @@ void cache_starter::accept(events::free_block_pickup& visitor) {
 void cache_starter::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-
 
 /*******************************************************************************
  * Task Metrics

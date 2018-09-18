@@ -47,8 +47,8 @@ NS_START(fordyca, params);
  */
 class communication_parser : public rcppsw::params::xml_param_parser {
  public:
-  communication_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-      : xml_param_parser(server, level) {}
+  communication_parser(uint level)
+      : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the

@@ -39,7 +39,8 @@ NS_START(fordyca);
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation { class perceived_arena_map; class block; }
+namespace ds { class perceived_arena_map; }
+
 NS_START(fsm);
 
 using transport_goal_type = block_transporter::goal_type;
@@ -61,16 +62,15 @@ NS_START(depth1);
  * goal. Once it has done that it will signal that its task is complete.
  */
 class block_to_goal_fsm : public base_foraging_fsm,
+                          public er::client<block_to_goal_fsm>,
                           public metrics::fsm::goal_acquisition_metrics,
                           public task_allocation::taskable,
                           public block_transporter,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
-  block_to_goal_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::block_selection_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  block_to_goal_fsm(const controller::block_selection_matrix* sel_matrix,
+                    controller::saa_subsystem* saa,
+                    ds::perceived_arena_map* map);
 
   block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
   block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;

@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcsw/common/common.h"
@@ -58,17 +60,22 @@ class cell2D_fsm : public state_machine::simple_fsm,
     ST_EMPTY,
     ST_HAS_BLOCK,
     ST_HAS_CACHE,
+    ST_CACHE_EXTENT,
     ST_MAX_STATES
   };
 
-  explicit cell2D_fsm(const std::shared_ptr<rcppsw::er::server>& server);
   cell2D_fsm(void);
   ~cell2D_fsm(void) override = default;
   cell2D_fsm(const cell2D_fsm& other) = default;
 
+  void init(void) override;
+
   bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
   bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
   bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
+  bool state_in_cache_extent(void) const {
+    return current_state() == ST_CACHE_EXTENT;
+  }
   bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
 
   /* events */
@@ -76,7 +83,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   void event_empty(void);
   void event_block_pickup(void);
   void event_block_drop(void);
-  void init(void) override;
+  void event_cache_extent(void);
 
   size_t block_count(void) const { return m_block_count; }
 
@@ -90,6 +97,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   FSM_STATE_DECLARE_ND(cell2D_fsm, state_empty);
   FSM_STATE_DECLARE_ND(cell2D_fsm, state_block);
   FSM_STATE_DECLARE(cell2D_fsm, state_cache, struct block_data);
+  FSM_STATE_DECLARE_ND(cell2D_fsm, state_cache_extent);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
     FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
@@ -97,12 +105,13 @@ class cell2D_fsm : public state_machine::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_empty),
         FSM_STATE_MAP_ENTRY(&state_block),
         FSM_STATE_MAP_ENTRY(&state_cache),
+        FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
     FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
 
-  size_t m_block_count;
+  uint m_block_count{0};
 };
 
 NS_END(fsm, forydca);

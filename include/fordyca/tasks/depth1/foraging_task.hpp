@@ -35,10 +35,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace events {
-class nest_block_drop;
-} // namespace events
-
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(tasks, depth1);
@@ -59,15 +55,14 @@ NS_START(tasks, depth1);
  */
 class foraging_task
     : public base_foraging_task,
-      public ta::polled_task,
-      public visitor::polymorphic_accept_set<events::nest_block_drop> {
+      public ta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
                 const struct ta::task_params *params,
-                std::unique_ptr<ta::taskable>& mechanism);
+                std::unique_ptr<ta::taskable> mechanism);
 
     /* task overrides */
   double current_time(void) const override;

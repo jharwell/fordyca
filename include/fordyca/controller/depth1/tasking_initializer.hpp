@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 
@@ -35,7 +33,7 @@
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 namespace params {
-namespace depth1 { class param_repository; }
+namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
@@ -52,10 +50,10 @@ NS_START(depth1);
  * @brief A helper class to offload initialization of the task tree for depth1
  * foraging.
  */
-class tasking_initializer : public depth0::stateful_tasking_initializer {
+class tasking_initializer : public depth0::stateful_tasking_initializer,
+                            public er::client<tasking_initializer> {
  public:
-  tasking_initializer(std::shared_ptr<rcppsw::er::server>& server,
-                      const controller::block_selection_matrix* bsel_matrix,
+  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
@@ -64,10 +62,10 @@ class tasking_initializer : public depth0::stateful_tasking_initializer {
   tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
-  operator()(params::depth1::param_repository *const param_repo);
+  operator()(params::depth1::controller_repository *const controller_repo);
 
  protected:
-  void depth1_tasking_init(params::depth1::param_repository* task_repo);
+  void depth1_tasking_init(params::depth1::controller_repository* task_repo);
   const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:

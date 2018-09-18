@@ -32,7 +32,7 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 cache_selection_matrix::cache_selection_matrix(const argos::CVector2& nest_loc) {
-  this->insert(std::make_pair("nest_loc", nest_loc));
+  this->insert(std::make_pair("nest_center", nest_loc));
 }
 
 NS_END(controller, fordyca);

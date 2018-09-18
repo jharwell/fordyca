@@ -81,7 +81,7 @@ NS_START(events);
 class nest_block_drop
     : public visitor::visitor,
       public block_drop_event,
-      public rcppsw::er::client,
+      public rcppsw::er::client<nest_block_drop>,
       public visitor::visit_set<controller::depth0::stateful_foraging_controller,
                                 controller::depth0::stateless_foraging_controller,
                                 controller::depth1::foraging_controller,
@@ -92,16 +92,15 @@ class nest_block_drop
                                 tasks::depth0::generalist,
                                 tasks::depth1::collector> {
  public:
-  nest_block_drop(std::shared_ptr<rcppsw::er::server> server,
-                  std::shared_ptr<representation::base_block> block,
+  nest_block_drop(std::shared_ptr<representation::base_block> block,
                   uint timestep);
-  ~nest_block_drop(void) override { client::rmmod(); }
+  ~nest_block_drop(void) override = default;
 
   nest_block_drop(const nest_block_drop& op) = delete;
   nest_block_drop& operator=(const nest_block_drop& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::arena_map& map) override;
+  void visit(ds::arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
   void visit(
@@ -132,7 +131,7 @@ class nest_block_drop
   // clang-format off
   uint                                        m_timestep;
   std::shared_ptr<representation::base_block> m_block;
-  //clang-format on
+  // clang-format on
 };
 
 NS_END(events, fordyca);
