@@ -32,6 +32,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/params/communication_params.hpp"
 
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
@@ -161,6 +162,11 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
                                                   &ogrid->priorities);
 
+  auto* m_communication_params = param_repo.parse_results<params::communication_params>();
+  m_chance_to_start_message = m_communication_params->chance_to_start;
+  m_chance_to_pass_on_message = m_communication_params->chance_to_pass_on;
+  m_communication_mode = m_communication_params->mode;
+
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
                                              saa_subsystem(),
@@ -184,15 +190,23 @@ void stateful_foraging_controller::perform_communication(void) {
 
   hal::wifi_packet packet = hal::wifi_packet();
 
-  if (!recieved_packet_data.empty()) {
+  if (!recieved_packet_data.empty() && probability >= m_chance_to_pass_on_message) {
     packet.data = recieved_packet_data;
     saa_subsystem()->actuation()->start_sending_message(packet);
-
-  // TODO: pull probability from params
-  } else if (probability >= 0.99) {
+  } else if (probability >= m_chance_to_start_message) {
     // TODO: random x and y for the cell within the limits of the arena
-    int x_coord = 2;
-    int y_coord = 2;
+    int x_coord;
+    int y_coord;
+    if(m_communication_mode == 1) {
+      x_coord = static_cast <int> (rand()) % static_cast <int> (12);
+      y_coord = static_cast <int> (rand()) % static_cast <int> (6);
+    } else {
+      x_coord = 2;
+      y_coord = 2;
+    }
+
+    std::cout << "I AM SENDING X_COORD: " << x_coord << " & Y_COORD: " << y_coord << std::endl;
+
     ds::cell2D cell = m_perception->map()->
       access<ds::occupancy_grid::kCell>(x_coord, y_coord);
     packet.data.push_back(2); // X Coord of cell

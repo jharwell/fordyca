@@ -162,6 +162,9 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem>           m_perception;
   std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
+  float                                                m_chance_to_pass_on_message;
+  float                                                m_chance_to_start_message;
+  int                                                  m_communication_mode;
   // clang-format on
 };
 
