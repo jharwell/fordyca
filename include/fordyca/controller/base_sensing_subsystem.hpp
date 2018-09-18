@@ -169,6 +169,8 @@ class base_sensing_subsystem {
    */
   argos::CVector2 find_closest_obstacle(void) const;
 
+  std::vector<uint8_t> recieve_message();
+
  private:
   /**
    * @brief Determine if the obstacle represented by its closest point to the

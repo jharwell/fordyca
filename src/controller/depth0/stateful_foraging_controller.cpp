@@ -38,6 +38,8 @@
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
+#include "fordyca/representation/base_cell_entity.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -111,6 +113,8 @@ void stateful_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
 
+  perform_communication();
+
   m_executive->run();
 } /* ControlStep() */
 
@@ -160,6 +164,59 @@ void stateful_foraging_controller::Reset(void) {
   stateless_foraging_controller::Reset();
   m_perception->reset();
 } /* Reset() */
+
+void stateful_foraging_controller::perform_communication(void) {
+  // TODO: integrate packet into percieved arena map
+  std::vector<uint8_t> recieved_packet_data = saa_subsystem()->
+    sensing()->recieve_message();
+
+  float probability = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+  hal::wifi_packet packet = hal::wifi_packet();
+
+  if (!recieved_packet_data.empty()) {
+    packet.data = recieved_packet_data;
+    saa_subsystem()->actuation()->start_sending_message(packet);
+
+  // TODO: pull probability from params
+  } else if (probability >= 0.99) {
+    // TODO: random x and y for the cell within the limits of the arena
+    int x_coord = 2;
+    int y_coord = 2;
+    representation::cell2D cell = m_perception->map()->
+      access<representation::occupancy_grid::kCellLayer>(x_coord, y_coord);
+    packet.data.push_back(2); // X Coord of cell
+    packet.data.push_back(2); // Y Coord of cell
+    
+    auto entity = cell.entity();
+    int id = -1;
+    if (entity) {
+      id = entity->id();
+    }
+    packet.data.push_back(id); // Entity ID (will be -1 if the cell is empty)
+
+    // The state is what the cell contains (nothing, block, or cache)
+    int state = -1;
+    if (cell.state_is_known()) {
+      if (cell.state_is_empty()) {
+        state = 0;
+      } else if (cell.state_has_block()) {
+        state = 1;
+      } else if (cell.state_has_cache()) {
+        state = 2;
+      }
+    }
+    // Type of entity (block / cache) (will be -1 if the cell state is unknown)
+    packet.data.push_back(state); 
+
+    // TODO: Need to get the relevancy for the cell
+    packet.data.push_back(-1); 
+
+    saa_subsystem()->actuation()->start_sending_message(packet);
+  } else {
+    saa_subsystem()->actuation()->stop_sending_message();
+  }
+}
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
                        stateful_foraging_controller,

@@ -98,6 +98,14 @@ class actuation_subsystem {
    */
   void throttling_update(uint timestep) { m_drive.throttling_update(timestep); }
 
+  void start_sending_message(struct hal::wifi_packet packet) {
+    m_actuators.wifi.broadcast_start(packet); 
+  }
+
+  void stop_sending_message(void) {
+    m_actuators.wifi.broadcast_stop();
+  }
+
   /**
    * @brief Reset the actuations, including stopping the robot.
    */

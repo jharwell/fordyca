@@ -119,4 +119,16 @@ bool base_sensing_subsystem::block_detected(void) const {
   return 4 == sum;
 } /* block_detected() */
 
+std::vector<uint8_t> base_sensing_subsystem::recieve_message() {
+
+  for (auto reading : m_sensors.rabs.readings()) {
+    std::vector<uint8_t> data = reading.data;
+    if (!data.empty() && (int) data.front() > 1) {
+      return reading.data;
+    }
+  }
+  std::vector<uint8_t> temp;
+  return temp;
+}
+
 NS_END(controller, fordyca);

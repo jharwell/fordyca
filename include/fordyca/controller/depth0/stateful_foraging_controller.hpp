@@ -83,6 +83,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
+  void perform_communication(void);
+
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
   FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
