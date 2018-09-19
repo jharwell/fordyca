@@ -112,7 +112,7 @@ void base_perception_subsystem::processed_los_verify(
     for (uint j = 0; j < c_los->ysize(); ++j) {
       rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
-      auto& cell2 = map()->access<occupancy_grid::kCell>(d);
+      auto& cell2 = m_map->access<occupancy_grid::kCell>(d);
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {
         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
@@ -155,6 +155,23 @@ void base_perception_subsystem::update_cell_stats(
     } /* for(j..) */
   }   /* for(i..) */
 } /* update_cell_stats() */
+
+/*******************************************************************************
+ * World Model Metrics
+ ******************************************************************************/
+double base_perception_subsystem::known_percentage(void) const {
+  uint known = 0;
+  for (uint i = 0; i < m_map->xdsize(); ++i) {
+    for (uint j = 0; j < m_map->ydsize(); ++j) {
+      known += m_map->access<occupancy_grid::kCell>(i, j).state_is_known();
+    } /* for(j..) */
+  }   /* for(i..) */
+  return known / static_cast<double>(m_map->xdsize() * m_map->ydsize());
+} /* known_percentage() */
+
+double base_perception_subsystem::unknown_percentage(void) const {
+  return 1.0 - known_percentage();
+} /* unknown_percentage() */
 
 void base_perception_subsystem::reset_metrics(void) {
   m_cell_stats.assign(m_cell_stats.size(), 0);

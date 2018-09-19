@@ -192,6 +192,14 @@ uint stateful_foraging_controller::cell_state_inaccuracies(uint state) const {
   return m_perception->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
+double stateful_foraging_controller::known_percentage(void) const {
+  return m_perception->known_percentage();
+} /* known_percentage() */
+
+double stateful_foraging_controller::unknown_percentage(void) const {
+  return m_perception->unknown_percentage();
+} /* unknown_percentage() */
+
 using namespace argos;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"

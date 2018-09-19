@@ -25,13 +25,14 @@
   <category name="fordyca.fsm.depth0" >
     <priority value ="all" />
   </category>
-    <category name="fordyca.loop.support.block_dist" >
-      <priority value ="info" />
-        </category>
-    <category name="fordyca.ds.occupancy_grid" >
+  <category name="fordyca.loop.support.block_dist" >
     <priority value ="info" />
   </category>
-  <!-- <category name="foobar.test.child" > -->
-  <!-- </category> -->
+  <category name="fordyca.ds.occupancy_grid" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.ds.arena_map" >
+    <priority value ="debug" />
+  </category>
 
  </log4j:configuration>

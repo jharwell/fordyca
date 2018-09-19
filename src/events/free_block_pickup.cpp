@@ -84,7 +84,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
   events::cell_empty op(cell_op::x(), cell_op::y());
   map.accept(op);
   m_block->accept(*this);
-  ER_INFO("arena_map: fb%u: block%d from (%f, %f) -> (%zu, %zu)",
+  ER_INFO("arena_map: fb%u: block%d from (%f, %f) -> (%u, %u)",
           m_robot_index,
           m_block->id(),
           old_r.GetX(),

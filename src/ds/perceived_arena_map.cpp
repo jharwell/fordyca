@@ -41,7 +41,7 @@ perceived_arena_map::perceived_arena_map(
     const struct fordyca::params::occupancy_grid_params* c_params,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.perceived_arena_map"),
-      m_grid(c_params, robot_id),
+      decorator(c_params, robot_id),
       m_caches(),
       m_blocks() {}
 
@@ -54,7 +54,7 @@ perceived_arena_map::perceived_block_list perceived_arena_map::perceived_blocks(
 
   for (auto& b : m_blocks) {
     pblocks.push_back(representation::perceived_block(
-        b, m_grid.access<occupancy_grid::kPheromone>(b->discrete_loc())));
+        b, decoratee().access<occupancy_grid::kPheromone>(b->discrete_loc())));
   } /* for(&b..) */
   return pblocks;
 } /* blocks() */
@@ -65,7 +65,7 @@ perceived_arena_map::perceived_cache_list perceived_arena_map::perceived_caches(
 
   for (auto& c : m_caches) {
     pcaches.push_back(representation::perceived_cache(
-        c, m_grid.access<occupancy_grid::kPheromone>(c->discrete_loc())));
+        c, decoratee().access<occupancy_grid::kPheromone>(c->discrete_loc())));
   } /* for(c..) */
   return pcaches;
 } /* caches() */
@@ -82,7 +82,7 @@ void perceived_arena_map::cache_remove(
     if (*(*it) == *victim) {
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
+      decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_caches.erase(it);
       return;
     }
@@ -150,7 +150,7 @@ bool perceived_arena_map::block_remove(
       ER_TRACE("Remove block%d", victim->id());
       events::cell_empty op(victim->discrete_loc().first,
                             victim->discrete_loc().second);
-      m_grid.access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
+      decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_blocks.erase(it);
       return true;
     }

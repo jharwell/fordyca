@@ -36,6 +36,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,6 +52,9 @@ class arena_cache;
 NS_START(ds);
 
 class cell2D;
+namespace visitor = rcppsw::patterns::visitor;
+namespace decorator = rcppsw::patterns::decorator;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,9 +67,10 @@ class cell2D;
  * arena. Basically, it combines a 2D grid with sets of objects that populate
  * the grid and move around as the state of the arena changes.
  */
-class arena_map : public rcppsw::er::client<arena_map>,
+class arena_map : public er::client<arena_map>,
                   public metrics::arena_metrics,
-                  public rcppsw::patterns::visitor::visitable_any<arena_map> {
+                  public visitor::visitable_any<arena_map>,
+                  public decorator::decorator<arena_grid> {
  public:
   using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
@@ -114,23 +119,23 @@ class arena_map : public rcppsw::er::client<arena_map>,
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) {
-    return m_grid.access<Index>(d.first, d.second);
+    return decoratee().access<Index>(d.first, d.second);
   }
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) const {
-    return m_grid.access<Index>(d.first, d.second);
+    return decoratee().access<Index>(d.first, d.second);
   }
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
                                                                    size_t j) {
-    return m_grid.access<Index>(i, j);
+    return decoratee().access<Index>(i, j);
   }
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       size_t i,
       size_t j) const {
-    return m_grid.access<Index>(i, j);
+    return decoratee().access<Index>(i, j);
   }
 
   /**
@@ -147,13 +152,12 @@ class arena_map : public rcppsw::er::client<arena_map>,
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(
-      std::shared_ptr<representation::base_block>& block);
+  bool distribute_single_block(std::shared_ptr<representation::base_block>& block);
 
-  double xdsize(void) const { return m_grid.xdsize(); }
-  double ydsize(void) const { return m_grid.ydsize(); }
-  double xrsize(void) const { return m_grid.xrsize(); }
-  double yrsize(void) const { return m_grid.yrsize(); }
+  DECORATE_FUNC(xdsize, const);
+  DECORATE_FUNC(ydsize, const);
+  DECORATE_FUNC(xrsize, const);
+  DECORATE_FUNC(yrsize, const);
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
@@ -226,9 +230,9 @@ class arena_map : public rcppsw::er::client<arena_map>,
    * @return The subgrid.
    */
   rcppsw::ds::grid_view<cell2D> subgrid(size_t x, size_t y, size_t radius) {
-    return m_grid.layer<arena_grid::kCell>()->subcircle(x, y, radius);
+    return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
-  double grid_resolution(void) { return m_grid.resolution(); }
+  double grid_resolution(void) { return decoratee().resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
 
   /**
@@ -257,7 +261,6 @@ class arena_map : public rcppsw::er::client<arena_map>,
   const params::depth1::static_cache_params mc_static_cache_params;
   block_vector                              m_blocks;
   cache_vector                              m_caches;
-  arena_grid                                m_grid;
   representation::nest                      m_nest;
   support::block_dist::dispatcher           m_block_dispatcher;
   // clang-format on

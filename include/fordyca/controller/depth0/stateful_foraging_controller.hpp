@@ -90,6 +90,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
+  double known_percentage(void) const override;
+  double unknown_percentage(void) const override;
 
   /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
