@@ -57,15 +57,15 @@ NS_START(events);
 class cell_op : public visitor::visitor,
                 public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
  public:
-  cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
+  cell_op(uint x,  uint y) : m_x(x), m_y(y) {}
   ~cell_op(void) override = default;
 
-  size_t x(void) const { return m_x; }
-  size_t y(void) const { return m_y; }
+  uint x(void) const { return m_x; }
+  uint y(void) const { return m_y; }
 
  private:
-  size_t m_x;
-  size_t m_y;
+  uint m_x;
+  uint m_y;
 };
 
 NS_END(events, fordyca);

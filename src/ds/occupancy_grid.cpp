@@ -42,7 +42,7 @@ occupancy_grid::occupancy_grid(
                    static_cast<size_t>(c_params->grid.upper.GetY())),
       m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
-  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
+  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),
@@ -89,7 +89,7 @@ void occupancy_grid::cell_update(uint i, uint j) {
   cell2D& cell = access<kCell>(i, j);
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.last_result() <= 1.0,
-              "Repeat pheromone deposit detected for cell@(%zu, %zu) (%f > "
+              "Repeat pheromone deposit detected for cell@(%u, %u) (%f > "
               "1.0, state=%d)",
               i,
               j,
@@ -98,7 +98,7 @@ void occupancy_grid::cell_update(uint i, uint j) {
   }
 
   if (density.calc() < kEPSILON) {
-    ER_TRACE("Relevance of cell(%zu, %zu) is within %f of 0 for %s",
+    ER_TRACE("Relevance of cell(%u, %u) is within %f of 0 for %s",
              i,
              j,
              kEPSILON,

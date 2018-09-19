@@ -29,6 +29,7 @@
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,6 +44,7 @@ class base_cell_entity;
 NS_START(ds);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace decorator = rcppsw::patterns::decorator;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,7 +56,8 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief Base ds of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref cell_entity the cell contains, if any.
  */
-class cell2D : public visitor::visitable_any<cell2D> {
+class cell2D : public visitor::visitable_any<cell2D>,
+               public decorator::decorator<fsm::cell2D_fsm> {
  public:
   cell2D(void);
 
@@ -65,48 +68,25 @@ class cell2D : public visitor::visitable_any<cell2D> {
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
   const std::string& robot_id(void) const { return m_robot_id; }
 
-  fsm::cell2D_fsm& fsm(void) { return m_fsm; }
-  const fsm::cell2D_fsm& fsm(void) const { return m_fsm; }
+  fsm::cell2D_fsm& fsm(void) { return decoratee(); }
+  const fsm::cell2D_fsm& fsm(void) const { return decoratee(); }
 
   /* state inquiry */
-
-  /**
-   * @brief If \c TRUE, the state is currently KNOWN.
-   */
-  bool state_is_known(void) const { return m_fsm.state_is_known(); }
-
-  /**
-   * @brief If \c TRUE, the cell is currently known to contain a block.
-   */
-  bool state_has_block(void) const { return m_fsm.state_has_block(); }
-
-  /**
-   * @brief If \c TRUE, the cell is currently known to contain a cache.
-   */
-  bool state_has_cache(void) const { return m_fsm.state_has_cache(); }
-
-  /**
-   * @brief If \c TRUE, the cell is currently known to be part of a cache's
-   * extent, though does not contain a cache, but merely points to it.
-   */
-  bool state_in_cache_extent(void) const {
-    return m_fsm.state_in_cache_extent();
-  }
-
-  /**
-   * @brief If \c TRUE, the cell is currently known to be empty.
-   */
-  bool state_is_empty(void) const { return m_fsm.state_is_empty(); }
+  DECORATE_FUNC(state_is_known, const);
+  DECORATE_FUNC(state_has_block, const);
+  DECORATE_FUNC(state_has_cache, const);
+  DECORATE_FUNC(state_in_cache_extent, const);
+  DECORATE_FUNC(state_is_empty, const);
 
   /**
    * @brief Reset the cell to its UNKNOWN state.
    */
   void reset(void) {
-    m_fsm.init();
+    decoratee().init();
     m_entity.reset();
   }
 
-  size_t block_count(void) const { return m_fsm.block_count(); }
+  DECORATE_FUNC(block_count, const);
 
   /**
    * @brief Set the entity associated with this cell.
@@ -144,7 +124,6 @@ class cell2D : public visitor::visitable_any<cell2D> {
   std::string                                       m_robot_id{""};
   std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
   rcppsw::math::dcoord2                             m_loc;
-  fsm::cell2D_fsm                                   m_fsm;
   // clang-format on
 };
 

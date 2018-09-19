@@ -64,7 +64,7 @@ void cache_block_drop::visit(ds::cell2D& cell) {
 
   cell.fsm().accept(*this);
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
-            "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+            "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
             m_cache->n_blocks(),
             cell.block_count());
 } /* visit() */
@@ -80,7 +80,7 @@ void cache_block_drop::visit(ds::arena_map& map) {
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
-  ER_INFO("arena_map: fb%d dropped block%d in cache%d [%u blocks total]",
+  ER_INFO("arena_map: fb%d dropped block%d in cache%d [%zu blocks total]",
           index,
           m_block->id(),
           m_cache->id(),

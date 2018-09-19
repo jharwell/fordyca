@@ -27,6 +27,7 @@
 #include <list>
 #include <string>
 
+#include "rcppsw/patterns/decorator/decorator.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
@@ -41,11 +42,15 @@ struct occupancy_grid_params;
 
 NS_START(ds);
 
+namespace decorator = rcppsw::patterns::decorator;
+namespace visitor = rcppsw::patterns::visitor;
+namespace er = rcppsw::er;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
-p * @class perceived_arena_map
+ * @class perceived_arena_map
  * @ingroup ds
  *
  * @brief The perceived arena map (PAM) stores a logical ds of the
@@ -58,8 +63,9 @@ p * @class perceived_arena_map
  * that is irrelevant for what the robots need (as of 9/14/18 anyway).
  */
 class perceived_arena_map
-    : public rcppsw::er::client<perceived_arena_map>,
-      public rcppsw::patterns::visitor::visitable_any<perceived_arena_map> {
+    : public er::client<perceived_arena_map>,
+      public decorator::decorator<occupancy_grid>,
+      public visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
@@ -70,9 +76,7 @@ class perceived_arena_map
       const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
 
-  bool pheromone_repeat_deposit(void) const {
-    return m_grid.pheromone_repeat_deposit();
-  }
+  DECORATE_FUNC(pheromone_repeat_deposit, const);
 
   /**
    * @brief Get a list of all blocks the robot is currently aware of and their
@@ -142,44 +146,44 @@ class perceived_arena_map
    * @return The cell.
    */
   template <int Index>
-  typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
-                                                                       size_t j) {
-    return m_grid.access<Index>(i, j);
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(uint i,
+                                                                       uint j) {
+    return decoratee().access<Index>(i, j);
   }
   template <int Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      size_t i,
-      size_t j) const {
-    return m_grid.access<Index>(i, j);
+      uint i,
+      uint j) const {
+    return decoratee().access<Index>(i, j);
   }
   template <int Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) {
-    return m_grid.access<Index>(d);
+    return decoratee().access<Index>(d);
   }
   template <int Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rcppsw::math::dcoord2& d) const {
-    return m_grid.access<Index>(d);
+    return decoratee().access<Index>(d);
   }
-
+  
   /**
    * @brief Update the density of all cells in the perceived arena.
    */
-  void update(void) { m_grid.update(); }
-
+  DECORATE_FUNC(update);
+  
   /**
    * @brief Reset all the cells in the percieved arena.
    */
-  void reset(void) { m_grid.reset(); }
+  DECORATE_FUNC(reset);
+  double grid_resolution(void) const { return decoratee().resolution(); }
 
-  double grid_resolution(void) const { return m_grid.resolution(); }
+  DECORATE_FUNC(xdsize, const);
+  DECORATE_FUNC(ydsize, const);
+  DECORATE_FUNC(xrsize, const);
+  DECORATE_FUNC(yrsize, const);
 
  private:
-  // clang-format off
-  occupancy_grid                      m_grid;
-  // clang-format on
-
   /**
    * @brief The caches that the robot currently knows about. Their relevance is
    * not stored with the cache, because that is a properly of the cell the cache
