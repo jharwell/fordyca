@@ -59,6 +59,7 @@ class energy_max_controller : public stateless_foraging_controller {
     void Init(argos::TConfigurationNode& node) override;
     void ControlStep(void) override;
     void Reset(void) override;
+    void
 
   private:
     // put in a energy params struct? Put in actuator manager class?

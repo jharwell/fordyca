@@ -139,26 +139,6 @@ HFSM_STATE_DEFINE(stateless_foraging_fsm,
 }
 
 
-/* Energy Optimization
-HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, retreat_to_nest) {
-  if (  charge below threshold ) {
-    m_explore_fsm.task_reset();
-    ER_NOM("Robot needs to recharge");
-    internal_event(ST_RETREATING);
-  } else {
-    m_explore_fsm.task_execute();
-  }
-  return controller::foraging_signal::HANDLED;
-}
-
-// Define more here
-HFSM_STATE_DEFINE_ND(stateless_foraging_fsm, charging) {
-  if ( charge rises diff threshold ) {
-    m_explore_fsm.task_execute();
-  }
-  return controller::foraging_signal::HANDLED;
-} */
-
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
