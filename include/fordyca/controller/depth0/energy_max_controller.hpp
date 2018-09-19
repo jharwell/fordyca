@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-
+#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -36,6 +36,7 @@ namespace fsm { namespace depth0 { class stateless_foraging_fsm; } }
 
 NS_START(controller, depth0);
 namespace er = rcppsw::er;
+namespace sensor rcppsw::robotics::hal::sensors;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +60,9 @@ class energy_max_controller : public stateless_foraging_controller {
     void Init(argos::TConfigurationNode& node) override;
     void ControlStep(void) override;
     void Reset(void) override;
-    void
+
+    /* Energy functions */
+    void sense_energy(void) { energy_level = bs.readings().time_left}
 
   private:
     // put in a energy params struct? Put in actuator manager class?
@@ -67,6 +70,8 @@ class energy_max_controller : public stateless_foraging_controller {
     double                                                   max_energy;
     double                                                   thresh_level;
     std::unique_ptr<fsm::depth0::stateless_foraging_fsm>     m_fsm;
+    sensor::battery_sensor                                   bs;
+
 }
 
 NS_END(depth0, controller, fordyca);
