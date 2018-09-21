@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/metrics/arena_metrics.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/params/depth1/static_cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -68,7 +68,7 @@ namespace er = rcppsw::er;
  * the grid and move around as the state of the arena changes.
  */
 class arena_map : public er::client<arena_map>,
-                  public metrics::arena_metrics,
+                  public metrics::robot_occupancy_metrics,
                   public visitor::visitable_any<arena_map>,
                   public decorator::decorator<arena_grid> {
  public:
@@ -232,7 +232,7 @@ class arena_map : public er::client<arena_map>,
   rcppsw::ds::grid_view<cell2D> subgrid(size_t x, size_t y, size_t radius) {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
-  double grid_resolution(void) { return decoratee().resolution(); }
+  double grid_resolution(void) const { return decoratee().resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
 
   /**

@@ -160,6 +160,7 @@ argos::CColor foraging_loop_functions::GetFloorColor(
 
 void foraging_loop_functions::PreStep() {
   ndc_push();
+  base_foraging_loop_functions::PreStep();
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());
@@ -174,6 +175,7 @@ void foraging_loop_functions::PreStep() {
     pre_step_iter(robot);
   } /* for(&entity..) */
   m_metrics_agg->collect_from_arena(arena_map());
+  m_metrics_agg->collect_from_loop(this);
   pre_step_final();
   ndc_pop();
 } /* PreStep() */

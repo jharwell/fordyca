@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/output_parser.hpp"
-
-#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************

@@ -1,5 +1,5 @@
 /**
- * @file arena_metrics_collector.cpp
+ * @file robot_occupancy_metrics_collector.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,10 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/arena_metrics_collector.hpp"
-#include <iostream>
+#include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/metrics/arena_metrics.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +33,7 @@ NS_START(fordyca, metrics);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_metrics_collector::arena_metrics_collector(const std::string& ofname,
+robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(const std::string& ofname,
                                                  uint interval,
                                                  const rcppsw::math::dcoord2& dims)
     : base_metrics_collector(ofname, interval, true),
@@ -43,7 +42,7 @@ arena_metrics_collector::arena_metrics_collector(const std::string& ofname,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string arena_metrics_collector::csv_header_build(const std::string&) {
+std::string robot_occupancy_metrics_collector::csv_header_build(const std::string&) {
   std::string line;
   for (size_t j = 0; j < m_stats.ysize(); ++j) {
     line += "y" + std::to_string(j) + separator();
@@ -52,12 +51,12 @@ std::string arena_metrics_collector::csv_header_build(const std::string&) {
   return line;
 } /* csv_header_build() */
 
-void arena_metrics_collector::reset(void) {
+void robot_occupancy_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool arena_metrics_collector::csv_line_build(std::string& line) {
+bool robot_occupancy_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
@@ -73,13 +72,13 @@ bool arena_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* csv_line_build() */
 
-void arena_metrics_collector::collect(
+void robot_occupancy_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const arena_metrics&>(metrics);
+  auto& m = dynamic_cast<const robot_occupancy_metrics&>(metrics);
 
+  ++m_total;
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      m_total += m.has_robot(i, j);
       m_stats.access(i, j) += m.has_robot(i, j);
     } /* for(j..) */
   }   /* for(i..) */

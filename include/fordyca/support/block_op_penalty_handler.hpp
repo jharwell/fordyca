@@ -101,21 +101,24 @@ class block_op_penalty_handler
               "Robot already serving block penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
-    ER_INFO("fb%d: start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            utils::robot_id(controller),
-            timestep,
-            original_penalty(),
-            penalty,
-            src);
-
     int id = -1;
     if (kFreePickup == src) {
       id = utils::robot_on_block(controller, *m_map);
       ER_ASSERT(-1 != id, "Robot not on block?");
     }
+    ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+            utils::robot_id(controller),
+            id,
+            timestep,
+            original_penalty(),
+            penalty,
+            src);
 
-    penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, timestep));
+
+    penalty_list().push_back(temporal_penalty<T>(&controller,
+                                                 id,
+                                                 penalty,
+                                                 timestep));
     return true;
   }
 

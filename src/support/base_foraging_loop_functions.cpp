@@ -22,20 +22,26 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_foraging_loop_functions.hpp"
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
 #include "fordyca/params/output_params.hpp"
+#include "rcppsw/algorithm/closest_pair2D.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "fordyca/controller/base_foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
+namespace alg = rcppsw::algorithm;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_foraging_loop_functions::base_foraging_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base") {
-}
+    : ER_CLIENT_INIT("fordyca.loop.base") {}
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
@@ -75,10 +81,64 @@ void base_foraging_loop_functions::Init(ticpp::Element& node) {
   /* parse all environment parameters and capture in logfile */
   m_params.parse_all(node);
 
+
   /* initialize output and metrics collection */
   output_init(m_params.parse_results<params::output_params>());
+
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
 } /* Init() */
+
+void base_foraging_loop_functions::PreStep(void) {
+  nearest_neighbors();
+} /* PreStep() */
+
+std::vector<double> base_foraging_loop_functions::nearest_neighbors(void) const {
+  std::vector<rcppsw::math::vector2d> v;
+  auto& robots = const_cast<base_foraging_loop_functions*>(this)->GetSpace().GetEntitiesByType("foot-bot");
+
+  for (auto& entity_pair : robots) {
+    auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    argos::CVector2 pos;
+    pos.Set(const_cast<argos::CFootBotEntity&>(robot)
+            .GetEmbodiedEntity()
+            .GetOriginAnchor()
+            .Position.GetX(),
+            const_cast<argos::CFootBotEntity&>(robot)
+            .GetEmbodiedEntity()
+            .GetOriginAnchor()
+            .Position.GetY());
+    v.push_back(rcppsw::math::vector2d(pos.GetX(), pos.GetY()));
+  } /* for(&entity..) */
+
+  /*
+   * For each closest pair of robots we find, we add the corresponding distance
+   * TWICE to our results vector, because 2 robots i and j are each other's
+   * closest robots (if they were not, they would not have been returned by the
+   * algorithm).
+   */
+  std::vector<double> res;
+  for (size_t i = 0; i < robots.size()/2; ++i) {
+    auto dist_func = std::bind(&rcppsw::math::vector2d::distance,
+                               std::placeholders::_1,
+                               std::placeholders::_2);
+    auto pts = alg::closest_pair<rcppsw::math::vector2d>()("recursive",
+                                                           v,
+                                                           dist_func);
+    size_t old = v.size();
+    v.erase(std::remove_if(v.begin(),
+                           v.end(),
+                           [&](const auto& pt) {
+                             return pt == pts.p1 || pt == pts.p2;
+                           }), v.end());
+
+    ER_ASSERT(old == v.size() + 2,
+              "Closest pair of points not removed from set");
+    res.push_back(pts.dist);
+    res.push_back(pts.dist);
+  } /* for(i..) */
+
+  return res;
+} /* nearest_neighbors() */
 
 NS_END(support, fordyca);
