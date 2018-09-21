@@ -70,7 +70,7 @@ class arena_interactor : public depth0::arena_interactor<T>,
                                     floor_in,
                                     block_manip_penalty),
     ER_CLIENT_INIT("fordyca.support.depth1.arena_interactor"),
-      m_cache_penalty_handler(map_in, cache_usage_penalty) {}
+    m_cache_penalty_handler(map_in, cache_usage_penalty) {}
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
@@ -83,7 +83,7 @@ class arena_interactor : public depth0::arena_interactor<T>,
    */
   void operator()(T& controller, uint timestep) {
     if (handle_task_abort(controller)) {
-        return;
+      return;
     }
     if (controller.is_carrying_block()) {
       handle_nest_block_drop(controller, timestep);
@@ -171,10 +171,18 @@ class arena_interactor : public depth0::arena_interactor<T>,
   void perform_cached_block_pickup(T& controller,
                                    const temporal_penalty<T>& penalty,
                                    uint timestep) {
-    events::cached_block_pickup pickup_op(map()->caches()[penalty.id()],
+    auto it = std::find_if(map()->caches().begin(),
+                           map()->caches().end(),
+                           [&](const auto& c) {
+                             return c->id() == penalty.id();
+                           });
+    ER_ASSERT(it != map()->caches().end(),
+              "Cache%d from penalty does not exist",
+              penalty.id());
+    events::cached_block_pickup pickup_op(*it,
                                           utils::robot_id(controller),
                                           timestep);
-    map()->caches()[penalty.id()]->penalty_served(penalty.penalty());
+    (*it)->penalty_served(penalty.penalty());
 
     /*
      * Map must be called before controller for proper cache block decrement!
@@ -230,10 +238,18 @@ class arena_interactor : public depth0::arena_interactor<T>,
    */
   void perform_cache_block_drop(T& controller,
                                 const temporal_penalty<T>& penalty) {
+    auto it = std::find_if(map()->caches().begin(),
+                           map()->caches().end(),
+                           [&](const auto& c) {
+                             return c->id() == penalty.id();
+                           });
+    ER_ASSERT(it != map()->caches().end(),
+              "Cache%d from penalty does not exist",
+              penalty.id());
     events::cache_block_drop drop_op(controller.block(),
-                                     map()->caches()[penalty.id()],
+                                     *it,
                                      map()->grid_resolution());
-    map()->caches()[penalty.id()]->penalty_served(penalty.penalty());
+    (*it)->penalty_served(penalty.penalty());
 
     /* Update arena map state due to a cache drop */
     map()->accept(drop_op);
@@ -264,34 +280,34 @@ class arena_interactor : public depth0::arena_interactor<T>,
      */
     if (controller.is_carrying_block()) {
       ER_INFO("%s aborted task %s while carrying block%d",
-             controller.GetId().c_str(),
-             dynamic_cast<ta::logical_task*>(
-                 controller.current_task())->name().c_str(),
-             controller.block()->id());
+              controller.GetId().c_str(),
+              dynamic_cast<ta::logical_task*>(
+                  controller.current_task())->name().c_str(),
+              controller.block()->id());
       task_abort_with_block(controller);
     } else {
       ER_INFO("%s aborted task %s (no block)",
-             controller.GetId().c_str(),
-             dynamic_cast<ta::logical_task*>(
-                 controller.current_task())->name().c_str());
+              controller.GetId().c_str(),
+              dynamic_cast<ta::logical_task*>(
+                  controller.current_task())->name().c_str());
     }
     if (m_cache_penalty_handler.is_serving_penalty(controller)) {
       m_cache_penalty_handler.penalty_abort(controller);
       ER_INFO("%s aborted task %s while serving cache penalty",
-             controller.GetId().c_str(),
-             dynamic_cast<ta::logical_task*>(
-                 controller.current_task())->name().c_str());
+              controller.GetId().c_str(),
+              dynamic_cast<ta::logical_task*>(
+                  controller.current_task())->name().c_str());
     } else if (free_pickup_penalty_handler().is_serving_penalty(controller)) {
       free_pickup_penalty_handler().penalty_abort(controller);
       ER_INFO("%s aborted task %s while serving free pickup penalty",
-             controller.GetId().c_str(),
-             dynamic_cast<ta::logical_task*>(
-                 controller.current_task())->name().c_str());
+              controller.GetId().c_str(),
+              dynamic_cast<ta::logical_task*>(
+                  controller.current_task())->name().c_str());
     } else if (nest_drop_penalty_handler().is_serving_penalty(controller)) {
       ER_INFO("%s aborted task %s while serving nest drop penalty",
-             controller.GetId().c_str(),
-             dynamic_cast<ta::logical_task*>(
-                 controller.current_task())->name().c_str());
+              controller.GetId().c_str(),
+              dynamic_cast<ta::logical_task*>(
+                  controller.current_task())->name().c_str());
       nest_drop_penalty_handler().penalty_abort(controller);
     }
     return true;
@@ -335,7 +351,7 @@ class arena_interactor : public depth0::arena_interactor<T>,
     events::free_block_drop drop_op(controller.block(),
                                     math::rcoord_to_dcoord(controller.robot_loc(),
                                                            map()->grid_resolution()),
-        map()->grid_resolution());
+                                    map()->grid_resolution());
     if (!conflict) {
       controller.visitor::template visitable_any<T>::accept(drop_op);
       map()->accept(drop_op);

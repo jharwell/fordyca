@@ -23,20 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/metrics/arena_metrics.hpp"
-#include "fordyca/metrics/arena_metrics_collector.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -51,39 +39,7 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
     : base_metrics_aggregator(params, output_root),
-      ER_CLIENT_INIT("fordyca.support.depth0.stateless_aggregator") {
-  register_collector<metrics::fsm::movement_metrics_collector>(
-      "fsm::movement",
-      metrics_path() + "/" + params->fsm_movement_fname,
-      params->collect_interval);
-
-  register_collector<metrics::fsm::collision_metrics_collector>(
-      "fsm::collision",
-      metrics_path() + "/" + params->fsm_collision_fname,
-      params->collect_interval);
-
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-      "blocks::acquisition",
-      metrics_path() + "/" + params->block_acquisition_fname,
-      params->collect_interval);
-
-  register_collector<metrics::blocks::transport_metrics_collector>(
-      "blocks::transport",
-      metrics_path() + "/" + params->block_transport_fname,
-      params->collect_interval);
-
-  register_collector<metrics::blocks::manipulation_metrics_collector>(
-      "blocks::manipulation",
-      metrics_path() + "/" + params->block_manipulation_fname,
-      params->collect_interval);
-  register_collector<metrics::arena_metrics_collector>(
-      "arena::robot_occupancy",
-      metrics_path() + "/" + params->arena_robot_occupancy_fname,
-      params->collect_interval,
-      math::rcoord_to_dcoord(params->arena_grid.upper,
-                             params->arena_grid.resolution));
-  reset_all();
-}
+      ER_CLIENT_INIT("fordyca.support.depth0.stateless_aggregator") {}
 
 /*******************************************************************************
  * Member Functions

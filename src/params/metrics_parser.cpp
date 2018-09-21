@@ -61,6 +61,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
     XML_PARSE_PARAM(mnode, m_params, perception_world_model_fname);
     XML_PARSE_PARAM(mnode, m_params, arena_robot_occupancy_fname);
+    XML_PARSE_PARAM(mnode, m_params, loop_robot_interaction_fname);
     XML_PARSE_PARAM(mnode, m_params, collect_interval);
 
     m_parsed = true;

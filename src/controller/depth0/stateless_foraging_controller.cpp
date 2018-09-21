@@ -27,7 +27,6 @@
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
-#include "fordyca/params/depth0/stateless_controller_repository.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 
 /*******************************************************************************
@@ -52,14 +51,6 @@ void stateless_foraging_controller::Init(ticpp::Element& node) {
   base_foraging_controller::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth0::stateless_controller_repository param_repo;
-  param_repo.parse_all(node);
-
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
-
   m_fsm = rcppsw::make_unique<fsm::depth0::stateless_foraging_fsm>(
       base_foraging_controller::saa_subsystem());
   ER_INFO("Initialization finished");
@@ -75,7 +66,6 @@ void stateless_foraging_controller::Reset(void) {
 
 void stateless_foraging_controller::ControlStep(void) {
   ndc_pusht();
-
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());

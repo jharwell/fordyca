@@ -134,6 +134,7 @@
           task_generalist_tab_fname="task-generalist-tab.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
+          loop_robot_interaction_fname="loop-robot-interaction.csv"
           collect_interval="1000"
           />
     </output>

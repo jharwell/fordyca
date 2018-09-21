@@ -160,12 +160,14 @@ void stateless_foraging_loop_functions::pre_step_final(void) {
 
 void stateless_foraging_loop_functions::PreStep() {
   ndc_push();
+  base_foraging_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
   m_metrics_agg->collect_from_arena(m_arena_map.get());
+  m_metrics_agg->collect_from_loop(this);
   pre_step_final();
   ndc_pop();
 } /* PreStep() */

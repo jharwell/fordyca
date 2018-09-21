@@ -75,10 +75,6 @@ class stateless_foraging_loop_functions : public base_foraging_loop_functions,
     controller.tick(GetSpace().GetSimulationClock());
   }
 
-  void ndc_push(void) {
-    ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
-  }
-  void ndc_pop(void) { ER_NDC_POP(); }
  private:
   using interactor =
       arena_interactor<controller::depth0::stateless_foraging_controller>;

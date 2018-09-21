@@ -66,10 +66,6 @@ bool arena_map::initialize(void) {
   return m_block_dispatcher.initialize();
 } /* initialize() */
 
-bool arena_map::has_robot(size_t i, size_t j) const {
-  return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
-} /* has_robot() */
-
 __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
@@ -81,7 +77,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   }
   for (size_t i = 0; i < m_blocks.size(); ++i) {
     if (m_blocks[i]->contains_point(pos)) {
-      return static_cast<int>(i);
+      return m_blocks[i]->id();
     }
   } /* for(i..) */
   return -1;
@@ -90,7 +86,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
 __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   for (size_t i = 0; i < m_caches.size(); ++i) {
     if (m_caches[i]->contains_point(pos)) {
-      return static_cast<int>(i);
+      return m_caches[i]->id();
     }
   } /* for(i..) */
   return -1;
@@ -145,7 +141,7 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
                                    std::to_string(b->discrete_loc().second) + "),";
                              }).c_str());
 
-    ER_ASSERT(count < representation::base_cache::kMinBlocks,
+    ER_ASSERT(m_blocks.size() - count < representation::base_cache::kMinBlocks,
               "For new cache @(%f, %f) [%u, %u]: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               center.GetX(),
@@ -322,5 +318,12 @@ void arena_map::cache_extent_clear(
     } /* for(j..) */
   }   /* for(i..) */
 } /* cache_extent_clear() */
+
+/*******************************************************************************
+ * Metrics
+ ******************************************************************************/
+bool arena_map::has_robot(size_t i, size_t j) const {
+  return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
+} /* has_robot() */
 
 NS_END(ds, fordyca);

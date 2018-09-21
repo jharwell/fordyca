@@ -1,5 +1,5 @@
 /**
- * @file arena_metrics.hpp
+ * @file robot_interaction_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,12 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
 #include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
@@ -36,24 +37,25 @@ NS_START(fordyca, metrics);
  ******************************************************************************/
 
 /**
- * @class arena_metrics
+ * @class robot_interaction_metrics
  * @ingroup metrics
  *
- * @brief Defines the metrics to be collected from the arena mapn.
+ * @brief Defines the metrics to be collected regarding robot interaction in the
+ * arena. Based on Szabo2014.
  *
  * Metrics are collected every timestep.
  */
-class arena_metrics : virtual public rcppsw::metrics::base_metrics {
+class robot_interaction_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
-  arena_metrics(void) = default;
+  robot_interaction_metrics(void) = default;
 
   /**
-   * @brief Should return \c TRUE iff there is currently a robot is the cell at
-   * (i,j) in the arena.
+   * @brief Vector of distances (one per robot), to each robot's closest
+   * neighbor.
    */
-  virtual bool has_robot(size_t i, size_t j) const = 0;
+  virtual std::vector<double> nearest_neighbors(void) const = 0;
 };
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_ARENA_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_ */

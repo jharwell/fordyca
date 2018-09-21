@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
 #include <string>
 
 #include "fordyca/events/free_block_pickup.hpp"
@@ -97,7 +96,7 @@ class arena_interactor : public er::client<arena_interactor<T>> {
   void handle_free_block_pickup(T& controller, uint timestep) {
     if (m_free_pickup_handler.is_serving_penalty(controller)) {
       if (m_free_pickup_handler.penalty_satisfied(controller,
-                                                    timestep)) {
+                                                  timestep)) {
         finish_free_block_pickup(controller, timestep);
       }
     } else {
@@ -110,7 +109,7 @@ class arena_interactor : public er::client<arena_interactor<T>> {
   void handle_nest_block_drop(T& controller, uint timestep) {
     if (m_nest_drop_handler.is_serving_penalty(controller)) {
       if (m_nest_drop_handler.penalty_satisfied(controller,
-                                                 timestep)) {
+                                                timestep)) {
         finish_nest_block_drop(controller, timestep);
       }
     } else {
@@ -167,10 +166,18 @@ class arena_interactor : public er::client<arena_interactor<T>> {
   void perform_free_block_pickup(T& controller,
                                  const temporal_penalty<T>& penalty,
                                  uint timestep) {
-    ER_ASSERT(m_map->blocks()[penalty.id()]->real_loc() !=
-              representation::base_block::kOutOfSightRLoc,
-              "Attempt to pick up out of sight block");
-    events::free_block_pickup pickup_op(m_map->blocks()[penalty.id()],
+    auto it = std::find_if(m_map->blocks().begin(),
+                           m_map->blocks().end(),
+                           [&](const auto& b) {
+                             return b->id() == penalty.id();
+                           });
+    ER_ASSERT(it != m_map->blocks().end(),
+              "Block%d from penalty does not exist",
+              penalty.id());
+    ER_ASSERT((*it)->real_loc() != representation::base_block::kOutOfSightRLoc,
+              "Attempt to pick up out of sight block%d",
+              (*it)->id());
+    events::free_block_pickup pickup_op(*it,
                                         utils::robot_id(controller),
                                         timestep);
 

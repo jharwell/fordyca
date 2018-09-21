@@ -12,7 +12,7 @@
 
   <root>
         <priority value="info" />
-        <!-- <appender-ref ref="__console__"/> -->
+        <appender-ref ref="__console__"/>
   </root>
 
   <!-- Specify the level for some specific categories -->

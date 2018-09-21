@@ -48,7 +48,7 @@ namespace ta = rcppsw::task_allocation;
  ******************************************************************************/
 stateful_foraging_controller::stateful_foraging_controller(void)
     : stateless_foraging_controller(),
-      ER_CLIENT_INIT("fordyca.controller.stateful"),
+      ER_CLIENT_INIT("fordyca.controller.depth0.stateful"),
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),

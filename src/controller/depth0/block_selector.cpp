@@ -47,7 +47,7 @@ representation::perceived_block block_selector::calc_best(
   double max_utility = 0.0;
   representation::perceived_block best{nullptr, {}};
 
-  ER_ASSERT(!blocks.empty(), "no known perceived blocks");
+  ER_ASSERT(!blocks.empty(), "No known perceived blocks");
   for (auto& b : blocks) {
     if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
       ER_DEBUG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",

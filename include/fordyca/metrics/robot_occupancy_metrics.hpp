@@ -1,5 +1,5 @@
 /**
- * @file block_manifest_processor.hpp
+ * @file robot_occupancy_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,45 +18,43 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
-
-#include "fordyca/params/arena/block_manifest.hpp"
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/patterns/factory/sharing_factory.hpp"
+#include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation { class base_block; }
-NS_START(support);
-namespace factory = rcppsw::patterns::factory;
+NS_START(fordyca, metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_manifest_processor
-    : private factory::sharing_factory<representation::base_block,
-                                       const rcppsw::math::vector2d&,
-                                       int> {
+
+/**
+ * @class robot_occupancy_metrics
+ * @ingroup metrics
+ *
+ * @brief Defines the metrics to be collected regarding robot occupancy in the
+ * arena.
+ *
+ * Metrics are collected every timestep.
+ */
+class robot_occupancy_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-  explicit block_manifest_processor(const params::arena::block_manifest* const m);
+  robot_occupancy_metrics(void) = default;
 
-  block_vector create_blocks(void);
-
- private:
-  // clang-format off
-  const params::arena::block_manifest mc_manifest;
-  // clang-format on
+  /**
+   * @brief Should return \c TRUE iff there is currently a robot is the cell at
+   * (i,j) in the robot_occupancy.
+   */
+  virtual bool has_robot(size_t i, size_t j) const = 0;
 };
 
-NS_END(support, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_MANIFEST_PROCESSOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_ */
