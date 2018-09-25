@@ -36,7 +36,7 @@ class bifurcating_tab;
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 
-namespace controller { namespace depth1 { class foraging_controller; }}
+namespace controller { namespace depth1 { class greedy_partitioning_controller; }}
 namespace representation { class arena_cache; }
 namespace metrics { namespace caches { class lifecycle_collator; }}
 
@@ -87,7 +87,7 @@ class metrics_aggregator : public depth0::stateful_metrics_aggregator,
    * @brief Collect metrics from the depth1 controller.
    */
   void collect_from_controller(
-      const controller::depth1::foraging_controller* controller);
+      const controller::depth1::greedy_partitioning_controller* controller);
 
   /**
    * @brief Collect utilization metrics from a cache in the arena.

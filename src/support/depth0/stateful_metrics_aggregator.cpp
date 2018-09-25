@@ -27,8 +27,8 @@
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ stateful_metrics_aggregator::stateful_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void stateful_metrics_aggregator::collect_from_controller(
-    const controller::depth0::stateful_foraging_controller* const controller) {
+    const controller::depth0::stateful_controller* const controller) {
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
@@ -73,7 +73,7 @@ void stateful_metrics_aggregator::collect_from_controller(
   collect("fsm::movement", *mov_m);
 
   if (controller->current_task()) {
-    auto* fsm = static_cast<fsm::depth0::stateful_foraging_fsm*>(
+    auto* fsm = static_cast<fsm::depth0::stateful_fsm*>(
         dynamic_cast<const ta::polled_task*>(controller->current_task())
             ->mechanism());
 

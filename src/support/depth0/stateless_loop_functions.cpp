@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_loop_functions.cpp
+ * @file stateless_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,10 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/stateless_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -40,19 +40,19 @@ using ds::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_foraging_loop_functions::stateless_foraging_loop_functions(void)
+stateless_loop_functions::stateless_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.stateless"),
       m_arena_map(nullptr),
       m_interactor(nullptr) {}
 
-stateless_foraging_loop_functions::~stateless_foraging_loop_functions(void) =
+stateless_loop_functions::~stateless_loop_functions(void) =
     default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
-  base_foraging_loop_functions::Init(node);
+void stateless_loop_functions::Init(ticpp::Element& node) {
+  base_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -79,7 +79,7 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = static_cast<controller::base_foraging_controller&>(
+    auto& controller = static_cast<controller::base_controller&>(
         robot.GetControllableEntity().GetController());
 
     /*
@@ -94,16 +94,16 @@ void stateless_foraging_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-void stateless_foraging_loop_functions::Reset() {
+void stateless_loop_functions::Reset() {
   m_metrics_agg->reset_all();
   m_arena_map->distribute_all_blocks();
 }
 
-void stateless_foraging_loop_functions::Destroy() {
+void stateless_loop_functions::Destroy() {
   m_metrics_agg->finalize_all();
 }
 
-__rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor stateless_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   if (m_arena_map->nest().contains_point(plane_pos)) {
     return argos::CColor(m_arena_map->nest().color().red(),
@@ -127,10 +127,10 @@ __rcsw_pure argos::CColor stateless_foraging_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void stateless_foraging_loop_functions::pre_step_iter(
+void stateless_loop_functions::pre_step_iter(
     argos::CFootBotEntity& robot) {
   auto& controller =
-      static_cast<controller::depth0::stateless_foraging_controller&>(
+      static_cast<controller::depth0::stateless_controller&>(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -139,8 +139,8 @@ void stateless_foraging_loop_functions::pre_step_iter(
   controller.free_drop_event(false);
 
   /* Send the robot its current position */
-  set_robot_tick<controller::depth0::stateless_foraging_controller>(robot);
-  utils::set_robot_pos<controller::depth0::stateless_foraging_controller>(robot);
+  set_robot_tick<controller::depth0::stateless_controller>(robot);
+  utils::set_robot_pos<controller::depth0::stateless_controller>(robot);
 
   /* update arena map metrics with robot position */
   auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
@@ -151,16 +151,16 @@ void stateless_foraging_loop_functions::pre_step_iter(
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-void stateless_foraging_loop_functions::pre_step_final(void) {
+void stateless_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
 
-void stateless_foraging_loop_functions::PreStep() {
+void stateless_loop_functions::PreStep() {
   ndc_push();
-  base_foraging_loop_functions::PreStep();
+  base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -172,7 +172,7 @@ void stateless_foraging_loop_functions::PreStep() {
   ndc_pop();
 } /* PreStep() */
 
-void stateless_foraging_loop_functions::arena_map_init(
+void stateless_loop_functions::arena_map_init(
     params::loop_function_repository& repo) {
   auto* aparams = repo.parse_results<struct params::arena::arena_map_params>();
   auto* vparams = repo.parse_results<struct params::visualization_params>();
@@ -199,7 +199,7 @@ using namespace argos;
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_LOOP_FUNCTIONS(stateless_foraging_loop_functions,
-                        "stateless_foraging_loop_functions"); // NOLINT
+REGISTER_LOOP_FUNCTIONS(stateless_loop_functions,
+                        "stateless_loop_functions"); // NOLINT
 #pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

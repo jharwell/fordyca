@@ -31,7 +31,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { namespace depth0 { class stateful_foraging_controller; }}
+namespace controller { namespace depth0 { class stateful_controller; }}
 
 NS_START(support, depth0);
 
@@ -58,7 +58,7 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator,
    * @brief Collect metrics from the stateful controller.
    */
   void collect_from_controller(
-      const controller::depth0::stateful_foraging_controller* controller);
+      const controller::depth0::stateful_controller* controller);
 };
 
 NS_END(depth0, support, fordyca);

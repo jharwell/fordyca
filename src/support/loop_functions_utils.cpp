@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,37 +33,37 @@ NS_START(fordyca, support, utils);
  * Functions
  ******************************************************************************/
 __rcsw_pure int robot_on_block(
-    const controller::base_foraging_controller& controller,
+    const controller::base_controller& controller,
     const ds::arena_map& map) {
   return map.robot_on_block(controller.robot_loc());
 } /* robot_on_block() */
 
 __rcsw_pure int robot_on_block(argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
-  return robot_on_block(dynamic_cast<controller::base_foraging_controller&>(
+  return robot_on_block(dynamic_cast<controller::base_controller&>(
                             robot.GetControllableEntity().GetController()),
                         map);
 } /* robot_on_block() */
 
 int robot_id(argos::CFootBotEntity& robot) {
-  return robot_id(dynamic_cast<controller::base_foraging_controller&>(
+  return robot_id(dynamic_cast<controller::base_controller&>(
       robot.GetControllableEntity().GetController()));
 } /* robot_id() */
 
-int robot_id(const controller::base_foraging_controller& controller) {
+int robot_id(const controller::base_controller& controller) {
   /* +2 because the ID string starts with 'fb' */
   return std::atoi(controller.GetId().c_str() + 2);
 } /* robot_id() */
 
 __rcsw_pure int robot_on_cache(
-    const controller::base_foraging_controller& controller,
+    const controller::base_controller& controller,
     const ds::arena_map& map) {
   return map.robot_on_cache(controller.robot_loc());
 } /* robot_on_cache() */
 
 __rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
-  return robot_on_cache(dynamic_cast<controller::base_foraging_controller&>(
+  return robot_on_cache(dynamic_cast<controller::base_controller&>(
                             robot.GetControllableEntity().GetController()),
                         map);
 }

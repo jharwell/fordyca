@@ -1,5 +1,5 @@
 /**
- * @file foraging_loop_functions.hpp
+ * @file depth1_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,14 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <list>
-#include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/stateful_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
@@ -41,7 +41,7 @@ class metrics_aggregator;
  * Classes
  ******************************************************************************/
 /**
- * @class foraging_loop_functions
+ * @class loop_functions
  * @ingroup support depth1
  *
  * @brief The loop functions for depth 1 foraging.
@@ -49,20 +49,18 @@ class metrics_aggregator;
  * Handles all operations robots perform relating to static caches: pickup,
  * drop, etc.
  */
-class foraging_loop_functions : public depth0::stateful_foraging_loop_functions,
-                                public er::client<foraging_loop_functions> {
+class depth1_loop_functions : public depth0::stateful_loop_functions,
+                                public er::client<depth1_loop_functions> {
  public:
-  foraging_loop_functions(void)
-      : ER_CLIENT_INIT("fordyca.loop.depth1"),
-        m_metrics_agg(nullptr) {}
-  ~foraging_loop_functions(void) override = default;
+  depth1_loop_functions(void);
+  ~depth1_loop_functions(void) override;
 
   void Init(ticpp::Element& node) override;
   void PreStep() override;
   void Reset(void) override;
 
  private:
-  using interactor = arena_interactor<controller::depth1::foraging_controller>;
+  using interactor = arena_interactor<controller::depth1::greedy_partitioning_controller>;
 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
@@ -79,4 +77,4 @@ class foraging_loop_functions : public depth0::stateful_foraging_loop_functions,
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_FORAGING_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_LOOP_FUNCTIONS_HPP_ */

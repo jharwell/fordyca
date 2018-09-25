@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_qt_user_functions.hpp
+ * @file depth1_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,37 +17,36 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, support, depth1);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class stateful_foraging_qt_user_functions
- * @ingroup support depth0
+ * @class depth1_qt_user_functions
+ * @ingroup support depth1
  *
  * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */
-class stateful_foraging_qt_user_functions : public stateless_foraging_qt_user_functions {
+class depth1_qt_user_functions : public depth0::stateful_qt_user_functions {
  public:
-  stateful_foraging_qt_user_functions(void);
-
-  ~stateful_foraging_qt_user_functions(void) override = default;
+  depth1_qt_user_functions(void);
+  ~depth1_qt_user_functions(void) override = default;
 
   void Draw(argos::CFootBotEntity& c_entity) override;
 };
 
-NS_END(depth0, fordyca, support);
+NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_ */

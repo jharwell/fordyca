@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
@@ -45,7 +45,7 @@ stateless_metrics_aggregator::stateless_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void stateless_metrics_aggregator::collect_from_controller(
-    const controller::depth0::stateless_foraging_controller* controller) {
+    const controller::depth0::stateless_controller* controller) {
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
   auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);

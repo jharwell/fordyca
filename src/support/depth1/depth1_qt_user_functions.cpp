@@ -1,5 +1,5 @@
 /**
- * @file foraging_qt_user_functions.cpp
+ * @file depth1_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -26,31 +26,32 @@
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#include "fordyca/support/depth1/foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
+namespace controller = controller::depth1;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-foraging_qt_user_functions::foraging_qt_user_functions(void) {
-  RegisterUserFunction<foraging_qt_user_functions, argos::CFootBotEntity>(
-      &foraging_qt_user_functions::Draw);
+depth1_qt_user_functions::depth1_qt_user_functions(void) {
+  RegisterUserFunction<depth1_qt_user_functions, argos::CFootBotEntity>(
+      &depth1_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  stateful_foraging_qt_user_functions::Draw(c_entity);
+void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  stateful_qt_user_functions::Draw(c_entity);
 
-  auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
+  auto& controller = dynamic_cast<controller::greedy_partitioning_controller&>(
       c_entity.GetControllableEntity().GetController());
 
   if (controller.display_task() && nullptr != controller.current_task()) {
@@ -61,20 +62,13 @@ void foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   }
 }
 
-/*
- * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
- * namespaces, so if you have two classes of the same name in two different
- * namespaces, the macro will create the same class definition, giving a linker
- * error.
- */
-using namespace argos;
-typedef foraging_qt_user_functions depth1_foraging_qt_user_functions;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_QTOPENGL_USER_FUNCTIONS(foraging_qt_user_functions,
-                                 "depth1_foraging_qt_user_functions"); // NOLINT
-#pragma clang diagnostic pop
+REGISTER_QTOPENGL_USER_FUNCTIONS(depth1_qt_user_functions,
+                                 "depth1_qt_user_functions");
+#pragma Clang diagnostic pop
 
 NS_END(support, fordyca, depth1);

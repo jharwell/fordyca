@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_loop_functions.hpp
+ * @file stateful_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/stateless_loop_functions.hpp"
 #include "fordyca/support/depth0/arena_interactor.hpp"
 
 /*******************************************************************************
@@ -38,7 +38,7 @@ class stateful_metrics_aggregator;
  * Classes
  ******************************************************************************/
 /**
- * @class stateful_foraging_loop_functions
+ * @class stateful_loop_functions
  * @ingroup support depth0
  *
  * @brief Contains the simulation support functions for stateful foraging, such
@@ -48,13 +48,11 @@ class stateful_metrics_aggregator;
  * - Sending robots their position each timestep.
  * - Sending robot the current simulation tick each timestep.
  */
-class stateful_foraging_loop_functions : public stateless_foraging_loop_functions,
-                                         public er::client<stateful_foraging_loop_functions> {
+class stateful_loop_functions : public stateless_loop_functions,
+                                public er::client<stateful_loop_functions> {
  public:
-  stateful_foraging_loop_functions(void)
-      : ER_CLIENT_INIT("fordyca.loop.stateful") {}
-
-  ~stateful_foraging_loop_functions(void) override = default;
+  stateful_loop_functions(void);
+  ~stateful_loop_functions(void) override;
 
   void Init(ticpp::Element& node) override;
   void PreStep(void) override;
@@ -65,18 +63,18 @@ class stateful_foraging_loop_functions : public stateless_foraging_loop_function
 
  private:
   using interactor =
-      arena_interactor<controller::depth0::stateful_foraging_controller>;
+      arena_interactor<controller::depth0::stateful_controller>;
 
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
-  std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg{nullptr};
-  std::unique_ptr<interactor> m_interactor{nullptr};
+  std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<interactor>                  m_interactor{nullptr};
   // clang-format on
 
 };
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_FORAGING_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATEFUL_LOOP_FUNCTIONS_HPP_ */

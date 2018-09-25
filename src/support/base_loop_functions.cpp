@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_loop_functions.cpp
+ * @file base_loop_functions.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/base_foraging_loop_functions.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "fordyca/params/output_params.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,13 +39,13 @@ namespace alg = rcppsw::algorithm;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-base_foraging_loop_functions::base_foraging_loop_functions(void)
+base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_foraging_loop_functions::output_init(
+void base_loop_functions::output_init(
     const struct params::output_params* const output) {
   if ("__current_date__" == output->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
@@ -77,7 +77,7 @@ void base_foraging_loop_functions::output_init(
 #endif
 } /* output_init() */
 
-void base_foraging_loop_functions::Init(ticpp::Element& node) {
+void base_loop_functions::Init(ticpp::Element& node) {
   /* parse all environment parameters and capture in logfile */
   m_params.parse_all(node);
 
@@ -89,13 +89,13 @@ void base_foraging_loop_functions::Init(ticpp::Element& node) {
   std::srand(std::time(nullptr));
 } /* Init() */
 
-void base_foraging_loop_functions::PreStep(void) {
+void base_loop_functions::PreStep(void) {
   nearest_neighbors();
 } /* PreStep() */
 
-std::vector<double> base_foraging_loop_functions::nearest_neighbors(void) const {
+std::vector<double> base_loop_functions::nearest_neighbors(void) const {
   std::vector<rcppsw::math::vector2d> v;
-  auto& robots = const_cast<base_foraging_loop_functions*>(this)->GetSpace().GetEntitiesByType("foot-bot");
+  auto& robots = const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);

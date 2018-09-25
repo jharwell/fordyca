@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <depth1_foraging_controller id="ffc"
+    <greedy_partitioning_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -104,7 +104,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </depth1_foraging_controller>
+    </greedy_partitioning_controller>
 
   </controllers>
 
@@ -112,7 +112,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_foraging_loop_functions">
+                  label="depth1_loop_functions">
     <output>
       <sim output_root="output"
            output_dir="__current_date__"

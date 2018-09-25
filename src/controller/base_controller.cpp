@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_controller.cpp
+ * @file base_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_foraging_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
@@ -50,29 +50,29 @@ namespace fs = std::experimental::filesystem;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_foraging_controller::base_foraging_controller(void)
+base_controller::base_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.base"), m_saa(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_foraging_controller::in_nest(void) const {
+bool base_controller::in_nest(void) const {
   return m_saa->sensing()->in_nest();
 } /* in_nest() */
 
-bool base_foraging_controller::block_detected(void) const {
+bool base_controller::block_detected(void) const {
   return m_saa->sensing()->block_detected();
 } /* block_detected() */
 
-void base_foraging_controller::robot_loc(argos::CVector2 loc) {
+void base_controller::robot_loc(argos::CVector2 loc) {
   m_saa->sensing()->position(loc);
 }
 
-__rcsw_pure argos::CVector2 base_foraging_controller::robot_loc(void) const {
+__rcsw_pure argos::CVector2 base_controller::robot_loc(void) const {
   return m_saa->sensing()->position();
 }
 
-void base_foraging_controller::Init(ticpp::Element& node) {
+void base_controller::Init(ticpp::Element& node) {
 #ifndef ER_NREPORT
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
@@ -127,12 +127,12 @@ void base_foraging_controller::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
-void base_foraging_controller::Reset(void) {
+void base_controller::Reset(void) {
   CCI_Controller::Reset();
   m_block.reset();
 } /* Reset() */
 
-void base_foraging_controller::output_init(
+void base_controller::output_init(
     const struct params::output_params* const params) {
   std::string output_root;
   if ("__current_date__" == params->output_dir) {
@@ -174,15 +174,15 @@ void base_foraging_controller::output_init(
 #endif
 } /* output_init() */
 
-void base_foraging_controller::tick(uint tick) {
+void base_controller::tick(uint tick) {
   m_saa->sensing()->tick(tick);
 } /* tick() */
 
-int base_foraging_controller::entity_id(void) const {
+int base_controller::entity_id(void) const {
   return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
 
-void base_foraging_controller::ndc_pusht(void) {
+void base_controller::ndc_pusht(void) {
   ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) +
               "] [" + GetId() + "]");
 }

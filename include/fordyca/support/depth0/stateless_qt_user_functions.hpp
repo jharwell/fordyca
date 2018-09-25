@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_qt_user_functions.hpp
+ * @file stateless_qt_user_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_FORAGING_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_FORAGING_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,13 +36,13 @@ NS_START(fordyca, support, depth0);
  * Classes
  ******************************************************************************/
 /**
- * @class stateless_foraging_qt_user_functions
+ * @class stateless_qt_user_functions
  * @ingroup support depth0
  *
  * @brief Contains hooks for Qt to draw the robot's ID, the block they are
  * carrying, and the ID of the block they are carrying, if so configured.
  */
-class stateless_foraging_qt_user_functions : public argos::CQTOpenGLUserFunctions {
+class stateless_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
   /**
    * @brief How far above the center of the robot to draw the carried block (if
@@ -56,13 +56,13 @@ class stateless_foraging_qt_user_functions : public argos::CQTOpenGLUserFunction
    */
   static constexpr double kTEXT_VIS_OFFSET = 0.5;
 
-  stateless_foraging_qt_user_functions(void);
+  stateless_qt_user_functions(void);
 
-  ~stateless_foraging_qt_user_functions(void) override = default;
+  ~stateless_qt_user_functions(void) override = default;
 
   virtual void Draw(argos::CFootBotEntity& c_entity);
 };
 
 NS_END(fordyca, support, depth0);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_FORAGING_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_QT_USER_FUNCTIONS_HPP_ */

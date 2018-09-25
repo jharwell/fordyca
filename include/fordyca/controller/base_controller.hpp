@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_controller.hpp
+ * @file base_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -50,7 +50,7 @@ class saa_subsystem;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_foraging_controller
+ * @class base_controller
  * @ingroup controller
  *
  * @brief The base controller foraging class that all FORDYCA controllers derive
@@ -59,15 +59,15 @@ class saa_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_foraging_controller
+class base_controller
     : public argos::CCI_Controller,
-      public rcppsw::er::client<base_foraging_controller> {
+      public rcppsw::er::client<base_controller> {
  public:
-  base_foraging_controller(void);
-  ~base_foraging_controller(void) override = default;
+  base_controller(void);
+  ~base_controller(void) override = default;
 
-  base_foraging_controller(const base_foraging_controller& other) = delete;
-  base_foraging_controller& operator=(const base_foraging_controller& other) =
+  base_controller(const base_controller& other) = delete;
+  base_controller& operator=(const base_controller& other) =
       delete;
 
   /* CCI_Controller overrides */
@@ -186,4 +186,4 @@ class base_foraging_controller
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_FORAGING_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_ */

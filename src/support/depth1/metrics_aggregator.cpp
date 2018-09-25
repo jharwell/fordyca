@@ -37,7 +37,7 @@
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bifurcating_tab.hpp"
 
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
@@ -96,7 +96,7 @@ metrics_aggregator::metrics_aggregator(const struct params::metrics_params* para
  * Member Functions
  ******************************************************************************/
 void metrics_aggregator::collect_from_controller(
-    const controller::depth1::foraging_controller* const controller) {
+    const controller::depth1::greedy_partitioning_controller* const controller) {
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);

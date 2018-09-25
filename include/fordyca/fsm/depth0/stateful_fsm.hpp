@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_fsm.hpp
+ * @file stateful_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FORAGING_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FORAGING_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -50,7 +50,7 @@ using transport_goal_type = block_transporter::goal_type;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateful_foraging_fsm
+ * @class stateful_fsm
  * @ingroup fsm depth0
  *
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
@@ -61,14 +61,14 @@ using transport_goal_type = block_transporter::goal_type;
  * way to the nest and dropped it in the nest, it will signal that its task is
  * complete.
  */
-class stateful_foraging_fsm : public base_foraging_fsm,
-                              er::client<stateful_foraging_fsm>,
+class stateful_fsm : public base_foraging_fsm,
+                              er::client<stateful_fsm>,
                               public metrics::fsm::goal_acquisition_metrics,
                               public block_transporter,
                               public task_allocation::taskable,
-                              public visitor::visitable_any<depth0::stateful_foraging_fsm> {
+                              public visitor::visitable_any<depth0::stateful_fsm> {
  public:
-  stateful_foraging_fsm(const controller::block_selection_matrix* sel_matrix,
+  stateful_fsm(const controller::block_selection_matrix* sel_matrix,
                         controller::saa_subsystem* saa,
                         ds::perceived_arena_map* map);
 
@@ -127,15 +127,15 @@ class stateful_foraging_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* depth0 foraging states */
-  HFSM_STATE_DECLARE(stateful_foraging_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, acquire_block);
-  HFSM_STATE_DECLARE(stateful_foraging_fsm,
+  HFSM_STATE_DECLARE(stateful_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(stateful_fsm, acquire_block);
+  HFSM_STATE_DECLARE(stateful_fsm,
                      wait_for_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(stateful_foraging_fsm,
+  HFSM_STATE_DECLARE(stateful_fsm,
                      wait_for_drop,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(stateful_foraging_fsm, finished);
+  HFSM_STATE_DECLARE_ND(stateful_fsm, finished);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -157,4 +157,4 @@ class stateful_foraging_fsm : public base_foraging_fsm,
 
 NS_END(depth0, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FORAGING_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_STATEFUL_FSM_HPP_ */

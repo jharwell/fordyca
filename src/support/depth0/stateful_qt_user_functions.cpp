@@ -1,5 +1,5 @@
 /**
- * @file foraging_qt_user_functions.cpp
+ * @file qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -26,12 +26,12 @@
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#include "fordyca/support/depth0/stateful_foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -42,19 +42,19 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_foraging_qt_user_functions::stateful_foraging_qt_user_functions() {
-  RegisterUserFunction<stateful_foraging_qt_user_functions, argos::CFootBotEntity>(
-      &stateful_foraging_qt_user_functions::Draw);
+stateful_qt_user_functions::stateful_qt_user_functions() {
+  RegisterUserFunction<stateful_qt_user_functions, argos::CFootBotEntity>(
+      &stateful_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  stateless_foraging_qt_user_functions::Draw(c_entity);
+void stateful_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  stateless_qt_user_functions::Draw(c_entity);
 
   auto& controller =
-      dynamic_cast<controller::depth0::stateful_foraging_controller&>(
+      dynamic_cast<controller::depth0::stateful_controller&>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_los()) {
@@ -84,8 +84,8 @@ using namespace argos;
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_QTOPENGL_USER_FUNCTIONS(stateful_foraging_qt_user_functions,
-                                 "stateful_foraging_qt_user_functions"); // NOLINT
+REGISTER_QTOPENGL_USER_FUNCTIONS(stateful_qt_user_functions,
+                                 "stateful_qt_user_functions"); // NOLINT
 #pragma clang diagnostic pop
 
 NS_END(depth0, support, fordyca);
