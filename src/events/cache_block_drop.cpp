@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
@@ -103,7 +103,7 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(controller::depth1::foraging_controller& controller) {
+void cache_block_drop::visit(controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
@@ -127,7 +127,7 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(controller::depth2::foraging_controller& controller) {
+void cache_block_drop::visit(controller::depth2::greedy_recpart_controller& controller) {
   ER_ASSERT(false, "Not implemented");
 } /* visit() */
 

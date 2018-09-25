@@ -38,7 +38,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace controller {
-class base_foraging_controller;
+class base_controller;
 }
 
 NS_START(support, utils);
@@ -54,7 +54,7 @@ NS_START(support, utils);
  * @return The block index, or -1 if the robot is not on top of a block.
  */
 int robot_on_block(argos::CFootBotEntity& robot, const ds::arena_map& map);
-int robot_on_block(const controller::base_foraging_controller& controller,
+int robot_on_block(const controller::base_controller& controller,
                    const ds::arena_map& map);
 
 /**
@@ -65,13 +65,13 @@ int robot_on_block(const controller::base_foraging_controller& controller,
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */
 int robot_on_cache(argos::CFootBotEntity& robot, const ds::arena_map& map);
-int robot_on_cache(const controller::base_foraging_controller& controller,
+int robot_on_cache(const controller::base_controller& controller,
                    const ds::arena_map& map);
 /**
  * @brief Get the ID of the robot as an integer.
  */
 int robot_id(argos::CFootBotEntity& robot);
-int robot_id(const controller::base_foraging_controller& controller);
+int robot_id(const controller::base_controller& controller);
 
 bool block_drop_overlap_with_cache(
     const std::shared_ptr<representation::base_block>& block,

@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -106,7 +106,7 @@ void free_block_pickup::visit(representation::base_block& block) {
 } /* visit() */
 
 void free_block_pickup::visit(
-    controller::depth0::stateless_foraging_controller& controller) {
+    controller::depth0::stateless_controller& controller) {
   controller.ndc_push();
   controller.fsm()->accept(*this);
   controller.block(m_block);
@@ -116,7 +116,7 @@ void free_block_pickup::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -146,13 +146,13 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
   }
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::stateful_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(
-    controller::depth0::stateful_foraging_controller& controller) {
+    controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
   dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
@@ -167,7 +167,7 @@ void free_block_pickup::visit(
  * Depth1 Foraging
  ******************************************************************************/
 void free_block_pickup::visit(
-    controller::depth1::foraging_controller& controller) {
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
   controller.free_pickup_event(true);
@@ -179,7 +179,7 @@ void free_block_pickup::visit(
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())
+  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */
 
@@ -196,7 +196,7 @@ void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void free_block_pickup::visit(
-    controller::depth2::foraging_controller& controller) {
+    controller::depth2::greedy_recpart_controller& controller) {
   ER_ASSERT(false, "Not implemented");
 } /* visit() */
 

@@ -39,7 +39,7 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/support/base_foraging_loop_functions.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -102,7 +102,7 @@ base_metrics_aggregator::base_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
-    const support::base_foraging_loop_functions* const loop) {
+    const support::base_loop_functions* const loop) {
   collect("loop::robot_interaction", *loop);
 } /* collect_from_loop() */
 

@@ -1,5 +1,5 @@
 /**
- * @file stateless_foraging_qt_user_functions.cpp
+ * @file stateless_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -26,10 +26,10 @@
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#include "fordyca/support/depth0/stateless_foraging_qt_user_functions.hpp"
+#include "fordyca/support/depth0/stateless_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/block_carry_visualizer.hpp"
 
@@ -41,17 +41,17 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_foraging_qt_user_functions::stateless_foraging_qt_user_functions() {
-  RegisterUserFunction<stateless_foraging_qt_user_functions, argos::CFootBotEntity>(
-      &stateless_foraging_qt_user_functions::Draw);
+stateless_qt_user_functions::stateless_qt_user_functions() {
+  RegisterUserFunction<stateless_qt_user_functions, argos::CFootBotEntity>(
+      &stateless_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_foraging_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+void stateless_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto& controller =
-      dynamic_cast<controller::depth0::stateless_foraging_controller&>(
+      dynamic_cast<controller::depth0::stateless_controller&>(
           c_entity.GetControllableEntity().GetController());
 
   if (controller.display_id()) {
@@ -69,7 +69,7 @@ using namespace argos;
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_QTOPENGL_USER_FUNCTIONS(stateless_foraging_qt_user_functions,
-                                 "stateless_foraging_qt_user_functions"); // NOLINT
+REGISTER_QTOPENGL_USER_FUNCTIONS(stateless_qt_user_functions,
+                                 "stateless_qt_user_functions"); // NOLINT
 #pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

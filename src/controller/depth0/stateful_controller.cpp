@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_controller.cpp
+ * @file stateful_controller.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
@@ -46,70 +46,68 @@ namespace ta = rcppsw::task_allocation;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_foraging_controller::stateful_foraging_controller(void)
-    : stateless_foraging_controller(),
+stateful_controller::stateful_controller(void)
+    : stateless_controller(),
       ER_CLIENT_INIT("fordyca.controller.depth0.stateful"),
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
       m_executive() {}
 
-stateful_foraging_controller::~stateful_foraging_controller(void) = default;
+stateful_controller::~stateful_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure const ta::bifurcating_tab* stateful_foraging_controller::active_tab(
+__rcsw_pure const ta::bifurcating_tab* stateful_controller::active_tab(
     void) const {
   return m_executive->active_tab();
 }
 
-void stateful_foraging_controller::block_sel_matrix(
+void stateful_controller::block_sel_matrix(
     std::unique_ptr<block_selection_matrix> m) {
   m_block_sel_matrix = std::move(m);
 }
-void stateful_foraging_controller::executive(
+void stateful_controller::executive(
     std::unique_ptr<ta::bifurcating_tdgraph_executive> executive) {
   m_executive = std::move(executive);
 }
 
-void stateful_foraging_controller::perception(
+void stateful_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
 }
-__rcsw_pure tasks::base_foraging_task* stateful_foraging_controller::current_task(
-    void) {
+__rcsw_pure tasks::base_foraging_task* stateful_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(
       m_executive.get()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* stateful_foraging_controller::
-    current_task(void) const {
-  return const_cast<stateful_foraging_controller*>(this)->current_task();
+__rcsw_pure const tasks::base_foraging_task* stateful_controller::current_task(void) const {
+  return const_cast<stateful_controller*>(this)->current_task();
 } /* current_task() */
 
-__rcsw_pure const representation::line_of_sight* stateful_foraging_controller::los(
+__rcsw_pure const representation::line_of_sight* stateful_controller::los(
     void) const {
   return stateful_sensors()->los();
 }
-void stateful_foraging_controller::los(
+void stateful_controller::los(
     std::unique_ptr<representation::line_of_sight>& new_los) {
   stateful_sensors()->los(new_los);
 }
 
-__rcsw_pure const depth0::sensing_subsystem* stateful_foraging_controller::
+__rcsw_pure const depth0::sensing_subsystem* stateful_controller::
     stateful_sensors(void) const {
   return static_cast<const depth0::sensing_subsystem*>(
       saa_subsystem()->sensing().get());
 }
 
-__rcsw_pure depth0::sensing_subsystem* stateful_foraging_controller::stateful_sensors(
+__rcsw_pure depth0::sensing_subsystem* stateful_controller::stateful_sensors(
     void) {
   return static_cast<depth0::sensing_subsystem*>(
       saa_subsystem()->sensing().get());
 }
 
-void stateful_foraging_controller::ControlStep(void) {
+void stateful_controller::ControlStep(void) {
   ndc_pusht();
   /*
    * Update the robot's model of the world with the current line-of-sight, and
@@ -125,12 +123,12 @@ void stateful_foraging_controller::ControlStep(void) {
   ndc_pop();
 } /* ControlStep() */
 
-void stateful_foraging_controller::Init(ticpp::Element& node) {
+void stateful_controller::Init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref stateless_foraging_controller::Init()--there
+   * Note that we do not call \ref stateless_controller::Init()--there
    * is nothing in there that we need.
    */
-  base_foraging_controller::Init(node);
+  base_controller::Init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -165,48 +163,47 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
-void stateful_foraging_controller::Reset(void) {
-  stateless_foraging_controller::Reset();
+void stateful_controller::Reset(void) {
+  stateless_controller::Reset();
   m_perception->reset();
 } /* Reset() */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                       stateful_foraging_controller,
+                       stateful_controller,
                        block_transport_goal,
                        current_task());
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       stateful_foraging_controller,
+                       stateful_controller,
                        acquisition_goal,
                        current_task());
 
 FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateful_foraging_controller,
+                       stateful_controller,
                        goal_acquired,
                        current_task());
 
 /*******************************************************************************
  * World Model Metrics
  ******************************************************************************/
-uint stateful_foraging_controller::cell_state_inaccuracies(uint state) const {
+uint stateful_controller::cell_state_inaccuracies(uint state) const {
   return m_perception->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
-double stateful_foraging_controller::known_percentage(void) const {
+double stateful_controller::known_percentage(void) const {
   return m_perception->known_percentage();
 } /* known_percentage() */
 
-double stateful_foraging_controller::unknown_percentage(void) const {
+double stateful_controller::unknown_percentage(void) const {
   return m_perception->unknown_percentage();
 } /* unknown_percentage() */
 
-using namespace argos;
+using namespace argos;  // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_CONTROLLER(stateful_foraging_controller,
-                    "stateful_foraging_controller"); // NOLINT
+REGISTER_CONTROLLER(stateful_controller, "stateful_controller");
 #pragma clang diagnostic pop
 
 NS_END(depth0, controller, fordyca);

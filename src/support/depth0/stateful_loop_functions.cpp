@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_loop_functions.cpp
+ * @file stateful_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,12 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateful_foraging_loop_functions.hpp"
+#include "fordyca/support/depth0/stateful_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
@@ -45,10 +44,19 @@ NS_START(fordyca, support, depth0);
 using ds::arena_grid;
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+stateful_loop_functions::stateful_loop_functions(void)
+    : ER_CLIENT_INIT("fordyca.loop.stateful"),
+      m_metrics_agg(nullptr) {}
+
+stateful_loop_functions::~stateful_loop_functions(void) = default;
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
-  stateless_foraging_loop_functions::Init(node);
+void stateful_loop_functions::Init(ticpp::Element& node) {
+  stateless_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -74,7 +82,7 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller =
-        dynamic_cast<controller::depth0::stateful_foraging_controller&>(
+        dynamic_cast<controller::depth0::stateful_controller&>(
             robot.GetControllableEntity().GetController());
 
     /*
@@ -89,10 +97,10 @@ void stateful_foraging_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-void stateful_foraging_loop_functions::pre_step_iter(
+void stateful_loop_functions::pre_step_iter(
     argos::CFootBotEntity& robot) {
   auto& controller =
-      static_cast<controller::depth0::stateful_foraging_controller&>(
+      static_cast<controller::depth0::stateful_controller&>(
           robot.GetControllableEntity().GetController());
 
   /* collect metrics from robot before its state changes */
@@ -114,7 +122,7 @@ void stateful_foraging_loop_functions::pre_step_iter(
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-__rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor stateful_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   if (arena_map()->nest().contains_point(plane_pos)) {
     return argos::CColor(arena_map()->nest().color().red(),
@@ -138,9 +146,9 @@ __rcsw_pure argos::CColor stateful_foraging_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void stateful_foraging_loop_functions::PreStep() {
+void stateful_loop_functions::PreStep() {
   ndc_push();
-  base_foraging_loop_functions::PreStep();
+  base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -152,24 +160,24 @@ void stateful_foraging_loop_functions::PreStep() {
   ndc_pop();
 } /* PreStep() */
 
-void stateful_foraging_loop_functions::Reset(void) {
-  stateless_foraging_loop_functions::Reset();
+void stateful_loop_functions::Reset(void) {
+  stateless_loop_functions::Reset();
   m_metrics_agg->reset_all();
 } /* Reset() */
 
-void stateful_foraging_loop_functions::pre_step_final(void) {
+void stateful_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
 
-using namespace argos;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_LOOP_FUNCTIONS(stateful_foraging_loop_functions,
-                        "stateful_foraging_loop_functions"); // NOLINT
+REGISTER_LOOP_FUNCTIONS(stateful_loop_functions,
+                        "stateful_loop_functions");
 #pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

@@ -27,7 +27,7 @@
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/params/depth0/exec_estimates_params.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -68,7 +68,7 @@ void stateful_tasking_initializer::stateful_tasking_init(
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::stateful_foraging_fsm>(
+      rcppsw::make_unique<fsm::depth0::stateful_fsm>(
           mc_sel_matrix, m_saa, m_perception->map());
 
   auto generalist =

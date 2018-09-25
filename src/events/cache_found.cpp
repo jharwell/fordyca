@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"

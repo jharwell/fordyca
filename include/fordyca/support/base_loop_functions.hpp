@@ -1,5 +1,5 @@
 /**
- * @file base_foraging_loop_functions.hpp
+ * @file base_loop_functions.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_FORAGING_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BASE_FORAGING_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -48,7 +48,7 @@ NS_START(support);
  * Classes
  ******************************************************************************/
 /**
- * @class base_foraging_loop_functions
+ * @class base_loop_functions
  * @ingroup support
  *
  * @brief The base loop functions in FORDYCA that all other loop functions
@@ -59,14 +59,14 @@ NS_START(support);
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_foraging_loop_functions : public argos::CLoopFunctions,
+class base_loop_functions : public argos::CLoopFunctions,
                                      public metrics::robot_interaction_metrics,
-                                     public rcppsw::er::client<base_foraging_loop_functions> {
+                                     public rcppsw::er::client<base_loop_functions> {
  public:
-  base_foraging_loop_functions(void);
-  base_foraging_loop_functions(const base_foraging_loop_functions& s) = delete;
-  base_foraging_loop_functions& operator=(
-      const base_foraging_loop_functions& s) = delete;
+  base_loop_functions(void);
+  base_loop_functions(const base_loop_functions& s) = delete;
+  base_loop_functions& operator=(
+      const base_loop_functions& s) = delete;
 
   /* CLoopFunctions overrides */
   void Init(ticpp::Element&) override;
@@ -103,4 +103,4 @@ class base_foraging_loop_functions : public argos::CLoopFunctions,
 
 NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_FORAGING_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_BASE_LOOP_FUNCTIONS_HPP_ */

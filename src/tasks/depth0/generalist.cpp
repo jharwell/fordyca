@@ -27,7 +27,7 @@
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
@@ -47,7 +47,7 @@ generalist::generalist(const struct ta::partitionable_task_params* const params,
  * Member Functions
  ******************************************************************************/
 __rcsw_pure double generalist::current_time(void) const {
-  return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
+  return dynamic_cast<fsm::depth0::stateful_fsm*>(
              polled_task::mechanism())
       ->base_sensors()
       ->tick();
@@ -84,29 +84,29 @@ TASK_WRAPPER_DEFINE_PTR(
     bool,
     generalist,
     is_exploring_for_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+    static_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism()));
 TASK_WRAPPER_DEFINE_PTR(
     bool,
     generalist,
     is_vectoring_to_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+    static_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism()));
 
 TASK_WRAPPER_DEFINE_PTR(
     bool,
     generalist,
     goal_acquired,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+    static_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism()));
 
 TASK_WRAPPER_DEFINE_PTR(
     acquisition_goal_type,
     generalist,
     acquisition_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+    static_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism()));
 
 TASK_WRAPPER_DEFINE_PTR(
     transport_goal_type,
     generalist,
     block_transport_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+    static_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism()));
 
 NS_END(depth0, tasks, fordyca);

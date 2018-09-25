@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_fsm.cpp
+ * @file stateful_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
@@ -34,7 +34,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-stateful_foraging_fsm::stateful_foraging_fsm(
+stateful_fsm::stateful_fsm(
     const controller::block_selection_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
@@ -73,7 +73,7 @@ stateful_foraging_fsm::stateful_foraging_fsm(
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 
-HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(stateful_fsm, start, state_machine::event_data) {
   /* first time running FSM */
   if (state_machine::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
@@ -93,7 +93,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(stateful_foraging_fsm, acquire_block) {
+HFSM_STATE_DEFINE_ND(stateful_fsm, acquire_block) {
   if (m_block_fsm.task_finished()) {
     internal_event(ST_WAIT_FOR_PICKUP);
   } else {
@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE_ND(stateful_foraging_fsm, acquire_block) {
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(stateful_foraging_fsm,
+HFSM_STATE_DEFINE(stateful_fsm,
                   wait_for_pickup,
                   state_machine::event_data) {
   /**
@@ -123,7 +123,7 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm,
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(stateful_foraging_fsm,
+HFSM_STATE_DEFINE(stateful_fsm,
                   wait_for_drop,
                   state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
@@ -133,31 +133,31 @@ HFSM_STATE_DEFINE(stateful_foraging_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-__rcsw_const FSM_STATE_DEFINE_ND(stateful_foraging_fsm, finished) {
+__rcsw_const FSM_STATE_DEFINE_ND(stateful_fsm, finished) {
   return controller::foraging_signal::HANDLED;
 }
 
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool stateful_foraging_fsm::in_collision_avoidance(void) const {
+__rcsw_pure bool stateful_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
          base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool stateful_foraging_fsm::entered_collision_avoidance(void) const {
+__rcsw_pure bool stateful_fsm::entered_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.entered_collision_avoidance()) ||
          base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool stateful_foraging_fsm::exited_collision_avoidance(void) const {
+__rcsw_pure bool stateful_fsm::exited_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint stateful_foraging_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure uint stateful_fsm::collision_avoidance_duration(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.collision_avoidance_duration();
   } else {
@@ -170,16 +170,16 @@ __rcsw_pure uint stateful_foraging_fsm::collision_avoidance_duration(void) const
  * FSM Metrics
  ******************************************************************************/
 FSM_WRAPPER_DEFINE(bool,
-                   stateful_foraging_fsm,
+                   stateful_fsm,
                    is_exploring_for_goal,
                    m_block_fsm);
 
 FSM_WRAPPER_DEFINE(bool,
-                   stateful_foraging_fsm,
+                   stateful_fsm,
                    is_vectoring_to_goal,
                    m_block_fsm);
 
-acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
+acquisition_goal_type stateful_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||
       ST_WAIT_FOR_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
@@ -187,7 +187,7 @@ acquisition_goal_type stateful_foraging_fsm::acquisition_goal(void) const {
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
 
-bool stateful_foraging_fsm::goal_acquired(void) const {
+bool stateful_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kBlock == acquisition_goal()) {
     return current_state() == ST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::kNest == block_transport_goal()) {
@@ -199,18 +199,18 @@ bool stateful_foraging_fsm::goal_acquired(void) const {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void stateful_foraging_fsm::init(void) {
+void stateful_fsm::init(void) {
   base_foraging_fsm::init();
   m_block_fsm.task_reset();
   m_task_running = false;
 } /* init() */
 
-void stateful_foraging_fsm::task_execute(void) {
+void stateful_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* task_execute() */
 
-transport_goal_type stateful_foraging_fsm::block_transport_goal(void) const {
+transport_goal_type stateful_fsm::block_transport_goal(void) const {
   if (ST_TRANSPORT_TO_NEST == current_state() ||
       ST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::kNest;

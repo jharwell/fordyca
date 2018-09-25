@@ -40,10 +40,10 @@ class block_to_goal_fsm;
 }} // namespace fsm::depth1
 namespace controller {
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 namespace tasks { namespace depth2 {
@@ -71,8 +71,8 @@ class free_block_drop
     : public cell_op,
       public rcppsw::er::client<free_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
+      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
                                 fsm::depth1::block_to_goal_fsm> {
@@ -92,10 +92,10 @@ class free_block_drop
   void visit(ds::arena_map& map) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller&) override;
+  void visit(controller::depth1::greedy_partitioning_controller&) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller&) override;
+  void visit(controller::depth2::greedy_recpart_controller&) override;
   void visit(tasks::depth2::cache_starter&) override;
   void visit(tasks::depth2::cache_finisher&) override;
   void visit(fsm::depth1::block_to_goal_fsm&) override;

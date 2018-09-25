@@ -1,5 +1,5 @@
 /**
- * @file stateful_foraging_controller.hpp
+ * @file stateful_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_STATEFUL_FORAGING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_STATEFUL_FORAGING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_STATEFUL_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_STATEFUL_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
@@ -60,7 +60,7 @@ NS_START(depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class stateful_foraging_controller
+ * @class stateful_controller
  * @ingroup controller depth0
  *
  * @brief A foraging controller that remembers what it has seen for a period of
@@ -71,13 +71,13 @@ NS_START(depth0);
  * block is acquired (either via randomized exploring or by vectoring to a known
  * block) and then bring the block to the nest.
  */
-class stateful_foraging_controller : public stateless_foraging_controller,
-                                     public er::client<stateful_foraging_controller>,
+class stateful_controller : public stateless_controller,
+                                     public er::client<stateful_controller>,
                                      public metrics::world_model_metrics,
-                                     public visitor::visitable_any<stateful_foraging_controller> {
+                                     public visitor::visitable_any<stateful_controller> {
  public:
-  stateful_foraging_controller(void);
-  ~stateful_foraging_controller(void) override;
+  stateful_controller(void);
+  ~stateful_controller(void) override;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
@@ -167,4 +167,4 @@ class stateful_foraging_controller : public stateless_foraging_controller,
 
 NS_END(depth0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_STATEFUL_FORAGING_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_STATEFUL_CONTROLLER_HPP_ */

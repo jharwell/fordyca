@@ -1,5 +1,5 @@
 /**
- * @file foraging_loop_functions.cpp
+ * @file depth1_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,9 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/foraging_loop_functions.hpp"
+#include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
@@ -41,10 +41,19 @@ NS_START(fordyca, support, depth1);
 using ds::arena_grid;
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+depth1_loop_functions::depth1_loop_functions(void)
+    : ER_CLIENT_INIT("fordyca.loop.depth1"),
+      m_metrics_agg(nullptr) {}
+
+depth1_loop_functions::~depth1_loop_functions(void) = default;
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void foraging_loop_functions::Init(ticpp::Element& node) {
-  depth0::stateful_foraging_loop_functions::Init(node);
+void depth1_loop_functions::Init(ticpp::Element& node) {
+  depth0::stateful_loop_functions::Init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -72,7 +81,7 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
+    auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
         robot.GetControllableEntity().GetController());
 
     /*
@@ -100,8 +109,8 @@ void foraging_loop_functions::Init(ticpp::Element& node) {
   ER_INFO("Initialization finished");
 }
 
-void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = dynamic_cast<controller::depth1::foraging_controller&>(
+void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+  auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -123,7 +132,7 @@ void foraging_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-argos::CColor foraging_loop_functions::GetFloorColor(
+argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   if (arena_map()->nest().contains_point(plane_pos)) {
     return argos::CColor(arena_map()->nest().color().red(),
@@ -158,9 +167,9 @@ argos::CColor foraging_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void foraging_loop_functions::PreStep() {
+void depth1_loop_functions::PreStep() {
   ndc_push();
-  base_foraging_loop_functions::PreStep();
+  base_loop_functions::PreStep();
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());
@@ -180,12 +189,12 @@ void foraging_loop_functions::PreStep() {
   ndc_pop();
 } /* PreStep() */
 
-void foraging_loop_functions::Reset() {
+void depth1_loop_functions::Reset() {
   m_metrics_agg->reset_all();
   arena_map()->static_cache_create();
 }
 
-void foraging_loop_functions::pre_step_final(void) {
+void depth1_loop_functions::pre_step_final(void) {
   /*
    * The cache is recreated with a probability that depends on the relative
    * ratio between the # foragers and the # collectors. If there are more
@@ -229,7 +238,7 @@ void foraging_loop_functions::pre_step_final(void) {
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
 
-void foraging_loop_functions::cache_handling_init(
+void depth1_loop_functions::cache_handling_init(
     const struct params::arena::arena_map_params* arenap) {
   /*
    * Regardless of how many foragers/etc there are, always create an
@@ -242,19 +251,11 @@ void foraging_loop_functions::cache_handling_init(
   mc_cache_respawn_scale_factor = arenap->static_cache.respawn_scale_factor;
 } /* cache_handling_init() */
 
-/*
- * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
- * namespaces, so if you have two classes of the same name in two different
- * namespaces, the macro will create the same class definition, giving a linker
- * error.
- */
-using namespace argos;
-typedef foraging_loop_functions depth1_foraging_loop_functions;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_LOOP_FUNCTIONS(depth1_foraging_loop_functions,
-                        "depth1_foraging_loop_functions");
+REGISTER_LOOP_FUNCTIONS(depth1_loop_functions, "depth1_loop_functions");
 #pragma clang diagnostic pop
 NS_END(depth1, support, fordyca);

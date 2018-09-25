@@ -24,7 +24,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -214,7 +214,7 @@ void cached_block_pickup::visit(representation::base_block& block) {
 } /* visit() */
 
 void cached_block_pickup::visit(
-    controller::depth1::foraging_controller& controller) {
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
@@ -245,7 +245,7 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cached_block_pickup::visit(
-    controller::depth2::foraging_controller& controller) {
+    controller::depth2::greedy_recpart_controller& controller) {
   ER_ASSERT(false, "Not implemented");
 } /* visit() */
 

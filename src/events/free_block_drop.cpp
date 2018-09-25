@@ -24,8 +24,8 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/controller/depth2/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
@@ -105,14 +105,14 @@ void free_block_drop::visit(ds::arena_map& map) {
 /*******************************************************************************
  * Depth1
  ******************************************************************************/
-void free_block_drop::visit(controller::depth1::foraging_controller& controller) {
+void free_block_drop::visit(controller::depth1::greedy_partitioning_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(controller::depth2::foraging_controller& controller) {
+void free_block_drop::visit(controller::depth2::greedy_recpart_controller& controller) {
   dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
       ->accept(*this);
   controller.block(nullptr);

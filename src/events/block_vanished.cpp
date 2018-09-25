@@ -22,12 +22,12 @@ n * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/controller/depth0/stateful_foraging_controller.hpp"
-#include "fordyca/controller/depth0/stateless_foraging_controller.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
-#include "fordyca/controller/depth2/foraging_controller.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_foraging_fsm.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
@@ -51,7 +51,7 @@ block_vanished::block_vanished(uint block_id)
  * Depth0 Foraging
  ******************************************************************************/
 void block_vanished::visit(
-    controller::depth0::stateless_foraging_controller& controller) {
+    controller::depth0::stateless_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
   controller.fsm()->accept(*this);
@@ -59,7 +59,7 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(
-    controller::depth0::stateful_foraging_controller& controller) {
+    controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
   dynamic_cast<tasks::depth0::generalist*>(controller.current_task())
@@ -68,16 +68,16 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_foraging_fsm*>(task.mechanism())
+  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())
       ->accept(*this);
 } /* visit() */
 
-void block_vanished::visit(fsm::depth0::stateless_foraging_fsm& fsm) {
+void block_vanished::visit(fsm::depth0::stateless_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void block_vanished::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
+void block_vanished::visit(fsm::depth0::stateful_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -85,7 +85,7 @@ void block_vanished::visit(fsm::depth0::stateful_foraging_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth1::foraging_controller& controller) {
+void block_vanished::visit(controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   ER_INFO(
       "Abort pickup executing task %s: block%d vanished",
@@ -111,7 +111,7 @@ void block_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth2::foraging_controller& controller) {
+void block_vanished::visit(controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in block: block%d vanished", m_block_id);
   dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
