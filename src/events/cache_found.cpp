@@ -86,10 +86,18 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_found::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
-  swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  swarm::pheromone_density& density = map.access<occupancy_grid::kPheromone>(x(),
+                                                                             y());
+  if (!cell.state_is_known()) {
+    map.known_cells_inc();
+    ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
+              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              map.known_cell_count(),
+              map.xdsize(),
+              map.ydsize());
+  }
+
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
@@ -101,7 +109,7 @@ void cache_found::visit(ds::perceived_arena_map& map) {
    * tracking blocks that no longer exist in our perception.
    *
    * @todo This is a hack, and once the robot computes its own LOS rather than
-   * being sent it the need for this function will disappear.
+   * being sent it the need for this will disappear.
    */
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {

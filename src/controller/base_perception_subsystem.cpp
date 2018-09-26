@@ -115,7 +115,7 @@ void base_perception_subsystem::processed_los_verify(
       auto& cell2 = m_map->access<occupancy_grid::kCell>(d);
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {
-        ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
+         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
                   "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
                   d.first,
                   d.second,
@@ -159,14 +159,9 @@ void base_perception_subsystem::update_cell_stats(
 /*******************************************************************************
  * World Model Metrics
  ******************************************************************************/
-double base_perception_subsystem::known_percentage(void) const {
-  uint known = 0;
-  for (uint i = 0; i < m_map->xdsize(); ++i) {
-    for (uint j = 0; j < m_map->ydsize(); ++j) {
-      known += m_map->access<occupancy_grid::kCell>(i, j).state_is_known();
-    } /* for(j..) */
-  }   /* for(i..) */
-  return known / static_cast<double>(m_map->xdsize() * m_map->ydsize());
+__rcsw_pure double base_perception_subsystem::known_percentage(void) const {
+  return m_map->known_cell_count() / static_cast<double>(m_map->xdsize() *
+                                                         m_map->ydsize());
 } /* known_percentage() */
 
 double base_perception_subsystem::unknown_percentage(void) const {

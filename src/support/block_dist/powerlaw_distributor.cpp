@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <parallel/algorithm>
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
@@ -96,10 +97,10 @@ bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
                      });
 } /* distribute_blocks() */
 
-powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placements(
+powerlaw_distributor::arena_view_vector powerlaw_distributor::guess_cluster_placements(
     ds::arena_grid& grid,
     const std::vector<uint>& clust_sizes) {
-  arena_view_list views;
+  arena_view_vector views;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
     std::uniform_int_distribution<int> xgen(
@@ -127,13 +128,19 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placem
 } /* guess_cluster_placements() */
 
 __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
-    const arena_view_list& list) {
-  for (auto& v : list) {
+    const arena_view_vector& list) {
+  for (const std::pair<ds::arena_grid::view, uint>& v : list) {
     bool overlap = std::any_of(
         list.begin(),
         list.end(),
-        [&](const std::pair<ds::arena_grid::view, uint>& other) {
-          if (other == v) { /* self */
+        [&](const auto& other) {
+          /*
+           * Can't compare directly (boost multi_array makes a COPY of each
+           * element during iteration for some reason, and because the cells
+           * have a unique_ptr, that doesn't work), so compare using addresses
+           * of elements of the vector, which WILL work.
+           */
+          if (&other == &v) { /* self */
             return false;
           }
           uint v_xbase = (*v.first.origin()).loc().first;
@@ -165,7 +172,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
   return true;
 } /* check_cluster_placements() */
 
-powerlaw_distributor::arena_view_list powerlaw_distributor::
+powerlaw_distributor::arena_view_vector powerlaw_distributor::
     compute_cluster_placements(ds::arena_grid& grid, uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
@@ -185,11 +192,11 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::
   } /* for(i..) */
   ER_FATAL_SENTINEL(
       "Unable to place clusters in arena (impossible situation?)");
-  return arena_view_list{};
+  return arena_view_vector{};
 } /* compute_cluster_placements() */
 
 bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
-  arena_view_list placements = compute_cluster_placements(grid, m_n_clusters);
+  arena_view_vector placements = compute_cluster_placements(grid, m_n_clusters);
   if (0 == placements.size()) {
     ER_WARN("Unable to compute all cluster placements");
     return false;

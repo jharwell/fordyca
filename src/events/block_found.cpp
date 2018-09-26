@@ -64,11 +64,18 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void block_found::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
-  swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  swarm::pheromone_density& density = map.access<occupancy_grid::kPheromone>(x(),
+                                                                             y());
 
+  if (!cell.state_is_known()) {
+    map.known_cells_inc();
+    ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
+              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              map.known_cell_count(),
+              map.xdsize(),
+              map.ydsize());
+  }
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
    * cell is coming back into our LOS with a block, when it contained a cache
