@@ -166,22 +166,25 @@ class perceived_arena_map
       const rcppsw::math::dcoord2& d) const {
     return decoratee().access<Index>(d);
   }
-  
+
   /**
    * @brief Update the density of all cells in the perceived arena.
    */
   DECORATE_FUNC(update);
-  
+
   /**
    * @brief Reset all the cells in the percieved arena.
    */
   DECORATE_FUNC(reset);
-  double grid_resolution(void) const { return decoratee().resolution(); }
-
   DECORATE_FUNC(xdsize, const);
   DECORATE_FUNC(ydsize, const);
   DECORATE_FUNC(xrsize, const);
   DECORATE_FUNC(yrsize, const);
+  DECORATE_FUNC(known_cells_inc);
+  DECORATE_FUNC(known_cells_dec);
+  DECORATE_FUNC(known_cell_count, const);
+
+  double grid_resolution(void) const { return decoratee().resolution(); }
 
  private:
   /**

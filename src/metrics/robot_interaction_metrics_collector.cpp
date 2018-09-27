@@ -46,7 +46,7 @@ robot_interaction_metrics_collector::robot_interaction_metrics_collector(
  ******************************************************************************/
 std::string robot_interaction_metrics_collector::csv_header_build(
     const std::string& header) {
-  return header +
+  return base_metrics_collector::csv_header_build(header) +
       "cum_avg_degree_raw" + separator() +
       "cum_avg_degree_normed" + separator();
 } /* csv_header_build() */

@@ -115,31 +115,35 @@ bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
 
   bool ret = true;
   if (blocks.size() < representation::base_cache::kMinBlocks) {
-    uint count = std::accumulate(
-        m_blocks.begin(),
-        m_blocks.end(),
-        0,
-        [&](uint sum, const std::shared_ptr<representation::base_block>& b) {
-          return sum + (b->is_out_of_sight() || b->discrete_loc() == dcenter);
-        });
+    /*
+     * Cannot use std::accumulate for these, because that doesn't work with
+     * C++14/gcc7 when you are accumulating into a different type (e.g. from a
+     * set of blocks into an int)
+     */
+    uint count = 0;
+    std::for_each(m_blocks.begin(), m_blocks.end(),
+                  [&](std::shared_ptr<representation::base_block>& b) {
+                    count += (b->is_out_of_sight() || b->discrete_loc() == dcenter);
+      });
 
-    ER_DEBUG("Block carry statuses: [%s]",
-             std::accumulate(m_blocks.begin(),
-                             m_blocks.end(),
-                             std::string(),
-                             [&](const std::string& a, auto& b) {
-                               return a + "b" + std::to_string(b->id()) +
-                                   "->fb" + std::to_string(b->robot_id()) + ",";
-                             }).c_str());
-    ER_DEBUG("Block locations: [%s]",
-             std::accumulate(m_blocks.begin(),
-                             m_blocks.end(),
-                             std::string(),
-                             [&](const std::string& a, auto& b) {
-                               return a + "b" + std::to_string(b->id()) +
-                                   "->(" + std::to_string(b->discrete_loc().first) + "," +
-                                   std::to_string(b->discrete_loc().second) + "),";
-                             }).c_str());
+    std::string accum;
+    std::for_each(m_blocks.begin(),
+                  m_blocks.end(),
+                  [&](const auto& b) {
+                    accum += "b" + std::to_string(b->id()) +
+                             "->fb" + std::to_string(b->robot_id()) + ",";
+                  });
+    ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
+
+    accum = "";
+    std::for_each(m_blocks.begin(),
+                  m_blocks.end(),
+                  [&](const auto& b) {
+                    accum += "b" + std::to_string(b->id()) +
+                             "->(" + std::to_string(b->discrete_loc().first) + "," +
+                             std::to_string(b->discrete_loc().second) + "),";
+                  });
+    ER_DEBUG("Block locations: [%s]", accum.c_str());
 
     ER_ASSERT(m_blocks.size() - count < representation::base_cache::kMinBlocks,
               "For new cache @(%f, %f) [%u, %u]: %zu blocks SHOULD be "

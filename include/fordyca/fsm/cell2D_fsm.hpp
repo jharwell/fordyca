@@ -46,11 +46,8 @@ namespace visitor = rcppsw::patterns::visitor;
  * @ingroup fsm
  *
  * @brief Per-cell FSM containing the current state of the cell (empty, has a
- * block, has a cache, or unknown).
+ * block, has a cache, or unknown, etc.).
  *
- * Though this class processes events, it does not do so via the visitor
- * pattern as it is so simple that using the visitor pattern would be overkill
- * here.
  */
 class cell2D_fsm : public state_machine::simple_fsm,
                    public visitor::visitable_any<cell2D_fsm> {
@@ -111,7 +108,9 @@ class cell2D_fsm : public state_machine::simple_fsm,
     return &kSTATE_MAP[index];
   }
 
+  // clang-format off
   uint m_block_count{0};
+  // clang-format on
 };
 
 NS_END(fsm, forydca);

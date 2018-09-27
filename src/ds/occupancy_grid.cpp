@@ -60,19 +60,28 @@ occupancy_grid::occupancy_grid(
  * Member Functions
  ******************************************************************************/
 void occupancy_grid::update(void) {
-#pragma omp parallel for
-  for (uint i = 0; i < xdsize(); ++i) {
-    for (uint j = 0; j < ydsize(); ++j) {
-      cell_update(i, j);
+  uint xmax = xdsize();
+  uint ymax = ydsize();
+
+  for (uint i = 0; i < xmax; ++i) {
+    for (uint j = 0; j < ymax; ++j) {
+      access<kPheromone>(i, j).calc();
+    } /* for(j..) */
+  }   /* for(i..) */
+
+  for (uint i = 0; i < xmax; ++i) {
+    for (uint j = 0; j < ymax; ++j) {
+      cell_state_update(i, j);
     } /* for(j..) */
   }   /* for(i..) */
 } /* update() */
 
 void occupancy_grid::reset(void) {
-  for (uint i = 0; i < xdsize(); ++i) {
-    for (uint j = 0; j < ydsize(); ++j) {
-      cell2D& cell = access<kCell>(i, j);
-      cell.reset();
+  uint xmax = xdsize();
+  uint ymax = ydsize();
+  for (uint i = 0; i < xmax; ++i) {
+    for (uint j = 0; j < ymax; ++j) {
+      access<kCell>(i, j).reset();
     } /* for(j..) */
   }   /* for(i..) */
 } /* Reset */
@@ -84,9 +93,10 @@ void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
   cell.loc(rcppsw::math::dcoord2(i, j));
 } /* cell_init() */
 
-void occupancy_grid::cell_update(uint i, uint j) {
+void occupancy_grid::cell_state_update(uint i, uint j) {
   rcppsw::swarm::pheromone_density& density = access<kPheromone>(i, j);
   cell2D& cell = access<kCell>(i, j);
+
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.last_result() <= 1.0,
               "Repeat pheromone deposit detected for cell@(%u, %u) (%f > "
@@ -97,15 +107,23 @@ void occupancy_grid::cell_update(uint i, uint j) {
               cell.fsm().current_state());
   }
 
-  if (density.calc() < kEPSILON) {
+  /*
+   * If the cell state is already unknown, don't resend the event. Doesn't
+   * matter for just a few robots, but it does when you have hundreds. We could
+   * also check if the cell state is known, but that is slower than checking if
+   * the density has already been reset.
+   */
+  if (density.last_result() < kEPSILON &&
+      density.last_result() > std::numeric_limits<double>::min()) {
     ER_TRACE("Relevance of cell(%u, %u) is within %f of 0 for %s",
              i,
              j,
              kEPSILON,
              m_robot_id.c_str());
     events::cell_unknown op(cell.loc().first, cell.loc().second);
-    cell.accept(op);
+    this->accept(op);
+    density.reset();
   }
-} /* cell_update() */
+} /* cell_state_update() */
 
 NS_END(ds, fordyca);
