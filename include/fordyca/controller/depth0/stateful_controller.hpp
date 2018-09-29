@@ -72,9 +72,9 @@ NS_START(depth0);
  * block) and then bring the block to the nest.
  */
 class stateful_controller : public stateless_controller,
-                                     public er::client<stateful_controller>,
-                                     public metrics::world_model_metrics,
-                                     public visitor::visitable_any<stateful_controller> {
+                            public er::client<stateful_controller>,
+                            public metrics::world_model_metrics,
+                            public visitor::visitable_any<stateful_controller> {
  public:
   stateful_controller(void);
   ~stateful_controller(void) override;
@@ -93,8 +93,9 @@ class stateful_controller : public stateless_controller,
   double known_percentage(void) const override;
   double unknown_percentage(void) const override;
 
-  /* block transportation */
+    /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+
 
   /**
    * @brief Get the current task the controller is executing. For this

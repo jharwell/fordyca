@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_GREEDY_PARTITIONING_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_GREEDY_PARTITIONING_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GREEDY_PARTITIONING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GREEDY_PARTITIONING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,6 +27,7 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +71,8 @@ NS_START(depth1);
  */
 class greedy_partitioning_controller : public depth0::stateful_controller,
                                        public er::client<greedy_partitioning_controller>,
-                                       public visitor::visitable_any<greedy_partitioning_controller> {
+                                       public visitor::visitable_any<greedy_partitioning_controller>,
+                                       public rcppsw::metrics::tasks::distribution_metrics {
  public:
   greedy_partitioning_controller(void);
   ~greedy_partitioning_controller(void) override;
@@ -78,6 +80,11 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
+
+  /* task ditribution metrics */
+  int current_task_depth(void) const override;
+  int current_task_id(void) const override;
+  int current_task_tab(void) const override;
 
   tasks::base_foraging_task* current_task(void) override;
   const tasks::base_foraging_task* current_task(void) const override;
@@ -130,4 +137,4 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
 
 NS_END(depth1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_GREEDY_PARTITIONING_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GREEDY_PARTITIONING_CONTROLLER_HPP_ */
