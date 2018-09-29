@@ -132,6 +132,7 @@
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
           task_generalist_tab_fname="task-generalist-tab.csv"
+          task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
           loop_robot_interaction_fname="loop-robot-interaction.csv"
@@ -231,7 +232,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="256" max_trials="1000">
+      <entity quantity="64" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

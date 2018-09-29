@@ -37,6 +37,7 @@
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -127,13 +128,26 @@ void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-/*
- * Work around argos' REGISTER_LOOP_FUNCTIONS() macro which does not support
- * namespaces, so if you have two classes of the same name in two different
- * namespaces, the macro will create the same class definition, giving a linker
- * error.
- */
-using namespace argos;
+/*******************************************************************************
+ * Task Distribution Metrics
+ ******************************************************************************/
+int greedy_partitioning_controller::current_task_depth(void) const {
+  return executive()->graph()->vertex_depth(dynamic_cast<const ta::polled_task*>(
+      current_task()));
+} /* current_task_depth() */
+
+int greedy_partitioning_controller::current_task_id(void) const {
+  return executive()->graph()->vertex_id(dynamic_cast<const ta::polled_task*>(
+      current_task()));
+} /* current_task_id() */
+
+__rcsw_pure int greedy_partitioning_controller::current_task_tab(void) const {
+  return dynamic_cast<const ta::bifurcating_tdgraph*>(executive()->graph())
+      ->active_tab_id();
+} /* current_task_tab() */
+
+
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
