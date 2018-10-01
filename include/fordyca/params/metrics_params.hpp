@@ -57,6 +57,7 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string task_execution_collector_fname{""};
   std::string task_execution_harvester_fname{""};
   std::string task_generalist_tab_fname{""};
+  std::string task_distribution_fname{""};
 
   std::string output_dir{""};
 

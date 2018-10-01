@@ -33,9 +33,12 @@
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/task_allocation/bifurcating_tab.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bifurcating_tab.hpp"
+#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
+#include "rcppsw/metrics/tasks/distribution_metrics_collector.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_collator.hpp"
@@ -81,6 +84,12 @@ metrics_aggregator::metrics_aggregator(const struct params::metrics_params* para
       metrics_path() + "/" + params->task_generalist_tab_fname,
       params->collect_interval);
 
+  register_collector<rcppsw::metrics::tasks::distribution_metrics_collector>(
+      "tasks::distribution",
+      metrics_path() + "/" + params->task_distribution_fname,
+      params->collect_interval,
+      1);
+
   register_collector<metrics::caches::utilization_metrics_collector>(
       "caches::utilization",
       metrics_path() + "/" + params->cache_utilization_fname,
@@ -119,9 +128,14 @@ void metrics_aggregator::collect_from_controller(
         dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
             dynamic_cast<const ta::polled_task*>(controller->current_task())
                 ->mechanism());
+    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::distribution_metrics*>(
+        controller);
+
+
     ER_ASSERT(block_acq_m,
               "Task does not provide FSM block acquisition metrics");
     ER_ASSERT(collision_m, "FSM does not provide collision metrics");
+    ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
 
     collect("fsm::collision", *collision_m);
     collect_if(
@@ -144,6 +158,7 @@ void metrics_aggregator::collect_from_controller(
                      metrics)
                      .acquisition_goal();
         });
+    collect("tasks::distribution", *dist_m);
   }
 } /* collect_from_controller() */
 
