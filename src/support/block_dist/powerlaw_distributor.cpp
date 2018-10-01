@@ -86,10 +86,6 @@ bool powerlaw_distributor::distribute_block(
 
 bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
                                              entity_list& entities) {
-  /*
-   * Try the distributors in a random order each time. If they all fail to
-   * distribute the block (for whatever reason) return the error.
-   */
   return std::all_of(blocks.begin(),
                      blocks.end(),
                      [&](std::shared_ptr<representation::base_block>& b) {

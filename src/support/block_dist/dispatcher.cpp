@@ -25,6 +25,7 @@
 #include <limits>
 
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
+#include "fordyca/support/block_dist/multi_cluster_distributor.hpp"
 #include "fordyca/support/block_dist/powerlaw_distributor.hpp"
 #include "fordyca/support/block_dist/random_distributor.hpp"
 
@@ -39,6 +40,8 @@ using ds::arena_grid;
  ******************************************************************************/
 constexpr char dispatcher::kDIST_RANDOM[];
 constexpr char dispatcher::kDIST_SINGLE_SRC[];
+constexpr char dispatcher::kDIST_DUAL_SRC[];
+constexpr char dispatcher::kDIST_QUAD_SRC[];
 constexpr char dispatcher::kDIST_POWERLAW[];
 
 /*******************************************************************************
@@ -63,9 +66,56 @@ bool dispatcher::initialize(void) {
                                                      mc_params.arena_resolution);
   } else if (kDIST_SINGLE_SRC == m_dist_type) {
     ds::arena_grid::view area = m_grid.layer<arena_grid::kCell>()->subgrid(
-        m_grid.xdsize() * 0.80, 2, m_grid.xdsize() * 0.90, m_grid.ydsize() - 2);
+        m_grid.xdsize() * 0.80,
+        2,
+        m_grid.xdsize() * 0.90,
+        m_grid.ydsize() - 2);
     m_dist = rcppsw::make_unique<cluster_distributor>(
-        area, mc_params.arena_resolution, std::numeric_limits<uint>::max());
+        area,
+        mc_params.arena_resolution,
+        std::numeric_limits<uint>::max());
+  } else if (kDIST_DUAL_SRC == m_dist_type) {
+    ds::arena_grid::view area_l = m_grid.layer<arena_grid::kCell>()->subgrid(
+        m_grid.xdsize() * 0.10,
+        2,
+        m_grid.xdsize() * 0.20,
+        m_grid.ydsize() - 2);
+    ds::arena_grid::view area_r = m_grid.layer<arena_grid::kCell>()->subgrid(
+        m_grid.xdsize() * 0.80,
+        2,
+        m_grid.xdsize() * 0.90,
+        m_grid.ydsize() - 2);
+    std::vector<ds::arena_grid::view> grids{area_l, area_r};
+    m_dist = rcppsw::make_unique<multi_cluster_distributor>(
+        grids,
+        mc_params.arena_resolution,
+        std::numeric_limits<uint>::max());
+  } else if (kDIST_QUAD_SRC == m_dist_type) {
+    ds::arena_grid::view area_l = m_grid.layer<arena_grid::kCell>()->subgrid(
+        m_grid.xdsize() * 0.10,
+        2,
+        m_grid.xdsize() * 0.20,
+        m_grid.ydsize() - 2);
+    ds::arena_grid::view area_r = m_grid.layer<arena_grid::kCell>()->subgrid(
+        m_grid.xdsize() * 0.80,
+        2,
+        m_grid.xdsize() * 0.90,
+        m_grid.ydsize() - 2);
+    ds::arena_grid::view area_b = m_grid.layer<arena_grid::kCell>()->subgrid(
+        2,
+        m_grid.ydsize() * 0.10,
+        m_grid.xdsize() - 2,
+        m_grid.ydsize() * 0.20);
+    ds::arena_grid::view area_u = m_grid.layer<arena_grid::kCell>()->subgrid(
+        2,
+        m_grid.ydsize() * 0.80,
+        m_grid.xdsize() - 2,
+        m_grid.ydsize() * 0.90);
+    std::vector<ds::arena_grid::view> grids{area_l, area_r, area_b, area_u};
+    m_dist = rcppsw::make_unique<multi_cluster_distributor>(
+        grids,
+        mc_params.arena_resolution,
+        std::numeric_limits<uint>::max());
   } else if (kDIST_POWERLAW == m_dist_type) {
     auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_params);
     if (!p->map_clusters(m_grid)) {
