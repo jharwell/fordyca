@@ -54,13 +54,18 @@ class base_distributor;
  * @class dispatcher
  * @ingroup block_dist support
  *
- * @brief Dispatches call to distribute blocks (or a single block a specific
- * distributer, as configured in simulation input file.
+ * @brief Dispatches call to distribute blocks (or a single block), as
+ * configured in simulation input file.
+ *
+ * - Single and dual source distribution assumes left-right rectangular arena.
+ * - Power law, quad source, random distribution assume square arena.
  */
 class dispatcher {
  public:
   static constexpr char kDIST_SINGLE_SRC[] = "single_source";
   static constexpr char kDIST_RANDOM[] = "random";
+  static constexpr char kDIST_DUAL_SRC[] = "dual_source";
+  static constexpr char kDIST_QUAD_SRC[] = "quad_source";
   static constexpr char kDIST_POWERLAW[] = "powerlaw";
 
   using entity_list = std::list<const representation::multicell_entity*>;

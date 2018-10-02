@@ -28,6 +28,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <list>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -98,12 +99,6 @@ class powerlaw_distributor : public base_distributor,
   using arena_view_vector = std::vector<std::pair<ds::arena_grid::view, uint>>;
 
   /**
-   * @brief How many times to attempt to distribute all blocks before giving up,
-   * causing an assertion failure on distribution.
-   */
-  static constexpr uint kMAX_DIST_TRIES = 100;
-
-  /**
    * @brief Assign cluster centers randomly, with the only restriction that the
    * edges of each cluster are within the boundaries of the arena.
    *
@@ -136,7 +131,7 @@ class powerlaw_distributor : public base_distributor,
   // clang-format off
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
-  std::map<uint, std::list<cluster_distributor>> m_dist_map;
+  std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
   // clang-format on

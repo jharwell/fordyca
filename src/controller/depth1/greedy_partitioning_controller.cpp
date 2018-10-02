@@ -111,7 +111,9 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
                                 perception())(&param_repo));
   ER_INFO("Initialization finished");
   executive()->task_abort_notify(std::bind(
-      &greedy_partitioning_controller::task_abort_cb, this, std::placeholders::_1));
+      &greedy_partitioning_controller::task_abort_cb,
+      this,
+      std::placeholders::_1));
   ndc_pop();
 } /* Init() */
 
