@@ -59,8 +59,8 @@ class base_block : public multicell_entity,
                    public prototype::clonable<base_block> {
  public:
   /**
-   * @brief Out of sight location base_blocks are moved to when a robot picks them
-   * up, for visualization/rending purposes.
+   * @brief Out of sight location base_blocks are moved to when a robot picks
+   * them up, for visualization/rending purposes.
    */
   static rcppsw::math::dcoord2 kOutOfSightDLoc;
   static argos::CVector2 kOutOfSightRLoc;

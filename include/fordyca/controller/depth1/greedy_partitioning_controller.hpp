@@ -113,11 +113,6 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   bool task_aborted(void) const { return m_task_aborted; }
   void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
 
-  /**
-   * @brief Callback for task abort. Task argument unused for now--only need to
-   * know that a task WAS aborted. \see \ref task_aborted().
-   */
-  void task_abort_cb(const ta::polled_task*);
 
  protected:
   const cache_selection_matrix*  cache_sel_matrix(void) const {
@@ -125,6 +120,12 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   }
 
  private:
+  /**
+   * @brief Callback for task abort. Task argument unused for now--only need to
+   * know that a task WAS aborted. \see \ref task_aborted().
+   */
+  void task_abort_cb(const ta::polled_task*);
+
   void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
                     params::depth1::task_repository* task_repo);
 

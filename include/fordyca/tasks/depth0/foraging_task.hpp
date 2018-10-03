@@ -60,7 +60,8 @@ class foraging_task
  public:
   static constexpr char kGeneralistName[] = "Generalist";
 
-  explicit foraging_task(const struct ta::task_params *params);
+  foraging_task(void) = default;
+  ~foraging_task(void) override = default;
 };
 
 NS_END(depth0, tasks, fordyca);

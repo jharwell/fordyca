@@ -71,15 +71,11 @@ class generalist : public ta::partitionable_polled_task,
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
-  double task_last_exec_time(void) const override { return last_exec_time(); }
-  double task_last_interface_time(void) const override { return last_interface_time(); }
   bool task_completed(void) const override { return task_finished(); }
-  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;
-  double calc_abort_prob(void) override;
   double calc_interface_time(double) override { return 0.0; }
 };
 

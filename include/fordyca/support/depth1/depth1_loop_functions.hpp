@@ -33,8 +33,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
+class tasking_oracle;
 
+NS_START(depth1);
 class metrics_aggregator;
 
 /*******************************************************************************
@@ -67,11 +69,28 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void cache_handling_init(const struct params::arena::arena_map_params *arenap);
 
+  /**
+   * @brief Configure a robot controller after initialization:
+   *
+   * - Displaying task text
+   * - Enabled tasking oracle (if applicable) via task executive hooks
+   * - Enabling tasking metric aggregation via task executive hooks
+   *
+   * @param c The controller to configure.
+   */
+  void controller_configure(controller::base_controller& c);
+
+  /**
+   * @brief Initialize all oracles.
+   */
+  void oracle_init(void);
+
   // clang-format off
   double                              mc_cache_respawn_scale_factor{0.0};
-  std::unique_ptr<interactor>         m_interactor{nullptr};
+  std::unique_ptr<interactor>         m_interactor{};
+  std::unique_ptr<tasking_oracle>     m_tasking_oracle{};
   metrics::caches::lifecycle_collator m_cache_collator{};
-  std::unique_ptr<metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<metrics_aggregator> m_metrics_agg{};
   // clang-format on
 };
 

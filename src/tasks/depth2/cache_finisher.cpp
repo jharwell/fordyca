@@ -61,11 +61,9 @@ double cache_finisher::calc_abort_prob(void) {
    */
   auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
   if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
-    return abort_prob().calc(executable_task::interface_time(),
-                             executable_task::interface_estimate());
+    return executable_task::update_abort_prob();
   }
-  return abort_prob().calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
+  return executable_task::update_abort_prob();
 } /* calc_abort_prob() */
 
 double cache_finisher::calc_interface_time(double start_time) {

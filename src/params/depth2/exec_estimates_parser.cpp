@@ -43,8 +43,8 @@ void exec_estimates_parser::parse(const ticpp::Element& node) {
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-    XML_PARSE_PARAM(enode, m_params, enabled);
-    if (m_params->enabled) {
+    XML_PARSE_PARAM(enode, m_params, seed_enabled);
+    if (m_params->seed_enabled) {
       XML_PARSE_PARAM(enode, m_params, generalist_range);
 
       XML_PARSE_PARAM(enode, m_params, harvester_range);
@@ -66,7 +66,8 @@ void exec_estimates_parser::show(std::ostream& stream) const {
     return;
   }
 
-  stream << build_header() << XML_PARAM_STR(m_params, enabled) << std::endl
+  stream << build_header()
+         << XML_PARAM_STR(m_params, seed_enabled) << std::endl
          << XML_PARAM_STR(m_params, generalist_range) << std::endl
          << XML_PARAM_STR(m_params, harvester_range) << std::endl
          << XML_PARAM_STR(m_params, collector_range) << std::endl

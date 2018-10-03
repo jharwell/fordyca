@@ -40,8 +40,7 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 generalist::generalist(const struct ta::partitionable_task_params* const params,
                        std::unique_ptr<ta::taskable> mechanism)
-    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)),
-      foraging_task(params) {}
+    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -52,17 +51,6 @@ __rcsw_pure double generalist::current_time(void) const {
       ->base_sensors()
       ->tick();
 } /* current_time() */
-
-double generalist::calc_abort_prob(void) {
-  /*
-   * Generalists always have a small chance of aborting their task when not at a
-   * task interface. Not strictly necessary at least for now, but it IS
-   * necessary for foragers and so it seems like a good idea to add this to all
-   * tasks.
-   */
-  return abort_prob().calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
-} /* calc_abort_prob() */
 
 /*******************************************************************************
  * Event Handling

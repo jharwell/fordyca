@@ -34,10 +34,4 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 constexpr char foraging_task::kGeneralistName[];
 
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-foraging_task::foraging_task(const struct ta::task_params* params)
-    : base_foraging_task(&params->abort) {}
-
 NS_END(depth0, tasks, fordyca);

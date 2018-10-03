@@ -65,8 +65,7 @@ double collector::calc_abort_prob(void) {
   if (transport_goal_type::kNest == fsm->block_transport_goal()) {
     return 0.0;
   }
-  return abort_prob().calc(executable_task::interface_time(),
-                           executable_task::interface_estimate());
+  return executable_task::update_abort_prob();
 } /* calc_abort_prob() */
 
 double collector::calc_interface_time(double start_time) {

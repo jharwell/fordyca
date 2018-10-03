@@ -1,7 +1,7 @@
 /**
- * @file exec_estimates_parser.cpp
+ * @file oracle_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,45 +21,32 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/exec_estimates_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/params/oracle_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char exec_estimates_parser::kXMLRoot[];
+constexpr char oracle_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exec_estimates_parser::parse(const ticpp::Element& node) {
-  if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-    m_params =
-        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(enode, m_params, enabled);
-    if (m_params->enabled) {
-      XML_PARSE_PARAM(enode, m_params, generalist_range);
-    }
-    m_parsed = true;
-  }
+void oracle_parser::parse(const ticpp::Element& node) {
+  ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_PARAM(enode, m_params, tasking_enabled);
 } /* parse() */
 
-void exec_estimates_parser::show(std::ostream& stream) const {
-  if (!m_parsed) {
-    stream << build_header() << "<< Not Parsed >>" << std::endl
-           << build_footer();
-    return;
-  }
-
-  stream << build_header() << XML_PARAM_STR(m_params, enabled) << std::endl
-         << XML_PARAM_STR(m_params, generalist_range) << std::endl
+void oracle_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_PARAM_STR(m_params, tasking_enabled) << std::endl
          << build_footer();
 } /* show() */
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);

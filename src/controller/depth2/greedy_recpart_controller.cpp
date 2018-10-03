@@ -86,7 +86,8 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<params::perception_params>(), GetId()));
 
   /* initialize tasking */
-  m_executive = tasking_initializer(block_sel_matrix(),
+  m_executive = tasking_initializer(false,
+                                    block_sel_matrix(),
                                     cache_sel_matrix(),
                                     saa_subsystem(),
                                     perception())(&param_repo);

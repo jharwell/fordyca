@@ -49,11 +49,12 @@ NS_START(controller, depth2);
  */
 class tasking_initializer : public depth1::tasking_initializer {
  public:
-  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
+  tasking_initializer(bool exec_ests_oracle,
+                      const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
-  ~tasking_initializer(void);
+  ~tasking_initializer(void) override;
 
   std::unique_ptr<ta::bifurcating_tdgraph_executive>
   operator()(params::depth2::controller_repository *const param_repo);
