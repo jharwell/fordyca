@@ -6,7 +6,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="8" />
+    <system threads="0" />
     <experiment length="1000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_partitioning_controller id="ffc"
+    <oracular_partitioning_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -67,7 +67,7 @@
               />
         </task_executive>
         <task_exec_estimates
-            enabled="true"
+            seed_enabled="true"
             generalist_range="2000:4000"
             collector_range="1000:2000"
             harvester_range="1000:2000"
@@ -104,7 +104,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_partitioning_controller>
+    </oracular_partitioning_controller>
 
   </controllers>
 
@@ -139,6 +139,9 @@
           collect_interval="1000"
           />
     </output>
+    <oracle
+        tasking_enabled="true"
+      />
     <arena_map>
       <grid resolution="0.2"
             size="12, 6, 2"/>

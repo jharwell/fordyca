@@ -28,7 +28,6 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "fordyca/params/depth0/exec_estimates_params.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 
@@ -63,8 +62,6 @@ stateful_tasking_initializer::~stateful_tasking_initializer(void) = default;
 void stateful_tasking_initializer::stateful_tasking_init(
     params::depth0::stateful_controller_repository* const stateful_repo) {
   auto* exec_params = stateful_repo->parse_results<ta::executive_params>();
-  auto* est_params =
-      stateful_repo->parse_results<params::depth0::exec_estimates_params>();
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
@@ -73,12 +70,6 @@ void stateful_tasking_initializer::stateful_tasking_init(
 
   auto generalist =
       new tasks::depth0::generalist(exec_params, std::move(generalist_fsm));
-
-  if (est_params->enabled) {
-    static_cast<ta::polled_task*>(generalist)
-        ->init_random(est_params->generalist_range.GetMin(),
-                      est_params->generalist_range.GetMax());
-  }
 
   m_graph = new ta::bifurcating_tdgraph();
 
@@ -90,7 +81,7 @@ std::unique_ptr<ta::bifurcating_tdgraph_executive> stateful_tasking_initializer:
 operator()(params::depth0::stateful_controller_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(m_graph);
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(false, m_graph);
 } /* initialize() */
 
 NS_END(depth0, controller, fordyca);

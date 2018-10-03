@@ -24,7 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/exec_estimates_params.hpp"
+#include <argos3/core/utility/math/range.h>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,16 +33,21 @@
 NS_START(fordyca, params, depth1);
 
 /*******************************************************************************
- * Structure Defexecions
+ * Structure Definitions
  ******************************************************************************/
 /**
  * @struct exec_estimates_params
  * @ingroup params depth1
  *
- * @brief Extends depth0 parameters for initializing execution time estimates of
- * tasks involved in depth1.
+ * @brief Parameters for execution time estimates of tasks involved in depth1.
  */
-struct exec_estimates_params : public depth0::exec_estimates_params {
+struct exec_estimates_params : public rcppsw::params::base_params {
+  /**
+   * @brief Should initial estimates of task execution times be used?
+   */
+  bool                seed_enabled{false};
+
+  argos::CRange<uint> generalist_range{};
   argos::CRange<uint> harvester_range{};
   argos::CRange<uint> collector_range{};
 };

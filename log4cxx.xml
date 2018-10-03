@@ -19,6 +19,9 @@
   <category name="fordyca.events" >
     <priority value ="all" />
   </category>
+    <category name="fordyca.support.tasking_oracle" >
+    <priority value ="debug" />
+  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>

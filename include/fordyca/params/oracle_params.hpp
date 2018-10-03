@@ -1,7 +1,7 @@
 /**
- * @file exec_estimates_params.hpp
+ * @file oracle_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,37 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/range.h>
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Defexecions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @struct exec_estimates_params
- * @ingroup params depth0
+ * @struct oracle_params
+ * @ingroup params
  *
- * @brief Parameters for initializing execution time estimates of tasks involved
- * in depth0 foraging to something within a certain range, which helps to speed
- * swarm convergence a fair bit.
+ * @brief Parameters for the various oracles that can be employed during
+ * simulation.
  */
-struct exec_estimates_params : public rcppsw::params::base_params {
-  bool enabled{false};
-
-  argos::CRange<uint> generalist_range{};
+struct oracle_params : public rcppsw::params::base_params {
+  /**
+   * @brief Should the all-knowing oracle be used when updating task time
+   * estimates? Only applicable to certain controllers.
+   */
+  bool tasking_enabled{false};
 };
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_ */

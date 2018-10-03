@@ -24,6 +24,8 @@
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
@@ -33,6 +35,9 @@
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
+#include "fordyca/support/tasking_oracle.hpp"
+#include "fordyca/params/oracle_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,8 +49,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 depth1_loop_functions::depth1_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.depth1"),
-      m_metrics_agg(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.depth1") {}
 
 depth1_loop_functions::~depth1_loop_functions(void) = default;
 
@@ -77,37 +81,34 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
                                       &arenap->blocks.manipulation_penalty,
                                       &arenap->static_cache.usage_penalty);
 
+  /* initialize oracles */
+  oracle_init();
+
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
         robot.GetControllableEntity().GetController());
-
-    /*
-     * If NULL, then visualization has been disabled.
-     */
-    auto* vparams = params().parse_results<struct params::visualization_params>();
-    if (nullptr != vparams) {
-      controller.display_task(vparams->robot_task);
-    }
-    controller.executive()->task_finish_notify(
-        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
-                  m_metrics_agg.get(),
-                  std::placeholders::_1));
-    controller.executive()->task_abort_notify(
-        std::bind(&metrics_aggregator::task_finish_or_abort_cb,
-                  m_metrics_agg.get(),
-                  std::placeholders::_1));
-    controller.executive()->task_alloc_notify(
-        std::bind(&metrics_aggregator::task_alloc_cb,
-                  m_metrics_agg.get(),
-                  std::placeholders::_1,
-                  std::placeholders::_2));
+    controller_configure(controller);
   } /* for(&entity..) */
   ndc_pop();
   ER_INFO("Initialization finished");
 }
+
+void depth1_loop_functions::oracle_init(void) {
+  auto* oraclep = params().parse_results<params::oracle_params>();
+  if (oraclep->tasking_enabled) {
+    ER_INFO("Creating oracle");
+    argos::CFootBotEntity& robot0 =
+        *argos::any_cast<argos::CFootBotEntity*>(GetSpace().GetEntitiesByType("foot-bot").begin()->second);
+    const auto& controller0 = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+        robot0.GetControllableEntity().GetController());
+    auto* bigraph = dynamic_cast<const ta::bifurcating_tdgraph*>(
+        controller0.executive()->graph());
+    m_tasking_oracle = rcppsw::make_unique<tasking_oracle>(bigraph);
+  }
+} /* oracle_init() */
 
 void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
@@ -131,6 +132,44 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   /* Now watch it react to the environment */
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
+
+void depth1_loop_functions::controller_configure(controller::base_controller& c) {
+  /*
+   * If NULL, then visualization has been disabled.
+   */
+  auto& greedy = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
+  auto* vparams = params().parse_results<struct params::visualization_params>();
+  if (nullptr != vparams) {
+    greedy.display_task(vparams->robot_task);
+  }
+
+  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto& oracular = dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
+  if (oraclep->tasking_enabled) {
+    oracular.executive()->task_finish_notify(
+        std::bind(&tasking_oracle::task_finish_cb,
+                  m_tasking_oracle.get(),
+                  std::placeholders::_1));
+    oracular.executive()->task_abort_notify(
+        std::bind(&tasking_oracle::task_abort_cb,
+                  m_tasking_oracle.get(),
+                  std::placeholders::_1));
+    oracular.tasking_oracle(m_tasking_oracle.get());
+  }
+  greedy.executive()->task_finish_notify(
+      std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                m_metrics_agg.get(),
+                std::placeholders::_1));
+  greedy.executive()->task_abort_notify(
+      std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+                m_metrics_agg.get(),
+                std::placeholders::_1));
+  greedy.executive()->task_alloc_notify(
+      std::bind(&metrics_aggregator::task_alloc_cb,
+                m_metrics_agg.get(),
+                std::placeholders::_1,
+                std::placeholders::_2));
+} /* controller_configure() */
 
 argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

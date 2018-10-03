@@ -51,11 +51,16 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
+    bool exec_ests_oracle,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : depth1::tasking_initializer(bsel_matrix, csel_matrix, saa, perception) {}
+    : depth1::tasking_initializer(exec_ests_oracle,
+                                  bsel_matrix,
+                                  csel_matrix,
+                                  saa,
+                                  perception) {}
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -101,7 +106,7 @@ void tasking_initializer::depth2_tasking_init(
   auto cache_collector =
       new tasks::depth1::collector(exec_params, std::move(cache_collector_fsm));
 
-  if (est_params->enabled) {
+  if (est_params->seed_enabled) {
     cache_starter->init_random(est_params->cache_starter_range.GetMin(),
                                est_params->cache_starter_range.GetMax());
     cache_finisher->init_random(est_params->cache_finisher_range.GetMin(),
@@ -133,7 +138,9 @@ std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator
 
   depth2_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(graph());
+  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
+      exec_ests_oracle(),
+      graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/exec_estimates_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,14 +37,13 @@ constexpr char exec_estimates_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void exec_estimates_parser::parse(const ticpp::Element& node) {
-  depth0::exec_estimates_parser::parse(node);
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    *std::static_pointer_cast<depth0::exec_estimates_params>(m_params) =
-        *depth0::exec_estimates_parser::parse_results();
-    if (m_params->enabled) {
+    XML_PARSE_PARAM(enode, m_params, seed_enabled);
+    if (m_params->seed_enabled) {
+      XML_PARSE_PARAM(enode, m_params, generalist_range);
       XML_PARSE_PARAM(enode, m_params, harvester_range);
       XML_PARSE_PARAM(enode, m_params, collector_range);
     }
@@ -59,8 +57,11 @@ void exec_estimates_parser::show(std::ostream& stream) const {
            << build_footer();
     return;
   }
-  depth0::exec_estimates_parser::show(stream);
-  stream << XML_PARAM_STR(m_params, harvester_range) << std::endl
+
+  stream << build_header()
+         << XML_PARAM_STR(m_params, seed_enabled) << std::endl
+         << XML_PARAM_STR(m_params, generalist_range) << std::endl
+         << XML_PARAM_STR(m_params, harvester_range) << std::endl
          << XML_PARAM_STR(m_params, collector_range) << std::endl
          << build_footer();
 } /* show() */

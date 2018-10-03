@@ -105,15 +105,16 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
   block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
       ogrid->nest, &ogrid->priorities));
   m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
-  executive(tasking_initializer(block_sel_matrix(),
+  executive(tasking_initializer(false,
+                                block_sel_matrix(),
                                 m_cache_sel_matrix.get(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
-  ER_INFO("Initialization finished");
   executive()->task_abort_notify(std::bind(
       &greedy_partitioning_controller::task_abort_cb,
       this,
       std::placeholders::_1));
+  ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
