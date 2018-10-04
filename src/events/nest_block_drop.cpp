@@ -25,6 +25,7 @@
 #include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
@@ -66,8 +67,7 @@ void nest_block_drop::visit(representation::base_block& block) {
   block.distribution_time(m_timestep);
 } /* visit() */
 
-void nest_block_drop::visit(
-    controller::depth0::stateless_controller& controller) {
+void nest_block_drop::visit(controller::depth0::stateless_controller& controller) {
   controller.ndc_push();
   controller.fsm()->accept(*this);
   controller.block(nullptr);
@@ -85,8 +85,7 @@ void nest_block_drop::visit(fsm::depth0::stateless_fsm& fsm) {
 /*******************************************************************************
  * Stateful Foraging
  ******************************************************************************/
-void nest_block_drop::visit(
-    controller::depth0::stateful_controller& controller) {
+void nest_block_drop::visit(controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   auto task = dynamic_cast<tasks::nest_interactor*>(controller.current_task());
   task->accept(*this);
@@ -104,7 +103,8 @@ void nest_block_drop::visit(fsm::depth0::stateful_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(controller::depth1::greedy_partitioning_controller& controller) {
+void nest_block_drop::visit(
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
   auto task = dynamic_cast<tasks::nest_interactor*>(controller.current_task());
@@ -119,8 +119,7 @@ void nest_block_drop::visit(controller::depth1::greedy_partitioning_controller& 
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())
-      ->accept(*this);
+  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth1::collector& task) {
@@ -131,6 +130,23 @@ void nest_block_drop::visit(tasks::depth1::collector& task) {
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void nest_block_drop::visit(
+    controller::depth2::greedy_recpart_controller& controller) {
+  controller.ndc_push();
+  controller.block(nullptr);
+  auto task = dynamic_cast<tasks::nest_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non nest-interactor task %s causing nest block drop",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
+  controller.free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+  controller.ndc_pop();
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -255,8 +256,18 @@ class arena_interactor : public er::client<arena_interactor<T>> {
   const ds::arena_map* map(void) const { return m_map; }
   const argos::CFloorEntity* floor(void) const { return m_floor; }
   argos::CFloorEntity* floor(void) { return m_floor; }
-  block_op_penalty_handler<T>& free_pickup_penalty_handler(void) { return m_free_pickup_handler; }
-  block_op_penalty_handler<T>& nest_drop_penalty_handler(void) { return m_nest_drop_handler; }
+  block_op_penalty_handler<T>& free_pickup_penalty_handler(void) {
+    return m_free_pickup_handler;
+  }
+  block_op_penalty_handler<T>& nest_drop_penalty_handler(void) {
+    return m_nest_drop_handler;
+  }
+  const block_op_penalty_handler<T>& free_pickup_penalty_handler(void) const {
+    return m_free_pickup_handler;
+  }
+  const block_op_penalty_handler<T>& nest_drop_penalty_handler(void) const {
+    return m_nest_drop_handler;
+  }
 
  private:
   // clang-format off

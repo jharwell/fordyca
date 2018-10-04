@@ -28,16 +28,19 @@
 #include "fordyca/support/depth0/stateful_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/arena_interactor.hpp"
-#include "fordyca/metrics/caches/lifecycle_collator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca);
+namespace params { namespace arena { struct cache_params; }}
+
+NS_START(support);
 class tasking_oracle;
 
 NS_START(depth1);
-class metrics_aggregator;
+class depth1_metrics_aggregator;
+class static_cache_manager;
 
 /*******************************************************************************
  * Classes
@@ -61,13 +64,22 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   void PreStep() override;
   void Reset(void) override;
 
+ protected:
+  const class tasking_oracle* tasking_oracle(void) const {
+    return m_tasking_oracle.get();
+  }
+  class tasking_oracle* tasking_oracle(void) {
+    return m_tasking_oracle.get();
+  }
+
  private:
   using interactor = arena_interactor<controller::depth1::greedy_partitioning_controller>;
 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void cache_handling_init(const struct params::arena::arena_map_params *arenap);
+  void cache_handling_init(
+      const struct params::arena::cache_params *cachep);
 
   /**
    * @brief Configure a robot controller after initialization:
@@ -86,11 +98,12 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   void oracle_init(void);
 
   // clang-format off
-  double                              mc_cache_respawn_scale_factor{0.0};
-  std::unique_ptr<interactor>         m_interactor{};
-  std::unique_ptr<tasking_oracle>     m_tasking_oracle{};
-  metrics::caches::lifecycle_collator m_cache_collator{};
-  std::unique_ptr<metrics_aggregator> m_metrics_agg{};
+  double                                     mc_cache_respawn_scale_factor{0.0};
+  argos::CVector2                            m_cache_loc{};
+  std::unique_ptr<interactor>                m_interactor{};
+  std::unique_ptr<class tasking_oracle>      m_tasking_oracle;
+  std::unique_ptr<depth1_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<static_cache_manager>      m_cache_manager;
   // clang-format on
 };
 

@@ -26,7 +26,6 @@
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
-#include "fordyca/params/oracle_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,17 +39,12 @@ namespace ct = rcppsw::control;
 loop_function_repository::loop_function_repository(void) {
   register_parser<output_parser, output_params>(
       output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<oracle_parser, oracle_params>(
-      oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<arena::arena_map_parser, arena::arena_map_params>(
       arena::arena_map_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ct::waveform_xml_parser>(
-      std::string("static_cache_penalty_") + ct::waveform_xml_parser::kXMLRoot,
-      ct::waveform_xml_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

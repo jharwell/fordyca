@@ -59,16 +59,14 @@ class saa_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_controller
-    : public argos::CCI_Controller,
-      public rcppsw::er::client<base_controller> {
+class base_controller : public argos::CCI_Controller,
+                        public rcppsw::er::client<base_controller> {
  public:
   base_controller(void);
   ~base_controller(void) override = default;
 
   base_controller(const base_controller& other) = delete;
-  base_controller& operator=(const base_controller& other) =
-      delete;
+  base_controller& operator=(const base_controller& other) = delete;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;

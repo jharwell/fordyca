@@ -27,6 +27,7 @@
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/tasks/free_block_interactor.hpp"
+#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +47,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * start a new cache. It is abortable, and has one task interface.
  */
 class cache_starter : public foraging_task,
-                      public free_block_interactor {
+                      public free_block_interactor,
+                      public dynamic_cache_interactor {
  public:
   cache_starter(const struct task_allocation::task_params* params,
                 std::unique_ptr<task_allocation::taskable> mechanism);
@@ -61,6 +63,7 @@ class cache_starter : public foraging_task,
   void accept(events::free_block_drop& visitor) override;
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::block_vanished& visitor) override;
+  void accept(events::cache_appeared& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);

@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/params/xml_param_parser.hpp"
 #include "fordyca/params/oracle_params.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +43,7 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters used for oracles at the start of simulation.
  */
-class oracle_parser: public rcppsw::params::xml_param_parser {
+class oracle_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit oracle_parser(uint level) : xml_param_parser(level) {}
 
@@ -57,12 +57,11 @@ class oracle_parser: public rcppsw::params::xml_param_parser {
   void show(std::ostream& stream) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<oracle_params> parse_results(void) const {
-    return m_params;
-  }
+  std::shared_ptr<oracle_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
     return m_params;
   }
 

@@ -32,9 +32,8 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-__rcsw_pure int robot_on_block(
-    const controller::base_controller& controller,
-    const ds::arena_map& map) {
+__rcsw_pure int robot_on_block(const controller::base_controller& controller,
+                               const ds::arena_map& map) {
   return map.robot_on_block(controller.robot_loc());
 } /* robot_on_block() */
 
@@ -55,9 +54,8 @@ int robot_id(const controller::base_controller& controller) {
   return std::atoi(controller.GetId().c_str() + 2);
 } /* robot_id() */
 
-__rcsw_pure int robot_on_cache(
-    const controller::base_controller& controller,
-    const ds::arena_map& map) {
+__rcsw_pure int robot_on_cache(const controller::base_controller& controller,
+                               const ds::arena_map& map) {
   return map.robot_on_cache(controller.robot_loc());
 } /* robot_on_cache() */
 

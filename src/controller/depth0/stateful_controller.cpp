@@ -82,7 +82,8 @@ __rcsw_pure tasks::base_foraging_task* stateful_controller::current_task(void) {
       m_executive.get()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* stateful_controller::current_task(void) const {
+__rcsw_pure const tasks::base_foraging_task* stateful_controller::current_task(
+    void) const {
   return const_cast<stateful_controller*>(this)->current_task();
 } /* current_task() */
 
@@ -95,8 +96,8 @@ void stateful_controller::los(
   stateful_sensors()->los(new_los);
 }
 
-__rcsw_pure const depth0::sensing_subsystem* stateful_controller::
-    stateful_sensors(void) const {
+__rcsw_pure const depth0::sensing_subsystem* stateful_controller::stateful_sensors(
+    void) const {
   return static_cast<const depth0::sensing_subsystem*>(
       saa_subsystem()->sensing().get());
 }
@@ -178,10 +179,7 @@ FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
                        acquisition_goal,
                        current_task());
 
-FSM_WRAPPER_DEFINE_PTR(bool,
-                       stateful_controller,
-                       goal_acquired,
-                       current_task());
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_controller, goal_acquired, current_task());
 
 /*******************************************************************************
  * World Model Metrics
@@ -198,7 +196,7 @@ double stateful_controller::unknown_percentage(void) const {
   return m_perception->unknown_percentage();
 } /* unknown_percentage() */
 
-using namespace argos;  // NOLINT
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"

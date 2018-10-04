@@ -1,7 +1,7 @@
 /**
  * @file arena_interactor.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -120,9 +120,14 @@ class arena_interactor : public depth0::arena_interactor<T>,
   using depth0::arena_interactor<T>::handle_free_block_pickup;
   using depth0::arena_interactor<T>::nest_drop_penalty_handler;
   using depth0::arena_interactor<T>::free_pickup_penalty_handler;
-
- private:
   using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
+
+  cache_op_penalty_handler<T>& cache_penalty_handler(void) {
+    return m_cache_penalty_handler;
+  }
+  const cache_op_penalty_handler<T>& cache_penalty_handler(void) const {
+    return m_cache_penalty_handler;
+  }
 
   /**
    * @brief Called after a robot has satisfied the cache usage penalty, and

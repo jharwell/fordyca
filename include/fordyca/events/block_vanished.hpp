@@ -103,10 +103,8 @@ class block_vanished
   block_vanished& operator=(const block_vanished& op) = delete;
 
   /* depth0 foraging */
-  void visit(
-      controller::depth0::stateless_controller& controller) override;
-  void visit(
-      controller::depth0::stateful_controller& controller) override;
+  void visit(controller::depth0::stateless_controller& controller) override;
+  void visit(controller::depth0::stateful_controller& controller) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(fsm::depth0::stateless_fsm& fsm) override;
   void visit(fsm::depth0::stateful_fsm& fsm) override;
@@ -114,7 +112,8 @@ class block_vanished
   /* depth1 foraging */
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
-  void visit(controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
 
   /* depth2 foraging */
   void visit(controller::depth2::greedy_recpart_controller& controller) override;

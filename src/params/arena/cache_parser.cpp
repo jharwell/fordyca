@@ -1,5 +1,5 @@
 /**
- * @file static_cache_parser.cpp
+ * @file cache_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,32 +21,31 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/static_cache_parser.hpp"
+#include "fordyca/params/arena/cache_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, arena);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char static_cache_parser::kXMLRoot[];
+constexpr char cache_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void static_cache_parser::parse(const ticpp::Element& node) {
+void cache_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(cnode, m_params, enable);
-    XML_PARSE_PARAM(cnode, m_params, size);
-    XML_PARSE_PARAM(cnode, m_params, dimension);
-    XML_PARSE_PARAM(cnode, m_params, min_dist);
-    XML_PARSE_PARAM(cnode, m_params, respawn_scale_factor);
+    XML_PARSE_ATTR(cnode, m_params, static_size);
+    XML_PARSE_ATTR(cnode, m_params, dimension);
+    XML_PARSE_ATTR(cnode, m_params, min_dist);
+    XML_PARSE_ATTR(cnode, m_params, respawn_scale_factor);
     m_waveform.parse(
         get_node(const_cast<ticpp::Element&>(cnode), "usage_penalty"));
     m_params->usage_penalty = *m_waveform.parse_results();
@@ -55,7 +54,7 @@ void static_cache_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-void static_cache_parser::show(std::ostream& stream) const {
+void cache_parser::show(std::ostream& stream) const {
   if (!m_parsed) {
     stream << build_header() << "<< Not Parsed >>" << std::endl
            << build_footer();
@@ -63,18 +62,17 @@ void static_cache_parser::show(std::ostream& stream) const {
   }
 
   stream << build_header() << std::endl
-         << XML_PARAM_STR(m_params, enable) << std::endl
-         << XML_PARAM_STR(m_params, size) << std::endl
-         << XML_PARAM_STR(m_params, dimension) << std::endl
-         << XML_PARAM_STR(m_params, min_dist) << std::endl
-         << XML_PARAM_STR(m_params, respawn_scale_factor) << std::endl
+         << XML_ATTR_STR(m_params, static_size) << std::endl
+         << XML_ATTR_STR(m_params, dimension) << std::endl
+         << XML_ATTR_STR(m_params, min_dist) << std::endl
+         << XML_ATTR_STR(m_params, respawn_scale_factor) << std::endl
          << m_waveform << build_footer();
 } /* show() */
 
-__rcsw_pure bool static_cache_parser::validate(void) const {
+__rcsw_pure bool cache_parser::validate(void) const {
   if (m_parsed) {
     CHECK(m_params->dimension > 0.0);
-    CHECK(m_params->size > 0.0);
+    CHECK(m_params->static_size > 0);
     CHECK(m_params->respawn_scale_factor > 0.0);
     CHECK(true == m_waveform.validate());
     return true;
@@ -84,4 +82,4 @@ error:
   return false;
 } /* validate() */
 
-NS_END(depth1, params, fordyca);
+NS_END(arena, params, fordyca);

@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <map>
 #include <boost/variant.hpp>
+#include <map>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
@@ -39,7 +39,7 @@ namespace rcppsw { namespace task_allocation {
 class bifurcating_tdgraph;
 class bifurcating_tdgraph_executive;
 class polled_task;
-}}
+}} // namespace rcppsw::task_allocation
 
 NS_START(fordyca, support);
 namespace ta = rcppsw::task_allocation;
@@ -91,6 +91,5 @@ class tasking_oracle : public er::client<tasking_oracle> {
 };
 
 NS_END(support, fordyca);
-
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_TASKING_ORACLE_HPP_ */

@@ -42,9 +42,9 @@ void powerlaw_dist_parser::parse(const ticpp::Element& node) {
     ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(bnode, m_params, pwr_min);
-    XML_PARSE_PARAM(bnode, m_params, pwr_max);
-    XML_PARSE_PARAM(bnode, m_params, n_clusters);
+    XML_PARSE_ATTR(bnode, m_params, pwr_min);
+    XML_PARSE_ATTR(bnode, m_params, pwr_max);
+    XML_PARSE_ATTR(bnode, m_params, n_clusters);
     m_parsed = true;
   }
 } /* parse() */
@@ -55,9 +55,9 @@ void powerlaw_dist_parser::show(std::ostream& stream) const {
     stream << "<<  Not Parsed >>" << std::endl << build_footer();
     return;
   }
-  stream << XML_PARAM_STR(m_params, pwr_min) << std::endl
-         << XML_PARAM_STR(m_params, pwr_max) << std::endl
-         << XML_PARAM_STR(m_params, n_clusters) << std::endl
+  stream << XML_ATTR_STR(m_params, pwr_min) << std::endl
+         << XML_ATTR_STR(m_params, pwr_max) << std::endl
+         << XML_ATTR_STR(m_params, n_clusters) << std::endl
          << build_footer();
 } /* show() */
 

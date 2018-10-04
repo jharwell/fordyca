@@ -114,11 +114,8 @@ class block_op_penalty_handler
             penalty,
             src);
 
-
-    penalty_list().push_back(temporal_penalty<T>(&controller,
-                                                 id,
-                                                 penalty,
-                                                 timestep));
+    penalty_list().push_back(
+        temporal_penalty<T>(&controller, id, penalty, timestep));
     return true;
   }
 

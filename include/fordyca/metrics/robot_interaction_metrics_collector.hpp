@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -56,8 +56,7 @@ class robot_interaction_metrics_collector
    * @param ofname The output file name.
    * @param interval Collection interval.
    */
-  robot_interaction_metrics_collector(const std::string& ofname,
-                                      uint interval);
+  robot_interaction_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;

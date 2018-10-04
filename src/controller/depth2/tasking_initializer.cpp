@@ -139,8 +139,7 @@ std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator
   depth2_tasking_init(param_repo);
 
   return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
-      exec_ests_oracle(),
-      graph());
+      exec_ests_oracle(), graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

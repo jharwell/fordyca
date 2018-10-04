@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
-#include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/params/depth1/controller_repository.hpp"
+#include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/support/tasking_oracle.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,42 +55,43 @@ void oracular_partitioning_controller::Init(ticpp::Element& node) {
                                 cache_sel_matrix(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
-  executive()->task_abort_notify(std::bind(
-      &oracular_partitioning_controller::task_abort_cb,
-      this,
-      std::placeholders::_1));
-  executive()->task_finish_notify(std::bind(
-      &oracular_partitioning_controller::task_finish_cb,
-      this,
-      std::placeholders::_1));
+  executive()->task_abort_notify(
+      std::bind(&oracular_partitioning_controller::task_abort_cb,
+                this,
+                std::placeholders::_1));
+  executive()->task_finish_notify(
+      std::bind(&oracular_partitioning_controller::task_finish_cb,
+                this,
+                std::placeholders::_1));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
-void oracular_partitioning_controller::task_abort_cb(ta::polled_task*task) {
+void oracular_partitioning_controller::task_abort_cb(ta::polled_task* task) {
   double oracle_est = boost::get<ta::time_estimate>(
-      mc_tasking_oracle->ask("exec_est." + task->name())).last_result();
+                          mc_tasking_oracle->ask("exec_est." + task->name()))
+                          .last_result();
   double old = task->task_exec_estimate().last_result();
   task->update_exec_estimate(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
-           task->name().c_str(),
-           oracle_est,
-           old,
-           task->task_exec_estimate().last_result());
+          task->name().c_str(),
+          oracle_est,
+          old,
+          task->task_exec_estimate().last_result());
 } /* task_abort_cb() */
 
 void oracular_partitioning_controller::task_finish_cb(ta::polled_task* task) {
   double oracle_est = boost::get<ta::time_estimate>(
-      mc_tasking_oracle->ask("exec_est." + task->name())).last_result();
+                          mc_tasking_oracle->ask("exec_est." + task->name()))
+                          .last_result();
   double old = task->task_exec_estimate().last_result();
   task->update_exec_estimate(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on finish: %f -> %f",
-           task->name().c_str(),
-           oracle_est,
-           old,
-           task->task_exec_estimate().last_result());
+          task->name().c_str(),
+          oracle_est,
+          old,
+          task->task_exec_estimate().last_result());
 } /* task_finish_cb() */
-
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

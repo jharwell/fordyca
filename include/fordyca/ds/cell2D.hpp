@@ -28,8 +28,8 @@
 
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/dcoord.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces

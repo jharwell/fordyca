@@ -35,8 +35,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-stateless_fsm::stateless_fsm(
-    controller::saa_subsystem* const saa)
+stateless_fsm::stateless_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.stateless"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -116,9 +115,7 @@ HFSM_STATE_DEFINE(stateless_fsm,
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(stateless_fsm,
-                  wait_for_block_drop,
-                  state_machine::event_data) {
+HFSM_STATE_DEFINE(stateless_fsm, wait_for_block_drop, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");

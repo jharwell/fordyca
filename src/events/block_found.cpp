@@ -65,8 +65,8 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 
 void block_found::visit(ds::perceived_arena_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  swarm::pheromone_density& density = map.access<occupancy_grid::kPheromone>(x(),
-                                                                             y());
+  swarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromone>(x(), y());
 
   if (!cell.state_is_known()) {
     map.known_cells_inc();

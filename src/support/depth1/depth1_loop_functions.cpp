@@ -23,21 +23,22 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
+#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
-#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
+#include "fordyca/params/oracle_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/support/depth1/metrics_aggregator.hpp"
+#include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+#include "fordyca/support/depth1/static_cache_manager.hpp"
+#include "fordyca/support/tasking_oracle.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "fordyca/support/tasking_oracle.hpp"
-#include "fordyca/params/oracle_params.hpp"
+#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +50,10 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 depth1_loop_functions::depth1_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.depth1") {}
+    : ER_CLIENT_INIT("fordyca.loop.depth1"),
+      m_tasking_oracle(nullptr),
+      m_metrics_agg(nullptr),
+      m_cache_manager(nullptr) {}
 
 depth1_loop_functions::~depth1_loop_functions(void) = default;
 
@@ -67,11 +71,11 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   params::output_params output =
       *params().parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg =
-      rcppsw::make_unique<metrics_aggregator>(&output.metrics, output_root());
+  m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
+                                                                 output_root());
 
   /* initialize cache handling and create initial cache */
-  cache_handling_init(arenap);
+  cache_handling_init(&arenap->cache);
 
   /* intitialize robot interactions with environment */
   m_interactor =
@@ -79,7 +83,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
-                                      &arenap->static_cache.usage_penalty);
+                                      &arenap->cache.usage_penalty);
 
   /* initialize oracles */
   oracle_init();
@@ -88,8 +92,9 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
-        robot.GetControllableEntity().GetController());
+    auto& controller =
+        dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+            robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
   ndc_pop();
@@ -100,19 +105,21 @@ void depth1_loop_functions::oracle_init(void) {
   auto* oraclep = params().parse_results<params::oracle_params>();
   if (oraclep->tasking_enabled) {
     ER_INFO("Creating oracle");
-    argos::CFootBotEntity& robot0 =
-        *argos::any_cast<argos::CFootBotEntity*>(GetSpace().GetEntitiesByType("foot-bot").begin()->second);
-    const auto& controller0 = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
-        robot0.GetControllableEntity().GetController());
+    argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
+        GetSpace().GetEntitiesByType("foot-bot").begin()->second);
+    const auto& controller0 =
+        dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+            robot0.GetControllableEntity().GetController());
     auto* bigraph = dynamic_cast<const ta::bifurcating_tdgraph*>(
         controller0.executive()->graph());
-    m_tasking_oracle = rcppsw::make_unique<tasking_oracle>(bigraph);
+    m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
   }
 } /* oracle_init() */
 
 void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
-      robot.GetControllableEntity().GetController());
+  auto& controller =
+      dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+          robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
@@ -137,14 +144,16 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto& greedy = dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
+  auto& greedy =
+      dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
   auto* vparams = params().parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
   }
 
   auto* oraclep = params().parse_results<params::oracle_params>();
-  auto& oracular = dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
+  auto& oracular =
+      dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
   if (oraclep->tasking_enabled) {
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
@@ -157,15 +166,15 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
     oracular.tasking_oracle(m_tasking_oracle.get());
   }
   greedy.executive()->task_finish_notify(
-      std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+      std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1));
   greedy.executive()->task_abort_notify(
-      std::bind(&metrics_aggregator::task_finish_or_abort_cb,
+      std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1));
   greedy.executive()->task_alloc_notify(
-      std::bind(&metrics_aggregator::task_alloc_cb,
+      std::bind(&depth1_metrics_aggregator::task_alloc_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1,
                 std::placeholders::_2));
@@ -214,8 +223,8 @@ void depth1_loop_functions::PreStep() {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
-  m_metrics_agg->collect_from_cache_collator(&m_cache_collator);
-  m_cache_collator.reset_metrics();
+  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
+  m_cache_manager->reset_metrics();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
@@ -230,7 +239,9 @@ void depth1_loop_functions::PreStep() {
 
 void depth1_loop_functions::Reset() {
   m_metrics_agg->reset_all();
-  arena_map()->static_cache_create();
+  /* return value ignored (for now...) */
+  auto pair = m_cache_manager->create(arena_map()->blocks());
+  arena_map()->caches_add(pair.second);
 }
 
 void depth1_loop_functions::pre_step_final(void) {
@@ -238,11 +249,11 @@ void depth1_loop_functions::pre_step_final(void) {
    * The cache is recreated with a probability that depends on the relative
    * ratio between the # foragers and the # collectors. If there are more
    * foragers than collectors, then the cache will be recreated very quickly. If
-   * there are more collectors than foragers, then it will probably not be
+   * there are more collectors than foragpers, then it will probably not be
    * recreated immediately. And if there are no foragers, there is no chance
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
-  if (arena_map()->has_static_cache() && arena_map()->caches().empty()) {
+  if (arena_map()->caches().empty()) {
     auto& collector =
         static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
             *(*m_metrics_agg)["tasks::generalist_tab"]);
@@ -251,14 +262,17 @@ void depth1_loop_functions::pre_step_final(void) {
     math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
     if (p.calc(n_harvesters, n_collectors) >=
         static_cast<double>(std::rand()) / RAND_MAX) {
-      if (arena_map()->static_cache_create()) {
+      auto pair = m_cache_manager->create(arena_map()->blocks());
+
+      if (pair.first) {
+        arena_map()->caches_add(pair.second);
         __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
             arena_map()->caches()[0]->discrete_loc());
         ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
                   "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
                   arena_map()->caches()[0]->n_blocks(),
                   cell.block_count());
-        m_cache_collator.cache_created();
+        m_cache_manager->cache_created();
         floor()->SetChanged();
       } else {
         ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
@@ -266,7 +280,7 @@ void depth1_loop_functions::pre_step_final(void) {
     }
   }
   if (arena_map()->caches_removed() > 0) {
-    m_cache_collator.cache_depleted();
+    m_cache_manager->cache_depleted();
     floor()->SetChanged();
     arena_map()->caches_removed_reset();
   }
@@ -278,16 +292,22 @@ void depth1_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void depth1_loop_functions::cache_handling_init(
-    const struct params::arena::arena_map_params* arenap) {
+    const struct params::arena::cache_params* cachep) {
   /*
    * Regardless of how many foragers/etc there are, always create an
    * initial cache.
    */
-  if (arenap->static_cache.enable) {
-    arena_map()->static_cache_create();
-  }
+  m_cache_loc = argos::CVector2(arena_map()->xrsize() +
+                                    arena_map()->nest().real_loc().GetX() / 2.0,
+                                arena_map()->nest().real_loc().GetY());
 
-  mc_cache_respawn_scale_factor = arenap->static_cache.respawn_scale_factor;
+  m_cache_manager = rcppsw::make_unique<static_cache_manager>(cachep,
+                                                              &arena_map()->decoratee(),
+                                                              m_cache_loc);
+
+  /* return value ignored at this level (for now...) */
+  auto pair = m_cache_manager->create(arena_map()->blocks());
+  arena_map()->caches_add(pair.second);
 } /* cache_handling_init() */
 
 using namespace argos; // NOLINT

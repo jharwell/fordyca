@@ -49,9 +49,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * @brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
-class base_foraging_task
-    : public fsm::block_transporter,
-      public metrics::fsm::goal_acquisition_metrics {
+class base_foraging_task : public fsm::block_transporter,
+                           public metrics::fsm::goal_acquisition_metrics {
  public:
   base_foraging_task(void) = default;
   ~base_foraging_task(void) override = default;

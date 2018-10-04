@@ -47,6 +47,8 @@ using ds::occupancy_grid;
 greedy_recpart_controller::greedy_recpart_controller(void)
     : ER_CLIENT_INIT(GetId()), m_executive() {}
 
+greedy_recpart_controller::~greedy_recpart_controller(void) = default;
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
@@ -96,7 +98,8 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
-__rcsw_pure tasks::base_foraging_task* greedy_recpart_controller::current_task(void) {
+__rcsw_pure tasks::base_foraging_task* greedy_recpart_controller::current_task(
+    void) {
   return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 

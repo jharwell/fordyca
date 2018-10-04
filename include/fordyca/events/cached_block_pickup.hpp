@@ -101,7 +101,8 @@ class cached_block_pickup
   void visit(representation::arena_cache& cache) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
-  void visit(controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(tasks::depth1::collector& task) override;
 
   /* depth2 foraging */

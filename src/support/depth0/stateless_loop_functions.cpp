@@ -45,8 +45,7 @@ stateless_loop_functions::stateless_loop_functions(void)
       m_arena_map(nullptr),
       m_interactor(nullptr) {}
 
-stateless_loop_functions::~stateless_loop_functions(void) =
-    default;
+stateless_loop_functions::~stateless_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -58,7 +57,8 @@ void stateless_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize output and metrics collection */
   auto* arena = params().parse_results<params::arena::arena_map_params>();
-  params::output_params output = *params().parse_results<params::output_params>();
+  params::output_params output =
+      *params().parse_results<params::output_params>();
   output.metrics.arena_grid = arena->grid;
 
   m_metrics_agg =
@@ -85,7 +85,8 @@ void stateless_loop_functions::Init(ticpp::Element& node) {
     /*
      * If NULL, then visualization has been disabled.
      */
-    auto* vparams = params().parse_results<struct params::visualization_params>();
+    auto* vparams =
+        params().parse_results<struct params::visualization_params>();
     if (nullptr != vparams) {
       controller.display_id(vparams->robot_id);
     }
@@ -99,9 +100,7 @@ void stateless_loop_functions::Reset() {
   m_arena_map->distribute_all_blocks();
 }
 
-void stateless_loop_functions::Destroy() {
-  m_metrics_agg->finalize_all();
-}
+void stateless_loop_functions::Destroy() { m_metrics_agg->finalize_all(); }
 
 __rcsw_pure argos::CColor stateless_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -127,11 +126,9 @@ __rcsw_pure argos::CColor stateless_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void stateless_loop_functions::pre_step_iter(
-    argos::CFootBotEntity& robot) {
-  auto& controller =
-      static_cast<controller::depth0::stateless_controller&>(
-          robot.GetControllableEntity().GetController());
+void stateless_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+  auto& controller = static_cast<controller::depth0::stateless_controller&>(
+      robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);

@@ -34,7 +34,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_block; }
+namespace representation {
+class base_block;
+}
 NS_START(support);
 namespace factory = rcppsw::patterns::factory;
 

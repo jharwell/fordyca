@@ -1,7 +1,7 @@
 /**
  * @file dynamic_cache_creator.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/cache_creator.hpp"
+#include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,24 +35,49 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dynamic_cache_creator : public depth1::cache_creator,
+class dynamic_cache_creator : public base_cache_creator,
                               public er::client<dynamic_cache_creator> {
  public:
-  dynamic_cache_creator(ds::arena_grid& grid,
-                        double cache_size, double resolution, double min_dist);
+  dynamic_cache_creator(ds::arena_grid* grid,
+                        double cache_dim,
+                        double min_dist);
 
   /**
-   * @brief Scan the entire list of blocks currently in the arena, and create
-   * caches from all blocks that are close enough together.
-   *
-   * @return The list of current caches.
+   * @brief Create new caches in the arena from blocks that are close enough
+   * together.
    */
-  cache_vector create_all(block_vector& blocks) override;
+  cache_vector create_all(const cache_vector& existing_caches,
+                          block_vector& candidate_blocks) override;
 
  private:
-  argos::CVector2 calc_center(const block_list& blocks);
+  static constexpr double kOVERLAP_SEARCH_DELTA = 0.5;
+  static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
 
+  /**
+   * @brief Calculate the center of the new cache that will be constructed from
+   * the specified blocks.
+   *
+   * Ideally that will be just the average of the x and y coordinates of all the
+   * constituent blocks. However, it is possible that placing a cache at that
+   * location will cause it to overlap with other caches, and so corrections may
+   * be necessary.
+   *
+   * @param blocks The list of blocks to create a new cache from.
+   * @param existing_caches Vector of existing caches in the arena.
+   *
+   * @return Coordinates of the new cache.
+   */
+  argos::CVector2 calc_center(const block_list& blocks,
+                              const cache_vector& existing_caches) const;
+
+  /**
+   * @brief Basic sanity checks on newly created caches.
+   */
+  bool creation_sanity_checks(const cache_vector& new_caches) const;
+
+  // clang-format off
   double m_min_dist;
+  // clang-format on
 };
 
 NS_END(depth2, support, fordyca);

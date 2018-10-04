@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/er/client.hpp"
-#include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/metrics/robot_interaction_metrics.hpp"
+#include "fordyca/params/loop_function_repository.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +42,6 @@ namespace params {
 struct output_params;
 }
 NS_START(support);
-
 
 /*******************************************************************************
  * Classes
@@ -60,13 +59,12 @@ NS_START(support);
  * the \ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
-                                     public metrics::robot_interaction_metrics,
-                                     public rcppsw::er::client<base_loop_functions> {
+                            public metrics::robot_interaction_metrics,
+                            public rcppsw::er::client<base_loop_functions> {
  public:
   base_loop_functions(void);
   base_loop_functions(const base_loop_functions& s) = delete;
-  base_loop_functions& operator=(
-      const base_loop_functions& s) = delete;
+  base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
   /* CLoopFunctions overrides */
   void Init(ticpp::Element&) override;
@@ -83,7 +81,9 @@ class base_loop_functions : public argos::CLoopFunctions,
  protected:
   argos::CFloorEntity* floor(void) const { return m_floor; }
   const std::string& output_root(void) const { return m_output_root; }
-  const params::loop_function_repository& params(void) const { return m_params; }
+  const params::loop_function_repository& params(void) const {
+    return m_params;
+  }
   params::loop_function_repository& params(void) { return m_params; }
 
  private:
