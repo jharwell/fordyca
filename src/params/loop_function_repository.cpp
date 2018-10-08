@@ -28,6 +28,7 @@
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
+#include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/battery_parser.hpp"
 
 /*******************************************************************************
