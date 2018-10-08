@@ -27,6 +27,7 @@
 #include "fordyca/params/visualization_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 #include "fordyca/params/oracle_parser.hpp"
+#include "fordyca/params/battery_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,6 +48,9 @@ loop_function_repository::loop_function_repository(void) {
       rcppsw::params::xml_param_parser::kHeader1);
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<battery_parser, battery_params>(
+      battery_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
   register_parser<ct::waveform_xml_parser>(
       std::string("static_cache_penalty_") + ct::waveform_xml_parser::kXMLRoot,

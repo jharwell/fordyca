@@ -113,6 +113,10 @@
   <!-- ****************** -->
   <loop_functions library="libfordyca"
                   label="depth1_loop_functions">
+    <battery
+      power_station_amount="0"
+      power_station_size="1"
+      power_station_distrubtion="normal"/>
     <output>
       <sim output_root="output"
            output_dir="__current_date__"
