@@ -111,12 +111,13 @@ class nest_block_drop
   void visit(tasks::depth0::generalist& task) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller&) override {}
+  void visit(controller::depth2::greedy_recpart_controller&) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

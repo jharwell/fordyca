@@ -34,7 +34,6 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
@@ -47,8 +46,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 stateful_loop_functions::stateful_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.stateful"),
-      m_metrics_agg(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.stateful"), m_metrics_agg(nullptr) {}
 
 stateful_loop_functions::~stateful_loop_functions(void) = default;
 
@@ -81,14 +79,14 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller =
-        dynamic_cast<controller::depth0::stateful_controller&>(
-            robot.GetControllableEntity().GetController());
+    auto& controller = dynamic_cast<controller::depth0::stateful_controller&>(
+        robot.GetControllableEntity().GetController());
 
     /*
      * If NULL, then visualization has been disabled.
      */
-    auto* vparams = params().parse_results<struct params::visualization_params>();
+    auto* vparams =
+        params().parse_results<struct params::visualization_params>();
     if (nullptr != vparams) {
       controller.display_los(vparams->robot_los);
     }
@@ -97,11 +95,9 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-void stateful_loop_functions::pre_step_iter(
-    argos::CFootBotEntity& robot) {
-  auto& controller =
-      static_cast<controller::depth0::stateful_controller&>(
-          robot.GetControllableEntity().GetController());
+void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+  auto& controller = static_cast<controller::depth0::stateful_controller&>(
+      robot.GetControllableEntity().GetController());
 
   /* collect metrics from robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
@@ -109,8 +105,8 @@ void stateful_loop_functions::pre_step_iter(
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<decltype(controller)>(robot);
-  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  loop_utils::set_robot_pos<decltype(controller)>(robot);
+  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
@@ -177,7 +173,6 @@ using namespace argos; // NOLINT
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_LOOP_FUNCTIONS(stateful_loop_functions,
-                        "stateful_loop_functions");
+REGISTER_LOOP_FUNCTIONS(stateful_loop_functions, "stateful_loop_functions");
 #pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

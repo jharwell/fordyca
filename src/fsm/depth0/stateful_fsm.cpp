@@ -101,9 +101,7 @@ HFSM_STATE_DEFINE_ND(stateful_fsm, acquire_block) {
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(stateful_fsm,
-                  wait_for_pickup,
-                  state_machine::event_data) {
+HFSM_STATE_DEFINE(stateful_fsm, wait_for_pickup, state_machine::event_data) {
   /**
    * It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
@@ -123,9 +121,7 @@ HFSM_STATE_DEFINE(stateful_fsm,
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(stateful_fsm,
-                  wait_for_drop,
-                  state_machine::event_data) {
+HFSM_STATE_DEFINE(stateful_fsm, wait_for_drop, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_LEAVING_NEST);
@@ -169,15 +165,9 @@ __rcsw_pure uint stateful_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool,
-                   stateful_fsm,
-                   is_exploring_for_goal,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINE(bool, stateful_fsm, is_exploring_for_goal, m_block_fsm);
 
-FSM_WRAPPER_DEFINE(bool,
-                   stateful_fsm,
-                   is_vectoring_to_goal,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINE(bool, stateful_fsm, is_vectoring_to_goal, m_block_fsm);
 
 acquisition_goal_type stateful_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

@@ -27,7 +27,7 @@
 #include <string>
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/arena/blocks_parser.hpp"
-#include "fordyca/params/depth1/static_cache_parser.hpp"
+#include "fordyca/params/arena/cache_parser.hpp"
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/arena/nest_parser.hpp"
 
@@ -83,7 +83,7 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<arena_map_params> m_params{nullptr};
   grid_parser                       m_grid;
   blocks_parser                     m_blocks;
-  depth1::static_cache_parser       m_cache;
+  cache_parser                      m_cache;
   nest_parser                       m_nest;
   // clang-format on
 };

@@ -1,5 +1,5 @@
 /**
- * @file lifecycle_collator.hpp
+ * @file dynamic_cache_interactor.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,47 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_COLLATOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_COLLATOR_HPP_
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_DYNAMIC_CACHE_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_DYNAMIC_CACHE_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/caches/lifecycle_metrics.hpp"
+#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, caches);
+NS_START(fordyca);
+
+namespace events {
+class cache_appeared;
+} // namespace events
+
+namespace visitor = rcppsw::patterns::visitor;
+
+NS_START(tasks, depth2);
 
 /*******************************************************************************
- * Class Definitions
+ * Structure Definitions
  ******************************************************************************/
 /**
- * @class lifecycle_collator
- * @ingroup metrics caches
+ * @class dynamic_cache_interactor
+ * @ingroup tasks depth2
  *
- * @brief Collates information about the lifecycles of caches in the arena for
- * the purpose of metric collection.
+ * @brief Interactor specifying the event visit set for all foraging tasks that
+ * interact with dynamic caches in FORDYCA.
  */
-class lifecycle_collator : public lifecycle_metrics {
- public:
-  lifecycle_collator(void) = default;
+class dynamic_cache_interactor
+    : public visitor::polymorphic_accept_set<events::cache_appeared> {};
 
-  uint caches_created(void) const override { return m_created; }
-  uint caches_depleted(void) const override { return m_depleted; }
-  void caches_created(uint c) { m_created += c; }
-  void caches_depleted(uint c) { m_depleted += c; }
-  void reset_metrics(void) override { m_created = 0; m_depleted = 0;  }
+NS_END(depth2, tasks, fordyca);
 
-  void cache_created(void) { ++m_created; }
-  void cache_depleted(void) { ++m_depleted; }
-
- private:
-  uint m_created{0};
-  uint m_depleted{0};
-};
-
-NS_END(caches, metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LIFECYCLE_COLLATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_DYNAMIC_CACHE_INTERACTOR_HPP_ */

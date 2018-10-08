@@ -50,9 +50,8 @@ stateless_qt_user_functions::stateless_qt_user_functions() {
  * Member Functions
  ******************************************************************************/
 void stateless_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  auto& controller =
-      dynamic_cast<controller::depth0::stateless_controller&>(
-          c_entity.GetControllableEntity().GetController());
+  auto& controller = dynamic_cast<controller::depth0::stateless_controller&>(
+      c_entity.GetControllableEntity().GetController());
 
   if (controller.display_id()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());

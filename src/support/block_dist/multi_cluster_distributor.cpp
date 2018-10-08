@@ -42,9 +42,7 @@ multi_cluster_distributor::multi_cluster_distributor(
     uint maxsize)
     : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
   for (size_t i = 0; i < grids.size(); ++i) {
-    m_dists.emplace_back(grids[i],
-                         arena_resolution,
-                         maxsize);
+    m_dists.emplace_back(grids[i], arena_resolution, maxsize);
   } /* for(i..) */
 }
 
@@ -54,13 +52,14 @@ multi_cluster_distributor::multi_cluster_distributor(
 bool multi_cluster_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
     entity_list& entities) {
-
   for (size_t i = 0; i < kMAX_DIST_TRIES; ++i) {
     uint idx = std::rand() % m_dists.size();
     cluster_distributor& d = m_dists[idx];
     if (d.cluster().capacity() == d.cluster().block_count()) {
       ER_DEBUG("block%d to cluster%u failed: Cluster capacity (%u) reached",
-               block->id(), idx, d.cluster().capacity());
+               block->id(),
+               idx,
+               d.cluster().capacity());
     } else {
       return d.distribute_block(block, entities);
     }

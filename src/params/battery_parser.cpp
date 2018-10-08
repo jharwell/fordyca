@@ -26,33 +26,34 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
- NS_START(fordyca, params);
+NS_START(fordyca, params);
 
- /*******************************************************************************
-  * Global Variables
-  ******************************************************************************/
- constexpr char battery_parser::kXMLRoot[];
+/*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char battery_parser::kXMLRoot[];
 
- /*******************************************************************************
-  * Member Functions
-  ******************************************************************************/
-  void battery_parser::parse(const ticpp::Element& node) {
-    ticpp::Element bynode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void battery_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bynode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
 
-    m_params = std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(bynode, m_params, power_station_amount);
-    XML_PARSE_PARAM(bynode, m_params, power_station_size);
-    XML_PARSE_PARAM(bynode, m_params, power_station_distrubtion);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_ATTR(bynode, m_params, power_station_amount);
+  XML_PARSE_ATTR(bynode, m_params, power_station_size);
+  XML_PARSE_ATTR(bynode, m_params, power_station_distrubtion);
+}
+
+__rcsw_pure bool battery_parser::validate(void) const {
+  if (m_params->power_station_size < 0) {
+    return false;
+  } else if (m_params->power_station_amount < 0) {
+    return false;
+  } else {
+    return true;
   }
+} /* validate() */
 
-  __rcsw_pure bool battery_parser::validate(void) const {
-    if (m_params->power_station_size < 0){
-      return false;
-    } else if (m_params->power_station_amount < 0){
-      return false;
-    } else {
-      return true;
-    }
-  } /* validate() */
-
-  NS_END(params, fordyca);
+NS_END(params, fordyca);

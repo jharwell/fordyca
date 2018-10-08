@@ -33,16 +33,18 @@ NS_START(fordyca, metrics);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(const std::string& ofname,
-                                                 uint interval,
-                                                 const rcppsw::math::dcoord2& dims)
+robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(
+    const std::string& ofname,
+    uint interval,
+    const rcppsw::math::dcoord2& dims)
     : base_metrics_collector(ofname, interval, true),
       m_stats(dims.first, dims.second) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string robot_occupancy_metrics_collector::csv_header_build(const std::string&) {
+std::string robot_occupancy_metrics_collector::csv_header_build(
+    const std::string&) {
   std::string line;
   for (size_t j = 0; j < m_stats.ysize(); ++j) {
     line += "y" + std::to_string(j) + separator();

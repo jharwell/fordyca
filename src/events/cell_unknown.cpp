@@ -56,5 +56,4 @@ void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_unknown();
 } /* visit() */
 
-
 NS_END(events, fordyca);

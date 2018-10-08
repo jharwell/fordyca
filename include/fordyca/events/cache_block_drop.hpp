@@ -104,7 +104,8 @@ class cache_block_drop
   void visit(ds::perceived_arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
 

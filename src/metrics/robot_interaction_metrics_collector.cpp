@@ -47,8 +47,8 @@ robot_interaction_metrics_collector::robot_interaction_metrics_collector(
 std::string robot_interaction_metrics_collector::csv_header_build(
     const std::string& header) {
   return base_metrics_collector::csv_header_build(header) +
-      "cum_avg_degree_raw" + separator() +
-      "cum_avg_degree_normed" + separator();
+         "cum_avg_degree_raw" + separator() + "cum_avg_degree_normed" +
+         separator();
 } /* csv_header_build() */
 
 void robot_interaction_metrics_collector::reset(void) {
@@ -62,11 +62,7 @@ bool robot_interaction_metrics_collector::csv_line_build(std::string& line) {
   }
 
   std::vector<double> tmp = m_cum_stats;
-  std::for_each(tmp.begin(),
-                tmp.end(),
-                [&](auto& d) {
-                  d /= (timestep() + 1);
-                });
+  std::for_each(tmp.begin(), tmp.end(), [&](auto& d) { d /= (timestep() + 1); });
 
   line += std::to_string(m_cum.raw_degree(tmp)) + separator();
   line += std::to_string(m_cum.normed_degree(tmp)) + separator();

@@ -27,7 +27,7 @@
 #include <string>
 #include "rcppsw/common/common.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/depth0/robot_arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,7 +77,7 @@ class stateless_loop_functions : public base_loop_functions,
 
  private:
   using interactor =
-      arena_interactor<controller::depth0::stateless_controller>;
+      robot_arena_interactor<controller::depth0::stateless_controller>;
 
   void arena_map_init(params::loop_function_repository& repo);
   void pre_step_iter(argos::CFootBotEntity& robot);

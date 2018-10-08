@@ -49,7 +49,7 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 
   m_cache.parse(anode);
   if (m_cache.parsed()) {
-    m_params->static_cache = *m_cache.parse_results();
+    m_params->cache = *m_cache.parse_results();
   }
 
   m_nest.parse(anode);

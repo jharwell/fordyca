@@ -111,8 +111,7 @@ class free_block_pickup
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::base_block& block) override;
-  void visit(
-      controller::depth0::stateless_controller& controller) override;
+  void visit(controller::depth0::stateless_controller& controller) override;
   void visit(fsm::depth0::stateless_fsm& fsm) override;
 
   /* stateful foraging */
@@ -121,7 +120,8 @@ class free_block_pickup
   void visit(controller::depth0::stateful_controller& controller) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(tasks::depth1::harvester& task) override;

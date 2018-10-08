@@ -45,12 +45,19 @@ cache_vanished::cache_vanished(uint cache_id)
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_vanished::visit(controller::depth1::greedy_partitioning_controller& controller) {
+void cache_vanished::visit(
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())
-      ->accept(*this);
+
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(
+      nullptr != task,
+      "Non existing cache interactor task %s received cache vanished event",
+      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+
+  task->accept(*this);
   controller.ndc_pop();
 } /* visit() */
 
@@ -76,12 +83,19 @@ void cache_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_vanished::visit(controller::depth2::greedy_recpart_controller& controller) {
-  controller.ndc_pop();
+void cache_vanished::visit(
+    controller::depth2::greedy_recpart_controller& controller) {
+  controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())
-      ->accept(*this);
+
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(
+      nullptr != task,
+      "Non existing cache interactor task %s received cache vanished event",
+      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+
+  task->accept(*this);
   controller.ndc_pop();
 } /* visit() */
 

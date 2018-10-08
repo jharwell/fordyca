@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GREEDY_RECPART_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GREEDY_RECPART_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -61,6 +61,7 @@ class greedy_recpart_controller : public depth1::greedy_partitioning_controller,
                                   public visitor::visitable_any<greedy_recpart_controller> {
  public:
   greedy_recpart_controller(void);
+  ~greedy_recpart_controller(void) override;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
@@ -79,4 +80,4 @@ class greedy_recpart_controller : public depth1::greedy_partitioning_controller,
 
 NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GREEDY_RECPART_CONTROLLER_HPP_ */

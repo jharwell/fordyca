@@ -25,6 +25,7 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -218,9 +219,13 @@ void cached_block_pickup::visit(
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())
-      ->accept(*this);
+
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 
   ER_INFO("Picked up block%d", m_pickup_block->id());
   controller.ndc_pop();
@@ -246,7 +251,12 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  ******************************************************************************/
 void cached_block_pickup::visit(
     controller::depth2::greedy_recpart_controller& controller) {
-  ER_ASSERT(false, "Not implemented");
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {

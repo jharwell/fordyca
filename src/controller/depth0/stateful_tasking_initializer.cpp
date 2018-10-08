@@ -65,8 +65,9 @@ void stateful_tasking_initializer::stateful_tasking_init(
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::stateful_fsm>(
-          mc_sel_matrix, m_saa, m_perception->map());
+      rcppsw::make_unique<fsm::depth0::stateful_fsm>(mc_sel_matrix,
+                                                     m_saa,
+                                                     m_perception->map());
 
   auto generalist =
       new tasks::depth0::generalist(exec_params, std::move(generalist_fsm));

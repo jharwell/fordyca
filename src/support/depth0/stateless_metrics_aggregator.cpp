@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
 #include "fordyca/controller/depth0/stateless_controller.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************

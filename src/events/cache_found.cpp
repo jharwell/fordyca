@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -42,6 +44,12 @@ cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
                         cache->discrete_loc().second),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
+
+cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
+    : perceived_cell_op(cache->discrete_loc().first,
+                        cache->discrete_loc().second),
+      ER_CLIENT_INIT("fordyca.events.cache_found"),
+      m_cache(cache) {}
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -87,8 +95,8 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 
 void cache_found::visit(ds::perceived_arena_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  swarm::pheromone_density& density = map.access<occupancy_grid::kPheromone>(x(),
-                                                                             y());
+  swarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromone>(x(), y());
   if (!cell.state_is_known()) {
     map.known_cells_inc();
     ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
@@ -163,6 +171,10 @@ void cache_found::visit(ds::perceived_arena_map& map) {
   }
   map.cache_add(m_cache);
   cell.accept(*this);
+} /* visit() */
+
+void cache_found::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.perception()->map()->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

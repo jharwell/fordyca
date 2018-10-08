@@ -24,6 +24,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
@@ -103,13 +104,18 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(controller::depth1::greedy_partitioning_controller& controller) {
+void cache_block_drop::visit(
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())
-      ->accept(*this);
+
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block drop",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 
   ER_INFO("Dropped block%d in cache%d", m_block->id(), m_cache->id());
   controller.ndc_pop();
@@ -127,8 +133,14 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(controller::depth2::greedy_recpart_controller& controller) {
-  ER_ASSERT(false, "Not implemented");
+void cache_block_drop::visit(
+    controller::depth2::greedy_recpart_controller& controller) {
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block drop",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {

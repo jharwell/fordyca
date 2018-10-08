@@ -43,17 +43,17 @@ void exec_estimates_parser::parse(const ticpp::Element& node) {
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-    XML_PARSE_PARAM(enode, m_params, seed_enabled);
+    XML_PARSE_ATTR(enode, m_params, seed_enabled);
     if (m_params->seed_enabled) {
-      XML_PARSE_PARAM(enode, m_params, generalist_range);
+      XML_PARSE_ATTR(enode, m_params, generalist_range);
 
-      XML_PARSE_PARAM(enode, m_params, harvester_range);
-      XML_PARSE_PARAM(enode, m_params, collector_range);
+      XML_PARSE_ATTR(enode, m_params, harvester_range);
+      XML_PARSE_ATTR(enode, m_params, collector_range);
 
-      XML_PARSE_PARAM(enode, m_params, cache_starter_range);
-      XML_PARSE_PARAM(enode, m_params, cache_finisher_range);
-      XML_PARSE_PARAM(enode, m_params, cache_transferer_range);
-      XML_PARSE_PARAM(enode, m_params, cache_collector_range);
+      XML_PARSE_ATTR(enode, m_params, cache_starter_range);
+      XML_PARSE_ATTR(enode, m_params, cache_finisher_range);
+      XML_PARSE_ATTR(enode, m_params, cache_transferer_range);
+      XML_PARSE_ATTR(enode, m_params, cache_collector_range);
     }
     m_parsed = true;
   }
@@ -66,15 +66,14 @@ void exec_estimates_parser::show(std::ostream& stream) const {
     return;
   }
 
-  stream << build_header()
-         << XML_PARAM_STR(m_params, seed_enabled) << std::endl
-         << XML_PARAM_STR(m_params, generalist_range) << std::endl
-         << XML_PARAM_STR(m_params, harvester_range) << std::endl
-         << XML_PARAM_STR(m_params, collector_range) << std::endl
-         << XML_PARAM_STR(m_params, cache_starter_range) << std::endl
-         << XML_PARAM_STR(m_params, cache_finisher_range) << std::endl
-         << XML_PARAM_STR(m_params, cache_transferer_range) << std::endl
-         << XML_PARAM_STR(m_params, cache_collector_range) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, seed_enabled) << std::endl
+         << XML_ATTR_STR(m_params, generalist_range) << std::endl
+         << XML_ATTR_STR(m_params, harvester_range) << std::endl
+         << XML_ATTR_STR(m_params, collector_range) << std::endl
+         << XML_ATTR_STR(m_params, cache_starter_range) << std::endl
+         << XML_ATTR_STR(m_params, cache_finisher_range) << std::endl
+         << XML_ATTR_STR(m_params, cache_transferer_range) << std::endl
+         << XML_ATTR_STR(m_params, cache_collector_range) << std::endl
          << build_footer();
 } /* show() */
 

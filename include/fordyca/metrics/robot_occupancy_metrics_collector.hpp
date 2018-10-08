@@ -62,8 +62,8 @@ class robot_occupancy_metrics_collector
    * @param dims Dimensions of robot_occupancy.
    */
   robot_occupancy_metrics_collector(const std::string& ofname,
-                          uint interval,
-                          const rcppsw::math::dcoord2& dims);
+                                    uint interval,
+                                    const rcppsw::math::dcoord2& dims);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;

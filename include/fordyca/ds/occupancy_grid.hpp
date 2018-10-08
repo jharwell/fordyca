@@ -25,8 +25,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <tuple>
 #include <string>
+#include <tuple>
 
 #include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
@@ -41,7 +41,7 @@ NS_START(fordyca);
 namespace events {
 class cell_unknown;
 class cell_empty;
-}
+} // namespace events
 namespace params {
 struct occupancy_grid_params;
 }
@@ -62,7 +62,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
                        public visitor::accept_set<occupancy_grid,
                                                   events::cell_unknown,
                                                   events::cell_empty>,
-                       public rcppsw::ds::stacked_grid<robot_layer_stack>{
+                       public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   constexpr static uint kPheromone = 0;
   constexpr static uint kCell = 1;

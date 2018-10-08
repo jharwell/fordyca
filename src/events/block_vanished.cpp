@@ -50,16 +50,14 @@ block_vanished::block_vanished(uint block_id)
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_vanished::visit(
-    controller::depth0::stateless_controller& controller) {
+void block_vanished::visit(controller::depth0::stateless_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
   controller.fsm()->accept(*this);
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(
-    controller::depth0::stateful_controller& controller) {
+void block_vanished::visit(controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
   dynamic_cast<tasks::depth0::generalist*>(controller.current_task())
@@ -68,8 +66,7 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())
-      ->accept(*this);
+  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::stateless_fsm& fsm) {
@@ -85,17 +82,19 @@ void block_vanished::visit(fsm::depth0::stateful_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth1::greedy_partitioning_controller& controller) {
+void block_vanished::visit(
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   ER_INFO(
       "Abort pickup executing task %s: block%d vanished",
       dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
       m_block_id);
-  auto* interactor =
+  auto* task =
       dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != interactor,
-            "Non-free block interactor task triggered block vanished event");
-  interactor->accept(*this);
+  ER_ASSERT(nullptr != task,
+            "Non-free block interactor task %s triggered block vanished event",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
   controller.ndc_pop();
 } /* visit() */
 
@@ -111,11 +110,17 @@ void block_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth2::greedy_recpart_controller& controller) {
+void block_vanished::visit(
+    controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in block: block%d vanished", m_block_id);
-  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
-      ->accept(*this);
+  auto* task =
+      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non-free block interactor task %s triggered block vanished event",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
+  controller.ndc_pop();
 } /* visit() */
 
 void block_vanished::visit(tasks::depth2::cache_starter& task) {

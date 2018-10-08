@@ -40,14 +40,14 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 generalist::generalist(const struct ta::partitionable_task_params* const params,
                        std::unique_ptr<ta::taskable> mechanism)
-    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)) {}
+    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)) {
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 __rcsw_pure double generalist::current_time(void) const {
-  return dynamic_cast<fsm::depth0::stateful_fsm*>(
-             polled_task::mechanism())
+  return dynamic_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */

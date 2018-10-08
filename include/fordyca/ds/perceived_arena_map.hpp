@@ -27,10 +27,10 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/patterns/decorator/decorator.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -62,10 +62,9 @@ namespace er = rcppsw::er;
  * caches. The PAM also does *NOT* track which cells are in CACHE_EXTENT, as
  * that is irrelevant for what the robots need (as of 9/14/18 anyway).
  */
-class perceived_arena_map
-    : public er::client<perceived_arena_map>,
-      public decorator::decorator<occupancy_grid>,
-      public visitor::visitable_any<perceived_arena_map> {
+class perceived_arena_map : public er::client<perceived_arena_map>,
+                            public decorator::decorator<occupancy_grid>,
+                            public visitor::visitable_any<perceived_arena_map> {
  public:
   using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;

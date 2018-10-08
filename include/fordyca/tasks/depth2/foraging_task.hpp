@@ -62,6 +62,7 @@ class foraging_task
   static constexpr char kCacheStarterName[] = "Cache Starter";
   static constexpr char kCacheFinisherName[] = "Cache Finisher";
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
+  static constexpr char kCacheCollectorName[] = "Cache Collector";
 
   /* task overrides */
   double current_time(void) const override;

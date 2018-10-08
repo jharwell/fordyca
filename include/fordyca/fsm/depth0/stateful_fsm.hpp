@@ -62,15 +62,15 @@ using transport_goal_type = block_transporter::goal_type;
  * complete.
  */
 class stateful_fsm : public base_foraging_fsm,
-                              er::client<stateful_fsm>,
-                              public metrics::fsm::goal_acquisition_metrics,
-                              public block_transporter,
-                              public task_allocation::taskable,
-                              public visitor::visitable_any<depth0::stateful_fsm> {
+                     er::client<stateful_fsm>,
+                     public metrics::fsm::goal_acquisition_metrics,
+                     public block_transporter,
+                     public task_allocation::taskable,
+                     public visitor::visitable_any<depth0::stateful_fsm> {
  public:
   stateful_fsm(const controller::block_selection_matrix* sel_matrix,
-                        controller::saa_subsystem* saa,
-                        ds::perceived_arena_map* map);
+               controller::saa_subsystem* saa,
+               ds::perceived_arena_map* map);
 
   /* taskable overrides */
   void task_reset(void) override { init(); }

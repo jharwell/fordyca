@@ -34,10 +34,10 @@
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
+#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -110,20 +110,22 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
                                 m_cache_sel_matrix.get(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
-  executive()->task_abort_notify(std::bind(
-      &greedy_partitioning_controller::task_abort_cb,
-      this,
-      std::placeholders::_1));
+
+  executive()->task_abort_notify(
+      std::bind(&greedy_partitioning_controller::task_abort_cb,
+                this,
+                std::placeholders::_1));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
-__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(void) {
+__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(
+    void) {
   return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::current_task(
-    void) const {
+__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::
+    current_task(void) const {
   return const_cast<greedy_partitioning_controller*>(this)->current_task();
 } /* current_task() */
 
@@ -135,20 +137,19 @@ void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
  * Task Distribution Metrics
  ******************************************************************************/
 int greedy_partitioning_controller::current_task_depth(void) const {
-  return executive()->graph()->vertex_depth(dynamic_cast<const ta::polled_task*>(
-      current_task()));
+  return executive()->graph()->vertex_depth(
+      dynamic_cast<const ta::polled_task*>(current_task()));
 } /* current_task_depth() */
 
 int greedy_partitioning_controller::current_task_id(void) const {
-  return executive()->graph()->vertex_id(dynamic_cast<const ta::polled_task*>(
-      current_task()));
+  return executive()->graph()->vertex_id(
+      dynamic_cast<const ta::polled_task*>(current_task()));
 } /* current_task_id() */
 
 __rcsw_pure int greedy_partitioning_controller::current_task_tab(void) const {
   return dynamic_cast<const ta::bifurcating_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
-
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

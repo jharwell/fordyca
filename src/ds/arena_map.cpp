@@ -27,10 +27,9 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/support/block_manifest_processor.hpp"
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
-#include "fordyca/support/depth1/static_cache_creator.hpp"
+#include "fordyca/support/block_manifest_processor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,9 +44,8 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
       decorator(params->grid.resolution,
                 static_cast<size_t>(params->grid.upper.GetX()),
                 static_cast<size_t>(params->grid.upper.GetY())),
-      mc_static_cache_params(params->static_cache),
       m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
-               .create_blocks()),
+                   .create_blocks()),
       m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(decoratee(), &params->blocks.dist) {
@@ -91,145 +89,6 @@ __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
   } /* for(i..) */
   return -1;
 } /* robot_on_cache() */
-
-bool arena_map::calc_blocks_for_static_cache(const argos::CVector2& center,
-                                             block_vector& blocks) {
-  /*
-   * Only blocks that are not:
-   *
-   * - Currently carried by a robot
-   * - Currently placed on the cell where the cache is to be created
-   *
-   * are eligible for being used to re-create the static cache.
-   */
-  rcppsw::math::dcoord2 dcenter =
-      math::rcoord_to_dcoord(center, grid_resolution());
-  for (auto& b : m_blocks) {
-    if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
-      blocks.push_back(b);
-    }
-    if (blocks.size() >= mc_static_cache_params.size) {
-      break;
-    }
-  } /* for(b..) */
-
-  bool ret = true;
-  if (blocks.size() < representation::base_cache::kMinBlocks) {
-    /*
-     * Cannot use std::accumulate for these, because that doesn't work with
-     * C++14/gcc7 when you are accumulating into a different type (e.g. from a
-     * set of blocks into an int)
-     */
-    uint count = 0;
-    std::for_each(m_blocks.begin(), m_blocks.end(),
-                  [&](std::shared_ptr<representation::base_block>& b) {
-                    count += (b->is_out_of_sight() || b->discrete_loc() == dcenter);
-      });
-
-    std::string accum;
-    std::for_each(m_blocks.begin(),
-                  m_blocks.end(),
-                  [&](const auto& b) {
-                    accum += "b" + std::to_string(b->id()) +
-                             "->fb" + std::to_string(b->robot_id()) + ",";
-                  });
-    ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
-
-    accum = "";
-    std::for_each(m_blocks.begin(),
-                  m_blocks.end(),
-                  [&](const auto& b) {
-                    accum += "b" + std::to_string(b->id()) +
-                             "->(" + std::to_string(b->discrete_loc().first) + "," +
-                             std::to_string(b->discrete_loc().second) + "),";
-                  });
-    ER_DEBUG("Block locations: [%s]", accum.c_str());
-
-    ER_ASSERT(m_blocks.size() - count < representation::base_cache::kMinBlocks,
-              "For new cache @(%f, %f) [%u, %u]: %zu blocks SHOULD be "
-              "available, but only %zu are (min=%zu)",
-              center.GetX(),
-              center.GetY(),
-              dcenter.first,
-              dcenter.second,
-              m_blocks.size() - count,
-              blocks.size(),
-              representation::base_cache::kMinBlocks);
-    ret = false;
-  }
-  if (blocks.size() < mc_static_cache_params.size) {
-    ER_WARN(
-        "Not enough free blocks to meet min size for new cache @(%f, %f) [%u, "
-            "%u] (%zu < %u)",
-        center.GetX(),
-        center.GetY(),
-        dcenter.first,
-        dcenter.second,
-        blocks.size(),
-        mc_static_cache_params.size);
-    ret = false;
-  }
-  return ret;
-} /* calc_blocks_for_static_cache() */
-
-bool arena_map::static_cache_create(void) {
-  ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_static_cache_params.size >= representation::base_cache::kMinBlocks,
-            "Static cache size %u < minimum %zu",
-            mc_static_cache_params.size,
-            representation::base_cache::kMinBlocks);
-
-  argos::CVector2 center((xrsize() + m_nest.real_loc().GetX()) / 2.0,
-                         m_nest.real_loc().GetY());
-
-  support::depth1::static_cache_creator creator(decoratee(),
-                                                center,
-                                                mc_static_cache_params.dimension,
-                                                grid_resolution());
-
-  block_vector blocks;
-  if (!calc_blocks_for_static_cache(center, blocks)) {
-    ER_WARN("Unable to create static cache @(%f, %f): Not enough free blocks",
-            center.GetX(),
-            center.GetY());
-    return false;
-  }
-  m_caches = creator.create_all(blocks);
-  ER_ASSERT(1 == m_caches.size(), "Wrong # caches after static create: %zu",
-            m_caches.size());
-
-  /*
-   * Any blocks that are under where the cache currently is (i.e. will be
-   * hidden by it) need to be added to the cache so that there all blocks in the
-   * arena are accessible. This is generally only an issue at the start of
-   * simulation if random block distribution is used, but weird cases can arise
-   * due to task abort+block drop as well, so it is best to be safe.
-   */
-  for (auto& b : m_blocks) {
-    for (auto& c : m_caches) {
-      if (!c->contains_block(b) &&
-          c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
-          c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
-        events::cell_empty empty(b->discrete_loc());
-        decoratee().access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(b,
-                                   math::rcoord_to_dcoord(c->real_loc(),
-                                                          grid_resolution()),
-                                   grid_resolution());
-        decoratee().access<arena_grid::kCell>(op.x(), op.y()).accept(op);
-        c->block_add(b);
-        ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
-      }
-    } /* for(&c..) */
-  }   /* for(&b..) */
-
-  /*
-   * Must be after fixing hidden blocks, otherwise the cache host cell will
-   * have a block as its entity!
-   */
-  creator.update_host_cells(m_caches);
-  return true;
-} /* static_cache_create() */
 
 bool arena_map::distribute_single_block(
     std::shared_ptr<representation::base_block>& block) {

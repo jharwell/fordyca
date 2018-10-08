@@ -26,6 +26,7 @@
 #include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -155,8 +156,14 @@ void free_block_pickup::visit(
     controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
-  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
-      ->accept(*this);
+
+  auto* task =
+      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non free block interactor task %s causing free block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+
+  task->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
@@ -172,15 +179,20 @@ void free_block_pickup::visit(
   controller.perception()->map()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
-  dynamic_cast<tasks::free_block_interactor*>(controller.current_task())
-      ->accept(*this);
+
+  auto* task =
+      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non free block interactor task %s causing free block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+
+  task->accept(*this);
   ER_INFO("Picked up block%d", m_block->id());
   controller.ndc_pop();
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())
-      ->accept(*this);
+  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth1::harvester& task) {
@@ -197,7 +209,20 @@ void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth2::greedy_recpart_controller& controller) {
-  ER_ASSERT(false, "Not implemented");
+  controller.ndc_push();
+  controller.perception()->map()->accept(*this);
+  controller.free_pickup_event(true);
+  controller.block(m_block);
+
+  auto* task =
+      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non free block interactor task %s causing free block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+
+  task->accept(*this);
+  ER_INFO("Picked up block%d", m_block->id());
+  controller.ndc_pop();
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth2::cache_starter& task) {

@@ -37,6 +37,7 @@ NS_START(fordyca, tasks, depth2);
 constexpr char foraging_task::kCacheStarterName[];
 constexpr char foraging_task::kCacheFinisherName[];
 constexpr char foraging_task::kCacheTransfererName[];
+constexpr char foraging_task::kCacheCollectorName[];
 
 /*******************************************************************************
  * Constructors/Destructor

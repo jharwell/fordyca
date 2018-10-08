@@ -18,24 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
- #ifndef INCLUDE_FORDYCA_PARAMS_BATTERY_PARAMS_HPP_
- #define INCLUDE_FORDYCA_PARAMS_BATTERY_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BATTERY_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BATTERY_PARAMS_HPP_
 
 /*******************************************************************************
   * Includes
 ******************************************************************************/
- #include <string>
- #include "rcppsw/params/base_params.hpp"
+#include <string>
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
   * Namespaces
 ******************************************************************************/
- NS_START(fordyca, params);
+NS_START(fordyca, params);
 
 /*******************************************************************************
   * Structure Definitions
 ******************************************************************************/
- /**
+/**
   * @struct battery_params
   * @ingroup params
   */

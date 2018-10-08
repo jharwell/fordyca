@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include "rcppsw/math/dcoord.hpp"
 

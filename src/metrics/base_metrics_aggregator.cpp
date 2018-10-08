@@ -24,12 +24,7 @@
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include <experimental/filesystem>
 
-#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
-#include "fordyca/metrics/robot_interaction_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
@@ -39,6 +34,11 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
+#include "fordyca/metrics/robot_interaction_metrics.hpp"
+#include "fordyca/metrics/robot_interaction_metrics_collector.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************

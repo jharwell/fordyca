@@ -24,8 +24,8 @@
 #include "fordyca/support/block_dist/powerlaw_distributor.hpp"
 #include <algorithm>
 #include <cmath>
-#include <random>
 #include <parallel/algorithm>
+#include <random>
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
@@ -93,9 +93,9 @@ bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
                      });
 } /* distribute_blocks() */
 
-powerlaw_distributor::arena_view_vector powerlaw_distributor::guess_cluster_placements(
-    ds::arena_grid& grid,
-    const std::vector<uint>& clust_sizes) {
+powerlaw_distributor::arena_view_vector powerlaw_distributor::
+    guess_cluster_placements(ds::arena_grid& grid,
+                             const std::vector<uint>& clust_sizes) {
   arena_view_vector views;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
@@ -126,41 +126,36 @@ powerlaw_distributor::arena_view_vector powerlaw_distributor::guess_cluster_plac
 __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
     const arena_view_vector& list) {
   for (const std::pair<ds::arena_grid::view, uint>& v : list) {
-    bool overlap = std::any_of(
-        list.begin(),
-        list.end(),
-        [&](const auto& other) {
-          /*
+    bool overlap = std::any_of(list.begin(), list.end(), [&](const auto& other) {
+      /*
            * Can't compare directly (boost multi_array makes a COPY of each
            * element during iteration for some reason, and because the cells
            * have a unique_ptr, that doesn't work), so compare using addresses
            * of elements of the vector, which WILL work.
            */
-          if (&other == &v) { /* self */
-            return false;
-          }
-          uint v_xbase = (*v.first.origin()).loc().first;
-          uint v_ybase = (*v.first.origin()).loc().second;
-          uint other_xbase = (*other.first.origin()).loc().first;
-          uint other_ybase = (*other.first.origin()).loc().second;
-          math::range<uint> v_xrange(v_xbase + v.first.index_bases()[0],
-                                     v_xbase + v.first.index_bases()[0] +
-                                         v.first.shape()[0]);
-          math::range<uint> v_yrange(v_ybase + v.first.index_bases()[1],
-                                     v_ybase + v.first.index_bases()[1] +
-                                         v.first.shape()[1]);
-          math::range<uint> other_xrange(
-              other_xbase + other.first.index_bases()[0],
-              other_xbase + other.first.index_bases()[0] +
-                  other.first.shape()[0]);
-          math::range<uint> other_yrange(
-              other_ybase + other.first.index_bases()[1],
-              other_ybase + other.first.index_bases()[1] +
-                  other.first.shape()[1]);
+      if (&other == &v) { /* self */
+        return false;
+      }
+      uint v_xbase = (*v.first.origin()).loc().first;
+      uint v_ybase = (*v.first.origin()).loc().second;
+      uint other_xbase = (*other.first.origin()).loc().first;
+      uint other_ybase = (*other.first.origin()).loc().second;
+      math::range<uint> v_xrange(v_xbase + v.first.index_bases()[0],
+                                 v_xbase + v.first.index_bases()[0] +
+                                     v.first.shape()[0]);
+      math::range<uint> v_yrange(v_ybase + v.first.index_bases()[1],
+                                 v_ybase + v.first.index_bases()[1] +
+                                     v.first.shape()[1]);
+      math::range<uint> other_xrange(other_xbase + other.first.index_bases()[0],
+                                     other_xbase + other.first.index_bases()[0] +
+                                         other.first.shape()[0]);
+      math::range<uint> other_yrange(other_ybase + other.first.index_bases()[1],
+                                     other_ybase + other.first.index_bases()[1] +
+                                         other.first.shape()[1]);
 
-          return v_xrange.overlaps_with(other_xrange) &&
-                 v_yrange.overlaps_with(other_yrange);
-        });
+      return v_xrange.overlaps_with(other_xrange) &&
+             v_yrange.overlaps_with(other_yrange);
+    });
     if (overlap) {
       return false;
     }
