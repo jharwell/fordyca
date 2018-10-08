@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
@@ -57,14 +59,17 @@ class block_op_penalty_handler
   enum penalty_src {
     kFreePickup,
     kNestDrop,
+    kCacheSiteDrop,
+    kNewCacheDrop,
   };
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
   block_op_penalty_handler(ds::arena_map* const map,
-                           const ct::waveform_params* const params)
-      : temporal_penalty_handler<T>(params),
+                           const ct::waveform_params* const params,
+                           const std::string& name)
+      : temporal_penalty_handler<T>(params, name),
         ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
         m_map(map) {}
 
@@ -86,7 +91,10 @@ class block_op_penalty_handler
    * @return \c TRUE if a penalty has been initialized for a robot, and they
    * should begin waiting, and \c FALSE otherwise.
    */
-  bool penalty_init(T& controller, penalty_src src, uint timestep) {
+  bool penalty_init(T& controller,
+                    penalty_src src,
+                    uint timestep,
+                    double cache_prox_dist = -1) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -96,6 +104,11 @@ class block_op_penalty_handler
       return false;
     } else if (kNestDrop == src && !nest_drop_filter(controller)) {
       return false;
+    } else if (kCacheSiteDrop == src && !cache_site_drop_filter(controller)) {
+      return false;
+    } else if (kNewCacheDrop == src &&
+               !new_cache_drop_filter(controller, cache_prox_dist)) {
+      return false;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
@@ -103,11 +116,15 @@ class block_op_penalty_handler
     uint penalty = deconflict_penalty_finish(timestep);
     int id = -1;
     if (kFreePickup == src) {
-      id = utils::robot_on_block(controller, *m_map);
+      id = loop_utils::robot_on_block(controller, *m_map);
       ER_ASSERT(-1 != id, "Robot not on block?");
     }
+    if (kCacheSiteDrop == src) {
+      ER_ASSERT(cache_prox_dist <= -1.0,
+                "Cache proximity distance not specified for cache site drop");
+    }
     ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            utils::robot_id(controller),
+            loop_utils::robot_id(controller),
             id,
             timestep,
             original_penalty(),
@@ -127,7 +144,7 @@ class block_op_penalty_handler
    * pickup, \c FALSE otherwise.
    */
   bool free_pickup_filter(const T& controller) const {
-    int block_id = utils::robot_on_block(controller, *m_map);
+    int block_id = loop_utils::robot_on_block(controller, *m_map);
     return (controller.goal_acquired() &&
             acquisition_goal_type::kBlock == controller.acquisition_goal() &&
             -1 != block_id);
@@ -142,6 +159,39 @@ class block_op_penalty_handler
    */
   bool nest_drop_filter(const T& controller) const {
     return (controller.in_nest() && controller.goal_acquired());
+  }
+
+  /**
+   * @brief Filter out spurious penalty initializations for cache site drop
+   * (i.e. controller not ready/not intending to drop a block), or
+   * is too close to a block to do a free block drop at the chosen site.
+   *
+   * @return \c TRUE if the controller has met preconditions for cache site
+   * drop, \c FALSE otherwise.
+   */
+  bool cache_site_drop_filter(const T& controller) const {
+    int block_id =
+        loop_utils::cache_site_block_proximity(controller, *m_map).first;
+    return (controller.goal_acquired() &&
+            acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
+            -1 == block_id);
+  }
+  /**
+   * @brief Filter out spurious penalty initializations for new cache drop
+   * (i.e. controller not ready/not intending to drop a block), or
+   * is too close to another cache to do a free block drop at the chosen site.
+   *
+   * @return \c TRUE if the controller has met preconditions for cache site
+   * drop, \c FALSE otherwise.
+   */
+  bool new_cache_drop_filter(const T& controller, double cache_prox_dist) const {
+    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+                                                         *m_map,
+                                                         cache_prox_dist)
+                       .first;
+    return (controller.goal_acquired() &&
+            acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
+            -1 == cache_id);
   }
 
  protected:

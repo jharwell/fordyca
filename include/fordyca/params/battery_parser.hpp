@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
- #ifndef INCLUDE_FORDYCA_PARAMS_BATTERY_PARSER_HPP_
- #define INCLUDE_FORDYCA_PARAMS_BATTERY_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BATTERY_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BATTERY_PARSER_HPP_
 
 /*******************************************************************************
-   * Includes
-******************************************************************************/
+ * Includes
+ ******************************************************************************/
 #include <string>
-#include "fordyca/params/metrics_parser.hpp"
 #include "fordyca/params/battery_params.hpp"
+#include "fordyca/params/metrics_parser.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
@@ -38,38 +38,41 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
- /**
-  * @class battery_parser
-  */
-  class battery_parser : public rcppsw::params::xml_param_parser {
-  public:
-    explicit battery_parser(uint level)
+/**
+ * @class battery_parser
+ * @ingroup params
+ *
+ * @brief Parses XML parameters relating to pheromones into
+ * \ref battery_params.
+ */
+class battery_parser : public rcppsw::params::xml_param_parser {
+ public:
+  explicit battery_parser(uint level)
       : xml_param_parser(level), m_metrics_parser(level + 1) {}
 
-      /**
-       * @brief The root tag that all battery loop functions parameters should lie
-       * under in the XML tree.
-       */
-      static constexpr char kXMLRoot[] = "battery";
+  /**
+   * @brief The root tag that all battery loop functions parameters should lie
+   * under in the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "battery";
 
+  bool validate(void) const override;
+  void parse(const ticpp::Element& node) override;
 
-      bool validate(void) const override;
-      void parse(const ticpp::Element& node) override;
+  std::string xml_root(void) const override { return kXMLRoot; }
 
-      std::string xml_root(void) const override { return kXMLRoot; }
+  std::shared_ptr<battery_params> parse_results(void) const { return m_params; }
 
-      std::shared_ptr<battery_params> parse_results(void) const { return m_params; }
+ private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
+    return m_params;
+  }
 
-     private:
-      std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-          void) const override {
-        return m_params;
-      }
-
-      // clang-format off
-      std::shared_ptr<battery_params> m_params{nullptr};
-      metrics_parser m_metrics_parser;
-      // clang-format on
+  // clang-format off
+  std::shared_ptr<battery_params> m_params{nullptr};
+  metrics_parser m_metrics_parser;
+  // clang-format on
 };
 
 NS_END(params, fordyca);

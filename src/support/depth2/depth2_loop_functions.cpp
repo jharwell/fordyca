@@ -73,7 +73,8 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
-                                      &arenap->cache.usage_penalty);
+                                      &arenap->cache.usage_penalty,
+                                      m_cache_manager.get());
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -99,8 +100,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller.free_drop_event(false);
 
   /* send the robot its view of the world: what it sees and where it is */
-  utils::set_robot_pos<decltype(controller)>(robot);
-  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  loop_utils::set_robot_pos<decltype(controller)>(robot);
+  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
@@ -210,8 +211,8 @@ void depth2_loop_functions::PreStep() {
 
 void depth2_loop_functions::Reset() {
   m_metrics_agg->reset_all();
-  auto pair = m_cache_manager->create(arena_map()->caches(),
-                                      arena_map()->blocks());
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
   if (pair.first) {
     arena_map()->caches_add(pair.second);
   }

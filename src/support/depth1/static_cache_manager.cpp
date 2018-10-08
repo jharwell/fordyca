@@ -139,10 +139,9 @@ std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create
             mc_cache_params.static_size,
             representation::base_cache::kMinBlocks);
 
-  support::depth1::static_cache_creator creator(
-      arena_grid(),
-      mc_cache_loc,
-      mc_cache_params.dimension);
+  support::depth1::static_cache_creator creator(arena_grid(),
+                                                mc_cache_loc,
+                                                mc_cache_params.dimension);
   auto pair = calc_blocks_for_creation(blocks);
   cache_vector created;
   if (!pair.first) {
@@ -152,8 +151,7 @@ std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create
     return std::make_pair(false, created);
   }
   /* no existing caches, so empty vector */
-  created = creator.create_all(cache_vector(),
-                               pair.second);
+  created = creator.create_all(cache_vector(), pair.second);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
@@ -172,10 +170,10 @@ std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
         events::cell_empty empty(b->discrete_loc());
         arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(b,
-                                   math::rcoord_to_dcoord(c->real_loc(),
-                                                          arena_grid()->resolution()),
-                                   arena_grid()->resolution());
+        events::free_block_drop op(
+            b,
+            math::rcoord_to_dcoord(c->real_loc(), arena_grid()->resolution()),
+            arena_grid()->resolution());
         arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());

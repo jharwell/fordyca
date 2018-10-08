@@ -47,9 +47,9 @@ dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
  ******************************************************************************/
 bool dynamic_cache_creator::creation_sanity_checks(
     const cache_vector& caches) const {
-  for (auto &c1 : caches) {
-    for (auto &c2 : caches) {
-      for (auto &b : c1->blocks()) {
+  for (auto& c1 : caches) {
+    for (auto& c2 : caches) {
+      for (auto& b : c1->blocks()) {
         ER_ASSERT(!c2->contains_block(b),
                   "Block%d contained in both cache%d and cache%d",
                   b->id(),
@@ -76,8 +76,8 @@ bool dynamic_cache_creator::creation_sanity_checks(
                   c2_yspan.get_min(),
                   c2_yspan.get_max());
       } /* for(&b..) */
-    } /* for(&c2..) */
-  } /* for(&c1..) */
+    }   /* for(&c2..) */
+  }     /* for(&c1..) */
   return true;
 } /* creation_sanity_checks() */
 
@@ -106,9 +106,8 @@ base_cache_creator::cache_vector dynamic_cache_creator::create_all(
     /*
      * Block already in a new cache
      */
-    if (std::find(used_blocks.begin(),
-                  used_blocks.end(),
-                  candidate_blocks[i]) != used_blocks.end()) {
+    if (std::find(used_blocks.begin(), used_blocks.end(), candidate_blocks[i]) !=
+        used_blocks.end()) {
       continue;
     }
     for (size_t j = i + 1; j < candidate_blocks.size(); ++j) {
@@ -116,8 +115,8 @@ base_cache_creator::cache_vector dynamic_cache_creator::create_all(
        * First, we have to first a block j that is close enough to block i to be
        * able to create a cache.
        */
-      if ((candidate_blocks[i]->real_loc() -
-           candidate_blocks[j]->real_loc()).Length() <= m_min_dist) {
+      if ((candidate_blocks[i]->real_loc() - candidate_blocks[j]->real_loc())
+              .Length() <= m_min_dist) {
         /*
          * We don't want to double add any blocks.
          */
@@ -169,20 +168,14 @@ base_cache_creator::cache_vector dynamic_cache_creator::create_all(
 argos::CVector2 dynamic_cache_creator::calc_center(
     const block_list& blocks,
     const cache_vector& existing_caches) const {
-  double sumx = std::accumulate(std::begin(blocks),
-                                std::end(blocks),
-                                0,
-                                [](double sum,
-                                   const auto& b) {
-                                  return sum + b->real_loc().GetX();
-                                });
-  double sumy = std::accumulate(std::begin(blocks),
-                                std::end(blocks),
-                                0,
-                                [](double sum,
-                                   const auto& b) {
-                                  return sum + b->real_loc().GetY();
-                                });
+  double sumx = std::accumulate(
+      std::begin(blocks), std::end(blocks), 0, [](double sum, const auto& b) {
+        return sum + b->real_loc().GetX();
+      });
+  double sumy = std::accumulate(
+      std::begin(blocks), std::end(blocks), 0, [](double sum, const auto& b) {
+        return sum + b->real_loc().GetY();
+      });
 
   argos::CVector2 center(sumx / blocks.size(), sumy / blocks.size());
   ER_DEBUG("Guess center=(%f,%f)", center.GetX(), center.GetY());
@@ -225,7 +218,7 @@ argos::CVector2 dynamic_cache_creator::calc_center(
         break;
       }
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
 
   /*
    * @todo This will definitely need to be changed later, because it may very

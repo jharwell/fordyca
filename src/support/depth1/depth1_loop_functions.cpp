@@ -127,8 +127,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller.free_drop_event(false);
 
   /* send the robot its view of the world: what it sees and where it is */
-  utils::set_robot_pos<decltype(controller)>(robot);
-  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  loop_utils::set_robot_pos<decltype(controller)>(robot);
+  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
@@ -301,9 +301,8 @@ void depth1_loop_functions::cache_handling_init(
                                     arena_map()->nest().real_loc().GetX() / 2.0,
                                 arena_map()->nest().real_loc().GetY());
 
-  m_cache_manager = rcppsw::make_unique<static_cache_manager>(cachep,
-                                                              &arena_map()->decoratee(),
-                                                              m_cache_loc);
+  m_cache_manager = rcppsw::make_unique<static_cache_manager>(
+      cachep, &arena_map()->decoratee(), m_cache_loc);
 
   /* return value ignored at this level (for now...) */
   auto pair = m_cache_manager->create(arena_map()->blocks());

@@ -54,8 +54,7 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center,
-                                                   grid()->resolution());
+  rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, grid()->resolution());
   ds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(cell.block(), "Cell does not have block");

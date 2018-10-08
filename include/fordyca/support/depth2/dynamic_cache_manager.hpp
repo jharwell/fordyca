@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <vector>
 #include <utility>
-
+#include <algorithm>
 #include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/params/arena/cache_params.hpp"
@@ -75,6 +75,17 @@ class dynamic_cache_manager : public base_cache_manager,
    */
   std::pair<bool, cache_vector> create(cache_vector& existing_caches,
                                        block_vector& blocks);
+
+  /**
+   * @brief Get the minimum distance that must be maintained between two caches
+   * in order for them to discrete. Equal to the maximum of (twice the cache
+   * dimension, minimmum distance between blocks to consider when creating
+   * caches);
+   */
+  double cache_proximity_dist(void) const {
+    return std::max(2 * mc_cache_params.dimension,
+                    mc_cache_params.min_dist);
+  }
 
  private:
   // clang-format off

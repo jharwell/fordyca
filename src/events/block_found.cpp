@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
@@ -41,6 +43,12 @@ block_found::block_found(std::unique_ptr<representation::base_block> block)
                         block->discrete_loc().second),
       ER_CLIENT_INIT("fordyca.events.block_found"),
       m_block(std::move(block)) {}
+
+block_found::block_found(const std::shared_ptr<representation::base_block>& block)
+    : perceived_cell_op(block->discrete_loc().first,
+                        block->discrete_loc().second),
+      ER_CLIENT_INIT("fordyca.events.block_found"),
+      m_block(block) {}
 
 /*******************************************************************************
  * Depth0 Foraging
@@ -125,6 +133,13 @@ void block_found::visit(ds::perceived_arena_map& map) {
      */
     cell.accept(*this);
   }
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void block_found::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.perception()->map()->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/stateless_loop_functions.hpp"
-#include "fordyca/support/depth0/arena_interactor.hpp"
+#include "fordyca/support/depth0/robot_arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +63,7 @@ class stateful_loop_functions : public stateless_loop_functions,
 
  private:
   using interactor =
-      arena_interactor<controller::depth0::stateful_controller>;
+      robot_arena_interactor<controller::depth0::stateful_controller>;
 
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
@@ -72,7 +72,6 @@ class stateful_loop_functions : public stateless_loop_functions,
   std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg;
   std::unique_ptr<interactor>                  m_interactor{nullptr};
   // clang-format on
-
 };
 
 NS_END(depth0, support, fordyca);

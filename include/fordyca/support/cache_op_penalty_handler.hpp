@@ -24,9 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/support/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
@@ -68,8 +69,9 @@ class cache_op_penalty_handler
   using temporal_penalty_handler<T>::original_penalty;
 
   cache_op_penalty_handler(ds::arena_map* const map,
-                           const ct::waveform_params* const params)
-      : temporal_penalty_handler<T>(params),
+                           const ct::waveform_params* const params,
+                           const std::string& name)
+      : temporal_penalty_handler<T>(params, name),
         ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
         m_map(map) {}
 
@@ -105,9 +107,9 @@ class cache_op_penalty_handler
               "Robot already serving cache penalty?");
 
     uint penalty = deconflict_penalty_finish(timestep);
-    int id = utils::robot_on_cache(controller, *m_map);
+    int id = loop_utils::robot_on_cache(controller, *m_map);
     ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            utils::robot_id(controller),
+            loop_utils::robot_id(controller),
             id,
             timestep,
             original_penalty(),
@@ -133,7 +135,7 @@ class cache_op_penalty_handler
       return false;
     }
 
-    int cache_id = utils::robot_on_cache(controller, *m_map);
+    int cache_id = loop_utils::robot_on_cache(controller, *m_map);
     return (controller.current_task()->goal_acquired() &&
             acquisition_goal_type::kExistingCache ==
                 controller.current_task()->acquisition_goal() &&

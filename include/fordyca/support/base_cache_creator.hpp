@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/utility/math/vector2.h>
 #include <list>
 #include <vector>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
@@ -35,7 +35,10 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class arena_cache; class base_block; }
+namespace representation {
+class arena_cache;
+class base_block;
+} // namespace representation
 NS_START(support);
 namespace er = rcppsw::er;
 

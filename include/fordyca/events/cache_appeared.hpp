@@ -34,20 +34,17 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-namespace depth2 {
+namespace controller { namespace depth2 {
 class greedy_recpart_controller;
-}
-} // namespace controller
+}} // namespace controller::depth2
 
 namespace fsm { namespace depth1 {
-class block_to_goal_fsm; }} // namespace fsm::depth1
-namespace tasks {
-namespace depth2 {
+class block_to_goal_fsm;
+}} // namespace fsm::depth1
+namespace tasks { namespace depth2 {
 class cache_starter;
 class cache_finisher;
-} // namespace depth2
-} // namespace tasks
+}} // namespace tasks::depth2
 
 NS_START(events);
 
@@ -82,7 +79,9 @@ class cache_appeared
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
 
  private:
+  // clang-format off
   uint m_cache_id;
+  // clang-format on
 };
 
 NS_END(events, fordyca);

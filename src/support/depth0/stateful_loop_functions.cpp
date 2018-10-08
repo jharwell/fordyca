@@ -34,7 +34,6 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
@@ -106,8 +105,8 @@ void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  utils::set_robot_pos<decltype(controller)>(robot);
-  utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  loop_utils::set_robot_pos<decltype(controller)>(robot);
+  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */

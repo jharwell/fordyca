@@ -85,9 +85,10 @@ void block_vanished::visit(fsm::depth0::stateful_fsm& fsm) {
 void block_vanished::visit(
     controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
-  ER_INFO("Abort pickup executing task %s: block%d vanished",
-          dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
-          m_block_id);
+  ER_INFO(
+      "Abort pickup executing task %s: block%d vanished",
+      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
+      m_block_id);
   auto* task =
       dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,

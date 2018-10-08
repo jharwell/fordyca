@@ -27,7 +27,7 @@
 #include <list>
 #include "fordyca/support/depth0/stateful_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/support/depth1/arena_interactor.hpp"
+#include "fordyca/support/depth1/robot_arena_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,7 +73,7 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   }
 
  private:
-  using interactor = arena_interactor<controller::depth1::greedy_partitioning_controller>;
+  using interactor = robot_arena_interactor<controller::depth1::greedy_partitioning_controller>;
 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);

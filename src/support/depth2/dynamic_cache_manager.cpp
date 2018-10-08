@@ -52,7 +52,6 @@ dynamic_cache_manager::dynamic_cache_manager(
 std::pair<bool, dynamic_cache_manager::cache_vector> dynamic_cache_manager::create(
     cache_vector& existing_caches,
     block_vector& blocks) {
-
   support::depth2::dynamic_cache_creator creator(arena_grid(),
                                                  mc_cache_params.dimension,
                                                  mc_cache_params.min_dist);

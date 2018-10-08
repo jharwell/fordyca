@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include "rcppsw/common/common.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,9 @@ namespace representation {
 class base_block;
 class arena_cache;
 } // namespace representation
-namespace ds { class arena_grid; }
+namespace ds {
+class arena_grid;
+}
 
 NS_START(support);
 
@@ -67,7 +69,10 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
   uint caches_depleted(void) const override { return m_cache_depleted; }
   void caches_created(uint c) { m_cache_created += c; }
   void caches_depleted(uint c) { m_cache_depleted += c; }
-  void reset_metrics(void) override { m_cache_created = 0; m_cache_depleted = 0;  }
+  void reset_metrics(void) override {
+    m_cache_created = 0;
+    m_cache_depleted = 0;
+  }
 
   void cache_created(void) { ++m_cache_created; }
   void cache_depleted(void) { ++m_cache_depleted; }

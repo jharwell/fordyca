@@ -137,7 +137,7 @@ void stateless_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* Send the robot its current position */
   set_robot_tick<controller::depth0::stateless_controller>(robot);
-  utils::set_robot_pos<controller::depth0::stateless_controller>(robot);
+  loop_utils::set_robot_pos<controller::depth0::stateless_controller>(robot);
 
   /* update arena map metrics with robot position */
   auto coord = math::rcoord_to_dcoord(controller.robot_loc(),

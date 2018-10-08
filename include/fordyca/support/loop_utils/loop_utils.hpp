@@ -1,11 +1,11 @@
 /**
- * @file loop_functions_utils.hpp
- * @ingroup support
+ * @file loop_utils.hpp
+ * @ingroup support loop_utils
  *
  * Helpers for loop functions that CAN be free functions, as they do not require
  * access to anything in \ref argos::CLoopFunctions.
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,13 +22,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_LOOP_FUNCTIONS_UTILS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_LOOP_FUNCTIONS_UTILS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include <utility>
 
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
@@ -41,7 +42,7 @@ namespace controller {
 class base_controller;
 }
 
-NS_START(support, utils);
+NS_START(support, loop_utils);
 
 /*******************************************************************************
  * Functions
@@ -113,6 +114,35 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
 }
 
 /**
+ * @brief Determine if creating dropping a block at the robot's current
+ * position will cause a cache to be created because it is too close to other
+ * blocks in the arena (blocks that are unknown to the robot).
+ *
+ * @return (block id of cache that is too close (-1 if none), distance to said
+ *         block).
+ */
+std::pair<int,
+          argos::CVector2> cache_site_block_proximity(
+              const controller::base_controller& controller,
+              const ds::arena_map& map);
+
+/**
+ * @brief Determine if creating a new cache centered at the robot's current
+ * position will overlap with any othennr caches in the arena. This is an
+ * approximate check, because the weighted centroid of constituent blocks is
+ * used rather than the robot's current location when creating a new cache, but
+ * this should serve as a good check against invalid cache creation.
+ *
+ * @return (cache id of cache that is too close (-1 if none), distance to said
+ *         cache).
+ */
+std::pair<int,
+          argos::CVector2> new_cache_cache_proximity(
+              const controller::base_controller& controller,
+              const ds::arena_map& map,
+              double proximity_dist);
+
+/**
  * @brief Set the LOS of a robot in the arena.
  *
  * This is a hack that makes getting my research up and running easier.
@@ -142,6 +172,6 @@ void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
   controller.los(new_los);
 }
 
-NS_END(utils, support, fordyca);
+NS_END(loop_utils, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_LOOP_FUNCTIONS_UTILS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_ */
