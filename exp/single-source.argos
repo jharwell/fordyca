@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <oracular_partitioning_controller id="ffc"
+    <greedy_partitioning_controller id="ffc"
                                 library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -104,7 +104,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </oracular_partitioning_controller>
+    </greedy_partitioning_controller>
 
   </controllers>
 
@@ -135,7 +135,13 @@
           task_execution_generalist_fname="task-execution-generalist.csv"
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
+          task_execution_cache_starter_fname="task-execution-cache_starter.csv"
+          task_execution_cache_finisher_fname="task-execution-cache_finisher.csv"
+          task_execution_cache_transferer_fname="task-execution-cache_transferer.csv"
+          task_execution_cache_collector_fname="task-execution-cache_collector.csv"
           task_generalist_tab_fname="task-generalist-tab.csv"
+          task_collector_tab_fname="task-collector-tab.csv"
+          task_harvester_tab_fname="task-harvester-tab.csv"
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
@@ -144,7 +150,7 @@
           />
     </output>
     <oracle
-        tasking_enabled="true"
+        tasking_enabled="false"
       />
     <arena_map>
       <grid resolution="0.2"
@@ -172,22 +178,27 @@
               />
         </distribution>
       </blocks>
-
-      <static_caches enable="true"
-                     size="2"
-                     respawn_scale_factor="0.05"
-                     dimension="0.8"
-                     min_dist="0.8">
-        <usage_penalty>
-          <waveform
-              type="Null"
-              frequency="100"
-              amplitude="500"
-              offset="10"/>
-        </usage_penalty>
-      </static_caches>
       <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
+    <caches
+         dimension="0.8">
+      <static enable="true"
+              size="2"
+              respawn_scale_factor="0.05"
+              >
+      </static>
+      <usage_penalty>
+        <waveform
+            type="Null"
+            frequency="100"
+            amplitude="500"
+            offset="10"/>
+      </usage_penalty>
+      <dynamic enable="false"
+               min_dist="0.8"/>
+
+    </caches>
+
     <visualization robot_id="true"
                    robot_los="false"
                    robot_task="true"
@@ -239,7 +250,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="64" max_trials="1000">
+      <entity quantity="4" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

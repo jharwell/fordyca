@@ -1,5 +1,5 @@
 /**
- * @file arena_map_parser.hpp
+ * @file caches_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,73 +18,74 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_ARENA_MAP_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_ARENA_MAP_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/arena/blocks_parser.hpp"
-#include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/arena/nest_parser.hpp"
 
 #include "rcppsw/common/common.hpp"
+#include "fordyca/params/caches/caches_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
+#include "fordyca/params/caches/static_cache_parser.hpp"
+#include "fordyca/params/caches/dynamic_cache_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca, params, caches);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_map_parser
- * @ingroup params arena
+ * @class caches_parser
+ * @ingroup params caches
  *
- * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
+ * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */
-class arena_map_parser : public rcppsw::params::xml_param_parser {
+class caches_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit arena_map_parser(uint level)
+  explicit caches_parser(uint level)
       : xml_param_parser(level),
-        m_grid(level + 1),
-        m_blocks(level + 1),
-        m_nest(level + 1) {}
+        m_waveform(level + 1),
+        m_static(level + 1),
+        m_dynamic(level + 1) {}
 
   /**
-   * @brief The root tag that all arena map parameters should lie under in the
-   * XML tree.
+   * @brief The root tag that all static cache parameters should lie under in
+   * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "arena_map";
+  static constexpr char kXMLRoot[] = "caches";
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
+  bool parsed(void) const override { return m_parsed; }
 
-  std::shared_ptr<arena_map_params> parse_results(void) const {
+  std::shared_ptr<caches_params> parse_results(void) const {
     return m_params;
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 
   // clang-format off
-  std::shared_ptr<arena_map_params> m_params{nullptr};
-  grid_parser                       m_grid;
-  blocks_parser                     m_blocks;
-  nest_parser                       m_nest;
+  bool                           m_parsed{false};
+  std::shared_ptr<caches_params> m_params{nullptr};
+  ct::waveform_xml_parser        m_waveform;
+  static_cache_parser            m_static;
+  dynamic_cache_parser           m_dynamic;
   // clang-format on
 };
 
-NS_END(arena, params, fordyca);
+NS_END(caches, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_ARENA_MAP_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_ */

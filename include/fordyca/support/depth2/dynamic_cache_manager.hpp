@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/params/arena/cache_params.hpp"
+#include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 
 #include "rcppsw/er/client.hpp"
@@ -59,7 +59,7 @@ namespace er = rcppsw::er;
 class dynamic_cache_manager : public base_cache_manager,
                               public er::client<dynamic_cache_manager> {
  public:
-  dynamic_cache_manager(const struct params::arena::cache_params* params,
+  dynamic_cache_manager(const struct params::caches::caches_params* params,
                         ds::arena_grid* const arena_grid);
 
   /**
@@ -84,12 +84,12 @@ class dynamic_cache_manager : public base_cache_manager,
    */
   double cache_proximity_dist(void) const {
     return std::max(2 * mc_cache_params.dimension,
-                    mc_cache_params.min_dist);
+                    mc_cache_params.dynamic.min_dist);
   }
 
  private:
   // clang-format off
-  const params::arena::cache_params mc_cache_params;
+  const params::caches::caches_params mc_cache_params;
   // clang-format on
 };
 

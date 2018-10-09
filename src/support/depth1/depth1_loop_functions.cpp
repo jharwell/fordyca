@@ -75,7 +75,8 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
                                                                  output_root());
 
   /* initialize cache handling and create initial cache */
-  cache_handling_init(&arenap->cache);
+  auto* cachep = params().parse_results<params::caches::caches_params>();
+  cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
   m_interactor =
@@ -83,7 +84,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
-                                      &arenap->cache.usage_penalty);
+                                      &cachep->usage_penalty);
 
   /* initialize oracles */
   oracle_init();
@@ -152,9 +153,9 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
   }
 
   auto* oraclep = params().parse_results<params::oracle_params>();
-  auto& oracular =
-      dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
   if (oraclep->tasking_enabled) {
+    auto& oracular =
+        dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   m_tasking_oracle.get(),
@@ -292,13 +293,15 @@ void depth1_loop_functions::pre_step_final(void) {
 } /* pre_step_final() */
 
 void depth1_loop_functions::cache_handling_init(
-    const struct params::arena::cache_params* cachep) {
+    const struct params::caches::caches_params* cachep) {
+  ER_ASSERT(nullptr != cachep && cachep->static_.enable,
+            "Static cache must be present in XML file and enabled for depth 1");
   /*
    * Regardless of how many foragers/etc there are, always create an
    * initial cache.
    */
-  m_cache_loc = argos::CVector2(arena_map()->xrsize() +
-                                    arena_map()->nest().real_loc().GetX() / 2.0,
+  m_cache_loc = argos::CVector2((arena_map()->xrsize() +
+                                 arena_map()->nest().real_loc().GetX()) / 2.0,
                                 arena_map()->nest().real_loc().GetY());
 
   m_cache_manager = rcppsw::make_unique<static_cache_manager>(

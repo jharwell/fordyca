@@ -25,7 +25,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/utils.hpp"
-#include "fordyca/params/arena/cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
@@ -40,7 +39,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 dynamic_cache_manager::dynamic_cache_manager(
-    const struct params::arena::cache_params* params,
+    const struct params::caches::caches_params* params,
     ds::arena_grid* const arena_grid)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
@@ -54,7 +53,7 @@ std::pair<bool, dynamic_cache_manager::cache_vector> dynamic_cache_manager::crea
     block_vector& blocks) {
   support::depth2::dynamic_cache_creator creator(arena_grid(),
                                                  mc_cache_params.dimension,
-                                                 mc_cache_params.min_dist);
+                                                 mc_cache_params.dynamic.min_dist);
 
   auto created = creator.create_all(existing_caches, blocks);
   /*

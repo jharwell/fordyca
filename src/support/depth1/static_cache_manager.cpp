@@ -25,7 +25,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/utils.hpp"
-#include "fordyca/params/arena/cache_params.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -40,7 +39,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_manager::static_cache_manager(
-    const struct params::arena::cache_params* params,
+    const struct params::caches::caches_params* params,
     ds::arena_grid* const arena_grid,
     const argos::CVector2& cache_loc)
     : base_cache_manager(arena_grid),
@@ -68,54 +67,54 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
       to_use.push_back(b);
     }
-    if (blocks.size() >= mc_cache_params.static_size) {
+    if (to_use.size() >= mc_cache_params.static_.size) {
       break;
     }
   } /* for(b..) */
 
   bool ret = true;
-  if (blocks.size() < representation::base_cache::kMinBlocks) {
+  if (to_use.size() < representation::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
      * set of blocks into an int)
      */
     uint count = 0;
-    std::for_each(blocks.begin(),
-                  blocks.end(),
+    std::for_each(to_use.begin(),
+                  to_use.end(),
                   [&](std::shared_ptr<representation::base_block>& b) {
                     count +=
                         (b->is_out_of_sight() || b->discrete_loc() == dcenter);
                   });
 
     std::string accum;
-    std::for_each(blocks.begin(), blocks.end(), [&](const auto& b) {
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
       accum += "b" + std::to_string(b->id()) + "->fb" +
                std::to_string(b->robot_id()) + ",";
     });
     ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
 
     accum = "";
-    std::for_each(blocks.begin(), blocks.end(), [&](const auto& b) {
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
       accum += "b" + std::to_string(b->id()) + "->(" +
                std::to_string(b->discrete_loc().first) + "," +
                std::to_string(b->discrete_loc().second) + "),";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
-    ER_ASSERT(blocks.size() - count < representation::base_cache::kMinBlocks,
+    ER_ASSERT(to_use.size() - count < representation::base_cache::kMinBlocks,
               "For new cache @(%f, %f) [%u, %u]: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               mc_cache_loc.GetX(),
               mc_cache_loc.GetY(),
               dcenter.first,
               dcenter.second,
-              blocks.size() - count,
-              blocks.size(),
+              to_use.size() - count,
+              to_use.size(),
               representation::base_cache::kMinBlocks);
     ret = false;
   }
-  if (blocks.size() < mc_cache_params.static_size) {
+  if (to_use.size() < mc_cache_params.static_.size) {
     ER_WARN(
         "Not enough free blocks to meet min size for new cache @(%f, %f) [%u, "
         "%u] (%zu < %u)",
@@ -123,8 +122,8 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
         mc_cache_loc.GetY(),
         dcenter.first,
         dcenter.second,
-        blocks.size(),
-        mc_cache_params.static_size);
+        to_use.size(),
+        mc_cache_params.static_.size);
     ret = false;
   }
   return std::make_pair(ret, to_use);
@@ -133,10 +132,10 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
 std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create(
     block_vector& blocks) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_cache_params.static_size >=
+  ER_ASSERT(mc_cache_params.static_.size >=
                 representation::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
-            mc_cache_params.static_size,
+            mc_cache_params.static_.size,
             representation::base_cache::kMinBlocks);
 
   support::depth1::static_cache_creator creator(arena_grid(),

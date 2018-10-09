@@ -30,6 +30,7 @@
 #include "rcppsw/control/waveform_xml_parser.hpp"
 #include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/battery_parser.hpp"
+#include "fordyca/params/caches/caches_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,6 +55,10 @@ loop_function_repository::loop_function_repository(void) {
       rcppsw::params::xml_param_parser::kHeader1);
   register_parser<oracle_parser, oracle_params>(
       oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<caches::caches_parser,
+                  caches::caches_params>(
+                      caches::caches_parser::kXMLRoot,
+                      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

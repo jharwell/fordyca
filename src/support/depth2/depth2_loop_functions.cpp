@@ -68,12 +68,13 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
                                                                  output_root());
 
   /* intitialize robot interactions with environment */
+  auto* cachep = params().parse_results<params::caches::caches_params>();
   m_interactor =
       rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
-                                      &arenap->cache.usage_penalty,
+                                      &cachep->usage_penalty,
                                       m_cache_manager.get());
 
   /* configure robots */

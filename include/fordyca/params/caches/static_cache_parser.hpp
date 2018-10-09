@@ -1,5 +1,5 @@
 /**
- * @file cache_parser.hpp
+ * @file static_cache_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,44 +27,41 @@
 #include <string>
 
 #include "rcppsw/common/common.hpp"
-#include "fordyca/params/arena/cache_params.hpp"
+#include "fordyca/params/caches/static_cache_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca, params, caches);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_parser
- * @ingroup params ranea
+ * @class static_cache_parser
+ * @ingroup params caches
  *
- * @brief Parses XML parameters for relating to caches into \ref cache_params.
+ * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */
-class cache_parser: public rcppsw::params::xml_param_parser {
+class static_cache_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit cache_parser(uint level)
-      : xml_param_parser(level),
-        m_waveform(level + 1) {}
+  explicit static_cache_parser(uint level)
+      : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all static cache parameters should lie under in
    * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "caches";
+  static constexpr char kXMLRoot[] = "static";
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  bool parsed(void) const override { return m_parsed; }
 
-  std::shared_ptr<cache_params> parse_results(void) const {
+  std::shared_ptr<static_cache_params> parse_results(void) const {
     return m_params;
   }
 
@@ -74,12 +71,10 @@ class cache_parser: public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  bool                          m_parsed{false};
-  std::shared_ptr<cache_params> m_params{nullptr};
-  ct::waveform_xml_parser       m_waveform;
+  std::shared_ptr<static_cache_params> m_params{nullptr};
   // clang-format on
 };
 
-NS_END(arena, params, fordyca);
+NS_END(caches, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARSER_HPP_ */

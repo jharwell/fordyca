@@ -1,5 +1,5 @@
 /**
- * @file arena_map_parser.cpp
+ * @file dynamic_cache_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,47 +18,44 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/arena/arena_map_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include <string>
+#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca, params, caches);
+namespace ct = rcppsw::control;
 
 /*******************************************************************************
- * Global Variables
+ * Structure Definitions
  ******************************************************************************/
-constexpr char arena_map_parser::kXMLRoot[];
+/**
+ * @struct dynamic_cache_params
+ * @ingroup params cache
+ */
+struct dynamic_cache_params : public rcppsw::params::base_params {
+  bool                enable{false};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  m_grid.parse(anode);
-  m_params->grid = *m_grid.parse_results();
+  /**
+   * @brief How close do blocks have to be to each other to be considered "in"
+   * the cache?
+   */
+  double              min_dist{0.0};
 
-  m_blocks.parse(anode);
-  m_params->blocks = *m_blocks.parse_results();
+ /**
+   * @brief How many blocks does it take to create a dynamic cache?
+   */
+  uint                min_blocks{0};
+};
 
-  m_nest.parse(anode);
-  m_params->nest = *m_nest.parse_results();
-} /* parse() */
+NS_END(caches, params, fordyca);
 
-void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid << m_blocks << m_nest
-         << build_footer();
-} /* show() */
-
-__rcsw_pure bool arena_map_parser::validate(void) const {
-  return m_grid.validate() && m_blocks.validate() &&
-         m_nest.validate();
-} /* validate() */
-
-NS_END(arena, params, fordyca);
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_ */
