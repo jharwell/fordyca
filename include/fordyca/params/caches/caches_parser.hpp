@@ -1,7 +1,7 @@
 /**
- * @file exec_estimates_parser.hpp
+ * @file caches_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,54 +18,59 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/depth0/exec_estimates_parser.hpp"
-#include "fordyca/params/depth1/exec_estimates_params.hpp"
+
+#include "rcppsw/common/common.hpp"
+#include "fordyca/params/caches/caches_params.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
+#include "fordyca/params/caches/static_cache_parser.hpp"
+#include "fordyca/params/caches/dynamic_cache_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, caches);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class exec_estimates_parser
- * @ingroup params depth1
+ * @class caches_parser
+ * @ingroup params caches
  *
- * @brief Parses XML parameters used for estimation of depth1 task execution
- * times at the start of simulation.
+ * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */
-class exec_estimates_parser: public rcppsw::params::xml_param_parser {
+class caches_parser: public rcppsw::params::xml_param_parser {
  public:
-  explicit exec_estimates_parser(uint level)
-      : xml_param_parser(level) {}
+  explicit caches_parser(uint level)
+      : xml_param_parser(level),
+        m_waveform(level + 1),
+        m_static(level + 1),
+        m_dynamic(level + 1) {}
 
   /**
-   * @brief The root tag that all cache parameters should lie under in the
-   * XML tree.
+   * @brief The root tag that all static cache parameters should lie under in
+   * the XML tree.
    */
-  static constexpr char kXMLRoot[] = "task_exec_estimates";
+  static constexpr char kXMLRoot[] = "caches";
 
   void parse(const ticpp::Element& node) override;
   void show(std::ostream& stream) const override;
+  bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<exec_estimates_params> parse_results(void) const {
-    return m_params;
-  }
-
   bool parsed(void) const override { return m_parsed; }
 
- protected:
-  void parsed(bool parsed) { m_parsed = parsed; }
+  std::shared_ptr<caches_params> parse_results(void) const {
+    return m_params;
+  }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
@@ -73,11 +78,14 @@ class exec_estimates_parser: public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  bool                                   m_parsed{false};
-  std::shared_ptr<exec_estimates_params> m_params{nullptr};
+  bool                           m_parsed{false};
+  std::shared_ptr<caches_params> m_params{nullptr};
+  ct::waveform_xml_parser        m_waveform;
+  static_cache_parser            m_static;
+  dynamic_cache_parser           m_dynamic;
   // clang-format on
 };
 
-NS_END(params, fordyca, depth1);
+NS_END(caches, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARSER_HPP_ */

@@ -24,17 +24,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/tasks/nest_interactor.hpp"
 #include "fordyca/tasks/free_block_interactor.hpp"
+#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {struct task_params; }}
-NS_START(fordyca);
 
+namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
+
+NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(tasks, depth0);
@@ -46,8 +50,8 @@ NS_START(tasks, depth0);
  * @class foraging_task
  * @ingroup tasks depth0
  *
- * @brief Interface specifying the visit set for all depth0 foraging tasks
- * in FORDYCA.
+ * @brief Interface specifying the visit set for all depth0 foraging tasks in
+ * FORDYCA.
  *
  * Not all tasks need all events, but it is convenient both from a design point
  * of view as well as not having to fight with the compiler as much if you do it
@@ -56,11 +60,18 @@ NS_START(tasks, depth0);
 class foraging_task
     : public base_foraging_task,
       public nest_interactor,
-      public free_block_interactor {
+      public free_block_interactor,
+      public ta::partitionable_polled_task {
  public:
   static constexpr char kGeneralistName[] = "Generalist";
 
-  foraging_task(void) = default;
+  foraging_task(const std::string& name,
+                const ta::task_allocation_params* const params,
+                std::unique_ptr<ta::taskable> mechanism) :
+      partitionable_polled_task(name,
+                                params,
+                                std::move(mechanism)) {}
+
   ~foraging_task(void) override = default;
 };
 

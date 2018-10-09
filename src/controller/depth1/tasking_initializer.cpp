@@ -38,9 +38,9 @@
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,7 +69,7 @@ tasking_initializer::~tasking_initializer(void) = default;
  ******************************************************************************/
 void tasking_initializer::depth1_tasking_init(
     params::depth1::controller_repository* const param_repo) {
-  auto* exec_params = param_repo->parse_results<ta::executive_params>();
+  auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
   auto* est_params =
       param_repo->parse_results<params::depth1::exec_estimates_params>();
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
@@ -86,47 +86,53 @@ void tasking_initializer::depth1_tasking_init(
           perception()->map());
 
   tasks::depth1::collector* collector =
-      new tasks::depth1::collector(exec_params, std::move(collector_fsm));
+      new tasks::depth1::collector(task_params, std::move(collector_fsm));
 
   auto harvester =
-      new tasks::depth1::harvester(exec_params, std::move(harvester_fsm));
+      new tasks::depth1::harvester(task_params, std::move(harvester_fsm));
+  auto generalist = graph()->find_vertex(
+      tasks::depth0::foraging_task::kGeneralistName);
 
   if (est_params->seed_enabled) {
-    static_cast<ta::polled_task*>(harvester)->init_random(
-        est_params->harvester_range.GetMin(),
-        est_params->harvester_range.GetMax());
-    static_cast<ta::polled_task*>(collector)->init_random(
-        est_params->collector_range.GetMin(),
-        est_params->collector_range.GetMax());
     /*
      * Generalist is not partitionable in depth 0 initialization, so this has
      * not been done.
      */
     if (0 == std::rand() % 2) {
-      static_cast<ta::partitionable_polled_task*>(graph()->root())
-          ->init_random(collector,
-                        est_params->generalist_range.GetMin(),
-                        est_params->generalist_range.GetMax());
+      dynamic_cast<ta::partitionable_polled_task*>(generalist)->last_partition(
+          collector);
     } else {
-      static_cast<ta::partitionable_polled_task*>(graph()->root())
-          ->init_random(harvester,
-                        est_params->generalist_range.GetMin(),
-                        est_params->generalist_range.GetMax());
+      dynamic_cast<ta::partitionable_polled_task*>(generalist)->last_partition(
+          harvester);
     }
+
+    ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
+            harvester->name().c_str(),
+            est_params->harvester_range.GetMin(),
+            est_params->harvester_range.GetMax(),
+            collector->name().c_str(),
+            est_params->collector_range.GetMin(),
+            est_params->collector_range.GetMax());
+    static_cast<ta::polled_task*>(harvester)->exec_est_bounds_init(
+        est_params->harvester_range.GetMin(),
+        est_params->harvester_range.GetMax());
+    static_cast<ta::polled_task*>(collector)->exec_est_bounds_init(
+        est_params->collector_range.GetMin(),
+        est_params->collector_range.GetMax());
   }
-  graph()->root()->set_partitionable(true);
-  graph()->root()->set_atomic(false);
+  generalist->set_partitionable(true);
+  generalist->set_atomic(false);
   graph()->set_children(tasks::depth0::foraging_task::kGeneralistName,
                         std::vector<ta::polled_task*>({harvester, collector}));
 } /* depth1_tasking_init() */
 
-std::unique_ptr<ta::bifurcating_tdgraph_executive> tasking_initializer::operator()(
+std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
     params::depth1::controller_repository* const param_repo) {
   stateful_tasking_init(param_repo);
 
   depth1_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bifurcating_tdgraph_executive>(
+  return rcppsw::make_unique<ta::bi_tdgraph_executive>(
       mc_exec_ests_oracle, graph());
 } /* initialize() */
 

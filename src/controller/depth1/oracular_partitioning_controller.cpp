@@ -25,7 +25,7 @@
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************

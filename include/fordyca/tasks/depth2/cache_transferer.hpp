@@ -48,7 +48,7 @@ NS_START(fordyca, tasks, depth2);
 class cache_transferer : public foraging_task,
                          public depth1::existing_cache_interactor {
  public:
-  cache_transferer(const struct ta::task_params* params,
+  cache_transferer(const struct ta::task_allocation_params* params,
                    std::unique_ptr<ta::taskable> mechanism);
 
   /*

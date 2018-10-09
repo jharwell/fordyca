@@ -29,7 +29,7 @@
 
 #include <argos3/core/utility/math/vector2.h>
 
-#include "fordyca/params/arena/cache_params.hpp"
+#include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 
 #include "rcppsw/er/client.hpp"
@@ -59,7 +59,7 @@ namespace er = rcppsw::er;
 class static_cache_manager : public base_cache_manager,
                              public er::client<static_cache_manager> {
  public:
-  static_cache_manager(const struct params::arena::cache_params* params,
+  static_cache_manager(const struct params::caches::caches_params* params,
                        ds::arena_grid* arena_grid,
                        const argos::CVector2& cache_loc);
 
@@ -95,8 +95,8 @@ class static_cache_manager : public base_cache_manager,
   std::pair<bool, block_vector> calc_blocks_for_creation(block_vector& blocks);
 
   // clang-format off
-  const params::arena::cache_params mc_cache_params;
-  const argos::CVector2             mc_cache_loc;
+  const params::caches::caches_params mc_cache_params;
+  const argos::CVector2               mc_cache_loc;
   // clang-format on
 };
 

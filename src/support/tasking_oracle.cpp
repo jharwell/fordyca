@@ -24,8 +24,8 @@
 #include "fordyca/support/tasking_oracle.hpp"
 #include <functional>
 
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -36,7 +36,7 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-tasking_oracle::tasking_oracle(const ta::bifurcating_tdgraph* const graph)
+tasking_oracle::tasking_oracle(const ta::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle") {
   graph->walk([&](const ta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
@@ -51,7 +51,7 @@ tasking_oracle::mapped_type tasking_oracle::ask(const std::string& query) const 
 } /* ask() */
 
 void tasking_oracle::listener_add(
-    ta::bifurcating_tdgraph_executive* const executive) {
+    ta::bi_tdgraph_executive* const executive) {
   executive->task_abort_notify(
       std::bind(&tasking_oracle::task_abort_cb, this, std::placeholders::_1));
   executive->task_finish_notify(

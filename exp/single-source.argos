@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,8 +16,8 @@
   <!-- *************** -->
   <controllers>
 
-    <oracular_partitioning_controller id="ffc"
-                                library="libfordyca">
+    <greedy_recpart_controller id="ffc"
+                               library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -47,31 +47,47 @@
               ramp="1.0"
               />
         </occupancy_grid>
-        <task_executive>
-          <estimation alpha="0.8"/>
-          <task_abort reactivity="8"
-                      offset="3"
-                      />
+        <task_allocation>
+          <task_abort>
+            <sigmoid reactivity="8"
+                     offset="3"
+                     gamma="1.0"/>
+          </task_abort>
           <task_partition
               method="pini2011"
               always_partition="false"
-              never_partition="false"
-              reactivity="4"
-              offset="1.0"
-              />
+              never_partition="false">
+            <sigmoid
+                reactivity="4"
+                offset="1.0"
+                gamma="1.0"/>
+          </task_partition>
           <subtask_selection
               method="harwell2018"
               reactivity="8"
               offset="1.25"
               gamma="1.0"
               />
-        </task_executive>
-        <task_exec_estimates
-            seed_enabled="true"
-            generalist_range="2000:4000"
-            collector_range="1000:2000"
-            harvester_range="1000:2000"
-            />
+          <task_exec_estimates
+              seed_enabled="true"
+              generalist_range="2000:4000"
+              collector_range="1000:2000"
+              harvester_range="1000:2000"
+              cache_starter_range="1000:2000"
+              cache_finisher_range="1000:2000"
+              cache_collector_range="1000:2000"
+              cache_transferer_range="1000:2000">
+            <ema alpha="0.8"/>
+          </task_exec_estimates>
+          <tab_selection
+              method="harwell2019">
+            <sigmoid
+                reactivity="4"
+                offset="1.0"
+                gamma="1.0"/>
+          </tab_selection>
+        </task_allocation>
+
         <sensing>
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
@@ -104,7 +120,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </oracular_partitioning_controller>
+    </greedy_recpart_controller>
 
   </controllers>
 
@@ -112,11 +128,11 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <battery
-      power_station_amount="0"
-      power_station_size="1"
-      power_station_distrubtion="normal"/>
+        power_station_amount="0"
+        power_station_size="1"
+        power_station_distrubtion="normal"/>
     <output>
       <sim output_root="output"
            output_dir="__current_date__"
@@ -135,7 +151,13 @@
           task_execution_generalist_fname="task-execution-generalist.csv"
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
+          task_execution_cache_starter_fname="task-execution-cache_starter.csv"
+          task_execution_cache_finisher_fname="task-execution-cache_finisher.csv"
+          task_execution_cache_transferer_fname="task-execution-cache_transferer.csv"
+          task_execution_cache_collector_fname="task-execution-cache_collector.csv"
           task_generalist_tab_fname="task-generalist-tab.csv"
+          task_collector_tab_fname="task-collector-tab.csv"
+          task_harvester_tab_fname="task-harvester-tab.csv"
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
@@ -144,8 +166,8 @@
           />
     </output>
     <oracle
-        tasking_enabled="true"
-      />
+        tasking_enabled="false"
+        />
     <arena_map>
       <grid resolution="0.2"
             size="12, 6, 2"/>
@@ -172,22 +194,27 @@
               />
         </distribution>
       </blocks>
-
-      <static_caches enable="true"
-                     size="2"
-                     respawn_scale_factor="0.05"
-                     dimension="0.8"
-                     min_dist="0.8">
-        <usage_penalty>
-          <waveform
-              type="Null"
-              frequency="100"
-              amplitude="500"
-              offset="10"/>
-        </usage_penalty>
-      </static_caches>
       <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
+    <caches
+        dimension="0.8">
+      <static enable="false"
+              size="2"
+              respawn_scale_factor="0.05"
+              >
+      </static>
+      <usage_penalty>
+        <waveform
+            type="Null"
+            frequency="100"
+            amplitude="500"
+            offset="10"/>
+      </usage_penalty>
+      <dynamic enable="false"
+               min_dist="0.8"/>
+
+    </caches>
+
     <visualization robot_id="true"
                    robot_los="false"
                    robot_task="true"
@@ -239,7 +266,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="64" max_trials="1000">
+      <entity quantity="4" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

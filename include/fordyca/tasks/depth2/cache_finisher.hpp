@@ -49,7 +49,7 @@ namespace task_allocation = rcppsw::task_allocation;
 class cache_finisher : public foraging_task,
                        public free_block_interactor {
  public:
-  cache_finisher(const struct task_allocation::task_params* params,
+  cache_finisher(const struct ta::task_allocation_params* params,
                  std::unique_ptr<task_allocation::taskable> mechanism);
 
   /*

@@ -1,7 +1,7 @@
 /**
  * @file exec_estimates_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/range.h>
-#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/depth0/exec_estimates_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,13 +41,7 @@ NS_START(fordyca, params, depth1);
  *
  * @brief Parameters for execution time estimates of tasks involved in depth1.
  */
-struct exec_estimates_params : public rcppsw::params::base_params {
-  /**
-   * @brief Should initial estimates of task execution times be used?
-   */
-  bool                seed_enabled{false};
-
-  argos::CRange<uint> generalist_range{};
+struct exec_estimates_params : public depth0::exec_estimates_params {
   argos::CRange<uint> harvester_range{};
   argos::CRange<uint> collector_range{};
 };

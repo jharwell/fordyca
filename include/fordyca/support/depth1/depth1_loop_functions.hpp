@@ -33,7 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace arena { struct cache_params; }}
+namespace params { namespace caches { struct caches_params; }}
 
 NS_START(support);
 class tasking_oracle;
@@ -78,8 +78,7 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void cache_handling_init(
-      const struct params::arena::cache_params *cachep);
+  void cache_handling_init(const struct params::caches::caches_params *cachep);
 
   /**
    * @brief Configure a robot controller after initialization:

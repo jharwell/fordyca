@@ -1,5 +1,5 @@
 /**
- * @file controller_repository.cpp
+ * @file caches_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,24 +18,44 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_CACHES_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include <string>
+#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
+#include "fordyca/params/caches/static_cache_params.hpp"
+#include "fordyca/params/caches/dynamic_cache_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, caches);
+namespace ct = rcppsw::control;
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-controller_repository::controller_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      std::string("depth1_") +  exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-}
+/**
+ * @struct caches_params
+ * @ingroup params arena
+ *
+ * @brief Contains parameters for both static and dynamic caches in the arena.
+ */
+struct caches_params : public rcppsw::params::base_params {
+  /**
+   * @brief How large are cache (geometrical area), when created (same for
+   * static and dynamic) ?
+   */
+  double               dimension{0.0};
+  static_cache_params  static_{};
+  dynamic_cache_params dynamic{};
+  ct::waveform_params  usage_penalty{};
+};
 
-NS_END(depth1, params, fordyca);
+NS_END(arena, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_CACHE_PARAMS_HPP_ */

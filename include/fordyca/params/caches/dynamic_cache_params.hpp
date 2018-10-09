@@ -1,5 +1,5 @@
 /**
- * @file controller_repository.cpp
+ * @file dynamic_cache_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,24 +18,44 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include <string>
+#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, caches);
+namespace ct = rcppsw::control;
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-controller_repository::controller_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      std::string("depth1_") +  exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-}
+/**
+ * @struct dynamic_cache_params
+ * @ingroup params cache
+ */
+struct dynamic_cache_params : public rcppsw::params::base_params {
+  bool                enable{false};
 
-NS_END(depth1, params, fordyca);
+  /**
+   * @brief How close do blocks have to be to each other to be considered "in"
+   * the cache?
+   */
+  double              min_dist{0.0};
+
+ /**
+   * @brief How many blocks does it take to create a dynamic cache?
+   */
+  uint                min_blocks{0};
+};
+
+NS_END(caches, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_DYNAMIC_CACHE_PARAMS_HPP_ */

@@ -33,7 +33,7 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class bifurcating_tdgraph_executive;
+class bi_tdgraph_executive;
 class polled_task;
 }}
 

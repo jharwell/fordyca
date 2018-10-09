@@ -32,8 +32,8 @@
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,13 +67,17 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 
+  /* initialize cache handling */
+  auto* cachep = params().parse_results<params::caches::caches_params>();
+  cache_handling_init(cachep);
+
   /* intitialize robot interactions with environment */
   m_interactor =
       rcppsw::make_unique<interactor>(arena_map(),
                                       m_metrics_agg.get(),
                                       floor(),
                                       &arenap->blocks.manipulation_penalty,
-                                      &arenap->cache.usage_penalty,
+                                      &cachep->usage_penalty,
                                       m_cache_manager.get());
 
   /* configure robots */
@@ -85,8 +89,8 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
             robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
-  ndc_pop();
   ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
@@ -124,9 +128,9 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
   }
 
   auto* oraclep = params().parse_results<params::oracle_params>();
-  auto& oracular =
-      dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);
   if (oraclep->tasking_enabled) {
+    auto& oracular =
+        dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   tasking_oracle(),
@@ -151,6 +155,14 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
                 std::placeholders::_1,
                 std::placeholders::_2));
 } /* controller_configure() */
+
+void depth2_loop_functions::cache_handling_init(
+    const struct params::caches::caches_params* const cachep) {
+  m_cache_manager = rcppsw::make_unique<dynamic_cache_manager>(
+      cachep,
+      &arena_map()->decoratee());
+} /* cache_handlng_init() */
+
 
 argos::CColor depth2_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

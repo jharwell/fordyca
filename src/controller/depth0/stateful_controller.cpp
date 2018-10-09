@@ -33,9 +33,7 @@
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,7 +57,7 @@ stateful_controller::~stateful_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure const ta::bifurcating_tab* stateful_controller::active_tab(
+__rcsw_pure const ta::bi_tab* stateful_controller::active_tab(
     void) const {
   return m_executive->active_tab();
 }
@@ -69,7 +67,7 @@ void stateful_controller::block_sel_matrix(
   m_block_sel_matrix = std::move(m);
 }
 void stateful_controller::executive(
-    std::unique_ptr<ta::bifurcating_tdgraph_executive> executive) {
+    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
   m_executive = std::move(executive);
 }
 

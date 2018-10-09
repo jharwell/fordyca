@@ -47,22 +47,17 @@ void arena_map_parser::parse(const ticpp::Element& node) {
   m_blocks.parse(anode);
   m_params->blocks = *m_blocks.parse_results();
 
-  m_cache.parse(anode);
-  if (m_cache.parsed()) {
-    m_params->cache = *m_cache.parse_results();
-  }
-
   m_nest.parse(anode);
   m_params->nest = *m_nest.parse_results();
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid << m_blocks << m_cache << m_nest
+  stream << build_header() << m_grid << m_blocks << m_nest
          << build_footer();
 } /* show() */
 
 __rcsw_pure bool arena_map_parser::validate(void) const {
-  return m_grid.validate() && m_blocks.validate() && m_cache.validate() &&
+  return m_grid.validate() && m_blocks.validate() &&
          m_nest.validate();
 } /* validate() */
 

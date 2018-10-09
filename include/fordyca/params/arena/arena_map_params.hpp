@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/arena/blocks_params.hpp"
-#include "fordyca/params/arena/cache_params.hpp"
 #include "fordyca/params/grid_params.hpp"
 #include "fordyca/params/arena/nest_params.hpp"
 #include "rcppsw/params/base_params.hpp"
@@ -45,7 +44,6 @@ NS_START(fordyca, params, arena);
 struct arena_map_params : public rcppsw::params::base_params {
   struct grid_params grid {};
   struct blocks_params blocks {};
-  struct cache_params cache {};
   struct nest_params nest {};
 };
 

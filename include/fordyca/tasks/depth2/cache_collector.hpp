@@ -1,5 +1,5 @@
 /**
- * @file controller_repository.cpp
+ * @file cache_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,24 +18,39 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-controller_repository::controller_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      std::string("depth1_") +  exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-}
+/**
+ * @class cache_collector
+ * @ingroup tasks depth2
+ *
+ * @brief Task in which robots locate a cache and bring a block from it to the
+ * nest. It is abortable, and has one task interface.
+ */
+class cache_collector : public depth1::collector {
+ public:
+  cache_collector(const struct ta::task_allocation_params* params,
+                  std::unique_ptr<ta::taskable> mechanism) :
+      collector(params,
+                depth2::foraging_task::kCacheCollectorName,
+                std::move(mechanism)) {}
+};
 
-NS_END(depth1, params, fordyca);
+NS_END(depth2, tasks, fordyca);
+
+#endif /* INCLUDE_FORDYCA_TASKS_DEPTH2_CACHE_COLLECTOR_HPP_ */

@@ -95,7 +95,7 @@ __rcsw_pure bool block_drop_overlap_with_nest(
 std::pair<int, argos::CVector2> cache_site_block_proximity(
     const controller::base_controller& c,
     const ds::arena_map& map) {
-  for (size_t j = 0; j < map.blocks().size(); ++j) {
+  for (size_t j = 0; j < map.caches().size(); ++j) {
     auto new_xspan = map.caches()[j]->xspan(c.robot_loc());
     auto new_yspan = map.caches()[j]->yspan(c.robot_loc());
     auto c_xspan = map.caches()[j]->xspan(map.caches()[j]->real_loc());

@@ -29,17 +29,15 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class bifurcating_tdgraph_executive;
-class bifurcating_tab;
+class bi_tdgraph_executive;
+class bi_tab;
 class executable_task;
-using executive_params = partitionable_task_params;
 }}
 namespace visitor = rcppsw::patterns::visitor;
 namespace ta = rcppsw::task_allocation;
@@ -132,13 +130,13 @@ class stateful_controller : public stateless_controller,
   const base_perception_subsystem* perception(void) const { return m_perception.get(); }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
 
-  const ta::bifurcating_tab* active_tab(void) const;
+  const ta::bi_tab* active_tab(void) const;
 
   /*
    * Public to setup metric collection from tasks.
    */
-  const ta::bifurcating_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bifurcating_tdgraph_executive* executive(void) { return m_executive.get(); }
+  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
@@ -154,15 +152,15 @@ class stateful_controller : public stateless_controller,
    *
    * Strategy pattern!
    */
-  void executive(std::unique_ptr<ta::bifurcating_tdgraph_executive> executive);
+  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
 
  private:
   // clang-format off
-  bool                                                 m_display_los{false};
-  argos::CVector2                                      m_light_loc;
-  std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
-  std::unique_ptr<base_perception_subsystem>           m_perception;
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
+  bool                                       m_display_los{false};
+  argos::CVector2                            m_light_loc;
+  std::unique_ptr<block_selection_matrix>    m_block_sel_matrix;
+  std::unique_ptr<base_perception_subsystem> m_perception;
+  std::unique_ptr<ta::bi_tdgraph_executive>  m_executive;
   // clang-format on
 };
 

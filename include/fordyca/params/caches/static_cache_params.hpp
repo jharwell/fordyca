@@ -1,5 +1,5 @@
 /**
- * @file cache_params.hpp
+ * @file static_cache_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,22 +31,24 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca, params, caches);
 namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct cache_params
- * @ingroup params arena
+ * @struct static_cache_params
+ * @ingroup params caches
  */
-struct cache_params : public rcppsw::params::base_params {
- /**
+struct static_cache_params : public rcppsw::params::base_params {
+  bool                enable{false};
+
+  /**
    * @brief How large should the static cache be, in terms of blocks (if
    * enabled)?
    */
-  uint                static_size{0};
+  uint                size{0};
 
   /**
    * @brief When depleted, how quickly should the cache be re-created by the
@@ -54,20 +56,8 @@ struct cache_params : public rcppsw::params::base_params {
    * creation in a more controlled setting.
    */
   double              respawn_scale_factor{0.0};
-
-  /**
-   * @brief How large is the cache (geometrical area) ?
-   */
-  double              dimension{0.0};
-
-  /**
-   * @brief How close do blocks have to be to each other to be considered "in"
-   * the cache?
-   */
-  double              min_dist{0.0};
-  ct::waveform_params usage_penalty{};
 };
 
-NS_END(arena, params, fordyca);
+NS_END(caches, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_CACHE_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHES_STATIC_CACHE_PARAMS_HPP_ */

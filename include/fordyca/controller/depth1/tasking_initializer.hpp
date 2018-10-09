@@ -69,7 +69,7 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
   tasking_initializer& operator=(const tasking_initializer& other) = delete;
   tasking_initializer(const tasking_initializer& other) = delete;
 
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>
+  std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth1::controller_repository *const controller_repo);
 
   bool exec_ests_oracle(void) const { return mc_exec_ests_oracle; }

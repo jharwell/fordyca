@@ -36,8 +36,8 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class bifurcating_tdgraph;
-class bifurcating_tdgraph_executive;
+class bi_tdgraph;
+class bi_tdgraph_executive;
 class polled_task;
 }} // namespace rcppsw::task_allocation
 
@@ -60,7 +60,7 @@ class tasking_oracle : public er::client<tasking_oracle> {
  public:
   using mapped_type = boost::variant<ta::time_estimate>;
 
-  explicit tasking_oracle(const ta::bifurcating_tdgraph* graph);
+  explicit tasking_oracle(const ta::bi_tdgraph* graph);
 
   /**
    * @brief Ask the oracle something.
@@ -79,7 +79,7 @@ class tasking_oracle : public er::client<tasking_oracle> {
    * attach the oracle to each robot so that it can build a perfect map of task
    * allocation information as the simulation progresses.
    */
-  void listener_add(ta::bifurcating_tdgraph_executive* executive);
+  void listener_add(ta::bi_tdgraph_executive* executive);
 
   void task_abort_cb(const ta::polled_task* task);
   void task_finish_cb(const ta::polled_task* task);
