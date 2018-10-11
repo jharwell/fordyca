@@ -100,13 +100,13 @@
             <phototaxis_force max="8"/>
           </steering2D>
 
-          <differential_drive soft_turn_max="30"
+          <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
 	      </actuation>
         <communication chance_to_pass_on="0.5"
-                       chance_to_start="0.99"
+                       chance_to_start="0.01"
                        max_message="10"
-                       mode="1"/>
+                       mode="2"/>
       </params>
     </stateful_foraging_controller>
   </controllers>
@@ -233,7 +233,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="2" max_trials="1000">
+      <entity quantity="3" max_trials="1000">
         <foot-bot id="fb" rab_range="3" rab_data_size="20">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

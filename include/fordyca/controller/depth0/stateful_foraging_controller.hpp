@@ -31,6 +31,8 @@
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/task_allocation/partitionable_task_params.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/params/communication_params.hpp"
+#include "rcppsw/robotics/hal/wifi_packet.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -85,6 +87,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   void Reset(void) override;
 
   void perform_communication(void);
+  void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
+  argos::CVector2 get_most_valuable_cell(void);
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLARE(bool, goal_acquired);
@@ -162,9 +166,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   std::unique_ptr<block_selection_matrix>              m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem>           m_perception;
   std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
-  float                                                m_chance_to_pass_on_message;
-  float                                                m_chance_to_start_message;
-  int                                                  m_communication_mode;
+  struct params::communication_params                  m_communication_params;
+  argos::CVector2                                      m_arena_size{};
   // clang-format on
 };
 

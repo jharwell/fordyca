@@ -32,13 +32,16 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/communication_params.hpp"
 
 #include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/executive_params.hpp"
 #include "rcppsw/task_allocation/task_params.hpp"
 
 #include "fordyca/representation/base_cell_entity.hpp"
+#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/representation/cube_block.hpp"
+#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/metrics/blocks/transport_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +58,8 @@ stateful_foraging_controller::stateful_foraging_controller(void)
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
-      m_executive() {}
+      m_executive(),
+      m_communication_params() {}
 
 stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 
@@ -124,7 +128,9 @@ void stateful_foraging_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
 
-  perform_communication();
+  if(m_communication_params.mode > 0) {
+    perform_communication();
+  }
 
   m_executive->run();
   ndc_pop();
@@ -162,10 +168,9 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
       rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
                                                   &ogrid->priorities);
 
-  auto* m_communication_params = param_repo.parse_results<params::communication_params>();
-  m_chance_to_start_message = m_communication_params->chance_to_start;
-  m_chance_to_pass_on_message = m_communication_params->chance_to_pass_on;
-  m_communication_mode = m_communication_params->mode;
+  auto* comm_params = param_repo.parse_results<params::communication_params>();
+  m_communication_params = *comm_params;
+  m_arena_size = ogrid->grid.upper;
 
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
@@ -182,42 +187,41 @@ void stateful_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateful_foraging_controller::perform_communication(void) {
-  // TODO: integrate packet into percieved arena map
   std::vector<uint8_t> recieved_packet_data = saa_subsystem()->
-    sensing()->recieve_message();
+      sensing()->recieve_message();
 
-  float probability = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  float probability = static_cast <float> (rand()) /
+      static_cast <float> (RAND_MAX);
 
   hal::wifi_packet packet = hal::wifi_packet();
 
-  if (!recieved_packet_data.empty() && probability >= m_chance_to_pass_on_message) {
+  if (!recieved_packet_data.empty() && probability >=
+      (1 - m_communication_params.chance_to_pass_on)) {
+    integrate_recieved_packet(packet);
     packet.data = recieved_packet_data;
     saa_subsystem()->actuation()->start_sending_message(packet);
-  } else if (probability >= m_chance_to_start_message) {
-    // TODO: random x and y for the cell within the limits of the arena
+  } else if (probability >= (1 - m_communication_params.chance_to_start)) {
     int x_coord;
     int y_coord;
-    if(m_communication_mode == 1) {
-      x_coord = static_cast <int> (rand()) % static_cast <int> (12);
-      y_coord = static_cast <int> (rand()) % static_cast <int> (6);
+
+    // Random Mode
+    if(m_communication_params.mode == 1) {
+      x_coord = static_cast <int> (rand()) % static_cast <int> (m_arena_size.GetX());
+      y_coord = static_cast <int> (rand()) % static_cast <int> (m_arena_size.GetY());
+    // Utility function
+    } else if (m_communication_params.mode == 2) {
+      argos::CVector2 cell = get_most_valuable_cell();
+      x_coord = cell.GetX();
+      y_coord = cell.GetY();
     } else {
       x_coord = 2;
       y_coord = 2;
     }
 
-    std::cout << "I AM SENDING X_COORD: " << x_coord << " & Y_COORD: " << y_coord << std::endl;
-
     ds::cell2D cell = m_perception->map()->
       access<ds::occupancy_grid::kCell>(x_coord, y_coord);
-    packet.data.push_back(2); // X Coord of cell
-    packet.data.push_back(2); // Y Coord of cell
-
-    auto entity = cell.entity();
-    int id = -1;
-    if (entity) {
-      id = entity->id();
-    }
-    packet.data.push_back(id); // Entity ID (will be -1 if the cell is empty)
+    packet.data.push_back(x_coord); // X Coord of cell
+    packet.data.push_back(y_coord); // Y Coord of cell
 
     // The state is what the cell contains (nothing, block, or cache)
     int state = -1;
@@ -233,14 +237,113 @@ void stateful_foraging_controller::perform_communication(void) {
     // Type of entity (block / cache) (will be -1 if the cell state is unknown)
     packet.data.push_back(state);
 
-    // TODO: Need to get the relevancy for the cell
-    packet.data.push_back(-1);
+    auto entity = cell.entity();
+    int id = -1;
+    int type = -1;
+    if (entity) {
+      id = entity->id();
+
+      // Block
+      if (state == 1) {
+        // Ramp block
+        if (cell.block()->type() == metrics::blocks::transport_metrics::kRamp) {
+          type = 1;
+        // Cube block
+        } else {
+          type = 2;
+        }
+      }
+    }
+    packet.data.push_back(id); // Entity ID (will be -1 if the cell is unknown)
+    packet.data.push_back(type); // Type of block
+
+
+    rcppsw::swarm::pheromone_density& density = m_perception->map()->
+      access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
+    packet.data.push_back(density.last_result());
 
     saa_subsystem()->actuation()->start_sending_message(packet);
   } else {
     saa_subsystem()->actuation()->stop_sending_message();
   }
-}
+} /* perform_communication */
+
+void stateful_foraging_controller::integrate_recieved_packet(hal::wifi_packet packet) {
+  // Data extraction
+  int x_coord = packet.data[0];
+  int y_coord = packet.data[1];
+  int state = packet.data[2];
+  int ent_id = packet.data[3];
+  // type of block (if it's not a block it will be -1)
+  int type = packet.data[4];
+  int pheromone_density = packet.data[5];
+
+  if (state != -1) {
+    rcppsw::swarm::pheromone_density& density = m_perception->map()->
+      access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
+    density.pheromone_set(static_cast<double>(pheromone_density));
+
+    // blocks
+    if (state == 1) {
+      // ramp block
+      if (type == 1) {
+        std::shared_ptr<representation::ramp_block> block_ptr;
+        representation::ramp_block block = representation::ramp_block(
+          rcppsw::math::vector2d(x_coord, y_coord), ent_id);
+        *block_ptr = block;
+
+        m_perception->map()->block_add(block_ptr);
+      // cube block
+      } else if (type == 2) {
+        std::shared_ptr<representation::cube_block> block_ptr;
+        representation::cube_block block = representation::cube_block(
+          rcppsw::math::vector2d(x_coord, y_coord), ent_id);
+        *block_ptr = block;
+
+        m_perception->map()->block_add(block_ptr);
+      } /* if type */
+    // caches
+    } else {
+      // TODO: Add caches to percieved_arena_map
+
+    } /* if (state == 1) / else */
+  } /* if (state != -1) */
+} /* integrate_recieved_packet */
+
+argos::CVector2 stateful_foraging_controller::get_most_valuable_cell(void) {
+  argos::CVector2 cell_coords;
+
+  // TODO: Get information on where the nest is!!!!
+  int nest_x_coord = 1;
+  int nest_y_coord = 1;
+
+  int communicated_cell_value = 0;
+  int current_cell_value = 0;
+
+  int arena_x_coord = static_cast <int> (m_arena_size.GetX());
+  int arena_y_coord = static_cast <int> (m_arena_size.GetY());
+  int cell_x = 0;
+  int cell_y = 0;
+
+  for (int i = 0; i < arena_x_coord; ++i) {
+    for (int j = 0; j < arena_y_coord; ++j) {
+      ds::cell2D current_cell = m_perception->map()->
+        access<ds::occupancy_grid::kCell>(i, j);
+      if (current_cell.state_has_block()) {
+        current_cell_value = ((((i - nest_x_coord)^2) +
+          ((j - nest_y_coord)^2))^(1/2)) / current_cell.block_count();
+        if (current_cell_value < communicated_cell_value) {
+          communicated_cell_value = current_cell_value;
+          cell_x = i;
+          cell_y = j;
+        } /* if value */
+      } /* if cell has block */
+    } /* for(j..) */
+  } /* for(i..) */
+  cell_coords.SetX(cell_x);
+  cell_coords.SetY(cell_y);
+  return cell_coords;
+} /* get_most_valuable_cell */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
                        stateful_foraging_controller,
