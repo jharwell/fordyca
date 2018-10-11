@@ -24,7 +24,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,9 +40,9 @@ constexpr char foraging_task::kHarvesterName[];
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const struct ta::task_params* params,
+                             const struct ta::task_allocation_params* params,
                              std::unique_ptr<ta::taskable> mechanism)
-    : polled_task(name, params, std::move(mechanism)) {}
+    : partitionable_polled_task(name, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

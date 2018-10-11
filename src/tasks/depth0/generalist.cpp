@@ -28,7 +28,6 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "rcppsw/task_allocation/partitionable_task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,9 +37,9 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const struct ta::partitionable_task_params* const params,
+generalist::generalist(const ta::task_allocation_params* const params,
                        std::unique_ptr<ta::taskable> mechanism)
-    : partitionable_polled_task(kGeneralistName, params, std::move(mechanism)) {
+    : foraging_task(kGeneralistName, params, std::move(mechanism)) {
 }
 
 /*******************************************************************************

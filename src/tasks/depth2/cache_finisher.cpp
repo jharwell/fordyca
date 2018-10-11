@@ -39,7 +39,7 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 cache_finisher::cache_finisher(
-    const struct task_allocation::task_params* params,
+    const struct ta::task_allocation_params* params,
     std::unique_ptr<task_allocation::taskable> mechanism)
     : foraging_task(kCacheFinisherName, params, std::move(mechanism)) {}
 

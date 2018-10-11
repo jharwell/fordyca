@@ -51,7 +51,7 @@ class harvester : public foraging_task,
                   public existing_cache_interactor,
                   public free_block_interactor {
  public:
-  harvester(const struct ta::task_params* params,
+  harvester(const struct ta::task_allocation_params* params,
             std::unique_ptr<ta::taskable> mechanism);
 
   /*

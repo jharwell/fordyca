@@ -25,12 +25,12 @@
 #include <vector>
 
 #include "fordyca/params/metrics_params.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
+#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bifurcating_tab.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tab.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
@@ -54,12 +54,12 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
     const std::string& output_root)
     : depth1_metrics_aggregator(params, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
-  register_collector<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector>(
+  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::collector_tab",
       metrics_path() + "/" + params->task_collector_tab_fname,
       params->collect_interval);
-  register_collector<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector>(
-      "tasks::collector_tab",
+  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+      "tasks::harvester_tab",
       metrics_path() + "/" + params->task_harvester_tab_fname,
       params->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
@@ -87,7 +87,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
  ******************************************************************************/
 void depth2_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const task,
-    const ta::bifurcating_tab* const tab) {
+    const ta::bi_tab* const tab) {
   if (task0::kGeneralistName == task->name()) {
     collect("tasks::generalist_tab", *tab);
   } else if (task1::kHarvesterName == task->name()) {

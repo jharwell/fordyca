@@ -36,9 +36,9 @@
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -98,8 +98,8 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
             robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
-  ndc_pop();
   ER_INFO("Initialization finished");
+  ndc_pop();
 }
 
 void depth1_loop_functions::oracle_init(void) {
@@ -111,7 +111,7 @@ void depth1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph = dynamic_cast<const ta::bifurcating_tdgraph*>(
+    auto* bigraph = dynamic_cast<const ta::bi_tdgraph*>(
         controller0.executive()->graph());
     m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
   }
@@ -256,7 +256,7 @@ void depth1_loop_functions::pre_step_final(void) {
    */
   if (arena_map()->caches().empty()) {
     auto& collector =
-        static_cast<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector&>(
+        static_cast<rcppsw::metrics::tasks::bi_tab_metrics_collector&>(
             *(*m_metrics_agg)["tasks::generalist_tab"]);
     uint n_harvesters = collector.int_subtask1_count();
     uint n_collectors = collector.int_subtask2_count();
@@ -294,22 +294,22 @@ void depth1_loop_functions::pre_step_final(void) {
 
 void depth1_loop_functions::cache_handling_init(
     const struct params::caches::caches_params* cachep) {
-  ER_ASSERT(nullptr != cachep && cachep->static_.enable,
-            "Static cache must be present in XML file and enabled for depth 1");
-  /*
-   * Regardless of how many foragers/etc there are, always create an
-   * initial cache.
-   */
-  m_cache_loc = argos::CVector2((arena_map()->xrsize() +
-                                 arena_map()->nest().real_loc().GetX()) / 2.0,
-                                arena_map()->nest().real_loc().GetY());
+  if (nullptr != cachep && cachep->static_.enable) {
+    /*
+     * Regardless of how many foragers/etc there are, always create an
+     * initial cache.
+     */
+    m_cache_loc = argos::CVector2((arena_map()->xrsize() +
+                                   arena_map()->nest().real_loc().GetX()) / 2.0,
+                                  arena_map()->nest().real_loc().GetY());
 
-  m_cache_manager = rcppsw::make_unique<static_cache_manager>(
-      cachep, &arena_map()->decoratee(), m_cache_loc);
+    m_cache_manager = rcppsw::make_unique<static_cache_manager>(
+        cachep, &arena_map()->decoratee(), m_cache_loc);
 
-  /* return value ignored at this level (for now...) */
-  auto pair = m_cache_manager->create(arena_map()->blocks());
-  arena_map()->caches_add(pair.second);
+    /* return value ignored at this level (for now...) */
+    auto pair = m_cache_manager->create(arena_map()->blocks());
+    arena_map()->caches_add(pair.second);
+  }
 } /* cache_handling_init() */
 
 using namespace argos; // NOLINT

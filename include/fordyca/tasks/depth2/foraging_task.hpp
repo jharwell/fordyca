@@ -33,6 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
 NS_START(fordyca, tasks, depth2);
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -55,7 +56,7 @@ class foraging_task
       public ta::polled_task {
  public:
   foraging_task(const std::string& name,
-                const struct ta::task_params *params,
+                const ta::task_allocation_params *params,
                 std::unique_ptr<ta::taskable> mechanism);
   ~foraging_task(void) override = default;
 

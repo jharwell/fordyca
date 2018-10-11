@@ -34,9 +34,8 @@
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
-#include "rcppsw/task_allocation/bifurcating_tdgraph.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/executive_params.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
 
 /*******************************************************************************
@@ -49,8 +48,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 greedy_partitioning_controller::greedy_partitioning_controller(void)
-    : depth0::stateful_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth1"),
+    : ER_CLIENT_INIT("fordyca.controller.depth1.greedy_partitioning"),
       m_cache_sel_matrix() {}
 
 greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
@@ -147,7 +145,7 @@ int greedy_partitioning_controller::current_task_id(void) const {
 } /* current_task_id() */
 
 __rcsw_pure int greedy_partitioning_controller::current_task_tab(void) const {
-  return dynamic_cast<const ta::bifurcating_tdgraph*>(executive()->graph())
+  return dynamic_cast<const ta::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
 

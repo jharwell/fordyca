@@ -65,6 +65,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void controller_configure(controller::base_controller& c);
+  void cache_handling_init(const struct params::caches::caches_params* cachep);
 
   // clang-format off
   std::unique_ptr<interactor>                m_interactor{};

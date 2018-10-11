@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class bifurcating_tdgraph_executive;
+class bi_tdgraph_executive;
 }}
 
 NS_START(fordyca);
@@ -74,7 +74,6 @@ class greedy_recpart_controller : public depth1::greedy_partitioning_controller,
  private:
   // clang-format off
   std::string                                        m_prev_task{""};
-  std::unique_ptr<ta::bifurcating_tdgraph_executive> m_executive;
   // clang-format on
 };
 

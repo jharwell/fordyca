@@ -39,7 +39,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_starter::cache_starter(const struct task_allocation::task_params* params,
+cache_starter::cache_starter(const struct ta::task_allocation_params* params,
                              std::unique_ptr<task_allocation::taskable> mechanism)
     : foraging_task(kCacheStarterName, params, std::move(mechanism)) {}
 

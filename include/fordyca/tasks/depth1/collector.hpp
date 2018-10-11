@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
@@ -50,7 +52,10 @@ class collector : public foraging_task,
                   public existing_cache_interactor,
                   public nest_interactor {
  public:
-  collector(const struct ta::task_params* params,
+  collector(const struct ta::task_allocation_params* params,
+            const std::string& name,
+            std::unique_ptr<ta::taskable> mechanism);
+  collector(const struct ta::task_allocation_params* params,
             std::unique_ptr<ta::taskable> mechanism);
 
   /*

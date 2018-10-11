@@ -39,7 +39,7 @@
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
-class bifurcating_tab;
+class bi_tab;
 }}
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
@@ -90,7 +90,7 @@ class depth1_metrics_aggregator : public depth0::stateful_metrics_aggregator,
    */
   void task_finish_or_abort_cb(const ta::polled_task* task);
 
-  void task_alloc_cb(const ta::polled_task*, const ta::bifurcating_tab* tab);
+  void task_alloc_cb(const ta::polled_task*, const ta::bi_tab* tab);
 
   /**
    * @brief Collect metrics from the depth1 controller.

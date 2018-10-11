@@ -23,7 +23,8 @@
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/occupancy_grid_parser.hpp"
-#include "rcppsw/task_allocation/executive_xml_parser.hpp"
+#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
+#include "fordyca/params/depth0/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,8 +38,11 @@ namespace ta = rcppsw::task_allocation;
 stateful_controller_repository::stateful_controller_repository(void) {
   register_parser<occupancy_grid_parser, occupancy_grid_params>(
       occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
-  register_parser<ta::executive_xml_parser, ta::executive_params>(
-      ta::executive_xml_parser::kXMLRoot,
+  register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
+      ta::task_allocation_xml_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<exec_estimates_parser, exec_estimates_params>(
+      std::string("depth0_") +  exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

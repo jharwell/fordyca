@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,10 +47,9 @@ NS_START(fordyca, tasks, depth0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist : public ta::partitionable_polled_task,
-                   public foraging_task {
+class generalist : public foraging_task {
  public:
-  generalist(const struct ta::partitionable_task_params* params,
+  generalist(const ta::task_allocation_params* params,
              std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */

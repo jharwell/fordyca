@@ -11,6 +11,7 @@
               (list
                (substitute-in-file-name "$rcsw/include")
                (substitute-in-file-name "$rcppsw/include")
+               (substitute-in-file-name "$fordyca/include")
                (concat
                 (projectile-project-root)
                 "include")

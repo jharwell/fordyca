@@ -34,7 +34,7 @@ NS_START(fordyca, params, depth2);
  ******************************************************************************/
 controller_repository::controller_repository(void) {
   register_parser<exec_estimates_parser, exec_estimates_params>(
-      exec_estimates_parser::kXMLRoot,
+      std::string("depth2_") +  exec_estimates_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

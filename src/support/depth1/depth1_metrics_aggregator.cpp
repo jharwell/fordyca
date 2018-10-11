@@ -31,14 +31,14 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics.hpp"
-#include "rcppsw/metrics/tasks/bifurcating_tab_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
+#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/distribution_metrics.hpp"
 #include "rcppsw/metrics/tasks/distribution_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bifurcating_tab.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tab.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/representation/arena_cache.hpp"
@@ -79,7 +79,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       metrics_path() + "/" + params->task_execution_harvester_fname,
       params->collect_interval);
 
-  register_collector<rcppsw::metrics::tasks::bifurcating_tab_metrics_collector>(
+  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::generalist_tab",
       metrics_path() + "/" + params->task_generalist_tab_fname,
       params->collect_interval);
@@ -122,7 +122,7 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
 
 void depth1_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const,
-    const ta::bifurcating_tab* const tab) {
+    const ta::bi_tab* const tab) {
   collect("tasks::generalist_tab", *tab);
 } /* task_alloc_cb() */
 

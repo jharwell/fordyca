@@ -32,7 +32,7 @@
 #include "fordyca/params/sensing_params.hpp"
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
-#include "rcppsw/task_allocation/bifurcating_tdgraph_executive.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/partitionable_task.hpp"
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 greedy_recpart_controller::greedy_recpart_controller(void)
-    : ER_CLIENT_INIT(GetId()), m_executive() {}
+    : ER_CLIENT_INIT("fordyca.controller.depth2.greedy_recpart") {}
 
 greedy_recpart_controller::~greedy_recpart_controller(void) = default;
 
@@ -53,25 +53,26 @@ greedy_recpart_controller::~greedy_recpart_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void greedy_recpart_controller::ControlStep(void) {
+  ndc_pusht();
   perception()->update(depth1::greedy_partitioning_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
 
-  m_executive->run();
+  executive()->run();
+  ndc_pop();
 } /* ControlStep() */
 
 void greedy_recpart_controller::Init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref depth1::greedy_partitioning_controller::Init()--there
+   * Note that we do not call \ref greedy_partitioning_controller::Init()--there
    * is nothing in there that we need.
    */
-  base_controller::Init(node);
+  depth1::greedy_partitioning_controller::Init(node);
 
-  ndc_push();
-  ER_INFO("Initializing...");
   params::depth2::controller_repository param_repo;
+
   param_repo.parse_all(node);
 
   if (!param_repo.validate_all()) {
@@ -79,20 +80,14 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 
-  /* Put in new depth1 sensors and perception, ala strategy pattern */
-  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
-      param_repo.parse_results<struct params::sensing_params>(),
-      &saa_subsystem()->sensing()->sensor_list()));
-
-  perception(rcppsw::make_unique<depth1::perception_subsystem>(
-      param_repo.parse_results<params::perception_params>(), GetId()));
-
+  ndc_push();
+  ER_INFO("Initializing");
   /* initialize tasking */
-  m_executive = tasking_initializer(false,
-                                    block_sel_matrix(),
-                                    cache_sel_matrix(),
-                                    saa_subsystem(),
-                                    perception())(&param_repo);
+  executive(tasking_initializer(false,
+                                block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa_subsystem(),
+                                perception())(&param_repo));
 
   ER_INFO("Initialization finished");
   ndc_pop();
@@ -100,7 +95,7 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
 
 __rcsw_pure tasks::base_foraging_task* greedy_recpart_controller::current_task(
     void) {
-  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
 } /* current_task() */
 
 __rcsw_pure const tasks::base_foraging_task* greedy_recpart_controller::current_task(

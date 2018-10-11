@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/collector.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -41,9 +40,14 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct ta::task_params* const params,
+collector::collector(const struct ta::task_allocation_params* const params,
                      std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(kCollectorName, params, std::move(mechanism)) {}
+    : collector{params, kCollectorName, std::move(mechanism)} {}
+
+collector::collector(const struct ta::task_allocation_params* const params,
+                     const std::string& name,
+                     std::unique_ptr<ta::taskable> mechanism)
+    : foraging_task(name, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

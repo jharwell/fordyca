@@ -16,8 +16,8 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_partitioning_controller id="ffc"
-                                library="libfordyca">
+    <greedy_recpart_controller id="ffc"
+                               library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -47,31 +47,47 @@
               ramp="1.0"
               />
         </occupancy_grid>
-        <task_executive>
-          <estimation alpha="0.8"/>
-          <task_abort reactivity="8"
-                      offset="3"
-                      />
+        <task_allocation>
+          <task_abort>
+            <sigmoid reactivity="8"
+                     offset="3"
+                     gamma="1.0"/>
+          </task_abort>
           <task_partition
               method="pini2011"
               always_partition="false"
-              never_partition="false"
-              reactivity="4"
-              offset="1.0"
-              />
+              never_partition="false">
+            <sigmoid
+                reactivity="4"
+                offset="1.0"
+                gamma="1.0"/>
+          </task_partition>
           <subtask_selection
               method="harwell2018"
               reactivity="8"
               offset="1.25"
               gamma="1.0"
               />
-        </task_executive>
-        <task_exec_estimates
-            seed_enabled="true"
-            generalist_range="2000:4000"
-            collector_range="1000:2000"
-            harvester_range="1000:2000"
-            />
+          <task_exec_estimates
+              seed_enabled="true"
+              generalist_range="2000:4000"
+              collector_range="1000:2000"
+              harvester_range="1000:2000"
+              cache_starter_range="1000:2000"
+              cache_finisher_range="1000:2000"
+              cache_collector_range="1000:2000"
+              cache_transferer_range="1000:2000">
+            <ema alpha="0.8"/>
+          </task_exec_estimates>
+          <tab_selection
+              method="harwell2019">
+            <sigmoid
+                reactivity="4"
+                offset="1.0"
+                gamma="1.0"/>
+          </tab_selection>
+        </task_allocation>
+
         <sensing>
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
@@ -104,7 +120,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_partitioning_controller>
+    </greedy_recpart_controller>
 
   </controllers>
 
@@ -112,11 +128,11 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <battery
-      power_station_amount="0"
-      power_station_size="1"
-      power_station_distrubtion="normal"/>
+        power_station_amount="0"
+        power_station_size="1"
+        power_station_distrubtion="normal"/>
     <output>
       <sim output_root="output"
            output_dir="__current_date__"
@@ -151,7 +167,7 @@
     </output>
     <oracle
         tasking_enabled="false"
-      />
+        />
     <arena_map>
       <grid resolution="0.2"
             size="12, 6, 2"/>
@@ -181,8 +197,8 @@
       <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
     <caches
-         dimension="0.8">
-      <static enable="true"
+        dimension="0.8">
+      <static enable="false"
               size="2"
               respawn_scale_factor="0.05"
               >

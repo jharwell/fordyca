@@ -33,7 +33,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-harvester::harvester(const struct task_allocation::task_params* params,
+harvester::harvester(const struct task_allocation::task_allocation_params* params,
                      std::unique_ptr<task_allocation::taskable> mechanism)
     : foraging_task(kHarvesterName, params, std::move(mechanism)) {}
 

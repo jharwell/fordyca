@@ -1,5 +1,5 @@
 /**
- * @file foraging_task.cpp
+ * @file exec_estimates_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,42 +21,44 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_allocation_params.hpp"
+#include "fordyca/params/depth0/exec_estimates_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, tasks, depth2);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Constant Definitions
+ * Global Variables
  ******************************************************************************/
-constexpr char foraging_task::kCacheStarterName[];
-constexpr char foraging_task::kCacheFinisherName[];
-constexpr char foraging_task::kCacheTransfererName[];
-constexpr char foraging_task::kCacheCollectorName[];
-
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-foraging_task::foraging_task(const std::string& name,
-                             const ta::task_allocation_params* params,
-                             std::unique_ptr<ta::taskable> mechanism)
-    : polled_task(name,
-                  &params->abort,
-                  &params->estimation,
-                  std::move(mechanism)) {}
+const char exec_estimates_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double foraging_task::current_time(void) const {
-  return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->base_sensors()
-      ->tick();
-} /* current_time() */
+void exec_estimates_parser::parse(const ticpp::Element& node) {
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_ATTR(enode, m_params, seed_enabled);
+    if (m_params->seed_enabled) {
+      XML_PARSE_ATTR(enode, m_params, generalist_range);
+    }
+    parsed(true);
+  }
+} /* parse() */
 
-NS_END(depth2, tasks, fordyca);
+void exec_estimates_parser::show(std::ostream& stream) const {
+  if (!parsed()) {
+    stream << build_header() << "<< Not Parsed >>" << std::endl
+           << build_footer();
+    return;
+  }
+
+  stream << build_header() << XML_ATTR_STR(m_params, seed_enabled) << std::endl
+         << XML_ATTR_STR(m_params, generalist_range) << std::endl
+         << build_footer();
+} /* show() */
+
+NS_END(depth0, params, fordyca);

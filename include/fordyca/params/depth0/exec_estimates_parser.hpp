@@ -1,7 +1,7 @@
 /**
  * @file exec_estimates_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,29 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/depth0/exec_estimates_parser.hpp"
-#include "fordyca/params/depth1/exec_estimates_params.hpp"
+
+#include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/depth0/exec_estimates_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth1);
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class exec_estimates_parser
- * @ingroup params depth1
+ * @ingroup params depth0
  *
- * @brief Parses XML parameters used for estimation of depth1 task execution
+ * @brief Parses XML parameters used for estimation of depth0 task execution
  * times at the start of simulation.
  */
 class exec_estimates_parser: public rcppsw::params::xml_param_parser {
@@ -78,6 +79,6 @@ class exec_estimates_parser: public rcppsw::params::xml_param_parser {
   // clang-format on
 };
 
-NS_END(params, fordyca, depth1);
+NS_END(params, fordyca, depth0);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH1_EXEC_ESTIMATES_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_EXEC_ESTIMATES_PARSER_HPP_ */

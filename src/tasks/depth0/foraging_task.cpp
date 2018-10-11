@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
