@@ -47,7 +47,7 @@ foraging_task::foraging_task(const std::string& name,
                              std::unique_ptr<ta::taskable> mechanism)
     : polled_task(name,
                   &params->abort,
-                  &params->estimation,
+                  &params->exec_est.ema,
                   std::move(mechanism)) {}
 
 /*******************************************************************************

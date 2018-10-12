@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_recpart_controller id="ffc"
+    <stateful_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -54,37 +54,44 @@
                      gamma="1.0"/>
           </task_abort>
           <task_partition
-              method="pini2011"
               always_partition="false"
               never_partition="false">
-            <sigmoid
-                reactivity="4"
-                offset="1.0"
-                gamma="1.0"/>
+            <sigmoid_selection
+                method="pini2011">
+                <sigmoid
+                    reactivity="4"
+                    offset="1.0"
+                    gamma="1.0"/>
+            </sigmoid_selection>
           </task_partition>
-          <subtask_selection
-              method="harwell2018"
-              reactivity="8"
-              offset="1.25"
-              gamma="1.0"
-              />
+          <subtask_selection>
+            <sigmoid_selection
+                method="harwell2018">
+                <sigmoid
+                    reactivity="8"
+                    offset="1.25"
+                    gamma="1.0"/>
+            </sigmoid_selection>
+          </subtask_selection>
           <task_exec_estimates
               seed_enabled="true"
-              generalist_range="2000:4000"
-              collector_range="1000:2000"
-              harvester_range="1000:2000"
-              cache_starter_range="1000:2000"
-              cache_finisher_range="1000:2000"
-              cache_collector_range="1000:2000"
-              cache_transferer_range="1000:2000">
+              generalist="2000:4000"
+              collector="1000:2000"
+              harvester="1000:2000"
+              cache_starter="1000:2000"
+              cache_finisher="1000:2000"
+              cache_collector="1000:2000"
+              cache_transferer="1000:2000">
             <ema alpha="0.8"/>
           </task_exec_estimates>
-          <tab_selection
-              method="harwell2019">
-            <sigmoid
-                reactivity="4"
-                offset="1.0"
-                gamma="1.0"/>
+          <tab_selection>
+            <sigmoid_selection
+                method="harwell2019">
+              <sigmoid
+                  reactivity="4"
+                  offset="1.0"
+                  gamma="1.0"/>
+            </sigmoid_selection>
           </tab_selection>
         </task_allocation>
 
@@ -120,7 +127,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_recpart_controller>
+    </stateful_controller>
 
   </controllers>
 
@@ -128,7 +135,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="stateful_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -222,7 +229,6 @@
                    />
   </loop_functions>
 
-  <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
   <arena size="12, 6, 2" center="6,3,1">

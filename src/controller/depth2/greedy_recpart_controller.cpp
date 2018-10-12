@@ -33,7 +33,6 @@
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/partitionable_task.hpp"
 
 /*******************************************************************************
  * Namespaces

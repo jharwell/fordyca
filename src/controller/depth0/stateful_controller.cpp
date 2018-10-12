@@ -117,7 +117,6 @@ void stateful_controller::ControlStep(void) {
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
-
   m_executive->run();
   ndc_pop();
 } /* ControlStep() */

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 
@@ -42,7 +43,10 @@ constexpr char foraging_task::kHarvesterName[];
 foraging_task::foraging_task(const std::string& name,
                              const struct ta::task_allocation_params* params,
                              std::unique_ptr<ta::taskable> mechanism)
-    : partitionable_polled_task(name, params, std::move(mechanism)) {}
+    : polled_task(name,
+                  &params->abort,
+                  &params->exec_est.ema,
+                  std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

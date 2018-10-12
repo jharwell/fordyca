@@ -31,7 +31,6 @@
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/depth2/exec_estimates_params.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -71,8 +70,6 @@ tasking_initializer::~tasking_initializer(void) = default;
  ******************************************************************************/
 void tasking_initializer::depth2_tasking_init(
     params::depth2::controller_repository* const param_repo) {
-  auto* est_params =
-      param_repo->parse_results<params::depth2::exec_estimates_params>();
   auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
 
   std::unique_ptr<ta::taskable> cache_starter_fsm =
@@ -114,57 +111,62 @@ void tasking_initializer::depth2_tasking_init(
   auto harvester = graph()->find_vertex(
       tasks::depth1::foraging_task::kHarvesterName);
 
-  if (est_params->seed_enabled) {
+  collector->set_partitionable(true);
+  collector->set_atomic(false);
+  harvester->set_partitionable(true);
+  harvester->set_atomic(false);
+  graph()->install_tab(tasks::depth1::foraging_task::kHarvesterName,
+                       std::vector<ta::polled_task*>(
+                           {cache_starter, cache_finisher}));
+  graph()->install_tab(tasks::depth1::foraging_task::kCollectorName,
+                       std::vector<ta::polled_task*>(
+                           {cache_transferer, cache_collector}));
+
+  if (task_params->exec_est.seed_enabled) {
     /*
      * Collector, harvester not partitionable in depth 1 initialization, so they
      * have only been initialized as atomic tasks.
      */
     if (0 == std::rand() % 2) {
-      dynamic_cast<ta::partitionable_polled_task*>(collector)->last_partition(
-          cache_transferer);
-      dynamic_cast<ta::partitionable_polled_task*>(harvester)->last_partition(
-          cache_starter);
+      graph()->tab_child(graph()->active_tab(),
+                         graph()->active_tab()->child1())->last_subtask(cache_starter);
+      graph()->tab_child(graph()->active_tab(),
+                         graph()->active_tab()->child2())->last_subtask(cache_transferer);
     } else {
-      dynamic_cast<ta::partitionable_polled_task*>(collector)->last_partition(
-          cache_collector);
-      dynamic_cast<ta::partitionable_polled_task*>(harvester)->last_partition(
-          cache_finisher);
+      graph()->tab_child(graph()->active_tab(),
+                         graph()->active_tab()->child1())->last_subtask(cache_finisher);
+      graph()->tab_child(graph()->active_tab(),
+                         graph()->active_tab()->child2())->last_subtask(cache_collector);
     }
+    uint cs_min = task_params->exec_est.ranges.find("cache_starter")->second.get_min();
+    uint cs_max = task_params->exec_est.ranges.find("cache_starter")->second.get_max();
+    uint cf_min = task_params->exec_est.ranges.find("cache_finisher")->second.get_min();
+    uint cf_max = task_params->exec_est.ranges.find("cache_finisher")->second.get_max();
+    uint ct_min = task_params->exec_est.ranges.find("cache_transferer")->second.get_min();
+    uint ct_max = task_params->exec_est.ranges.find("cache_transferer")->second.get_max();
+    uint cc_min = task_params->exec_est.ranges.find("cache_collector")->second.get_min();
+    uint cc_max = task_params->exec_est.ranges.find("cache_collector")->second.get_max();
+
     ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
             cache_starter->name().c_str(),
-            est_params->cache_starter_range.GetMin(),
-            est_params->cache_starter_range.GetMax(),
+            cs_min,
+            cs_max,
             cache_finisher->name().c_str(),
-            est_params->cache_finisher_range.GetMin(),
-            est_params->cache_finisher_range.GetMax());
-    cache_starter->exec_est_bounds_init(est_params->cache_starter_range.GetMin(),
-                                        est_params->cache_starter_range.GetMax());
-    cache_finisher->exec_est_bounds_init(est_params->cache_finisher_range.GetMin(),
-                                         est_params->cache_starter_range.GetMax());
+            cf_min,
+            cf_max);
+    cache_starter->exec_est_bounds_init(cs_min, cs_max);
+    cache_finisher->exec_est_bounds_init(cf_min, cf_max);
 
     ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
             cache_transferer->name().c_str(),
-            est_params->cache_transferer_range.GetMin(),
-            est_params->cache_transferer_range.GetMax(),
+            ct_min,
+            ct_max,
             cache_collector->name().c_str(),
-            est_params->cache_collector_range.GetMin(),
-            est_params->cache_collector_range.GetMax());
-    cache_transferer->exec_est_bounds_init(est_params->cache_transferer_range.GetMin(),
-                                           est_params->cache_transferer_range.GetMax());
-    cache_collector->exec_est_bounds_init(est_params->cache_collector_range.GetMin(),
-                                          est_params->cache_collector_range.GetMax());
+            cc_min,
+            cc_max);
+    cache_transferer->exec_est_bounds_init(ct_min, ct_max);
+    cache_collector->exec_est_bounds_init(ct_min, ct_max);
   }
-
-  collector->set_partitionable(true);
-  collector->set_atomic(false);
-  harvester->set_partitionable(true);
-  harvester->set_atomic(false);
-  graph()->set_children(tasks::depth1::foraging_task::kHarvesterName,
-                        std::vector<ta::polled_task*>(
-                            {cache_starter, cache_finisher}));
-  graph()->set_children(tasks::depth1::foraging_task::kCollectorName,
-                        std::vector<ta::polled_task*>(
-                            {cache_transferer, cache_collector}));
 } /* depth2_tasking_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(

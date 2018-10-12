@@ -123,7 +123,12 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
 void depth1_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const,
     const ta::bi_tab* const tab) {
-  collect("tasks::generalist_tab", *tab);
+  /*
+   * Will be NULL on first task allocation, because there is no active TAB yet.
+   */
+  if (nullptr != tab) {
+    collect("tasks::generalist_tab", *tab);
+  }
 } /* task_alloc_cb() */
 
 NS_END(depth1, support, fordyca);
