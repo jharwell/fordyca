@@ -45,6 +45,14 @@ generalist::generalist(const ta::task_allocation_params* const params,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+double generalist::abort_prob_calc(void) {
+  if (is_atomic()) {
+    return 0.0;
+  } else {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  }
+} /* abort_prob_calc() */
+
 __rcsw_pure double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::stateful_fsm*>(polled_task::mechanism())
       ->base_sensors()

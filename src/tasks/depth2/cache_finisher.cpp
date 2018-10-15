@@ -41,7 +41,8 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 cache_finisher::cache_finisher(
     const struct ta::task_allocation_params* params,
     std::unique_ptr<task_allocation::taskable> mechanism)
-    : foraging_task(kCacheFinisherName, params, std::move(mechanism)) {}
+    : foraging_task(kCacheFinisherName, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
 /*******************************************************************************
  * Member Functions
@@ -52,36 +53,22 @@ void cache_finisher::task_start(const task_allocation::taskable_argument* const)
   interface_complete(false);
 } /* task_start() */
 
-double cache_finisher::calc_abort_prob(void) {
-  /*
-   * Cache finishers always have a small chance of aborting their task when not
-   * at a task interface. Having the cache finisher task un-abortable until
-   * AFTER it acquires a block can cause it to get stuck and not switch to
-   * another task if it cannot find a block anywhere.
-   */
-  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
-  if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
-    return executable_task::update_abort_prob();
+double cache_finisher::abort_prob_calc(void) {
+    if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
   }
-  return executable_task::update_abort_prob();
-} /* calc_abort_prob() */
+} /* abort_prob_calc() */
 
-double cache_finisher::calc_interface_time(double start_time) {
-  if (task_at_interface()) {
-    return current_time() - start_time;
-  }
+double cache_finisher::interface_time_calc(uint interface,double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
 
-  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
-  if (fsm->goal_acquired() &&
-      transport_goal_type::kNewCache == fsm->block_transport_goal()) {
-    if (!interface_complete()) {
-      interface_complete(true);
-      reset_interface_time();
-    }
-    return interface_time();
-  }
-  return 0.0;
-} /* calc_interface_time() */
+void cache_finisher::active_interface_update(int) {
+  ER_FATAL_SENTINEL("Not implemented yet");
+} /* active_interface_update() */
 
 /*******************************************************************************
  * FSM Metrics
@@ -127,13 +114,5 @@ void cache_finisher::accept(events::free_block_pickup& visitor) {
 void cache_finisher::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-
-/*******************************************************************************
- * Task Metrics
- ******************************************************************************/
-__rcsw_pure bool cache_finisher::task_at_interface(void) const {
-  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
-  return acquisition_goal_type::kExistingCache == fsm->acquisition_goal();
-} /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);

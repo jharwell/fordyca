@@ -118,9 +118,14 @@ class block_op_penalty_handler
     if (kFreePickup == src) {
       id = loop_utils::robot_on_block(controller, *m_map);
       ER_ASSERT(-1 != id, "Robot not on block?");
-    }
-    if (kCacheSiteDrop == src) {
-      ER_ASSERT(cache_prox_dist <= -1.0,
+    } else if (kNestDrop == src) {
+      ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+                "Robot not carrying block?");
+      id = controller.block()->id();
+    } else if (kCacheSiteDrop == src) {
+      ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+                "Robot not carrying block?");
+      ER_ASSERT(cache_prox_dist > 0.0,
                 "Cache proximity distance not specified for cache site drop");
     }
     ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",

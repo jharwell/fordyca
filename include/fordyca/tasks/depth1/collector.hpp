@@ -32,6 +32,7 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
 #include "fordyca/tasks/nest_interactor.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,8 @@ NS_START(fordyca, tasks, depth1);
  */
 class collector : public foraging_task,
                   public existing_cache_interactor,
-                  public nest_interactor {
+                  public nest_interactor,
+                  public rcppsw::er::client<collector> {
  public:
   collector(const struct ta::task_allocation_params* params,
             const std::string& name,
@@ -84,8 +86,10 @@ class collector : public foraging_task,
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(const ta::taskable_argument*) override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double start_time) override;
+  double abort_prob_calc(void) override;
+  double interface_time_calc(uint interface,
+                             double start_time) override;
+  void active_interface_update(int) override;
 };
 
 NS_END(depth1, tasks, fordyca);

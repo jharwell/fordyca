@@ -117,8 +117,8 @@ void tasking_initializer::depth1_tasking_init(
             collector->name().c_str(),
             c_min,
             c_max);
-    static_cast<ta::polled_task*>(harvester)->exec_est_bounds_init(h_min, h_max);
-    static_cast<ta::polled_task*>(collector)->exec_est_bounds_init(c_min, c_max);
+    static_cast<ta::polled_task*>(harvester)->exec_estimate_init(h_min, h_max);
+    static_cast<ta::polled_task*>(collector)->exec_estimate_init(c_min, c_max);
   }
 } /* depth1_tasking_init() */
 
@@ -129,7 +129,7 @@ std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
   depth1_tasking_init(param_repo);
 
   return rcppsw::make_unique<ta::bi_tdgraph_executive>(
-      mc_exec_ests_oracle, graph());
+      !mc_exec_ests_oracle, graph());
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

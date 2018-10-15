@@ -69,11 +69,6 @@ class foraging_task
   double current_time(void) const override;
 
  protected:
-  void interface_complete(bool interface_complete) { m_interface_complete = interface_complete; }
-  bool interface_complete(void) const { return m_interface_complete; }
-
- private:
-  bool m_interface_complete{false};
 };
 
 NS_END(depth2, tasks, fordyca);

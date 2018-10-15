@@ -79,7 +79,7 @@ void stateful_tasking_initializer::stateful_tasking_init(
             generalist->name().c_str(),
             min,
             max);
-    generalist->exec_est_bounds_init(min, max);
+    generalist->exec_estimate_init(min, max);
   }
   m_graph = new ta::bi_tdgraph(task_params);
 

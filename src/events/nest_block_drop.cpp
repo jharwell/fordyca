@@ -54,7 +54,7 @@ nest_block_drop::nest_block_drop(std::shared_ptr<representation::base_block> blo
  * Foraging Support
  ******************************************************************************/
 void nest_block_drop::visit(ds::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_id(), "undefined robot index");
+  ER_ASSERT(-1 != m_block->robot_id(), "Undefined robot index");
   map.distribute_single_block(m_block);
   m_block->accept(*this);
 } /* visit() */

@@ -72,7 +72,7 @@ void oracular_partitioning_controller::task_abort_cb(ta::polled_task* task) {
                           mc_tasking_oracle->ask("exec_est." + task->name()))
                           .last_result();
   double old = task->task_exec_estimate().last_result();
-  task->update_exec_estimate(oracle_est);
+  task->exec_estimate_update(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
           oracle_est,
@@ -85,7 +85,7 @@ void oracular_partitioning_controller::task_finish_cb(ta::polled_task* task) {
                           mc_tasking_oracle->ask("exec_est." + task->name()))
                           .last_result();
   double old = task->task_exec_estimate().last_result();
-  task->update_exec_estimate(oracle_est);
+  task->exec_estimate_update(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on finish: %f -> %f",
           task->name().c_str(),
           oracle_est,
