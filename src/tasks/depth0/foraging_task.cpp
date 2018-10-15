@@ -1,7 +1,7 @@
 /**
  * @file foraging_task.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,11 +22,23 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth0);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+foraging_task::foraging_task(const std::string& name,
+                             const ta::task_allocation_params* const params,
+                             std::unique_ptr<ta::taskable> mechanism) :
+    polled_task(name,
+                &params->abort,
+                &params->exec_est.ema,
+                std::move(mechanism)) {}
 
 /*******************************************************************************
  * Constant Definitions

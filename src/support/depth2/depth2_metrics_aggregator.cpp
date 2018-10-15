@@ -88,6 +88,13 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 void depth2_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const task,
     const ta::bi_tab* const tab) {
+  /*
+   * Will be NULL on first task allocation, because there is no active TAB yet.
+   */
+  if (nullptr == tab) {
+    return;
+  }
+
   if (task0::kGeneralistName == task->name()) {
     collect("tasks::generalist_tab", *tab);
   } else if (task1::kHarvesterName == task->name()) {

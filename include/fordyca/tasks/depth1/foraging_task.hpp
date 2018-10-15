@@ -28,7 +28,7 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ NS_START(tasks, depth1);
  */
 class foraging_task
     : public base_foraging_task,
-      public ta::partitionable_polled_task {
+      public ta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";

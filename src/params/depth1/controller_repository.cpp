@@ -22,20 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/params/depth1/exec_estimates_parser.hpp"
+#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      std::string("depth1_") +  exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("collector");
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("harvester");
 }
 
 NS_END(depth1, params, fordyca);

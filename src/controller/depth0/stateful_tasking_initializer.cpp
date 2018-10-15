@@ -30,7 +30,6 @@
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
-#include "fordyca/params/depth0/exec_estimates_params.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -64,8 +63,6 @@ void stateful_tasking_initializer::stateful_tasking_init(
     params::depth0::stateful_controller_repository* const stateful_repo) {
   auto* task_params = stateful_repo->parse_results<ta::task_allocation_params>();
 
-  auto* est_params =
-      stateful_repo->parse_results<params::depth0::exec_estimates_params>();
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
@@ -75,15 +72,16 @@ void stateful_tasking_initializer::stateful_tasking_init(
   auto generalist =
       new tasks::depth0::generalist(task_params, std::move(generalist_fsm));
 
-  if (est_params->seed_enabled) {
+  if (task_params->exec_est.seed_enabled) {
+    uint min = task_params->exec_est.ranges.find("generalist")->second.get_min();
+    uint max = task_params->exec_est.ranges.find("generalist")->second.get_max();
     ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u]",
             generalist->name().c_str(),
-            est_params->generalist_range.GetMin(),
-            est_params->generalist_range.GetMax());
-    generalist->exec_est_bounds_init(est_params->generalist_range.GetMin(),
-                                     est_params->generalist_range.GetMax());
+            min,
+            max);
+    generalist->exec_est_bounds_init(min, max);
   }
-  m_graph = new ta::bi_tdgraph(&task_params->tab_sw);
+  m_graph = new ta::bi_tdgraph(task_params);
 
   m_graph->set_root(generalist);
   generalist->set_atomic(true);
