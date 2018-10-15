@@ -47,7 +47,8 @@ collector::collector(const struct ta::task_allocation_params* const params,
 collector::collector(const struct ta::task_allocation_params* const params,
                      const std::string& name,
                      std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(name, params, std::move(mechanism)) {}
+    : foraging_task(name, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
@@ -55,36 +56,45 @@ collector::collector(const struct ta::task_allocation_params* const params,
 void collector::task_start(const ta::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   ta::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
-double collector::calc_abort_prob(void) {
+double collector::abort_prob_calc(void) {
   /*
    * Collectors always have a small chance of aborting their task when not at a
    * task interface. Not strictly necessary at least for now, but it IS
    * necessary for foragers and so it seems like a good idea to add this to all
    * tasks.
    */
+  if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
+  }
+} /* abort_prob_calc() */
+
+double collector::interface_time_calc(uint interface, double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
+
+void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
+
   if (transport_goal_type::kNest == fsm->block_transport_goal()) {
-    return 0.0;
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_TRACE("Interface finished at timestep %f", current_time());
+    }
+    ER_TRACE("Interface time: %f", interface_time(0));
+  } else if (acquisition_goal_type::kExistingCache == fsm->acquisition_goal()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+    }
+    ER_TRACE("Interface start at timestep %f", current_time());
   }
-  return executable_task::update_abort_prob();
-} /* calc_abort_prob() */
-
-double collector::calc_interface_time(double start_time) {
-  auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (transport_goal_type::kNest == fsm->block_transport_goal() &&
-      !interface_complete()) {
-    interface_complete(true);
-    reset_interface_time();
-  }
-
-  if (!(transport_goal_type::kNest == fsm->block_transport_goal())) {
-    return current_time() - start_time;
-  }
-  return 0.0;
-} /* calc_interface_time() */
+} /* active_interface_update() */
 
 /*******************************************************************************
  * Event Handling

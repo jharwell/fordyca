@@ -43,7 +43,8 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 cache_transferer::cache_transferer(
     const struct ta::task_allocation_params* params,
     std::unique_ptr<task_allocation::taskable> mechanism)
-    : foraging_task(kCacheTransfererName, params, std::move(mechanism)) {}
+    : foraging_task(kCacheTransfererName, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth2.cache_transferer") {}
 
 /*******************************************************************************
  * Member Functions
@@ -56,35 +57,24 @@ void cache_transferer::task_start(
   interface_complete(false);
 } /* task_start() */
 
-double cache_transferer::calc_abort_prob(void) {
-  /*
-   * Cache transferers always have a small chance of aborting their task when
-   * not at a task interface. Having the cache transferer task un-abortable
-   * until AFTER it acquires a block from a cache can cause it to get stuck and
-   * not switch to another task if it cannot find a cache anywhere.
-   */
-  auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
-  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
-    return executable_task::update_abort_prob();
+double cache_transferer::abort_prob_calc(void) {
+  if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
   }
-  return executable_task::update_abort_prob();
-} /* calc_abort_prob() */
+} /* abort_prob_calc() */
 
-double cache_transferer::calc_interface_time(double start_time) {
-  if (task_at_interface()) {
-    return current_time() - start_time;
-  }
+double cache_transferer::interface_time_calc(uint interface,
+                                             double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
 
+void cache_transferer::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
-  if (fsm->goal_acquired() && task_at_interface()) {
-    if (!interface_complete()) {
-      interface_complete(true);
-      reset_interface_time();
-    }
-    return interface_time();
-  }
-  return 0.0;
-} /* calc_interface_time() */
+  ER_FATAL_SENTINEL("Not implemented yet");
+} /* active_interface_update() */
 
 /*******************************************************************************
  * Event Handling
@@ -132,13 +122,5 @@ TASK_WRAPPER_DEFINE_PTR(
     cache_transferer,
     block_transport_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
-
-/*******************************************************************************
- * Task Metrics
- ******************************************************************************/
-__rcsw_pure bool cache_transferer::task_at_interface(void) const {
-  auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
-  return acquisition_goal_type::kExistingCache == fsm->acquisition_goal();
-} /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);

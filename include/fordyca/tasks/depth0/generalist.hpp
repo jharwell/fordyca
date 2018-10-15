@@ -74,7 +74,9 @@ class generalist : public foraging_task {
   void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;
-  double calc_interface_time(double) override { return 0.0; }
+  double interface_time_calc(uint, double) override { return 0.0; }
+  void active_interface_update(int) override {}
+  double abort_prob_calc(void) override;
 };
 
 NS_END(depth0, tasks, fordyca);

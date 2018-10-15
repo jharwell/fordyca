@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_controller id="ffc"
+    <greedy_partitioning_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -54,7 +54,7 @@
                      gamma="1.0"/>
           </task_abort>
           <task_partition
-              always_partition="false"
+              always_partition="true"
               never_partition="false">
             <sigmoid_selection
                 method="pini2011">
@@ -123,11 +123,11 @@
             <phototaxis_force max="8"/>
           </steering2D>
 
-          <differential_drive soft_turn_max="30"
+          <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
       </params>
-    </stateful_controller>
+    </greedy_partitioning_controller>
 
   </controllers>
 
@@ -135,7 +135,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_loop_functions">
+                  label="depth1_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -205,7 +205,7 @@
     </arena_map>
     <caches
         dimension="0.8">
-      <static enable="false"
+      <static enable="true"
               size="2"
               respawn_scale_factor="0.05"
               >
@@ -272,7 +272,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
+      <entity quantity="2" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

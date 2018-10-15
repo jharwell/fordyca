@@ -19,9 +19,6 @@
   <category name="fordyca.events" >
     <priority value ="all" />
   </category>
-  <category name="rcppsw.ta.bifurcating_tdgraph" >
-    <priority value ="all" />
-  </category>
   <category name="rcppsw.ta.tdgraph" >
     <priority value ="all" />
   </category>

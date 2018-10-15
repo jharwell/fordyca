@@ -27,6 +27,7 @@
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/tasks/free_block_interactor.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +48,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * abortable, and has one task interface.
  */
 class cache_finisher : public foraging_task,
-                       public free_block_interactor {
+                       public free_block_interactor,
+                       public rcppsw::er::client<cache_finisher> {
  public:
   cache_finisher(const struct ta::task_allocation_params* params,
                  std::unique_ptr<task_allocation::taskable> mechanism);
@@ -73,12 +75,13 @@ class cache_finisher : public foraging_task,
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
   /* task metrics */
-  bool task_at_interface(void) const override;
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(const task_allocation::taskable_argument*) override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double start_time) override;
+  double abort_prob_calc(void) override;
+  double interface_time_calc(uint interface,
+                             double start_time) override;
+  void active_interface_update(int) override;
 };
 
 NS_END(depth2, tasks, fordyca);

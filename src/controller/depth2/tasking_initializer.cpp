@@ -154,8 +154,8 @@ void tasking_initializer::depth2_tasking_init(
             cache_finisher->name().c_str(),
             cf_min,
             cf_max);
-    cache_starter->exec_est_bounds_init(cs_min, cs_max);
-    cache_finisher->exec_est_bounds_init(cf_min, cf_max);
+    cache_starter->exec_estimate_init(cs_min, cs_max);
+    cache_finisher->exec_estimate_init(cf_min, cf_max);
 
     ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
             cache_transferer->name().c_str(),
@@ -164,8 +164,8 @@ void tasking_initializer::depth2_tasking_init(
             cache_collector->name().c_str(),
             cc_min,
             cc_max);
-    cache_transferer->exec_est_bounds_init(ct_min, ct_max);
-    cache_collector->exec_est_bounds_init(ct_min, ct_max);
+    cache_transferer->exec_estimate_init(ct_min, ct_max);
+    cache_collector->exec_estimate_init(cc_min, cc_max);
   }
 } /* depth2_tasking_init() */
 
@@ -183,7 +183,7 @@ std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
   depth2_tasking_init(param_repo);
 
   return rcppsw::make_unique<ta::bi_tdgraph_executive>(
-      exec_ests_oracle(), graph());
+      !exec_ests_oracle(), graph());
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);
