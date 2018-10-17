@@ -34,6 +34,7 @@
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/task_allocation_params.hpp"
+#include "rcppsw/task_allocation/task_executive_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -91,7 +92,10 @@ std::unique_ptr<ta::bi_tdgraph_executive> stateful_tasking_initializer::
 operator()(params::depth0::stateful_controller_repository* const stateful_repo) {
   stateful_tasking_init(stateful_repo);
 
-  return rcppsw::make_unique<ta::bi_tdgraph_executive>(false, m_graph);
+  struct ta::task_executive_params p;
+  p.update_exec_ests = true;
+  p.update_interface_ests = true;
+  return rcppsw::make_unique<ta::bi_tdgraph_executive>(&p, m_graph);
 } /* initialize() */
 
 NS_END(depth0, controller, fordyca);

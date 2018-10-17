@@ -27,6 +27,7 @@
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/params/oracle_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +50,9 @@ void oracular_partitioning_controller::Init(ticpp::Element& node) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
+  auto* oraclep = param_repo.parse_results<params::oracle_params>();
 
-  executive(tasking_initializer(true,
+  executive(tasking_initializer(oraclep,
                                 block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),

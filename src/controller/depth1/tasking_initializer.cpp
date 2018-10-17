@@ -40,6 +40,8 @@
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/task_allocation_params.hpp"
+#include "rcppsw/task_allocation/task_executive_params.hpp"
+#include "fordyca/params/oracle_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,15 +53,19 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    bool exec_ests_oracle,
+    const struct params::oracle_params* const oparams,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
     : stateful_tasking_initializer(bsel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.depth1.tasking_initializer"),
-      mc_exec_ests_oracle(exec_ests_oracle),
-      mc_sel_matrix(csel_matrix) {}
+      mc_sel_matrix(csel_matrix) {
+  if (nullptr != oparams) {
+    m_exec_ests_oracle = oparams->task_exec_ests;
+    m_interface_ests_oracle = oparams->task_interface_ests;
+  }
+      }
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -128,8 +134,10 @@ std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
 
   depth1_tasking_init(param_repo);
 
-  return rcppsw::make_unique<ta::bi_tdgraph_executive>(
-      !mc_exec_ests_oracle, graph());
+  struct ta::task_executive_params p;
+  p.update_exec_ests = !m_exec_ests_oracle;
+  p.update_interface_ests = !m_interface_ests_oracle;
+  return rcppsw::make_unique<ta::bi_tdgraph_executive>(&p, graph());
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

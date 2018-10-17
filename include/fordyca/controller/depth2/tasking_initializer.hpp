@@ -51,7 +51,7 @@ NS_START(controller, depth2);
 class tasking_initializer : public depth1::tasking_initializer,
                             public er::client<tasking_initializer> {
  public:
-  tasking_initializer(bool exec_ests_oracle,
+  tasking_initializer(const struct params::oracle_params* params,
                       const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,

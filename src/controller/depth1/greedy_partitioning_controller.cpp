@@ -102,7 +102,7 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
   block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
       ogrid->nest, &ogrid->priorities));
   m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
-  executive(tasking_initializer(false,
+  executive(tasking_initializer(nullptr,
                                 block_sel_matrix(),
                                 m_cache_sel_matrix.get(),
                                 saa_subsystem(),
