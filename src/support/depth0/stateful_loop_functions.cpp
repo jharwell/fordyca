@@ -35,6 +35,7 @@
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +67,7 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
 
   m_metrics_agg =
       rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
-                                                       output_root());
+                                                     output_root());
 
   /* intitialize robot interactions with environment */
   m_interactor =
@@ -79,21 +80,35 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::depth0::stateful_controller&>(
+    auto& controller = dynamic_cast<controller::base_controller&>(
         robot.GetControllableEntity().GetController());
-
-    /*
-     * If NULL, then visualization has been disabled.
-     */
-    auto* vparams =
-        params().parse_results<struct params::visualization_params>();
-    if (nullptr != vparams) {
-      controller.display_los(vparams->robot_los);
-    }
+    controller_configure(controller);
   } /* for(entity..) */
   ER_INFO("Initialization finished");
   ndc_pop();
 }
+
+void stateful_loop_functions::controller_configure(controller::base_controller& c) {
+  auto& stateful =
+      dynamic_cast<controller::depth0::stateful_controller&>(c);
+  /*
+   * If NULL, then visualization has been disabled.
+   */
+  auto* vparams =
+      params().parse_results<struct params::visualization_params>();
+  if (nullptr != vparams) {
+    stateful.display_los(vparams->robot_los);
+  }
+
+  stateful.executive()->task_finish_notify(
+      std::bind(&stateful_metrics_aggregator::task_finish_or_abort_cb,
+                m_metrics_agg.get(),
+                std::placeholders::_1));
+  stateful.executive()->task_abort_notify(
+      std::bind(&stateful_metrics_aggregator::task_finish_or_abort_cb,
+                m_metrics_agg.get(),
+                std::placeholders::_1));
+} /* controller_configure() */
 
 void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller = static_cast<controller::depth0::stateful_controller&>(

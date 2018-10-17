@@ -172,6 +172,16 @@ void cache_transferer_fsm::init(void) {
   m_cache_fsm.task_reset();
 } /* init() */
 
+bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
+  return transport_goal_type::kCacheSite == block_transport_goal() &&
+      ST_ACQUIRE_DEST_CACHE == current_state();
+} /* is_acquiring_dest_cache() */
+
+bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
+  return transport_goal_type::kCacheSite == block_transport_goal() &&
+      ST_ACQUIRE_SRC_CACHE == current_state();
+} /* is_acquiring_src_cache() */
+
 void cache_transferer_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);

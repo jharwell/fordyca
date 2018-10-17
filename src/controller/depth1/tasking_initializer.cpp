@@ -41,7 +41,6 @@
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/task_allocation_params.hpp"
 #include "rcppsw/task_allocation/task_executive_params.hpp"
-#include "fordyca/params/oracle_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +52,6 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    const struct params::oracle_params* const oparams,
     const controller::block_selection_matrix* bsel_matrix,
     const controller::cache_selection_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
@@ -61,10 +59,6 @@ tasking_initializer::tasking_initializer(
     : stateful_tasking_initializer(bsel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.depth1.tasking_initializer"),
       mc_sel_matrix(csel_matrix) {
-  if (nullptr != oparams) {
-    m_exec_ests_oracle = oparams->task_exec_ests;
-    m_interface_ests_oracle = oparams->task_interface_ests;
-  }
       }
 
 tasking_initializer::~tasking_initializer(void) = default;
@@ -72,7 +66,7 @@ tasking_initializer::~tasking_initializer(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void tasking_initializer::depth1_tasking_init(
+tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
     params::depth1::controller_repository* const param_repo) {
   auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
   ER_ASSERT(block_sel_matrix(), "NULL block selection matrix");
@@ -100,16 +94,24 @@ void tasking_initializer::depth1_tasking_init(
 
   graph()->install_tab(tasks::depth0::foraging_task::kGeneralistName,
                        std::vector<ta::polled_task*>({harvester, collector}));
+  return tasking_map{{"collector", collector}, {"harvester", harvester}};
+} /* depth1_tasks_create() */
 
+void tasking_initializer::depth1_exec_est_init(
+    params::depth1::controller_repository* const param_repo,
+    const tasking_map& map) {
+  auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
   if (task_params->exec_est.seed_enabled) {
     /*
      * Generalist is not partitionable in depth 0 initialization, so this has
      * not been done.
      */
+    auto harvester = map.find("harvester")->second;
+    auto collector = map.find("collector")->second;
     if (0 == std::rand() % 2) {
-      graph()->active_tab()->last_subtask(collector);
+      graph()->root_tab()->last_subtask(harvester);
     } else {
-      graph()->active_tab()->last_subtask(harvester);
+      graph()->root_tab()->last_subtask(collector);
     }
 
     uint h_min = task_params->exec_est.ranges.find("harvester")->second.get_min();
@@ -126,18 +128,19 @@ void tasking_initializer::depth1_tasking_init(
     static_cast<ta::polled_task*>(harvester)->exec_estimate_init(h_min, h_max);
     static_cast<ta::polled_task*>(collector)->exec_estimate_init(c_min, c_max);
   }
-} /* depth1_tasking_init() */
+} /* depth1_exec_est_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
     params::depth1::controller_repository* const param_repo) {
   stateful_tasking_init(param_repo);
 
-  depth1_tasking_init(param_repo);
+  auto map = depth1_tasks_create(param_repo);
+  auto* executivep = param_repo->parse_results<ta::task_executive_params>();
+  graph()->active_tab_init(executivep->tab_init_method);
+  depth1_exec_est_init(param_repo, map);
 
-  struct ta::task_executive_params p;
-  p.update_exec_ests = !m_exec_ests_oracle;
-  p.update_interface_ests = !m_interface_ests_oracle;
-  return rcppsw::make_unique<ta::bi_tdgraph_executive>(&p, graph());
+  auto* execp = param_repo->parse_results<ta::task_executive_params>();
+  return rcppsw::make_unique<ta::bi_tdgraph_executive>(execp, graph());
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

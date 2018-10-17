@@ -50,13 +50,7 @@ void oracular_partitioning_controller::Init(ticpp::Element& node) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
-  auto* oraclep = param_repo.parse_results<params::oracle_params>();
 
-  executive(tasking_initializer(oraclep,
-                                block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(&param_repo));
   executive()->task_abort_notify(
       std::bind(&oracular_partitioning_controller::task_abort_cb,
                 this,
@@ -93,6 +87,16 @@ void oracular_partitioning_controller::task_finish_cb(ta::polled_task* task) {
           oracle_est,
           old,
           task->task_exec_estimate().last_result());
+
+  oracle_est = boost::get<ta::time_estimate>(
+      mc_tasking_oracle->ask("interface_est." + task->name())).last_result();
+  old = task->task_interface_estimate(0).last_result();
+  task->exec_estimate_update(oracle_est);
+  ER_INFO("Update 'interface_est.%s' with oracular estimate %f on finish: %f -> %f",
+          task->name().c_str(),
+          oracle_est,
+          old,
+          task->task_interface_estimate(0).last_result());
 } /* task_finish_cb() */
 
 using namespace argos; // NOLINT

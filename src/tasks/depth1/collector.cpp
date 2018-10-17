@@ -84,7 +84,7 @@ void collector::active_interface_update(int) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
-      ER_TRACE("Interface finished at timestep %f", current_time());
+      ER_DEBUG("Interface finished at timestep %f", current_time());
     }
     ER_TRACE("Interface time: %f", interface_time(0));
   } else if (acquisition_goal_type::kExistingCache == fsm->acquisition_goal()) {
@@ -92,7 +92,7 @@ void collector::active_interface_update(int) {
       interface_enter(0);
       interface_time_mark_start(0);
     }
-    ER_TRACE("Interface start at timestep %f", current_time());
+    ER_DEBUG("Interface start at timestep %f", current_time());
   }
 } /* active_interface_update() */
 

@@ -57,4 +57,8 @@ __rcsw_pure double foraging_task::current_time(void) const {
       ->tick();
 } /* current_time() */
 
+bool foraging_task::task_in_depth1(const polled_task* const task) {
+  return task->name() == kCollectorName || task->name() == kHarvesterName;
+} /* task_in_depth1() */
+
 NS_END(depth1, tasks, fordyca);

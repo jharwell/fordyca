@@ -51,15 +51,6 @@ void oracular_recpart_controller::Init(ticpp::Element& node) {
     std::exit(EXIT_FAILURE);
   }
 
-  /*
-   * Replace the executive/task decomposition graph via strategy pattern.
-   */
-  auto* oraclep = param_repo.parse_results<params::oracle_params>();
-  executive(tasking_initializer(oraclep,
-                                block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(&param_repo));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

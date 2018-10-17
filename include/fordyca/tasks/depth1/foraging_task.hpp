@@ -66,6 +66,8 @@ class foraging_task
                 std::unique_ptr<ta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
+  static bool task_in_depth1(const polled_task* const task);
+
     /* task overrides */
   double current_time(void) const override;
 };

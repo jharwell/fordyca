@@ -30,11 +30,13 @@
 #include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
+using task0 = tasks::depth0::foraging_task;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -88,5 +90,19 @@ void stateful_metrics_aggregator::collect_from_controller(
     collect("blocks::acquisition", *block_acq_m);
   }
 } /* collect_from_controller() */
+
+void stateful_metrics_aggregator::task_finish_or_abort_cb(
+    const ta::polled_task* const task) {
+  /*
+   * Both depth1 and depth2 metrics aggregators are registered on the same
+   * callback, so this function will be called for the depth2 task abort/finish
+   * as well, which should be ignored.
+   */
+  if (!task0::task_in_depth0(task)) {
+    return;
+  }
+  collect("tasks::execution::" + task->name(),
+          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+} /* task_finish_or_abort_cb() */
 
 NS_END(depth0, support, fordyca);

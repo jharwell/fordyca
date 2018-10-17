@@ -65,10 +65,10 @@ class foraging_task
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
   static constexpr char kCacheCollectorName[] = "Cache Collector";
 
+  static bool task_in_depth2(const polled_task* const task);
+
   /* task overrides */
   double current_time(void) const override;
-
- protected:
 };
 
 NS_END(depth2, tasks, fordyca);

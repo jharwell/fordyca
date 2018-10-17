@@ -78,32 +78,9 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
   params::depth1::controller_repository param_repo;
+  non_unique_init(node, &param_repo);
 
-  param_repo.parse_all(node);
-
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
-
-  /* Put in new depth1 sensors and perception, ala strategy pattern */
-  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
-      param_repo.parse_results<struct params::sensing_params>(),
-      &saa_subsystem()->sensing()->sensor_list()));
-
-  perception(rcppsw::make_unique<perception_subsystem>(
-      param_repo.parse_results<params::perception_params>(), GetId()));
-
-  /*
-   * Initialize tasking by overriding stateful controller executive via
-   * strategy pattern.
-   */
-  auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
-  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
-      ogrid->nest, &ogrid->priorities));
-  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
-  executive(tasking_initializer(nullptr,
-                                block_sel_matrix(),
+  executive(tasking_initializer(block_sel_matrix(),
                                 m_cache_sel_matrix.get(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
@@ -115,6 +92,35 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
+
+void greedy_partitioning_controller::non_unique_init(
+    ticpp::Element& node,
+    params::depth1::controller_repository* param_repo) {
+
+  param_repo->parse_all(node);
+
+  if (!param_repo->validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+
+  /* Put in new depth1 sensors and perception, ala strategy pattern */
+  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
+      param_repo->parse_results<struct params::sensing_params>(),
+      &saa_subsystem()->sensing()->sensor_list()));
+
+  perception(rcppsw::make_unique<perception_subsystem>(
+      param_repo->parse_results<params::perception_params>(), GetId()));
+
+  /*
+   * Initialize tasking by overriding stateful controller executive via
+   * strategy pattern.
+   */
+  auto* ogrid = param_repo->parse_results<params::occupancy_grid_params>();
+  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
+      ogrid->nest, &ogrid->priorities));
+  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
+} /* non_unique_init() */
 
 __rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(
     void) {
