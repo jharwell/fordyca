@@ -128,7 +128,7 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
   }
 
   auto* oraclep = params().parse_results<params::oracle_params>();
-  if (oraclep->tasking_enabled) {
+  if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);
     oracular.executive()->task_finish_notify(

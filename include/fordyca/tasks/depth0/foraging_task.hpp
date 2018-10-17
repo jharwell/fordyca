@@ -69,6 +69,8 @@ class foraging_task
                 std::unique_ptr<ta::taskable> mechanism);
 
   ~foraging_task(void) override = default;
+
+  static bool task_in_depth0(const ta::polled_task* const task);
 };
 
 NS_END(depth0, tasks, fordyca);

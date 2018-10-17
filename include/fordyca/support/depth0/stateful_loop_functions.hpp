@@ -67,10 +67,11 @@ class stateful_loop_functions : public stateless_loop_functions,
 
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  void controller_configure(controller::base_controller& c);
 
   // clang-format off
   std::unique_ptr<stateful_metrics_aggregator> m_metrics_agg;
-  std::unique_ptr<interactor>                  m_interactor{nullptr};
+  std::unique_ptr<interactor>                m_interactor{nullptr};
   // clang-format on
 };
 
