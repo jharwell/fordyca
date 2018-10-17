@@ -42,11 +42,18 @@ NS_START(fordyca, params);
  * simulation.
  */
 struct oracle_params : public rcppsw::params::base_params {
+  bool enabled{false};
   /**
-   * @brief Should the all-knowing oracle be used when updating task time
-   * estimates? Only applicable to certain controllers.
+   * @brief Should the all-knowing oracle be used when updating task execution
+   * time estimates? Only applicable to certain controllers.
    */
-  bool tasking_enabled{false};
+  bool task_exec_ests{false};
+
+  /**
+   * @brief Should the all-knowing oracle be used when updating task interface
+   * time estimates? Only applicable to certain controllers.
+   */
+  bool task_interface_ests{false};
 };
 
 NS_END(params, fordyca);

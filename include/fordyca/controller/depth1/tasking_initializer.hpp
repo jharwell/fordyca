@@ -33,6 +33,7 @@
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 namespace params {
+struct oracle_params;
 namespace depth1 { class controller_repository; }
 }
 
@@ -53,13 +54,7 @@ NS_START(depth1);
 class tasking_initializer : public depth0::stateful_tasking_initializer,
                             public er::client<tasking_initializer> {
  public:
-  /**
-   * @param exec_ests_oracle Should the executive update task execution time
-   *                         estimates automatically each time a task is
-   *                         finished/aborted, or will the oracle provide that
-   *                         information?
-   */
-  tasking_initializer(bool exec_ests_oracle,
+  tasking_initializer(const struct params::oracle_params* oparams,
                       const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
@@ -72,7 +67,8 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
   std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth1::controller_repository *const controller_repo);
 
-  bool exec_ests_oracle(void) const { return mc_exec_ests_oracle; }
+  bool exec_ests_oracle(void) const { return m_exec_ests_oracle; }
+  bool interface_ests_oracle(void) const { return m_interface_ests_oracle; }
 
  protected:
   void depth1_tasking_init(params::depth1::controller_repository* task_repo);
@@ -80,8 +76,9 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
 
  private:
   // clang-format off
-  const bool                                      mc_exec_ests_oracle;
   const controller::cache_selection_matrix* const mc_sel_matrix;
+  bool                                            m_exec_ests_oracle{false};
+  bool                                            m_interface_ests_oracle{false};
   // clang-format on
 };
 

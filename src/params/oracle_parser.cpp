@@ -40,12 +40,18 @@ void oracle_parser::parse(const ticpp::Element& node) {
   ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(enode, m_params, tasking_enabled);
+  XML_PARSE_ATTR(enode, m_params, enabled);
+  if (m_params->enabled) {
+    XML_PARSE_ATTR(enode, m_params, task_exec_ests);
+    XML_PARSE_ATTR(enode, m_params, task_interface_ests);
+  }
 } /* parse() */
 
 void oracle_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, tasking_enabled)
-         << std::endl
+  stream << build_header()
+         << XML_ATTR_STR(m_params, enabled) << std::endl
+         << XML_ATTR_STR(m_params, task_exec_ests) << std::endl
+         << XML_ATTR_STR(m_params, task_interface_ests) << std::endl
          << build_footer();
 } /* show() */
 
