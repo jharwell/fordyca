@@ -82,7 +82,7 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing");
   /* initialize tasking */
-  executive(tasking_initializer(false,
+  executive(tasking_initializer(nullptr,
                                 block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),
