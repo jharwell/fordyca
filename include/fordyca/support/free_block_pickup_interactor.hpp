@@ -119,8 +119,16 @@ class free_block_pickup_interactor
      * second one will attempt to perform the pickup on a block that is already
      * out of sight, resulting in a boost index out of bounds assertion. See
      * #410.
+     *
+     * Furthermore, it is ALSO possible that while the second robot is still
+     * waiting to serve its penalty, and the first robot has already picked up
+     * the ramp block, that the arena distributes a new block onto the square
+     * that the robot is currently occupying. Thus, when it has served its
+     * penalty, we need to check that the ID of the block the robot is on
+     * matches the ID of the block we originally served the penalty for (not
+     * just checking if it is not -1).
      */
-    if (-1 == loop_utils::robot_on_block(controller, *m_map)) {
+    if (p.id() != loop_utils::robot_on_block(controller, *m_map)) {
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
               m_penalty_handler.find(controller)->id());

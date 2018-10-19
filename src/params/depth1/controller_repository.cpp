@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
-#include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,10 +34,6 @@ namespace ta = rcppsw::task_allocation;
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  register_parser<ta::task_executive_xml_parser, ta::task_executive_params>(
-      ta::task_executive_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-
   get_parser<ta::task_allocation_xml_parser>(
       ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("collector");
   get_parser<ta::task_allocation_xml_parser>(

@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include <algorithm>
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
@@ -61,6 +63,34 @@ void base_perception_subsystem::reset(void) { m_map->reset(); }
 
 void base_perception_subsystem::process_los(
     const representation::line_of_sight* const c_los) {
+  ER_TRACE("LOS LL=(%u, %u), LR=(%u, %u), UL=(%u, %u) UR=(%u, %u)",
+      c_los->abs_ll().first,
+      c_los->abs_ll().second,
+      c_los->abs_lr().first,
+      c_los->abs_lr().second,
+      c_los->abs_ul().first,
+      c_los->abs_ul().second,
+      c_los->abs_ur().first,
+      c_los->abs_ur().second);
+
+  /*
+   * Because this is computed, rather than a returned reference to a member
+   * variable, we can't use separate begin()/end() calls with it, and need to
+   * explicitly assign it.
+   */
+  representation::line_of_sight::const_block_list blocks = c_los->blocks();
+  std::string accum;
+  std::for_each(blocks.begin(),
+                blocks.end(),
+                [&](const auto& b) {
+                  accum += "b" + std::to_string(b->id()) + "->(" +
+                           std::to_string(b->discrete_loc().first) + "," +
+                           std::to_string(b->discrete_loc().second) +  "),";
+                });
+  if (!blocks.empty()) {
+    ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
+  }
+
   /*
    * If the robot thinks that a cell contains a block, because the cell had one
    * the last time it passed nearby, but when coming near the cell a second time
@@ -87,14 +117,27 @@ void base_perception_subsystem::process_los(
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto block : c_los->blocks()) {
+  for (auto& block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(), "Block out of sight in LOS?");
-    if (!m_map->access<occupancy_grid::kCell>(block->discrete_loc())
-             .state_has_block()) {
-      ER_INFO("Discovered block%d at (%u, %u)",
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
+    if (!cell.state_has_block()) {
+      ER_INFO("Discovered block%d@(%u, %u)",
               block->id(),
               block->discrete_loc().first,
               block->discrete_loc().second);
+    } else if (cell.state_has_block()) {
+      ER_DEBUG("Block%d@(%u,%u) already known",
+              block->id(),
+              block->discrete_loc().first,
+              block->discrete_loc().second);
+      auto it = std::find_if(m_map->blocks().begin(),
+                             m_map->blocks().end(),
+                             [&](const auto& b) {
+                               return b->id() == cell.block()->id();
+                             });
+      ER_ASSERT(it != m_map->blocks().end(),
+                "Known block%d not in PAM",
+                block->id());
     }
     events::block_found op(block->clone());
     m_map->accept(op);
@@ -103,6 +146,23 @@ void base_perception_subsystem::process_los(
 
 void base_perception_subsystem::processed_los_verify(
     const representation::line_of_sight* const c_los) const {
+  /*
+   * Verify that for each cell that contained a block in the LOS, the
+   * corresponding cell in the PAM also contains the same block.
+   */
+  for (auto &block : c_los->blocks()) {
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
+    ER_ASSERT(cell.state_has_block(), "Cell at (%u,%u) not in HAS_BLOCK state",
+              block->discrete_loc().first,
+              block->discrete_loc().second);
+    ER_ASSERT(cell.block()->id() == block->id(),
+              "Cell at (%u,%u) has wrong block ID (%u vs %u)",
+              block->discrete_loc().first,
+              block->discrete_loc().second,
+              block->id(),
+              cell.block()->id());
+  } /* for(&block..) */
+
   /*
    * Verify that for each cell in LOS that was empty or contained a block, that
    * it matches the PAM.
