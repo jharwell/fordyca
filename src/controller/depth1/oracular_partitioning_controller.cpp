@@ -38,19 +38,17 @@ NS_START(fordyca, controller, depth1);
  * Member Functions
  ******************************************************************************/
 void oracular_partitioning_controller::Init(ticpp::Element& node) {
-  greedy_partitioning_controller::Init(node);
+  base_controller::Init(node);
 
   ndc_push();
-  ER_INFO("Initializing...");
+  ER_INFO("Initializing");
   params::depth1::controller_repository param_repo;
+  depth1::greedy_partitioning_controller::non_unique_init(node, &param_repo);
 
-  param_repo.parse_all(node);
-
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
-
+  executive(tasking_initializer(block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa_subsystem(),
+                                perception())(&param_repo));
   executive()->task_abort_notify(
       std::bind(&oracular_partitioning_controller::task_abort_cb,
                 this,

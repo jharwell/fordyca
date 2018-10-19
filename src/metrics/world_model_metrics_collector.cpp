@@ -75,9 +75,6 @@ bool world_model_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] /
                          static_cast<double>(timestep() + 1)) +
           separator();
-  line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
   double known = std::accumulate(m_known.begin(), m_known.end(), 0.0);
   double unknown = std::accumulate(m_unknown.begin(), m_unknown.end(), 0.0);
   line += std::to_string(known / m_known.size()) + separator();

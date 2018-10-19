@@ -37,8 +37,11 @@
   <category name="fordyca.ds.occupancy_grid" >
     <priority value ="info" />
   </category>
+  <category name="fordyca.controller.perception" >
+    <priority value ="all" />
+  </category>
   <category name="fordyca.ds.arena_map" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
 
  </log4j:configuration>

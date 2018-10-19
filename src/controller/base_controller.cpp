@@ -149,25 +149,27 @@ void base_controller::output_init(
   }
 
 #ifndef ER_NREPORT
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.controller"),
-      output_root + "/controller.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.ds.occupancy_grid"),
-      output_root + "/controller.log");
+  /*
+   * Each file appender is attached to a root category in the FORDYCA
+   * namespace. If you give different file appenders the same file, then the
+   * lines within it are not always ordered, which is not overly helpful for
+   * debugging.
+   */
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller"),
+                      output_root + "/controller.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"),
+                      output_root + "/ds.log");
 
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("rcppsw.ta"), output_root + "/controller.log");
+  client::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
+                      output_root + "/ta.log");
 
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.fsm"), output_root + "/fsm.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"),
+                      output_root + "/fsm.log");
 
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.controller.saa_subsystem"),
-      output_root + "/saa.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
-      output_root + "/saa.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.saa_subsystem"),
+                      output_root + "/saa.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+                      output_root + "/saa.log");
 #endif
 } /* output_init() */
 

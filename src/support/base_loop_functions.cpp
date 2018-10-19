@@ -60,19 +60,16 @@ void base_loop_functions::output_init(
   }
 
 #ifndef ER_NREPORT
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.events"), m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.support"), m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.loop"), m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
-      m_output_root + "/sim.log");
-  client<std::remove_reference<decltype(*this)>::type>::set_logfile(
-      log4cxx::Logger::getLogger("fordyca.metrics"), m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
+                      m_output_root + "/events.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
+                      m_output_root + "/support.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
+                      m_output_root + "/metrics.log");
 #endif
 } /* output_init() */
 
