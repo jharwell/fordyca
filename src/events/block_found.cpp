@@ -54,7 +54,6 @@ block_found::block_found(const std::shared_ptr<representation::base_block>& bloc
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(ds::cell2D& cell) {
-  ER_ASSERT(nullptr != m_block, "nullptr block?");
   cell.entity(m_block);
   cell.fsm().accept(*this);
 } /* visit() */
@@ -133,6 +132,16 @@ void block_found::visit(ds::perceived_arena_map& map) {
      */
     cell.accept(*this);
   }
+  ER_ASSERT(cell.state_has_block(),
+            "Cell@(%u,%u) not in HAS_BLOCK",
+            cell.loc().first,
+            cell.loc().second);
+  ER_ASSERT(cell.block()->id() == m_block->id(),
+            "Block for cell@(%u,%u) ID mismatch: %d/%d",
+            cell.loc().first,
+            cell.loc().second,
+            m_block->id(),
+            cell.block()->id());
 } /* visit() */
 
 /*******************************************************************************

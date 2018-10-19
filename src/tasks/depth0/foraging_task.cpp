@@ -45,4 +45,11 @@ foraging_task::foraging_task(const std::string& name,
  ******************************************************************************/
 constexpr char foraging_task::kGeneralistName[];
 
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+bool foraging_task::task_in_depth0(const ta::polled_task* const task) {
+  return task->name() == kGeneralistName;
+} /* task_in_depth0() */
+
 NS_END(depth0, tasks, fordyca);

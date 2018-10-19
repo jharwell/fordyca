@@ -54,7 +54,6 @@ void cache_transferer::task_start(
     const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
 double cache_transferer::abort_prob_calc(void) {
@@ -73,7 +72,25 @@ double cache_transferer::interface_time_calc(uint interface,
 
 void cache_transferer::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
-  ER_FATAL_SENTINEL("Not implemented yet");
+
+  /*
+   * @todo This task really should have 2 task interfaces: one for acquiring
+   * each cache...
+   */
+  if (fsm->goal_acquired() && fsm->is_acquiring_dest_cache()) {
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_TRACE("Interface finished at timestep %f", current_time());
+    }
+    ER_TRACE("Interface time: %f", interface_time(0));
+  } else if (fsm->is_acquiring_dest_cache()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+    }
+    ER_TRACE("Interface start at timestep %f", current_time());
+  }
 } /* active_interface_update() */
 
 /*******************************************************************************

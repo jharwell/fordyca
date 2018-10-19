@@ -104,7 +104,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
 
 void depth1_loop_functions::oracle_init(void) {
   auto* oraclep = params().parse_results<params::oracle_params>();
-  if (oraclep->tasking_enabled) {
+  if (oraclep->enabled) {
     ER_INFO("Creating oracle");
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
@@ -153,7 +153,7 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
   }
 
   auto* oraclep = params().parse_results<params::oracle_params>();
-  if (oraclep->tasking_enabled) {
+  if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
     oracular.executive()->task_finish_notify(

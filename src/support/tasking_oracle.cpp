@@ -40,6 +40,9 @@ tasking_oracle::tasking_oracle(const ta::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle") {
   graph->walk([&](const ta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
+    m_map.insert({"interface_est." + task->name(),
+            task->task_interface_estimate(0)});
+    ER_WARN("Assuming all tasks have at most 1 interface");
   });
 }
 
@@ -68,6 +71,18 @@ void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
            task->name().c_str(),
            old,
            est.last_result());
+
+  est = boost::get<ta::time_estimate>(
+      m_map.find("interface_est." + task->name())->second);
+  old = est.last_result();
+
+  /* Assuming 1 interface! */
+  est.calc(task->task_interface_estimate(0));
+
+  ER_DEBUG("Update interface_est.%s on finish: %f -> %f",
+           task->name().c_str(),
+           old,
+           est.last_result());
 } /* task_finish_cb() */
 
 void tasking_oracle::task_abort_cb(const ta::polled_task* task) {
@@ -80,6 +95,12 @@ void tasking_oracle::task_abort_cb(const ta::polled_task* task) {
            task->name().c_str(),
            old,
            est.last_result());
+  /*
+   * @todo We do not update interface estimates on task abort! It would be safe
+   * to do so if we knew that we had completed our interface upon abortion, but
+   * there is currently no clean way to do that. Plus, since we are the oracle,
+   * we should get plenty of updates to interface times on task completion.
+   */
 } /* task_abort_cb() */
 
 NS_END(support, fordyca);

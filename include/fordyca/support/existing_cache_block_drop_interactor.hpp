@@ -112,10 +112,18 @@ class existing_cache_block_drop_interactor
      *
      * This results in a \ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
+     *
+     * Furthermore, it is also possible that while a robot is serving its pickup
+     * penalty that the destination cache disappears AND then is re-created by
+     * the arena or another robot dropping a block nearby. This does not appear
+     * to be causing an error right now, but very well might in the future, so
+     * we check that the ID of the cache we are sitting in/on when we finish
+     * serving our penalty is the same as the one the penalty was originally
+     * initialized with (not just checking if it is not -1).
      */
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
 
-    if (-1 == cache_id) {
+    if (p.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());

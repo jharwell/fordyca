@@ -58,6 +58,7 @@ class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
 
   void task_alloc_cb(const ta::polled_task* task,
                      const ta::bi_tab* tab);
+  void task_finish_or_abort_cb(const ta::polled_task* const task);
 
   /**
    * @brief Collect metrics from the depth2 controller.

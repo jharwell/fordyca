@@ -50,7 +50,6 @@ cache_starter::cache_starter(const struct ta::task_allocation_params* params,
 void cache_starter::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
 double cache_starter::abort_prob_calc(void) {
@@ -67,7 +66,23 @@ double cache_starter::interface_time_calc(uint interface, double start_time) {
 } /* interface_time_calc() */
 
 void cache_starter::active_interface_update(int) {
-  ER_FATAL_SENTINEL("Not implemented yet");
+  auto* fsm = static_cast<fsm::depth2::block_to_cache_site_fsm*>(mechanism());
+
+  if (fsm->goal_acquired() &&
+      transport_goal_type::kCacheSite == fsm->block_transport_goal()) {
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_TRACE("Interface finished at timestep %f", current_time());
+    }
+    ER_TRACE("Interface time: %f", interface_time(0));
+  } else if (transport_goal_type::kCacheSite == fsm->block_transport_goal()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+    }
+    ER_TRACE("Interface start at timestep %f", current_time());
+  }
 } /* active_interface_update() */
 
 /*******************************************************************************

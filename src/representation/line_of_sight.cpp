@@ -39,7 +39,10 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_block()) {
-        assert(cell.block());
+        ER_ASSERT(nullptr != cell.block(),
+                  "Cell at(%u,%u) in HAS_BLOCK state, but does not have block",
+                  i,
+                  j);
         blocks.push_back(cell.block());
       }
     } /* for(j..) */
@@ -55,8 +58,16 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
       const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
-        assert(nullptr != cache);
-        assert(cache->n_blocks() >= base_cache::kMinBlocks);
+        ER_ASSERT(nullptr != cell.cache(),
+                  "Cell at(%u,%u) in HAS_CACHE state, but does not have cache",
+                  i,
+                  j);
+        ER_ASSERT(nullptr != cell.cache(),
+                  "Cache at(%u,%u) has too few blocks (%zu < %zu)",
+                  i,
+                  j,
+                  cache->n_blocks(),
+                  base_cache::kMinBlocks);
         /*
          * We can't add the cache unconditionally, because cache host cells and
          * extent cells both refer to the same cache, and doing so will give you
@@ -78,8 +89,14 @@ __rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
 }
 
 __rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
-  assert(i < m_view.shape()[0]);
-  assert(j < m_view.shape()[1]);
+  ER_ASSERT(i < m_view.shape()[0],
+            "Out of bounds X access: %u >= %lu",
+            i,
+            m_view.shape()[0]);
+  ER_ASSERT(j < m_view.shape()[1],
+            "Out of bounds Y access: %u >= %lu",
+            j,
+            m_view.shape()[1]);
   return m_view[i][j];
 }
 

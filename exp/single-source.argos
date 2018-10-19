@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_partitioning_controller id="ffc"
+    <stateful_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -47,32 +47,49 @@
               ramp="1.0"
               />
         </occupancy_grid>
+        <task_executive
+            update_exec_ests="false"
+            update_interface_ests="false"
+            tab_init_method="max_depth"
+            />
         <task_allocation>
           <task_abort>
-            <sigmoid reactivity="8"
-                     offset="3"
-                     gamma="1.0"/>
+            <src_sigmoid_sel
+                input_src="exec">
+              <sigmoid_sel
+                  method="">
+                <sigmoid reactivity="8"
+                         offset="3"
+                         gamma="1.0"/>
+              </sigmoid_sel>
+              </src_sigmoid_sel>
           </task_abort>
           <task_partition
               always_partition="true"
               never_partition="false">
-            <sigmoid_selection
-                method="pini2011">
+            <src_sigmoid_sel
+                input_src="exec">
+              <sigmoid_sel
+                  method="pini2011">
                 <sigmoid
                     reactivity="4"
                     offset="1.0"
                     gamma="1.0"/>
-            </sigmoid_selection>
+              </sigmoid_sel>
+            </src_sigmoid_sel>
           </task_partition>
-          <subtask_selection>
-            <sigmoid_selection
-                method="harwell2018">
+          <subtask_sel>
+            <src_sigmoid_sel
+                input_src="exec">
+              <sigmoid_sel
+                  method="harwell2018">
                 <sigmoid
                     reactivity="8"
                     offset="1.25"
                     gamma="1.0"/>
-            </sigmoid_selection>
-          </subtask_selection>
+              </sigmoid_sel>
+            </src_sigmoid_sel>
+          </subtask_sel>
           <task_exec_estimates
               seed_enabled="true"
               generalist="2000:4000"
@@ -84,15 +101,18 @@
               cache_transferer="1000:2000">
             <ema alpha="0.8"/>
           </task_exec_estimates>
-          <tab_selection>
-            <sigmoid_selection
-                method="harwell2019">
-              <sigmoid
-                  reactivity="4"
-                  offset="1.0"
-                  gamma="1.0"/>
-            </sigmoid_selection>
-          </tab_selection>
+          <tab_sel>
+            <src_sigmoid_sel
+                input_src="exec">
+              <sigmoid_sel
+                  method="harwell2019">
+                <sigmoid
+                    reactivity="4"
+                    offset="1.0"
+                    gamma="1.0"/>
+              </sigmoid_sel>
+            </src_sigmoid_sel>
+          </tab_sel>
         </task_allocation>
 
         <sensing>
@@ -127,7 +147,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_partitioning_controller>
+    </stateful_controller>
 
   </controllers>
 
@@ -135,7 +155,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="stateful_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -148,7 +168,6 @@
           output_dir="metrics"
           fsm_collision_fname="fsm-collision.csv"
           fsm_movement_fname="fsm-movement.csv"
-          block_fname="block.csv"
           block_acquisition_fname="block-acquisition.csv"
           block_transport_fname="block-transport.csv"
           block_manipulation_fname="block-manipulation.csv"
@@ -173,7 +192,9 @@
           />
     </output>
     <oracle
-        tasking_enabled="false"
+        enabled="false"
+        task_exec_est="false"
+        task_interface_est="false"
         />
     <arena_map>
       <grid resolution="0.2"
@@ -205,7 +226,7 @@
     </arena_map>
     <caches
         dimension="0.8">
-      <static enable="true"
+      <static enable="false"
               size="2"
               respawn_scale_factor="0.05"
               >
@@ -217,8 +238,9 @@
             amplitude="500"
             offset="10"/>
       </usage_penalty>
-      <dynamic enable="false"
-               min_dist="0.8"/>
+      <dynamic enable="true"
+               min_dist="0.8"
+               min_blocks="2"/>
 
     </caches>
 
@@ -237,7 +259,7 @@
            source="loop_functions"
            pixels_per_meter="50" />
 
-    <box id="wall_north" size="12`2`,0.1,0.5" movable="false">
+    <box id="wall_north" size="12,0.1,0.5" movable="false">
       <body position="6,6,0" orientation="0,0,0" />
     </box>
     <box id="wall_south" size="12,0.1,0.5" movable="false">
@@ -272,7 +294,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="2" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

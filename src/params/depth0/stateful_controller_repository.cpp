@@ -24,6 +24,7 @@
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/occupancy_grid_parser.hpp"
 #include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
+#include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,6 +41,10 @@ stateful_controller_repository::stateful_controller_repository(void) {
   register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
       ta::task_allocation_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<ta::task_executive_xml_parser, ta::task_executive_params>(
+      ta::task_executive_xml_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+
   get_parser<ta::task_allocation_xml_parser>(
       ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("generalist");
 }

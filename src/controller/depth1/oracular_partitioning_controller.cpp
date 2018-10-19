@@ -38,22 +38,14 @@ NS_START(fordyca, controller, depth1);
  * Member Functions
  ******************************************************************************/
 void oracular_partitioning_controller::Init(ticpp::Element& node) {
-  greedy_partitioning_controller::Init(node);
+  base_controller::Init(node);
 
   ndc_push();
-  ER_INFO("Initializing...");
+  ER_INFO("Initializing");
   params::depth1::controller_repository param_repo;
+  depth1::greedy_partitioning_controller::non_unique_init(node, &param_repo);
 
-  param_repo.parse_all(node);
-
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
-  auto* oraclep = param_repo.parse_results<params::oracle_params>();
-
-  executive(tasking_initializer(oraclep,
-                                block_sel_matrix(),
+  executive(tasking_initializer(block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
@@ -93,6 +85,16 @@ void oracular_partitioning_controller::task_finish_cb(ta::polled_task* task) {
           oracle_est,
           old,
           task->task_exec_estimate().last_result());
+
+  oracle_est = boost::get<ta::time_estimate>(
+      mc_tasking_oracle->ask("interface_est." + task->name())).last_result();
+  old = task->task_interface_estimate(0).last_result();
+  task->exec_estimate_update(oracle_est);
+  ER_INFO("Update 'interface_est.%s' with oracular estimate %f on finish: %f -> %f",
+          task->name().c_str(),
+          oracle_est,
+          old,
+          task->task_interface_estimate(0).last_result());
 } /* task_finish_cb() */
 
 using namespace argos; // NOLINT

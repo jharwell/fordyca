@@ -24,13 +24,16 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <map>
+#include <string>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ta = rcppsw::task_allocation;
+namespace rcppsw { namespace task_allocation { class polled_task; }}
 NS_START(fordyca);
 namespace params {
 struct oracle_params;
@@ -40,6 +43,7 @@ namespace depth1 { class controller_repository; }
 NS_START(controller);
 class cache_selection_matrix;
 NS_START(depth1);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,8 +58,7 @@ NS_START(depth1);
 class tasking_initializer : public depth0::stateful_tasking_initializer,
                             public er::client<tasking_initializer> {
  public:
-  tasking_initializer(const struct params::oracle_params* oparams,
-                      const controller::block_selection_matrix* bsel_matrix,
+  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
@@ -67,18 +70,18 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
   std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth1::controller_repository *const controller_repo);
 
-  bool exec_ests_oracle(void) const { return m_exec_ests_oracle; }
-  bool interface_ests_oracle(void) const { return m_interface_ests_oracle; }
+  using tasking_map = std::map<std::string, ta::polled_task*>;
 
  protected:
-  void depth1_tasking_init(params::depth1::controller_repository* task_repo);
+  tasking_map depth1_tasks_create(
+      params::depth1::controller_repository* task_repo);
+  void depth1_exec_est_init(params::depth1::controller_repository* task_repo,
+                            const tasking_map& map);
   const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:
   // clang-format off
   const controller::cache_selection_matrix* const mc_sel_matrix;
-  bool                                            m_exec_ests_oracle{false};
-  bool                                            m_interface_ests_oracle{false};
   // clang-format on
 };
 

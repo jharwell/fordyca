@@ -49,6 +49,24 @@ perception_subsystem::perception_subsystem(
 void perception_subsystem::process_los(
     const representation::line_of_sight* const c_los) {
   base_perception_subsystem::process_los(c_los);
+  /*
+   * Because this is computed, rather than a returned reference to a member
+   * variable, we can't use separate begin()/end() calls with it, and need to
+   * explicitly assign it.
+   */
+  representation::line_of_sight::const_cache_list caches = c_los->caches();
+  std::string accum;
+  std::for_each(caches.begin(),
+                caches.end(),
+                [&](const auto& c) {
+                  accum += "c" + std::to_string(c->id()) + "->(" +
+                           std::to_string(c->discrete_loc().first) + "," +
+                           std::to_string(c->discrete_loc().second) +  "),";
+                });
+  if (!caches.empty()) {
+    ER_DEBUG("Caches in LOS: [%s]", accum.c_str());
+  }
+
 
   /*
    * If the robot thinks that a cell contains a cache, because the cell had one
@@ -70,20 +88,6 @@ void perception_subsystem::process_los(
     } /* for(j..) */
   }   /* for(i..) */
 
-  ER_TRACE(
-      "LOS: n_blocks=%zu, n_caches=%zu, LL=(%u, %u), LR=(%u, %u), UL=(%u, %u) "
-      "UR=(%u, %u)",
-      c_los->blocks().size(),
-      c_los->caches().size(),
-      c_los->abs_ll().first,
-      c_los->abs_ll().second,
-      c_los->abs_lr().first,
-      c_los->abs_lr().second,
-      c_los->abs_ul().first,
-      c_los->abs_ul().second,
-      c_los->abs_ur().first,
-      c_los->abs_ur().second);
-
   for (auto cache : c_los->caches()) {
     /*
      * The state of a cache can change between when the robot saw it last
@@ -96,15 +100,15 @@ void perception_subsystem::process_los(
              cache->discrete_loc().second,
              cache->n_blocks());
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
+    auto& density = map()->access<occupancy_grid::kPheromone>(cache->discrete_loc());
+
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d(%u, %u): %zu blocks (density=%f, state=%d)",
               cache->id(),
               cache->discrete_loc().first,
               cache->discrete_loc().second,
               cache->n_blocks(),
-              map()
-                  ->access<occupancy_grid::kPheromone>(cache->discrete_loc())
-                  .last_result(),
+              density.last_result(),
               cell.fsm().current_state());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
@@ -135,10 +139,27 @@ void perception_subsystem::process_los(
 void perception_subsystem::processed_los_verify(
     const representation::line_of_sight* const c_los) const {
   base_perception_subsystem::processed_los_verify(c_los);
+  /*
+   * Verify that for each cell that contained a cache in the LOS, the
+   * corresponding cell in the PAM also contains the same cache.
+   */
+  for (auto &cache : c_los->caches()) {
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
+    ER_ASSERT(cell.state_has_cache(), "Cell at (%u,%u) not in HAS_CACHE state",
+              cache->discrete_loc().first,
+              cache->discrete_loc().second);
+    ER_ASSERT(cell.cache()->id() == cache->id(),
+              "Cell at (%u,%u) has wrong cache ID (%u vs %u)",
+              cache->discrete_loc().first,
+              cache->discrete_loc().second,
+              cache->id(),
+              cell.cache()->id());
+  } /* for(&block..) */
 
   /*
    * Verify processing (cache part, other parts done by parent class). We do not
-   * check the CACHE_EXTENT state because the PAM does not need that information.
+   * check the CACHE_EXTENT state because the PAM does not need that
+   * information.
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {

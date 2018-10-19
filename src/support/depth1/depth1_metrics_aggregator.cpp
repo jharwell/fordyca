@@ -67,10 +67,6 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       params->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
-      "tasks::execution::" + std::string(task0::kGeneralistName),
-      metrics_path() + "/" + params->task_execution_generalist_fname,
-      params->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kCollectorName),
       metrics_path() + "/" + params->task_execution_collector_fname,
       params->collect_interval);
@@ -80,7 +76,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       params->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
-      "tasks::generalist_tab",
+      "tasks::tab::generalist",
       metrics_path() + "/" + params->task_generalist_tab_fname,
       params->collect_interval);
 
@@ -116,6 +112,14 @@ void depth1_metrics_aggregator::collect_from_cache_manager(
 
 void depth1_metrics_aggregator::task_finish_or_abort_cb(
     const ta::polled_task* const task) {
+  /*
+   * Both depth1 and depth2 metrics aggregators are registered on the same
+   * callback, so this function will be called for the depth2 task abort/finish
+   * as well, which should be ignored.
+   */
+  if (!task1::task_in_depth1(task)) {
+      return;
+  }
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
@@ -124,11 +128,14 @@ void depth1_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const,
     const ta::bi_tab* const tab) {
   /*
-   * Will be NULL on first task allocation, because there is no active TAB yet.
+   * Depth [0,1,2] metrics aggregators are registered on the same executive,
+   * so this function will be called for the task allocations for any depth,
+   * so anything that is not in our TAB should be ignored.
    */
-  if (nullptr != tab) {
-    collect("tasks::generalist_tab", *tab);
+  if (!(tab->root()->name() == task0::kGeneralistName)) {
+    return;
   }
+  collect("tasks::tab::generalist", *tab);
 } /* task_alloc_cb() */
 
 NS_END(depth1, support, fordyca);

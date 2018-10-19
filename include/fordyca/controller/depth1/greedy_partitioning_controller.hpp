@@ -50,8 +50,7 @@ class foraging_task;
 }
 }
 namespace params {
-namespace depth0 { class stateful_foraging_repository; }
-namespace depth1 { class task_repository; }
+namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
@@ -118,6 +117,14 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   const cache_selection_matrix*  cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
   }
+  /**
+   * @brief Perform initialization that derived classes will also need to do.
+   *
+   * @param node XML node passed to \ref Init() function
+   * @param param_repo Parameter repository for this controller.
+   */
+  void non_unique_init(ticpp::Element& node,
+                       params::depth1::controller_repository* param_repo);
 
  private:
   /**
@@ -125,9 +132,6 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    * know that a task WAS aborted. \see \ref task_aborted().
    */
   void task_abort_cb(const ta::polled_task*);
-
-  void tasking_init(params::depth0::stateful_foraging_repository* stateful_repo,
-                    params::depth1::task_repository* task_repo);
 
   // clang-format off
   bool                                    m_display_task{false};

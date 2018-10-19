@@ -64,26 +64,14 @@ void greedy_recpart_controller::ControlStep(void) {
 } /* ControlStep() */
 
 void greedy_recpart_controller::Init(ticpp::Element& node) {
-  /*
-   * Note that we do not call \ref greedy_partitioning_controller::Init()--there
-   * is nothing in there that we need.
-   */
-  depth1::greedy_partitioning_controller::Init(node);
-
-  params::depth2::controller_repository param_repo;
-
-  param_repo.parse_all(node);
-
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
-
+  base_controller::Init(node);
   ndc_push();
   ER_INFO("Initializing");
-  /* initialize tasking */
-  executive(tasking_initializer(nullptr,
-                                block_sel_matrix(),
+
+  params::depth2::controller_repository param_repo;
+  depth1::greedy_partitioning_controller::non_unique_init(node, &param_repo);
+
+  executive(tasking_initializer(block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),
                                 perception())(&param_repo));
