@@ -45,6 +45,11 @@ class base_controller;
 NS_START(support, loop_utils);
 
 /*******************************************************************************
+ * Types
+ ******************************************************************************/
+using proximity_status_type = std::pair<int, argos::CVector2>;
+
+/*******************************************************************************
  * Functions
  ******************************************************************************/
 /**
@@ -121,10 +126,10 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
  * @return (block id of cache that is too close (-1 if none), distance to said
  *         block).
  */
-std::pair<int,
-          argos::CVector2> cache_site_block_proximity(
-              const controller::base_controller& controller,
-              const ds::arena_map& map);
+proximity_status_type cache_site_block_proximity(
+    const controller::base_controller& controller,
+    const ds::arena_map& map,
+    double block_prox_dist);
 
 /**
  * @brief Determine if creating a new cache centered at the robot's current
@@ -136,11 +141,10 @@ std::pair<int,
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
-std::pair<int,
-          argos::CVector2> new_cache_cache_proximity(
-              const controller::base_controller& controller,
-              const ds::arena_map& map,
-              double proximity_dist);
+proximity_status_type new_cache_cache_proximity(
+    const controller::base_controller& controller,
+    const ds::arena_map& map,
+    double proximity_dist);
 
 /**
  * @brief Set the LOS of a robot in the arena.

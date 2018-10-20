@@ -78,7 +78,7 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kExistingCacheDrop,
+                                      penalty_type::kSrcExistingCachePickup,
                                       timestep);
     }
   }
