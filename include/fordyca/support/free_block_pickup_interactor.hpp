@@ -83,7 +83,7 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler.penalty_init(controller,
-                                     penalty_type::kFreePickup,
+                                     penalty_type::kSrcFreePickup,
                                      timestep);
     }
   }

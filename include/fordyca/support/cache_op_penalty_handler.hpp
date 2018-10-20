@@ -61,8 +61,8 @@ class cache_op_penalty_handler
       public er::client<cache_op_penalty_handler<T>> {
  public:
   enum penalty_src {
-    kExistingCacheDrop,
-    kExistingCachePickup,
+    kSrcExistingCacheDrop,
+    kSrcExistingCachePickup,
   };
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
@@ -98,7 +98,7 @@ class cache_op_penalty_handler
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
      */
-    if ((kExistingCacheDrop == src || kExistingCachePickup == src) &&
+    if ((kSrcExistingCacheDrop == src || kSrcExistingCachePickup == src) &&
         !existing_cache_op_filter(controller)) {
       return false;
     }
