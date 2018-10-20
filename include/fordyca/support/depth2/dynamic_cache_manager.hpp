@@ -87,6 +87,15 @@ class dynamic_cache_manager : public base_cache_manager,
                     mc_cache_params.dynamic.min_dist);
   }
 
+  /**
+   * @brief Get the minimum distance that must be maintained between two blocks
+   * in order for them not to be consolidated into a cache. Equal to the minimum
+   * cache distance.
+   */
+  double block_proximity_dist(void) const {
+    return mc_cache_params.dynamic.min_dist;
+  }
+
  private:
   // clang-format off
   const params::caches::caches_params mc_cache_params;

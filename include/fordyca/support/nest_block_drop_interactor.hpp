@@ -85,7 +85,7 @@ class nest_block_drop_interactor
       }
     } else {
       m_penalty_handler.penalty_init(controller,
-                                     penalty_type::kNestDrop,
+                                     penalty_type::kSrcNestDrop,
                                      timestep);
     }
   }

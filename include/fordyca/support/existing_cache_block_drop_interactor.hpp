@@ -79,7 +79,7 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kExistingCacheDrop,
+                                      penalty_type::kSrcExistingCacheDrop,
                                       timestep);
     }
   }

@@ -48,7 +48,8 @@ argos::CVector2 cache_site_selector::calc_best(
   argos::CVector2 site((robot_loc.GetX() - nest_loc.GetX()) / 2.0,
                        nest_loc.GetY());
 
-  ER_INFO("Best utility: cache_site at (%f, %f)", site.GetX(), site.GetY());
+  ER_INFO("Best utility: cache_site at (%f, %f) [%f]", site.GetX(), site.GetY(),
+          1.0);
   return site;
 } /* calc_best() */
 
