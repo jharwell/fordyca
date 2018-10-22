@@ -92,26 +92,24 @@ __rcsw_pure bool block_drop_overlap_with_nest(
          nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_nest() */
 
-std::pair<int, argos::CVector2> cache_site_block_proximity(
+proximity_status_type cache_site_block_proximity(
     const controller::base_controller& c,
-    const ds::arena_map& map) {
-  for (size_t j = 0; j < map.caches().size(); ++j) {
-    auto new_xspan = map.caches()[j]->xspan(c.robot_loc());
-    auto new_yspan = map.caches()[j]->yspan(c.robot_loc());
-    auto c_xspan = map.caches()[j]->xspan(map.caches()[j]->real_loc());
-    auto c_yspan = map.caches()[j]->yspan(map.caches()[j]->real_loc());
-    if (new_xspan.overlaps_with(c_xspan) || new_yspan.overlaps_with(c_yspan)) {
-      return std::make_pair(j, map.caches()[j]->real_loc() - c.robot_loc());
+    const ds::arena_map& map,
+    double block_prox_dist) {
+  for (const auto& b : map.blocks()) {
+    if ((b->real_loc() - c.robot_loc()).Length() <= block_prox_dist) {
+      return std::make_pair(b->id(), b->real_loc() - c.robot_loc());
     }
-  } /* for(j..) */
+  } /* for(&b..) */
   return std::make_pair(-1, argos::CVector2());
 } /* cache_site_block_proximity() */
-std::pair<int, argos::CVector2> new_cache_cache_proximity(
+
+proximity_status_type new_cache_cache_proximity(
     const controller::base_controller& c,
     const ds::arena_map& map,
     double proximity_dist) {
   for (const auto& b : map.blocks()) {
-    if ((b->real_loc() - c.robot_loc()).Length() >= proximity_dist) {
+    if ((b->real_loc() - c.robot_loc()).Length() <= proximity_dist) {
       return std::make_pair(b->id(), b->real_loc() - c.robot_loc());
     }
   } /* for(&b..) */

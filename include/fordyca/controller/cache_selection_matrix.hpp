@@ -34,7 +34,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+namespace params {
+struct cache_selection_matrix_params;
+}
+NS_START(controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -55,9 +59,10 @@ NS_START(fordyca, controller);
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
 class cache_selection_matrix
-    : public std::map<std::string, boost::variant<argos::CVector2>> {
+    : public std::map<std::string, boost::variant<double, argos::CVector2>> {
  public:
-  explicit cache_selection_matrix(const argos::CVector2& nest_loc);
+  cache_selection_matrix(const struct params::cache_selection_matrix_params* params,
+                         const argos::CVector2& nest_loc);
 };
 
 NS_END(controller, fordyca);

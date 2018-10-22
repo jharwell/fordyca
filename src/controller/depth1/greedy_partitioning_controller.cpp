@@ -33,6 +33,8 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/params/cache_selection_matrix_params.hpp"
+#include "fordyca/params/block_selection_matrix_params.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -116,10 +118,11 @@ void greedy_partitioning_controller::non_unique_init(
    * Initialize tasking by overriding stateful controller executive via
    * strategy pattern.
    */
-  auto* ogrid = param_repo->parse_results<params::occupancy_grid_params>();
-  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(
-      ogrid->nest, &ogrid->priorities));
-  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(ogrid->nest);
+  auto* cache_mat = param_repo->parse_results<params::cache_selection_matrix_params>();
+  auto* block_mat = param_repo->parse_results<params::block_selection_matrix_params>();
+  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(cache_mat,
+                                                                   block_mat->nest);
+  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(block_mat));
 } /* non_unique_init() */
 
 __rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(

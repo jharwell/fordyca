@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid_parser.cpp
+ * @file cache_selection_matrix_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/occupancy_grid_parser.hpp"
+#include "fordyca/params/cache_selection_matrix_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,40 +32,24 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char occupancy_grid_parser::kXMLRoot[];
+constexpr char cache_selection_matrix_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void occupancy_grid_parser::parse(const ticpp::Element& node) {
-  if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element onode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-    m_params =
-        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-
-    m_grid.parse(onode);
-    m_pheromone.parse(onode);
-    m_params->grid = *m_grid.parse_results();
-    m_params->pheromone = *m_pheromone.parse_results();
-    m_parsed = true;
-  }
+void cache_selection_matrix_parser::parse(const ticpp::Element& node) {
+  ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_ATTR(cnode, m_params, cache_prox_dist);
+  XML_PARSE_ATTR(cnode, m_params, block_prox_dist);
 } /* parse() */
 
-void occupancy_grid_parser::show(std::ostream& stream) const {
-  if (!m_parsed) {
-    stream << build_header() << "<< Not parsed >>" << std::endl
-           << build_footer();
-    return;
-  }
-  stream << build_header() << m_grid << m_pheromone
-          << build_footer();
+void cache_selection_matrix_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_ATTR_STR(m_params, cache_prox_dist) << std::endl
+         << XML_ATTR_STR(m_params, block_prox_dist) << std::endl
+         << build_footer();
 } /* show() */
-
-__rcsw_pure bool occupancy_grid_parser::validate(void) const {
-  if (m_parsed) {
-    return m_grid.validate() && m_pheromone.validate();
-  }
-  return true;
-} /* validate() */
 
 NS_END(params, fordyca);

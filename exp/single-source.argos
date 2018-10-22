@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_controller id="ffc"
+    <greedy_recpart_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -36,16 +36,11 @@
                output_dir="__current_date__"
                />
         </output>
-        <occupancy_grid
-            nest="2.0, 3">
+        <occupancy_grid>
           <grid resolution="0.2"
                 size="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
-          <block_priorities
-              cube="1.0"
-              ramp="1.0"
-              />
         </occupancy_grid>
         <task_executive
             update_exec_ests="false"
@@ -114,7 +109,16 @@
             </src_sigmoid_sel>
           </tab_sel>
         </task_allocation>
-
+        <block_selection_matrix
+              nest="2.0, 3">
+              <block_priorities
+                  cube="1.0"
+                  ramp="1.0"
+                  />
+        </block_selection_matrix>
+        <cache_selection_matrix
+            cache_prox_dist="1.0"
+            block_prox_dist="1.0"/>
         <sensing>
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
@@ -147,7 +151,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </stateful_controller>
+    </greedy_recpart_controller>
 
   </controllers>
 
@@ -155,7 +159,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_loop_functions">
+                  label="depth2_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -209,7 +213,7 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="random">
+            dist_type="single_source">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -322,18 +326,18 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="5,2.5,6" -->
-  <!--                  look_at="5,2.5,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth1_foraging_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0"
+                   position="5,2.5,6"
+                   look_at="5,2.5,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth1_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

@@ -78,14 +78,44 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
         finish_cache_site_block_drop(controller);
       }
     } else {
-      m_penalty_handler.penalty_init(controller,
-                                     penalty_type::kCacheSiteDrop,
-                                     timestep);
+      /*
+       * If we failed initialize a penalty because there is another block too
+       * close, then that probably means that the robot is not aware of said
+       * block, so we should send a \ref block_found event to fix that. Better
+       * to do this here AND after serving the penalty rather than always just
+       * waiting until after the penalty is served to figure out that the robot
+       * is too close to a block.
+       */
+      penalty_status status = m_penalty_handler.penalty_init(controller,
+                                                             penalty_type::kSrcCacheSiteDrop,
+                                                             timestep,
+                                                             m_cache_manager->cache_proximity_dist(),
+                                                             m_cache_manager->block_proximity_dist());
+      if (penalty_status::kStatusBlockProximity == status) {
+        auto block_pair = loop_utils::cache_site_block_proximity(controller,
+                                                                 *m_map,
+                                                                 m_cache_manager->block_proximity_dist());
+        ER_ASSERT(-1 != block_pair.first,"Error in block op handler");
+        block_proximity_notify(controller, block_pair);
+      }
     }
   }
 
  private:
-    using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
+  using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
+  using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
+
+  void block_proximity_notify(T& controller, std::pair<int, argos::CVector2> block_pair) {
+    ER_WARN("%s cannot drop block in cache site (%f, %f): Block%d too close (%f <= %f)",
+            controller.GetId().c_str(),
+            controller.robot_loc().GetX(),
+            controller.robot_loc().GetY(),
+            block_pair.first,
+            block_pair.second.Length(),
+            m_cache_manager->block_proximity_dist());
+    events::block_found prox(m_map->blocks()[block_pair.first]);
+    controller.visitor::template visitable_any<T>::accept(prox);
+  }
 
   /**
    * @brief Handles handshaking between cache, robot, and arena if the robot is
@@ -100,25 +130,18 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               acquisition_goal_type::kCacheSite == controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache site block drop");
-    auto block_pair = loop_utils::cache_site_block_proximity(controller, *m_map);
+    auto block_pair = loop_utils::cache_site_block_proximity(controller,
+                                                             *m_map,
+                                                             m_cache_manager->block_proximity_dist());
 
-    if (-1 != block_pair.first) {
-      /*
-     * If there is another block nearby that the robot is unaware of, and if
-     * that block is close enough to the robot's current location that a block
-     * drop would result in the creation of a new cache (which is not the
-     * robot's goal!), then abort the drop and tell the robot abort the
-     * undiscovered block so that it will update its state and pick a new site.
+    /*
+     * We checked this before starting to serve a penalty, but it is still
+     * possible that another robot dropped a block nearby that we are unaware
+     * of, so we need to check again to make sure we can still drop the block on
+     * the cache site.
      */
-      ER_WARN("%s cannot drop block in cache site (%f, %f): Block%d too close (%f <= %f)",
-              controller.GetId().c_str(),
-              controller.robot_loc().GetX(),
-              controller.robot_loc().GetY(),
-              block_pair.first,
-              block_pair.second.Length(),
-              m_cache_manager->cache_proximity_dist());
-      events::block_found prox(m_map->blocks()[block_pair.first]);
-      controller.visitor::template visitable_any<T>::accept(prox);
+    if (-1 != block_pair.first) {
+      block_proximity_notify(controller, block_pair);
     } else {
       perform_cache_site_block_drop(controller, p);
       m_penalty_handler.remove(p);

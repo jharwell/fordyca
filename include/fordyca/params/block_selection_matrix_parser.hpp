@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid_parser.hpp
+ * @file block_selection_matrix_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,19 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/grid_parser.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
-#include "fordyca/params/pheromone_parser.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/params/block_selection_matrix_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/block_priorities_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,33 +39,29 @@ NS_START(fordyca, params);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class occupancy_grid_parser
- * @ingroup params depth0
+ * @class block_selection_matrix_parser
+ * @ingroup params
  *
- * @brief Parses XML parameters for \ref occupancy_grid into
- * \ref occupancy_grid_params.
+ * @brief Parses XML parameters for the \ref block_selection_matrix at the start
+ * of simulation.
  */
-class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
+class block_selection_matrix_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit occupancy_grid_parser(uint level)
-      : xml_param_parser(level),
-        m_grid(level + 1),
-        m_pheromone(level + 1) {}
+  explicit block_selection_matrix_parser(uint level) :
+      xml_param_parser(level),
+      m_priorities(level + 1) {}
 
   /**
-   * @brief The root tag that all occupancy grid parameters should lie under in
-   * the XML tree.
+   * @brief The root tag that all block selection matrix parameters should lie
+   * under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "occupancy_grid";
+  static constexpr char kXMLRoot[] = "block_selection_matrix";
 
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<occupancy_grid_params> parse_results(void) const {
-    return m_params;
-  }
+  std::shared_ptr<block_selection_matrix_params> parse_results(void) const { return m_params; }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
@@ -76,13 +70,12 @@ class occupancy_grid_parser : public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  bool                                   m_parsed{false};
-  std::shared_ptr<occupancy_grid_params> m_params{nullptr};
-  grid_parser                            m_grid;
-  pheromone_parser                       m_pheromone;
+  std::shared_ptr<block_selection_matrix_params> m_params{nullptr};
+  block_priorities_parser                        m_priorities;
+
   // clang-format on
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARSER_HPP_ */

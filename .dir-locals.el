@@ -28,6 +28,7 @@
                                                                  "$rcppsw")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
                                                                 "$localroot/include")))
+          (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-clang-definitions "HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT")
 
           (add-to-list 'flycheck-gcc-args "-fPIC")
@@ -37,6 +38,7 @@
                                                               "$rcppsw")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
                                                               "$localroot/include")))
+          (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
           (setq compile-command
                 (concat "make -C"
                         (concat
@@ -48,6 +50,8 @@
         (let
             ((cc-search-dirs
               (list
+               "/usr/include/eigen3"
+               (substitute-in-file-name "$localroot/include")
                (concat
                 (projectile-project-root)
                 "src/*/*/*")

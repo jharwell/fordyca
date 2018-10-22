@@ -78,14 +78,44 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
         finish_new_cache_block_drop(controller);
       }
     } else {
-      m_penalty_handler.penalty_init(controller,
-                                     penalty_type::kNewCacheDrop,
-                                     timestep);
+      /*
+       * If we failed initialize a penalty because there is another
+       * block/cache too close, then that probably means that the robot is not
+       * aware of said block, so we should send an event to fix that. Better
+       * to do this here AND after serving the penalty rather than always just
+       * waiting until after the penalty is served to figure out that the
+       * robot is too close to a block/cache.
+       */
+      penalty_status status = m_penalty_handler.penalty_init(controller,
+                                                             penalty_type::kSrcNewCacheDrop,
+                                                             timestep,
+                                                             m_cache_manager->cache_proximity_dist(),
+                                                             m_cache_manager->block_proximity_dist());
+      if (penalty_status::kStatusCacheProximity == status) {
+        auto cache_pair = loop_utils::new_cache_cache_proximity(controller,
+                                                                *m_map,
+                                                                m_cache_manager->cache_proximity_dist());
+        ER_ASSERT(-1 != cache_pair.first,"Error in block op handler");
+        cache_proximity_notify(controller, cache_pair);
+      }
     }
   }
 
  private:
   using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
+  using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
+
+    void cache_proximity_notify(T& controller, std::pair<int, argos::CVector2> cache_pair) {
+    ER_WARN("%s cannot drop block in new cache@(%f, %f): Cache%d too close (%f <= %f)",
+            controller.GetId().c_str(),
+            controller.robot_loc().GetX(),
+            controller.robot_loc().GetY(),
+            cache_pair.first,
+            cache_pair.second.Length(),
+            m_cache_manager->cache_proximity_dist());
+    events::cache_found prox(m_map->caches()[cache_pair.first]);
+    controller.visitor::template visitable_any<T>::accept(prox);
+  }
 
   /**
    * @brief Handles handshaking between cache, robot, and arena if the robot is
