@@ -77,7 +77,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + params->task_generalist_tab_fname,
+      metrics_path() + "/" + params->task_tab_generalist_fname,
       params->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::distribution_metrics_collector>(

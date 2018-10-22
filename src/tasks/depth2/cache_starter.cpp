@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_appeared.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/block_proximity.hpp"
+
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -129,7 +130,7 @@ void cache_starter::accept(events::free_block_pickup& visitor) {
 void cache_starter::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::cache_appeared& visitor) {
+void cache_starter::accept(events::block_proximity& visitor) {
   visitor.visit(*this);
 }
 

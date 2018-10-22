@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_recpart_controller id="ffc"
+    <greedy_partitioning_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -43,8 +43,8 @@
                      repeat_deposit="false"/>
         </occupancy_grid>
         <task_executive
-            update_exec_ests="false"
-            update_interface_ests="false"
+            update_exec_ests="true"
+            update_interface_ests="true"
             tab_init_method="max_depth"
             />
         <task_allocation>
@@ -60,7 +60,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="true"
+              always_partition="false"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -151,7 +151,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_recpart_controller>
+    </greedy_partitioning_controller>
 
   </controllers>
 
@@ -159,7 +159,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth1_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -185,9 +185,9 @@
           task_execution_cache_finisher_fname="task-execution-cache_finisher.csv"
           task_execution_cache_transferer_fname="task-execution-cache_transferer.csv"
           task_execution_cache_collector_fname="task-execution-cache_collector.csv"
-          task_generalist_tab_fname="task-generalist-tab.csv"
-          task_collector_tab_fname="task-collector-tab.csv"
-          task_harvester_tab_fname="task-harvester-tab.csv"
+          task_tab_generalist_fname="task-tab-generalist.csv"
+          task_tab_collector_fname="task-tab-collector.csv"
+          task_tab_harvester_fname="task-tab-harvester.csv"
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
@@ -206,14 +206,14 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Sine"
+              type="Constant"
               frequency="0.01"
               amplitude="50"
-              offset="50"/>
+              offset="10"/>
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="random">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -230,7 +230,7 @@
     </arena_map>
     <caches
         dimension="0.8">
-      <static enable="false"
+      <static enable="true"
               size="2"
               respawn_scale_factor="0.05"
               >
@@ -328,10 +328,20 @@
   <!-- ****************** -->
   <visualization>
     <qt-opengl>
+       <frame_grabbing directory="frames"
+                       base_name="frame_"
+                       format="png"
+                       quality="100" />
       <camera>
         <placement idx="0"
-                   position="5,2.5,6"
-                   look_at="5,2.5,0"
+                   position="6,3,6"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+        <placement idx="1"
+                   position="6,0,5"
+                   look_at="6,3,0"
                    lens_focal_length="20"
                    up="0,1,0"
                    />

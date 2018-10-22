@@ -32,7 +32,8 @@
 NS_START(fordyca);
 
 namespace events {
-class cache_appeared;
+class block_proximity;
+class cache_proximity;
 } // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
@@ -50,7 +51,8 @@ NS_START(tasks, depth2);
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public visitor::polymorphic_accept_set<events::cache_appeared> {};
+    : public visitor::polymorphic_accept_set<events::block_proximity>,
+      public visitor::polymorphic_accept_set<events::cache_proximity> {};
 
 NS_END(depth2, tasks, fordyca);
 

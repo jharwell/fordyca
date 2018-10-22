@@ -57,11 +57,11 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::harvester",
-      metrics_path() + "/" + params->task_collector_tab_fname,
+      metrics_path() + "/" + params->task_tab_collector_fname,
       params->collect_interval);
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::collector",
-      metrics_path() + "/" + params->task_harvester_tab_fname,
+      metrics_path() + "/" + params->task_tab_harvester_fname,
       params->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheStarterName),

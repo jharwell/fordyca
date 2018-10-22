@@ -44,7 +44,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(controller::saa_subsystem* saa,
                                    const ds::perceived_arena_map* const map,
-                                   std::function<bool(void)> goal_detect)
+                                   std::function<bool(void)> explore_goal_reached_cb)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -55,7 +55,7 @@ acquire_goal_fsm::acquire_goal_fsm(controller::saa_subsystem* saa,
       m_vector_fsm(saa),
       m_explore_fsm(saa,
                     std::make_unique<controller::random_explore_behavior>(saa),
-                    goal_detect),
+                    explore_goal_reached_cb),
       m_goal_acquired_cb(nullptr),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
@@ -157,10 +157,9 @@ bool acquire_goal_fsm::acquire_unknown_goal(void) {
 
 bool acquire_goal_fsm::acquire_goal(void) {
   /*
-   * If we know of ANY caches in the arena, go to the location of the best one
-   * and pick it up. Otherwise, explore until you find one. If during
-   * exploration we find one through our LOS, then stop exploring and go vector
-   * to it.
+   * If we know of goal caches in the arena, go to the location of the best
+   * one. Otherwise, explore until you find one. If during exploration we find
+   * one through our LOS, then stop exploring and go vector to it.
    */
   if (!acquire_known_goal()) {
     if (m_vector_fsm.task_running()) {

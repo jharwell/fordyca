@@ -95,7 +95,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
         auto block_pair = loop_utils::cache_site_block_proximity(controller,
                                                                  *m_map,
                                                                  m_cache_manager->block_proximity_dist());
-        ER_ASSERT(-1 != block_pair.first,"Error in block op handler");
+        ER_ASSERT(-1 != block_pair.first, "Error in block op handler");
         block_proximity_notify(controller, block_pair);
       }
     }

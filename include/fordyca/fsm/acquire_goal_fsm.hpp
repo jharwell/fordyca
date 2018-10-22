@@ -67,7 +67,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
  public:
   acquire_goal_fsm(controller::saa_subsystem* saa,
                    const ds::perceived_arena_map* map,
-                   std::function<bool(void)> goal_detect);
+                   std::function<bool(void)> explore_goal_reached_cb);
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
   acquire_goal_fsm& operator=(const acquire_goal_fsm& fsm) = delete;

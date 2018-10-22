@@ -1,5 +1,5 @@
 /**
- * @file cache_appeared.hpp
+ * @file cache_proximity.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CACHE_APPEARED_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CACHE_APPEARED_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CACHE_PROXIMITY_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CACHE_PROXIMITY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -42,7 +42,6 @@ namespace fsm { namespace depth1 {
 class block_to_goal_fsm;
 }} // namespace fsm::depth1
 namespace tasks { namespace depth2 {
-class cache_starter;
 class cache_finisher;
 }} // namespace tasks::depth2
 
@@ -52,29 +51,26 @@ NS_START(events);
  * Class Definitions
  ******************************************************************************/
 /*
- * @class cache_appeared
+ * @class cache_proximity
  * @ingroup events
  *
- * @brief Created whenever a robot is serving a cache penalty, but while
- * serving the penalty the cache it is waiting in vanishes due to another
- * robot picking up the last available block.
+ * @brief Created whenever a robot is attempting to start a new cache, but an
+ * existing cache unknown to the robot is too close.
  */
-class cache_appeared
-    : public rcppsw::er::client<cache_appeared>,
+class cache_proximity
+    : public rcppsw::er::client<cache_proximity>,
       public visitor::visit_set<controller::depth2::greedy_recpart_controller,
-                                tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
-  explicit cache_appeared(uint cache_id);
-  ~cache_appeared(void) override = default;
+  explicit cache_proximity(uint cache_id);
+  ~cache_proximity(void) override = default;
 
-  cache_appeared(const cache_appeared& op) = delete;
-  cache_appeared& operator=(const cache_appeared& op) = delete;
+  cache_proximity(const cache_proximity& op) = delete;
+  cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
   void visit(controller::depth2::greedy_recpart_controller& controller) override;
-  void visit(tasks::depth2::cache_starter& task) override;
   void visit(tasks::depth2::cache_finisher& task) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
 
@@ -86,4 +82,4 @@ class cache_appeared
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CACHE_APPEARED_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CACHE_PROXIMITY_HPP_ */

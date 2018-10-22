@@ -1,7 +1,7 @@
 /**
- * @file cache_appeared.cpp
+ * @file block_proximity.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,12 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cache_appeared.hpp"
+#include "fordyca/events/block_proximity.hpp"
+#include "fordyca/events/block_found.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
-#include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
-#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,38 +38,29 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_appeared::cache_appeared(uint cache_id)
-    : ER_CLIENT_INIT("fordyca.events.cache_appeared"), m_cache_id(cache_id) {}
+block_proximity::block_proximity(const std::shared_ptr<representation::base_block>& block)
+    : ER_CLIENT_INIT("fordyca.events.block_proximity"),
+      m_block(block) {}
 
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_appeared::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
-  controller.ndc_push();
-  ER_INFO("Abort block drop: cache%d appeared", m_cache_id);
-
-  auto* task = dynamic_cast<tasks::depth2::dynamic_cache_interactor*>(
-      controller.current_task());
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task %s received cache appeared event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
-
+void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
+  events::block_found found(m_block);
+  c.perception()->map()->accept(found);
+  auto* task = dynamic_cast<tasks::depth2::cache_starter*>(c.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non cache starter task %s received block proximity event",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
   task->accept(*this);
-  controller.ndc_pop();
 } /* visit() */
 
-void cache_appeared::visit(tasks::depth2::cache_starter& task) {
+void block_proximity::visit(tasks::depth2::cache_starter& task) {
   static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_appeared::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
-} /* visit() */
-
-void cache_appeared::visit(fsm::depth1::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_APPEARED,
+void block_proximity::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+  fsm.inject_event(controller::foraging_signal::BLOCK_PROXIMITY,
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
