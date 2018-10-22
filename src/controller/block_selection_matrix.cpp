@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_selection_matrix.hpp"
-#include "fordyca/params/block_priority_params.hpp"
+#include "fordyca/params/block_selection_matrix_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,11 +33,10 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 block_selection_matrix::block_selection_matrix(
-    const argos::CVector2& nest_loc,
-    const params::block_priority_params* priorities) {
-  this->insert(std::make_pair("nest_center", nest_loc));
-  this->insert(std::make_pair("cube_priority", priorities->cube));
-  this->insert(std::make_pair("ramp_priority", priorities->ramp));
+    const struct params::block_selection_matrix_params * params) {
+  this->insert(std::make_pair("nest_loc", params->nest));
+  this->insert(std::make_pair("cube_priority", params->priorities.cube));
+  this->insert(std::make_pair("ramp_priority", params->priorities.ramp));
 }
 
 NS_END(controller, fordyca);

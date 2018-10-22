@@ -36,7 +36,7 @@
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -83,7 +83,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
   /*
    * Overwrite depth1; we have a deeper decomposition now
    */
-  register_collector<rcppsw::metrics::tasks::distribution_metrics_collector>(
+  register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
       metrics_path() + "/" + params->task_distribution_fname,
       params->collect_interval,

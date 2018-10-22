@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid_params.hpp
+ * @file cache_selection_matrix_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,14 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/grid_params.hpp"
-#include "fordyca/params/pheromone_params.hpp"
+#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -37,14 +36,16 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct occupancy_grid_params
+ * @struct cache_selection_matrix_params
  * @ingroup params
+ *
+ * @brief XML parameters for the \ref cache_selection_matrix
  */
-struct occupancy_grid_params : public rcppsw::params::base_params {
-  struct grid_params grid {};
-  struct pheromone_params pheromone {};
+struct cache_selection_matrix_params : public rcppsw::params::base_params {
+  double cache_prox_dist;
+  double block_prox_dist;
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_OCCUPANCY_GRID_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_ */

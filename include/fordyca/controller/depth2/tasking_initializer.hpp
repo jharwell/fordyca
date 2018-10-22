@@ -37,6 +37,8 @@ namespace depth2 { class controller_repository; }
 }
 
 NS_START(controller, depth2);
+namespace er = rcppsw::er;
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions

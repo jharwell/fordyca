@@ -34,20 +34,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
-class bi_tdgraph_executive;
-class bi_tab;
-class executable_task;
-}}
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-
 NS_START(fordyca);
-
-namespace tasks { namespace depth0 { class foraging_task; }}
-
+namespace fsm { namespace depth0 { class stateful_fsm; }}
 NS_START(controller);
-
 class base_perception_subsystem;
 class block_selection_matrix;
 namespace depth0 { class sensing_subsystem; }
@@ -91,16 +80,9 @@ class stateful_controller : public stateless_controller,
   double known_percentage(void) const override;
   double unknown_percentage(void) const override;
 
-    /* block transportation */
+  /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
-
-  /**
-   * @brief Get the current task the controller is executing. For this
-   * controller, that is always the \ref generalist task.
-   */
-  virtual tasks::base_foraging_task* current_task(void);
-  virtual const tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set the robot's current line of sight (LOS).
@@ -130,29 +112,13 @@ class stateful_controller : public stateless_controller,
   const base_perception_subsystem* perception(void) const { return m_perception.get(); }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
 
-  const ta::bi_tab* active_tab(void) const;
-
-  /*
-   * Public to setup metric collection from tasks.
-   */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+  const fsm::depth0::stateful_fsm* fsm(void) const { return m_fsm.get(); }
+  fsm::depth0::stateful_fsm* fsm(void) { return m_fsm.get(); }
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
   const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
   void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
-
-  /*
-   * The stateful foraging controller owns the executive, but derived classes
-   * can access it and set it to whatever they want. This is done to reduce the
-   * amount of function overriding that would have to be performed otherwise if
-   * derived controllers each had private executives--slightly cleaner to do it
-   * this way I think.
-   *
-   * Strategy pattern!
-   */
-  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
 
  private:
   // clang-format off
@@ -160,7 +126,7 @@ class stateful_controller : public stateless_controller,
   argos::CVector2                            m_light_loc;
   std::unique_ptr<block_selection_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
-  std::unique_ptr<ta::bi_tdgraph_executive>  m_executive;
+  std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
   // clang-format on
 };
 

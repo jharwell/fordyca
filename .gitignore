@@ -58,6 +58,7 @@ ext/rcppsw
 *.csv
 output
 reports
+frames
 
 # Tags
 .tag*

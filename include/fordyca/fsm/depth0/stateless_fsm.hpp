@@ -92,7 +92,6 @@ class stateless_fsm : public base_foraging_fsm,
    */
   void run(void);
 
-
  private:
   bool block_detected(void) const;
 

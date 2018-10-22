@@ -39,6 +39,7 @@ namespace fsm {
 namespace depth0 {
 class stateless_fsm;
 class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
 namespace depth1 {
 class block_to_goal_fsm;
@@ -92,6 +93,7 @@ class free_block_pickup
                                 controller::depth2::greedy_recpart_controller,
                                 fsm::depth0::stateless_fsm,
                                 fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
                                 fsm::depth1::block_to_goal_fsm,
                                 tasks::depth0::generalist,
                                 tasks::depth1::harvester,
@@ -120,6 +122,7 @@ class free_block_pickup
   void visit(controller::depth0::stateful_controller& controller) override;
 
   /* depth1 foraging */
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
   void visit(
       controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;

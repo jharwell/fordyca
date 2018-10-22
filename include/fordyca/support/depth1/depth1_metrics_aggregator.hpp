@@ -32,7 +32,7 @@
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -119,7 +119,7 @@ class depth1_metrics_aggregator : public depth0::stateful_metrics_aggregator,
         dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
             dynamic_cast<const ta::polled_task*>(controller->current_task())
                 ->mechanism());
-    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::distribution_metrics*>(
+    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
         controller);
 
 

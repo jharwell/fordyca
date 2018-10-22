@@ -64,7 +64,7 @@ void block_carry_visualizer::draw(const representation::base_block* const block,
 
   } else {
     /* Unknown block type */
-    assert(false);
+    ER_FATAL_SENTINEL("Cannot visualize unknown block type: Not cube or ramp");
   }
   if (block->display_id()) {
     m_qt->DrawText(argos::CVector3(0.0, 0.0, m_text_vis_offset),

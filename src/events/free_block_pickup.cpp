@@ -156,14 +156,7 @@ void free_block_pickup::visit(
     controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
-
-  auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non free block interactor task %s causing free block pickup",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-
-  task->accept(*this);
+  controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
@@ -192,7 +185,7 @@ void free_block_pickup::visit(
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth1::harvester& task) {
@@ -200,6 +193,11 @@ void free_block_pickup::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
+void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

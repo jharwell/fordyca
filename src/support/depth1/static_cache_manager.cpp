@@ -28,6 +28,7 @@
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
+#include "fordyca/math/cache_respawn_probability.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,7 +78,7 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
-     * set of blocks into an int)
+     * set of blocks into an int).
      */
     uint count = 0;
     std::for_each(to_use.begin(),
@@ -128,6 +129,18 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
   }
   return std::make_pair(ret, to_use);
 } /* calc_blocks_for_creation() */
+
+std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create_conditional(block_vector& blocks,
+                                                                                             uint n_harvesters,
+                                                                                             uint n_collectors) {
+  math::cache_respawn_probability p(mc_cache_params.static_.respawn_scale_factor);
+  if (p.calc(n_harvesters, n_collectors) >=
+      static_cast<double>(std::rand()) / RAND_MAX) {
+    return create(blocks);
+  } else {
+    return std::make_pair(false, cache_vector());
+  }
+} /* create_conditional() */
 
 std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create(
     block_vector& blocks) {

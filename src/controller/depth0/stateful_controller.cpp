@@ -28,12 +28,11 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_selection_matrix.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/params/block_selection_matrix_params.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,40 +49,22 @@ stateful_controller::stateful_controller(void)
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
-      m_executive() {}
+      m_fsm() {}
 
 stateful_controller::~stateful_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure const ta::bi_tab* stateful_controller::active_tab(
-    void) const {
-  return m_executive->active_tab();
-}
 
 void stateful_controller::block_sel_matrix(
     std::unique_ptr<block_selection_matrix> m) {
   m_block_sel_matrix = std::move(m);
 }
-void stateful_controller::executive(
-    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
-  m_executive = std::move(executive);
-}
-
 void stateful_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
 }
-__rcsw_pure tasks::base_foraging_task* stateful_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(
-      m_executive.get()->current_task());
-} /* current_task() */
-
-__rcsw_pure const tasks::base_foraging_task* stateful_controller::current_task(
-    void) const {
-  return const_cast<stateful_controller*>(this)->current_task();
-} /* current_task() */
 
 __rcsw_pure const representation::line_of_sight* stateful_controller::los(
     void) const {
@@ -117,7 +98,7 @@ void stateful_controller::ControlStep(void) {
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
-  m_executive->run();
+  m_fsm->run();
   ndc_pop();
 } /* ControlStep() */
 
@@ -148,15 +129,15 @@ void stateful_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
-  auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
-  m_block_sel_matrix =
-      rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
-                                                  &ogrid->priorities);
+  auto* block_mat = param_repo.parse_results<params::block_selection_matrix_params>();
+  m_block_sel_matrix = rcppsw::make_unique<block_selection_matrix>(block_mat);
+
+  m_fsm = rcppsw::make_unique<fsm::depth0::stateful_fsm>(
+      m_block_sel_matrix.get(),
+      base_controller::saa_subsystem(),
+      m_perception->map());
 
   /* initialize tasking */
-  m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
-                                             saa_subsystem(),
-                                             perception())(&param_repo);
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -167,16 +148,16 @@ void stateful_controller::Reset(void) {
 } /* Reset() */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                       stateful_controller,
-                       block_transport_goal,
-                       current_task());
+                   stateful_controller,
+                   block_transport_goal,
+                   m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       stateful_controller,
-                       acquisition_goal,
-                       current_task());
+                   stateful_controller,
+                   acquisition_goal,
+                   m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_controller, goal_acquired, current_task());
+FSM_WRAPPER_DEFINE_PTR(bool, stateful_controller, goal_acquired, m_fsm);
 
 /*******************************************************************************
  * World Model Metrics

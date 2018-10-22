@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <cassert>
 #include <utility>
 #include <vector>
 

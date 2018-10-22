@@ -67,7 +67,7 @@ class utilization_metrics_collector
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    size_t int_blocks{0};
+    uint int_blocks{0};
     uint int_pickups{0};
     uint int_drops{0};
     uint cum_blocks{0};

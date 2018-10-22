@@ -26,16 +26,23 @@
  ******************************************************************************/
 #include <list>
 #include <utility>
+#include <functional>
+#include <vector>
 
 #include <argos3/core/utility/math/vector2.h>
+#include <nlopt.hpp>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+namespace representation {
+class base_cache;
+class base_block;
+}
+NS_START(controller);
 class cache_selection_matrix;
 NS_START(depth2);
 
@@ -52,6 +59,24 @@ NS_START(depth2);
  */
 class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
  public:
+  struct cache_constraint_data {
+    representation::base_cache* cache;
+    double cache_prox_dist;
+  };
+  struct block_constraint_data {
+    representation::base_block* block;
+    double block_prox_dist;
+  };
+  struct site_utility_data {
+    argos::CVector2 robot_loc;
+    argos::CVector2 nest_loc;
+  };
+
+  using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
+  using cache_constraint_vector = std::vector<cache_constraint_data>;
+  using block_list = std::list<std::shared_ptr<representation::base_block>>;
+  using block_constraint_vector = std::vector<block_constraint_data>;
+
   explicit cache_site_selector(const controller::cache_selection_matrix* matrix);
 
   ~cache_site_selector(void) override = default;
@@ -59,20 +84,43 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
   cache_site_selector(const cache_site_selector& other) = delete;
 
   /**
-   * @brief Given a list of existing caches that a robot knows about (i.e. have
-   * not faded into an unknown state), compute the best site for a new cache.
+   * @brief Given a list of existing caches/blocks that a robot knows about
+   * (i.e. have not faded into an unknown state), compute the best site to start
+   * a new cache.
    *
-   * @return A pointer to the "best" cache site, along with its utility value.
+   * @return The local of the best cache site.
    */
-  argos::CVector2 calc_best(
-      const std::list<representation::perceived_cache>& known_caches,
-      argos::CVector2 robot_loc);
+  argos::CVector2 calc_best(const cache_list& known_caches,
+                            const block_list& known_blocks,
+                            argos::CVector2 robot_loc);
 
  private:
+  static constexpr double kCACHE_CONSTRAINT_TOL = 1E-8;
+  static constexpr double kBLOCK_CONSTRAINT_TOL = 1E-8;
+  static constexpr double kUTILITY_TOL = 1E-4;
+
+  using constraint_return_type = std::pair<cache_constraint_vector,
+                                           block_constraint_vector>;
+  constraint_return_type constraints_create(const cache_list& known_caches,
+                       const block_list& known_blocks);
+
   // clang-format off
   const controller::cache_selection_matrix* const mc_matrix;
+  nlopt::opt                                      m_alg;
   // clang-format on
 };
+
+double __cache_constraint_func(const std::vector<double>& x,
+                               std::vector<double>& ,
+                               void *data);
+
+double __block_constraint_func(const std::vector<double>& x,
+                               std::vector<double>& ,
+                               void *data);
+
+double __site_utility_func(const std::vector<double>& x,
+                           std::vector<double>& ,
+                           void *data);
 
 NS_END(depth2, controller, fordyca);
 
