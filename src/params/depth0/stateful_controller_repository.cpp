@@ -25,6 +25,7 @@
 #include "fordyca/params/occupancy_grid_parser.hpp"
 #include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
 #include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
+#include "fordyca/params/block_selection_matrix_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,6 +39,9 @@ namespace ta = rcppsw::task_allocation;
 stateful_controller_repository::stateful_controller_repository(void) {
   register_parser<occupancy_grid_parser, occupancy_grid_params>(
       occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
+  register_parser<block_selection_matrix_parser,
+                  block_selection_matrix_params>(block_selection_matrix_parser::kXMLRoot,
+                                                 block_selection_matrix_parser::kHeader1);
   register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
       ta::task_allocation_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
