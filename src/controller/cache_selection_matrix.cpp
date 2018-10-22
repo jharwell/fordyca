@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/params/cache_selection_matrix_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,8 +32,12 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-cache_selection_matrix::cache_selection_matrix(const argos::CVector2& nest_loc) {
-  this->insert(std::make_pair("nest_center", nest_loc));
+cache_selection_matrix::cache_selection_matrix(
+    const struct params::cache_selection_matrix_params* const params,
+    const argos::CVector2& nest_loc) {
+  this->insert(std::make_pair("nest_loc", nest_loc));
+  this->insert(std::make_pair("cache_prox_dist", params->cache_prox_dist));
+  this->insert(std::make_pair("block_prox_dist", params->block_prox_dist));
 }
 
 NS_END(controller, fordyca);

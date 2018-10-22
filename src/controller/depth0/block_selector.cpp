@@ -68,7 +68,7 @@ representation::perceived_block block_selector::calc_best(
             ? boost::get<double>(mc_matrix->find("cube_priority")->second)
             : boost::get<double>(mc_matrix->find("ramp_priority")->second);
     argos::CVector2 nest_loc =
-        boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second);
+        boost::get<argos::CVector2>(mc_matrix->find("nest_loc")->second);
 
     double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
         robot_loc, b.density.last_result(), priority);

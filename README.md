@@ -15,7 +15,8 @@ This is the main entry point for getting started on the project.
 1. Install development packages for the project:
 
    - Qt5 (`qtbase5-dev` on ubuntu)
-
+   - NLopt (`libnlopt-dev` on ubuntu)
+   
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
@@ -29,7 +30,7 @@ This is the main entry point for getting started on the project.
 
         sudo apt install -f
 
-   To fix installation issues.
+   After installing the .deb with dpkg to fix installation issues.
 
    If you are compiling ARGoS from source you can use whatever compiler/compiler
    version you like, so long as it supports C++14.

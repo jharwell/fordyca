@@ -32,6 +32,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/params/block_selection_matrix_params.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
@@ -148,10 +149,8 @@ void stateful_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
-  auto* ogrid = param_repo.parse_results<params::occupancy_grid_params>();
-  m_block_sel_matrix =
-      rcppsw::make_unique<block_selection_matrix>(ogrid->nest,
-                                                  &ogrid->priorities);
+  auto* block_mat = param_repo.parse_results<params::block_selection_matrix_params>();
+  m_block_sel_matrix = rcppsw::make_unique<block_selection_matrix>(block_mat);
 
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
