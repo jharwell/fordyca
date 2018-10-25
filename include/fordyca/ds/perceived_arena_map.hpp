@@ -175,6 +175,9 @@ class perceived_arena_map
 
   double grid_resolution(void) const { return m_grid.resolution(); }
 
+  //TODO: remove This
+  ds::occupancy_grid& grid(void) { return m_grid; }
+
  private:
   // clang-format off
   occupancy_grid                      m_grid;

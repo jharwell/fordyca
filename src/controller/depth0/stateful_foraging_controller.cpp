@@ -59,7 +59,9 @@ stateful_foraging_controller::stateful_foraging_controller(void)
       m_block_sel_matrix(),
       m_perception(),
       m_executive(),
-      m_communication_params() {}
+      m_communication_params(),
+      m_arena_x(0),
+      m_arena_y(0) {}
 
 stateful_foraging_controller::~stateful_foraging_controller(void) = default;
 
@@ -170,7 +172,6 @@ void stateful_foraging_controller::Init(ticpp::Element& node) {
 
   auto* comm_params = param_repo.parse_results<params::communication_params>();
   m_communication_params = *comm_params;
-  m_arena_size = ogrid->grid.upper;
 
   /* initialize tasking */
   m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
@@ -187,18 +188,17 @@ void stateful_foraging_controller::Reset(void) {
 } /* Reset() */
 
 void stateful_foraging_controller::perform_communication(void) {
-  std::vector<uint8_t> recieved_packet_data = saa_subsystem()->
-      sensing()->recieve_message();
-
+  m_arena_x = perception()->map()->grid().xdsize();
+  m_arena_y = perception()->map()->grid().ydsize();
+  std::vector<uint8_t> recieved_packet_data = saa_subsystem()->sensing()->recieve_message();
   float probability = static_cast <float> (rand()) /
       static_cast <float> (RAND_MAX);
 
   hal::wifi_packet packet = hal::wifi_packet();
-
   if (!recieved_packet_data.empty() && probability >=
       (1 - m_communication_params.chance_to_pass_on)) {
-    integrate_recieved_packet(packet);
     packet.data = recieved_packet_data;
+    integrate_recieved_packet(packet);
     saa_subsystem()->actuation()->start_sending_message(packet);
   } else if (probability >= (1 - m_communication_params.chance_to_start)) {
     int x_coord;
@@ -206,8 +206,8 @@ void stateful_foraging_controller::perform_communication(void) {
 
     // Random Mode
     if(m_communication_params.mode == 1) {
-      x_coord = static_cast <int> (rand()) % static_cast <int> (m_arena_size.GetX());
-      y_coord = static_cast <int> (rand()) % static_cast <int> (m_arena_size.GetY());
+      x_coord = static_cast <int> (rand()) % m_arena_x;
+      y_coord = static_cast <int> (rand()) % m_arena_y;
     // Utility function
     } else if (m_communication_params.mode == 2) {
       argos::CVector2 cell = get_most_valuable_cell();
@@ -220,85 +220,89 @@ void stateful_foraging_controller::perform_communication(void) {
 
     ds::cell2D cell = m_perception->map()->
       access<ds::occupancy_grid::kCell>(x_coord, y_coord);
-    packet.data.push_back(x_coord); // X Coord of cell
-    packet.data.push_back(y_coord); // Y Coord of cell
+    packet.data.push_back(static_cast<uint8_t>(x_coord)); // X Coord of cell
+    packet.data.push_back(static_cast<uint8_t>(y_coord)); // Y Coord of cell
 
     // The state is what the cell contains (nothing, block, or cache)
-    int state = -1;
-    if (cell.state_is_known()) {
-      if (cell.state_is_empty()) {
-        state = 0;
-      } else if (cell.state_has_block()) {
-        state = 1;
-      } else if (cell.state_has_cache()) {
-        state = 2;
-      }
+    int state = 1;
+    if (cell.state_is_empty()) {
+      state = 2;
+    } else if (cell.state_has_block()) {
+      state = 3;
+    } else if (cell.state_has_cache()) {
+      state = 4;
     }
-    // Type of entity (block / cache) (will be -1 if the cell state is unknown)
-    packet.data.push_back(state);
+    // Type of entity (block / cache) (will be 1 if the cell state is unknown)
+    packet.data.push_back(static_cast<uint8_t>(state));
 
     auto entity = cell.entity();
-    int id = -1;
-    int type = -1;
+    int id = 0;
+
+    // Type is specific to blocks as there are ramp and cube blocks.
+    int type = 1;
     if (entity) {
       id = entity->id();
 
       // Block
-      if (state == 1) {
+      if (state == 3) {
         // Ramp block
         if (cell.block()->type() == metrics::blocks::transport_metrics::kRamp) {
-          type = 1;
+          type = 2;
         // Cube block
         } else {
-          type = 2;
-        }
-      }
-    }
-    packet.data.push_back(id); // Entity ID (will be -1 if the cell is unknown)
-    packet.data.push_back(type); // Type of block
-
+          type = 3;
+        } /* if block type */
+      } /* if state */
+    } /* if entity */
+    packet.data.push_back(static_cast<uint8_t>(id)); // Entity ID (will be 0 if the cell is unknown)
+    packet.data.push_back(static_cast<uint8_t>(type)); // Type of block
 
     rcppsw::swarm::pheromone_density& density = m_perception->map()->
       access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
-    packet.data.push_back(density.last_result());
+    packet.data.push_back(static_cast<uint8_t>(density.last_result()));
 
     saa_subsystem()->actuation()->start_sending_message(packet);
   } else {
     saa_subsystem()->actuation()->stop_sending_message();
-  }
+  } /* if !recieved_packet_data.empty() */
 } /* perform_communication */
 
 void stateful_foraging_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   // Data extraction
-  int x_coord = packet.data[0];
-  int y_coord = packet.data[1];
-  int state = packet.data[2];
-  int ent_id = packet.data[3];
+  int x_coord = static_cast<int>(packet.data[0]);
+  int y_coord = static_cast<int>(packet.data[1]);
+  int state = static_cast<int>(packet.data[2]);
+  int ent_id = static_cast<int>(packet.data[3]);
   // type of block (if it's not a block it will be -1)
-  int type = packet.data[4];
-  int pheromone_density = packet.data[5];
+  int type = static_cast<int>(packet.data[4]);
+  int pheromone_density = static_cast<int>(packet.data[5]);
 
-  if (state != -1) {
+  if (state != 1) {
     rcppsw::swarm::pheromone_density& density = m_perception->map()->
       access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
+
+      // If the recieved pheromone density is less than the known, don't
+      // integrate the recieved information.
+      if (density.last_result() > pheromone_density) {
+        return;
+      }
+
     density.pheromone_set(static_cast<double>(pheromone_density));
 
     // blocks
-    if (state == 1) {
+    if (state == 3) {
       // ramp block
-      if (type == 1) {
-        std::shared_ptr<representation::ramp_block> block_ptr;
-        representation::ramp_block block = representation::ramp_block(
-          rcppsw::math::vector2d(x_coord, y_coord), ent_id);
-        *block_ptr = block;
+      if (type == 2) {
+        std::shared_ptr<representation::ramp_block> block_ptr (new
+          representation::ramp_block(rcppsw::math::vector2d(x_coord, y_coord),
+          ent_id));
 
         m_perception->map()->block_add(block_ptr);
       // cube block
-      } else if (type == 2) {
-        std::shared_ptr<representation::cube_block> block_ptr;
-        representation::cube_block block = representation::cube_block(
-          rcppsw::math::vector2d(x_coord, y_coord), ent_id);
-        *block_ptr = block;
+    } else if (type == 3) {
+        std::shared_ptr<representation::cube_block> block_ptr (new
+          representation::cube_block(rcppsw::math::vector2d(x_coord, y_coord),
+          ent_id));
 
         m_perception->map()->block_add(block_ptr);
       } /* if type */
@@ -314,14 +318,15 @@ argos::CVector2 stateful_foraging_controller::get_most_valuable_cell(void) {
   argos::CVector2 cell_coords;
 
   // TODO: Get information on where the nest is!!!!
-  int nest_x_coord = 1;
-  int nest_y_coord = 1;
+  int nest_x_coord = 2;
+  int nest_y_coord = 3;
 
-  int communicated_cell_value = 0;
+  int communicated_cell_value = 99999;
+  // int communicated_cell_value = 0;
   int current_cell_value = 0;
 
-  int arena_x_coord = static_cast <int> (m_arena_size.GetX());
-  int arena_y_coord = static_cast <int> (m_arena_size.GetY());
+  int arena_x_coord = static_cast<int>(m_arena_x);
+  int arena_y_coord = static_cast<int>(m_arena_y);
   int cell_x = 0;
   int cell_y = 0;
 
@@ -340,6 +345,10 @@ argos::CVector2 stateful_foraging_controller::get_most_valuable_cell(void) {
       } /* if cell has block */
     } /* for(j..) */
   } /* for(i..) */
+  if (cell_x != 0 || cell_y != 0) {
+    std::cout << "Arena x: " << arena_x_coord << " and y: " << arena_y_coord << std::endl;
+    std::cout << "Most Valuable X coord: " << cell_x << " and the most valuable y: " << cell_y << std::endl;
+  }
   cell_coords.SetX(cell_x);
   cell_coords.SetY(cell_y);
   return cell_coords;

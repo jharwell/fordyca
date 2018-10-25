@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="2000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -104,7 +104,7 @@
                               max_speed="10.0" />
 	      </actuation>
         <communication chance_to_pass_on="0.5"
-                       chance_to_start="0.01"
+                       chance_to_start="0.5"
                        max_message="10"
                        mode="2"/>
       </params>
@@ -233,8 +233,8 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="3" max_trials="1000">
-        <foot-bot id="fb" rab_range="3" rab_data_size="20">
+      <entity quantity="2" max_trials="1000">
+        <foot-bot id="fb" rab_range="30" rab_data_size="20">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>

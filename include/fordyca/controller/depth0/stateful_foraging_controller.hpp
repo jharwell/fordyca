@@ -167,7 +167,8 @@ class stateful_foraging_controller : public stateless_foraging_controller,
   std::unique_ptr<base_perception_subsystem>           m_perception;
   std::unique_ptr<ta::bifurcating_tdgraph_executive>   m_executive;
   struct params::communication_params                  m_communication_params;
-  argos::CVector2                                      m_arena_size{};
+  uint                                                  m_arena_x;
+  uint                                                  m_arena_y;
   // clang-format on
 };
 

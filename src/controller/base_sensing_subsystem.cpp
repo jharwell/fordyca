@@ -120,10 +120,11 @@ bool base_sensing_subsystem::block_detected(void) const {
 } /* block_detected() */
 
 std::vector<uint8_t> base_sensing_subsystem::recieve_message() {
-
-  for (auto reading : m_sensors.rabs.readings()) {
+  auto readings = m_sensors.rabs.readings();
+  for (auto reading : readings) {
     std::vector<uint8_t> data = reading.data;
-    if (!data.empty() && (int) data.front() > 1) {
+    // Check if data isn't empty and if there is a value in the state position
+    if (!data.empty() && static_cast<int>(data[2]) >= 1) {
       return reading.data;
     }
   }
