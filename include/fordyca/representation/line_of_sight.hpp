@@ -29,6 +29,7 @@
 #include <utility>
 #include "rcppsw/ds/base_grid2D.hpp"
 #include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -60,7 +61,7 @@ class base_cache;
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
  */
-class line_of_sight {
+class line_of_sight : public rcppsw::er::client<line_of_sight> {
  public:
   using block_list = std::list<std::shared_ptr<base_block>>;
   using const_block_list = std::list<std::shared_ptr<const base_block>>;
@@ -69,7 +70,10 @@ class line_of_sight {
   using grid_view = rcppsw::ds::grid_view<ds::cell2D>;
 
   line_of_sight(const grid_view& c_view, rcppsw::math::dcoord2 center)
-      : m_center(std::move(center)), m_view(c_view), m_caches() {}
+      : ER_CLIENT_INIT("fordyca.representation.line_of_sight"),
+        m_center(std::move(center)),
+        m_view(c_view),
+        m_caches() {}
 
   const_block_list blocks(void) const;
   const_cache_list caches(void) const;

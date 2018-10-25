@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
 #include <random>
 #include <vector>
 #include <map>
+#include <utility>
+#include <list>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -90,12 +91,12 @@ class powerlaw_distributor : public base_distributor,
   bool map_clusters(ds::arena_grid& grid);
 
  private:
-  using arena_view_list = std::list<std::pair<ds::arena_grid::view, uint>>;
-  /**
-   * @brief How many times to attempt to distribute all blocks before giving up,
-   * causing an assertion failure on distribution.
+  /*
+   * @brief Vector of (arena view, cluster size within the view) pairs. MUST be
+   * a vector in order for automatic parallelizing of std algorithms to work
+   * with comparisions of const_view (boost multi_array is terrible).
    */
-  static constexpr uint kMAX_DIST_TRIES = 100;
+  using arena_view_vector = std::vector<std::pair<ds::arena_grid::view, uint>>;
 
   /**
    * @brief Assign cluster centers randomly, with the only restriction that the
@@ -104,7 +105,7 @@ class powerlaw_distributor : public base_distributor,
    * @param grid Arena grid.
    * @param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
-  arena_view_list guess_cluster_placements(ds::arena_grid& grid,
+  arena_view_vector guess_cluster_placements(ds::arena_grid& grid,
                                              const std::vector<uint>& clust_sizes);
 
   /**
@@ -115,7 +116,7 @@ class powerlaw_distributor : public base_distributor,
    *
    * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
-  bool check_cluster_placements(const arena_view_list& list);
+  bool check_cluster_placements(const arena_view_vector& list);
 
   /**
    * @brief Perform a "guess and check" cluster placement until you get a
@@ -124,13 +125,13 @@ class powerlaw_distributor : public base_distributor,
    *
    * Cluster sizes are drawn from the internally stored power law distribution.
    */
-  arena_view_list compute_cluster_placements(ds::arena_grid& grid,
+  arena_view_vector compute_cluster_placements(ds::arena_grid& grid,
                                              uint n_clusters);
 
   // clang-format off
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
-  std::map<uint, std::list<cluster_distributor>> m_dist_map;
+  std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
   // clang-format on

@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/logical_task.hpp"
@@ -50,17 +49,11 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * @brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
-class base_foraging_task
-    : public virtual rcppsw::metrics::tasks::execution_metrics,
-      public fsm::block_transporter,
-      public metrics::fsm::goal_acquisition_metrics {
+class base_foraging_task : public fsm::block_transporter,
+                           public metrics::fsm::goal_acquisition_metrics {
  public:
-  explicit base_foraging_task(const struct ta::abort_params* params);
-
-  ta::abort_probability abort_prob(void) const { return m_abort_prob; }
-
- private:
-  ta::abort_probability m_abort_prob;
+  base_foraging_task(void) = default;
+  ~base_foraging_task(void) override = default;
 };
 
 NS_END(tasks, fordyca);

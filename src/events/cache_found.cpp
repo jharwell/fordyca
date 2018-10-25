@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -43,6 +44,12 @@ cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
                         cache->discrete_loc().second),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
+
+cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
+    : perceived_cell_op(cache->discrete_loc().first,
+                        cache->discrete_loc().second),
+      ER_CLIENT_INIT("fordyca.events.cache_found"),
+      m_cache(cache) {}
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -87,10 +94,18 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_found::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(x(), y());
+  if (!cell.state_is_known()) {
+    map.known_cells_inc();
+    ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
+              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              map.known_cell_count(),
+              map.xdsize(),
+              map.ydsize());
+  }
+
   /**
    * Remove any and all blocks from the known blocks list that exist in
    * the same space that a cache occupies.
@@ -102,7 +117,7 @@ void cache_found::visit(ds::perceived_arena_map& map) {
    * tracking blocks that no longer exist in our perception.
    *
    * @todo This is a hack, and once the robot computes its own LOS rather than
-   * being sent it the need for this function will disappear.
+   * being sent it the need for this will disappear.
    */
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {
@@ -156,6 +171,10 @@ void cache_found::visit(ds::perceived_arena_map& map) {
   }
   map.cache_add(m_cache);
   cell.accept(*this);
+} /* visit() */
+
+void cache_found::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.perception()->map()->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

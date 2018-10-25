@@ -35,19 +35,20 @@ using representation::base_cache;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-static_cache_creator::static_cache_creator(ds::arena_grid& grid,
+static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
                                            const argos::CVector2& center,
-                                           double cache_size,
-                                           double resolution)
-    : cache_creator(grid, cache_size, resolution),
+                                           double cache_size)
+    : base_cache_creator(grid, cache_size),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
       m_center(center) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cache_creator::cache_vector static_cache_creator::create_all(
+base_cache_creator::cache_vector static_cache_creator::create_all(
+    const cache_vector& existing_caches,
     block_vector& blocks) {
+  ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
@@ -62,7 +63,7 @@ cache_creator::cache_vector static_cache_creator::create_all(
     starter_blocks.push_back(b);
   } /* for(i..) */
 
-  auto cache = cache_creator::create_single(starter_blocks, m_center);
+  auto cache = create_single_cache(starter_blocks, m_center);
   auto cache_p = std::shared_ptr<representation::arena_cache>(std::move(cache));
   caches.push_back(cache_p);
   return caches;

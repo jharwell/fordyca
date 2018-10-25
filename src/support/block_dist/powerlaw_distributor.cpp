@@ -24,6 +24,7 @@
 #include "fordyca/support/block_dist/powerlaw_distributor.hpp"
 #include <algorithm>
 #include <cmath>
+#include <parallel/algorithm>
 #include <random>
 
 #include "fordyca/ds/arena_grid.hpp"
@@ -85,10 +86,6 @@ bool powerlaw_distributor::distribute_block(
 
 bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
                                              entity_list& entities) {
-  /*
-   * Try the distributors in a random order each time. If they all fail to
-   * distribute the block (for whatever reason) return the error.
-   */
   return std::all_of(blocks.begin(),
                      blocks.end(),
                      [&](std::shared_ptr<representation::base_block>& b) {
@@ -96,10 +93,10 @@ bool powerlaw_distributor::distribute_blocks(block_vector& blocks,
                      });
 } /* distribute_blocks() */
 
-powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placements(
-    ds::arena_grid& grid,
-    const std::vector<uint>& clust_sizes) {
-  arena_view_list views;
+powerlaw_distributor::arena_view_vector powerlaw_distributor::
+    guess_cluster_placements(ds::arena_grid& grid,
+                             const std::vector<uint>& clust_sizes) {
+  arena_view_vector views;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
     std::uniform_int_distribution<int> xgen(
@@ -127,37 +124,38 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::guess_cluster_placem
 } /* guess_cluster_placements() */
 
 __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
-    const arena_view_list& list) {
-  for (auto& v : list) {
-    bool overlap = std::any_of(
-        list.begin(),
-        list.end(),
-        [&](const std::pair<ds::arena_grid::view, uint>& other) {
-          if (other == v) { /* self */
-            return false;
-          }
-          uint v_xbase = (*v.first.origin()).loc().first;
-          uint v_ybase = (*v.first.origin()).loc().second;
-          uint other_xbase = (*other.first.origin()).loc().first;
-          uint other_ybase = (*other.first.origin()).loc().second;
-          math::range<uint> v_xrange(v_xbase + v.first.index_bases()[0],
-                                     v_xbase + v.first.index_bases()[0] +
-                                         v.first.shape()[0]);
-          math::range<uint> v_yrange(v_ybase + v.first.index_bases()[1],
-                                     v_ybase + v.first.index_bases()[1] +
-                                         v.first.shape()[1]);
-          math::range<uint> other_xrange(
-              other_xbase + other.first.index_bases()[0],
-              other_xbase + other.first.index_bases()[0] +
-                  other.first.shape()[0]);
-          math::range<uint> other_yrange(
-              other_ybase + other.first.index_bases()[1],
-              other_ybase + other.first.index_bases()[1] +
-                  other.first.shape()[1]);
+    const arena_view_vector& list) {
+  for (const std::pair<ds::arena_grid::view, uint>& v : list) {
+    bool overlap = std::any_of(list.begin(), list.end(), [&](const auto& other) {
+      /*
+           * Can't compare directly (boost multi_array makes a COPY of each
+           * element during iteration for some reason, and because the cells
+           * have a unique_ptr, that doesn't work), so compare using addresses
+           * of elements of the vector, which WILL work.
+           */
+      if (&other == &v) { /* self */
+        return false;
+      }
+      uint v_xbase = (*v.first.origin()).loc().first;
+      uint v_ybase = (*v.first.origin()).loc().second;
+      uint other_xbase = (*other.first.origin()).loc().first;
+      uint other_ybase = (*other.first.origin()).loc().second;
+      math::range<uint> v_xrange(v_xbase + v.first.index_bases()[0],
+                                 v_xbase + v.first.index_bases()[0] +
+                                     v.first.shape()[0]);
+      math::range<uint> v_yrange(v_ybase + v.first.index_bases()[1],
+                                 v_ybase + v.first.index_bases()[1] +
+                                     v.first.shape()[1]);
+      math::range<uint> other_xrange(other_xbase + other.first.index_bases()[0],
+                                     other_xbase + other.first.index_bases()[0] +
+                                         other.first.shape()[0]);
+      math::range<uint> other_yrange(other_ybase + other.first.index_bases()[1],
+                                     other_ybase + other.first.index_bases()[1] +
+                                         other.first.shape()[1]);
 
-          return v_xrange.overlaps_with(other_xrange) &&
-                 v_yrange.overlaps_with(other_yrange);
-        });
+      return v_xrange.overlaps_with(other_xrange) &&
+             v_yrange.overlaps_with(other_yrange);
+    });
     if (overlap) {
       return false;
     }
@@ -165,7 +163,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
   return true;
 } /* check_cluster_placements() */
 
-powerlaw_distributor::arena_view_list powerlaw_distributor::
+powerlaw_distributor::arena_view_vector powerlaw_distributor::
     compute_cluster_placements(ds::arena_grid& grid, uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
@@ -185,11 +183,11 @@ powerlaw_distributor::arena_view_list powerlaw_distributor::
   } /* for(i..) */
   ER_FATAL_SENTINEL(
       "Unable to place clusters in arena (impossible situation?)");
-  return arena_view_list{};
+  return arena_view_vector{};
 } /* compute_cluster_placements() */
 
 bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
-  arena_view_list placements = compute_cluster_placements(grid, m_n_clusters);
+  arena_view_vector placements = compute_cluster_placements(grid, m_n_clusters);
   if (0 == placements.size()) {
     ER_WARN("Unable to compute all cluster placements");
     return false;

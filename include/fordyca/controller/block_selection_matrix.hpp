@@ -36,7 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace params {
-struct block_priority_params;
+struct block_selection_matrix_params;
 }
 NS_START(controller);
 
@@ -59,8 +59,8 @@ NS_START(controller);
 class block_selection_matrix
     : public std::map<std::string, boost::variant<double, argos::CVector2>> {
  public:
-  block_selection_matrix(const argos::CVector2& nest_loc,
-                         const params::block_priority_params* priorities);
+  explicit block_selection_matrix(
+      const struct params::block_selection_matrix_params * params);
 
  private:
   using mapped_type = boost::variant<double, argos::CVector2>;

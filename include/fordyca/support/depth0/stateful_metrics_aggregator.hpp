@@ -29,11 +29,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation { class polled_task; }}
 NS_START(fordyca);
 
-namespace controller { namespace depth0 { class stateful_foraging_controller; }}
+namespace controller { namespace depth0 { class stateful_controller; }}
 
 NS_START(support, depth0);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -58,7 +60,8 @@ class stateful_metrics_aggregator : public stateless_metrics_aggregator,
    * @brief Collect metrics from the stateful controller.
    */
   void collect_from_controller(
-      const controller::depth0::stateful_foraging_controller* controller);
+      const controller::depth0::stateful_controller* controller);
+  void task_finish_or_abort_cb(const ta::polled_task* const task);
 };
 
 NS_END(depth0, support, fordyca);

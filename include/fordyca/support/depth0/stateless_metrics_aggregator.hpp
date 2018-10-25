@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include "rcppsw/math/dcoord.hpp"
 
@@ -31,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller { namespace depth0 { class stateless_foraging_controller; }}
+namespace controller { namespace depth0 { class stateless_controller; }}
 namespace representation {
 class base_block;
 } /* namespace representation */
@@ -73,7 +74,7 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
    * the end of each timestep).
    */
   void collect_from_controller(
-      const controller::depth0::stateless_foraging_controller* controller);
+      const controller::depth0::stateless_controller* controller);
 
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.

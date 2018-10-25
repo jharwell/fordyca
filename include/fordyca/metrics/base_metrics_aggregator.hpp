@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
@@ -34,6 +36,10 @@ NS_START(fordyca);
 
 namespace params {
 struct metrics_params;
+}
+
+namespace support {
+class base_loop_functions;
 }
 
 NS_START(metrics);
@@ -56,6 +62,8 @@ class base_metrics_aggregator
   base_metrics_aggregator(const struct params::metrics_params* params,
                           const std::string& output_root);
   virtual ~base_metrics_aggregator(void) = default;
+
+  void collect_from_loop(const support::base_loop_functions* const loop);
 
  protected:
   const std::string& metrics_path(void) const { return m_metrics_path; }

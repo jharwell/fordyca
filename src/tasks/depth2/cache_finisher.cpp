@@ -39,9 +39,10 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 cache_finisher::cache_finisher(
-    const struct task_allocation::task_params* params,
+    const struct ta::task_allocation_params* params,
     std::unique_ptr<task_allocation::taskable> mechanism)
-    : foraging_task(kCacheFinisherName, params, std::move(mechanism)) {}
+    : foraging_task(kCacheFinisherName, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
 /*******************************************************************************
  * Member Functions
@@ -49,41 +50,40 @@ cache_finisher::cache_finisher(
 void cache_finisher::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
-double cache_finisher::calc_abort_prob(void) {
-  /*
-   * Cache finishers always have a small chance of aborting their task when not
-   * at a task interface. Having the cache finisher task un-abortable until
-   * AFTER it acquires a block can cause it to get stuck and not switch to
-   * another task if it cannot find a block anywhere.
-   */
-  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
-  if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
-    return abort_prob().calc(executable_task::interface_time(),
-                             executable_task::interface_estimate());
+double cache_finisher::abort_prob_calc(void) {
+    if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
   }
-  return abort_prob().calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
-} /* calc_abort_prob() */
+} /* abort_prob_calc() */
 
-double cache_finisher::calc_interface_time(double start_time) {
-  if (task_at_interface()) {
-    return current_time() - start_time;
-  }
+double cache_finisher::interface_time_calc(uint interface,double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
 
+void cache_finisher::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
+
   if (fsm->goal_acquired() &&
       transport_goal_type::kNewCache == fsm->block_transport_goal()) {
-    if (!interface_complete()) {
-      interface_complete(true);
-      reset_interface_time();
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_TRACE("Interface finished at timestep %f", current_time());
     }
-    return interface_time();
+    ER_TRACE("Interface time: %f", interface_time(0));
+  } else if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+    }
+    ER_TRACE("Interface start at timestep %f", current_time());
   }
-  return 0.0;
-} /* calc_interface_time() */
+} /* active_interface_update() */
 
 /*******************************************************************************
  * FSM Metrics
@@ -129,13 +129,5 @@ void cache_finisher::accept(events::free_block_pickup& visitor) {
 void cache_finisher::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-
-/*******************************************************************************
- * Task Metrics
- ******************************************************************************/
-__rcsw_pure bool cache_finisher::task_at_interface(void) const {
-  auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
-  return acquisition_goal_type::kExistingCache == fsm->acquisition_goal();
-} /* task_at_interface() */
 
 NS_END(depth2, tasks, fordyca);

@@ -15,7 +15,8 @@ This is the main entry point for getting started on the project.
 1. Install development packages for the project:
 
    - Qt5 (`qtbase5-dev` on ubuntu)
-
+   - NLopt (`libnlopt-dev` on ubuntu)
+   
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
@@ -29,7 +30,7 @@ This is the main entry point for getting started on the project.
 
         sudo apt install -f
 
-   To fix installation issues.
+   After installing the .deb with dpkg to fix installation issues.
 
    If you are compiling ARGoS from source you can use whatever compiler/compiler
    version you like, so long as it supports C++14.
@@ -46,6 +47,7 @@ This is the main entry point for getting started on the project.
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
 
+        `mkdir ext`
         `ln -s /path/to/rcppsw ext/rcppsw`
 
    Follow all pre/post-cloning instructions found in README for the rcppsw repo.
@@ -83,7 +85,7 @@ After successful compilation, follow these steps to run a foraging scenario:
 2. Unless you disable event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
 
-        export LOG4CXX_CONFIGURATION=/path/to=fordyca/log4cxx.xml
+        export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
 
 3. cd to the ROOT of the fordyca repo, and run the experiment:
 
@@ -142,7 +144,7 @@ access to that directory as part of the gini group.
      resulting in a dynamic linking error.
 
   3. Make sure you have the necessary environment variables set correctly.
-  
+
 ## Contributing
 
 For contributing to `fordyca`, see

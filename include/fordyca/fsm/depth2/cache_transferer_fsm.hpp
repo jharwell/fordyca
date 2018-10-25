@@ -88,10 +88,10 @@ class cache_transferer_fsm : public base_foraging_fsm,
   /* block transportation */
   FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
 
-  /**
-   * @brief Reset the FSM.
-   */
   void init(void) override;
+
+  bool is_acquiring_dest_cache(void) const;
+  bool is_acquiring_src_cache(void) const;
 
  protected:
   enum fsm_states {

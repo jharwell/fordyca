@@ -53,6 +53,7 @@ class cache_found : public perceived_cell_op,
                     public rcppsw::er::client<cache_found> {
  public:
   explicit cache_found(std::unique_ptr<representation::base_cache> cache);
+  explicit cache_found(const std::shared_ptr<representation::base_cache>& cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
@@ -64,8 +65,9 @@ class cache_found : public perceived_cell_op,
   /* depth1 foraging */
   void visit(ds::perceived_arena_map& map) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(controller::depth1::foraging_controller&) override {}
-  void visit(controller::depth0::stateful_foraging_controller&) override {}
+
+  /* depth2 foraging */
+  void visit(controller::depth2::greedy_recpart_controller& controller) override;
 
  private:
   std::shared_ptr<representation::base_cache> m_cache;

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,7 +34,8 @@ NS_START(fordyca);
 
 namespace ds {
 class cell2D;
-}
+class occupancy_grid;
+} // namespace ds
 namespace fsm {
 class perceived_cell2D_fsm;
 }
@@ -55,12 +57,16 @@ NS_START(events);
  * 1. After its relevance expires.
  * 2. Before the robot sees it for the first time (ala Fog of War).
  */
-class cell_unknown : public cell_op {
+class cell_unknown : public cell_op,
+                     public visitor::can_visit<ds::occupancy_grid>,
+                     public rcppsw::er::client<cell_unknown> {
  public:
-  cell_unknown(size_t x, size_t y) : cell_op(x, y) {}
+  cell_unknown(uint x, uint y)
+      : cell_op(x, y), ER_CLIENT_INIT("fordyca.ds.events.cell_unknown") {}
 
   /* stateful foraging */
   void visit(ds::cell2D& cell) override;
+  void visit(ds::occupancy_grid& grid) override;
   void visit(fsm::cell2D_fsm& fsm) override;
 };
 

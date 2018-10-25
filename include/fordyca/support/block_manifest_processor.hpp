@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
+
 #include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/factory/sharing_factory.hpp"
@@ -32,15 +34,19 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_block; }
+namespace representation {
+class base_block;
+}
 NS_START(support);
+namespace factory = rcppsw::patterns::factory;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class block_manifest_processor
-    : private rcppsw::patterns::factory::
-          sharing_factory<representation::base_block, const rcppsw::math::vector2d&, int> {
+    : private factory::sharing_factory<representation::base_block,
+                                       const rcppsw::math::vector2d&,
+                                       int> {
  public:
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   explicit block_manifest_processor(const params::arena::block_manifest* const m);

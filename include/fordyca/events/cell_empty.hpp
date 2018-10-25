@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
@@ -34,6 +35,7 @@ NS_START(fordyca);
 
 namespace ds {
 class arena_map;
+class occupancy_grid;
 class perceived_arena_map;
 } // namespace ds
 
@@ -55,11 +57,14 @@ NS_START(events);
  */
 class cell_empty : public cell_op,
                    public visitor::can_visit<ds::arena_map>,
-                   public visitor::can_visit<ds::perceived_arena_map> {
+                   public visitor::can_visit<ds::occupancy_grid>,
+                   public visitor::can_visit<ds::perceived_arena_map>,
+                   public rcppsw::er::client<cell_empty> {
  public:
   explicit cell_empty(const rcppsw::math::dcoord2& coord)
       : cell_empty{coord.first, coord.second} {}
-  cell_empty(size_t x, size_t y) : cell_op(x, y) {}
+  cell_empty(uint x, uint y)
+      : cell_op(x, y), ER_CLIENT_INIT("fordyca.events.cell_empty") {}
 
   /* stateless foraging */
   void visit(ds::cell2D& cell) override;
@@ -67,6 +72,7 @@ class cell_empty : public cell_op,
   void visit(ds::arena_map& map) override;
 
   /* stateful foraging */
+  void visit(ds::occupancy_grid& grid) override;
   void visit(ds::perceived_arena_map& map) override;
 };
 

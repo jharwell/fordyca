@@ -24,7 +24,8 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/foraging_controller.hpp"
+#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -59,7 +60,7 @@ cached_block_pickup::cached_block_pickup(
       m_timestep(timestep),
       m_real_cache(cache) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
-            "< %d blocks in cache",
+            "< %zu blocks in cache",
             base_cache::kMinBlocks);
   m_pickup_block = m_real_cache->block_get();
   ER_ASSERT(m_pickup_block, "No block in non-empty cache");
@@ -78,7 +79,7 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "cell does not have cache");
   if (nullptr != m_orphan_block) {
     cell.entity(m_orphan_block);
-    ER_DEBUG("Cell (%zu, %zu) gets orphan block%d",
+    ER_DEBUG("Cell (%u, %u) gets orphan block%d",
              cell_op::x(),
              cell_op::y(),
              m_orphan_block->id());
@@ -93,14 +94,14 @@ void cached_block_pickup::visit(representation::arena_cache& cache) {
 
 void cached_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
-            "< %d blocks in cache",
+            "< %zu blocks in cache",
             base_cache::kMinBlocks);
   int cache_id = m_real_cache->id();
   ER_ASSERT(-1 != cache_id, "Cache ID undefined on block pickup");
 
   rcppsw::math::dcoord2 coord = m_real_cache->discrete_loc();
   ER_ASSERT(coord == rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
-            "Coordinates for cache%d (%u, %u)/cell(%zu, %zu) do not "
+            "Coordinates for cache%d (%u, %u)/cell(%u, %u) do not "
             "agree",
             cache_id,
             coord.first,
@@ -110,7 +111,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
-            "Cache/cell disagree on # of blocks: cache=%u/cell=%zu",
+            "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
             m_real_cache->n_blocks(),
             cell.block_count());
 
@@ -124,12 +125,12 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     m_real_cache->accept(*this);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
-              "cell@(%zu, %zu) with >= %u blocks does not have cache",
+              "cell@(%u, %u) with >= %zu blocks does not have cache",
               cell_op::x(),
               cell_op::y(),
               base_cache::kMinBlocks);
     ER_INFO(
-        "arena_map: fb%u: block%d from cache%d@(%zu, %zu) [%u blocks remain]",
+        "arena_map: fb%u: block%d from cache%d@(%u, %u) [%zu blocks remain]",
         m_robot_index,
         m_pickup_block->id(),
         cache_id,
@@ -143,14 +144,14 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     cell.accept(*this);
 
     ER_ASSERT(cell.state_has_block(),
-              "cell@(%zu, %zu) with 1 block has cache",
+              "cell@(%u, %u) with 1 block has cache",
               cell_op::x(),
               cell_op::y());
 
     map.cache_extent_clear(m_real_cache);
     map.cache_remove(m_real_cache);
     map.caches_removed(1);
-    ER_INFO("arena_map: fb%u: block%d from cache%d@(%zu, %zu) [cache depleted]",
+    ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [cache depleted]",
             m_robot_index,
             m_pickup_block->id(),
             cache_id,
@@ -165,24 +166,23 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
-            "perceived cache/cell disagree on # of blocks: "
-            "cache=%u/cell=%zu",
+            "Perceived cache/cell disagree on # of blocks: "
+            "cache=%zu/cell=%zu",
             cell.cache()->n_blocks(),
             cell.block_count());
 
   ER_ASSERT(cell.cache()->contains_block(m_pickup_block),
-            "perceived cache does not contain ref to block to be picked "
-            "up");
+            "Perceived cache does not contain ref to block to be picked up");
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
     cell.cache()->block_remove(m_pickup_block);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
-              "cell@(%zu, %zu) with >= 2 blocks does not have cache",
+              "cell@(%u, %u) with >= 2 blocks does not have cache",
               cell_op::x(),
               cell_op::y());
     ER_INFO(
-        "perceived_arena_map: fb%u: block%d from cache%d@(%zu, %zu) [%u "
+        "perceived_arena_map: fb%u: block%d from cache%d@(%u, %u) [%zu "
         "blocks remain]",
         m_robot_index,
         m_pickup_block->id(),
@@ -196,14 +196,12 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());
-    ER_INFO(
-        "perceived_arena_map: fb%u: block%d from cache%d@(%zu, %zu) [cache "
-        "depleted]",
-        m_robot_index,
-        m_pickup_block->id(),
-        id,
-        cell_op::x(),
-        cell_op::y());
+    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u) [cache depleted]",
+            m_robot_index,
+            m_pickup_block->id(),
+            id,
+            cell_op::x(),
+            cell_op::y());
   }
 } /* visit() */
 
@@ -213,17 +211,21 @@ void cached_block_pickup::visit(representation::base_block& block) {
   block.first_pickup_time(m_timestep);
 
   block.move_out_of_sight();
-  ER_INFO("block: block%d is now carried by fb%u", block.id(), m_robot_index);
+  ER_INFO("Block%d is now carried by fb%u", block.id(), m_robot_index);
 } /* visit() */
 
 void cached_block_pickup::visit(
-    controller::depth1::foraging_controller& controller) {
+    controller::depth1::greedy_partitioning_controller& controller) {
   controller.ndc_push();
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
-  dynamic_cast<tasks::depth1::existing_cache_interactor*>(
-      controller.current_task())
-      ->accept(*this);
+
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 
   ER_INFO("Picked up block%d", m_pickup_block->id());
   controller.ndc_pop();
@@ -248,8 +250,13 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cached_block_pickup::visit(
-    controller::depth2::foraging_controller& controller) {
-  ER_ASSERT(false, "Not implemented");
+    controller::depth2::greedy_recpart_controller& controller) {
+  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+      controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block pickup",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {

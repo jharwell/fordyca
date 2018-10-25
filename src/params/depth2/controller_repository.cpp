@@ -22,20 +22,26 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/depth2/exec_estimates_parser.hpp"
+#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth2);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  register_parser<exec_estimates_parser, exec_estimates_params>(
-      exec_estimates_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_starter");
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_finisher");
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_transferer");
+  get_parser<ta::task_allocation_xml_parser>(
+      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_collector");
 }
 
 NS_END(depth2, params, fordyca);

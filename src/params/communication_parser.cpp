@@ -41,18 +41,18 @@ void communication_parser::parse(const ticpp::Element& node) {
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_PARAM(anode, m_params, chance_to_pass_on);
-  XML_PARSE_PARAM(anode, m_params, chance_to_start);
-  XML_PARSE_PARAM(anode, m_params, max_message);
-  XML_PARSE_PARAM(anode, m_params, mode);
+  XML_PARSE_ATTR(anode, m_params, chance_to_pass_on);
+  XML_PARSE_ATTR(anode, m_params, chance_to_start);
+  XML_PARSE_ATTR(anode, m_params, max_message);
+  XML_PARSE_ATTR(anode, m_params, mode);
 } /* parse() */
 
 void communication_parser::show(std::ostream& stream) const {
   stream << build_header();
 
-  stream << XML_PARAM_STR(m_params, chance_to_pass_on)
-         << XML_PARAM_STR(m_params, chance_to_start)
-         << XML_PARAM_STR(m_params, max_message)
+  stream << XML_ATTR_STR(m_params, chance_to_pass_on)
+         << XML_ATTR_STR(m_params, chance_to_start)
+         << XML_ATTR_STR(m_params, max_message)
          << std::endl
          << build_footer();
 } /* show() */

@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,10 +41,12 @@ constexpr char foraging_task::kHarvesterName[];
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const struct ta::task_params* params,
+                             const struct ta::task_allocation_params* params,
                              std::unique_ptr<ta::taskable> mechanism)
-    : base_foraging_task(&params->abort),
-      polled_task(name, params, std::move(mechanism)) {}
+    : polled_task(name,
+                  &params->abort,
+                  &params->exec_est.ema,
+                  std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -54,5 +56,9 @@ __rcsw_pure double foraging_task::current_time(void) const {
       ->base_sensors()
       ->tick();
 } /* current_time() */
+
+bool foraging_task::task_in_depth1(const polled_task* const task) {
+  return task->name() == kCollectorName || task->name() == kHarvesterName;
+} /* task_in_depth1() */
 
 NS_END(depth1, tasks, fordyca);

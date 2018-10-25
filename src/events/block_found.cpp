@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
@@ -42,11 +44,16 @@ block_found::block_found(std::unique_ptr<representation::base_block> block)
       ER_CLIENT_INIT("fordyca.events.block_found"),
       m_block(std::move(block)) {}
 
+block_found::block_found(const std::shared_ptr<representation::base_block>& block)
+    : perceived_cell_op(block->discrete_loc().first,
+                        block->discrete_loc().second),
+      ER_CLIENT_INIT("fordyca.events.block_found"),
+      m_block(block) {}
+
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
 void block_found::visit(ds::cell2D& cell) {
-  ER_ASSERT(nullptr != m_block, "nullptr block?");
   cell.entity(m_block);
   cell.fsm().accept(*this);
 } /* visit() */
@@ -64,11 +71,18 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void block_found::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   swarm::pheromone_density& density =
-      map.access<occupancy_grid::kPheromone>(cell_op::x(), cell_op::y());
+      map.access<occupancy_grid::kPheromone>(x(), y());
 
+  if (!cell.state_is_known()) {
+    map.known_cells_inc();
+    ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
+              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              map.known_cell_count(),
+              map.xdsize(),
+              map.ydsize());
+  }
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
    * cell is coming back into our LOS with a block, when it contained a cache
@@ -118,6 +132,23 @@ void block_found::visit(ds::perceived_arena_map& map) {
      */
     cell.accept(*this);
   }
+  ER_ASSERT(cell.state_has_block(),
+            "Cell@(%u,%u) not in HAS_BLOCK",
+            cell.loc().first,
+            cell.loc().second);
+  ER_ASSERT(cell.block()->id() == m_block->id(),
+            "Block for cell@(%u,%u) ID mismatch: %d/%d",
+            cell.loc().first,
+            cell.loc().second,
+            m_block->id(),
+            cell.block()->id());
+} /* visit() */
+
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void block_found::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.perception()->map()->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -27,6 +27,7 @@
 #include <string>
 
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -47,19 +48,25 @@ NS_START(controller, depth2);
  * @brief A helper class to offload initialization of the task tree for depth2
  * foraging.
  */
-class tasking_initializer : public depth1::tasking_initializer {
+class tasking_initializer : public depth1::tasking_initializer,
+                            public er::client<tasking_initializer> {
  public:
   tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
-  ~tasking_initializer(void);
+  ~tasking_initializer(void) override;
 
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>
+  std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth2::controller_repository *const param_repo);
 
+  using depth1::tasking_initializer::tasking_map;
+
  protected:
-  void depth2_tasking_init(params::depth2::controller_repository* param_repo);
+  tasking_map depth2_tasks_create(
+      params::depth2::controller_repository* task_repo);
+  void depth2_exec_est_init(params::depth2::controller_repository* task_repo,
+                            const tasking_map& map);
 };
 
 NS_END(depth2, controller, fordyca);
