@@ -24,21 +24,26 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <map>
+#include <string>
+
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ta = rcppsw::task_allocation;
+namespace rcppsw { namespace task_allocation { class polled_task; }}
 NS_START(fordyca);
 namespace params {
+struct oracle_params;
 namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
 class cache_selection_matrix;
 NS_START(depth1);
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -57,15 +62,21 @@ class tasking_initializer : public depth0::stateful_tasking_initializer,
                       const controller::cache_selection_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
-  ~tasking_initializer(void);
+
+  ~tasking_initializer(void) override;
   tasking_initializer& operator=(const tasking_initializer& other) = delete;
   tasking_initializer(const tasking_initializer& other) = delete;
 
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>
+  std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth1::controller_repository *const controller_repo);
 
+  using tasking_map = std::map<std::string, ta::polled_task*>;
+
  protected:
-  void depth1_tasking_init(params::depth1::controller_repository* task_repo);
+  tasking_map depth1_tasks_create(
+      params::depth1::controller_repository* task_repo);
+  void depth1_exec_est_init(params::depth1::controller_repository* task_repo,
+                            const tasking_map& map);
   const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:

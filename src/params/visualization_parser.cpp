@@ -41,10 +41,10 @@ void visualization_parser::parse(const ticpp::Element& node) {
     ticpp::Element vnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(vnode, m_params, robot_id);
-    XML_PARSE_PARAM(vnode, m_params, robot_los);
-    XML_PARSE_PARAM(vnode, m_params, robot_task);
-    XML_PARSE_PARAM(vnode, m_params, block_id);
+    XML_PARSE_ATTR(vnode, m_params, robot_id);
+    XML_PARSE_ATTR(vnode, m_params, robot_los);
+    XML_PARSE_ATTR(vnode, m_params, robot_task);
+    XML_PARSE_ATTR(vnode, m_params, block_id);
     m_parsed = true;
   }
 } /* parse() */
@@ -55,10 +55,10 @@ void visualization_parser::show(std::ostream& stream) const {
            << build_footer();
     return;
   }
-  stream << build_header() << XML_PARAM_STR(m_params, robot_id) << std::endl
-         << XML_PARAM_STR(m_params, robot_los) << std::endl
-         << XML_PARAM_STR(m_params, robot_task) << std::endl
-         << XML_PARAM_STR(m_params, block_id) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, robot_id) << std::endl
+         << XML_ATTR_STR(m_params, robot_los) << std::endl
+         << XML_ATTR_STR(m_params, robot_task) << std::endl
+         << XML_ATTR_STR(m_params, block_id) << std::endl
          << build_footer();
 } /* show() */
 

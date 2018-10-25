@@ -32,8 +32,8 @@
  ******************************************************************************/
 namespace rcppsw {
 namespace task_allocation {
-class bifurcating_tdgraph_executive;
-class bifurcating_tdgraph;
+class bi_tdgraph_executive;
+class bi_tdgraph;
 }}
 namespace ta = rcppsw::task_allocation;
 
@@ -68,7 +68,7 @@ class stateful_tasking_initializer : public er::client<stateful_tasking_initiali
   stateful_tasking_initializer& operator=(const stateful_tasking_initializer& other) = delete;
   stateful_tasking_initializer(const stateful_tasking_initializer& other) = delete;
 
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>
+  std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(params::depth0::stateful_controller_repository *const stateful_repo);
 
  protected:
@@ -77,8 +77,8 @@ class stateful_tasking_initializer : public er::client<stateful_tasking_initiali
   base_perception_subsystem* perception(void) { return m_perception; }
 
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
-  ta::bifurcating_tdgraph* graph(void) { return m_graph; }
-  const ta::bifurcating_tdgraph* graph(void) const { return m_graph; }
+  ta::bi_tdgraph* graph(void) { return m_graph; }
+  const ta::bi_tdgraph* graph(void) const { return m_graph; }
   const block_selection_matrix* block_sel_matrix(void) const { return mc_sel_matrix; }
 
  private:
@@ -86,7 +86,7 @@ class stateful_tasking_initializer : public er::client<stateful_tasking_initiali
   controller::saa_subsystem* const    m_saa;
   base_perception_subsystem* const    m_perception;
   const block_selection_matrix* const mc_sel_matrix;
-  ta::bifurcating_tdgraph*            m_graph;
+  ta::bi_tdgraph*                     m_graph;
   // clang-format on
 };
 

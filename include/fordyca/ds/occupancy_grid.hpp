@@ -25,6 +25,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <tuple>
 
 #include "fordyca/ds/cell2D.hpp"
@@ -37,6 +38,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace events {
+class cell_unknown;
+class cell_empty;
+} // namespace events
 namespace params {
 struct occupancy_grid_params;
 }
@@ -54,6 +59,9 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  * @brief Multilayered grid of \ref cell2D and \ref rcppsw::swarm::pheromone_density.
  */
 class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
+                       public visitor::accept_set<occupancy_grid,
+                                                  events::cell_unknown,
+                                                  events::cell_empty>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   constexpr static uint kPheromone = 0;
@@ -76,13 +84,18 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
     return m_pheromone_repeat_deposit;
   }
 
+  uint known_cell_count(void) const { return m_known_cell_count; }
+  void known_cells_inc(void) { ++m_known_cell_count; }
+  void known_cells_dec(void) { --m_known_cell_count; }
+
  private:
-  void cell_update(uint i, uint j);
+  void cell_state_update(uint i, uint j);
   void cell_init(uint i, uint j, double pheromone_rho);
 
   // clang-format off
   static constexpr double             kEPSILON{0.0001};
 
+  uint                                m_known_cell_count{0};
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
   // clang-format on

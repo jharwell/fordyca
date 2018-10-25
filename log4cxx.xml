@@ -19,16 +19,29 @@
   <category name="fordyca.events" >
     <priority value ="all" />
   </category>
+  <category name="rcppsw.ta.tdgraph" >
+    <priority value ="all" />
+  </category>
+    <category name="fordyca.support.tasking_oracle" >
+    <priority value ="debug" />
+  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
   <category name="fordyca.fsm.depth0" >
     <priority value ="all" />
   </category>
-    <category name="fordyca.loop.support.block_dist" >
+  <category name="fordyca.loop.support.block_dist" >
     <priority value ="info" />
   </category>
-  <!-- <category name="foobar.test.child" > -->
-  <!-- </category> -->
+  <category name="fordyca.ds.occupancy_grid" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.controller.perception" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.ds.arena_map" >
+    <priority value ="info" />
+  </category>
 
  </log4j:configuration>

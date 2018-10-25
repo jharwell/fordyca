@@ -75,7 +75,7 @@ bool random_distributor::distribute_block(
   if (!find_avail_coord(entities, coord)) {
     return false;
   }
-  ER_DEBUG("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
+  ER_INFO("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
            coord[0],
            coord[1],
            coord[2],

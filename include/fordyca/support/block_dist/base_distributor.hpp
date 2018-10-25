@@ -25,6 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <algorithm>
+#include <vector>
+
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -53,6 +56,12 @@ class base_distributor {
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using entity_list = std::list<const representation::multicell_entity*>;
 
+  /**
+   * @brief How many times to attempt to distribute all blocks before giving up,
+   * causing an assertion failure on distribution.
+   */
+  static constexpr uint kMAX_DIST_TRIES = 100;
+
   base_distributor(void) = default;
   virtual ~base_distributor(void) = default;
 
@@ -72,7 +81,13 @@ class base_distributor {
    * @return \c TRUE iff all block distributions were successful, \c FALSE
    * otherwise.
    */
-  virtual bool distribute_blocks(block_vector& blocks, entity_list& entities) = 0;
+  virtual bool distribute_blocks(block_vector& blocks, entity_list& entities) {
+    return std::all_of(blocks.begin(),
+                       blocks.end(),
+                       [&](std::shared_ptr<representation::base_block>& b) {
+                         return distribute_block(b, entities);
+                       });
+  }
 };
 
 NS_END(block_dist, support, fordyca);

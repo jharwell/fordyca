@@ -33,7 +33,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,9 +44,10 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-harvester::harvester(const struct task_allocation::task_params* params,
+harvester::harvester(const struct task_allocation::task_allocation_params* params,
                      std::unique_ptr<task_allocation::taskable> mechanism)
-    : foraging_task(kHarvesterName, params, std::move(mechanism)) {}
+    : foraging_task(kHarvesterName, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth1.harvester") {}
 
 /*******************************************************************************
  * Member Functions
@@ -54,43 +55,47 @@ harvester::harvester(const struct task_allocation::task_params* params,
 void harvester::task_start(const task_allocation::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
   task_allocation::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
-double harvester::calc_abort_prob(void) {
+double harvester::abort_prob_calc(void) {
   /*
    * Harvesters always have a small chance of aborting their task when not at a
    * task interface. Having the harvester task un-abortable until AFTER it
    * acquires a block can cause it to get stuck and not switch to another task
    * if it cannot find a block anywhere. See #232.
    */
-  auto* fsm =
-      static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
-    return abort_prob().calc(executable_task::interface_time(),
-                             executable_task::interface_estimate());
+  if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
   }
-  return abort_prob().calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
 } /* calc_abort_prob() */
 
-double harvester::calc_interface_time(double start_time) {
+double harvester::interface_time_calc(uint interface, double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
+
+void harvester::active_interface_update(int) {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
-    return current_time() - start_time;
-  }
 
-  if (fsm->goal_acquired() && fsm::block_transporter::goal_type::kExistingCache ==
-                                  fsm->block_transport_goal()) {
-    if (!interface_complete()) {
-      interface_complete(true);
-      reset_interface_time();
+  if (fsm->goal_acquired() &&
+      transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_DEBUG("Interface finished at timestep %f", current_time());
     }
-    return interface_time();
+    ER_TRACE("Interface time: %f", interface_time(0));
+  } else if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+      ER_DEBUG("Interface start at timestep %f", current_time());
+    }
   }
-  return 0.0;
-} /* calc_interface_time() */
+} /* active_interface_update() */
 
 /*******************************************************************************
  * Event Handling

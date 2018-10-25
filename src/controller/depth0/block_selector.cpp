@@ -47,7 +47,7 @@ representation::perceived_block block_selector::calc_best(
   double max_utility = 0.0;
   representation::perceived_block best{nullptr, {}};
 
-  ER_ASSERT(!blocks.empty(), "no known perceived blocks");
+  ER_ASSERT(!blocks.empty(), "No known perceived blocks");
   for (auto& b : blocks) {
     if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
       ER_DEBUG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",
@@ -68,7 +68,7 @@ representation::perceived_block block_selector::calc_best(
             ? boost::get<double>(mc_matrix->find("cube_priority")->second)
             : boost::get<double>(mc_matrix->find("ramp_priority")->second);
     argos::CVector2 nest_loc =
-        boost::get<argos::CVector2>(mc_matrix->find("nest_center")->second);
+        boost::get<argos::CVector2>(mc_matrix->find("nest_loc")->second);
 
     double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
         robot_loc, b.density.last_result(), priority);

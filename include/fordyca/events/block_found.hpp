@@ -55,6 +55,7 @@ class block_found : public perceived_cell_op,
                     public rcppsw::er::client<block_found> {
  public:
   explicit block_found(std::unique_ptr<representation::base_block> block);
+  explicit block_found(const std::shared_ptr<representation::base_block>& block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
@@ -63,11 +64,10 @@ class block_found : public perceived_cell_op,
   /* stateful foraging */
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(controller::depth0::stateful_foraging_controller&) override {}
   void visit(ds::perceived_arena_map& map) override;
 
-  /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller&) override {}
+  /* depth2 foraging */
+  void visit(controller::depth2::greedy_recpart_controller& controller) override;
 
  private:
   // clang-format off

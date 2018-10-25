@@ -31,6 +31,7 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,9 +50,10 @@ NS_START(fordyca, tasks, depth1);
  */
 class harvester : public foraging_task,
                   public existing_cache_interactor,
-                  public free_block_interactor {
+                  public free_block_interactor,
+                  public rcppsw::er::client<harvester> {
  public:
-  harvester(const struct ta::task_params* params,
+  harvester(const struct ta::task_allocation_params* params,
             std::unique_ptr<ta::taskable> mechanism);
 
   /*
@@ -80,14 +82,13 @@ class harvester : public foraging_task,
 
   /* task metrics */
   bool task_at_interface(void) const override;
-  double task_last_exec_time(void) const override { return last_exec_time(); }
-  double task_last_interface_time(void) const override { return last_interface_time(); }
   bool task_completed(void) const override { return task_finished(); }
-  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument*) override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double start_time) override;
+  double abort_prob_calc(void) override;
+  double interface_time_calc(uint interface,
+                             double start_time) override;
+  void active_interface_update(int) override;
 };
 
 NS_END(depth1, tasks, fordyca);

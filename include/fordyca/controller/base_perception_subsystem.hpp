@@ -64,6 +64,14 @@ class base_perception_subsystem
   base_perception_subsystem(const params::perception_params* const params,
                             const std::string& id);
 
+  /* world model metrics */
+  uint cell_state_inaccuracies(uint state) const override {
+    return m_cell_stats[state];
+  }
+  void reset_metrics(void) override;
+  double known_percentage(void) const override;
+  double unknown_percentage(void) const override;
+
   /**
    * @brief Update the robot's perception of the environment, passing it its
    * current line of sight.
@@ -79,12 +87,6 @@ class base_perception_subsystem
 
   const ds::perceived_arena_map* map(void) const { return m_map.get(); }
   ds::perceived_arena_map* map(void) { return m_map.get(); }
-
-  /* metrics */
-  uint cell_state_inaccuracies(uint state) const override {
-    return m_cell_stats[state];
-  }
-  void reset_metrics(void) override;
 
  protected:
   /*

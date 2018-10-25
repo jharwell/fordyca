@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/cache_creator.hpp"
+#include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,17 +42,20 @@ NS_START(fordyca, support, depth1);
  * free blocks and grouping them together into a cache at the specified
  * location.
  */
-class static_cache_creator : public cache_creator,
+class static_cache_creator : public base_cache_creator,
                              public er::client<static_cache_creator> {
  public:
-  static_cache_creator(ds::arena_grid& grid,
+  static_cache_creator(ds::arena_grid* grid,
                        const argos::CVector2& center,
-                       double cache_size, double resolution);
+                       double cache_dim);
 
-  cache_vector create_all(block_vector& blocks) override;
+  cache_vector create_all(const cache_vector& existing_caches,
+                          block_vector& blocks) override;
 
  private:
+  // clang-format off
   argos::CVector2 m_center;
+  // clang-format on
 };
 
 NS_END(depth1, support, fordyca);

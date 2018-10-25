@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,10 +47,9 @@ NS_START(fordyca, tasks, depth0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist : public ta::partitionable_polled_task,
-                   public foraging_task {
+class generalist : public foraging_task {
  public:
-  generalist(const struct ta::partitionable_task_params* params,
+  generalist(const ta::task_allocation_params* params,
              std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */
@@ -71,16 +69,14 @@ class generalist : public ta::partitionable_polled_task,
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
-  double task_last_exec_time(void) const override { return last_exec_time(); }
-  double task_last_interface_time(void) const override { return last_interface_time(); }
   bool task_completed(void) const override { return task_finished(); }
-  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double) override { return 0.0; }
+  double interface_time_calc(uint, double) override { return 0.0; }
+  void active_interface_update(int) override {}
+  double abort_prob_calc(void) override;
 };
 
 NS_END(depth0, tasks, fordyca);

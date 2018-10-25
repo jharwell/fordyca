@@ -72,7 +72,8 @@ bool acquire_cache_site_fsm::acquire_known_goal(void) {
     controller::depth2::cache_site_selector s(mc_matrix);
     tasks::vector_argument v(
         vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
-        s.calc_best(std::list<representation::perceived_cache>(),
+        s.calc_best(map()->caches(),
+                    map()->blocks(),
                     saa_subsystem()->sensing()->position()));
     explore_fsm().task_reset();
     vector_fsm().task_reset();

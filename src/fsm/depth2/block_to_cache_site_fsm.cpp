@@ -44,10 +44,12 @@ block_to_cache_site_fsm::block_to_cache_site_fsm(
  * FSM Metrics
  ******************************************************************************/
 acquisition_goal_type block_to_cache_site_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_FREE_BLOCK == current_state()) {
-    return block_fsm().acquisition_goal();
-  } else if (ST_TRANSPORT_TO_GOAL == current_state()) {
-    return m_cache_fsm.acquisition_goal();
+  if (block_fsm().task_running() ||
+      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return acquisition_goal_type::kBlock;
+  } else if (m_cache_fsm.task_running() ||
+             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return acquisition_goal_type::kCacheSite;
   }
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
