@@ -51,6 +51,7 @@ namespace fsm {
 namespace depth0 {
 class stateless_fsm;
 class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
 namespace depth1 {
 class block_to_goal_fsm;
@@ -94,6 +95,7 @@ class block_vanished
                                 tasks::depth2::cache_finisher,
                                 fsm::depth0::stateless_fsm,
                                 fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
   explicit block_vanished(uint block_id);
@@ -110,6 +112,7 @@ class block_vanished
   void visit(fsm::depth0::stateful_fsm& fsm) override;
 
   /* depth1 foraging */
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
   void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
   void visit(

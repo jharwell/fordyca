@@ -120,7 +120,7 @@ class cached_block_pickup_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    if (p.id() == loop_utils::robot_on_cache(controller, *m_map)) {
+    if (p.id() != loop_utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());

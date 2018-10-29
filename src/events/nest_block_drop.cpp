@@ -87,8 +87,8 @@ void nest_block_drop::visit(fsm::depth0::stateless_fsm& fsm) {
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
-  auto task = dynamic_cast<tasks::nest_interactor*>(controller.current_task());
-  task->accept(*this);
+
+  controller.fsm()->accept(*this);
   controller.block(nullptr);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
@@ -119,7 +119,7 @@ void nest_block_drop::visit(
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::stateful_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth1::collector& task) {
@@ -128,6 +128,11 @@ void nest_block_drop::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
+  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
+                   state_machine::event_type::NORMAL);
+} /* visit() */
+
+void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

@@ -16,7 +16,7 @@ This is the main entry point for getting started on the project.
 
    - Qt5 (`qtbase5-dev` on ubuntu)
    - NLopt (`libnlopt-dev` on ubuntu)
-   
+
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
@@ -144,6 +144,10 @@ access to that directory as part of the gini group.
      resulting in a dynamic linking error.
 
   3. Make sure you have the necessary environment variables set correctly.
+
+  4. If you get a `std::bad_cast` exception (or something similar), then verify
+     that the name of [controller, loop functions, qt user functions], are
+     compatible (i.e. have the same name/are from the same depth).
 
 ## Contributing
 

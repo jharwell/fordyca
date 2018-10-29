@@ -27,7 +27,6 @@
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -250,22 +249,21 @@ void depth1_loop_functions::pre_step_final(void) {
    * The cache is recreated with a probability that depends on the relative
    * ratio between the # foragers and the # collectors. If there are more
    * foragers than collectors, then the cache will be recreated very quickly. If
-   * there are more collectors than foragpers, then it will probably not be
+   * there are more collectors than foragers, then it will probably not be
    * recreated immediately. And if there are no foragers, there is no chance
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
   if (arena_map()->caches().empty()) {
     auto& collector =
         static_cast<rcppsw::metrics::tasks::bi_tab_metrics_collector&>(
-            *(*m_metrics_agg)["tasks::generalist_tab"]);
+            *(*m_metrics_agg)["tasks::tab::generalist"]);
     uint n_harvesters = collector.int_subtask1_count();
     uint n_collectors = collector.int_subtask2_count();
-    math::cache_respawn_probability p(mc_cache_respawn_scale_factor);
-    if (p.calc(n_harvesters, n_collectors) >=
-        static_cast<double>(std::rand()) / RAND_MAX) {
-      auto pair = m_cache_manager->create(arena_map()->blocks());
+    auto pair = m_cache_manager->create_conditional(arena_map()->blocks(),
+                                                    n_harvesters,
+                                                    n_collectors);
 
-      if (pair.first) {
+    if (pair.first) {
         arena_map()->caches_add(pair.second);
         __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
             arena_map()->caches()[0]->discrete_loc());
@@ -279,7 +277,7 @@ void depth1_loop_functions::pre_step_final(void) {
         ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
       }
     }
-  }
+
   if (arena_map()->caches_removed() > 0) {
     m_cache_manager->cache_depleted();
     floor()->SetChanged();
@@ -299,12 +297,12 @@ void depth1_loop_functions::cache_handling_init(
      * Regardless of how many foragers/etc there are, always create an
      * initial cache.
      */
-    m_cache_loc = argos::CVector2((arena_map()->xrsize() +
-                                   arena_map()->nest().real_loc().GetX()) / 2.0,
-                                  arena_map()->nest().real_loc().GetY());
+    argos::CVector2 cache_loc = argos::CVector2((arena_map()->xrsize() +
+                                                 arena_map()->nest().real_loc().GetX()) / 2.0,
+                                                arena_map()->nest().real_loc().GetY());
 
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
-        cachep, &arena_map()->decoratee(), m_cache_loc);
+        cachep, &arena_map()->decoratee(), cache_loc);
 
     /* return value ignored at this level (for now...) */
     auto pair = m_cache_manager->create(arena_map()->blocks());

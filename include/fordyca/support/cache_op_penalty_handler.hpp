@@ -108,6 +108,7 @@ class cache_op_penalty_handler
 
     uint penalty = deconflict_penalty_finish(timestep);
     int id = loop_utils::robot_on_cache(controller, *m_map);
+    ER_ASSERT(-1 != id, "Robot not in cache?");
     ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
             loop_utils::robot_id(controller),
             id,
@@ -116,7 +117,6 @@ class cache_op_penalty_handler
             penalty,
             src);
 
-    ER_ASSERT(-1 != id, "Robot not in cache?");
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
     return true;

@@ -70,27 +70,27 @@ argos::CVector2 cache_site_selector::calc_best(
   return argos::CVector2(best[0], best[1]);
 } /* calc_best() */
 
-double __cache_constraint_func(const std::vector<double>& x,
-                                            std::vector<double>& ,
-                                            void *data) {
+__rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
+                                           std::vector<double>& ,
+                                           void *data) {
   cache_site_selector::cache_constraint_data* c =
       reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
-    return (argos::CVector2(x[0], x[1]) -
-            c->cache->real_loc()).Length() - c->cache_prox_dist;
+  return (argos::CVector2(x[0], x[1]) -
+          c->cache->real_loc()).Length() - c->cache_prox_dist;
 } /* __cache_constraint_func() */
 
-double __block_constraint_func(const std::vector<double>& x,
-                               std::vector<double>& ,
-                               void *data) {
+__rcsw_pure double __block_constraint_func(const std::vector<double>& x,
+                                           std::vector<double>& ,
+                                           void *data) {
   cache_site_selector::block_constraint_data* c =
       reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   return (argos::CVector2(x[0], x[1]) -
           c->block->real_loc()).Length() - c->block_prox_dist;
 } /* __block_constraint_func() */
 
-double __site_utility_func(const std::vector<double>& x,
-                               std::vector<double>& ,
-                               void *data) {
+__rcsw_pure double __site_utility_func(const std::vector<double>& x,
+                                       std::vector<double>& ,
+                                       void *data) {
   cache_site_selector::site_utility_data* d =
       reinterpret_cast<cache_site_selector::site_utility_data*>(data);
   double robot_dist = (argos::CVector2(x[0], x[1]) - d->robot_loc).Length();

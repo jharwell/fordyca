@@ -99,15 +99,6 @@ void stateful_loop_functions::controller_configure(controller::base_controller& 
   if (nullptr != vparams) {
     stateful.display_los(vparams->robot_los);
   }
-
-  stateful.executive()->task_finish_notify(
-      std::bind(&stateful_metrics_aggregator::task_finish_or_abort_cb,
-                m_metrics_agg.get(),
-                std::placeholders::_1));
-  stateful.executive()->task_abort_notify(
-      std::bind(&stateful_metrics_aggregator::task_finish_or_abort_cb,
-                m_metrics_agg.get(),
-                std::placeholders::_1));
 } /* controller_configure() */
 
 void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {

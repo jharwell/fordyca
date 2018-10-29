@@ -184,7 +184,6 @@ void tasking_initializer::depth2_exec_est_init(
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
     params::depth2::controller_repository* const param_repo) {
-  stateful_tasking_init(param_repo);
 
   auto* executivep = param_repo->parse_results<ta::task_executive_params>();
   auto map1 = depth1_tasks_create(param_repo);

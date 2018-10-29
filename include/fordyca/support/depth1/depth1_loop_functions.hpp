@@ -97,8 +97,6 @@ class depth1_loop_functions : public depth0::stateful_loop_functions,
   void oracle_init(void);
 
   // clang-format off
-  double                                     mc_cache_respawn_scale_factor{0.0};
-  argos::CVector2                            m_cache_loc{};
   std::unique_ptr<interactor>                m_interactor{};
   std::unique_ptr<class tasking_oracle>      m_tasking_oracle;
   std::unique_ptr<depth1_metrics_aggregator> m_metrics_agg;
