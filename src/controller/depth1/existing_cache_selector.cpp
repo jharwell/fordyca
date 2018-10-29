@@ -67,7 +67,7 @@ representation::perceived_cache existing_cache_selector::calc_best(
     }
     math::existing_cache_utility u(c.ent->real_loc(),
                                    boost::get<argos::CVector2>(
-                                       mc_matrix->find("nest_center")->second));
+                                       mc_matrix->find("nest_loc")->second));
 
     double utility =
         u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());

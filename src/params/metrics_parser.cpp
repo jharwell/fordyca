@@ -60,9 +60,9 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(mnode, m_params, task_execution_cache_transferer_fname);
     XML_PARSE_ATTR(mnode, m_params, task_execution_cache_collector_fname);
 
-    XML_PARSE_ATTR(mnode, m_params, task_generalist_tab_fname);
-    XML_PARSE_ATTR(mnode, m_params, task_collector_tab_fname);
-    XML_PARSE_ATTR(mnode, m_params, task_harvester_tab_fname);
+    XML_PARSE_ATTR(mnode, m_params, task_tab_generalist_fname);
+    XML_PARSE_ATTR(mnode, m_params, task_tab_collector_fname);
+    XML_PARSE_ATTR(mnode, m_params, task_tab_harvester_fname);
 
     XML_PARSE_ATTR(mnode, m_params, task_distribution_fname);
 
@@ -92,7 +92,9 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_ATTR_STR(m_params, task_execution_generalist_fname) << std::endl
          << XML_ATTR_STR(m_params, task_execution_collector_fname) << std::endl
          << XML_ATTR_STR(m_params, task_execution_harvester_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_generalist_tab_fname) << std::endl
+         << XML_ATTR_STR(m_params, task_tab_generalist_fname) << std::endl
+         << XML_ATTR_STR(m_params, task_tab_harvester_fname) << std::endl
+         << XML_ATTR_STR(m_params, task_tab_collector_fname) << std::endl
          << XML_ATTR_STR(m_params, task_distribution_fname) << std::endl
          << XML_ATTR_STR(m_params, fsm_collision_fname) << std::endl
          << XML_ATTR_STR(m_params, fsm_movement_fname) << std::endl

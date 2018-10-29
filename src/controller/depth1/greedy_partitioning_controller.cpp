@@ -50,7 +50,8 @@ using ds::occupancy_grid;
  ******************************************************************************/
 greedy_partitioning_controller::greedy_partitioning_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.depth1.greedy_partitioning"),
-      m_cache_sel_matrix() {}
+      m_cache_sel_matrix(),
+      m_executive() {}
 
 greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
 
@@ -123,21 +124,55 @@ void greedy_partitioning_controller::non_unique_init(
   m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(cache_mat,
                                                                    block_mat->nest);
   block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(block_mat));
+  m_executive = tasking_initializer(block_sel_matrix(),
+                                    m_cache_sel_matrix.get(),
+                                    saa_subsystem(),
+                                    perception())(param_repo);
 } /* non_unique_init() */
-
-__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(
-    void) {
-  return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
-} /* current_task() */
-
-__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::
-    current_task(void) const {
-  return const_cast<greedy_partitioning_controller*>(this)->current_task();
-} /* current_task() */
 
 void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
+
+__rcsw_pure const ta::bi_tab* greedy_partitioning_controller::active_tab(void) const {
+  return m_executive->active_tab();
+} /* active_tab() */
+
+__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(void) {
+  return dynamic_cast<tasks::base_foraging_task*>(
+      m_executive.get()->current_task());
+} /* current_task() */
+
+__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::current_task(
+    void) const {
+  return const_cast<greedy_partitioning_controller*>(this)->current_task();
+} /* current_task() */
+
+void greedy_partitioning_controller::executive(
+    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
+  m_executive = std::move(executive);
+}
+
+/*******************************************************************************
+ * Block Transportation
+ ******************************************************************************/
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        greedy_partitioning_controller,
+                        block_transport_goal,
+                       current_task());
+
+/*******************************************************************************
+ * Goal Acquisition
+ ******************************************************************************/
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                   greedy_partitioning_controller,
+                   acquisition_goal,
+                        current_task());
+
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        greedy_partitioning_controller,
+                        goal_acquired,
+                        current_task());
 
 /*******************************************************************************
  * Task Distribution Metrics
