@@ -37,6 +37,19 @@ block_selection_matrix::block_selection_matrix(
   this->insert(std::make_pair("nest_loc", params->nest));
   this->insert(std::make_pair("cube_priority", params->priorities.cube));
   this->insert(std::make_pair("ramp_priority", params->priorities.ramp));
+  this->insert(std::make_pair("sel_exceptions", std::vector<int>()));
 }
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void block_selection_matrix::sel_exception_add(int id) {
+  boost::get<std::vector<int>>(this->find("sel_exceptions")->second).push_back(id);
+} /* sel_exception_add() */
+
+void block_selection_matrix::sel_exceptions_clear(void) {
+  boost::get<std::vector<int>>(this->operator[]("sel_exceptions")).clear();
+} /* sel_exceptions_clear() */
+
 
 NS_END(controller, fordyca);

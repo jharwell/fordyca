@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/params/base_params.hpp"
+#include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,8 +43,11 @@ NS_START(fordyca, params);
  * @brief XML parameters for the \ref cache_selection_matrix
  */
 struct cache_selection_matrix_params : public rcppsw::params::base_params {
-  double cache_prox_dist;
-  double block_prox_dist;
+  double                      cache_prox_dist{0.0};
+  double                      block_prox_dist{0.0};
+  double                      nest_prox_dist{0.0};
+  rcppsw::math::range<uint>   site_xrange{0, 0};
+  rcppsw::math::range<uint>   site_yrange{0, 0};
 };
 
 NS_END(params, fordyca);

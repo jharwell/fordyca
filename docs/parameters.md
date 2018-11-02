@@ -14,9 +14,19 @@ The following root XML tags are defined:
                      continuous world into a grid, and the objects it tracks
                      within the grid.
 
-- `task_executive` - Parameters pertaining to tasks/task allocation.
+- `task_executive` - Parameters pertaining to the task executive (the entitity
+                     responsible for managing/running tasks after they have been
+                     allocated).
 
-- `task_exec_estimates` - Parameters pertaining to initial tasks time estimates.
+- `task_allocation` - Parameters pertaining to task allocation.
+
+- `block_selection_matrix` - Parameters used by robots when selecting which
+                             block to acquire/obtain as part of the task they
+                             are currently executing.
+
+- `cache_selection_matrix` - Parameters used by robots when selecting which
+                             cache to acquire/obtain as part of the task they
+                             are currently executing.
 
 - `sensing` -  Parameters for robot sensors.
 
@@ -43,8 +53,8 @@ The following root XML tags are defined:
 
 - `repeat_deposit` - If TRUE, then repeated pheromone deposits for cells
                      containing blocks/caches a robot already knows about will
-                     be enabled. `rho` should be possibly be updated
-                     accordingly.
+                     be enabled. `rho` should be updated accordingly, probably
+                     to a larger value to enable faster decay.
 
 #### `grid`
 
@@ -58,13 +68,52 @@ The following root XML tags are defined:
 
 ### `task_executive`
 
-#### `estimation`
+- `update_exec_ests` - If TRUE, then the executive will use the elapsed time
+                       since a task started to update the task time
+                       estimate. Estimate is updated on both abort an
+                       completion.
 
-`alpha`- Parameter for exponential weighting of a moving estimate of the true
-         execution time of a task.
+- `update_interface_ests` - If TRUE, then the executive will use the calculated
+                            interface time for a task to update the interface
+                            estimate for the task. Estimate is updated on both
+                            abort an completion.
 
-#### `task_abort`
-- `reactivty` - Once the `abort_offset` is tripped, this parameter controls how
+- `tab_init_method` - When performing initial task allocation, an active Task
+                      Allocation Block (TAB), consisting of a root has and two
+                      sequentially interdependent subtasks has to be
+                      selected. This parameter controls the selection
+                      method. Valid values are:
+
+    - `root` - Use the root TAB as the initially active TAB.
+
+    - `random` - Choose a random TAB as the initially active TAB.
+
+    - `max_depth` - Choose a random TAB from among those at the greatest depth
+                    within the task decomposition graph that is passed to the
+                    executive.
+
+    This parameter is current experimental, and only affects depth2
+    simulations.
+
+### `task_allocation`
+
+Several subsections in this section sigmoid based functions for choosing between
+alternatives, with the input src and sigmoid method varying.
+
+#### `src_sigmoid_sel` - Sourced sigmoid activation function
+
+- `input_src` - Can be `exec` or `interface`, indicating that estimates of
+                execution/interface times should be used in the selection
+                process.
+
+##### `sigmoid_sel` - Sigmoid-based method for selecting SOMETHING
+
+- `method` - Unused for task abort, but should still exist, as future
+             implementations may define different sigmoid based methods.
+
+###### `sigmoid` - Actual sigmoid parameters
+
+- `reactivty` - Once the `offset` is tripped, this parameter controls how
                 fast the probability a robot aborts its current task grows.
 
 - `offset` - A positive proportition indicating what ratio of measured execution
@@ -72,11 +121,15 @@ The following root XML tags are defined:
              the task is considered to be the threshold for a task taking too
              long, and should be aborted.
 
-#### `task_partition`
+- `gamma` - A scaling factor that is applied to the overall calculated
+            probability.
 
-- `method` - If `pini2011`, then robots will use the method described in the
-             corresponding paper to determine if a task should be partitioned or
-             not when deciding on their next task allocation.
+#### `task_abort`
+
+Uses `src_sigmoid_sel`, with an empty `method` tag to perform the stochastic
+abort decision, which is calculated each timestep.
+
+#### `task_partition`
 
 - `always_partition` - If `true`, then robots will always choose to partition a
                        task, given the chance. Has no effect if `false`.
@@ -84,54 +137,76 @@ The following root XML tags are defined:
 - `never_partition` - If `true`, then robots will never choose to partition a
                        task, given the chance. Has no effect if `false`.
 
-- `reactivty` - Once the partition offset is tripped, this parameter controls
-                how fast the probability a robot will partition its next task
-                allocation grows.
-
-- `offset` - A positive proportition indicating what ratio of execution times
-             for unpartitioned task to sum of subtasks is considered to be
-             acceptable for continuing to partition/not partition the task.
+Uses `src_sigmoid_sel` with a `method` tag that can be one of [`pini2011`] for
+performing the stochastic partitioning decision. Calculated once upon each task
+allocation, after the previous task is finished or aborted.
 
 #### `subtask_selection`
 
-- `method` - If `random`, then if a robot choosing to employ partitioning for a
-             given task it will select one of the subtasks randomly. If
-             `brutcshy2014`, then it will use the method described in the
-             corresponding paper, which using estimates of waiting time at the
-             task interface for selection. If `harwell2018`, it will use the
-             same method as `brutcshy2014`, but use estimates of overall
-             execution time as input instead.
-
-- `offset` - A positive proportition indicating what ratio of execution times
-             for the two subtasks will cause the subtask switching probability
-             to start to change drastically.
-
-- `reactivty` - Once the offset is tripped, this parameter controls how fast the
-                subtask switching probability grows.
-
-- `gamma` - Multiplicative factor used by `brutcshy2014`. I think.
+Uses `src_sigmoid_sel` with a `method` tag that can be one of [`harwell2018`,
+`random`] to perform stochastic subtask selection if partitioning is employed.
 
 #### `task_exec_estimates`
 
-- `enabled` - If `true`, then all estimates of task execution times are
-              initialized randomly within the specified ranges, rather than with
-              zero, in order to avoid any possibly weird behavior on system
-              startup. Has no effect if `false`.
+- `seed_enabled` - If `true`, then all estimates of task execution times are
+                   initialized randomly within the specified ranges, rather than
+                   with zero, in order to avoid any possibly weird behavior on
+                   system startup. Has no effect if `false`.
 
-- `generalist_range` - Takes a pair like so: `100:200` specifying the range of
-  the uniform random distribution over which a robots' initial estimation of the
-  duration of the generalist task will be drawn. Only used if `enabled` is
-  `true`.
+- `<task name>_range` - Takes a pair like so: `100:200` specifying the range of
+                        the uniform random distribution over which a robots'
+                        initial estimation of the duration of the specified task
+                        will be drawn. Only used if `enabled` is `true`. Valid
+                        values for `<task_namne>` are: [`generalist`, `collector`,
+                        `harvester`]. Experimental values that may or may not
+                        work as expected are [`cache_starter`, `cache_finisher`,
+                        `cache_transferer` `cache_collector`] for the depth2
+                        tasks.
 
-- `collector_range` - Takes a pair like so: `100:200` specifying the range of
-  the uniform random distribution over which a robots' initial estimation of the
-  duration of the collector task will be drawn. Only used if `enabled` is
-  `true`.
+##### `ema` - Exponential Moving Average
 
-- `harvester_range` - Takes a pair like so: `100:200` specifying the range of
-  the uniform random distribution over which a robots' initial estimation of the
-  duration of the harvester task will be drawn. Only used if `enabled` is
-  `true`.
+`alpha`- Parameter for exponential weighting of a moving time estimate of the
+         true execution/interface time of a task.
+
+#### `tab_sel`
+
+Uses `src_sigmoid_sel` to select which TAB to switch to (if applicable) during
+task allocation, with a `method` tag that can be one of [`harwell2019`].
+
+
+### `block_selection_matrix`
+
+`nest` - The location of the nest.
+
+#### `block_priorities`
+
+- `cube` - The priority value used as part of block utility calculation for cube
+           blocks during block selection.
+
+- `ramp` - The priority value used as part of block utility calculation for ramp
+           blocks during block selection.
+
+### `cache_selection_matrix`
+
+- `cache_prox_dist` - When executing the Cache Finisher task, the constraint
+                      applied to new cache selection for how close the chosen
+                      new cache can be to known existing caches.
+
+- `block_prox_dist` - When executing the Cache Starter task, the constraint
+                      applied to cache site selection for how close the chosen
+                      cache site can be to known blocks.
+
+- `nest_prox_dist` - When executing the Cache Starter task, the constraint
+                     applied to cache site selection for how close the chosen
+                     cache site can be to the nest.
+
+- `site_xrange` - The valid X range for cache site selection (should be a subset
+                  of the full arena X size, to avoid robots being able to select
+                  locations by arena boundaries).
+
+- `site_yrange` - The valid Y range for cache site selection (should be a subset
+                  of the full arena Y size, to avoid robots being able to select
+                  locations by arena boundaries).
 
 ### `sensing`
 
@@ -199,21 +274,6 @@ The following root XML tags are defined:
 
 - `max_speed` - The maximimum speed of the robot.
 
-### `visualization`
-
-- `robot_id` - Set to `true` or `false`. If true, robot id is displayed above
-               each robot during simulation.
-
-- `robot_los` - Set to `true` or `false`. If true, each robot's approximate line
-                of sight is displayed as a red wireframe square during
-                simulation.
-
-- `robot_task` - Set to `true` or `false`. If `true`, the current task each robot
-              is executing is displayed above it.
-
-- `block_id` - Set to `true` or `false`. If true, each block's id displayed
-               above it during simulation.
-
 ## Loop Functions
 
 The following root XML tags are defined:
@@ -222,12 +282,18 @@ The following root XML tags are defined:
 
 - `arena_map` - Parameters relating to discretization of the arena.
 
+- `oracle` - Parameters related to the all knowing oracle, which allows
+             robots/swarms to make decisions based on perfect information, to
+             provide an upper bound on performance.
+
+- `caches` - Parameters related to the use of caches in the arena.
+
 ### `output`
 
 #### `sim`
 
 - `sim_log_fname` - The name of the simulation log output file in
-  `output_root`/`output_dir`.
+                    `output_root`/`output_dir`.
 
 - `output_root` - The root output directory in which the directories of
                   different simulation runs will be placed.
@@ -242,55 +308,25 @@ The following root XML tags are defined:
 - `output_dir` - Name of directory within the output directory for the
   simulation run that metrics will be placed in.
 
-- `collision_fname` - The filename that statistics collected about collision
-                      avoidance will be logged to.
-
-- `block_acquisition_fname` - Filename for statistics related to block
-                              acquisition, such as vectoring/exploring, will be
-                              logged to.
-
-- `block_transport_fname` - Filename for statistics related to block
-                            transportation, such as # carries, will be logged
-                            to.
-
-- `block_manipulation_fname` - Filename for statistics related to block
-                               manipulation, such as pickup/drop penalties, will
-                               be logged to.
-
-- `cache_acquisition_fname` - Filename for statistics related to cache
-                              acquisition, such as vectoring/exploring, will be
-                              logged to.
-
-- `cache_utilization_fname` - Filename for statistics related to cache size,
-                              pickups/drops, will be logged to.
-
-- `cache_lifecycle_fname` - Filename for statistics related to cache
-                            creation/depletion, will be logged to.
-
-- `distance_fname` - Filename for logging statistics for how far all robots have
-                     cumulatively traveled.
-
-- `task_execution_generalist_fname` - Filename for logging metrics about the
-                                      generalist task as it is executed.
-
-- `task_execution_harvester_fname` - Filename for logging metrics about the
-                                     generalist task as it is executed.
-
-- `task_execution_collector_fname` - Filename for logging metrics about the
-                                     generalist task as it is executed.
-
-- `task_generalist_tab_fname` - Filename for logging metrics collected at the
-                                "meta" level of task allocation: how often tasks
-                                are aborted, etc. for the TAB rooted at the
-                                generalist task.
-
-- `perception_world_model_fname` - Filename for logging metrics related to
-                                   errors/inaccuracies in robots' perceived
-                                   model of the world.
-
 - `collect_interval` - The timestep interval after which statistics will be
                        reset. Gathering statistics on a single timestep of a
-                       long simulation is generally not useful; hence this field.
+                       long simulation is generally not useful; hence this
+                       field.
+
+### oracle
+
+- `enabled` - Is the oracle enabled or not? Only affects `oracular_controllers`.
+
+- `task_exec_est` - If the oracle is enabled, then this will inject perfect
+                    estimates of task execution time based on the performance of
+                    the entire swarm into each robot when it performs task
+                    allocation.
+
+- `task_interface_est` - If the oracle is enabled, then this will inject perfect
+                         estimates of task interface time based on the
+                         performance of the entire swarm into each robot when it
+                         performs task allocation.
+
 
 ### `arena_map`
 
@@ -306,8 +342,8 @@ The following root XML tags are defined:
 
 ##### `manipulation_penalty`
 
-- `waveform` - Parameters defining the waveform of throttling. Should always be
-              at least 5, and non-Null.
+- `waveform` - Parameters defining the waveform of block manipulation penalty
+  (picking up, dropping that does not involve caches).
 
 ##### `distribution`
 
@@ -325,9 +361,24 @@ The following root XML tags are defined:
 
   - `powerlaw`: Distributed according to a powerlaw.
 
-  - `single_source` - Placed within a small arena opposite about 90% of the
-                      way from the nest to the other side of the arena
-                      (assumes horizontal, rectangular arena).
+  - `single_source` - Placed within an arena opposite about 90% of the way from
+                      the nest to the other side of the arena (assumes
+                      horizontal, rectangular arena).
+
+  - `dual_source` - Placed in two sources on either side of a central nest
+                    (assumes a horizontal, rectangular arena).
+
+  - `quad_source` - Placed in 4 sources at each cardinal direction in the
+                    arena. Assumes a square arena.
+
+###### `manifest`
+
+- `n_cube` - # Cube blocks that should be used.
+
+- `n_ramp` - # Ramp blocks that should be used.
+
+- `unit_dim` - Unit dimension of blocks. Cube are 1x1 of this, ramp are 2x1 of
+               this.
 
 ######  `powerlaw`
 
@@ -337,17 +388,21 @@ The following root XML tags are defined:
 
 - `n_clusters` - Max # of clusters the arena.
 
-###### `manifest`
+#### `nest`
 
-- `n_cube`- # cube blocks in the arena
+- `size` - The size of the nest. Must be specified in a tuple like so:
+  `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
 
-- `n_ramp`- # ramp blocks in the arena
+- `center` - Location for center of the nest (nest is a square).  Must be
+             specified in a tuple like so: `1.5, 1.5`. Note the space--parsing
+             does not work if it is omitted.
 
-- `unit_dim` - Size of one side of the a cube block. Ramp blocks are 2x1 in this
-               dimension.
+### `caches`
 
+- `dimension` - The dimension of the cache. Should be greater than the dimension
+                for blocks.
 
-#### `static_caches`
+#### `static`
 
 - `enable` - If true, then a single static cache will be created in the center
              of the arena (assumed to be horizontal). The cache will be
@@ -361,19 +416,30 @@ The following root XML tags are defined:
                            probability of static cache respawn will grow once
                            the conditions for respawning are met.
 
-- `dimension` - The dimension of the cache. Should be greater than the dimension
-                for blocks.
+#### `dynamic`
 
-- `min_dist` - The minimum distance between two blocks to be considered for
+- `enable` - If `true`, then the creation of dynamic caches will be enabled
+             (depth2 only).
+
+- `min_dist` - The minimum distance between blocks to be considered for
                cache creation from said blocks.
+
+- `min_blocks` - The minimum # of blocks that need to within `min_dist` from
+                 each other to trigger dynamic cache creation.
 
 - `usage_penalty` - Waveform params again.
 
-#### `nest`
+### `visualization`
 
-- `size` - The size of the nest. Must be specified in a tuple like so:
-  `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
+- `robot_id` - Set to `true` or `false`. If true, robot id is displayed above
+               each robot during simulation.
 
-- `center` - Location for center of the nest (nest is a square).  Must be
-             specified in a tuple like so: `1.5, 1.5`. Note the space--parsing
-             does not work if it is omitted.
+- `robot_los` - Set to `true` or `false`. If true, each robot's approximate line
+                of sight is displayed as a red wireframe square during
+                simulation.
+
+- `robot_task` - Set to `true` or `false`. If `true`, the current task each robot
+              is executing is displayed above it.
+
+- `block_id` - Set to `true` or `false`. If true, each block's id displayed
+               above it during simulation.

@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_partitioning_controller id="ffc"
+    <greedy_recpart_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -60,7 +60,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="false"
+              always_partition="true"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -118,7 +118,11 @@
         </block_selection_matrix>
         <cache_selection_matrix
             cache_prox_dist="1.0"
-            block_prox_dist="1.0"/>
+            nest_prox_dist="3.0"
+            block_prox_dist="1.0"
+            site_xrange="1:11"
+            site_yrange="1:5"
+            />
         <sensing>
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
@@ -151,7 +155,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_partitioning_controller>
+    </greedy_recpart_controller>
 
   </controllers>
 
@@ -159,7 +163,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -230,7 +234,7 @@
     </arena_map>
     <caches
         dimension="0.8">
-      <static enable="true"
+      <static enable="false"
               size="2"
               respawn_scale_factor="0.05"
               >

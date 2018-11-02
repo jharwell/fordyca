@@ -48,13 +48,16 @@ NS_START(fordyca, math);
  * - Distance of block to nest (Further is better).
  * - Distance of block to robot's current position (closer is better).
  * - Pheromone density associated with the block information (higher is better).
+ * - Block priority of the block type being evaluated.
  */
 class block_utility : public rcppsw::math::expression<double> {
  public:
   block_utility(const argos::CVector2& block_loc,
                 const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc, double density, double priority);
+  double calc(const argos::CVector2& rloc,
+              double density,
+              double priority);
   double operator()(const argos::CVector2& rloc,
                     double density,
                     double priority) {

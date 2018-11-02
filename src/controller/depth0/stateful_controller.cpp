@@ -62,6 +62,7 @@ void stateful_controller::block_sel_matrix(
   m_block_sel_matrix = std::move(m);
 }
 
+
 void stateful_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);

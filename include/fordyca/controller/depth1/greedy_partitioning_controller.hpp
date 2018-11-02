@@ -34,8 +34,12 @@
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
 class bi_tdgraph_executive;
+class bi_tab;
+class executable_task;
 class polled_task;
 }}
+namespace visitor = rcppsw::patterns::visitor;
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
@@ -71,7 +75,7 @@ NS_START(depth1);
 class greedy_partitioning_controller : public depth0::stateful_controller,
                                        public er::client<greedy_partitioning_controller>,
                                        public visitor::visitable_any<greedy_partitioning_controller>,
-                                       public rcppsw::metrics::tasks::distribution_metrics {
+                                       public rcppsw::metrics::tasks::bi_tdgraph_metrics {
  public:
   greedy_partitioning_controller(void);
   ~greedy_partitioning_controller(void) override;
@@ -129,6 +133,7 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    */
   const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
   ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+
 
  protected:
   const cache_selection_matrix*  cache_sel_matrix(void) const {

@@ -103,8 +103,10 @@ bool acquire_block_fsm::acquire_known_goal(void) {
     if (nullptr == best.ent) {
       return false;
     }
-    ER_INFO("Vector towards best block: %d@(%u, %u)=%f",
+    ER_INFO("Vector towards best block%d@(%f,%f) [%u, %u]=%f",
             best.ent->id(),
+            best.ent->real_loc().GetX(),
+            best.ent->real_loc().GetY(),
             best.ent->discrete_loc().first,
             best.ent->discrete_loc().second,
             best.density.last_result());

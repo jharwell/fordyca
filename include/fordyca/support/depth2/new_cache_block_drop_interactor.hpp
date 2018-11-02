@@ -113,7 +113,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
             cache_pair.first,
             cache_pair.second.Length(),
             m_cache_manager->cache_proximity_dist());
-    events::cache_found prox(m_map->caches()[cache_pair.first]);
+    events::cache_found prox(m_map->caches()[cache_pair.first]->clone());
     controller.visitor::template visitable_any<T>::accept(prox);
   }
 

@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/math/cache_site_utility.hpp"
 #include <cmath>
+#include <limits>
 
 /*******************************************************************************
  * Namespaces
@@ -32,24 +33,43 @@ NS_START(fordyca, math);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_site_utility::cache_site_utility(const argos::CVector2& site_loc,
+cache_site_utility::cache_site_utility(const argos::CVector2& robot_loc,
                                        const argos::CVector2& nest_loc)
-    : mc_site_loc(site_loc), mc_nest_loc(nest_loc) {}
+    : sigmoid(4.0, 1.0, 1.0),
+      ER_CLIENT_INIT("fordyca.math.cache_site_utility"),
+      mc_robot_loc(robot_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double cache_site_utility::calc(const argos::CVector2& rloc,
-                                const argos::CVector2& nearest_cache) {
-  return set_result(
-      (nearest_cache - mc_site_loc).Length() /
-      ((mc_site_loc - rloc).Length() * (rloc - (rloc - mc_nest_loc) / 2.0))
-          .Length());
-} /* calc() */
+double cache_site_utility::calc(const argos::CVector2& site_loc) {
+  argos::CVector2 ideal_loc = (mc_robot_loc + mc_nest_loc) / 2;
+  double deviation_from_ideal = (site_loc - ideal_loc).Length();
+  double theta =  reactivity() * (deviation_from_ideal - offset());
+  double deviation_scaling = gamma() * 1.0 / (1.0 + std::exp(theta));
+  /* ER_INFO("ideal_loc=(%f,%f), point=(%f,%f), deviation=%f, deviation_scaling=%f", */
+  /*         ideal_loc.GetX(), */
+  /*         ideal_loc.GetY(), */
+  /*         site_loc.GetX(), */
+  /*         site_loc.GetY(), */
+  /*         deviation_from_ideal, */
+  /*         deviation_scaling) */
 
-double cache_site_utility::operator()(const argos::CVector2& rloc,
-                                      const argos::CVector2& nearest_cache) {
-  return calc(rloc, nearest_cache);
-} /* operator() */
+  /*
+   * If we don't impose a minimum distance the cache site has to be from the
+   * robot, then if a robot's initial guess of the cache site is right where it
+   * currently is (i.e. where it just picked up a block from), then it can get a
+   * high utility for that spot and choose it to drop the block in. If it then
+   * allocates itself the Cache Starter task again, you can get stuck in an
+   * infinite loop.
+   */
+  double dist_to_robot = std::max(1.0, (site_loc - mc_robot_loc).Length());
+  double dist_to_nest = (site_loc - ideal_loc).Length();
+  /* ER_INFO("Utility: %f", (1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling); */
+  if (deviation_from_ideal <= std::numeric_limits<double>::epsilon()) {
+    return std::numeric_limits<double>::min();
+  }
+  return set_result((1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
+} /* calc() */
 
 NS_END(expressions, fordyca);

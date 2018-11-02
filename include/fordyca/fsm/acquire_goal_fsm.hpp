@@ -74,9 +74,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(
-      __rcsw_unused const rcppsw::task_allocation::taskable_argument*) override {
-  }
+  void task_start(const rcppsw::task_allocation::taskable_argument*) override {}
   bool task_finished(void) const override {
     return ST_FINISHED == current_state();
   }

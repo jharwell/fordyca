@@ -33,6 +33,7 @@
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/controller/block_selection_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -76,6 +77,10 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
                                 saa_subsystem(),
                                 perception())(&param_repo));
 
+  executive()->task_alloc_notify(std::bind(&greedy_recpart_controller::task_alloc_cb,
+                                           this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -89,6 +94,15 @@ __rcsw_pure const tasks::base_foraging_task* greedy_recpart_controller::current_
     void) const {
   return const_cast<greedy_recpart_controller*>(this)->current_task();
 } /* current_task() */
+
+void greedy_recpart_controller::task_alloc_cb(
+    const ta::polled_task* const,
+    const ta::bi_tab* const) {
+  if (!m_bsel_exception_added) {
+    block_sel_matrix()->sel_exceptions_clear();
+  }
+  m_bsel_exception_added = false;
+} /* task_alloc_cb() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

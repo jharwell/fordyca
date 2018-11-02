@@ -30,6 +30,7 @@
 #include <string>
 
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,6 +40,7 @@ namespace params {
 struct cache_selection_matrix_params;
 }
 NS_START(controller);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +61,8 @@ NS_START(controller);
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
 class cache_selection_matrix
-    : public std::map<std::string, boost::variant<double, argos::CVector2>> {
+    : public std::map<std::string, boost::variant<double, argos::CVector2,
+                                                  rmath::range<uint>>> {
  public:
   cache_selection_matrix(const struct params::cache_selection_matrix_params* params,
                          const argos::CVector2& nest_loc);

@@ -122,6 +122,24 @@ void free_block_drop::visit(
             "Non free block interactor task %s causing free block drop",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
 
+  /*
+   * If this is true then we know the current task must be a cache starter or a
+   * cache finisher, so we need to make a note of the block we are dropping so
+   * we don't just turn around and pick it up when we start our next task.
+   *
+   * If we are performing a free block drop because we have just aborted our
+   * task, then obviously no need to do that.
+   */
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
+      !polled->task_aborted()) {
+    ER_INFO("Added block%d@(%f,%f) to exception list",
+            m_block->id(),
+            m_block->real_loc().GetX(),
+            m_block->real_loc().GetY());
+    controller.block_sel_matrix()->sel_exception_add(m_block->id());
+    controller.bsel_exception_added(true);
+  }
   task->accept(*this);
   controller.block(nullptr);
 } /* visit() */

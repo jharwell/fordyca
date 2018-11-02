@@ -28,7 +28,7 @@
 
 #include "fordyca/support/block_op_penalty_handler.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/events/block_found.hpp"
+#include "fordyca/events/block_proximity.hpp"
 #include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
@@ -95,7 +95,8 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
         auto block_pair = loop_utils::cache_site_block_proximity(controller,
                                                                  *m_map,
                                                                  m_cache_manager->block_proximity_dist());
-        ER_ASSERT(-1 != block_pair.first,"Error in block op handler");
+        ER_ASSERT(-1 != block_pair.first,
+                  "No block too close with BlockProximity return status");
         block_proximity_notify(controller, block_pair);
       }
     }
@@ -113,7 +114,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
             block_pair.first,
             block_pair.second.Length(),
             m_cache_manager->block_proximity_dist());
-    events::block_found prox(m_map->blocks()[block_pair.first]);
+    events::block_proximity prox(m_map->blocks()[block_pair.first]->clone());
     controller.visitor::template visitable_any<T>::accept(prox);
   }
 

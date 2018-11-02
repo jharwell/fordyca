@@ -67,13 +67,17 @@ class greedy_recpart_controller : public depth1::greedy_partitioning_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
+  void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
 
   tasks::base_foraging_task* current_task(void) override;
   const tasks::base_foraging_task* current_task(void) const override;
 
  private:
+  void task_alloc_cb(const ta::polled_task* const,
+                     const ta::bi_tab* const);
+
   // clang-format off
-  std::string                                        m_prev_task{""};
+  bool m_bsel_exception_added{false};
   // clang-format on
 };
 

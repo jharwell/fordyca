@@ -141,7 +141,11 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   auto* goal = dynamic_cast<const struct goal_data*>(data);
   if (nullptr != goal) {
     m_goal_data = *goal;
-    ER_INFO("Target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
+    ER_INFO("Target=(%f,%f), robot=(%f,%f)",
+            m_goal_data.loc.GetX(),
+            m_goal_data.loc.GetY(),
+            saa_subsystem()->sensing()->position().GetX(),
+            saa_subsystem()->sensing()->position().GetY());
   }
 
   if ((m_goal_data.loc - base_sensors()->position()).Length() <=

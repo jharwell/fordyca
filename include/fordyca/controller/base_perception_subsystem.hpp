@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <string>
+
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception_params.hpp"
@@ -93,6 +95,8 @@ class base_perception_subsystem
    * @brief Update the perceived arena map with the current line-of-sight,
    * update the relevance of information (density) within it, and fix any blocks
    * that should be hidden from our awareness.
+   *
+   * @param c_los The LOS to process.
    */
   virtual void process_los(const representation::line_of_sight* const c_los);
 
