@@ -131,15 +131,20 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
     internal_event(ST_FINISHED);
+  } else if (controller::foraging_signal::BLOCK_PROXIMITY == data->signal()) {
+    ER_ASSERT(acquisition_goal_type::kCacheSite == acquisition_goal(),
+              "Bad goal on block proximity");
+    goal_fsm().task_reset();
+    internal_event(ST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kExistingCache == acquisition_goal(),
               "Non-existing cache vanished? ");
     goal_fsm().task_reset();
     internal_event(ST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::CACHE_APPEARED == data->signal()) {
+  } else if (controller::foraging_signal::CACHE_PROXIMITY == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kNewCache == acquisition_goal() ||
                   acquisition_goal_type::kCacheSite == acquisition_goal(),
-              "Bad goal on cache appear");
+              "Bad goal on cache proxmity");
     goal_fsm().task_reset();
     internal_event(ST_TRANSPORT_TO_GOAL);
   }

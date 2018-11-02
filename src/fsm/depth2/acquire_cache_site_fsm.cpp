@@ -26,6 +26,8 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +43,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
-                       std::bind(&acquire_cache_site_fsm::site_detected_cb,
-                                 this)),
+                       []() {return false;}), /* We should never acquire a
+                                               * cache site by exploring */
       ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       mc_matrix(csel_matrix) {}
 
@@ -56,6 +58,18 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
    * cache site, but for now, just signal that everything is fine.
    */
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
+  argos::CVector2 robot_loc = saa_subsystem()->sensing()->position();
+  for (auto &b : map()->blocks()) {
+    if ((robot_loc - b->real_loc()).Length() <=
+        boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
+      ER_WARN("Cannot drop block in cache site at (%f,%f): Block%d too close",
+              robot_loc.GetX(),
+              robot_loc.GetY(),
+              b->id());
+      return false;
+    }
+  } /* for(&b..) */
+
   return true;
 } /* site_acquired_cb() */
 

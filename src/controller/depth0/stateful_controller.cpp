@@ -61,6 +61,7 @@ void stateful_controller::block_sel_matrix(
     std::unique_ptr<block_selection_matrix> m) {
   m_block_sel_matrix = std::move(m);
 }
+
 void stateful_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
   m_perception = std::move(perception);
@@ -137,7 +138,7 @@ void stateful_controller::Init(ticpp::Element& node) {
       base_controller::saa_subsystem(),
       m_perception->map());
 
-  /* initialize tasking */
+  
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

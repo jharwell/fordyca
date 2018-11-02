@@ -48,7 +48,8 @@ acquire_block_fsm::acquire_block_fsm(
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
-                       std::bind(&acquire_block_fsm::block_detected_cb, this)),
+                       std::bind(&acquire_block_fsm::explore_goal_reached,
+                                 this)),
       ER_CLIENT_INIT("fordyca.fsm.acquire_block"),
       mc_matrix(sel_matrix) {
   goal_acquired_cb(std::bind(
@@ -57,13 +58,13 @@ acquire_block_fsm::acquire_block_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_block_fsm::block_detected_cb(void) const {
+bool acquire_block_fsm::explore_goal_reached(void) const {
   return saa_subsystem()->sensing()->block_detected();
-} /* block_detected_cb() */
+} /* explore_goal_reached() */
 
 bool acquire_block_fsm::block_acquired_cb(bool explore_result) const {
   if (explore_result) {
-    ER_ASSERT(saa_subsystem()->sensing()->block_detected(),
+    ER_ASSERT(explore_goal_reached(),
               "No block detected after successful exploration?");
     return true;
   } else {

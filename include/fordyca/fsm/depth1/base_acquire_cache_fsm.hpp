@@ -80,7 +80,7 @@ class base_acquire_cache_fsm : public acquire_goal_fsm,
  private:
   bool acquire_known_goal(void) override;
   bool cache_acquired_cb(bool explore_result) const;
-  bool cache_detected_cb(void) const;
+  bool explore_goal_reached(void) const;
 
   // clang-format off
   const controller::cache_selection_matrix* mc_sel_matrix;

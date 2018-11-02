@@ -85,4 +85,18 @@ void stateful_metrics_aggregator::collect_from_controller(
   collect("blocks::acquisition", *block_acq_m);
 } /* collect_from_controller() */
 
+void stateful_metrics_aggregator::task_finish_or_abort_cb(
+    const ta::polled_task* const task) {
+  /*
+   * Both depth1 and depth2 metrics aggregators are registered on the same
+   * callback, so this function will be called for the depth2 task abort/finish
+   * as well, which should be ignored.
+   */
+  if (!task0::task_in_depth0(task)) {
+    return;
+  }
+  collect("tasks::execution::" + task->name(),
+          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+} /* task_finish_or_abort_cb() */
+
 NS_END(depth0, support, fordyca);

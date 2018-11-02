@@ -65,7 +65,9 @@ class cache_starter : public foraging_task,
   void accept(events::free_block_drop& visitor) override;
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::block_vanished& visitor) override;
-  void accept(events::cache_appeared& visitor) override;
+  void accept(events::block_proximity& visitor) override;
+  void accept(events::cache_proximity&) override {};
+
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);

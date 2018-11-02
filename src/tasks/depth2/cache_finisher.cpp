@@ -27,6 +27,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -127,6 +128,9 @@ void cache_finisher::accept(events::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
 void cache_finisher::accept(events::block_vanished& visitor) {
+  visitor.visit(*this);
+}
+void cache_finisher::accept(events::cache_proximity& visitor) {
   visitor.visit(*this);
 }
 

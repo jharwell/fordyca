@@ -16,7 +16,7 @@ This is the main entry point for getting started on the project.
 
    - Qt5 (`qtbase5-dev` on ubuntu)
    - NLopt (`libnlopt-dev` on ubuntu)
-
+   
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 

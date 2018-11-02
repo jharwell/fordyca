@@ -27,6 +27,7 @@
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/tasks/free_block_interactor.hpp"
+#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -49,6 +50,7 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class cache_finisher : public foraging_task,
                        public free_block_interactor,
+                       public dynamic_cache_interactor,
                        public rcppsw::er::client<cache_finisher> {
  public:
   cache_finisher(const struct ta::task_allocation_params* params,
@@ -64,6 +66,8 @@ class cache_finisher : public foraging_task,
   void accept(events::free_block_drop& visitor) override;
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::block_vanished& visitor) override;
+  void accept(events::block_proximity&) override {};
+  void accept(events::cache_proximity& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired);

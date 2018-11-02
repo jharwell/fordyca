@@ -66,11 +66,12 @@ class acquire_block_fsm : public acquire_goal_fsm,
   bool acquire_known_goal(void) override;
 
   /**
-   * @brief Callback for block detection used by parent class.
+   * @brief Callback for block detection used by parent class when doing
+   * exploring, as you don't know when you will reach your goal.
    *
    * @return \c TRUE if a block has been detected, \c FALSE otherwise.
    */
-  bool block_detected_cb(void) const;
+  bool explore_goal_reached(void) const;
 
   /**
    * @brief Callback used after a block has been acquired for sanity

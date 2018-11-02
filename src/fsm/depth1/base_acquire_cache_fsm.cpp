@@ -42,7 +42,7 @@ base_acquire_cache_fsm::base_acquire_cache_fsm(
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
-                       std::bind(&base_acquire_cache_fsm::cache_detected_cb,
+                       std::bind(&base_acquire_cache_fsm::explore_goal_reached,
                                  this)),
       ER_CLIENT_INIT("fordyca.fsm.depth1.base_acquire_cache"),
       mc_sel_matrix(sel_matrix) {}
@@ -50,11 +50,11 @@ base_acquire_cache_fsm::base_acquire_cache_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_acquire_cache_fsm::cache_detected_cb(void) const {
+bool base_acquire_cache_fsm::explore_goal_reached(void) const {
   const auto& sensors =
       std::static_pointer_cast<const depth1::sensing_subsystem>(base_sensors());
   return sensors->cache_detected();
-} /* block_detected_cb() */
+} /* explore_goal_reached() */
 
 bool base_acquire_cache_fsm::cache_acquired_cb(bool explore_result) const {
   const auto& sensors =

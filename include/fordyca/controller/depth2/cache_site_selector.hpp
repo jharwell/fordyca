@@ -99,14 +99,15 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
   static constexpr double kBLOCK_CONSTRAINT_TOL = 1E-8;
   static constexpr double kUTILITY_TOL = 1E-4;
 
-  using constraint_return_type = std::pair<cache_constraint_vector,
-                                           block_constraint_vector>;
-  constraint_return_type constraints_create(const cache_list& known_caches,
-                       const block_list& known_blocks);
+  using constraint_set = std::pair<cache_constraint_vector,
+                                   block_constraint_vector>;
+  void constraints_create(const cache_list& known_caches,
+                          const block_list& known_blocks,
+                          constraint_set* constraints);
 
   // clang-format off
   const controller::cache_selection_matrix* const mc_matrix;
-  nlopt::opt                                      m_alg;
+  nlopt::opt*                                     m_alg{nullptr};
   // clang-format on
 };
 

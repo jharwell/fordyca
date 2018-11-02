@@ -72,15 +72,6 @@ class acquire_cache_site_fsm : public acquire_goal_fsm,
   bool acquire_known_goal(void) override;
   bool site_acquired_cb(bool explore_result) const;
 
-  /**
-   * @brief Callback used by the \ref acquire_goal_fsm to determine if the goal
-   * has actually been acquired. For this class, that means that the site is
-   * available/there is not another cache nearby. For now, those concerns are
-   * ignored, so that once the robot arrives at the chosen site, it can just
-   * signal that it has acquired its goal.
-   */
-  bool site_detected_cb(void) const { return true; }
-
   // clang-format off
   const controller::cache_selection_matrix* const mc_matrix;
   // clang-format on

@@ -58,7 +58,7 @@ class perceived_cell_op
       public visitor::visit_set<controller::depth2::greedy_recpart_controller,
                                 ds::perceived_arena_map> {
  public:
-  perceived_cell_op(size_t x, size_t y) : cell_op(x, y) {}
+  perceived_cell_op(uint x, uint y) : cell_op(x, y) {}
   ~perceived_cell_op(void) override = default;
 };
 
