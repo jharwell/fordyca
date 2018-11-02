@@ -43,12 +43,17 @@ void cache_selection_matrix_parser::parse(const ticpp::Element& node) {
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_ATTR(cnode, m_params, cache_prox_dist);
   XML_PARSE_ATTR(cnode, m_params, block_prox_dist);
+  XML_PARSE_ATTR(cnode, m_params, site_xrange);
+  XML_PARSE_ATTR(cnode, m_params, site_yrange);
 } /* parse() */
 
 void cache_selection_matrix_parser::show(std::ostream& stream) const {
   stream << build_header()
          << XML_ATTR_STR(m_params, cache_prox_dist) << std::endl
          << XML_ATTR_STR(m_params, block_prox_dist) << std::endl
+         << XML_ATTR_STR(m_params, nest_prox_dist) << std::endl
+         << XML_ATTR_STR(m_params, site_xrange) << std::endl
+         << XML_ATTR_STR(m_params, site_yrange) << std::endl
          << build_footer();
 } /* show() */
 

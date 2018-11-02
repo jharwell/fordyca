@@ -28,6 +28,7 @@
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "rcppsw/common/common.hpp"
 
@@ -39,6 +40,9 @@ namespace params {
 struct block_selection_matrix_params;
 }
 NS_START(controller);
+using block_selection_variant = boost::variant<double,
+                                               argos::CVector2,
+                                               std::vector<int>>;
 
 /*******************************************************************************
  * Class Definitions
@@ -57,13 +61,15 @@ NS_START(controller);
  */
 
 class block_selection_matrix
-    : public std::map<std::string, boost::variant<double, argos::CVector2>> {
+    : public std::map<std::string, block_selection_variant> {
  public:
   explicit block_selection_matrix(
       const struct params::block_selection_matrix_params * params);
 
+  void sel_exception_add(int id);
+  void sel_exceptions_clear(void);
+
  private:
-  using mapped_type = boost::variant<double, argos::CVector2>;
 };
 
 NS_END(controller, fordyca);

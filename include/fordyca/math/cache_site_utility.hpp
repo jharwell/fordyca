@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/math/expression.hpp"
+#include "rcppsw/math/sigmoid.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca, math);
  * @class cache_site_utility
  * @ingroup math
  *
- * @brief Calculates the utility associated with a new cache to a robot as part
+ * @brief Calculates the utility associated with a cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.
  *
  * Depends on:
@@ -48,20 +48,27 @@ NS_START(fordyca, math);
  * - Distance of perspective site to the nest (closer is better).
  * - Distance of perspective site to robot's current location (closer is
  * - better).
- * - Distance to nearest known cache (further is better).
+ *
+ * The ideal location is halfway between the robot's current position and the
+ * nest. However, if that location is unsuitable (i.e. it violates one or more
+ * constraints), then we need to constrain our site selection to along the arc
+ * of the circle formed by the nest center and distance to the ideal
+ * point. We do this via exponential falloff on either side of the arc.
  */
-class cache_site_utility : public rcppsw::math::expression<double> {
+class cache_site_utility : public rcppsw::math::sigmoid,
+                           public rcppsw::er::client<cache_site_utility> {
  public:
-  cache_site_utility(const argos::CVector2& site_loc,
+  cache_site_utility(const argos::CVector2& robot_loc,
                      const argos::CVector2& nest_loc);
 
-  double calc(const argos::CVector2& rloc, const argos::CVector2& nearest_cache);
-  double operator()(const argos::CVector2& rloc,
-                    const argos::CVector2& nearest_cache);
+  double calc(const argos::CVector2& site_loc);
+  double operator()(const argos::CVector2& site_loc) { return calc(site_loc); }
 
  private:
-  const argos::CVector2 mc_site_loc;
+  // clang-format off
+  const argos::CVector2 mc_robot_loc;
   const argos::CVector2 mc_nest_loc;
+  // clang-format on
 };
 
 NS_END(math, fordyca);

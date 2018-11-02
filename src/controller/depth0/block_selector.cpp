@@ -49,16 +49,10 @@ representation::perceived_block block_selector::calc_best(
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
   for (auto& b : blocks) {
-    if ((robot_loc - b.ent->real_loc()).Length() <= kMinDist) {
-      ER_DEBUG("Ignoring block at (%f, %f) [%u, %u]: Too close (%f < %f)",
-               b.ent->real_loc().GetX(),
-               b.ent->real_loc().GetY(),
-               b.ent->discrete_loc().first,
-               b.ent->discrete_loc().second,
-               (robot_loc - b.ent->real_loc()).Length(),
-               kMinDist);
+    if (block_is_excluded(robot_loc, b.ent.get())) {
       continue;
     }
+
     /*
      * Only two options for right now: cube blocks or ramp blocks. This will
      * undoubtedly have to change in the future.
@@ -94,9 +88,37 @@ representation::perceived_block block_selector::calc_best(
             best.ent->discrete_loc().second,
             max_utility);
   } else {
-    ER_WARN("No best block found: all known blocks too close!");
+    ER_WARN("No best block found: all known blocks too close/on exception list!");
   }
   return best;
 } /* calc_best() */
+
+bool block_selector::block_is_excluded(
+    const argos::CVector2& robot_loc,
+    const representation::base_block* const block) const {
+  if ((robot_loc - block->real_loc()).Length() <= kMinDist) {
+    ER_INFO("Ignoring block%d@(%f,%f) [%u, %u]: Too close (%f < %f)",
+             block->id(),
+             block->real_loc().GetX(),
+             block->real_loc().GetY(),
+             block->discrete_loc().first,
+             block->discrete_loc().second,
+             (robot_loc - block->real_loc()).Length(),
+             kMinDist);
+    return true;
+  }
+  std::vector<int> exceptions =
+      boost::get<std::vector<int>>(mc_matrix->find("sel_exceptions")->second);
+  if (std::any_of(exceptions.begin(),
+                  exceptions.end(),
+                  [&](int id) { return id == block->id(); })) {
+    ER_INFO("Ignoring block%d@(%f,%f): On exception list",
+             block->id(),
+             block->real_loc().GetX(),
+             block->real_loc().GetY());
+    return true;
+  }
+  return false;
+} /* block_is_excluded() */
 
 NS_END(depth0, controller, fordyca);

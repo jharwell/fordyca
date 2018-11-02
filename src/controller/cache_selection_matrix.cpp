@@ -38,6 +38,9 @@ cache_selection_matrix::cache_selection_matrix(
   this->insert(std::make_pair("nest_loc", nest_loc));
   this->insert(std::make_pair("cache_prox_dist", params->cache_prox_dist));
   this->insert(std::make_pair("block_prox_dist", params->block_prox_dist));
+  this->insert(std::make_pair("nest_prox_dist", params->nest_prox_dist));
+  this->insert(std::make_pair("site_xrange", params->site_xrange));
+  this->insert(std::make_pair("site_yrange", params->site_yrange));
 }
 
 NS_END(controller, fordyca);

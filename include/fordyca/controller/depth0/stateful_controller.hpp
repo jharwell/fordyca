@@ -115,9 +115,18 @@ class stateful_controller : public stateless_controller,
   const fsm::depth0::stateful_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::stateful_fsm* fsm(void) { return m_fsm.get(); }
 
+  const block_selection_matrix* block_sel_matrix(void) const {
+    return m_block_sel_matrix.get();
+  }
+  /*
+   * Needed to update block selections exceptions list in depth2.
+   */
+  block_selection_matrix* block_sel_matrix(void) {
+    return m_block_sel_matrix.get();
+  }
+
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
-  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
   void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
 
  private:

@@ -43,8 +43,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
-                       []() {return false;}), /* We should never acquire a
-                                               * cache site by exploring */
+                       []() { return false; }), /* We should never acquire a
+                                                 * cache site by exploring */
       ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       mc_matrix(csel_matrix) {}
 
@@ -53,19 +53,17 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
  ******************************************************************************/
 __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
     bool explore_result) const {
-  /*
-   * At some point this will have some sanity checks/warnings about the chosen
-   * cache site, but for now, just signal that everything is fine.
-   */
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
   argos::CVector2 robot_loc = saa_subsystem()->sensing()->position();
   for (auto &b : map()->blocks()) {
     if ((robot_loc - b->real_loc()).Length() <=
         boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
-      ER_WARN("Cannot drop block in cache site at (%f,%f): Block%d too close",
+      ER_WARN("Cannot acquire cache site@(%f,%f): Block%d@(%f,%f) too close",
               robot_loc.GetX(),
               robot_loc.GetY(),
-              b->id());
+              b->id(),
+              b->real_loc().GetX(),
+              b->real_loc().GetY());
       return false;
     }
   } /* for(&b..) */

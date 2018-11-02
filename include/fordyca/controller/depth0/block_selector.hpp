@@ -67,6 +67,10 @@ class block_selector: public rcppsw::er::client<block_selector> {
       argos::CVector2 robot_loc);
 
  private:
+  bool block_is_excluded(
+      const argos::CVector2& robot_loc,
+      const representation::base_block* block) const;
+
   /**
    * @brief The minimum distance a robot has to be from a block for it to have a
    * non-zero utility. Allowing robots to consider ANY block, regardless of how

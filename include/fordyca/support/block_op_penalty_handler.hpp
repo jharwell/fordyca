@@ -182,8 +182,8 @@ class block_op_penalty_handler
    */
   filter_status_type filter_controller(T& controller,
                                        penalty_src src,
-                                       double block_prox_dist,
-                                       double cache_prox_dist) {
+                                       double cache_prox_dist,
+                                       double block_prox_dist) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -247,13 +247,13 @@ class block_op_penalty_handler
    */
   filter_status_type cache_site_drop_filter(const T& controller,
                                             double block_prox_dist) const {
-    int block_id = loop_utils::cache_site_block_proximity(controller,
-                                                          *m_map,
-                                                          block_prox_dist).first;
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kCacheSite == controller.acquisition_goal())) {
       return filter_status_type(true, kStatusControllerNotReady);
     }
+    int block_id = loop_utils::cache_site_block_proximity(controller,
+                                                          *m_map,
+                                                          block_prox_dist).first;
     if (-1 != block_id) {
       return filter_status_type(true, kStatusBlockProximity);
     }

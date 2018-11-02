@@ -123,7 +123,18 @@ class explore_for_goal_fsm : public base_explore_fsm,
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 
+  /**
+   * @brief The minimum # of timesteps that a robot must explore before goal
+   * acquisition will be checked. Needed to force \ref cache_starter and
+   * \ref cache_finisher tasks to not pick up the block the just dropped if it
+   * is the only one they know about (The exceptions list disables vectoring to
+   * it, BUT they can still explore for it, and without this minimum they will
+   * immediately acquire it and bypass the list).
+   */
+  static constexpr uint kMIN_EXPLORE_TIME = 50;
+
   // clang-format off
+  uint                                          m_explore_time{0};
   std::unique_ptr<controller::explore_behavior> m_explore_behavior;
   std::function<bool(void)>                     m_goal_detect;
   // clang-format on
