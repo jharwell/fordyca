@@ -66,17 +66,18 @@ class static_cache_manager : public base_cache_manager,
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    *
-   * @param grid_resolution The resolution of the arena.
    * @param blocks The total block vector for the arena.
-   * @param arena_grid The grid for the arena.
    *
    * @return \c TRUE iff a static cache was actually created. Non-fatal failures
    * to create the static cache can occur if, for example, all blocks are
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  std::pair<bool,
-            static_cache_manager::cache_vector> create(block_vector& blocks);
+  std::pair<bool,cache_vector> create(block_vector& blocks);
+
+  std::pair<bool, cache_vector> create_conditional(block_vector& blocks,
+                                                   uint n_harvesters,
+                                                   uint n_collectors);
 
  private:
   /**

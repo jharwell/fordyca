@@ -23,15 +23,12 @@
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/occupancy_grid_parser.hpp"
-#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
-#include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
 #include "fordyca/params/block_selection_matrix_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth0);
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -42,15 +39,6 @@ stateful_controller_repository::stateful_controller_repository(void) {
   register_parser<block_selection_matrix_parser,
                   block_selection_matrix_params>(block_selection_matrix_parser::kXMLRoot,
                                                  block_selection_matrix_parser::kHeader1);
-  register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
-      ta::task_allocation_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ta::task_executive_xml_parser, ta::task_executive_params>(
-      ta::task_executive_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
-
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("generalist");
 }
 
 NS_END(depth0, params, fordyca);

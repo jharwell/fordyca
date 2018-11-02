@@ -145,6 +145,10 @@ access to that directory as part of the gini group.
 
   3. Make sure you have the necessary environment variables set correctly.
 
+  4. If you get a `std::bad_cast` exception (or something similar), then verify
+     that the name of [controller, loop functions, qt user functions], are
+     compatible (i.e. have the same name/are from the same depth).
+
 ## Contributing
 
 For contributing to `fordyca`, see

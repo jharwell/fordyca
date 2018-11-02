@@ -189,7 +189,6 @@ class block_op_penalty_handler
      * not, nothing to do. If a robot is carrying a block but is still
      * transporting it (even if it IS currently in the nest), nothing to do.
      */
-    filter_status_type res;
     switch (src) {
       case kSrcFreePickup:
         return free_pickup_filter(controller);
@@ -203,6 +202,7 @@ class block_op_penalty_handler
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     } /* switch() */
     ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
+    return filter_status_type();
   }
 
   /**

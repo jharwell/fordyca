@@ -33,8 +33,7 @@
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tab.hpp"
@@ -74,13 +73,17 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       "tasks::execution::" + std::string(task1::kHarvesterName),
       metrics_path() + "/" + params->task_execution_harvester_fname,
       params->collect_interval);
+  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      "tasks::execution::" + std::string(task0::kGeneralistName),
+      metrics_path() + "/" + params->task_execution_generalist_fname,
+      params->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + params->task_tab_generalist_fname,
+      metrics_path() + "/" + params->task_generalist_tab_fname,
       params->collect_interval);
 
-  register_collector<rcppsw::metrics::tasks::distribution_metrics_collector>(
+  register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
       metrics_path() + "/" + params->task_distribution_fname,
       params->collect_interval,
@@ -117,12 +120,13 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
    * callback, so this function will be called for the depth2 task abort/finish
    * as well, which should be ignored.
    */
-  if (!task1::task_in_depth1(task)) {
+  if (!(task1::task_in_depth1(task) || task0::task_in_depth0(task))) {
       return;
   }
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
+
 
 void depth1_metrics_aggregator::task_alloc_cb(
     const ta::polled_task* const,

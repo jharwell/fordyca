@@ -73,20 +73,20 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
     ER_TRACE("Block hidden by cache%d", robot_on_cache(pos));
     return -1;
   }
-  for (size_t i = 0; i < m_blocks.size(); ++i) {
-    if (m_blocks[i]->contains_point(pos)) {
-      return m_blocks[i]->id();
+  for (auto &b : m_blocks) {
+    if (b->contains_point(pos)) {
+      return b->id();
     }
-  } /* for(i..) */
+  } /* for(&b..) */
   return -1;
 } /* robot_on_block() */
 
 __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
-  for (size_t i = 0; i < m_caches.size(); ++i) {
-    if (m_caches[i]->contains_point(pos)) {
-      return m_caches[i]->id();
+  for (auto &c : m_caches) {
+    if (c->contains_point(pos)) {
+      return c->id();
     }
-  } /* for(i..) */
+  } /* for(&c..) */
   return -1;
 } /* robot_on_cache() */
 
