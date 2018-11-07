@@ -31,6 +31,8 @@
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/support/block_vector.hpp"
+#include "fordyca/support/cache_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -73,7 +75,7 @@ class static_cache_manager : public base_cache_manager,
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  std::pair<bool,cache_vector> create(block_vector& blocks);
+  std::pair<bool, cache_vector> create(block_vector& blocks);
 
   std::pair<bool, cache_vector> create_conditional(block_vector& blocks,
                                                    uint n_harvesters,

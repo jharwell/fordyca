@@ -43,7 +43,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,
                        map,
-                       std::bind([](){ return false; })),
+                       std::bind([]() noexcept { return false; })),
       ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       mc_sel_matrix(csel_matrix) {}
 

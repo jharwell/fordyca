@@ -30,6 +30,8 @@
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/support/cache_vector.hpp"
+#include "fordyca/support/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,9 +55,7 @@ namespace er = rcppsw::er;
  */
 class base_cache_creator : public er::client<base_cache_creator> {
  public:
-  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
   /**

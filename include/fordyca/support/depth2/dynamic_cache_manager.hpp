@@ -31,6 +31,8 @@
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/support/block_vector.hpp"
+#include "fordyca/support/cache_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -97,6 +99,10 @@ class dynamic_cache_manager : public base_cache_manager,
   }
 
  private:
+  std::pair<bool, block_vector> calc_blocks_for_creation(
+      const cache_vector& existing_caches,
+      block_vector& blocks);
+
   // clang-format off
   const params::caches::caches_params mc_cache_params;
   // clang-format on

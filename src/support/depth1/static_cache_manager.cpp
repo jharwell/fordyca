@@ -51,8 +51,8 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
-    calc_blocks_for_creation(block_vector& blocks) {
+std::pair<bool, block_vector> static_cache_manager::calc_blocks_for_creation(
+    block_vector& blocks) {
   /*
    * Only blocks that are not:
    *
@@ -83,9 +83,8 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
     uint count = 0;
     std::for_each(to_use.begin(),
                   to_use.end(),
-                  [&](std::shared_ptr<representation::base_block>& b) {
-                    count +=
-                        (b->is_out_of_sight() || b->discrete_loc() == dcenter);
+                  [&](const auto& b) {
+                    count += (b->is_out_of_sight() || b->discrete_loc() == dcenter);
                   });
 
     std::string accum;
@@ -130,9 +129,9 @@ std::pair<bool, base_cache_manager::block_vector> static_cache_manager::
   return std::make_pair(ret, to_use);
 } /* calc_blocks_for_creation() */
 
-std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create_conditional(block_vector& blocks,
-                                                                                             uint n_harvesters,
-                                                                                             uint n_collectors) {
+std::pair<bool, cache_vector> static_cache_manager::create_conditional(block_vector& blocks,
+                                                                       uint n_harvesters,
+                                                                       uint n_collectors) {
   math::cache_respawn_probability p(mc_cache_params.static_.respawn_scale_factor);
   if (p.calc(n_harvesters, n_collectors) >=
       static_cast<double>(std::rand()) / RAND_MAX) {
@@ -142,7 +141,7 @@ std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create
   }
 } /* create_conditional() */
 
-std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create(
+std::pair<bool, cache_vector> static_cache_manager::create(
     block_vector& blocks) {
   ER_DEBUG("(Re)-Creating static cache");
   ER_ASSERT(mc_cache_params.static_.size >=
@@ -199,6 +198,6 @@ std::pair<bool, static_cache_manager::cache_vector> static_cache_manager::create
    */
   creator.update_host_cells(created);
   return std::make_pair(true, created);
-} /* static_cache_create() */
+} /* create() */
 
 NS_END(depth1, support, fordyca);

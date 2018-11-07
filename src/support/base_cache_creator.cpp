@@ -91,17 +91,25 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
                           const std::shared_ptr<representation::base_block>& b) {
                         return a + "b" + std::to_string(b->id()) + ",";
                       });
-  ER_INFO("Create cache at (%f, %f) -> (%u, %u) with  %zu blocks [%s]",
-          center.GetX(),
-          center.GetY(),
-          d.first,
-          d.second,
-          blocks.size(),
-          s.c_str());
-
   block_vector block_vec(blocks.begin(), blocks.end());
-  return rcppsw::make_unique<representation::arena_cache>(
-      m_cache_dim, m_grid->resolution(), center, block_vec, -1);
+  auto ret = rcppsw::make_unique<representation::arena_cache>( m_cache_dim,
+                                                               m_grid->resolution(),
+                                                               center,
+                                                               block_vec,
+                                                               -1);
+  ER_INFO("Create cache%d@(%f,%f) [%u,%u], xspan=[%f-%f],yspan=[%f-%f] with %zu blocks [%s]",
+          ret->id(),
+          ret->real_loc().GetX(),
+          ret->real_loc().GetY(),
+          ret->discrete_loc().first,
+          ret->discrete_loc().second,
+          ret->xspan(ret->real_loc()).get_min(),
+          ret->xspan(ret->real_loc()).get_max(),
+          ret->yspan(ret->real_loc()).get_min(),
+          ret->yspan(ret->real_loc()).get_max(),
+          ret->n_blocks(),
+          s.c_str());
+  return ret;
 } /* create_single_cache() */
 
 void base_cache_creator::update_host_cells(cache_vector& caches) {
