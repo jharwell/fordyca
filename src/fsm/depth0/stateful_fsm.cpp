@@ -35,7 +35,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 stateful_fsm::stateful_fsm(
-    const controller::block_selection_matrix* const sel_matrix,
+    const controller::block_sel_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),

@@ -58,7 +58,7 @@ namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -136,7 +136,7 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
 
 
  protected:
-  const cache_selection_matrix*  cache_sel_matrix(void) const {
+  const class cache_sel_matrix* cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
   }
   /**
@@ -170,7 +170,7 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   // clang-format off
   bool                                      m_display_task{false};
   bool                                      m_task_aborted{false};
-  std::unique_ptr<cache_selection_matrix>   m_cache_sel_matrix;
+  std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
   std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
   // clang-format on
 };

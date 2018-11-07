@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { class cache_selection_matrix; }
+namespace controller { class cache_sel_matrix; }
 
 NS_START(fsm, depth2);
 
@@ -58,7 +58,7 @@ class acquire_cache_site_fsm : public acquire_goal_fsm,
                                public er::client<acquire_cache_site_fsm> {
  public:
   acquire_cache_site_fsm(
-      const controller::cache_selection_matrix* csel_matrix,
+      const controller::cache_sel_matrix* csel_matrix,
       controller::saa_subsystem* saa,
       ds::perceived_arena_map* map);
 
@@ -73,7 +73,7 @@ class acquire_cache_site_fsm : public acquire_goal_fsm,
   bool site_acquired_cb(bool explore_result) const;
 
   // clang-format off
-  const controller::cache_selection_matrix* const mc_matrix;
+  const controller::cache_sel_matrix* const mc_matrix;
   // clang-format on
 };
 

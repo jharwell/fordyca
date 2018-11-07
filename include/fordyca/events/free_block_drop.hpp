@@ -77,6 +77,11 @@ class free_block_drop
                                 tasks::depth2::cache_finisher,
                                 fsm::depth1::block_to_goal_fsm> {
  public:
+  /**
+   * @param block The block to drop.
+   * @param coord The discrete coordinates of the cell to drop the block in.
+   * @param resolution The resolution of the arena map.
+   */
   free_block_drop(const std::shared_ptr<representation::base_block>& block,
                   rcppsw::math::dcoord2 coord,
                   double resolution);

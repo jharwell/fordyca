@@ -36,7 +36,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
-    const controller::cache_selection_matrix* sel_matrix,
+    const controller::cache_sel_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),

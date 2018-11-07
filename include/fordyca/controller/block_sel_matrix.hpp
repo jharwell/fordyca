@@ -1,5 +1,5 @@
 /**
- * @file cache_selection_matrix.hpp
+ * @file block_sel_matrix.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_CACHE_SELECTION_MATRIX_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_CACHE_SELECTION_MATRIX_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_SEL_MATRIX_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_SEL_MATRIX_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,46 +28,52 @@
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 namespace params {
-struct cache_selection_matrix_params;
+struct block_sel_matrix_params;
 }
 NS_START(controller);
-namespace rmath = rcppsw::math;
+using block_sel_variant = boost::variant<double,
+                                               argos::CVector2,
+                                               std::vector<int>>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
- * @class cache_selection_matrix
+ * @class block_sel_matrix
  * @ingroup controller
  *
  * @brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:
  *
- * - existing cache
- * - new cache
- * - cache site
+ * - block (of whatever type)
  *
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_selection_matrix
-    : public std::map<std::string, boost::variant<double, argos::CVector2,
-                                                  rmath::range<uint>>> {
+
+class block_sel_matrix : public std::map<std::string, block_sel_variant> {
  public:
-  cache_selection_matrix(const struct params::cache_selection_matrix_params* params,
-                         const argos::CVector2& nest_loc);
+  static constexpr char kNestLoc[] = "nest_loc";
+  static constexpr char kCubePriority[] = "cube_priority";
+  static constexpr char kRampPriority[] = "ramp_priority";
+  static constexpr char kSelExceptions[] = "sel_exceptions";
+
+  explicit block_sel_matrix(
+      const struct params::block_sel_matrix_params * params);
+
+  void sel_exception_add(int id);
+  void sel_exceptions_clear(void);
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_CACHE_SELECTION_MATRIX_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_SEL_MATRIX_HPP_ */

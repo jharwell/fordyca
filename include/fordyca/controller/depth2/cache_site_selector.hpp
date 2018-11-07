@@ -43,7 +43,7 @@ class base_cache;
 class base_block;
 }
 NS_START(controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -60,23 +60,23 @@ NS_START(depth2);
 class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
-    representation::base_cache* cache;
-    cache_site_selector*        selector;
-    double                      cache_prox_dist;
+    representation::base_cache* cache{nullptr};
+    cache_site_selector*        selector{nullptr};
+    double                      cache_prox_dist{0.0};
   };
   struct block_constraint_data {
-    representation::base_block* block;
-    cache_site_selector*        selector;
-    double                      block_prox_dist;
+    representation::base_block* block{nullptr};
+    cache_site_selector*        selector{nullptr};
+    double                      block_prox_dist{0.0};
   };
   struct nest_constraint_data {
-    argos::CVector2      nest_loc;
-    cache_site_selector* selector;
-    double               nest_prox_dist;
+    argos::CVector2      nest_loc{};
+    cache_site_selector* selector{nullptr};
+    double               nest_prox_dist{0.0};
   };
   struct site_utility_data {
-    argos::CVector2 robot_loc;
-    argos::CVector2 nest_loc;
+    argos::CVector2 robot_loc{};
+    argos::CVector2 nest_loc{};
   };
 
   using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
@@ -85,7 +85,7 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
   using block_constraint_vector = std::vector<block_constraint_data>;
   using nest_constraint_vector = std::vector<nest_constraint_data>;
 
-  explicit cache_site_selector(const controller::cache_selection_matrix* matrix);
+  explicit cache_site_selector(const controller::cache_sel_matrix* matrix);
 
   ~cache_site_selector(void) override = default;
   cache_site_selector& operator=(const cache_site_selector& other) = delete;
@@ -160,10 +160,11 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                       const block_list& known_blocks,
                       argos::CVector2 robot_loc,
                       constraint_set* constraints,
+                      struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);
 
   // clang-format off
-  const controller::cache_selection_matrix* const mc_matrix;
+  const controller::cache_sel_matrix* const mc_matrix;
   nlopt::opt                                      m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
   std::vector<bool> m_cc_violations{};
   std::vector<bool> m_bc_violations{};

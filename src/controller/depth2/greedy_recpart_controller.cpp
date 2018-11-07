@@ -33,7 +33,7 @@
 
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces

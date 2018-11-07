@@ -52,8 +52,8 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    const controller::block_selection_matrix* bsel_matrix,
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::block_sel_matrix* bsel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
     : depth1::tasking_initializer(bsel_matrix,

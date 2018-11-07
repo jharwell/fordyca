@@ -1,5 +1,5 @@
 /**
- * @file block_selection_matrix_params.hpp
+ * @file cache_sel_matrix_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,15 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "fordyca/params/block_priority_params.hpp"
-#include "rcppsw/params/base_params.hpp"
+#include <string>
+
+#include "fordyca/params/cache_sel_matrix_params.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,19 +35,44 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct block_selection_matrix_params
+ * @class cache_sel_matrix_parser
  * @ingroup params
  *
- * @brief XML parameters for the \ref block_selection_matrix
+ * @brief Parses XML parameters for the \ref cache_sel_matrix at the start
+ * of simulation.
  */
-struct block_selection_matrix_params : public rcppsw::params::base_params {
-  argos::CVector2 nest{};
-  struct block_priority_params priorities {};
+class cache_sel_matrix_parser : public rcppsw::params::xml_param_parser {
+ public:
+  explicit cache_sel_matrix_parser(uint level) : xml_param_parser(level) {}
+
+  /**
+   * @brief The root tag that all cache sel matrix parameters should lie
+   * under in the XML tree.
+   */
+  static constexpr char kXMLRoot[] = "cache_selection_matrix";
+
+  void parse(const ticpp::Element& node) override;
+  void show(std::ostream& stream) const override;
+
+  std::string xml_root(void) const override { return kXMLRoot; }
+  std::shared_ptr<cache_sel_matrix_params> parse_results(void) const {
+    return m_params;
+  }
+
+ private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
+    return m_params;
+  }
+
+  // clang-format off
+  std::shared_ptr<cache_sel_matrix_params> m_params{nullptr};
+  // clang-format on
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SELECTION_MATRIX_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_ */

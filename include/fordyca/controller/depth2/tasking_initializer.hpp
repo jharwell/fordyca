@@ -53,8 +53,8 @@ namespace ta = rcppsw::task_allocation;
 class tasking_initializer : public depth1::tasking_initializer,
                             public er::client<tasking_initializer> {
  public:
-  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
-                      const controller::cache_selection_matrix* csel_matrix,
+  tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
+                      const controller::cache_sel_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
   ~tasking_initializer(void) override;

@@ -223,8 +223,8 @@ void depth2_loop_functions::PreStep() {
 
 void depth2_loop_functions::Reset() {
   m_metrics_agg->reset_all();
-  auto pair =
-      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
+  auto pair = m_cache_manager->create(arena_map()->caches(),
+                                      arena_map()->blocks());
   if (pair.first) {
     arena_map()->caches_add(pair.second);
   }

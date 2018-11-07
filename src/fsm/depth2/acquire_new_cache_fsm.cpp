@@ -38,37 +38,96 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* saa,
     ds::perceived_arena_map* const map)
-    : base_acquire_cache_fsm(csel_matrix, saa, map),
-      ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache") {}
+    : acquire_goal_fsm(saa,
+                       map,
+                       std::bind([](){ return false; })),
+      ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
+      mc_sel_matrix(csel_matrix) {}
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::select_cache_for_acquisition(
     argos::CVector2* const acquisition) {
-  controller::depth2::new_cache_selector selector(sel_matrix());
+  controller::depth2::new_cache_selector selector(mc_sel_matrix);
 
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
       selector.calc_best(map()->perceived_blocks(), base_sensors()->position());
-  /*a
-   * If this happens, all the blocks we know of are too close for us to vector
-   * to.
+
+  /*
+   * If this happens, all the blocks we know of are ineligible for us to
+   * vector to (too close or something similar).
    */
   if (nullptr == best.ent) {
     return false;
   }
-  ER_INFO("Select new cache for acquisition: %d@(%u, %u) [utility=%f]",
+  ER_INFO("Select new cache%d@(%f,%f) [%u, %u], utility=%f for acquisition",
           best.ent->id(),
+          best.ent->real_loc().GetX(),
+          best.ent->real_loc().GetY(),
           best.ent->discrete_loc().first,
           best.ent->discrete_loc().second,
           best.density.last_result());
   *acquisition = best.ent->real_loc();
   return true;
-} /* select_cache() */
+} /* select_cache_for_acquisition() */
+
+bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
+  ER_ASSERT(!explore_result, "New cache acquisition via exploration");
+  argos::CVector2 position = saa_subsystem()->sensing()->position();
+  for (auto &b : map()->blocks()) {
+    if ((b->real_loc() - position).Length() <= vector_fsm::kCACHE_ARRIVAL_TOL) {
+      return true;
+    }
+  } /* for(&b..) */
+  ER_WARN("Robot arrived at location (%f,%f), but no known block within range.",
+          position.GetX(),
+          position.GetY());
+  return false;
+} /* cache_acquired_cb() */
+
+bool acquire_new_cache_fsm::acquire_known_goal(void) {
+  std::list<representation::perceived_block> blocks = map()->perceived_blocks();
+  /*
+   * If we don't know of any blocks and we are not current vectoring towards
+   * one, then there is no way we can acquire a known block, so bail out.
+   */
+  if (blocks.empty() && !vector_fsm().task_running()) {
+    return false;
+  }
+
+  if (!blocks.empty() && !vector_fsm().task_running()) {
+    /*
+     * If we get here, we must know of some blocks, but not be currently
+     * vectoring toward any of them.
+     */
+    if (!vector_fsm().task_running()) {
+      argos::CVector2 best;
+      if (!select_cache_for_acquisition(&best)) {
+        return false;
+      }
+      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, best);
+      explore_fsm().task_reset();
+      vector_fsm().task_reset();
+      vector_fsm().task_start(&v);
+    }
+  }
+
+  /* we are vectoring */
+  if (!vector_fsm().task_finished()) {
+    vector_fsm().task_execute();
+  }
+
+  if (vector_fsm().task_finished()) {
+    vector_fsm().task_reset();
+    return cache_acquired_cb(false);
+  }
+  return false;
+} /* acquire_known_goal() */
 
 /*******************************************************************************
  * FSM Metrics

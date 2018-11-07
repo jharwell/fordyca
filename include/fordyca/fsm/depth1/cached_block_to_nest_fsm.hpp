@@ -79,7 +79,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  cached_block_to_nest_fsm(const controller::cache_selection_matrix* sel_matrix,
+  cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
                            ds::perceived_arena_map* map);
 

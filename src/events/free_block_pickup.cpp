@@ -138,7 +138,7 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
    * true (and the fact that it isn't is not an indication of inconsistent
    * simulation state :-( ). This can happen if, for example, a robot is
    * exploring for a block very near the edge of the arena, and happens to drive
-   * over a block. In that case the block is not in its LOS (BUG!), or it its
+   * over a block. In that case the block is not in its LOS (BUG!), or in its
    * occupancy grid, and hence the assertion failure here.
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */

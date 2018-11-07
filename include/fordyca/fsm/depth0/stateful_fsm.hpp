@@ -66,7 +66,7 @@ class stateful_fsm : public base_foraging_fsm,
                      public block_transporter,
                      public visitor::visitable_any<depth0::stateful_fsm> {
  public:
-  stateful_fsm(const controller::block_selection_matrix* sel_matrix,
+  stateful_fsm(const controller::block_sel_matrix* sel_matrix,
                controller::saa_subsystem* saa,
                ds::perceived_arena_map* map);
 

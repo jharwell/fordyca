@@ -33,8 +33,8 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_new_cache_fsm::block_to_new_cache_fsm(
-    const controller::block_selection_matrix* bsel_matrix,
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::block_sel_matrix* bsel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : block_to_goal_fsm(bsel_matrix, saa, map),

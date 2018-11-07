@@ -34,7 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ NS_START(depth1);
  */
 class existing_cache_selector: public rcppsw::er::client<existing_cache_selector> {
  public:
-  explicit existing_cache_selector(const cache_selection_matrix* matrix);
+  explicit existing_cache_selector(const cache_sel_matrix* matrix);
 
   ~existing_cache_selector(void) override = default;
   existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
@@ -68,7 +68,7 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
       argos::CVector2 robot_loc);
 
  private:
-  const cache_selection_matrix* const mc_matrix;
+  const cache_sel_matrix* const mc_matrix;
 };
 
 NS_END(depth1, controller, fordyca);

@@ -62,7 +62,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
                                public task_allocation::taskable,
                                public visitor::visitable_any<free_block_to_nest_fsm> {
  public:
-  free_block_to_nest_fsm(const controller::block_selection_matrix* sel_matrix,
+  free_block_to_nest_fsm(const controller::block_sel_matrix* sel_matrix,
                          controller::saa_subsystem* saa,
                          ds::perceived_arena_map* map);
 

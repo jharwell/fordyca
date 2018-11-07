@@ -42,7 +42,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    const controller::cache_selection_matrix* const sel_matrix,
+    const controller::cache_sel_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),

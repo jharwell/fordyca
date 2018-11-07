@@ -1,5 +1,5 @@
 /**
- * @file block_selection_matrix.cpp
+ * @file block_sel_matrix_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,35 +21,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/block_selection_matrix.hpp"
-#include "fordyca/params/block_selection_matrix_params.hpp"
+#include "fordyca/params/block_sel_matrix_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Global Variables
  ******************************************************************************/
-block_selection_matrix::block_selection_matrix(
-    const struct params::block_selection_matrix_params * params) {
-  this->insert(std::make_pair("nest_loc", params->nest));
-  this->insert(std::make_pair("cube_priority", params->priorities.cube));
-  this->insert(std::make_pair("ramp_priority", params->priorities.ramp));
-  this->insert(std::make_pair("sel_exceptions", std::vector<int>()));
-}
+constexpr char block_sel_matrix_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_selection_matrix::sel_exception_add(int id) {
-  boost::get<std::vector<int>>(this->find("sel_exceptions")->second).push_back(id);
-} /* sel_exception_add() */
+void block_sel_matrix_parser::parse(const ticpp::Element& node) {
+  ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-void block_selection_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<int>>(this->operator[]("sel_exceptions")).clear();
-} /* sel_exceptions_clear() */
+  rcppsw::utils::line_parser parser(' ');
+  std::string val;
+  std::vector<std::string> res;
+  res = parser.parse(cnode.GetAttribute("nest"));
+  m_params->nest.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
+  m_priorities.parse(cnode);
+  m_params->priorities = *m_priorities.parse_results();
+} /* parse() */
 
-NS_END(controller, fordyca);
+void block_sel_matrix_parser::show(std::ostream& stream) const {
+  stream << build_header()
+         << XML_ATTR_STR(m_params, nest) << std::endl
+         << m_priorities << std::endl
+         << build_footer();
+} /* show() */
+
+NS_END(params, fordyca);

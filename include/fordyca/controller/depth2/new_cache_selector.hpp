@@ -34,7 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ NS_START(depth2);
  */
 class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
  public:
-  explicit new_cache_selector(const controller::cache_selection_matrix* csel_matrix);
+  explicit new_cache_selector(const controller::cache_sel_matrix* csel_matrix);
 
   ~new_cache_selector(void) override = default;
   new_cache_selector& operator=(const new_cache_selector& other) = delete;
@@ -70,7 +70,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
 
  private:
   // clang-format off
-  const controller::cache_selection_matrix* const mc_matrix;
+  const controller::cache_sel_matrix* const mc_matrix;
   // clang-format on
 };
 

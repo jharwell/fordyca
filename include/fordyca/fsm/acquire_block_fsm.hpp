@@ -27,7 +27,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <map>
 
-#include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ NS_START(fordyca, fsm);
 class acquire_block_fsm : public acquire_goal_fsm,
                           public er::client<acquire_block_fsm> {
  public:
-  acquire_block_fsm(const controller::block_selection_matrix* matrix,
+  acquire_block_fsm(const controller::block_sel_matrix* matrix,
                     controller::saa_subsystem* saa,
                     ds::perceived_arena_map* map);
 
@@ -86,7 +86,7 @@ class acquire_block_fsm : public acquire_goal_fsm,
   bool block_acquired_cb(bool explore_result) const;
 
   // clang-format off
-  const controller::block_selection_matrix* const mc_matrix;
+  const controller::block_sel_matrix* const mc_matrix;
   // clang-format on
 };
 

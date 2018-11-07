@@ -62,7 +62,7 @@ class cache_transferer_fsm : public base_foraging_fsm,
                              public visitor::visitable_any<depth2::cache_transferer_fsm> {
  public:
   cache_transferer_fsm(
-      const controller::cache_selection_matrix* sel_matrix,
+      const controller::cache_sel_matrix* sel_matrix,
       controller::saa_subsystem* saa,
       ds::perceived_arena_map* map);
 

@@ -133,10 +133,11 @@ proximity_status_type cache_site_block_proximity(
 
 /**
  * @brief Determine if creating a new cache centered at the robot's current
- * position will overlap with any othennr caches in the arena. This is an
- * approximate check, because the weighted centroid of constituent blocks is
- * used rather than the robot's current location when creating a new cache, but
- * this should serve as a good check against invalid cache creation.
+ * position will overlap with any other caches in the arena/be too close to
+ * them. This is an approximate check, because the weighted centroid of
+ * constituent blocks is used rather than the robot's current location when
+ * creating a new cache, but this should serve as a good check against invalid
+ * cache creation.
  *
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).

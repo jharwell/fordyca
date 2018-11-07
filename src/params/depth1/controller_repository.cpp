@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
-#include "fordyca/params/cache_selection_matrix_parser.hpp"
+#include "fordyca/params/cache_sel_matrix_parser.hpp"
 #include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
 #include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
 
@@ -37,9 +37,9 @@ namespace ta = rcppsw::task_allocation;
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  register_parser<cache_selection_matrix_parser,
-                  cache_selection_matrix_params>(cache_selection_matrix_parser::kXMLRoot,
-                                                 cache_selection_matrix_parser::kHeader1);
+  register_parser<cache_sel_matrix_parser,
+                  cache_sel_matrix_params>(cache_sel_matrix_parser::kXMLRoot,
+                                           cache_sel_matrix_parser::kHeader1);
     register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
       ta::task_allocation_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);

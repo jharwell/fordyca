@@ -1,5 +1,5 @@
 /**
- * @file cache_selection_matrix_parser.cpp
+ * @file cache_sel_matrix_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/cache_selection_matrix_parser.hpp"
+#include "fordyca/params/cache_sel_matrix_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -32,12 +32,12 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char cache_selection_matrix_parser::kXMLRoot[];
+constexpr char cache_sel_matrix_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_selection_matrix_parser::parse(const ticpp::Element& node) {
+void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
@@ -47,7 +47,7 @@ void cache_selection_matrix_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_params, site_yrange);
 } /* parse() */
 
-void cache_selection_matrix_parser::show(std::ostream& stream) const {
+void cache_sel_matrix_parser::show(std::ostream& stream) const {
   stream << build_header()
          << XML_ATTR_STR(m_params, cache_prox_dist) << std::endl
          << XML_ATTR_STR(m_params, block_prox_dist) << std::endl
