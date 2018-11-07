@@ -2,7 +2,7 @@
 
 This is the main entry point for getting started on the project.
 
-## Papers
+# Papers
 
 1. J. Harwell and M. Gini, "Broadening applicability of swarm-robotic foraging
    through constraint relaxation," 2018 IEEE International Conference on
@@ -10,13 +10,13 @@ This is the main entry point for getting started on the project.
    Australia, 2018, pp. 116-122.
    [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
 
-## Pre-cloning Setup
+# Pre-cloning Setup
 
 1. Install development packages for the project:
 
    - Qt5 (`qtbase5-dev` on ubuntu)
    - NLopt (`libnlopt-dev` on ubuntu)
-   
+
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
 
@@ -43,7 +43,6 @@ This is the main entry point for getting started on the project.
    look at the platform requirements for that project and install any
    needed packages/libraries.
 
-
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
 
@@ -52,7 +51,7 @@ This is the main entry point for getting started on the project.
 
    Follow all pre/post-cloning instructions found in README for the rcppsw repo.
 
-## Post-cloning setup
+# Post-cloning setup
 
 1. Check out the development branch, as that has not only the latest semi-stable
    release, but also the most up-to-date documentation, including this README.
@@ -73,7 +72,22 @@ This is the main entry point for getting started on the project.
 
         make documentation
 
-## Running On Your Laptop
+# Configuring Simulations
+
+For parameter configuration see [parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
+
+## Controller Configuration
+
+| Controller Name        | Required loop/QT user functions | Notes                                                                                             |
+|------------------------|---------------------------------|---------------------------------------------------------------------------------------------------|
+| stateless              | stateless                       |                                                                                                   |
+| stateful               | stateful                        |                                                                                                   |
+| greedy\_partitioning   | depth1                          | Requires static caches to also be enabled. Only really valid for single source foraging scenarios |
+| oracular\_partitioning | depth1                          | Requires static caches and the oracle to be enabled.                                              |
+| greedy\_recpart        | depth2                          | Requires dynamic caches to also be enabled.                                                       |
+| oracular\_recpart      | depth2                          | Requires dynamic caches and the oracle to be enabled.                                             |
+
+# Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
 
@@ -93,7 +107,7 @@ After successful compilation, follow these steps to run a foraging scenario:
 
    This should pop up a nice GUI from which you can start the experiment.
 
-## Running on MSI
+# Running on MSI
 
 ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
 access to that directory as part of the gini group.
@@ -149,7 +163,8 @@ access to that directory as part of the gini group.
      that the name of [controller, loop functions, qt user functions], are
      compatible (i.e. have the same name/are from the same depth).
 
-## Contributing
+
+# Contributing
 
 For contributing to `fordyca`, see
 [CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/blob/master/docs/CONTRIBUTING.md).
