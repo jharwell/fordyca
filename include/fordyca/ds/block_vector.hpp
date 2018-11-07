@@ -1,5 +1,5 @@
 /**
- * @file cache_sel_matrix_params.hpp
+ * @file block_vector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,38 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_
+#define INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/range.hpp"
-#include "rcppsw/params/base_params.hpp"
+#include <vector>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca);
+namespace representation {
+class base_block;
+}
+NS_START(ds);
+
+using block_vector_type = std::shared_ptr<representation::base_block>;
 
 /*******************************************************************************
- * Structure Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @struct cache_sel_matrix_params
- * @ingroup params
- *
- * @brief XML parameters for the \ref cache_sel_matrix
- */
-struct cache_sel_matrix_params : public rcppsw::params::base_params {
-  double cache_prox_dist{0.0};
-  double block_prox_dist{0.0};
-  double nest_prox_dist{0.0};
-  rcppsw::math::range<uint> site_xrange{0, 0};
-  rcppsw::math::range<uint> site_yrange{0, 0};
-};
+using block_vector = std::vector<block_vector_type>;
 
-NS_END(params, fordyca);
+NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_ */

@@ -24,9 +24,9 @@
 #include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,10 +41,10 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const controller::cache_sel_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
-    : acquire_goal_fsm(saa,
-                       map,
-                       std::bind(&acquire_existing_cache_fsm::explore_goal_reached,
-                                 this)),
+    : acquire_goal_fsm(
+          saa,
+          map,
+          std::bind(&acquire_existing_cache_fsm::explore_goal_reached, this)),
       ER_CLIENT_INIT("fordyca.fsm.depth1.acquire_existing_cache"),
       mc_sel_matrix(sel_matrix) {}
 
@@ -63,13 +63,14 @@ bool acquire_existing_cache_fsm::select_cache_for_acquisition(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_INFO("Selected existing cache%d@(%f,%f) [%u,%u], utility=%f for acquisition",
-          best.ent->id(),
-          best.ent->real_loc().GetX(),
-          best.ent->real_loc().GetY(),
-          best.ent->discrete_loc().first,
-          best.ent->discrete_loc().second,
-          best.density.last_result());
+  ER_INFO(
+      "Selected existing cache%d@(%f,%f) [%u,%u], utility=%f for acquisition",
+      best.ent->id(),
+      best.ent->real_loc().GetX(),
+      best.ent->real_loc().GetY(),
+      best.ent->discrete_loc().first,
+      best.ent->discrete_loc().second,
+      best.density.last_result());
 
   /*
    * Now that we have the location of the best cache, we need to pick a random
@@ -86,14 +87,15 @@ bool acquire_existing_cache_fsm::select_cache_for_acquisition(
                                               yrange.get_max());
 
   *acquisition = argos::CVector2(xrnd(m_rd), yrnd(m_rd));
-  ER_INFO("Selected point (%f,%f) inside cache%d: xrange=[%f-%f], yrange=[%f-%f]",
-          acquisition->GetX(),
-          acquisition->GetY(),
-          best.ent->id(),
-          xrange.get_min(),
-          xrange.get_max(),
-          yrange.get_min(),
-          yrange.get_max());
+  ER_INFO(
+      "Selected point (%f,%f) inside cache%d: xrange=[%f-%f], yrange=[%f-%f]",
+      acquisition->GetX(),
+      acquisition->GetY(),
+      best.ent->id(),
+      xrange.get_min(),
+      xrange.get_max(),
+      yrange.get_min(),
+      yrange.get_max());
   return true;
 } /* select_cache_for_acquisition() */
 

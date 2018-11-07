@@ -41,7 +41,7 @@ constexpr char block_sel_matrix::kSelExceptions[];
  * Constructors/Destructors
  ******************************************************************************/
 block_sel_matrix::block_sel_matrix(
-    const struct params::block_sel_matrix_params * params) {
+    const struct params::block_sel_matrix_params* params) {
   this->insert(std::make_pair(kNestLoc, params->nest));
   this->insert(std::make_pair(kCubePriority, params->priorities.cube));
   this->insert(std::make_pair(kRampPriority, params->priorities.ramp));
@@ -58,6 +58,5 @@ void block_sel_matrix::sel_exception_add(int id) {
 void block_sel_matrix::sel_exceptions_clear(void) {
   boost::get<std::vector<int>>(this->operator[](kSelExceptions)).clear();
 } /* sel_exceptions_clear() */
-
 
 NS_END(controller, fordyca);

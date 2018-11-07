@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
-#include "fordyca/params/occupancy_grid_parser.hpp"
 #include "fordyca/params/block_sel_matrix_parser.hpp"
+#include "fordyca/params/occupancy_grid_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,9 +36,8 @@ NS_START(fordyca, params, depth0);
 stateful_controller_repository::stateful_controller_repository(void) {
   register_parser<occupancy_grid_parser, occupancy_grid_params>(
       occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
-  register_parser<block_sel_matrix_parser,
-                  block_sel_matrix_params>(block_sel_matrix_parser::kXMLRoot,
-                                           block_sel_matrix_parser::kHeader1);
+  register_parser<block_sel_matrix_parser, block_sel_matrix_params>(
+      block_sel_matrix_parser::kXMLRoot, block_sel_matrix_parser::kHeader1);
 }
 
 NS_END(depth0, params, fordyca);

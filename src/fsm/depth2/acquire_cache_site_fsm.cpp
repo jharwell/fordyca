@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
     bool explore_result) const {
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
   argos::CVector2 robot_loc = saa_subsystem()->sensing()->position();
-  for (auto &b : map()->blocks()) {
+  for (auto& b : map()->blocks()) {
     if ((robot_loc - b->real_loc()).Length() <=
         boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
       ER_WARN("Cannot acquire cache site@(%f,%f): Block%d@(%f,%f) too close",
@@ -82,11 +82,10 @@ bool acquire_cache_site_fsm::acquire_known_goal(void) {
   /* Start vectoring towards our chosen site */
   if (!vector_fsm().task_running() && !vector_fsm().task_finished()) {
     controller::depth2::cache_site_selector s(mc_matrix);
-    tasks::vector_argument v(
-        vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
-        s.calc_best(map()->caches(),
-                    map()->blocks(),
-                    saa_subsystem()->sensing()->position()));
+    tasks::vector_argument v(vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
+                             s.calc_best(map()->caches(),
+                                         map()->blocks(),
+                                         saa_subsystem()->sensing()->position()));
     explore_fsm().task_reset();
     vector_fsm().task_reset();
     vector_fsm().task_start(&v);

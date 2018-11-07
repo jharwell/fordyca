@@ -102,7 +102,7 @@ bool perceived_arena_map::block_add(
       m_blocks.end(),
       [&block_in](const std::shared_ptr<representation::base_block>& b) {
         return b->discrete_loc() == block_in->discrete_loc() &&
-        b->id() != block_in->id();
+               b->id() != block_in->id();
       });
 
   /*
@@ -165,7 +165,8 @@ bool perceived_arena_map::block_remove(
     const std::shared_ptr<representation::base_block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
-      ER_TRACE("Removing block%d@(%u,%u)", victim->id(),
+      ER_TRACE("Removing block%d@(%u,%u)",
+               victim->id(),
                victim->discrete_loc().first,
                victim->discrete_loc().second);
       events::cell_empty op(victim->discrete_loc());

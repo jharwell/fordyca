@@ -29,10 +29,10 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +61,6 @@ void stateful_controller::block_sel_matrix(
     std::unique_ptr<class block_sel_matrix> m) {
   m_block_sel_matrix = std::move(m);
 }
-
 
 void stateful_controller::perception(
     std::unique_ptr<base_perception_subsystem> perception) {
@@ -139,7 +138,6 @@ void stateful_controller::Init(ticpp::Element& node) {
       base_controller::saa_subsystem(),
       m_perception->map());
 
-
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -150,14 +148,14 @@ void stateful_controller::Reset(void) {
 } /* Reset() */
 
 FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                   stateful_controller,
-                   block_transport_goal,
-                   m_fsm);
+                       stateful_controller,
+                       block_transport_goal,
+                       m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                   stateful_controller,
-                   acquisition_goal,
-                   m_fsm);
+                       stateful_controller,
+                       acquisition_goal,
+                       m_fsm);
 
 FSM_WRAPPER_DEFINE_PTR(bool, stateful_controller, goal_acquired, m_fsm);
 

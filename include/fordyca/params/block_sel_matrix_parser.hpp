@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/params/block_priorities_parser.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "fordyca/params/block_priorities_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,9 +47,8 @@ NS_START(fordyca, params);
  */
 class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit block_sel_matrix_parser(uint level) :
-      xml_param_parser(level),
-      m_priorities(level + 1) {}
+  explicit block_sel_matrix_parser(uint level)
+      : xml_param_parser(level), m_priorities(level + 1) {}
 
   /**
    * @brief The root tag that all block sel matrix parameters should lie
@@ -61,7 +60,9 @@ class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
   void show(std::ostream& stream) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<block_sel_matrix_params> parse_results(void) const { return m_params; }
+  std::shared_ptr<block_sel_matrix_params> parse_results(void) const {
+    return m_params;
+  }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(

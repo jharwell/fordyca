@@ -76,10 +76,10 @@ bool random_distributor::distribute_block(
     return false;
   }
   ER_INFO("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
-           coord[0],
-           coord[1],
-           coord[2],
-           coord[3]);
+          coord[0],
+          coord[1],
+          coord[2],
+          coord[3]);
 
   cell = &m_grid[coord[0]][coord[1]];
 

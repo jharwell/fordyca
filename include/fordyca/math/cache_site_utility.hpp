@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
-#include "rcppsw/math/sigmoid.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/sigmoid.hpp"
 
 /*******************************************************************************
  * Namespaces

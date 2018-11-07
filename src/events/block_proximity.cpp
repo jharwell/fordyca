@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_proximity.hpp"
-#include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,9 +38,9 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(const std::shared_ptr<representation::base_block>& block)
-    : ER_CLIENT_INIT("fordyca.events.block_proximity"),
-      m_block(block) {}
+block_proximity::block_proximity(
+    const std::shared_ptr<representation::base_block>& block)
+    : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
 
 /*******************************************************************************
  * Depth2 Foraging

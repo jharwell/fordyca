@@ -34,10 +34,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-stateful_fsm::stateful_fsm(
-    const controller::block_sel_matrix* const sel_matrix,
-    controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+stateful_fsm::stateful_fsm(const controller::block_sel_matrix* const sel_matrix,
+                           controller::saa_subsystem* const saa,
+                           ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.stateful"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -70,9 +69,7 @@ HFSM_STATE_DEFINE(stateful_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(stateful_fsm,
-                  block_to_nest,
-                  state_machine::event_data) {
+HFSM_STATE_DEFINE(stateful_fsm, block_to_nest, state_machine::event_data) {
   if (nullptr != data &&
       controller::foraging_signal::FSM_RUN != data->signal() &&
       state_machine::event_signal::IGNORED != data->signal()) {
@@ -118,7 +115,6 @@ void stateful_fsm::init(void) {
   base_foraging_fsm::init();
   m_block_fsm.task_reset();
 } /* init() */
-
 
 void stateful_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,

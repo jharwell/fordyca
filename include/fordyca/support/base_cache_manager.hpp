@@ -54,9 +54,6 @@ NS_START(support);
  */
 class base_cache_manager : public metrics::caches::lifecycle_metrics {
  public:
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
-
   explicit base_cache_manager(ds::arena_grid* const arena_grid)
       : m_grid(arena_grid) {}
   virtual ~base_cache_manager(void) = default;

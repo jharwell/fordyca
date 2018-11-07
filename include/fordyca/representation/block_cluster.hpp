@@ -42,7 +42,7 @@ NS_START(fordyca, representation);
  * @brief Represents a cluster of blocks in the arena as an entity for use
  * during block distribution.
  */
-class block_cluster : public rcppsw::er::client<block_cluster>{
+class block_cluster : public rcppsw::er::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view, uint capacity)
       : ER_CLIENT_INIT("fordyca.representation.block_cluster"),

@@ -61,9 +61,9 @@ __rcsw_pure double foraging_task::current_time(void) const {
 
 bool foraging_task::task_in_depth2(const polled_task* const task) {
   return task->name() == kCacheStarterName ||
-      task->name() == kCacheFinisherName ||
-      task->name() == kCacheTransfererName ||
-      task->name() == kCacheCollectorName;
+         task->name() == kCacheFinisherName ||
+         task->name() == kCacheTransfererName ||
+         task->name() == kCacheCollectorName;
 } /* task_in_depth2() */
 
 NS_END(depth2, tasks, fordyca);

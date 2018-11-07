@@ -29,6 +29,8 @@
 #include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -53,9 +55,7 @@ namespace er = rcppsw::er;
  */
 class base_cache_creator : public er::client<base_cache_creator> {
  public:
-  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
   using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
   /**
@@ -80,8 +80,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *
    * @return A vector of created caches.
    */
-  virtual cache_vector create_all(const cache_vector& existing_caches,
-                                  block_vector& candidate_blocks) = 0;
+  virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                                      ds::block_vector& candidate_blocks) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -89,7 +89,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *
    * @param caches Vector of newly created caches.
    */
-  void update_host_cells(cache_vector& caches);
+  void update_host_cells(ds::cache_vector& caches);
 
  protected:
   const ds::arena_grid* grid(void) const { return m_grid; }

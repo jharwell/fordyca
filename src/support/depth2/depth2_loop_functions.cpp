@@ -158,11 +158,10 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
 
 void depth2_loop_functions::cache_handling_init(
     const struct params::caches::caches_params* const cachep) {
-  m_cache_manager = rcppsw::make_unique<dynamic_cache_manager>(
-      cachep,
-      &arena_map()->decoratee());
+  m_cache_manager =
+      rcppsw::make_unique<dynamic_cache_manager>(cachep,
+                                                 &arena_map()->decoratee());
 } /* cache_handlng_init() */
-
 
 argos::CColor depth2_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -202,40 +201,55 @@ argos::CColor depth2_loop_functions::GetFloorColor(
 void depth2_loop_functions::PreStep() {
   ndc_push();
   base_loop_functions::PreStep();
-  /* Get metrics from caches */
-  for (auto& c : arena_map()->caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
-    c->reset_metrics();
-  } /* for(&c..) */
-  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
-  m_cache_manager->reset_metrics();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
-  m_metrics_agg->collect_from_arena(arena_map());
-  m_metrics_agg->collect_from_loop(this);
-  pre_step_final();
-  ndc_pop();
-} /* PreStep() */
 
-void depth2_loop_functions::Reset() {
-  m_metrics_agg->reset_all();
-  auto pair = m_cache_manager->create(arena_map()->caches(),
-                                      arena_map()->blocks());
+  /* create new caches */
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
   if (pair.first) {
     arena_map()->caches_add(pair.second);
+    floor()->SetChanged();
   }
-}
 
-void depth2_loop_functions::pre_step_final(void) {
+  /* handle cache removal */
   if (arena_map()->caches_removed() > 0) {
     m_cache_manager->cache_depleted();
     floor()->SetChanged();
     arena_map()->caches_removed_reset();
   }
+
+  pre_step_final();
+  ndc_pop();
+} /* PreStep() */
+
+void depth2_loop_functions::Reset(void) {
+  m_metrics_agg->reset_all();
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
+  if (pair.first) {
+    arena_map()->caches_add(pair.second);
+    floor()->SetChanged();
+  }
+}
+
+void depth2_loop_functions::pre_step_final(void) {
+  /* collect metrics from/about caches */
+  for (auto& c : arena_map()->caches()) {
+    m_metrics_agg->collect_from_cache(c.get());
+    c->reset_metrics();
+  } /* for(&c..) */
+
+  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
+  m_cache_manager->reset_metrics();
+
+  /* collect metrics about the arena  */
+  m_metrics_agg->collect_from_arena(arena_map());
+  m_metrics_agg->collect_from_loop(this);
 
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();

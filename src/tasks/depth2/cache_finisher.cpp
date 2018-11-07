@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/events/block_vanished.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "fordyca/events/cache_proximity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,14 +54,14 @@ void cache_finisher::task_start(const task_allocation::taskable_argument* const)
 } /* task_start() */
 
 double cache_finisher::abort_prob_calc(void) {
-    if (-1 == active_interface()) {
+  if (-1 == active_interface()) {
     return ta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }
 } /* abort_prob_calc() */
 
-double cache_finisher::interface_time_calc(uint interface,double start_time) {
+double cache_finisher::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */

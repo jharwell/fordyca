@@ -25,10 +25,10 @@
 #include <random>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/representation/perceived_cache.hpp"
+#include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_block.hpp"
-#include "fordyca/math/cache_site_utility.hpp"
+#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,20 +48,14 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-argos::CVector2 cache_site_selector::calc_best(
-    const cache_list& known_caches,
-    const block_list& known_blocks,
-    argos::CVector2 robot_loc) {
+argos::CVector2 cache_site_selector::calc_best(const cache_list& known_caches,
+                                               const block_list& known_blocks,
+                                               argos::CVector2 robot_loc) {
   double max_utility;
   std::vector<double> point;
   constraint_set constraints;
   struct site_utility_data u;
-  opt_initialize(known_caches,
-                 known_blocks,
-                 robot_loc,
-                 &constraints,
-                 &u,
-                 &point);
+  opt_initialize(known_caches, known_blocks, robot_loc, &constraints, &u, &point);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
@@ -76,17 +70,19 @@ argos::CVector2 cache_site_selector::calc_best(
     ER_WARN("NLopt failed");
   }
 
-  ER_INFO("Selected cache site @(%f, %f), utility=%f", point[0], point[1],
+  ER_INFO("Selected cache site @(%f, %f), utility=%f",
+          point[0],
+          point[1],
           max_utility);
-  uint cc_count = std::accumulate(std::begin(m_cc_violations),
-                             std::end(m_cc_violations),
-                             0);
-  uint bc_count = std::accumulate(std::begin(m_bc_violations),
-                                  std::end(m_bc_violations),
-                                  0);
+  uint cc_count =
+      std::accumulate(std::begin(m_cc_violations), std::end(m_cc_violations), 0);
+  uint bc_count =
+      std::accumulate(std::begin(m_bc_violations), std::end(m_bc_violations), 0);
 
   ER_INFO("%u cache, %u block, %u nest constraint violations on cache site",
-          cc_count, bc_count, m_nc_violations);
+          cc_count,
+          bc_count,
+          m_nc_violations);
 
   return argos::CVector2(point[0], point[1]);
 } /* calc_best() */
@@ -98,22 +94,22 @@ void cache_site_selector::opt_initialize(
     constraint_set* const constraints,
     struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
-    argos::CVector2 nest_loc = boost::get<argos::CVector2>(
-        mc_matrix->find(cselm::kNestLoc)->second);
+  argos::CVector2 nest_loc =
+      boost::get<argos::CVector2>(mc_matrix->find(cselm::kNestLoc)->second);
 
   std::string baccum;
   std::for_each(known_blocks.begin(), known_blocks.end(), [&](const auto& b) {
-      baccum += "b" + std::to_string(b->id()) + "->(" +
-                std::to_string(b->discrete_loc().first) + "," +
-                std::to_string(b->discrete_loc().second) + "),";
-    });
+    baccum += "b" + std::to_string(b->id()) + "->(" +
+              std::to_string(b->discrete_loc().first) + "," +
+              std::to_string(b->discrete_loc().second) + "),";
+  });
 
   std::string caccum;
   std::for_each(known_caches.begin(), known_caches.end(), [&](const auto& c) {
-      caccum += "c" + std::to_string(c->id()) + "->(" +
-                std::to_string(c->discrete_loc().first) + "," +
-                std::to_string(c->discrete_loc().second) + "),";
-    });
+    caccum += "c" + std::to_string(c->id()) + "->(" +
+              std::to_string(c->discrete_loc().first) + "," +
+              std::to_string(c->discrete_loc().second) + "),";
+  });
 
   ER_INFO("Known blocks: [%s]", baccum.c_str());
   ER_INFO("Known caches: [%s]", caccum.c_str());
@@ -139,9 +135,9 @@ void cache_site_selector::opt_initialize(
   m_alg.set_ftol_rel(kUTILITY_TOL);
   m_alg.set_stopval(1000000);
   m_alg.set_lower_bounds({static_cast<double>(xrange.get_min()),
-          static_cast<double>(yrange.get_min())});
+                          static_cast<double>(yrange.get_min())});
   m_alg.set_upper_bounds({static_cast<double>(xrange.get_max()),
-          static_cast<double>(yrange.get_max())});
+                          static_cast<double>(yrange.get_max())});
   m_alg.set_maxeval(kMAX_ITERATIONS);
   m_alg.set_default_initial_step({1.0, 1.0});
 
@@ -162,51 +158,57 @@ void cache_site_selector::constraints_create(const cache_list& known_caches,
                                              const block_list& known_blocks,
                                              const argos::CVector2& nest_loc,
                                              constraint_set* const constraints) {
-  for (auto &c : known_caches) {
-    std::get<0>(*constraints).push_back({c.get(),
-            this,
-            boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second)});
+  for (auto& c : known_caches) {
+    std::get<0>(*constraints)
+        .push_back({c.get(),
+                    this,
+                    boost::get<double>(
+                        mc_matrix->find(cselm::kCacheProxDist)->second)});
   } /* for(&c..) */
 
-  for (auto &b : known_blocks) {
-    std::get<1>(*constraints).push_back({b.get(),
-            this,
-            boost::get<double>(mc_matrix->find(cselm::kBlockProxDist)->second)});
+  for (auto& b : known_blocks) {
+    std::get<1>(*constraints)
+        .push_back({b.get(),
+                    this,
+                    boost::get<double>(
+                        mc_matrix->find(cselm::kBlockProxDist)->second)});
   } /* for(&c..) */
 
-  std::get<2>(*constraints).push_back({nest_loc,
-          this,
-          boost::get<double>(mc_matrix->find(cselm::kNestProxDist)->second)});
+  std::get<2>(*constraints)
+      .push_back(
+          {nest_loc,
+           this,
+           boost::get<double>(mc_matrix->find(cselm::kNestProxDist)->second)});
 
   for (size_t i = 0; i < std::get<0>(*constraints).size(); ++i) {
     m_alg.add_inequality_constraint(__cache_constraint_func,
-                                     &std::get<0>(*constraints)[i],
+                                    &std::get<0>(*constraints)[i],
                                     kCACHE_CONSTRAINT_TOL);
   } /* for(i..) */
   for (size_t i = 0; i < std::get<1>(*constraints).size(); ++i) {
     m_alg.add_inequality_constraint(__block_constraint_func,
-                                     &std::get<1>(*constraints)[i],
+                                    &std::get<1>(*constraints)[i],
                                     kBLOCK_CONSTRAINT_TOL);
   } /* for(i..) */
 
   m_alg.add_inequality_constraint(__nest_constraint_func,
-                                   &std::get<2>(*constraints)[0],
-                                   kNEST_CONSTRAINT_TOL);
+                                  &std::get<2>(*constraints)[0],
+                                  kNEST_CONSTRAINT_TOL);
 } /* constraints_create() */
 
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
 __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
-                                           std::vector<double>& ,
-                                           void *data) {
+                                           std::vector<double>&,
+                                           void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
   cache_site_selector::cache_constraint_data* c =
       reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
-  double val = c->cache_prox_dist - (argos::CVector2(x[0], x[1]) -
-                                     c->cache->real_loc()).Length();
+  double val = c->cache_prox_dist -
+               (argos::CVector2(x[0], x[1]) - c->cache->real_loc()).Length();
 
   if (val > 0) {
     c->selector->cc_violated(c->cache->id());
@@ -217,15 +219,15 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
 } /* __cache_constraint_func() */
 
 __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
-                                           std::vector<double>& ,
-                                           void *data) {
+                                          std::vector<double>&,
+                                          void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
   cache_site_selector::nest_constraint_data* c =
       reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
-  double val = c->nest_prox_dist - (argos::CVector2(x[0], x[1]) -
-                                    c->nest_loc).Length();
+  double val =
+      c->nest_prox_dist - (argos::CVector2(x[0], x[1]) - c->nest_loc).Length();
   if (val > 0) {
     c->selector->nc_violated();
   } else {
@@ -236,15 +238,15 @@ __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
 } /* __nest_constraint_func() */
 
 __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
-                                                std::vector<double>& ,
-                                                void *data) {
+                                           std::vector<double>&,
+                                           void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
   cache_site_selector::block_constraint_data* c =
       reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
-  double val = c->block_prox_dist - (argos::CVector2(x[0], x[1]) -
-                        c->block->real_loc()).Length();
+  double val = c->block_prox_dist -
+               (argos::CVector2(x[0], x[1]) - c->block->real_loc()).Length();
   if (val > 0) {
     c->selector->bc_violated(c->block->id());
   } else {
@@ -254,8 +256,8 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
 } /* __block_constraint_func() */
 
 __rcsw_pure double __site_utility_func(const std::vector<double>& x,
-                                       std::vector<double>& ,
-                                       void *data) {
+                                       std::vector<double>&,
+                                       void* data) {
   /*
    * @todo If for some reason we get a NaN point, return the worst possible
    * utility. Again this should probably not be necessary, but I don't know

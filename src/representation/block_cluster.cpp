@@ -36,7 +36,8 @@ __rcsw_pure uint block_cluster::block_count(void) const {
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
-      ER_ASSERT(!cell.state_has_cache(), "Cell@(%u,%u) in HAS_CACHE state",
+      ER_ASSERT(!cell.state_has_cache(),
+                "Cell@(%u,%u) in HAS_CACHE state",
                 cell.loc().first,
                 cell.loc().second);
       count += cell.state_has_block();

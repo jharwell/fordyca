@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <random>
 #include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
@@ -35,22 +36,29 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class dynamic_cache_creator
+ * @ingroup support depth2
+ *
+ * @brief Handles creation of dynamic caches during simulation, given a set of
+ * candidate blocks, and constraints on proximity, minimum # for a cache, etc.
+ */
 class dynamic_cache_creator : public base_cache_creator,
                               public er::client<dynamic_cache_creator> {
  public:
   dynamic_cache_creator(ds::arena_grid* grid,
                         double cache_dim,
-                        double min_dist);
+                        double min_dist,
+                        uint min_blocks);
 
   /**
    * @brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cache_vector create_all(const cache_vector& existing_caches,
-                          block_vector& candidate_blocks) override;
+  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                          ds::block_vector& candidate_blocks) override;
 
  private:
-  static constexpr double kOVERLAP_SEARCH_DELTA = 0.5;
   static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
 
   /**
@@ -68,17 +76,28 @@ class dynamic_cache_creator : public base_cache_creator,
    * @return Coordinates of the new cache.
    */
   argos::CVector2 calc_center(const block_list& blocks,
-                              const cache_vector& existing_caches) const;
+                              const ds::cache_vector& existing_caches) const;
 
   /**
    * @brief Basic sanity checks on newly created caches.
    */
-  bool creation_sanity_checks(const cache_vector& new_caches) const;
+  bool creation_sanity_checks(const ds::cache_vector& new_caches) const;
 
+  /**
+   * @brief Deconflict new cache cache from overlapping with any existing caches
+   * (including taking the span of the new cache into account)
+   *
+   * @return \c TRUE if there were no conflicts, \c FALSE otherwise.
+   */
+  bool deconflict_cache_center(const representation::base_cache& cache,
+                               argos::CVector2& center) const;
   // clang-format off
-  double m_min_dist;
+  double                             m_min_dist;
+  uint                               m_min_blocks;
+  mutable std::default_random_engine m_rng{};
   // clang-format on
 };
+
 
 NS_END(depth2, support, fordyca);
 

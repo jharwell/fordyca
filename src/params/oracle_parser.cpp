@@ -48,8 +48,7 @@ void oracle_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void oracle_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_ATTR_STR(m_params, enabled) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, enabled) << std::endl
          << XML_ATTR_STR(m_params, task_exec_ests) << std::endl
          << XML_ATTR_STR(m_params, task_interface_ests) << std::endl
          << build_footer();

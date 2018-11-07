@@ -61,8 +61,8 @@ namespace rmath = rcppsw::math;
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
 class cache_sel_matrix
-    : public std::map<std::string, boost::variant<double, argos::CVector2,
-                                                  rmath::range<uint>>> {
+    : public std::map<std::string,
+                      boost::variant<double, argos::CVector2, rmath::range<uint>>> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";
@@ -72,7 +72,7 @@ class cache_sel_matrix
   static constexpr char kSiteYRange[] = "site_yrange";
 
   cache_sel_matrix(const struct params::cache_sel_matrix_params* params,
-                         const argos::CVector2& nest_loc);
+                   const argos::CVector2& nest_loc);
 };
 
 NS_END(controller, fordyca);

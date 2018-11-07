@@ -53,14 +53,15 @@ namespace er = rcppsw::er;
  * @class perceived_arena_map
  * @ingroup ds
  *
- * @brief The perceived arena map (PAM) stores a logical ds of the
- * state of the arena, from the perspective of the robot.
+ * @brief The perceived arena map (PAM) stores a logical map of the state of the
+ * arena, from the perspective of the robot.
  *
- * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
- * where they actually live (clone not reference), which decouples/simplifies a
- * lot of the tricky handshaking logic for picking up/dropping blocks in
- * caches. The PAM also does *NOT* track which cells are in CACHE_EXTENT, as
- * that is irrelevant for what the robots need (as of 9/14/18 anyway).
+ * Crucially, this class stores the caches and blocks SEPARATELY from the \ref
+ * arena_map where they actually live (clone not reference), which
+ * decouples/simplifies a lot of the tricky handshaking logic for picking
+ * up/dropping blocks in caches. The PAM also does *NOT* track which cells are
+ * in CACHE_EXTENT, as that is irrelevant for what the robots need (as of
+ * 9/14/18 anyway).
  */
 class perceived_arena_map : public er::client<perceived_arena_map>,
                             public decorator::decorator<occupancy_grid>,
@@ -125,19 +126,24 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * If the block is already in our list of blocks we know about it needs to be
    * removed, because the new version we just got from our LOS is more up to
    * date.
+   *
+   * @return \c TRUE if a block was actually added to the PAM, and \c FALSE
+   * otherwise.
    */
   bool block_add(const std::shared_ptr<representation::base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
+   *
+   * @return \c TRUE if a block was removed, \c FALSE otherwise.
    */
   bool block_remove(const std::shared_ptr<representation::base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
    * robot's view of the arena. No bounds checking is performed, so if something
-   * is out of bounds, boost with fail with a bounds checking assertion.
+   * is out of bounds, boost will fail with a bounds checking assertion.
    *
    * @param i X coord.
    * @param j Y coord

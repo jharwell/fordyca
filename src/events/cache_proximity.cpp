@@ -46,8 +46,8 @@ void cache_proximity::visit(
   controller.ndc_push();
   ER_INFO("Abort block drop: cache%d proximity", m_cache_id);
 
-  auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(
-      controller.current_task());
+  auto* task =
+      dynamic_cast<tasks::depth2::cache_finisher*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non cache finisher task %s received cache proximity event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());

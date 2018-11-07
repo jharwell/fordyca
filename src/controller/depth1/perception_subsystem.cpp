@@ -56,17 +56,14 @@ void perception_subsystem::process_los(
    */
   representation::line_of_sight::const_cache_list caches = c_los->caches();
   std::string accum;
-  std::for_each(caches.begin(),
-                caches.end(),
-                [&](const auto& c) {
-                  accum += "c" + std::to_string(c->id()) + "->(" +
-                           std::to_string(c->discrete_loc().first) + "," +
-                           std::to_string(c->discrete_loc().second) +  "),";
-                });
+  std::for_each(caches.begin(), caches.end(), [&](const auto& c) {
+    accum += "c" + std::to_string(c->id()) + "->(" +
+             std::to_string(c->discrete_loc().first) + "," +
+             std::to_string(c->discrete_loc().second) + "),";
+  });
   if (!caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", accum.c_str());
   }
-
 
   /*
    * If the robot thinks that a cell contains a cache, because the cell had one
@@ -100,7 +97,8 @@ void perception_subsystem::process_los(
              cache->discrete_loc().second,
              cache->n_blocks());
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
-    auto& density = map()->access<occupancy_grid::kPheromone>(cache->discrete_loc());
+    auto& density =
+        map()->access<occupancy_grid::kPheromone>(cache->discrete_loc());
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d(%u, %u): %zu blocks (density=%f, state=%d)",
@@ -143,9 +141,10 @@ void perception_subsystem::processed_los_verify(
    * Verify that for each cell that contained a cache in the LOS, the
    * corresponding cell in the PAM also contains the same cache.
    */
-  for (auto &cache : c_los->caches()) {
+  for (auto& cache : c_los->caches()) {
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
-    ER_ASSERT(cell.state_has_cache(), "Cell at (%u,%u) not in HAS_CACHE state",
+    ER_ASSERT(cell.state_has_cache(),
+              "Cell at (%u,%u) not in HAS_CACHE state",
               cache->discrete_loc().first,
               cache->discrete_loc().second);
     ER_ASSERT(cell.cache()->id() == cache->id(),

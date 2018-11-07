@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "rcppsw/task_allocation/task_allocation_params.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -39,8 +39,7 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 generalist::generalist(const ta::task_allocation_params* const params,
                        std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(kGeneralistName, params, std::move(mechanism)) {
-}
+    : foraging_task(kGeneralistName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -50,7 +49,8 @@ __rcsw_pure double generalist::abort_prob_calc(void) {
 } /* abort_prob_calc() */
 
 __rcsw_pure double generalist::current_time(void) const {
-  return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism())
+  return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
+             polled_task::mechanism())
       ->base_sensors()
       ->tick();
 } /* current_time() */
@@ -71,33 +71,33 @@ void generalist::accept(events::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    is_exploring_for_goal,
-    static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    is_vectoring_to_goal,
-    static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        generalist,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        generalist,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    goal_acquired,
-    static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        generalist,
+                        goal_acquired,
+                        static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    acquisition_goal_type,
-    generalist,
-    acquisition_goal,
-    static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        generalist,
+                        acquisition_goal,
+                        static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    transport_goal_type,
-    generalist,
-    block_transport_goal,
-    static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        generalist,
+                        block_transport_goal,
+                        static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                            polled_task::mechanism()));
 
 NS_END(depth0, tasks, fordyca);

@@ -31,6 +31,8 @@
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -73,8 +75,8 @@ class dynamic_cache_manager : public base_cache_manager,
    * failures to create dynamic caches can occur if, for example, all blocks are
    * currently being carried by robots.
    */
-  std::pair<bool, cache_vector> create(cache_vector& existing_caches,
-                                       block_vector& blocks);
+  std::pair<bool, ds::cache_vector> create(ds::cache_vector& existing_caches,
+                                       ds::block_vector& blocks);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -97,6 +99,10 @@ class dynamic_cache_manager : public base_cache_manager,
   }
 
  private:
+  std::pair<bool, ds::block_vector> calc_blocks_for_creation(
+      const ds::cache_vector& existing_caches,
+      ds::block_vector& blocks);
+
   // clang-format off
   const params::caches::caches_params mc_cache_params;
   // clang-format on

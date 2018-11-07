@@ -40,9 +40,8 @@ namespace params {
 struct block_sel_matrix_params;
 }
 NS_START(controller);
-using block_sel_variant = boost::variant<double,
-                                               argos::CVector2,
-                                               std::vector<int>>;
+using block_sel_variant =
+    boost::variant<double, argos::CVector2, std::vector<int>>;
 
 /*******************************************************************************
  * Class Definitions
@@ -67,8 +66,7 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kRampPriority[] = "ramp_priority";
   static constexpr char kSelExceptions[] = "sel_exceptions";
 
-  explicit block_sel_matrix(
-      const struct params::block_sel_matrix_params * params);
+  explicit block_sel_matrix(const struct params::block_sel_matrix_params* params);
 
   void sel_exception_add(int id);
   void sel_exceptions_clear(void);

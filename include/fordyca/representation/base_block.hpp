@@ -65,9 +65,21 @@ class base_block : public multicell_entity,
   static rcppsw::math::dcoord2 kOutOfSightDLoc;
   static argos::CVector2 kOutOfSightRLoc;
 
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   *
+   * Using this constructor, blocks are assigned the next available id, starting
+   * from 0.
+   */
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color)
       : multicell_entity(dim, color, -1), movable_cell_entity() {}
 
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   * @param id The id of the block.
+   */
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color, int id)
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 

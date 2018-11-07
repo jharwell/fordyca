@@ -1,6 +1,5 @@
 /**
  * @file arena_grid.hpp
- * @ingroup ds
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -43,7 +42,8 @@ using arena_layer_stack = std::tuple<cell2D, bool>;
  * @class arena_grid
  * @ingroup ds
  *
- * @brief Ds of the cells within a grid layout
+ * @brief 2D grid of \ref cell2D objects containing the state of the geometrical
+ * extent of the arena floor.
  */
 class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
  public:
@@ -53,24 +53,32 @@ class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
   constexpr static uint kCell = 0;
   constexpr static uint kRobotOccupancy = 1;
 
+  /**
+   *
+   * @param resolution The arena resolution (i.e. what is the size of 1 cell in
+   *                   the 2D grid).
+   * @param x_max      Size in X of 2D grid.
+   * @param y_max      Size in Y of 2D grid.
+   *
+   * The origin of the grid is in the lower left corner at (0,0).
+   */
   arena_grid(double resolution, size_t x_max, size_t y_max)
       : stacked_grid(resolution, x_max, y_max) {
-    for (size_t i = 0; i < xdsize(); ++i) {
-      for (size_t j = 0; j < ydsize(); ++j) {
+    for (uint i = 0; i < xdsize(); ++i) {
+      for (uint j = 0; j < ydsize(); ++j) {
         access<kCell>(i, j).loc(rcppsw::math::dcoord2(i, j));
       } /* for(j..) */
     }   /* for(i..) */
   }
 
   /**
-    * @brief Reset all the cells within the grid, removing all
-    * references to old blocks.
+    * @brief Reset all the cells within the grid, removing all references to old
+    * blocks as well as setting all cells back to an empty state.
     */
   void reset(void) {
-    for (size_t i = 0; i < xdsize(); ++i) {
-      for (size_t j = 0; j < ydsize(); ++j) {
-        cell2D& cell = access<kCell>(i, j);
-        cell.reset();
+    for (uint i = 0; i < xdsize(); ++i) {
+      for (uint j = 0; j < ydsize(); ++j) {
+        access<kCell>(i, j).reset();
       } /* for(j..) */
     }   /* for(i..) */
   }     /* reset */

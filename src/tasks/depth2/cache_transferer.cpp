@@ -64,8 +64,7 @@ double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-double cache_transferer::interface_time_calc(uint interface,
-                                             double start_time) {
+double cache_transferer::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */

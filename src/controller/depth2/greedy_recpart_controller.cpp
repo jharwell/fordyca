@@ -31,9 +31,9 @@
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "fordyca/controller/block_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,10 +77,11 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
                                 saa_subsystem(),
                                 perception())(&param_repo));
 
-  executive()->task_alloc_notify(std::bind(&greedy_recpart_controller::task_alloc_cb,
-                                           this,
-                                           std::placeholders::_1,
-                                           std::placeholders::_2));
+  executive()->task_alloc_notify(
+      std::bind(&greedy_recpart_controller::task_alloc_cb,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -95,9 +96,8 @@ __rcsw_pure const tasks::base_foraging_task* greedy_recpart_controller::current_
   return const_cast<greedy_recpart_controller*>(this)->current_task();
 } /* current_task() */
 
-void greedy_recpart_controller::task_alloc_cb(
-    const ta::polled_task* const,
-    const ta::bi_tab* const) {
+void greedy_recpart_controller::task_alloc_cb(const ta::polled_task* const,
+                                              const ta::bi_tab* const) {
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

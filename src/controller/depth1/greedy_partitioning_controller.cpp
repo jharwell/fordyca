@@ -31,10 +31,10 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/cache_sel_matrix_params.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -99,7 +99,6 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
 void greedy_partitioning_controller::non_unique_init(
     ticpp::Element& node,
     params::depth1::controller_repository* param_repo) {
-
   param_repo->parse_all(node);
 
   if (!param_repo->validate_all()) {
@@ -121,8 +120,8 @@ void greedy_partitioning_controller::non_unique_init(
    */
   auto* cache_mat = param_repo->parse_results<params::cache_sel_matrix_params>();
   auto* block_mat = param_repo->parse_results<params::block_sel_matrix_params>();
-  m_cache_sel_matrix = rcppsw::make_unique<class cache_sel_matrix>(cache_mat,
-                                                                   block_mat->nest);
+  m_cache_sel_matrix =
+      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
   block_sel_matrix(rcppsw::make_unique<class block_sel_matrix>(block_mat));
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
@@ -134,17 +133,19 @@ void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-__rcsw_pure const ta::bi_tab* greedy_partitioning_controller::active_tab(void) const {
+__rcsw_pure const ta::bi_tab* greedy_partitioning_controller::active_tab(
+    void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
-__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(void) {
+__rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(
+    void) {
   return dynamic_cast<tasks::base_foraging_task*>(
       m_executive.get()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::current_task(
-    void) const {
+__rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::
+    current_task(void) const {
   return const_cast<greedy_partitioning_controller*>(this)->current_task();
 } /* current_task() */
 
@@ -159,14 +160,14 @@ void greedy_partitioning_controller::executive(
 TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
                         greedy_partitioning_controller,
                         block_transport_goal,
-                       current_task());
+                        current_task());
 
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
 TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                   greedy_partitioning_controller,
-                   acquisition_goal,
+                        greedy_partitioning_controller,
+                        acquisition_goal,
                         current_task());
 
 TASK_WRAPPER_DEFINE_PTR(bool,

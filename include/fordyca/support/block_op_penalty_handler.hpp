@@ -108,10 +108,8 @@ class block_op_penalty_handler
                               uint timestep,
                               double cache_prox_dist = -1,
                               double block_prox_dist = -1) {
-    auto filter = filter_controller(controller,
-                                    src,
-                                    cache_prox_dist,
-                                    block_prox_dist);
+    auto filter =
+        filter_controller(controller, src, cache_prox_dist, block_prox_dist);
     if (filter.first) {
       return filter.second;
     }
@@ -149,19 +147,22 @@ class block_op_penalty_handler
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
       case kSrcNestDrop:
-      ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
-                "Robot not carrying block?");
-      id = controller.block()->id();
-      break;
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
+                  "Robot not carrying block?");
+        id = controller.block()->id();
+        break;
       case kSrcCacheSiteDrop:
-        ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
                   "Robot not carrying block?");
         ER_ASSERT(block_prox_dist > 0.0,
                   "Block proximity distance not specified for cache site drop");
-      id = controller.block()->id();
-      break;
+        id = controller.block()->id();
+        break;
       case kSrcNewCacheDrop:
-        ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
                   "Robot not carrying block?");
         ER_ASSERT(cache_prox_dist > 0.0,
                   "Cache proximity distance not specified for new cache drop");
@@ -212,7 +213,7 @@ class block_op_penalty_handler
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
- filter_status_type free_pickup_filter(const T& controller) const {
+  filter_status_type free_pickup_filter(const T& controller) const {
     int block_id = loop_utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kBlock == controller.acquisition_goal())) {
@@ -253,7 +254,8 @@ class block_op_penalty_handler
     }
     int block_id = loop_utils::cache_site_block_proximity(controller,
                                                           *m_map,
-                                                          block_prox_dist).first;
+                                                          block_prox_dist)
+                       .first;
     if (-1 != block_id) {
       return filter_status_type(true, kStatusBlockProximity);
     }
@@ -272,11 +274,12 @@ class block_op_penalty_handler
                                            double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kNewCache == controller.acquisition_goal())) {
-          return filter_status_type(true, kStatusControllerNotReady);
+      return filter_status_type(true, kStatusControllerNotReady);
     }
     int cache_id = loop_utils::new_cache_cache_proximity(controller,
                                                          *m_map,
-                                                         cache_prox_dist).first;
+                                                         cache_prox_dist)
+                       .first;
     if (-1 != cache_id) {
       return filter_status_type(true, kStatusCacheProximity);
     }

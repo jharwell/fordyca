@@ -32,7 +32,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 cell2D_fsm::cell2D_fsm(void)
     : state_machine::simple_fsm(ST_MAX_STATES, ST_UNKNOWN),
-    ER_CLIENT_INIT("fordyca.fsm.cell2D_fsm"),
+      ER_CLIENT_INIT("fordyca.fsm.cell2D_fsm"),
       state_unknown(),
       state_empty(),
       state_block(),
@@ -133,9 +133,8 @@ FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
 
 FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
   if (ST_HAS_CACHE != last_state()) {
-    ER_ASSERT(1 == m_block_count,
-              "Incorrect block count: %u vs %u",
-              m_block_count, 1);
+    ER_ASSERT(
+        1 == m_block_count, "Incorrect block count: %u vs %u", m_block_count, 1);
   }
   if (nullptr != data) {
     if (data->pickup) {
