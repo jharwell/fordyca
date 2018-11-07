@@ -26,7 +26,7 @@
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -38,7 +38,7 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : acquire_goal_fsm(saa,

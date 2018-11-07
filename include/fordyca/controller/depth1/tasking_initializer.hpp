@@ -45,8 +45,8 @@ namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
-class cache_selection_matrix;
-class block_selection_matrix;
+class cache_sel_matrix;
+class block_sel_matrix;
 class saa_subsystem;
 class base_perception_subsystem;
 NS_START(depth1);
@@ -65,8 +65,8 @@ namespace er = rcppsw::er;
  */
 class tasking_initializer : public er::client<tasking_initializer> {
  public:
-  tasking_initializer(const controller::block_selection_matrix* bsel_matrix,
-                      const controller::cache_selection_matrix* csel_matrix,
+  tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
+                      const controller::cache_sel_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
 
@@ -86,20 +86,20 @@ class tasking_initializer : public er::client<tasking_initializer> {
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   ta::bi_tdgraph* graph(void) { return m_graph; }
   const ta::bi_tdgraph* graph(void) const { return m_graph; }
-  const block_selection_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
+  const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
 
   tasking_map depth1_tasks_create(
       params::depth1::controller_repository* task_repo);
   void depth1_exec_est_init(params::depth1::controller_repository* task_repo,
                             const tasking_map& map);
-  const cache_selection_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
+  const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
 
  private:
   // clang-format off
   controller::saa_subsystem* const                m_saa;
   base_perception_subsystem* const                m_perception;
-  const controller::cache_selection_matrix* const mc_csel_matrix;
-  const controller::block_selection_matrix* const mc_bsel_matrix;
+  const controller::cache_sel_matrix* const mc_csel_matrix;
+  const controller::block_sel_matrix* const mc_bsel_matrix;
 
   ta::bi_tdgraph*                                 m_graph;
   // clang-format on

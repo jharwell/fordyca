@@ -1,5 +1,5 @@
 /**
- * @file block_selection_matrix_parser.cpp
+ * @file block_sel_matrix.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,42 +21,43 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/block_selection_matrix_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Global Variables
+ * Class Constants
  ******************************************************************************/
-constexpr char block_selection_matrix_parser::kXMLRoot[];
+constexpr char block_sel_matrix::kNestLoc[];
+constexpr char block_sel_matrix::kCubePriority[];
+constexpr char block_sel_matrix::kRampPriority[];
+constexpr char block_sel_matrix::kSelExceptions[];
+
+/*******************************************************************************
+ * Constructors/Destructors
+ ******************************************************************************/
+block_sel_matrix::block_sel_matrix(
+    const struct params::block_sel_matrix_params * params) {
+  this->insert(std::make_pair(kNestLoc, params->nest));
+  this->insert(std::make_pair(kCubePriority, params->priorities.cube));
+  this->insert(std::make_pair(kRampPriority, params->priorities.ramp));
+  this->insert(std::make_pair(kSelExceptions, std::vector<int>()));
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_selection_matrix_parser::parse(const ticpp::Element& node) {
-  ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+void block_sel_matrix::sel_exception_add(int id) {
+  boost::get<std::vector<int>>(this->find(kSelExceptions)->second).push_back(id);
+} /* sel_exception_add() */
 
-  rcppsw::utils::line_parser parser(' ');
-  std::string val;
-  std::vector<std::string> res;
-  res = parser.parse(cnode.GetAttribute("nest"));
-  m_params->nest.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
+void block_sel_matrix::sel_exceptions_clear(void) {
+  boost::get<std::vector<int>>(this->operator[](kSelExceptions)).clear();
+} /* sel_exceptions_clear() */
 
-  m_priorities.parse(cnode);
-  m_params->priorities = *m_priorities.parse_results();
-} /* parse() */
 
-void block_selection_matrix_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_ATTR_STR(m_params, nest) << std::endl
-         << m_priorities << std::endl
-         << build_footer();
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(controller, fordyca);

@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -35,7 +35,7 @@ NS_START(fordyca, controller, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
-    const cache_selection_matrix* const matrix)
+    const cache_sel_matrix* const matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth0.existing_cache_selector"),
       mc_matrix(matrix) {}
 

@@ -30,11 +30,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
+using bselm = block_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_selector::block_selector(const block_selection_matrix* const sel_matrix)
+block_selector::block_selector(const block_sel_matrix* const sel_matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth0.block_selector"),
       mc_matrix(sel_matrix) {}
 
@@ -59,13 +60,15 @@ representation::perceived_block block_selector::calc_best(
      */
     double priority =
         (dynamic_cast<representation::cube_block*>(b.ent.get()))
-            ? boost::get<double>(mc_matrix->find("cube_priority")->second)
-            : boost::get<double>(mc_matrix->find("ramp_priority")->second);
+        ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
+        : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     argos::CVector2 nest_loc =
-        boost::get<argos::CVector2>(mc_matrix->find("nest_loc")->second);
+        boost::get<argos::CVector2>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
-        robot_loc, b.density.last_result(), priority);
+    double utility = math::block_utility(b.ent->real_loc(),
+                                         nest_loc)(robot_loc,
+                                                   b.density.last_result(),
+                                                   priority);
 
     ER_DEBUG("Utility for block%d loc=(%u, %u), density=%f: %f",
              b.ent->id(),
@@ -108,7 +111,7 @@ bool block_selector::block_is_excluded(
     return true;
   }
   std::vector<int> exceptions =
-      boost::get<std::vector<int>>(mc_matrix->find("sel_exceptions")->second);
+      boost::get<std::vector<int>>(mc_matrix->find(bselm::kSelExceptions)->second);
   if (std::any_of(exceptions.begin(),
                   exceptions.end(),
                   [&](int id) { return id == block->id(); })) {

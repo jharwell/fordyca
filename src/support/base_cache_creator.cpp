@@ -71,8 +71,7 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
 
   /*
    * The cells for all blocks that will comprise the cache should be set to
-   * cache extent,
-   * and all blocks be deposited in a single cell.
+   * cache extent, and all blocks be deposited in a single cell.
    */
   for (auto& block : blocks) {
     events::cell_empty op(block->discrete_loc());

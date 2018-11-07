@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include <random>
 
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_block.hpp"
@@ -35,12 +35,13 @@
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
 namespace rmath = rcppsw::math;
+using cselm = cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
-    const controller::cache_selection_matrix* const matrix)
+    const controller::cache_sel_matrix* const matrix)
     : client("fordyca.controller.depth2.cache_site_selector"),
       mc_matrix(matrix) {}
 
@@ -51,15 +52,21 @@ argos::CVector2 cache_site_selector::calc_best(
     const cache_list& known_caches,
     const block_list& known_blocks,
     argos::CVector2 robot_loc) {
-  constraint_set constraints;
-  std::vector<double> point;
-  opt_initialize(known_caches, known_blocks, robot_loc, &constraints,
-                 &point);
   double max_utility;
+  std::vector<double> point;
+  constraint_set constraints;
+  struct site_utility_data u;
+  opt_initialize(known_caches,
+                 known_blocks,
+                 robot_loc,
+                 &constraints,
+                 &u,
+                 &point);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
-   * know why. This should be investigated and fixed, but for now this works.
+   * know why. This should be investigated and fixed, but for now this seems to
+   * work.
    */
   try {
     nlopt::result res = m_alg.optimize(point, max_utility);
@@ -84,50 +91,15 @@ argos::CVector2 cache_site_selector::calc_best(
   return argos::CVector2(point[0], point[1]);
 } /* calc_best() */
 
-void cache_site_selector::constraints_create(const cache_list& known_caches,
-                                             const block_list& known_blocks,
-                                             const argos::CVector2& nest_loc,
-                                             constraint_set* const constraints) {
-  for (auto &c : known_caches) {
-    std::get<0>(*constraints).push_back({c.get(),
-            this,
-            boost::get<double>(mc_matrix->find("cache_prox_dist")->second)});
-  } /* for(&c..) */
-
-  for (auto &b : known_blocks) {
-    std::get<1>(*constraints).push_back({b.get(),
-            this,
-            boost::get<double>(mc_matrix->find("block_prox_dist")->second)});
-  } /* for(&c..) */
-
-  std::get<2>(*constraints).push_back({nest_loc,
-          this,
-          boost::get<double>(mc_matrix->find("nest_prox_dist")->second)});
-
-  for (size_t i = 0; i < std::get<0>(*constraints).size(); ++i) {
-    m_alg.add_inequality_constraint(__cache_constraint_func,
-                                     &std::get<0>(*constraints)[i],
-                                    kCACHE_CONSTRAINT_TOL);
-  } /* for(i..) */
-  for (size_t i = 0; i < std::get<1>(*constraints).size(); ++i) {
-    m_alg.add_inequality_constraint(__block_constraint_func,
-                                     &std::get<1>(*constraints)[i],
-                                    kBLOCK_CONSTRAINT_TOL);
-  } /* for(i..) */
-
-  m_alg.add_inequality_constraint(__nest_constraint_func,
-                                   &std::get<2>(*constraints)[0],
-                                   kNEST_CONSTRAINT_TOL);
-} /* constraints_create() */
-
 void cache_site_selector::opt_initialize(
     const cache_list& known_caches,
     const block_list& known_blocks,
     argos::CVector2 robot_loc,
     constraint_set* const constraints,
+    struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
     argos::CVector2 nest_loc = boost::get<argos::CVector2>(
-      mc_matrix->find("nest_loc")->second);
+        mc_matrix->find(cselm::kNestLoc)->second);
 
   std::string baccum;
   std::for_each(known_blocks.begin(), known_blocks.end(), [&](const auto& b) {
@@ -158,10 +130,12 @@ void cache_site_selector::opt_initialize(
   m_cc_violations.reserve(std::get<0>(*constraints).size());
   m_bc_violations.reserve(std::get<1>(*constraints).size());
 
-  auto xrange = boost::get<rmath::range<uint>>(mc_matrix->find("site_xrange")->second);
-  auto yrange = boost::get<rmath::range<uint>>(mc_matrix->find("site_yrange")->second);
-  struct site_utility_data utility_data = {robot_loc, nest_loc};
-  m_alg.set_max_objective(&__site_utility_func, &utility_data);
+  auto xrange = boost::get<rmath::range<uint>>(
+      mc_matrix->find(cselm::kSiteXRange)->second);
+  auto yrange = boost::get<rmath::range<uint>>(
+      mc_matrix->find(cselm::kSiteYRange)->second);
+  *utility_data = {robot_loc, nest_loc};
+  m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
   m_alg.set_stopval(1000000);
   m_alg.set_lower_bounds({static_cast<double>(xrange.get_min()),
@@ -172,8 +146,8 @@ void cache_site_selector::opt_initialize(
   m_alg.set_default_initial_step({1.0, 1.0});
 
   /* Initial guess: random point in the arena */
-  uint x = std::min((std::rand() % xrange.get_min()) + 1, xrange.get_max());
-  uint y = std::min((std::rand() % yrange.get_min()) + 1, yrange.get_max());
+  uint x = std::min((std::rand() % xrange.get_max()) + 1, xrange.get_max());
+  uint y = std::min((std::rand() % yrange.get_max()) + 1, yrange.get_max());
   *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
   ER_INFO("Initial guess: (%u,%u), xrange=[%u-%u], yrange=[%u-%u]",
           x,
@@ -183,6 +157,42 @@ void cache_site_selector::opt_initialize(
           yrange.get_min(),
           yrange.get_max());
 } /* opt_initialize() */
+
+void cache_site_selector::constraints_create(const cache_list& known_caches,
+                                             const block_list& known_blocks,
+                                             const argos::CVector2& nest_loc,
+                                             constraint_set* const constraints) {
+  for (auto &c : known_caches) {
+    std::get<0>(*constraints).push_back({c.get(),
+            this,
+            boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second)});
+  } /* for(&c..) */
+
+  for (auto &b : known_blocks) {
+    std::get<1>(*constraints).push_back({b.get(),
+            this,
+            boost::get<double>(mc_matrix->find(cselm::kBlockProxDist)->second)});
+  } /* for(&c..) */
+
+  std::get<2>(*constraints).push_back({nest_loc,
+          this,
+          boost::get<double>(mc_matrix->find(cselm::kNestProxDist)->second)});
+
+  for (size_t i = 0; i < std::get<0>(*constraints).size(); ++i) {
+    m_alg.add_inequality_constraint(__cache_constraint_func,
+                                     &std::get<0>(*constraints)[i],
+                                    kCACHE_CONSTRAINT_TOL);
+  } /* for(i..) */
+  for (size_t i = 0; i < std::get<1>(*constraints).size(); ++i) {
+    m_alg.add_inequality_constraint(__block_constraint_func,
+                                     &std::get<1>(*constraints)[i],
+                                    kBLOCK_CONSTRAINT_TOL);
+  } /* for(i..) */
+
+  m_alg.add_inequality_constraint(__nest_constraint_func,
+                                   &std::get<2>(*constraints)[0],
+                                   kNEST_CONSTRAINT_TOL);
+} /* constraints_create() */
 
 /*******************************************************************************
  * Non-Member Functions
@@ -257,7 +267,6 @@ __rcsw_pure double __site_utility_func(const std::vector<double>& x,
   cache_site_selector::site_utility_data* d =
       reinterpret_cast<cache_site_selector::site_utility_data*>(data);
   argos::CVector2 point(x[0], x[1]);
-
   return math::cache_site_utility(d->robot_loc, d->nest_loc)(point);
 } /* __site_utility_func() */
 

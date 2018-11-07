@@ -1,7 +1,7 @@
 /**
- * @file stateful_controller_repository.cpp
+ * @file cache_sel_matrix_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,27 +18,38 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateful_controller_repository.hpp"
-#include "fordyca/params/occupancy_grid_parser.hpp"
-#include "fordyca/params/block_sel_matrix_parser.hpp"
+#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-stateful_controller_repository::stateful_controller_repository(void) {
-  register_parser<occupancy_grid_parser, occupancy_grid_params>(
-      occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
-  register_parser<block_sel_matrix_parser,
-                  block_sel_matrix_params>(block_sel_matrix_parser::kXMLRoot,
-                                           block_sel_matrix_parser::kHeader1);
-}
+/**
+ * @struct cache_sel_matrix_params
+ * @ingroup params
+ *
+ * @brief XML parameters for the \ref cache_sel_matrix
+ */
+struct cache_sel_matrix_params : public rcppsw::params::base_params {
+  double                      cache_prox_dist{0.0};
+  double                      block_prox_dist{0.0};
+  double                      nest_prox_dist{0.0};
+  rcppsw::math::range<uint>   site_xrange{0, 0};
+  rcppsw::math::range<uint>   site_yrange{0, 0};
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_ */

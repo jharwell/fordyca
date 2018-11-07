@@ -25,16 +25,16 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/cache_selection_matrix_params.hpp"
-#include "fordyca/params/block_selection_matrix_params.hpp"
+#include "fordyca/params/cache_sel_matrix_params.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -119,11 +119,11 @@ void greedy_partitioning_controller::non_unique_init(
    * Initialize tasking by overriding stateful controller executive via
    * strategy pattern.
    */
-  auto* cache_mat = param_repo->parse_results<params::cache_selection_matrix_params>();
-  auto* block_mat = param_repo->parse_results<params::block_selection_matrix_params>();
-  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(cache_mat,
+  auto* cache_mat = param_repo->parse_results<params::cache_sel_matrix_params>();
+  auto* block_mat = param_repo->parse_results<params::block_sel_matrix_params>();
+  m_cache_sel_matrix = rcppsw::make_unique<class cache_sel_matrix>(cache_mat,
                                                                    block_mat->nest);
-  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(block_mat));
+  block_sel_matrix(rcppsw::make_unique<class block_sel_matrix>(block_mat));
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
                                     saa_subsystem(),

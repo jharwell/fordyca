@@ -38,7 +38,7 @@ NS_START(fordyca);
 namespace fsm { namespace depth0 { class stateful_fsm; }}
 NS_START(controller);
 class base_perception_subsystem;
-class block_selection_matrix;
+class block_sel_matrix;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
@@ -115,25 +115,25 @@ class stateful_controller : public stateless_controller,
   const fsm::depth0::stateful_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::stateful_fsm* fsm(void) { return m_fsm.get(); }
 
-  const block_selection_matrix* block_sel_matrix(void) const {
+  const class block_sel_matrix* block_sel_matrix(void) const {
     return m_block_sel_matrix.get();
   }
   /*
    * Needed to update block selections exceptions list in depth2.
    */
-  block_selection_matrix* block_sel_matrix(void) {
+  class block_sel_matrix* block_sel_matrix(void) {
     return m_block_sel_matrix.get();
   }
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
-  void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
+  void block_sel_matrix(std::unique_ptr<class block_sel_matrix> m);
 
  private:
   // clang-format off
   bool                                       m_display_los{false};
   argos::CVector2                            m_light_loc;
-  std::unique_ptr<block_selection_matrix>    m_block_sel_matrix;
+  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
   // clang-format on

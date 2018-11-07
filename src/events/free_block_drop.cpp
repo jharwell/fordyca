@@ -78,28 +78,36 @@ void free_block_drop::visit(representation::base_block& block) {
 void free_block_drop::visit(ds::arena_map& map) {
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
 
-  /*
-   * @todo We should be able to handle dropping a block on a cell in any
-   * state. However, until we get to depth2, dropping a block onto a cell that
-   * already contains a single block (but not a cache) does not work, so we have
-   * to fudge it and just distribute the block. Failing to do this results
-   * robots that are carrying a block and that abort their current task causing
-   * the cell that the drop the block onto to go into a HAS_CACHE state, when
-   * the cell entity is not a cache.
-   *
-   * This was a terrible bug to track down.
-   */
   if (cell.state_has_cache()) {
     cache_block_drop op(m_block,
                         std::static_pointer_cast<representation::arena_cache>(
                             cell.cache()),
                         m_resolution);
     map.accept(op);
-  } else if (cell.state_has_block()) {
-    map.distribute_single_block(m_block);
-  } else {
-    cell.accept(*this);
+    return;
   }
+
+  /*
+   * Dropping a block onto a cell that already contains a single block (but not
+   * a cache) does not work, so we have to fudge it and just distribute the
+   * block. Failing to do this results robots that are carrying a block and that
+   * abort their current task causing the cell that they drop the block onto to
+   * go into a HAS_CACHE state, when the cell entity is not a cache. This
+   * unsurprisingly causes a segfault later.
+   *
+   * Even in depth2, when dynamic cache creation is enabled, robots drop blocks
+   * NEXT to others to start caches, NOT on top of them.
+   *
+   * This was a terrible bug to track down.
+   */
+  if (cell.state_has_block()) {
+    map.distribute_single_block(m_block);
+  }
+  /*
+   * Cell does not have a block/cache on it; either empty or unknown (base
+   * case).
+   */
+  cell.accept(*this);
 } /* visit() */
 
 /*******************************************************************************

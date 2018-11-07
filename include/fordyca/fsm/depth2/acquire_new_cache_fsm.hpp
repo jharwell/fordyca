@@ -24,12 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth2);
+NS_START(fordyca);
+
+namespace controller { class cache_sel_matrix; }
+namespace representation { class perceived_arena_map; }
+
+NS_START(fsm, depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -44,19 +49,28 @@ NS_START(fordyca, fsm, depth2);
  * cache or via random exploration). Once the chosen new cache has been
  * acquired, it signals that it has completed its task.
  */
-class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm,
+class acquire_new_cache_fsm : public acquire_goal_fsm,
                               public er::client<acquire_new_cache_fsm> {
  public:
   acquire_new_cache_fsm(
-      const controller::cache_selection_matrix* csel_matrix,
+      const controller::cache_sel_matrix* csel_matrix,
       controller::saa_subsystem* actuators,
       ds::perceived_arena_map* map);
+
+  acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;
+  acquire_new_cache_fsm& operator=(const acquire_new_cache_fsm& fsm) = delete;
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
 
  private:
-  bool select_cache_for_acquisition(argos::CVector2 * acquisition) override;
+  bool select_cache_for_acquisition(argos::CVector2 * acquisition);
+  bool acquire_known_goal(void) override;
+  bool cache_acquired_cb(bool explore_result) const;
+
+  // clang-format off
+  const controller::cache_sel_matrix* mc_sel_matrix;
+  // clang-format on
 };
 
 NS_END(depth2, fsm, fordyca);

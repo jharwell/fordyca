@@ -108,9 +108,9 @@ proximity_status_type new_cache_cache_proximity(
     const controller::base_controller& c,
     const ds::arena_map& map,
     double proximity_dist) {
-  for (const auto& b : map.blocks()) {
-    if ((b->real_loc() - c.robot_loc()).Length() <= proximity_dist) {
-      return std::make_pair(b->id(), b->real_loc() - c.robot_loc());
+  for (const auto& cache : map.caches()) {
+    if ((cache->real_loc() - c.robot_loc()).Length() <= proximity_dist) {
+      return std::make_pair(cache->id(), cache->real_loc() - c.robot_loc());
     }
   } /* for(&b..) */
   return std::make_pair(-1, argos::CVector2());

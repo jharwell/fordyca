@@ -1,5 +1,5 @@
 /**
- * @file cache_selection_matrix.cpp
+ * @file cache_sel_matrix.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/cache_selection_matrix.hpp"
-#include "fordyca/params/cache_selection_matrix_params.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/params/cache_sel_matrix_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,17 +30,27 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
+ * Class Constants
+ ******************************************************************************/
+constexpr char cache_sel_matrix::kNestLoc[];
+constexpr char cache_sel_matrix::kCacheProxDist[];
+constexpr char cache_sel_matrix::kBlockProxDist[];
+constexpr char cache_sel_matrix::kNestProxDist[];
+constexpr char cache_sel_matrix::kSiteXRange[];
+constexpr char cache_sel_matrix::kSiteYRange[];
+
+/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-cache_selection_matrix::cache_selection_matrix(
-    const struct params::cache_selection_matrix_params* const params,
+cache_sel_matrix::cache_sel_matrix(
+    const struct params::cache_sel_matrix_params* const params,
     const argos::CVector2& nest_loc) {
-  this->insert(std::make_pair("nest_loc", nest_loc));
-  this->insert(std::make_pair("cache_prox_dist", params->cache_prox_dist));
-  this->insert(std::make_pair("block_prox_dist", params->block_prox_dist));
-  this->insert(std::make_pair("nest_prox_dist", params->nest_prox_dist));
-  this->insert(std::make_pair("site_xrange", params->site_xrange));
-  this->insert(std::make_pair("site_yrange", params->site_yrange));
+  this->insert(std::make_pair(kNestLoc, nest_loc));
+  this->insert(std::make_pair(kCacheProxDist, params->cache_prox_dist));
+  this->insert(std::make_pair(kBlockProxDist, params->block_prox_dist));
+  this->insert(std::make_pair(kNestProxDist, params->nest_prox_dist));
+  this->insert(std::make_pair(kSiteXRange, params->site_xrange));
+  this->insert(std::make_pair(kSiteYRange, params->site_yrange));
 }
 
 NS_END(controller, fordyca);

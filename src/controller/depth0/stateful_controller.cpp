@@ -26,12 +26,12 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth0/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/block_selection_matrix_params.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ stateful_controller::~stateful_controller(void) = default;
  ******************************************************************************/
 
 void stateful_controller::block_sel_matrix(
-    std::unique_ptr<block_selection_matrix> m) {
+    std::unique_ptr<class block_sel_matrix> m) {
   m_block_sel_matrix = std::move(m);
 }
 
@@ -131,15 +131,15 @@ void stateful_controller::Init(ticpp::Element& node) {
       param_repo.parse_results<struct params::sensing_params>(),
       &saa_subsystem()->sensing()->sensor_list()));
 
-  auto* block_mat = param_repo.parse_results<params::block_selection_matrix_params>();
-  m_block_sel_matrix = rcppsw::make_unique<block_selection_matrix>(block_mat);
+  auto* block_mat = param_repo.parse_results<params::block_sel_matrix_params>();
+  m_block_sel_matrix = rcppsw::make_unique<class block_sel_matrix>(block_mat);
 
   m_fsm = rcppsw::make_unique<fsm::depth0::stateful_fsm>(
       m_block_sel_matrix.get(),
       base_controller::saa_subsystem(),
       m_perception->map());
 
-  
+
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

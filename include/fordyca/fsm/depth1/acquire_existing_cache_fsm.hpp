@@ -24,13 +24,19 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <random>
 #include <argos3/core/utility/math/vector2.h>
-#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth1);
+NS_START(fordyca);
+
+namespace controller { class cache_sel_matrix; }
+namespace representation { class perceived_arena_map; class cache; }
+
+NS_START(fsm, depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -43,10 +49,10 @@ NS_START(fordyca, fsm, depth1);
  * acquired (either a known existing cache or via random exploration), it
  * signals that it has completed its task.
  */
-class acquire_existing_cache_fsm : public base_acquire_cache_fsm,
+class acquire_existing_cache_fsm : public acquire_goal_fsm,
                                    public er::client<acquire_existing_cache_fsm> {
  public:
-  acquire_existing_cache_fsm(const controller::cache_selection_matrix* sel_matrix,
+  acquire_existing_cache_fsm(const controller::cache_sel_matrix* sel_matrix,
                              controller::saa_subsystem* saa,
                              ds::perceived_arena_map* map);
 
@@ -56,7 +62,16 @@ class acquire_existing_cache_fsm : public base_acquire_cache_fsm,
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
 
-  bool select_cache_for_acquisition(argos::CVector2 * acquisition) override;
+ private:
+  bool acquire_known_goal(void) override;
+  bool cache_acquired_cb(bool explore_result) const;
+  bool explore_goal_reached(void) const;
+  bool select_cache_for_acquisition(argos::CVector2 * acquisition);
+
+  // clang-format off
+  const controller::cache_sel_matrix* mc_sel_matrix;
+  std::default_random_engine          m_rd{};
+  // clang-format on
 };
 
 NS_END(depth1, fsm, fordyca);

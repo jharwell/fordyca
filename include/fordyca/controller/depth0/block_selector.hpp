@@ -28,7 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/perceived_block.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,7 @@ class block_selector: public rcppsw::er::client<block_selector> {
  public:
   using perceived_block_list = std::list<representation::perceived_block>;
 
-  explicit block_selector(const block_selection_matrix* sel_matrix);
+  explicit block_selector(const block_sel_matrix* sel_matrix);
 
   ~block_selector(void) override = default;
 
@@ -81,7 +81,7 @@ class block_selector: public rcppsw::er::client<block_selector> {
   static constexpr double kMinDist = 0.2;
 
   // clang-format off
-  const block_selection_matrix* const mc_matrix;
+  const block_sel_matrix* const mc_matrix;
   // clang-format on
 };
 

@@ -1,5 +1,5 @@
 /**
- * @file cache_selection_matrix_params.hpp
+ * @file block_sel_matrix_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,15 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/vector2.h>
+#include "fordyca/params/block_priority_params.hpp"
 #include "rcppsw/params/base_params.hpp"
-#include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,19 +37,16 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct cache_selection_matrix_params
+ * @struct block_sel_matrix_params
  * @ingroup params
  *
- * @brief XML parameters for the \ref cache_selection_matrix
+ * @brief XML parameters for the \ref block_sel_matrix
  */
-struct cache_selection_matrix_params : public rcppsw::params::base_params {
-  double                      cache_prox_dist{0.0};
-  double                      block_prox_dist{0.0};
-  double                      nest_prox_dist{0.0};
-  rcppsw::math::range<uint>   site_xrange{0, 0};
-  rcppsw::math::range<uint>   site_yrange{0, 0};
+struct block_sel_matrix_params : public rcppsw::params::base_params {
+  argos::CVector2 nest{};
+  struct block_priority_params priorities {};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SELECTION_MATRIX_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_ */

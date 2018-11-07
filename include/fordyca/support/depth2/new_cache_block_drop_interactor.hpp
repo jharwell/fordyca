@@ -128,8 +128,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(nullptr != dynamic_cast<tasks::depth2::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              acquisition_goal_type::kCacheSite == controller.current_task()->acquisition_goal(),
-              "Controller not waiting for cache site block drop");
+              acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),
+              "Controller not waiting for new cache block drop");
     auto cache_pair = loop_utils::new_cache_cache_proximity(controller,
                                                        *m_map,
                                                        m_cache_manager->cache_proximity_dist());
@@ -164,13 +164,12 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    * preconditions have been satisfied.
    */
   void perform_new_cache_block_drop(T& controller,
-                                     const temporal_penalty<T>& penalty) {
+                                    const temporal_penalty<T>& penalty) {
     events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
                                     math::rcoord_to_dcoord(controller.robot_loc(),
                                                            m_map->grid_resolution()),
                                     m_map->grid_resolution());
 
-    /* Update arena map state due to a free block drop */
     m_map->accept(drop_op);
     controller.visitor::template visitable_any<T>::accept(drop_op);
     m_floor->SetChanged();

@@ -48,8 +48,8 @@ NS_START(fordyca, fsm, depth1);
  */
 class block_to_existing_cache_fsm : public block_to_goal_fsm {
  public:
-  block_to_existing_cache_fsm(const controller::block_selection_matrix* bsel_matrix,
-                              const controller::cache_selection_matrix* csel_matrix,
+  block_to_existing_cache_fsm(const controller::block_sel_matrix* bsel_matrix,
+                              const controller::cache_sel_matrix* csel_matrix,
                               controller::saa_subsystem* saa,
                               ds::perceived_arena_map* map);
 
