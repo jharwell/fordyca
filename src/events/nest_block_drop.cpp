@@ -119,7 +119,8 @@ void nest_block_drop::visit(
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth1::collector& task) {

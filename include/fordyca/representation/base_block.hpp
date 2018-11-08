@@ -65,15 +65,28 @@ class base_block : public multicell_entity,
   static rcppsw::math::dcoord2 kOutOfSightDLoc;
   static argos::CVector2 kOutOfSightRLoc;
 
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   *
+   * Using this constructor, blocks are assigned the next available id, starting
+   * from 0.
+   */
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color)
       : multicell_entity(dim, color, -1), movable_cell_entity() {}
 
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   * @param id The id of the block.
+   */
   base_block(const rcppsw::math::vector2d& dim, const ut::color& color, int id)
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const base_block& other) const {
     return (this->id() == other.id());
   }
+  ~base_block(void) override = default;
 
   /* transport metrics */
   void reset_metrics(void) override;
@@ -118,8 +131,8 @@ class base_block : public multicell_entity,
   void reset_robot_id(void) { m_robot_id = -1; }
 
   /**
-   * @brief change the base_block's location to something outside the visitable space
-   * in the arena when it is being carried by robot.
+   * @brief change the base_block's location to something outside the visitable
+   * space in the arena when it is being carried by robot.
    */
   void move_out_of_sight(void);
 
@@ -151,8 +164,8 @@ class base_block : public multicell_entity,
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+    return xspan(real_loc()).contains(point.GetX()) &&
+           yspan(real_loc()).contains(point.GetY());
   }
 
  private:

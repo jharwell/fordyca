@@ -40,8 +40,8 @@ tasking_oracle::tasking_oracle(const ta::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle") {
   graph->walk([&](const ta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
-    m_map.insert({"interface_est." + task->name(),
-            task->task_interface_estimate(0)});
+    m_map.insert(
+        {"interface_est." + task->name(), task->task_interface_estimate(0)});
     ER_WARN("Assuming all tasks have at most 1 interface");
   });
 }
@@ -53,8 +53,7 @@ tasking_oracle::mapped_type tasking_oracle::ask(const std::string& query) const 
   return m_map.find(query)->second;
 } /* ask() */
 
-void tasking_oracle::listener_add(
-    ta::bi_tdgraph_executive* const executive) {
+void tasking_oracle::listener_add(ta::bi_tdgraph_executive* const executive) {
   executive->task_abort_notify(
       std::bind(&tasking_oracle::task_abort_cb, this, std::placeholders::_1));
   executive->task_finish_notify(

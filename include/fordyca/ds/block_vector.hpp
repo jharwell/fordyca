@@ -1,7 +1,7 @@
 /**
- * @file stateful_controller_repository.cpp
+ * @file block_vector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,26 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_
+#define INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateful_controller_repository.hpp"
-#include "fordyca/params/block_sel_matrix_parser.hpp"
-#include "fordyca/params/occupancy_grid_parser.hpp"
+#include <vector>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca);
+namespace representation {
+class base_block;
+}
+NS_START(ds);
+
+using block_vector_type = std::shared_ptr<representation::base_block>;
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Type Definitions
  ******************************************************************************/
-stateful_controller_repository::stateful_controller_repository(void) {
-  register_parser<occupancy_grid_parser, occupancy_grid_params>(
-      occupancy_grid_parser::kXMLRoot, occupancy_grid_parser::kHeader1);
-  register_parser<block_sel_matrix_parser, block_sel_matrix_params>(
-      block_sel_matrix_parser::kXMLRoot, block_sel_matrix_parser::kHeader1);
-}
+using block_vector = std::vector<block_vector_type>;
 
-NS_END(depth0, params, fordyca);
+NS_END(ds, fordyca);
+
+#endif /* INCLUDE_FORDYCA_DS_BLOCK_VECTOR_HPP_ */

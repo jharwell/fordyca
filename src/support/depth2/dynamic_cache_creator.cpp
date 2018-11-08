@@ -47,10 +47,10 @@ dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cache_vector dynamic_cache_creator::create_all(
-    const cache_vector& existing_caches,
-    block_vector& candidate_blocks) {
-  cache_vector caches;
+ds::cache_vector dynamic_cache_creator::create_all(
+    const ds::cache_vector& existing_caches,
+    ds::block_vector& candidate_blocks) {
+  ds::cache_vector caches;
 
   std::string s =
       std::accumulate(candidate_blocks.begin(),
@@ -73,9 +73,8 @@ cache_vector dynamic_cache_creator::create_all(
     /*
      * Block already in a new cache
      */
-    if (std::find(used_blocks.begin(),
-                  used_blocks.end(),
-                  candidate_blocks[i]) != used_blocks.end()) {
+    if (std::find(used_blocks.begin(), used_blocks.end(), candidate_blocks[i]) !=
+        used_blocks.end()) {
       continue;
     }
     for (size_t j = i + 1; j < candidate_blocks.size(); ++j) {
@@ -119,7 +118,7 @@ cache_vector dynamic_cache_creator::create_all(
        * when selecting the location of the new cache, not just the caches that
        * currently exist.
        */
-      cache_vector avoid = existing_caches;
+      ds::cache_vector avoid = existing_caches;
       avoid.insert(avoid.end(), caches.begin(), caches.end());
       argos::CVector2 center = calc_center(cache_i_blocks, avoid);
       auto cache_p = std::shared_ptr<representation::arena_cache>(
@@ -140,7 +139,7 @@ cache_vector dynamic_cache_creator::create_all(
 
 argos::CVector2 dynamic_cache_creator::calc_center(
     const block_list& blocks,
-    const cache_vector& existing_caches) const {
+    const ds::cache_vector& existing_caches) const {
   double sumx = std::accumulate(
       std::begin(blocks), std::end(blocks), 0.0, [](double sum, const auto& b) {
         return sum + b->real_loc().GetX();
@@ -187,7 +186,7 @@ argos::CVector2 dynamic_cache_creator::calc_center(
     if (!conflict) {
       break;
     }
-  }   /* for(i..) */
+  } /* for(i..) */
 
   /*
    * @todo This will definitely need to be changed later, because it may very
@@ -203,11 +202,10 @@ argos::CVector2 dynamic_cache_creator::calc_center(
 bool dynamic_cache_creator::deconflict_cache_center(
     const representation::base_cache& cache,
     argos::CVector2& center) const {
-
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
 
-    auto exc_xspan = cache.xspan(cache.real_loc());
+  auto exc_xspan = cache.xspan(cache.real_loc());
   auto exc_yspan = cache.yspan(cache.real_loc());
   auto newc_xspan = cache.xspan(center);
   auto newc_yspan = cache.yspan(center);
@@ -223,41 +221,43 @@ bool dynamic_cache_creator::deconflict_cache_center(
   double y_min = exc_yspan.span() * 1.5;
 
   if (newc_xspan.overlaps_with(exc_xspan)) {
-    ER_TRACE("xspan=[%f,%f] overlap cache%d@(%f,%f) xspan=[%f-%f] center=(%f,%f)",
-             newc_xspan.get_min(),
-             newc_xspan.get_max(),
-             cache.id(),
-             cache.real_loc().GetX(),
-             cache.real_loc().GetY(),
-             exc_xspan.get_min(),
-             exc_xspan.get_max(),
-             center.GetX(),
-             center.GetY());
-    center.SetX(std::max(x_min,
-                         std::min(x_max, center.GetX() +
-                                  xrnd(m_rng) * newc_xspan.span())));
+    ER_TRACE(
+        "xspan=[%f,%f] overlap cache%d@(%f,%f) xspan=[%f-%f] center=(%f,%f)",
+        newc_xspan.lb(),
+        newc_xspan.ub(),
+        cache.id(),
+        cache.real_loc().GetX(),
+        cache.real_loc().GetY(),
+        exc_xspan.lb(),
+        exc_xspan.ub(),
+        center.GetX(),
+        center.GetY());
+    center.SetX(std::max(
+        x_min,
+        std::min(x_max, center.GetX() + xrnd(m_rng) * newc_xspan.span())));
     return false;
   } else if (newc_yspan.overlaps_with(exc_yspan)) {
-    ER_TRACE("yspan=[%f,%f] overlap cache%d@(%f,%f) yspan=[%f-%f] center=(%f,%f)",
-             newc_xspan.get_min(),
-             newc_xspan.get_max(),
-             cache.id(),
-             cache.real_loc().GetX(),
-             cache.real_loc().GetY(),
-             exc_yspan.get_min(),
-             exc_yspan.get_max(),
-             center.GetX(),
-             center.GetY());
-    center.SetY(std::max(y_min,
-                         std::min(y_max, center.GetY() +
-                                  yrnd(m_rng) * newc_yspan.span())));
+    ER_TRACE(
+        "yspan=[%f,%f] overlap cache%d@(%f,%f) yspan=[%f-%f] center=(%f,%f)",
+        newc_xspan.lb(),
+        newc_xspan.ub(),
+        cache.id(),
+        cache.real_loc().GetX(),
+        cache.real_loc().GetY(),
+        exc_yspan.lb(),
+        exc_yspan.ub(),
+        center.GetX(),
+        center.GetY());
+    center.SetY(std::max(
+        y_min,
+        std::min(y_max, center.GetY() + yrnd(m_rng) * newc_yspan.span())));
     return false;
   }
   return true;
 } /* deconflict_cache_center() */
 
 bool dynamic_cache_creator::creation_sanity_checks(
-    const cache_vector& caches) const {
+    const ds::cache_vector& caches) const {
   for (auto& c1 : caches) {
     for (auto& c2 : caches) {
       if (c1->id() == c2->id()) {
@@ -275,17 +275,18 @@ bool dynamic_cache_creator::creation_sanity_checks(
         auto c2_yspan = c2->yspan(c2->real_loc());
         ER_ASSERT(!(c1_xspan.overlaps_with(c2_xspan) &&
                     c1_yspan.overlaps_with(c2_yspan)),
-                  "Cache%d xspan=[%f-%f], yspan=[%f,%f] overlaps cache%d xspan=[%f-%f],yspan=[%f,%f]",
+                  "Cache%d xspan=[%f-%f], yspan=[%f,%f] overlaps cache%d "
+                  "xspan=[%f-%f],yspan=[%f,%f]",
                   c1->id(),
-                  c1_xspan.get_min(),
-                  c1_xspan.get_max(),
-                  c1_yspan.get_min(),
-                  c1_yspan.get_max(),
+                  c1_xspan.lb(),
+                  c1_xspan.ub(),
+                  c1_yspan.lb(),
+                  c1_yspan.ub(),
                   c2->id(),
-                  c2_xspan.get_min(),
-                  c2_xspan.get_max(),
-                  c2_yspan.get_min(),
-                  c2_yspan.get_max());
+                  c2_xspan.lb(),
+                  c2_xspan.ub(),
+                  c2_yspan.lb(),
+                  c2_yspan.ub());
       } /* for(&b..) */
     }   /* for(&c2..) */
   }     /* for(&c1..) */

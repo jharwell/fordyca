@@ -28,8 +28,8 @@
 #include <list>
 #include <utility>
 #include "rcppsw/ds/base_grid2D.hpp"
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/dcoord.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

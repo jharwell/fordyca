@@ -60,8 +60,7 @@ void block_vanished::visit(controller::depth0::stateless_controller& controller)
 void block_vanished::visit(controller::depth0::stateful_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
-  dynamic_cast<fsm::depth0::stateful_fsm*>(controller.fsm())
-      ->accept(*this);
+  dynamic_cast<fsm::depth0::stateful_fsm*>(controller.fsm())->accept(*this);
   controller.ndc_pop();
 } /* visit() */
 
@@ -95,7 +94,8 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void block_vanished::visit(tasks::depth1::harvester& task) {

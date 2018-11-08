@@ -42,9 +42,10 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_goal_fsm::acquire_goal_fsm(controller::saa_subsystem* saa,
-                                   const ds::perceived_arena_map* const map,
-                                   std::function<bool(void)> explore_goal_reached_cb)
+acquire_goal_fsm::acquire_goal_fsm(
+    controller::saa_subsystem* saa,
+    const ds::perceived_arena_map* const map,
+    std::function<bool(void)> explore_goal_reached_cb)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),

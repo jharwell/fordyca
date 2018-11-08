@@ -110,8 +110,8 @@ void depth1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph = dynamic_cast<const ta::bi_tdgraph*>(
-        controller0.executive()->graph());
+    auto* bigraph =
+        dynamic_cast<const ta::bi_tdgraph*>(controller0.executive()->graph());
     m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
   }
 } /* oracle_init() */
@@ -264,19 +264,19 @@ void depth1_loop_functions::pre_step_final(void) {
                                                     n_collectors);
 
     if (pair.first) {
-        arena_map()->caches_add(pair.second);
-        __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
-            arena_map()->caches()[0]->discrete_loc());
-        ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                  "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-                  arena_map()->caches()[0]->n_blocks(),
-                  cell.block_count());
-        m_cache_manager->cache_created();
-        floor()->SetChanged();
-      } else {
-        ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
-      }
+      arena_map()->caches_add(pair.second);
+      __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
+          arena_map()->caches()[0]->discrete_loc());
+      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
+                "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+                arena_map()->caches()[0]->n_blocks(),
+                cell.block_count());
+      m_cache_manager->cache_created();
+      floor()->SetChanged();
+    } else {
+      ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
     }
+  }
 
   if (arena_map()->caches_removed() > 0) {
     m_cache_manager->cache_depleted();
@@ -297,9 +297,9 @@ void depth1_loop_functions::cache_handling_init(
      * Regardless of how many foragers/etc there are, always create an
      * initial cache.
      */
-    argos::CVector2 cache_loc = argos::CVector2((arena_map()->xrsize() +
-                                                 arena_map()->nest().real_loc().GetX()) / 2.0,
-                                                arena_map()->nest().real_loc().GetY());
+    argos::CVector2 cache_loc = argos::CVector2(
+        (arena_map()->xrsize() + arena_map()->nest().real_loc().GetX()) / 2.0,
+        arena_map()->nest().real_loc().GetY());
 
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
         cachep, &arena_map()->decoratee(), cache_loc);

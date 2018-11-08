@@ -121,8 +121,8 @@ class base_cache : public multicell_entity,
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+    return xspan(real_loc()).contains(point.GetX()) &&
+           yspan(real_loc()).contains(point.GetY());
   }
 
   /**
@@ -136,7 +136,7 @@ class base_cache : public multicell_entity,
    * @brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
-  std::shared_ptr<base_block> block_get(void) { return m_blocks.front(); }
+  std::shared_ptr<base_block> oldest_block(void) { return m_blocks.front(); }
 
   std::unique_ptr<base_cache> clone(void) const override;
 

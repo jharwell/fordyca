@@ -60,15 +60,13 @@ representation::perceived_block block_selector::calc_best(
      */
     double priority =
         (dynamic_cast<representation::cube_block*>(b.ent.get()))
-        ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
-        : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
+            ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
+            : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     argos::CVector2 nest_loc =
         boost::get<argos::CVector2>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent->real_loc(),
-                                         nest_loc)(robot_loc,
-                                                   b.density.last_result(),
-                                                   priority);
+    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
+        robot_loc, b.density.last_result(), priority);
 
     ER_DEBUG("Utility for block%d loc=(%u, %u), density=%f: %f",
              b.ent->id(),
@@ -91,7 +89,8 @@ representation::perceived_block block_selector::calc_best(
             best.ent->discrete_loc().second,
             max_utility);
   } else {
-    ER_WARN("No best block found: all known blocks too close/on exception list!");
+    ER_WARN(
+        "No best block found: all known blocks too close/on exception list!");
   }
   return best;
 } /* calc_best() */
@@ -101,24 +100,24 @@ bool block_selector::block_is_excluded(
     const representation::base_block* const block) const {
   if ((robot_loc - block->real_loc()).Length() <= kMinDist) {
     ER_INFO("Ignoring block%d@(%f,%f) [%u, %u]: Too close (%f < %f)",
-             block->id(),
-             block->real_loc().GetX(),
-             block->real_loc().GetY(),
-             block->discrete_loc().first,
-             block->discrete_loc().second,
-             (robot_loc - block->real_loc()).Length(),
-             kMinDist);
+            block->id(),
+            block->real_loc().GetX(),
+            block->real_loc().GetY(),
+            block->discrete_loc().first,
+            block->discrete_loc().second,
+            (robot_loc - block->real_loc()).Length(),
+            kMinDist);
     return true;
   }
-  std::vector<int> exceptions =
-      boost::get<std::vector<int>>(mc_matrix->find(bselm::kSelExceptions)->second);
-  if (std::any_of(exceptions.begin(),
-                  exceptions.end(),
-                  [&](int id) { return id == block->id(); })) {
+  std::vector<int> exceptions = boost::get<std::vector<int>>(
+      mc_matrix->find(bselm::kSelExceptions)->second);
+  if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
+        return id == block->id();
+      })) {
     ER_INFO("Ignoring block%d@(%f,%f): On exception list",
-             block->id(),
-             block->real_loc().GetX(),
-             block->real_loc().GetY());
+            block->id(),
+            block->real_loc().GetX(),
+            block->real_loc().GetY());
     return true;
   }
   return false;

@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"

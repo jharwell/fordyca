@@ -67,7 +67,7 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
 
   m_metrics_agg =
       rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
-                                                     output_root());
+                                                       output_root());
 
   /* intitialize robot interactions with environment */
   m_interactor =
@@ -88,14 +88,13 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-void stateful_loop_functions::controller_configure(controller::base_controller& c) {
-  auto& stateful =
-      dynamic_cast<controller::depth0::stateful_controller&>(c);
+void stateful_loop_functions::controller_configure(
+    controller::base_controller& c) {
+  auto& stateful = dynamic_cast<controller::depth0::stateful_controller&>(c);
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto* vparams =
-      params().parse_results<struct params::visualization_params>();
+  auto* vparams = params().parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     stateful.display_los(vparams->robot_los);
   }

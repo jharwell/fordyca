@@ -41,9 +41,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
     const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* saa,
     ds::perceived_arena_map* const map)
-    : acquire_goal_fsm(saa,
-                       map,
-                       std::bind([]() noexcept { return false; })),
+    : acquire_goal_fsm(saa, map, std::bind([]() noexcept { return false; })),
       ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       mc_sel_matrix(csel_matrix) {}
 
@@ -79,7 +77,7 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration");
   argos::CVector2 position = saa_subsystem()->sensing()->position();
-  for (auto &b : map()->blocks()) {
+  for (auto& b : map()->blocks()) {
     if ((b->real_loc() - position).Length() <= vector_fsm::kCACHE_ARRIVAL_TOL) {
       return true;
     }

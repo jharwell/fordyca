@@ -95,6 +95,9 @@ class random_distributor : public base_distributor,
   bool verify_block_dist(const representation::base_block& block,
                          const ds::cell2D* cell);
 
+  bool entity_contains_coord(const representation::multicell_entity* entity,
+                             double abs_x,
+                             double abs_y);
   // clang-format off
   double                     m_resolution;
   std::default_random_engine m_rng{std::random_device{}()};

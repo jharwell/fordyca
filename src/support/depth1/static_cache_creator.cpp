@@ -45,9 +45,9 @@ static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cache_vector static_cache_creator::create_all(
-    const cache_vector& existing_caches,
-    block_vector& blocks) {
+ds::cache_vector static_cache_creator::create_all(
+    const ds::cache_vector& existing_caches,
+    ds::block_vector& blocks) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 

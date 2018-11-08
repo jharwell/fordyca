@@ -91,28 +91,27 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
                           const std::shared_ptr<representation::base_block>& b) {
                         return a + "b" + std::to_string(b->id()) + ",";
                       });
-  block_vector block_vec(blocks.begin(), blocks.end());
-  auto ret = rcppsw::make_unique<representation::arena_cache>( m_cache_dim,
-                                                               m_grid->resolution(),
-                                                               center,
-                                                               block_vec,
-                                                               -1);
-  ER_INFO("Create cache%d@(%f,%f) [%u,%u], xspan=[%f-%f],yspan=[%f-%f] with %zu blocks [%s]",
-          ret->id(),
-          ret->real_loc().GetX(),
-          ret->real_loc().GetY(),
-          ret->discrete_loc().first,
-          ret->discrete_loc().second,
-          ret->xspan(ret->real_loc()).get_min(),
-          ret->xspan(ret->real_loc()).get_max(),
-          ret->yspan(ret->real_loc()).get_min(),
-          ret->yspan(ret->real_loc()).get_max(),
-          ret->n_blocks(),
-          s.c_str());
+  ds::block_vector block_vec(blocks.begin(), blocks.end());
+  auto ret = rcppsw::make_unique<representation::arena_cache>(
+      m_cache_dim, m_grid->resolution(), center, block_vec, -1);
+  ER_INFO(
+      "Create cache%d@(%f,%f) [%u,%u], xspan=[%f-%f],yspan=[%f-%f] with %zu "
+      "blocks [%s]",
+      ret->id(),
+      ret->real_loc().GetX(),
+      ret->real_loc().GetY(),
+      ret->discrete_loc().first,
+      ret->discrete_loc().second,
+      ret->xspan(ret->real_loc()).lb(),
+      ret->xspan(ret->real_loc()).ub(),
+      ret->yspan(ret->real_loc()).lb(),
+      ret->yspan(ret->real_loc()).ub(),
+      ret->n_blocks(),
+      s.c_str());
   return ret;
 } /* create_single_cache() */
 
-void base_cache_creator::update_host_cells(cache_vector& caches) {
+void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
   /*
    * To reset all cells covered by a cache's extent, we simply send them a
    * CACHE_EXTENT event. EXCEPT for the cell that hosted the actual cache,
@@ -124,14 +123,10 @@ void base_cache_creator::update_host_cells(cache_vector& caches) {
 
     auto xspan = cache->xspan(cache->real_loc());
     auto yspan = cache->yspan(cache->real_loc());
-    uint xmin =
-        static_cast<uint>(std::ceil(xspan.get_min() / m_grid->resolution()));
-    uint xmax =
-        static_cast<uint>(std::ceil(xspan.get_max() / m_grid->resolution()));
-    uint ymin =
-        static_cast<uint>(std::ceil(yspan.get_min() / m_grid->resolution()));
-    uint ymax =
-        static_cast<uint>(std::ceil(yspan.get_max() / m_grid->resolution()));
+    uint xmin = static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution()));
+    uint xmax = static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution()));
+    uint ymin = static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution()));
+    uint ymax = static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution()));
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {

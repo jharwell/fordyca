@@ -53,7 +53,7 @@ namespace decorator = rcppsw::patterns::decorator;
  * @class cell2D
  * @ingroup ds
  *
- * @brief Base ds of a cell on a 2D grid. A combination of FSM +
+ * @brief Base representation of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref cell_entity the cell contains, if any.
  */
 class cell2D : public visitor::visitable_any<cell2D>,
@@ -113,7 +113,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
   /**
    * @brief Get the cache entity associated with this cell.
    *
-   * Will be NULL unless it contains a block, so check the cell's state before
+   * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
   const std::shared_ptr<representation::base_cache> cache(void) const;

@@ -29,8 +29,8 @@
 
 #include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,9 +74,10 @@ void stateful_metrics_aggregator::collect_from_controller(
   collect("blocks::manipulation", *manip_m);
   collect("fsm::movement", *mov_m);
 
-  auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
-  auto block_acq_m =
-      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller->fsm());
+  auto collision_m =
+      dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
+  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+      controller->fsm());
   ER_ASSERT(block_acq_m,
             "Controller does not provide FSM block acquisition metrics");
   ER_ASSERT(collision_m, "FSM does not provide collision metrics");

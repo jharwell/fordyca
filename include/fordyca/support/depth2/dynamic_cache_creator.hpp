@@ -55,8 +55,8 @@ class dynamic_cache_creator : public base_cache_creator,
    * @brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cache_vector create_all(const cache_vector& existing_caches,
-                          block_vector& candidate_blocks) override;
+  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                          ds::block_vector& candidate_blocks) override;
 
  private:
   static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
@@ -76,12 +76,12 @@ class dynamic_cache_creator : public base_cache_creator,
    * @return Coordinates of the new cache.
    */
   argos::CVector2 calc_center(const block_list& blocks,
-                              const cache_vector& existing_caches) const;
+                              const ds::cache_vector& existing_caches) const;
 
   /**
    * @brief Basic sanity checks on newly created caches.
    */
-  bool creation_sanity_checks(const cache_vector& new_caches) const;
+  bool creation_sanity_checks(const ds::cache_vector& new_caches) const;
 
   /**
    * @brief Deconflict new cache cache from overlapping with any existing caches

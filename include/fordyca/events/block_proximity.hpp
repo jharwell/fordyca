@@ -33,12 +33,16 @@
 NS_START(fordyca);
 namespace controller { namespace depth2 {
 class greedy_recpart_controller;
-}}
+}} // namespace controller::depth2
 namespace representation {
 class base_block;
 }
-namespace fsm { namespace depth1 { class block_to_goal_fsm; }}
-namespace tasks { namespace depth2 { class cache_starter; }}
+namespace fsm { namespace depth1 {
+class block_to_goal_fsm;
+}} // namespace fsm::depth1
+namespace tasks { namespace depth2 {
+class cache_starter;
+}} // namespace tasks::depth2
 
 NS_START(events);
 namespace visitor = rcppsw::patterns::visitor;
@@ -53,12 +57,14 @@ namespace visitor = rcppsw::patterns::visitor;
  * @brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.
  */
-class block_proximity : public visitor::visit_set<controller::depth2::greedy_recpart_controller,
-                                                  fsm::depth1::block_to_goal_fsm,
-                                                  tasks::depth2::cache_starter>,
-                        public rcppsw::er::client<block_proximity> {
+class block_proximity
+    : public visitor::visit_set<controller::depth2::greedy_recpart_controller,
+                                fsm::depth1::block_to_goal_fsm,
+                                tasks::depth2::cache_starter>,
+      public rcppsw::er::client<block_proximity> {
  public:
-  explicit block_proximity(const std::shared_ptr<representation::base_block>& block);
+  explicit block_proximity(
+      const std::shared_ptr<representation::base_block>& block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;

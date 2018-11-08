@@ -73,7 +73,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
     ER_TRACE("Block hidden by cache%d", robot_on_cache(pos));
     return -1;
   }
-  for (auto &b : m_blocks) {
+  for (auto& b : m_blocks) {
     if (b->contains_point(pos)) {
       return b->id();
     }
@@ -82,7 +82,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
 } /* robot_on_block() */
 
 __rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
-  for (auto &c : m_caches) {
+  for (auto& c : m_caches) {
     if (c->contains_point(pos)) {
       return c->id();
     }
@@ -139,7 +139,7 @@ void arena_map::cache_remove(
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
-  ER_ASSERT(caches().size() == before - 1, "cache%d not removed", id);
+  ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
@@ -153,10 +153,10 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  uint xmin = static_cast<uint>(std::ceil(xspan.get_min() / grid_resolution()));
-  uint xmax = static_cast<uint>(std::ceil(xspan.get_max() / grid_resolution()));
-  uint ymin = static_cast<uint>(std::ceil(yspan.get_min() / grid_resolution()));
-  uint ymax = static_cast<uint>(std::ceil(yspan.get_max() / grid_resolution()));
+  uint xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
+  uint xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
+  uint ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
+  uint ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {

@@ -52,13 +52,11 @@ void arena_map_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid << m_blocks << m_nest
-         << build_footer();
+  stream << build_header() << m_grid << m_blocks << m_nest << build_footer();
 } /* show() */
 
 __rcsw_pure bool arena_map_parser::validate(void) const {
-  return m_grid.validate() && m_blocks.validate() &&
-         m_nest.validate();
+  return m_grid.validate() && m_blocks.validate() && m_nest.validate();
 } /* validate() */
 
 NS_END(arena, params, fordyca);

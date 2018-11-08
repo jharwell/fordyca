@@ -49,8 +49,8 @@ class static_cache_creator : public base_cache_creator,
                        const argos::CVector2& center,
                        double cache_dim);
 
-  cache_vector create_all(const cache_vector& existing_caches,
-                          block_vector& blocks) override;
+  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                              ds::block_vector& blocks) override;
 
  private:
   // clang-format off

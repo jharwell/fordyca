@@ -62,7 +62,7 @@ cached_block_pickup::cached_block_pickup(
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
             base_cache::kMinBlocks);
-  m_pickup_block = m_real_cache->block_get();
+  m_pickup_block = m_real_cache->oldest_block();
   ER_ASSERT(m_pickup_block, "No block in non-empty cache");
 }
 
@@ -140,7 +140,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
   } else {
     m_real_cache->accept(*this);
-    m_orphan_block = m_real_cache->block_get();
+    m_orphan_block = m_real_cache->oldest_block();
     cell.accept(*this);
 
     ER_ASSERT(cell.state_has_block(),

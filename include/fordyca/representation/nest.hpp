@@ -62,8 +62,8 @@ class nest : public multicell_entity, public immovable_cell_entity {
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+    return xspan(real_loc()).contains(point.GetX()) &&
+           yspan(real_loc()).contains(point.GetY());
   }
 };
 

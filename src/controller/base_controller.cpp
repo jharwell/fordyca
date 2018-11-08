@@ -166,9 +166,11 @@ void base_controller::output_init(
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"),
                       output_root + "/fsm.log");
 
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.saa_subsystem"),
+  client::set_logfile(log4cxx::Logger::getLogger(
+                          "fordyca.controller.saa_subsystem"),
                       output_root + "/saa.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+  client::set_logfile(log4cxx::Logger::getLogger(
+                          "fordyca.controller.explore_behavior"),
                       output_root + "/saa.log");
 #endif
 } /* output_init() */

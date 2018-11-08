@@ -42,7 +42,6 @@ void dynamic_cache_parser::parse(const ticpp::Element& node) {
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-
   XML_PARSE_ATTR(cnode, m_params, enable);
   if (m_params->enable) {
     XML_PARSE_ATTR(cnode, m_params, min_dist);

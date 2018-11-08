@@ -121,16 +121,14 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
    * as well, which should be ignored.
    */
   if (!(task1::task_in_depth1(task) || task0::task_in_depth0(task))) {
-      return;
+    return;
   }
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-
-void depth1_metrics_aggregator::task_alloc_cb(
-    const ta::polled_task* const,
-    const ta::bi_tab* const tab) {
+void depth1_metrics_aggregator::task_alloc_cb(const ta::polled_task* const,
+                                              const ta::bi_tab* const tab) {
   /*
    * Depth [0,1,2] metrics aggregators are registered on the same executive,
    * so this function will be called for the task allocations for any depth,

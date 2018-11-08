@@ -37,7 +37,8 @@ cache_site_utility::cache_site_utility(const argos::CVector2& robot_loc,
                                        const argos::CVector2& nest_loc)
     : sigmoid(4.0, 1.0, 1.0),
       ER_CLIENT_INIT("fordyca.math.cache_site_utility"),
-      mc_robot_loc(robot_loc), mc_nest_loc(nest_loc) {}
+      mc_robot_loc(robot_loc),
+      mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
@@ -45,15 +46,16 @@ cache_site_utility::cache_site_utility(const argos::CVector2& robot_loc,
 double cache_site_utility::calc(const argos::CVector2& site_loc) {
   argos::CVector2 ideal_loc = (mc_robot_loc + mc_nest_loc) / 2;
   double deviation_from_ideal = (site_loc - ideal_loc).Length();
-  double theta =  reactivity() * (deviation_from_ideal - offset());
+  double theta = reactivity() * (deviation_from_ideal - offset());
   double deviation_scaling = gamma() * 1.0 / (1.0 + std::exp(theta));
-  ER_TRACE("ideal_loc=(%f,%f), point=(%f,%f), deviation=%f, deviation_scaling=%f",
-          ideal_loc.GetX(),
-          ideal_loc.GetY(),
-          site_loc.GetX(),
-          site_loc.GetY(),
-          deviation_from_ideal,
-          deviation_scaling)
+  ER_TRACE(
+      "ideal_loc=(%f,%f), point=(%f,%f), deviation=%f, deviation_scaling=%f",
+      ideal_loc.GetX(),
+      ideal_loc.GetY(),
+      site_loc.GetX(),
+      site_loc.GetY(),
+      deviation_from_ideal,
+      deviation_scaling)
 
   /*
    * If we don't impose a minimum distance the cache site has to be from the
@@ -65,7 +67,8 @@ double cache_site_utility::calc(const argos::CVector2& site_loc) {
    */
   double dist_to_robot = std::max(1.0, (site_loc - mc_robot_loc).Length());
   double dist_to_nest = (site_loc - ideal_loc).Length();
-  ER_TRACE("Utility: %f", (1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
+  ER_TRACE("Utility: %f",
+           (1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
   if (deviation_from_ideal <= std::numeric_limits<double>::epsilon()) {
     return set_result(std::numeric_limits<double>::min());
   }

@@ -48,8 +48,8 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void cache_sel_matrix_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_ATTR_STR(m_params, cache_prox_dist) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, cache_prox_dist)
+         << std::endl
          << XML_ATTR_STR(m_params, block_prox_dist) << std::endl
          << XML_ATTR_STR(m_params, nest_prox_dist) << std::endl
          << XML_ATTR_STR(m_params, site_xrange) << std::endl

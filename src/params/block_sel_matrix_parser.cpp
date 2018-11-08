@@ -53,8 +53,7 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 void block_sel_matrix_parser::show(std::ostream& stream) const {
-  stream << build_header()
-         << XML_ATTR_STR(m_params, nest) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, nest) << std::endl
          << m_priorities << std::endl
          << build_footer();
 } /* show() */

@@ -94,10 +94,8 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_alloc_cb(
-    const ta::polled_task* const task,
-    const ta::bi_tab* const tab) {
-
+void depth2_metrics_aggregator::task_alloc_cb(const ta::polled_task* const task,
+                                              const ta::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {

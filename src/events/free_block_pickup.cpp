@@ -185,7 +185,8 @@ void free_block_pickup::visit(
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth1::harvester& task) {

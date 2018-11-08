@@ -49,10 +49,7 @@ explore_for_goal_fsm::explore_for_goal_fsm(
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       mc_state_map{
           HFSM_STATE_MAP_ENTRY_EX(&start),
-          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore,
-                                      nullptr,
-                                      &entry_explore,
-                                      nullptr),
+          HFSM_STATE_MAP_ENTRY_EX_ALL(&explore, nullptr, &entry_explore, nullptr),
           HFSM_STATE_MAP_ENTRY_EX(&finished)},
       m_explore_behavior(std::move(behavior)),
       m_goal_detect(goal_detect) {}

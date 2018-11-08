@@ -48,13 +48,14 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<bool, cache_vector> dynamic_cache_manager::create(
-    cache_vector& existing_caches,
-    block_vector& blocks) {
-  support::depth2::dynamic_cache_creator creator(arena_grid(),
-                                                 mc_cache_params.dimension,
-                                                 mc_cache_params.dynamic.min_dist,
-                                                 mc_cache_params.dynamic.min_blocks);
+std::pair<bool, ds::cache_vector> dynamic_cache_manager::create(
+    ds::cache_vector& existing_caches,
+    ds::block_vector& blocks) {
+  support::depth2::dynamic_cache_creator creator(
+      arena_grid(),
+      mc_cache_params.dimension,
+      mc_cache_params.dynamic.min_dist,
+      mc_cache_params.dynamic.min_blocks);
 
   /*
    * Only blocks that are not:
@@ -66,7 +67,7 @@ std::pair<bool, cache_vector> dynamic_cache_manager::create(
    */
   auto pair = calc_blocks_for_creation(existing_caches, blocks);
   if (!pair.first) {
-    return std::make_pair(false, cache_vector());
+    return std::make_pair(false, ds::cache_vector());
   }
   auto created = creator.create_all(existing_caches, pair.second);
 
@@ -78,9 +79,9 @@ std::pair<bool, cache_vector> dynamic_cache_manager::create(
   return std::make_pair(!created.empty(), created);
 } /* create() */
 
-std::pair<bool, block_vector> dynamic_cache_manager::calc_blocks_for_creation(
-    const cache_vector& existing_caches,
-    block_vector& blocks) {
+std::pair<bool, ds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
+    const ds::cache_vector& existing_caches,
+    ds::block_vector& blocks) {
   /*
    * Only blocks that are not:
    *
@@ -89,7 +90,7 @@ std::pair<bool, block_vector> dynamic_cache_manager::calc_blocks_for_creation(
    *
    * are eligible for being part of a dynamically created cache.
    */
-  block_vector to_use;
+  ds::block_vector to_use;
   std::copy_if(blocks.begin(),
                blocks.end(),
                std::back_inserter(to_use),
@@ -98,7 +99,8 @@ std::pair<bool, block_vector> dynamic_cache_manager::calc_blocks_for_creation(
                                     existing_caches.end(),
                                     [&](const auto& c) {
                                       return !c->contains_block(b);
-                                    }) &&  -1 == b->robot_id();
+                                    }) &&
+                        -1 == b->robot_id();
                });
 
   bool ret = true;
@@ -109,16 +111,13 @@ std::pair<bool, block_vector> dynamic_cache_manager::calc_blocks_for_creation(
      * set of blocks into an int).
      */
     uint count = 0;
-    std::for_each(to_use.begin(),
-                  to_use.end(),
-                  [&](const auto& b) {
-                    count += (b->is_out_of_sight() ||
-                              std::any_of(existing_caches.begin(),
-                                          existing_caches.end(),
-                                          [&](const auto& c) {
-                                            return !c->contains_block(b);
-                                          }));
-                  });
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
+      count +=
+          (b->is_out_of_sight() ||
+           std::any_of(existing_caches.begin(),
+                       existing_caches.end(),
+                       [&](const auto& c) { return !c->contains_block(b); }));
+    });
 
     std::string accum;
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
@@ -136,7 +135,8 @@ std::pair<bool, block_vector> dynamic_cache_manager::calc_blocks_for_creation(
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
     ER_ASSERT(to_use.size() - count < mc_cache_params.dynamic.min_blocks,
-              "For new caches, %zu blocks SHOULD be available, but only %zu are (min=%u)",
+              "For new caches, %zu blocks SHOULD be available, but only %zu "
+              "are (min=%u)",
               to_use.size() - count,
               to_use.size(),
               mc_cache_params.dynamic.min_blocks);

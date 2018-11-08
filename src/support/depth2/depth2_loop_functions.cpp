@@ -158,9 +158,9 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
 
 void depth2_loop_functions::cache_handling_init(
     const struct params::caches::caches_params* const cachep) {
-  m_cache_manager = rcppsw::make_unique<dynamic_cache_manager>(
-      cachep,
-      &arena_map()->decoratee());
+  m_cache_manager =
+      rcppsw::make_unique<dynamic_cache_manager>(cachep,
+                                                 &arena_map()->decoratee());
 } /* cache_handlng_init() */
 
 
@@ -210,8 +210,8 @@ void depth2_loop_functions::PreStep() {
   } /* for(&entity..) */
 
   /* create new caches */
-  auto pair = m_cache_manager->create(arena_map()->caches(),
-                                      arena_map()->blocks());
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
   if (pair.first) {
     arena_map()->caches_add(pair.second);
     floor()->SetChanged();
@@ -230,8 +230,8 @@ void depth2_loop_functions::PreStep() {
 
 void depth2_loop_functions::Reset(void) {
   m_metrics_agg->reset_all();
-  auto pair = m_cache_manager->create(arena_map()->caches(),
-                                      arena_map()->blocks());
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
   if (pair.first) {
     arena_map()->caches_add(pair.second);
     floor()->SetChanged();

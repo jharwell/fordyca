@@ -34,11 +34,11 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
                              const ta::task_allocation_params* const params,
-                             std::unique_ptr<ta::taskable> mechanism) :
-    polled_task(name,
-                &params->abort,
-                &params->exec_est.ema,
-                std::move(mechanism)) {}
+                             std::unique_ptr<ta::taskable> mechanism)
+    : polled_task(name,
+                  &params->abort,
+                  &params->exec_est.ema,
+                  std::move(mechanism)) {}
 
 /*******************************************************************************
  * Constant Definitions
